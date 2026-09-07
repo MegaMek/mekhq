@@ -83,6 +83,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.InjuryType;
@@ -963,6 +964,12 @@ public class CampaignOptionsPane extends JPanel {
         boolean newIsAwardVeterancySPAs = newOptions.awardVeterancySPAs();
         if (!isStartUp && newIsAwardVeterancySPAs && !oldAwardVeterancySPAs) { // Has tracking changed?
             new VeterancyAwardsCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newIsUseSupportTeams = newOptions.useSupportTeams();
+        if (!isStartUp && newIsUseSupportTeams && !oldOptions.useSupportTeams()
+                  && SupportCarrierReconciler.hasStaffToOrganize(campaign)) { // Has tracking changed?
+            new SupportTeamsCampaignOptionsChangedConfirmationDialog(campaign, false);
         }
 
         boolean newIsUseMASHTheatres = newOptions.useMASHTheatres();

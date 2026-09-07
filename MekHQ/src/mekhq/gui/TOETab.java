@@ -71,12 +71,14 @@ import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.gui.adapter.TOEMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.MaplessStratConForcePicker;
 import mekhq.gui.dialog.MaplessStratConScenarioPicker;
+import mekhq.gui.dialog.SupportCarrierDeploymentDialogs;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.handler.TOETransferHandler;
 import mekhq.gui.model.CrewListModel;
@@ -182,6 +184,14 @@ public final class TOETab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private void deploymentButton() {
+        // The button acts on the whole TOE, not the highlighted node, but a player who has a support carrier or a
+        // support company highlighted reads it as "deploy this". Say up front that it will not, rather than running
+        // the whole flow in silence.
+        if (isHighlightedSupportOnly()) {
+            SupportCarrierDeploymentDialogs.showNothingToDeploy(getCampaign(), highlightedName());
+            return;
+        }
+
         // Build scenario list with mission mapping
         Map<Scenario, AbstractContract> scenarioMissionMap = new HashMap<>();
         for (AbstractContract mission : getCampaign().getActiveContracts()) {
@@ -214,6 +224,32 @@ public final class TOETab extends CampaignGuiTab {
         } else {
             deployToRegularScenario(selectedScenario);
         }
+    }
+
+    /**
+     * @return {@code true} if the highlighted node is a support carrier, or a formation holding only support carriers
+     */
+    private boolean isHighlightedSupportOnly() {
+        Object node = orgTree.getLastSelectedPathComponent();
+        if (node instanceof Unit unit) {
+            return SupportCarrierDeployment.staysHome(unit, null);
+        }
+        if (node instanceof Formation formation) {
+            return SupportCarrierDeployment.deploysNothing(getCampaign(), formation, null);
+        }
+        return false;
+    }
+
+    /** @return the display name of the highlighted node, for the dialog */
+    private String highlightedName() {
+        Object node = orgTree.getLastSelectedPathComponent();
+        if (node instanceof Unit unit) {
+            return unit.getName();
+        }
+        if (node instanceof Formation formation) {
+            return formation.getName();
+        }
+        return "";
     }
 
     /**
@@ -258,6 +294,8 @@ public final class TOETab extends CampaignGuiTab {
                                                      return campaign1.getPlayerForce().getFormation(id);
                                                  })
                                                  .filter(force -> force != null && !force.isDeployed())
+                                                 .filter(force -> !SupportCarrierDeployment.deploysNothing(campaign,
+                                                       force, selectedScenario))
                                                  .sorted(Comparator.comparing(Formation::getFullName))
                                                  .toList();
 
@@ -288,6 +326,8 @@ public final class TOETab extends CampaignGuiTab {
             selectedScenario.addForces(selectedFormation.getId());
             selectedFormation.setScenarioId(selectedScenario.getId(), getCampaign());
             MekHQ.triggerEvent(new DeploymentChangedEvent(selectedFormation, selectedScenario));
+
+            SupportCarrierDeploymentDialogs.showStayingHome(campaign, List.of(selectedFormation), selectedScenario);
         }
     }
 

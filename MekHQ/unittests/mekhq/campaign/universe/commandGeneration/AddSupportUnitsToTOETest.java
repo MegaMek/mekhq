@@ -33,11 +33,20 @@
 package mekhq.campaign.universe.commandGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.force.FormationType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import org.junit.jupiter.api.BeforeAll;
@@ -53,6 +62,7 @@ class AddSupportUnitsToTOETest {
     @BeforeAll
     static void initializeTypes() {
         EquipmentType.initializeTypes();
+        SkillType.initializeTypes();
     }
 
     @Test
@@ -71,5 +81,107 @@ class AddSupportUnitsToTOETest {
               .filter(formation -> formation.getName().equalsIgnoreCase(label))
               .count();
         assertEquals(1, matching, "a second support batch of the same type must reuse the existing formation");
+    }
+
+    @Test
+    void organize_collapsesASectionThatHoldsOneCompany() {
+        // Twelve administrators pack into two squads, which become one Administrator company under the Command
+        // section. That section then groups nothing, so it should hold the carriers itself rather than adding a layer
+        // - every extra layer pushes the whole TOE up an echelon.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        List<Person> administrators = new ArrayList<>();
+        for (int index = 0; index < 12; index++) {
+            administrators.add(campaign.getPlayerForce().getHumanResources()
+                                    .newPerson(campaign, PersonnelRole.ADMINISTRATOR, PersonnelRole.NONE));
+        }
+
+        SupportPersonnelToTOE.organize(campaign, administrators, false);
+
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        assertNotNull(supportCommand, "organize must record the Support Command formation");
+
+        // Command is the only section, so it collapses into Support Command too, leaving the carriers one step down.
+        assertTrue(supportCommand.getSubFormations().isEmpty(),
+              "a Support Command holding a single section must not keep the section layer");
+        assertEquals(2, supportCommand.getUnits().size(),
+              "both administrator carriers should hang directly off Support Command");
+
+        // Two squads is a platoon's worth, so that is what it says. Depth-based levels called this a Battalion.
+        assertEquals(FormationLevel.LANCE, supportCommand.getFormationLevel(),
+              "a support command holding two squads must be sized as a platoon, not by how deep the tree is");
+    }
+
+    @Test
+    void organize_joinsTheCampaignsExistingSupportHome() {
+        // A hand-built campaign keeps its support under whatever the player named it - here a Command Battalion with
+        // a convoy and a salvage detachment. Support Command must join it rather than standing up a rival
+        // Headquarters, which would leave the TOE with two support structures.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation origin = campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN);
+        Formation commandBattalion = new Formation("Command Battalion");
+        campaign.getPlayerForce().addFormation(commandBattalion, origin, campaign);
+        for (String name : List.of("Logistics", "Salvage")) {
+            Formation detachment = new Formation(name);
+            campaign.getPlayerForce().addFormation(detachment, commandBattalion, campaign);
+            detachment.setFormationType(name.equals("Salvage") ? FormationType.SALVAGE : FormationType.CONVOY, true);
+        }
+
+        List<Person> administrators = new ArrayList<>();
+        for (int index = 0; index < 12; index++) {
+            administrators.add(campaign.getPlayerForce().getHumanResources()
+                                     .newPerson(campaign, PersonnelRole.ADMINISTRATOR, PersonnelRole.NONE));
+        }
+        SupportPersonnelToTOE.organize(campaign, administrators, false);
+
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        assertNotNull(supportCommand);
+        assertEquals(commandBattalion.getId(), supportCommand.getParentFormation().getId(),
+              "Support Command must join the existing support home");
+        assertTrue(campaign.getPlayerForce().getAllFormations().stream()
+                    .noneMatch(formation -> formation.getName().equalsIgnoreCase("Headquarters")),
+              "no rival Headquarters may be created when the campaign already has a support home");
+    }
+
+    @Test
+    void organize_sizesEachSupportFormationByWhatItHolds() {
+        // 30 technicians pack into a full 28-person platoon plus a 2-person squad: 4 + 1 = 5 squads, which is more
+        // than one platoon and so reads as a company.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        List<Person> technicians = new ArrayList<>();
+        for (int index = 0; index < 30; index++) {
+            technicians.add(campaign.getPlayerForce().getHumanResources()
+                                  .newPerson(campaign, PersonnelRole.MEK_TECH, PersonnelRole.NONE));
+        }
+
+        SupportPersonnelToTOE.organize(campaign, technicians, false);
+
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        assertNotNull(supportCommand);
+        assertEquals(FormationLevel.COMPANY, supportCommand.getFormationLevel(),
+              "a platoon plus a squad is five squads, which is a company's worth");
+    }
+
+    @Test
+    void organize_keepsTheLayersThatSeparateProfessions() {
+        // Two professions means the companies actually tell them apart, so nothing collapses.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        List<Person> staff = new ArrayList<>();
+        for (int index = 0; index < 12; index++) {
+            staff.add(campaign.getPlayerForce().getHumanResources()
+                              .newPerson(campaign, PersonnelRole.MEK_TECH, PersonnelRole.NONE));
+        }
+        for (int index = 0; index < 12; index++) {
+            staff.add(campaign.getPlayerForce().getHumanResources()
+                              .newPerson(campaign, PersonnelRole.MECHANIC, PersonnelRole.NONE));
+        }
+
+        SupportPersonnelToTOE.organize(campaign, staff, false);
+
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        assertNotNull(supportCommand);
+        // Maintenance is still the only section, so it collapses into Support Command, but the two profession
+        // companies below it survive: they are what separates the technicians from the mechanics.
+        assertEquals(2, supportCommand.getSubFormations().size(),
+              "the two profession companies must survive, one per profession");
     }
 }

@@ -33,9 +33,14 @@
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
+import megamek.common.annotations.Nullable;
+import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
 import megamek.common.units.UnitType;
@@ -45,12 +50,16 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.icons.FormationPieceIcon;
 import mekhq.campaign.icons.LayeredFormationIcon;
 import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
+import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
+import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSection;
 
 /**
  * Builds layered formation icons for the Force Generator pipeline, covering every {@link FormationLevel}
@@ -76,6 +85,18 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 public final class FormationIconBuilder {
 
     private static final MMLogger LOGGER = MMLogger.create(FormationIconBuilder.class);
+
+    // The rulebook's common symbology (Core Rulebook p.28): a support formation is drawn for the job it does, not
+    // for the machines it rides in. Carriers are conventional infantry, so without these every support formation in
+    // the TOE would show the same infantry symbol.
+    /** StratOps type icon for medical staff and MASH-equipped vehicles. */
+    private static final String MEDICAL_TYPE_FILENAME = "Medical.png";
+    /** StratOps type icon for technicians and recovery vehicles. */
+    private static final String MAINTENANCE_TYPE_FILENAME = "Maintenance.png";
+    /** StratOps type icon for administrative staff. */
+    private static final String HEADQUARTERS_TYPE_FILENAME = "Headquarters (Staff).png";
+    /** StratOps type icon for a logistics convoy. */
+    private static final String SUPPLY_TYPE_FILENAME = "Supply.png";
 
     private FormationIconBuilder() {
         // utility class
@@ -132,6 +153,66 @@ public final class FormationIconBuilder {
      * itself is NOT decorated by this method — the caller already handled the root in
      * {@link #applyIcons}. Returns the count of decorated Formations.
      */
+    /**
+     * Decorates one existing formation and everything under it, using the campaign's own faction.
+     *
+     * <p>The generation pass above needs {@link CommandGenerationOptions} because it also decides the origin node's
+     * icon. Support teams organized after generation - a campaign that switched the option on - have no generation
+     * options to consult, but their formations should look like the generated ones, so this is the same builder
+     * without the origin-node question.</p>
+     *
+     * @param root     the formation to decorate, along with its subtree
+     * @param campaign the campaign the formation belongs to
+     *
+     * @return the number of formations decorated
+     */
+    public static int applyIconsToSubtree(@Nullable Formation root, @Nullable Campaign campaign) {
+        return applyIconsToFormations(root == null ? List.of() : List.of(root), campaign);
+    }
+
+    /**
+     * Decorates the named formations and everything under them, using the campaign's own faction.
+     *
+     * <p>Used by the support-team conversion, which knows exactly which formations it created and must not touch the
+     * player's own - their icons are their business.</p>
+     *
+     * @param formations the formations to decorate, each along with its subtree
+     * @param campaign   the campaign the formations belong to
+     *
+     * @return the number of formations decorated
+     */
+    public static int applyIconsToFormations(List<Formation> formations, @Nullable Campaign campaign) {
+        if ((campaign == null) || formations.isEmpty()) {
+            return 0;
+        }
+        if (MHQStaticDirectoryManager.getFormationIcons() == null) {
+            LOGGER.warn("[SupportTOE] applyIconsToSubtree: formation-icon directory unavailable, skipping");
+            return 0;
+        }
+
+        Faction iconFaction = campaign.getPlayerForce().getFaction();
+        if (iconFaction == null) {
+            return 0;
+        }
+        FormationPieceIcon background = buildBackgroundPiece(iconFaction);
+
+        int applied = 0;
+        for (Formation formation : formations) {
+            if (formation == null) {
+                continue;
+            }
+            LayeredFormationIcon icon = buildFormationIcon(formation, campaign, iconFaction, background);
+            if (icon != null) {
+                formation.setFormationIcon(icon);
+                applied++;
+            }
+            applied += applyToSubtree(formation, campaign, iconFaction, background);
+        }
+
+        LOGGER.info("[SupportTOE] applyIconsToFormations DONE; {} formation(s) decorated", applied);
+        return applied;
+    }
+
     private static int applyToSubtree(Formation parent, Campaign campaign, Faction iconFaction,
           FormationPieceIcon background) {
         int count = 0;
@@ -229,6 +310,23 @@ public final class FormationIconBuilder {
      */
     private static void appendTypePieces(LayeredFormationIcon icon, Formation formation, Campaign campaign) {
         icon.getPieces().putIfAbsent(LayeredFormationIconLayer.TYPE, new ArrayList<>());
+
+        // A field hospital or a recovery detachment is a formation of vehicles, and vehicles have no StratOps
+        // silhouette, so the generic path below would give them nothing but a weight-class letter. StratOps ships an
+        // icon for both jobs, so use it: what the formation is for reads better than how heavy it is.
+        String purposeIcon = purposeIconFor(formation, campaign);
+        if (purposeIcon != null) {
+            try {
+                appendSingle(icon, MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH, purposeIcon);
+                LOGGER.info("[CompanyGen][Icons] formation '{}' -> purpose icon {}", formation.getName(), purposeIcon);
+                return;
+            } catch (Exception exception) {
+                LOGGER.warn("[CompanyGen][Icons] cannot resolve purpose icon {} for '{}'; using the unit-type icon",
+                      purposeIcon, formation.getName());
+                icon.getPieces().get(LayeredFormationIconLayer.TYPE).clear();
+            }
+        }
+
         int dominantType = determineDominantUnitType(formation, campaign);
         int weightClass = determineWeightClass(formation, campaign);
         String weightFilename = EntityWeightClass.getClassName(weightClass) + ".png";
@@ -323,6 +421,107 @@ public final class FormationIconBuilder {
      * {@link UnitType#MEK} when the formation has no units or all units' entities are null. Used
      * by {@link #appendTypePieces} to pick the chassis silhouette.
      */
+    /**
+     * The icon for what a formation is <em>for</em>, when that is clear from the equipment its units carry.
+     *
+     * <p>Every unit has to agree, so a company of MASH trucks is a field hospital while a mixed formation that merely
+     * contains one is not.</p>
+     *
+     * @param formation the formation
+     * @param campaign  the campaign, to resolve the unit ids
+     *
+     * @return the StratOps type filename, or {@code null} when the formation has no single clear purpose
+     */
+    private static @Nullable String purposeIconFor(Formation formation, Campaign campaign) {
+        if (isHeadquarters(formation, campaign)) {
+            return HEADQUARTERS_TYPE_FILENAME;
+        }
+
+        if (formation.isFormationType(FormationType.CONVOY)) {
+            return SUPPLY_TYPE_FILENAME;
+        }
+
+        int units = 0;
+        int medical = 0;
+        int recovery = 0;
+        Set<SupportSection> sections = EnumSet.noneOf(SupportSection.class);
+        for (UUID unitId : formation.getAllUnits(false)) {
+            Unit unit = campaign.getUnit(unitId);
+            if ((unit == null) || (unit.getEntity() == null)) {
+                continue;
+            }
+            units++;
+            if (unit.getEntity().hasWorkingMisc(MiscTypeFlag.F_MASH)) {
+                medical++;
+            } else if (unit.getEntity().hasWorkingMisc(MiscTypeFlag.F_LIFT_HOIST)
+                             || unit.getEntity().hasWorkingMisc(MiscTypeFlag.F_SALVAGE_ARM)) {
+                recovery++;
+            }
+            if (unit.isCarrier()) {
+                SupportSection section = sectionOf(unit);
+                // EnumSet rejects null, and an empty carrier has no vote to cast anyway.
+                if (section != null) {
+                    sections.add(section);
+                }
+            }
+        }
+        if (units == 0) {
+            return null;
+        }
+        if (medical == units) {
+            return MEDICAL_TYPE_FILENAME;
+        }
+        if (recovery == units) {
+            return MAINTENANCE_TYPE_FILENAME;
+        }
+        // A support team's job is its crew's job. One section only, so a mixed formation keeps the generic icon.
+        if (sections.size() == 1) {
+            return switch (sections.iterator().next()) {
+                case MAINTENANCE -> MAINTENANCE_TYPE_FILENAME;
+                case MEDICAL -> MEDICAL_TYPE_FILENAME;
+                case COMMAND -> HEADQUARTERS_TYPE_FILENAME;
+            };
+        }
+        return null;
+    }
+
+    /**
+     * Whether this formation is the command's headquarters.
+     *
+     * <p>Asked of the structure rather than the name: the support tree hangs off the headquarters, so whatever the
+     * player has renamed it to, it is the formation the Support Command sits under.</p>
+     *
+     * @param formation the formation
+     * @param campaign  the campaign
+     *
+     * @return {@code true} if the Support Command formation is a direct child of this formation
+     */
+    private static boolean isHeadquarters(Formation formation, Campaign campaign) {
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        if (supportCommand == null) {
+            return false;
+        }
+        Formation headquarters = supportCommand.getParentFormation();
+        return (headquarters != null) && (headquarters.getId() == formation.getId());
+    }
+
+    /**
+     * The support section a carrier's crew belongs to.
+     *
+     * <p>Every seat on a carrier holds the same profession, so the first crew member answers for the unit. A carrier
+     * that has lost its crew answers for nothing, which keeps an empty one from claiming a section.</p>
+     *
+     * @param carrier the support carrier
+     *
+     * @return the section, or {@code null} when the carrier is empty or its crew is not support staff
+     */
+    private static @Nullable SupportSection sectionOf(Unit carrier) {
+        for (Person person : carrier.getCrew()) {
+            return SupportPersonnelToTOE.sectionFor(person.getPrimaryRole());
+        }
+        return null;
+    }
+
     private static int determineDominantUnitType(Formation formation, Campaign campaign) {
         Map<Integer, Integer> counts = new java.util.HashMap<>();
         for (UUID unitId : formation.getAllUnits(false)) {

@@ -129,6 +129,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -1914,6 +1915,12 @@ public final class BriefingTab extends CampaignGuiTab {
                 continue;
             }
 
+            // A support carrier that stayed home is not a unit that failed to deploy; it is skipped rather than
+            // listed in the warning below.
+            if (unit.isCarrier() && !SupportCarrierDeployment.isAllowed(scenario)) {
+                continue;
+            }
+
             Entity entity = unit.getEntity();
 
             if (entity == null) {
@@ -2327,6 +2334,14 @@ public final class BriefingTab extends CampaignGuiTab {
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
+            if (u == null) {
+                continue;
+            }
+            // A support carrier that stayed home is not a unit that failed to deploy; it is skipped rather than
+            // listed in the warning below.
+            if (u.isCarrier() && !SupportCarrierDeployment.isAllowed(scenario)) {
+                continue;
+            }
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
                     // Make sure the unit's entity and pilot are fully up to date!
