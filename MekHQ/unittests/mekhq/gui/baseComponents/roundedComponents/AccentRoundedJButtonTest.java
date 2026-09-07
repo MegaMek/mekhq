@@ -112,9 +112,9 @@ class AccentRoundedJButtonTest {
     }
 
     @Test
-    void paintsYellowFaceInsideBlackFrame() {
+    void paintsYellowFaceInsideAFrameOfHazardTape() {
         // A short label, so the sampled face pixel cannot land on an antialiased glyph. The caution label is
-        // the same near-black as its frame, which would otherwise read as a frame hit.
+        // the same near-black as its dark stripe, which would otherwise read as a stripe hit.
         AccentRoundedJButton button = new AccentRoundedJButton("Go", Accent.CAUTION);
         button.setFont(button.getFont().deriveFont(Font.BOLD, 12f));
         button.setSize(120, 40);
@@ -129,7 +129,17 @@ class AccentRoundedJButtonTest {
 
         // A point well inside the face, away from the text, is the hazard yellow.
         assertEquals(Accent.CAUTION.getFace().getRGB(), image.getRGB(12, 20));
-        // The middle of the top edge is the black frame.
-        assertEquals(Accent.CAUTION.getFrame().getRGB(), image.getRGB(60, 1));
+
+        // The frame is tape rather than a line, so the top edge alternates: both stripe colours appear along it.
+        // Asserting a single pixel would only be testing where the diagonal happens to fall.
+        boolean sawLight = false;
+        boolean sawDark = false;
+        for (int x = 8; x < 112; x++) {
+            int pixel = image.getRGB(x, 1);
+            sawLight |= (pixel == Accent.CAUTION.getFace().getRGB());
+            sawDark |= (pixel == Accent.CAUTION.getFrame().getRGB());
+        }
+        assertTrue(sawLight, "the tape's light bars must show along the top edge");
+        assertTrue(sawDark, "the tape's dark bars must show along the top edge");
     }
 }
