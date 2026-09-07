@@ -49,8 +49,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
  * The player-facing side of {@link SupportCarrierDeployment}: the senior administrator explains, in character, why
  * support carriers are not going, with the plain detail underneath.
  *
- * @author Illiani
- * @since 0.51.0
+ * @since 0.51.01
  */
 public final class SupportCarrierDeploymentDialogs {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SupportPersonnelToTOE";

@@ -70,8 +70,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * the roster and no Support Command. Declining a load-time offer switches the option off for that campaign, so the
  * offer is made once rather than at every load; ticking the box again asks again.</p>
  *
- * @author Illiani
- * @since 0.51.1
+ * @since 0.51.01
  */
 public class SupportTeamsCampaignOptionsChangedConfirmationDialog extends JDialog {
     private static final String RESOURCE_BUNDLE =

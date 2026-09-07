@@ -60,8 +60,7 @@ import mekhq.campaign.unit.Unit;
  * sites. The reconciler is already deployment-aware and needs no change when that happens: it leaves a deployed
  * carrier alone and catches its profession up when the deployment ends.</p>
  *
- * @author Illiani
- * @since 0.51.0
+ * @since 0.51.01
  */
 public final class SupportCarrierDeployment {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SupportPersonnelToTOE";

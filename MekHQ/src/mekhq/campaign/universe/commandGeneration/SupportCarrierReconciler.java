@@ -94,8 +94,7 @@ import mekhq.campaign.universe.commandGeneration.ratgen.FormationIconBuilder;
  * index or cache is kept - the answer is derived from the live object graph each time, which both avoids a new
  * serialization surface and removes any possibility of the cache going stale.</p>
  *
- * @author Illiani
- * @since 0.51.0
+ * @since 0.51.01
  */
 public final class SupportCarrierReconciler {
     private static final MMLogger LOGGER = MMLogger.create(SupportCarrierReconciler.class);
