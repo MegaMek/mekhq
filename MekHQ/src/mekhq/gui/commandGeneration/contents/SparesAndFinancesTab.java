@@ -88,6 +88,49 @@ import mekhq.gui.commandGeneration.components.CommandGenerationStandardPanel;
  */
 public class SparesAndFinancesTab {
 
+    /**
+     * The restock categories the Spares section offers, each paired with the campaign option it reads and writes.
+     *
+     * <p>This is the single list. The spinners are built from it, loaded from it and written back from it, so a new
+     * autoLogistics category is added here once rather than in three places that can drift apart. Declared in the
+     * order they appear on screen, filling the left column before the right.</p>
+     */
+    enum SparesCategory {
+        MEK_HEAD("SparesMekHead", CampaignOption.AUTO_LOGISTICS_MEK_HEAD),
+        MEK_LOCATION("SparesMekLocation", CampaignOption.AUTO_LOGISTICS_MEK_LOCATION),
+        NON_REPAIRABLE_LOCATION("SparesNonRepairableLocation", CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION),
+        ARMOR("SparesArmor", CampaignOption.AUTO_LOGISTICS_ARMOR),
+        ARMOR_KIT("SparesArmorKit", CampaignOption.AUTO_LOGISTICS_ARMOR_KIT),
+        AMMUNITION("SparesAmmunition", CampaignOption.AUTO_LOGISTICS_AMMUNITION),
+        BOMB("SparesBomb", CampaignOption.AUTO_LOGISTICS_BOMB),
+        HEAT_SINK("SparesHeatSink", CampaignOption.AUTO_LOGISTICS_HEAT_SINK),
+        WEAPONS("SparesWeapons", CampaignOption.AUTO_LOGISTICS_WEAPONS),
+        ACTUATORS("SparesActuators", CampaignOption.AUTO_LOGISTICS_ACTUATORS),
+        JUMP_JETS("SparesJumpJets", CampaignOption.AUTO_LOGISTICS_JUMP_JETS),
+        HEAD_COMPONENTS("SparesHeadComponents", CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS),
+        ENGINES("SparesEngines", CampaignOption.AUTO_LOGISTICS_ENGINES),
+        GYROS("SparesGyros", CampaignOption.AUTO_LOGISTICS_GYROS),
+        OTHER("SparesOther", CampaignOption.AUTO_LOGISTICS_OTHER);
+
+        private final String resourceKey;
+        private final CampaignOption<Integer> campaignOption;
+
+        SparesCategory(String resourceKey, CampaignOption<Integer> campaignOption) {
+            this.resourceKey = resourceKey;
+            this.campaignOption = campaignOption;
+        }
+
+        /** @return the bundle key for this category's label and tooltip */
+        String getResourceKey() {
+            return resourceKey;
+        }
+
+        /** @return the campaign option this category's spinner reads and writes */
+        CampaignOption<Integer> getCampaignOption() {
+            return campaignOption;
+        }
+    }
+
     // Mirror the Campaign Options AutoLogistics spinners (AcquisitionPage.createAutoLogisticsPanel):
     // 0-10000 in steps of 1, so no value settable there is ever clamped or rounded here.
     private static final int MIN_PERCENT = 0;
@@ -185,23 +228,6 @@ public class SparesAndFinancesTab {
         section.setLayout(new GridBagLayout());
         GridBagConstraints constraints = sectionConstraints();
 
-        // Same categories and order as the Campaign Options AutoLogistics grid.
-        String[] keys = {
-              "SparesMekHead",
-              "SparesMekLocation",
-              "SparesNonRepairableLocation",
-              "SparesArmor",
-              "SparesAmmunition",
-              "SparesHeatSink",
-              "SparesWeapons",
-              "SparesActuators",
-              "SparesJumpJets",
-              "SparesHeadComponents",
-              "SparesEngines",
-              "SparesGyros",
-              "SparesOther"
-        };
-
         // The explanation heads the section it explains. The bundle text carries a fixed HTML body width
         // so the label wraps; an unconstrained HTML JLabel reports its whole text as one line of preferred
         // width, which inflated this column until the finances column was pushed off-screen.
@@ -213,11 +239,13 @@ public class SparesAndFinancesTab {
         section.add(new CommandGenerationLabel("SparesHelpBody", true), constraints);
         constraints.gridwidth = 1;
 
-        // Two columns of part-and-spinner pairs: thirteen rows in one column made this the tallest thing
-        // on the tab, with the finances column finishing well above it.
-        int perColumn = (keys.length + 1) / 2;
-        for (int index = 0; index < keys.length; index++) {
-            String key = keys[index];
+        // Two columns of part-and-spinner pairs: every category in one column made this the tallest thing
+        // on the tab, with the finances column finishing well above it. Counted from the enum rather than
+        // stated here, so adding a category cannot leave this comment behind.
+        SparesCategory[] categories = SparesCategory.values();
+        int perColumn = (categories.length + 1) / 2;
+        for (int index = 0; index < categories.length; index++) {
+            String key = categories[index].getResourceKey();
             JSpinner spinner = new JSpinner(new SpinnerNumberModel(100, MIN_PERCENT, MAX_PERCENT, STEP_PERCENT));
             spinner.setName("spn" + key);
             spinners.put(key, spinner);
@@ -522,19 +550,9 @@ public class SparesAndFinancesTab {
         if (co == null) {
             return;
         }
-        spinners.get("SparesMekHead").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_MEK_HEAD)));
-        spinners.get("SparesMekLocation").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION)));
-        spinners.get("SparesNonRepairableLocation").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION)));
-        spinners.get("SparesArmor").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_ARMOR)));
-        spinners.get("SparesAmmunition").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_AMMUNITION)));
-        spinners.get("SparesHeatSink").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_HEAT_SINK)));
-        spinners.get("SparesWeapons").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_WEAPONS)));
-        spinners.get("SparesActuators").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_ACTUATORS)));
-        spinners.get("SparesJumpJets").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_JUMP_JETS)));
-        spinners.get("SparesHeadComponents").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS)));
-        spinners.get("SparesEngines").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_ENGINES)));
-        spinners.get("SparesGyros").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_GYROS)));
-        spinners.get("SparesOther").setValue(clamp(co.get(CampaignOption.AUTO_LOGISTICS_OTHER)));
+        for (SparesCategory category : SparesCategory.values()) {
+            spinners.get(category.getResourceKey()).setValue(clamp(co.get(category.getCampaignOption())));
+        }
     }
 
     /**
@@ -582,19 +600,9 @@ public class SparesAndFinancesTab {
         if (co == null) {
             return;
         }
-        co.set(CampaignOption.AUTO_LOGISTICS_MEK_HEAD, (Integer) spinners.get("SparesMekHead").getValue());
-        co.set(CampaignOption.AUTO_LOGISTICS_MEK_LOCATION, (Integer) spinners.get("SparesMekLocation").getValue());
-        co.set(CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION, (Integer) spinners.get("SparesNonRepairableLocation").getValue());
-        co.set(CampaignOption.AUTO_LOGISTICS_ARMOR, (Integer) spinners.get("SparesArmor").getValue());
-        co.set(CampaignOption.AUTO_LOGISTICS_AMMUNITION, (Integer) spinners.get("SparesAmmunition").getValue());
-        co.set(CampaignOption.AUTO_LOGISTICS_HEAT_SINK, (Integer) spinners.get("SparesHeatSink").getValue());
-        co.set(CampaignOption.AUTO_LOGISTICS_WEAPONS, (Integer) spinners.get("SparesWeapons").getValue());
-        co.set(CampaignOption.AUTO_LOGISTICS_ACTUATORS, (Integer) spinners.get("SparesActuators").getValue());
-        co.set(CampaignOption.AUTO_LOGISTICS_JUMP_JETS, (Integer) spinners.get("SparesJumpJets").getValue());
-        co.set(CampaignOption.AUTO_LOGISTICS_HEAD_COMPONENTS, (Integer) spinners.get("SparesHeadComponents").getValue());
-        co.set(CampaignOption.AUTO_LOGISTICS_ENGINES, (Integer) spinners.get("SparesEngines").getValue());
-        co.set(CampaignOption.AUTO_LOGISTICS_GYROS, (Integer) spinners.get("SparesGyros").getValue());
-        co.set(CampaignOption.AUTO_LOGISTICS_OTHER, (Integer) spinners.get("SparesOther").getValue());
+        for (SparesCategory category : SparesCategory.values()) {
+            co.set(category.getCampaignOption(), (Integer) spinners.get(category.getResourceKey()).getValue());
+        }
     }
 
     private static int clamp(int value) {
