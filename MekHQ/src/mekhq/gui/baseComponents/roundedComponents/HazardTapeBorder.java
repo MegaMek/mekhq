@@ -57,7 +57,6 @@ import megamek.client.ui.util.UIUtil;
  * <p>The stripes are painted as a repeating tile, so they stay the same width whatever size the component is,
  * and they run in one continuous direction around all four sides rather than mirroring at the corners.</p>
  *
- * @author Illiani
  * @since 0.51.01
  */
 public class HazardTapeBorder extends AbstractBorder {
