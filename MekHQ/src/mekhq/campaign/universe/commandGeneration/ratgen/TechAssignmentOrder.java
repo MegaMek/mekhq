@@ -57,7 +57,6 @@ import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
  * {@link TechAssignmentSortFactor#NONE} is skipped. With every slot set to {@code NONE} the order is empty and the
  * shared assigner falls back to its own battle value ordering.</p>
  *
- * @author Illiani
  * @since 0.51.0
  */
 public final class TechAssignmentOrder {
@@ -74,7 +73,6 @@ public final class TechAssignmentOrder {
      *
      * @return the ordering, or {@code null} when no slot is set, so the caller keeps the shared assigner's default
      *
-     * @author Illiani
      * @since 0.51.0
      */
     public static @Nullable Comparator<Unit> unitOrderFor(Campaign campaign, CommandGenerationOptions options) {
@@ -99,7 +97,6 @@ public final class TechAssignmentOrder {
      *
      * @return the tech-role people among them, never {@code null}
      *
-     * @author Illiani
      * @since 0.51.0
      */
     public static List<Person> techsAmong(@Nullable Collection<Person> generatedPersons) {
