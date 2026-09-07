@@ -4049,6 +4049,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(CMD_EDIT_PORTRAIT);
             menuItem.addActionListener(this);
             changeProfileMenu.add(menuItem);
+
+            JMenuHelpers.addMenuIfNonEmpty(popup, changeProfileMenu);
         }
 
         JMenu editLogsMenu = new JMenu(resources.getString("editLogs.text"));
