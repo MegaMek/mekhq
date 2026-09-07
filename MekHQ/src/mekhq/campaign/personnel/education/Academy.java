@@ -52,6 +52,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
@@ -64,7 +65,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.factionHints.FactionHints;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * The Academy class represents an academy with various properties and methods.
@@ -1232,6 +1232,7 @@ public class Academy implements Comparable<Academy> {
             case "artillery" -> SkillType.S_ARTILLERY;
             case "gunnery/battlearmor" -> SkillType.S_GUN_BA;
             case "gunnery/protomek" -> SkillType.S_GUN_PROTO;
+            case "piloting/protomek" -> SkillType.S_PILOT_PROTO;
             case "small arms" -> SkillType.S_SMALL_ARMS;
             case "anti-mek", "climbing" -> SkillType.S_ANTI_MEK;
             case "tech/mek" -> SkillType.S_TECH_MEK;
