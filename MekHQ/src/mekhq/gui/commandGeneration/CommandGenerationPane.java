@@ -43,6 +43,8 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import megamek.client.ratgenerator.FactionRecord;
+import megamek.client.ratgenerator.ManeiDominiCrewAugmentor;
+import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
@@ -161,6 +163,7 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
      */
     public void applyFactionDrivenDefaults() {
         FactionRecord factionRecord = lastFactionRecord;
+        setupTab.setAugmentationSectionVisible(offersAugmentation(factionRecord));
         if (factionRecord == null) {
             LOGGER.debug("[NamingMethod] no faction reported yet; leaving naming alone");
             return;
@@ -175,6 +178,51 @@ public class CommandGenerationPane extends AbstractMHQTabbedPane {
         if (namesFormationsInGreek) {
             setupTab.setSelectedForceNamingMethod(ForceNamingMethod.GREEK_ALPHABET);
         }
+    }
+
+    /**
+     * The sub-faction key for Warrior House Thuggee, the Capellan command whose warriors are augmented.
+     *
+     * <p>Kali Liao raised these Houses in secret from her Thuggee cult and the Manei Domini, so they answer to
+     * her rather than to the Warrior House Orders. The regular Warrior Houses ({@code CC.WHO}) are not
+     * augmented and are deliberately not included here.</p>
+     */
+    static final String WARRIOR_HOUSE_THUGGEE_FACTION_KEY = "CC.THG";
+
+    /**
+     * Whether the selected faction is one the player would want the augmentation controls for, which decides
+     * whether the Setup tab shows them at all.
+     *
+     * <p>Three cases, for two different reasons:</p>
+     * <ul>
+     *   <li><b>The Word of Blake Shadow Divisions</b>, keyed
+     *       {@value ManeiDominiCrewAugmentor#SHADOW_DIVISION_FACTION_KEY} - the only faction the Manei Domini
+     *       stage fits implants to.</li>
+     *   <li><b>Any Clan</b> - enhanced imaging is the Clans' alone, and its stage reads the same Use Implants
+     *       setting. Gating on the Shadow Divisions by themselves would leave a Clan player unable to switch
+     *       implants on from here, and enhanced imaging would then never be fitted.</li>
+     *   <li><b>Warrior House Thuggee</b>, keyed {@value #WARRIOR_HOUSE_THUGGEE_FACTION_KEY} - raised from the
+     *       Thuggee cult and the Manei Domini, so its warriors carry implants. No generation stage fits them
+     *       today, but the setting lets the campaign track implants for a command whose warriors have
+     *       them.</li>
+     * </ul>
+     *
+     * <p>For anyone else the two settings change nothing, so they are not offered.</p>
+     *
+     * @param factionRecord the selected faction, or {@code null} when none has been reported yet
+     *
+     * @return {@code true} if the augmentation controls should be shown for this faction
+     */
+    static boolean offersAugmentation(@Nullable FactionRecord factionRecord) {
+        if (factionRecord == null) {
+            return false;
+        }
+        if (factionRecord.isClan()) {
+            return true;
+        }
+        String key = factionRecord.getKey();
+        return ManeiDominiCrewAugmentor.SHADOW_DIVISION_FACTION_KEY.equalsIgnoreCase(key)
+                     || WARRIOR_HOUSE_THUGGEE_FACTION_KEY.equalsIgnoreCase(key);
     }
 
     /**
