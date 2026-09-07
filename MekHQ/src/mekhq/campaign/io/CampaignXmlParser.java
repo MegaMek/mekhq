@@ -2526,14 +2526,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 campaign.addReport(GENERAL, report);
             }
 
-            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
-            // potentially as far back as 2014. The next two handlers should never be removed.
-            if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
-                resolveRolePerformability(person, campaign);
-            }
-
-            if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
-            }
+            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase potentially as far back as
+            // 2014. The next two handlers should never be removed. It makes a good place to add missing skills, in
+            // the event we change the skill requirements for a role.
+            resolveRolePerformability(person, campaign);
         }
 
         campaign.getPlayerForce().getHangar().forEachUnit(unit -> {
@@ -2790,7 +2786,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             reportInvalidProfession(person, campaign, "ineligibleForSecondaryRole");
         }
     }
-
 
     private static void reportInvalidProfession(Person person, Campaign campaign, String key) {
         campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, key,
