@@ -75,8 +75,12 @@ class BulkGenerationRefreshTest {
     }
 
     /**
-     * Whether a tab has a {@link Subscribe} handler that takes an {@link OrganizationChangedEvent}. Declared methods
-     * only: the handler has to be on the tab itself for the event bus to register it.
+     * Whether a tab has a {@link Subscribe} handler the event bus would deliver an {@link OrganizationChangedEvent} to.
+     *
+     * <p>That is any handler whose parameter is the event type or a supertype of it, not the exact type alone.
+     * {@code EventBus.trigger} walks every superclass of the fired event up to {@code MMEvent} and fires the listeners
+     * registered against each, so a handler declared with a supertype receives the event too, and the tab is refreshed
+     * either way. Declared methods only - the handler has to be on the tab itself for the bus to register it.</p>
      *
      * @param tab the tab class to inspect
      *

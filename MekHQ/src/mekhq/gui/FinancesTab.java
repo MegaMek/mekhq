@@ -721,11 +721,13 @@ public final class FinancesTab extends CampaignGuiTab {
      * is true, so the {@link TransactionEvent}s it raises are all dropped by the guard in
      * {@link #refreshFinancialReport()}. Generation signs off with this event and nothing else, so without this handler
      * the ledger and the net worth both keep their pre-simulation figures.
+     *
+     * <p>Scheduling the transactions refresh covers both: {@link #refreshFinancialTransactions()} ends by calling
+     * {@link #refreshFinancialReport()}.</p>
      */
     @Subscribe
     public void handle(OrganizationChangedEvent ev) {
         financialTransactionsScheduler.schedule();
-        financialReportScheduler.schedule();
     }
 
     @Subscribe
