@@ -718,7 +718,7 @@ public final class CommandGenerator {
      * @param options          the generation options holding the assignment toggle and the sort grid
      * @param generatedPersons everyone this generation run produced; the techs among them form the pool
      *
-     * @since 0.51.0
+     * @since 0.51.01
      */
     private static void assignTechsToGeneratedUnits(Campaign campaign, CommandGenerationOptions options,
           Collection<Person> generatedPersons) {
