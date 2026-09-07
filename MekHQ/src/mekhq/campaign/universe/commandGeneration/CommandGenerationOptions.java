@@ -66,6 +66,13 @@ import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
 public class CommandGenerationOptions {
 
     /**
+     * Working capital the command is guaranteed to keep once the pay-for toggles have taken their
+     * cut, in C-bills. A command that starts broke cannot pay its first month's wages, so generation
+     * floors the float here and takes a loan for the shortfall when one is allowed.
+     */
+    private static final long DEFAULT_MINIMUM_STARTING_FLOAT = 10_000_000L;
+
+    /**
      * Support roles seeded with default coverage percentages and skill levels: the four tech roles,
      * doctor, and administrators - matches the SetupTab spinner/dropdown layout.
      */
@@ -138,12 +145,6 @@ public class CommandGenerationOptions {
     // off, and a player who has never opened either options dialog would otherwise have no way to
     // generate an augmented command.
     private boolean useImplants;
-    /**
-     * The crew roles whose seats temporary crew fill instead of named people. These live on the campaign: the
-     * dialog seeds them from the campaign's current settings and the generator writes them back before any unit is
-     * crewed, because the crew assembler reads the campaign options as it builds each unit.
-     */
-    private Set<TemporaryCrewRole> temporaryCrewRoles;
     private NeuralInterfaceMode neuralInterfaceMode;
 
     // Force naming and formation icons
@@ -172,7 +173,7 @@ public class CommandGenerationOptions {
     private int startingCashPercent;
     private boolean randomizeStartingCash;
     private int randomStartingCashDiceCount;
-    private int minimumStartingFloat;
+    private long minimumStartingFloat;
     private boolean startingLoan;
     private boolean payForSetup;
     private boolean payForPersonnel;
@@ -212,7 +213,7 @@ public class CommandGenerationOptions {
         setGenerateMedics(true);
         setMedicsAsPersonnel(false);
         setMedicSkillLevel(SkillLevel.NONE);
-        setGenerateMedicalReserve(false);
+        setGenerateMedicalReserve(true);
         setMedicalReservePercent(10);
 
         // Tech-to-unit assignment grid defaults: officers first, then heaviest, then best pilot.
@@ -225,14 +226,14 @@ public class CommandGenerationOptions {
         setTechAssignmentTertiaryDescending(true);
 
         // Officer assignment and personnel flags
-        setGenerateCaptains(false);
+        setGenerateCaptains(true);
         setAssignCompanyCommanderFlag(true);
         setApplyOfficerStatBonusToWorstSkill(false);
-        setAssignBestCompanyCommander(false);
+        setAssignBestCompanyCommander(true);
         setPrioritizeCompanyCommanderCombatSkills(false);
-        setAssignBestOfficers(false);
+        setAssignBestOfficers(true);
         setPrioritizeOfficerCombatSkills(false);
-        setAssignMostSkilledToPrimaryLances(false);
+        setAssignMostSkilledToPrimaryLances(true);
         setAutomaticallyAssignRanks(true);
         // Default ON so the target faction's rank system (Clan ranks for a Clan target, ComStar
         // ranks for a CS target, etc.) drives the generated commanders' rank names.
@@ -244,8 +245,6 @@ public class CommandGenerationOptions {
         // currently has, so the defaults here only matter to a caller that never opens it.
         setUseImplants(false);
         setNeuralInterfaceMode(NeuralInterfaceMode.OFF);
-        // None by default, matching a fresh campaign; the dialog replaces this with the campaign's own settings.
-        setTemporaryCrewRoles(EnumSet.noneOf(TemporaryCrewRole.class));
 
         // Force naming and formation icons
         setForceNamingMethod(ForceNamingMethod.CCB_1943);
@@ -258,10 +257,10 @@ public class CommandGenerationOptions {
         setUseOriginNodeFormationIconLogo(false);
 
         // Starting simulation
-        setRunStartingSimulation(false);
+        setRunStartingSimulation(true);
         setSimulationDuration(10);
-        setSimulateRandomMarriages(false);
-        setSimulateRandomProcreation(false);
+        setSimulateRandomMarriages(true);
+        setSimulateRandomProcreation(true);
 
         // Contracts
         setSelectStartingContract(true);
@@ -270,12 +269,13 @@ public class CommandGenerationOptions {
         // Finances. Pay for Initial Setup defaults OFF: with the percentage-of-unit-value cash base,
         // paying for the units would always dwarf the base (10% cash vs 100% cost) and floor every
         // default build into a maximum loan. Out of the box the command is granted free with its
-        // working capital; players opt into the pay-for accounting.
+        // working capital; players opt into the pay-for accounting. The minimum float leaves the
+        // command able to pay its first month's wages rather than starting broke.
         setProcessFinances(true);
         setStartingCashPercent(10);
         setRandomizeStartingCash(false);
         setRandomStartingCashDiceCount(18);
-        setMinimumStartingFloat(0);
+        setMinimumStartingFloat(DEFAULT_MINIMUM_STARTING_FLOAT);
         setStartingLoan(true);
         setPayForSetup(false);
         setPayForPersonnel(true);
@@ -564,22 +564,6 @@ public class CommandGenerationOptions {
     }
 
     /**
-     * @return the crew roles whose seats temporary crew fill instead of named people; never {@code null}
-     */
-    public Set<TemporaryCrewRole> getTemporaryCrewRoles() {
-        return temporaryCrewRoles;
-    }
-
-    /**
-     * @param temporaryCrewRoles the crew roles whose seats temporary crew fill; {@code null} means none
-     */
-    public void setTemporaryCrewRoles(@Nullable final Set<TemporaryCrewRole> temporaryCrewRoles) {
-        this.temporaryCrewRoles = (temporaryCrewRoles == null)
-                                        ? EnumSet.noneOf(TemporaryCrewRole.class)
-                                        : EnumSet.copyOf(temporaryCrewRoles);
-    }
-
-    /**
      * @return which of MegaMek's neural interface rules is in play, which decides whether an enhanced
      *       imaging or direct neural implant does anything
      */
@@ -729,11 +713,11 @@ public class CommandGenerationOptions {
         this.randomStartingCashDiceCount = randomStartingCashDiceCount;
     }
 
-    public int getMinimumStartingFloat() {
+    public long getMinimumStartingFloat() {
         return minimumStartingFloat;
     }
 
-    public void setMinimumStartingFloat(final int minimumStartingFloat) {
+    public void setMinimumStartingFloat(final long minimumStartingFloat) {
         this.minimumStartingFloat = minimumStartingFloat;
     }
 
@@ -839,7 +823,6 @@ public class CommandGenerationOptions {
               && (assignMekWarriorsCallSigns == other.assignMekWarriorsCallSigns)
               && (assignFounderFlag == other.assignFounderFlag)
               && (useImplants == other.useImplants)
-              && Objects.equals(temporaryCrewRoles, other.temporaryCrewRoles)
               && Objects.equals(neuralInterfaceMode, other.neuralInterfaceMode)
               && Objects.equals(forceNamingMethod, other.forceNamingMethod)
               && (alwaysNumberRegiments == other.alwaysNumberRegiments)
@@ -902,7 +885,6 @@ public class CommandGenerationOptions {
               assignMekWarriorsCallSigns, 
               assignFounderFlag, 
               useImplants, 
-              temporaryCrewRoles, 
               neuralInterfaceMode, 
               forceNamingMethod, 
               alwaysNumberRegiments, 

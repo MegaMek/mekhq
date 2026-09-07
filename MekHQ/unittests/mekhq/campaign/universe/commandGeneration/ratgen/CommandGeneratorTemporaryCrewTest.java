@@ -32,19 +32,17 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
-import java.util.EnumSet;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Map;
+
 import megamek.common.units.Entity;
-import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
-import mekhq.campaign.universe.commandGeneration.TemporaryCrewRole;
-import testUtilities.MHQTestUtilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -52,6 +50,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import testUtilities.MHQTestUtilities;
 
 /**
  * Covers the generated command's units arriving fully crewed.
@@ -122,42 +121,34 @@ class CommandGeneratorTemporaryCrewTest {
         assertEquals(1, platoon.getTotalCrewSize(), "the platoon keeps only its named soldier");
     }
     /**
-     * The designer's toggles are campaign settings, and the assembler reads them as each unit is crewed, so
-     * the choices must land on the campaign: every chosen role on, every other role off - even one the
-     * campaign had on before, because the toggles show and replace the campaign's settings.
+     * Every temporary-crew campaign option must name a role the crew assembler recognises. An option the
+     * assembler does not know would be a setting that does nothing, which is the failure this feature exists
+     * to remove.
+     *
+     * <p>The Command Designer no longer offers these as its own toggles - it reads whatever the campaign
+     * already has - so this walks the campaign options rather than a duplicate list of them.</p>
      */
     @Test
-    void theDesignersChoicesAreWrittenToTheCampaign() {
+    void everyTemporaryCrewOptionIsRecognisedByTheCrewAssembler() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
-        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_VESSEL_CREW, true);
-        CommandGenerationOptions options = new CommandGenerationOptions();
-        options.setTemporaryCrewRoles(EnumSet.of(TemporaryCrewRole.INFANTRY, TemporaryCrewRole.VTOL_CREW));
-
-        CommandGenerator.applyTemporaryCrewChoices(campaign, options);
-
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        assertTrue(campaignOptions.get(CampaignOption.USE_BLOB_INFANTRY), "a chosen role is switched on");
-        assertTrue(campaignOptions.get(CampaignOption.USE_BLOB_VEHICLE_CREW_VTOL), "a chosen role is switched on");
-        assertFalse(campaignOptions.get(CampaignOption.USE_BLOB_VESSEL_CREW),
-              "a role left unticked is switched off, even one the campaign had on");
-    }
 
-    /**
-     * Every toggle must map to a role the crew assembler recognises. A toggle for a role the assembler does
-     * not know would be a checkbox that does nothing, which is the failure this feature exists to remove.
-     */
-    @Test
-    void everyToggleIsRecognisedByTheCrewAssembler() {
-        Campaign campaign = MHQTestUtilities.getTestCampaign();
-        CommandGenerationOptions options = new CommandGenerationOptions();
-        options.setTemporaryCrewRoles(EnumSet.allOf(TemporaryCrewRole.class));
+        Map<CampaignOption<Boolean>, PersonnelRole> toggles = Map.of(
+              CampaignOption.USE_BLOB_INFANTRY, PersonnelRole.SOLDIER,
+              CampaignOption.USE_BLOB_BATTLE_ARMOR, PersonnelRole.BATTLE_ARMOUR,
+              CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, PersonnelRole.VEHICLE_CREW_GROUND,
+              CampaignOption.USE_BLOB_VEHICLE_CREW_VTOL, PersonnelRole.VEHICLE_CREW_VTOL,
+              CampaignOption.USE_BLOB_VEHICLE_CREW_NAVAL, PersonnelRole.VEHICLE_CREW_NAVAL,
+              CampaignOption.USE_BLOB_VESSEL_PILOT, PersonnelRole.VESSEL_PILOT,
+              CampaignOption.USE_BLOB_VESSEL_GUNNER, PersonnelRole.VESSEL_GUNNER,
+              CampaignOption.USE_BLOB_VESSEL_CREW, PersonnelRole.VESSEL_CREW);
 
-        CommandGenerator.applyTemporaryCrewChoices(campaign, options);
-
-        for (TemporaryCrewRole toggle : TemporaryCrewRole.values()) {
+        for (Map.Entry<CampaignOption<Boolean>, PersonnelRole> toggle : toggles.entrySet()) {
+            campaignOptions.set(toggle.getKey(), true);
             assertTrue(campaign.getPlayerForce().getHumanResources()
-                             .isBlobCrewEnabled(toggle.getPersonnelRole(), campaign.getCampaignOptions()),
-                  toggle + " must switch temporary crew on for " + toggle.getPersonnelRole());
+                             .isBlobCrewEnabled(toggle.getValue(), campaignOptions),
+                  toggle.getKey().xmlTag() + " must switch temporary crew on for " + toggle.getValue());
+            campaignOptions.set(toggle.getKey(), false);
         }
     }
 }

@@ -61,7 +61,6 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
-import mekhq.campaign.universe.commandGeneration.TemporaryCrewRole;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
 import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
@@ -206,12 +205,6 @@ public class SetupTab {
     private CommandGenerationCheckBox chkUseImplants;
     private MMComboBox<NeuralInterfaceMode> cmbNeuralInterfaceMode;
 
-    // Temporary crew. Campaign settings, surfaced here for the same reason as the augmentation toggles: a
-    // player building a starting force decides here whether a tank's crew are named warriors or an
-    // anonymous pool, without going through the campaign options dialog first.
-    private final Map<TemporaryCrewRole, CommandGenerationCheckBox> chkTemporaryCrew =
-          new EnumMap<>(TemporaryCrewRole.class);
-
     // Random origin
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
 
@@ -265,7 +258,6 @@ public class SetupTab {
         rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
         rightColumn.add(buildRandomOriginSection());
         rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
-        rightColumn.add(buildTemporaryCrewSection());
         rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         rightColumn.add(buildTechAssignmentSection());
         rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
@@ -742,32 +734,6 @@ public class SetupTab {
      * The eight temporary-crew toggles, laid out as the campaign options dialog lays them out so the same
      * setting reads the same in both places.
      */
-    private JPanel buildTemporaryCrewSection() {
-        CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
-              "TemporaryCrew", true, "TemporaryCrew");
-        section.setLayout(new GridBagLayout());
-        GridBagConstraints constraints = sectionConstraints();
-
-        constraints.gridy = 0;
-        constraints.gridx = 0;
-        constraints.gridwidth = 2;
-        section.add(new CommandGenerationLabel("TemporaryCrewDescription"), constraints);
-
-        constraints.gridwidth = 1;
-        chkTemporaryCrew.clear();
-        int index = 0;
-        for (TemporaryCrewRole role : TemporaryCrewRole.values()) {
-            CommandGenerationCheckBox checkBox = new CommandGenerationCheckBox(role.getLabelKey());
-            chkTemporaryCrew.put(role, checkBox);
-            constraints.gridy = 1 + (index / 2);
-            constraints.gridx = index % 2;
-            section.add(checkBox, constraints);
-            index++;
-        }
-
-        addLeftAlignFiller(section, 2);
-        return section;
-    }
 
     private static GridBagConstraints sectionConstraints() {
         GridBagConstraints constraints = new GridBagConstraints();
@@ -973,7 +939,6 @@ public class SetupTab {
         chkAssignFounderFlag.setSelected(sourceOptions.isAssignFounderFlag());
 
         loadAugmentationValues();
-        loadTemporaryCrewValues();
     }
 
     /**
@@ -1005,15 +970,6 @@ public class SetupTab {
      * options, so what the campaign holds is what the player must see; the toggles are written back to the
      * campaign when the command is generated.
      */
-    private void loadTemporaryCrewValues() {
-        if (campaign == null) {
-            return;
-        }
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        for (Map.Entry<TemporaryCrewRole, CommandGenerationCheckBox> entry : chkTemporaryCrew.entrySet()) {
-            entry.getValue().setSelected(campaignOptions.get(entry.getKey().getCampaignOption()));
-        }
-    }
 
     /**
      * Reads values back from this tab's controls into the supplied options. Same mapping as
@@ -1084,14 +1040,6 @@ public class SetupTab {
         targetOptions.setUseSpecifiedFactionToAssignRanks(chkUseSpecifiedFactionToAssignRanks.isSelected());
         targetOptions.setAssignMekWarriorsCallSigns(chkAssignMekWarriorsCallSigns.isSelected());
         targetOptions.setAssignFounderFlag(chkAssignFounderFlag.isSelected());
-
-        EnumSet<TemporaryCrewRole> temporaryCrewRoles = EnumSet.noneOf(TemporaryCrewRole.class);
-        for (Map.Entry<TemporaryCrewRole, CommandGenerationCheckBox> entry : chkTemporaryCrew.entrySet()) {
-            if (entry.getValue().isSelected()) {
-                temporaryCrewRoles.add(entry.getKey());
-            }
-        }
-        targetOptions.setTemporaryCrewRoles(temporaryCrewRoles);
 
         targetOptions.setUseImplants(chkUseImplants.isSelected());
         NeuralInterfaceMode mode = NeuralInterfaceMode.OFF;

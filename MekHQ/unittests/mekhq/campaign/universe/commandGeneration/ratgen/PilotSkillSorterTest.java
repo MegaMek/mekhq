@@ -93,7 +93,10 @@ class PilotSkillSorterTest {
         Person green = pilot(campaign, firstSeat, 1);
         pilot(campaign, secondSeat, 5);
 
-        int moved = PilotSkillSorter.apply(campaign, new CommandGenerationOptions());
+        CommandGenerationOptions off = new CommandGenerationOptions();
+        off.setAssignMostSkilledToPrimaryLances(false);
+
+        int moved = PilotSkillSorter.apply(campaign, off);
 
         assertEquals(0, moved);
         assertSame(green, firstSeat.getCommander());

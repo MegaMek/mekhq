@@ -35,6 +35,7 @@ package mekhq.gui.commandGeneration;
 import java.awt.Component;
 import java.awt.Insets;
 import javax.swing.JButton;
+import megamek.client.ui.enums.DialogResult;
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
@@ -118,6 +119,21 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      * command that differs from the one previewed.
      */
     private CommandGenerationOptions settingsAtLastGenerate;
+
+    /**
+     * Whether the last press of Accept &amp; Build actually started a build.
+     *
+     * <p>Set once the combat phase has put a force in the TOE, which is the point the build becomes real. Every
+     * way of not getting there leaves it {@code false}: the tab settings cannot be collected, no force has been
+     * previewed yet, the player cancels at the build confirmation, the phase throws, or it returns no result.
+     * None of those should close the designer or greet the player with a command they have not built, so the
+     * flag lets {@link #okButtonActionPerformed} and {@link #confirmationActionListener} tell a real commit from
+     * everything else.</p>
+     *
+     * <p>A later phase failing does not clear it. By then the combat force is committed to the campaign, so the
+     * designer has nothing left to go back to.</p>
+     */
+    private boolean buildStarted;
 
     private Campaign campaign;
     private CommandGenerationOptions commandGenerationOptions;
@@ -259,8 +275,32 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         }
     }
 
+    /**
+     * Confirms and closes the designer only when {@link #okAction()} actually started a build.
+     *
+     * <p>The inherited behaviour marks the dialog confirmed and hides it unconditionally, because {@code okAction}
+     * returns {@code void} and cannot refuse. That turned every way of backing out - cancelling the build
+     * confirmation among them - into a confirmed close, so the designer vanished and the player was greeted for a
+     * command that was never built.</p>
+     *
+     * @param evt the button event
+     */
+    @Override
+    protected void okButtonActionPerformed(final ActionEvent evt) {
+        okAction();
+        if (!buildStarted) {
+            LOGGER.info("[CompanyGen] Accept pressed but no build started; leaving the designer open");
+            return;
+        }
+        setResult(DialogResult.CONFIRMED);
+        setVisible(false);
+    }
+
     private void confirmationActionListener(final ActionEvent evt) {
         okButtonActionPerformed(evt);
+        if (!buildStarted) {
+            return;
+        }
 
         Faction campaignFaction = campaign.getPlayerForce().getFaction();
         String campaignFactionCode = campaignFaction.getShortName();
@@ -387,6 +427,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
 
     @Override
     protected void okAction() {
+        buildStarted = false;
         CommandGenerationOptions options = settingsToBuildWith(collectOptionsFromTabs("okAction"));
         if (options == null) {
             return;
@@ -444,6 +485,10 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
                 LOGGER.info("[CompanyGen][Worker] combat phase produced no result; skipping support");
                 return;
             }
+            // The commit point: the combat force is in the TOE, so this counts as a build even if a later
+            // phase falls over. A phase that threw never reaches here, because runGenerationPhase reports the
+            // failure and skips this consumer entirely.
+            buildStarted = true;
             List<Person> generatedPersons = new ArrayList<>(combatResult.generatedPersons());
             runGenerationPhase("Generating support forces...",
                   supportListener -> CommandGenerator.generateSupportFromToe(getCampaign(), options,

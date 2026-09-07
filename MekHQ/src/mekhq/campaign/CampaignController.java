@@ -38,7 +38,6 @@ import javax.swing.SwingUtilities;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.events.StoryFinishedEvent;
-import mekhq.campaign.market.PersonnelMarket;
 
 /**
  * Manages the timeline of a {@link Campaign}.
@@ -65,10 +64,6 @@ public class CampaignController {
      * Manually registers campaign-related event bus listeners.
      */
     public void activate() {
-        PersonnelMarket personnelMarket = localCampaign.getPlayerForce().getHumanResources().getPersonnelMarket();
-        if (personnelMarket != null) {
-            MekHQ.registerHandler(personnelMarket);
-        }
         MekHQ.registerHandler(campaignEventProcessor);
         MekHQ.registerHandler(this);
     }
@@ -79,10 +74,6 @@ public class CampaignController {
     public void deactivate() {
         if (localCampaign.getStoryArc() != null) {
             MekHQ.unregisterHandler(localCampaign.getStoryArc());
-        }
-        PersonnelMarket personnelMarket = localCampaign.getPlayerForce().getHumanResources().getPersonnelMarket();
-        if (personnelMarket != null) {
-            MekHQ.unregisterHandler(personnelMarket);
         }
         MekHQ.unregisterHandler(campaignEventProcessor);
         MekHQ.unregisterHandler(this);

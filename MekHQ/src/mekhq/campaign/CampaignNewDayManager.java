@@ -771,6 +771,19 @@ public class CampaignNewDayManager {
     private void updateFacilities() {
         updateFieldKitchenCapacity();
         updateMASHTheatreCapacity();
+        updateFleetAltitudeCapability();
+    }
+
+    /**
+     * Refreshes the player force's cached {@link mekhq.campaign.force.FleetAltitudeCapability}.
+     *
+     * <p>This is a daily, roster-derived snapshot (mirroring {@link #updateMASHTheatreCapacity()}) so StratCon
+     * scenario generation can read the fleet's fightable altitudes in O(1) instead of rescanning every unit for each
+     * scenario it generates. It runs before scenario generation in the new-day sequence.</p>
+     */
+    private void updateFleetAltitudeCapability() {
+        campaign.getPlayerForce()
+              .setFleetAltitudeCapability(campaign.getPlayerForce().calculateFleetAltitudeCapability(campaign));
     }
 
     private void processAllArrivals() {
@@ -2226,20 +2239,6 @@ public class CampaignNewDayManager {
                       .getHangar()
                       .getUnits()
                       .forEach(unit -> unit.setSite(ContractRepairLocation.getRepairLocation(contract.getObjectiveType())));
-            }
-
-            if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
-                int deficit = ContractUtilities.getDeploymentDeficit(campaign, contract);
-                StratConCampaignState campaignState = contract.getStratConCampaignState();
-
-                if (campaignState != null && deficit > 0) {
-                    campaign.addReport(GENERAL, String.format(resources.getString("contractBreach.text"),
-                          contract.getHyperlinkedName(),
-                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                          CLOSING_SPAN_TAG));
-
-                    campaignState.changeVictoryPoints(-1);
-                }
             }
 
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {

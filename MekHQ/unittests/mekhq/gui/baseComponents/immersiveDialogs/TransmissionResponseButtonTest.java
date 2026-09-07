@@ -62,10 +62,6 @@ class TransmissionResponseButtonTest {
     private static final int HEIGHT = 44;
     private static final int HORIZONTAL_LAYOUT_ALLOWANCE = 4;
     private static final int VERTICAL_LAYOUT_ALLOWANCE = 2;
-    private static final String CONFIRMATION_TEXT = "TRANSMITTING";
-    private static final String COMPACT_CONFIRMATION_TEXT = "TX...";
-    private static final String ACCESSIBLE_CONFIRMATION_TEXT = "Transmitting response";
-
     @Test
     void framePaintsIdlePartialAndFullStates() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
@@ -350,7 +346,7 @@ class TransmissionResponseButtonTest {
     }
 
     @Test
-    void frameAnimationAndConfirmationPreserveDimensionsWithoutForegroundChurn() throws Exception {
+    void frameAnimationPreservesDimensionsWithoutForegroundChurn() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             TransmissionResponseButton button = createButton();
             ImmersiveDialogCore.applyUniformButtonSizes(List.of(button));
@@ -371,155 +367,26 @@ class TransmissionResponseButtonTest {
             button.advanceFrameTransition(TransmissionResponseButton.FRAME_TRANSITION_DURATION_NANOS);
             assertButtonDimensions(button, preferredSize, minimumSize, currentSize);
             assertEquals(changesAfterHover, foregroundChanges.get());
-
-            button.lockTransmissionConfirmation(
-                  CONFIRMATION_TEXT, COMPACT_CONFIRMATION_TEXT, ACCESSIBLE_CONFIRMATION_TEXT);
-            assertButtonDimensions(button, preferredSize, minimumSize, currentSize);
         });
     }
 
     @Test
-    void transmissionConfirmationPreservesTextAndSizeAndCleansUpOnRemoval() throws Exception {
+    void responseActivationCapturesAndDisposesImmediatelyAndRejectsDuplicates() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createButton();
-            button.getAccessibleContext().setAccessibleName("Original response");
-            String originalText = button.getText();
-            Dimension originalPreferredSize = button.getPreferredSize();
-            Dimension originalMinimumSize = button.getMinimumSize();
-            Dimension originalMaximumSize = button.getMaximumSize();
-            Dimension originalSize = button.getSize();
-            int[] idlePixels = renderPixels(button);
-
-            assertTrue(button.lockTransmissionConfirmation(
-                CONFIRMATION_TEXT, COMPACT_CONFIRMATION_TEXT, ACCESSIBLE_CONFIRMATION_TEXT));
-            assertFalse(button.lockTransmissionConfirmation(
-                CONFIRMATION_TEXT, COMPACT_CONFIRMATION_TEXT, ACCESSIBLE_CONFIRMATION_TEXT));
-            assertTrue(button.isTransmissionConfirmationVisible());
-            assertEquals(originalText, button.getText());
-            assertEquals(originalPreferredSize, button.getPreferredSize());
-            assertEquals(originalMinimumSize, button.getMinimumSize());
-            assertEquals(originalMaximumSize, button.getMaximumSize());
-            assertEquals(originalSize, button.getSize());
-            assertEquals(ACCESSIBLE_CONFIRMATION_TEXT, button.getAccessibleContext().getAccessibleName());
-            assertEquals(1.0, button.getFrameProgress(), 0.001);
-            assertFalse(button.isAnimationTimerRunning());
-
-            int[] transmittingPixels = renderPixels(button);
-            assertNotEquals(pixelAt(idlePixels, WIDTH / 2, 5), pixelAt(transmittingPixels, WIDTH / 2, 5));
-            assertNotEquals(pixelAt(transmittingPixels, WIDTH / 2, 0),
-                  pixelAt(transmittingPixels, WIDTH / 2, 3));
-            assertNotEquals(pixelAt(transmittingPixels, 0, HEIGHT / 2),
-                pixelAt(transmittingPixels, 3, HEIGHT / 2));
-
-            fireFocusLost(button);
-            assertEquals(1.0, button.getFrameProgress(), 0.001);
-
-            button.removeNotify();
-            assertFalse(button.isTransmissionConfirmationVisible());
-            assertFalse(button.isAnimationTimerRunning());
-            assertEquals(originalText, button.getText());
-            assertEquals(originalPreferredSize, button.getPreferredSize());
-            assertEquals(originalMinimumSize, button.getMinimumSize());
-            assertEquals(originalMaximumSize, button.getMaximumSize());
-            assertEquals(originalSize, button.getSize());
-            assertEquals("Original response", button.getAccessibleContext().getAccessibleName());
-        });
-    }
-
-    @Test
-    void confirmationUsesCompactTextOnlyWhenFullTextDoesNotFit() throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createButton();
-            FontMetrics fontMetrics = button.getFontMetrics(button.getFont());
-            Insets insets = button.getInsets();
-            int frameWidth = insets.left + insets.right;
-            int fullTextWidth = fontMetrics.stringWidth(CONFIRMATION_TEXT);
-
-            button.setSize(frameWidth + fullTextWidth, HEIGHT);
-            button.lockTransmissionConfirmation(
-                  CONFIRMATION_TEXT, COMPACT_CONFIRMATION_TEXT, ACCESSIBLE_CONFIRMATION_TEXT);
-            assertEquals(CONFIRMATION_TEXT, button.getTransmissionConfirmationOverlayText(fontMetrics));
-
-            button.clearTransmissionConfirmation();
-            button.setSize(frameWidth + fullTextWidth - 1, HEIGHT);
-            button.lockTransmissionConfirmation(
-                  CONFIRMATION_TEXT, COMPACT_CONFIRMATION_TEXT, ACCESSIBLE_CONFIRMATION_TEXT);
-            assertEquals(COMPACT_CONFIRMATION_TEXT, button.getTransmissionConfirmationOverlayText(fontMetrics));
-        });
-    }
-
-    @Test
-    void responseActivationCapturesImmediatelyAndRejectsDuplicates() throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton selectedButton = createButton();
-            TransmissionResponseButton alternateButton = createButton();
             AtomicInteger captureCount = new AtomicInteger();
             AtomicInteger disposeCount = new AtomicInteger();
-            boolean[] capturedBeforeVisualChanges = new boolean[1];
-            selectedButton.getAccessibleContext().setAccessibleName("Original response");
             ImmersiveDialogCore.ResponseActivationController controller =
                 new ImmersiveDialogCore.ResponseActivationController(disposeCount::incrementAndGet);
 
-            boolean activated = controller.activate(selectedButton,
-                  List.of(selectedButton, alternateButton),
-                  () -> {
-                      captureCount.incrementAndGet();
-                      capturedBeforeVisualChanges[0] = !selectedButton.isTransmissionConfirmationVisible()
-                                                         && alternateButton.isEnabled();
-                  },
-                  CONFIRMATION_TEXT, COMPACT_CONFIRMATION_TEXT, ACCESSIBLE_CONFIRMATION_TEXT);
+            boolean activated = controller.activate(captureCount::incrementAndGet);
 
             assertTrue(activated);
             assertEquals(1, captureCount.get());
-            assertTrue(capturedBeforeVisualChanges[0]);
-            assertTrue(selectedButton.isEnabled());
-            assertFalse(alternateButton.isEnabled());
-            assertTrue(selectedButton.isTransmissionConfirmationVisible());
-            assertEquals("Respond", selectedButton.getText());
-            assertEquals(ACCESSIBLE_CONFIRMATION_TEXT, selectedButton.getAccessibleContext().getAccessibleName());
-            int[] selectedPixels = renderPixels(selectedButton);
-            assertNotEquals(pixelAt(selectedPixels, WIDTH / 2, 0), pixelAt(selectedPixels, WIDTH / 2, 3));
-            assertNotEquals(pixelAt(selectedPixels, 0, HEIGHT / 2), pixelAt(selectedPixels, 3, HEIGHT / 2));
-            assertTrue(controller.isConfirmationTimerRunning());
-            assertFalse(controller.isConfirmationTimerRepeating());
-            assertEquals(350,
-                  ImmersiveDialogCore.ResponseActivationController.TRANSMISSION_CONFIRMATION_DELAY_MS);
-
-            assertFalse(controller.activate(selectedButton,
-                  List.of(selectedButton, alternateButton),
-                  captureCount::incrementAndGet,
-                  CONFIRMATION_TEXT, COMPACT_CONFIRMATION_TEXT, ACCESSIBLE_CONFIRMATION_TEXT));
-            assertEquals(1, captureCount.get());
-
-            controller.completeTransmission();
-            controller.completeTransmission();
             assertEquals(1, disposeCount.get());
-            assertFalse(controller.isConfirmationTimerRunning());
-            assertFalse(selectedButton.isTransmissionConfirmationVisible());
-            assertEquals("Original response", selectedButton.getAccessibleContext().getAccessibleName());
-        });
-    }
 
-    @Test
-    void responseActivationTimerCancelsWithoutDisposal() throws Exception {
-        SwingUtilities.invokeAndWait(() -> {
-            TransmissionResponseButton button = createButton();
-            AtomicInteger disposeCount = new AtomicInteger();
-            button.getAccessibleContext().setAccessibleName("Original response");
-            ImmersiveDialogCore.ResponseActivationController controller =
-                new ImmersiveDialogCore.ResponseActivationController(disposeCount::incrementAndGet);
-            controller.activate(button, List.of(button), () -> { },
-                  CONFIRMATION_TEXT, COMPACT_CONFIRMATION_TEXT, ACCESSIBLE_CONFIRMATION_TEXT);
-
-            controller.cancel();
-            controller.completeTransmission();
-
-            assertFalse(controller.isConfirmationTimerRunning());
-            assertFalse(button.isTransmissionConfirmationVisible());
-            assertFalse(button.isAnimationTimerRunning());
-            assertEquals(0.0, button.getFrameProgress(), 0.001);
-            assertEquals("Original response", button.getAccessibleContext().getAccessibleName());
-            assertEquals(0, disposeCount.get());
+            assertFalse(controller.activate(captureCount::incrementAndGet));
+            assertEquals(1, captureCount.get());
+            assertEquals(1, disposeCount.get());
         });
     }
 

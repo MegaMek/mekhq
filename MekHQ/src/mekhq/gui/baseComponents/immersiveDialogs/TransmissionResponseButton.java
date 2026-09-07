@@ -35,7 +35,6 @@ package mekhq.gui.baseComponents.immersiveDialogs;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 
 import java.awt.Color;
-import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -66,10 +65,6 @@ final class TransmissionResponseButton extends JButton {
     private boolean frameTransitionActive;
     private boolean pointerActive;
     private boolean focusActive;
-    private boolean transmissionConfirmationVisible;
-    private String transmissionConfirmationText;
-    private String compactTransmissionConfirmationText;
-    private String accessibleNameBeforeTransmission;
 
     TransmissionResponseButton(String text) {
         super(text);
@@ -125,17 +120,12 @@ final class TransmissionResponseButton extends JButton {
 
     @Override
     public void removeNotify() {
-        clearTransmissionConfirmation();
         resetAnimation();
         super.removeNotify();
     }
 
     @Override
     protected void paintComponent(Graphics graphics) {
-        if (transmissionConfirmationVisible) {
-            paintTransmissionConfirmation(graphics);
-            return;
-        }
         paintFrameButton(graphics);
     }
 
@@ -149,7 +139,7 @@ final class TransmissionResponseButton extends JButton {
     }
 
     void setFrameActive(boolean active, long nowNanos) {
-        if (!isEnabled() || transmissionConfirmationVisible) {
+        if (!isEnabled()) {
             return;
         }
 
@@ -215,42 +205,6 @@ final class TransmissionResponseButton extends JButton {
         return animationTimer.isRepeats();
     }
 
-    boolean lockTransmissionConfirmation(String confirmationText, String compactConfirmationText,
-          String accessibleFeedbackText) {
-        if (transmissionConfirmationVisible) {
-            return false;
-        }
-        if (confirmationText == null || compactConfirmationText == null || accessibleFeedbackText == null) {
-            throw new IllegalArgumentException("transmission confirmation text cannot be null");
-        }
-
-        transmissionConfirmationVisible = true;
-        transmissionConfirmationText = confirmationText;
-        compactTransmissionConfirmationText = compactConfirmationText;
-        accessibleNameBeforeTransmission = getAccessibleContext().getAccessibleName();
-        animationTimer.stop();
-        frameTransitionActive = false;
-        frameTransitionStartProgress = 1.0;
-        frameTargetProgress = 1.0;
-        frameProgress = 1.0;
-        getAccessibleContext().setAccessibleName(accessibleFeedbackText);
-        updateFrameForeground();
-        repaint();
-        return true;
-    }
-
-    boolean isTransmissionConfirmationVisible() {
-        return transmissionConfirmationVisible;
-    }
-
-    String getTransmissionConfirmationOverlayText(FontMetrics fontMetrics) {
-        Insets insets = getInsets();
-        int availableWidth = Math.max(0, getWidth() - insets.left - insets.right);
-        return fontMetrics.stringWidth(transmissionConfirmationText) <= availableWidth
-                     ? transmissionConfirmationText
-                     : compactTransmissionConfirmationText;
-    }
-
     private void advanceAnimation() {
         advanceFrameTransition(System.nanoTime());
         if (frameTransitionActive) {
@@ -259,9 +213,6 @@ final class TransmissionResponseButton extends JButton {
     }
 
     private void updateFrameTarget(long nowNanos) {
-        if (transmissionConfirmationVisible) {
-            return;
-        }
         setFrameActive(pointerActive, nowNanos);
     }
 
@@ -310,41 +261,6 @@ final class TransmissionResponseButton extends JButton {
         frameGraphics.dispose();
     }
 
-    private void paintTransmissionConfirmation(Graphics graphics) {
-        ImmersiveDialogStyle.ResponseButtonStateColors pressedColors =
-              ImmersiveDialogStyle.getTransmissionConfirmationColors();
-
-        Graphics2D backgroundGraphics = (Graphics2D) graphics.create();
-        backgroundGraphics.setColor(pressedColors.background());
-        backgroundGraphics.fillRect(0, 0, getWidth(), getHeight());
-        backgroundGraphics.dispose();
-
-        Insets insets = getInsets();
-        int innerWidth = Math.max(0, getWidth() - insets.left - insets.right);
-        int innerHeight = Math.max(0, getHeight() - insets.top - insets.bottom);
-        if (innerWidth > 0 && innerHeight > 0) {
-            Graphics2D textGraphics = (Graphics2D) graphics.create();
-            textGraphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
-                  RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-            textGraphics.setColor(pressedColors.foreground());
-            textGraphics.setFont(getFont());
-            textGraphics.clipRect(insets.left, insets.top, innerWidth, innerHeight);
-            FontMetrics fontMetrics = textGraphics.getFontMetrics();
-            String overlayText = getTransmissionConfirmationOverlayText(fontMetrics);
-            int textX = insets.left + Math.max(0, (innerWidth - fontMetrics.stringWidth(overlayText)) / 2);
-            int textY = insets.top + Math.max(0, (innerHeight - fontMetrics.getHeight()) / 2)
-                              + fontMetrics.getAscent();
-            textGraphics.drawString(overlayText, textX, textY);
-            textGraphics.dispose();
-        }
-
-        Graphics2D frameGraphics = (Graphics2D) graphics.create();
-        frameGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_OFF);
-        frameGraphics.setColor(pressedColors.frame());
-        paintCornerFrame(frameGraphics, 1.0);
-        frameGraphics.dispose();
-    }
-
     private void paintCornerFrame(Graphics2D graphics, double progress) {
         int width = getWidth();
         int height = getHeight();
@@ -375,9 +291,7 @@ final class TransmissionResponseButton extends JButton {
     private void updateFrameForeground() {
         ImmersiveDialogStyle.ResponseButtonColors colors = ImmersiveDialogStyle.getResponseButtonColors();
         Color foreground;
-        if (transmissionConfirmationVisible) {
-            foreground = colors.pressed().foreground();
-        } else if (getModel().isPressed()) {
+        if (getModel().isPressed()) {
             foreground = colors.pressed().foreground();
         } else {
             foreground = isEnabled() && frameTargetProgress > 0.0
@@ -387,25 +301,6 @@ final class TransmissionResponseButton extends JButton {
         if (!foreground.equals(super.getForeground())) {
             super.setForeground(foreground);
         }
-    }
-
-    void clearTransmissionConfirmation() {
-        if (!transmissionConfirmationVisible) {
-            return;
-        }
-
-        transmissionConfirmationVisible = false;
-        transmissionConfirmationText = null;
-        compactTransmissionConfirmationText = null;
-        getAccessibleContext().setAccessibleName(accessibleNameBeforeTransmission);
-        accessibleNameBeforeTransmission = null;
-        frameTransitionActive = false;
-        frameTransitionStartProgress = pointerActive ? 1.0 : 0.0;
-        frameTargetProgress = frameTransitionStartProgress;
-        frameProgress = frameTransitionStartProgress;
-        animationTimer.stop();
-        updateFrameForeground();
-        repaint();
     }
 
     private static ImmersiveDialogStyle.ResponseButtonStateColors blend(
