@@ -168,6 +168,9 @@ class RulesetRankAssignerSelectionTest {
     private static CommandGenerationOptions companyOptions() {
         CommandGenerationOptions options = new CommandGenerationOptions();
         options.setAutomaticallyAssignRanks(true);
+        // Each case turns on the selection option it is about; the baseline starts with none of them.
+        options.setAssignBestCompanyCommander(false);
+        options.setAssignBestOfficers(false);
         options.getForceDescriptorSnapshot().setEchelon(COMPANY_ECHELON);
         return options;
     }

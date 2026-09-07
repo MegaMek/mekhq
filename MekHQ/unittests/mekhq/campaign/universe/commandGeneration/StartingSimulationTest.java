@@ -97,8 +97,11 @@ class StartingSimulationTest {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         Person person = mekWarrior(campaign);
         CommandGenerationOptions off = new CommandGenerationOptions();
+        off.setRunStartingSimulation(false);
         CommandGenerationOptions nothingToDo = new CommandGenerationOptions();
         nothingToDo.setRunStartingSimulation(true);
+        nothingToDo.setSimulateRandomMarriages(false);
+        nothingToDo.setSimulateRandomProcreation(false);
         nothingToDo.setSimulationDuration(12);
 
         assertEquals(StartingSimulation.Result.none(), StartingSimulation.run(campaign, off, List.of(person), null));
