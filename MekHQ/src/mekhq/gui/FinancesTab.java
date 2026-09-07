@@ -58,6 +58,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.GMModeEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.assets.AssetEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.missions.MissionChangedEvent;
@@ -713,6 +714,18 @@ public final class FinancesTab extends CampaignGuiTab {
     @Subscribe
     public void handle(TransactionEvent ev) {
         financialTransactionsScheduler.schedule();
+    }
+
+    /**
+     * The starting simulation books ten years of pay and expenses while {@link Campaign#isBulkGenerationInProgress()}
+     * is true, so the {@link TransactionEvent}s it raises are all dropped by the guard in
+     * {@link #refreshFinancialReport()}. Generation signs off with this event and nothing else, so without this handler
+     * the ledger and the net worth both keep their pre-simulation figures.
+     */
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
+        financialTransactionsScheduler.schedule();
+        financialReportScheduler.schedule();
     }
 
     @Subscribe
