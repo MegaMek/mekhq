@@ -1837,6 +1837,11 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void promptAutoResolve(Scenario scenario) {
+        if (!MekHQ.getMHQOptions().getEnableAbstractCombatAutoResolve()) {
+            runPrincessAutoResolve();
+            return;
+        }
+
         // the options for the auto resolve method follow a predefined order, which is the same as the order in the enum,
         // and it uses that to preselect the option that is currently set in the campaign options
         Object[] options = new Object[] { getText("AutoResolveMethod.PRINCESS.text"),
