@@ -7473,82 +7473,38 @@ public class Person implements ILocatable {
             return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel(), 0);
         }
 
-        Skill skill = getSkillForWorkingOn(unit);
-        if (skill != null) {
-            return skill;
-        }
-
         SkillModifierData skillModifierData = getSkillModifierData();
 
-        // check spare parts
-        // return the best one
-        if (part.isRightTechType(S_TECH_MEK) && hasSkill(S_TECH_MEK)) {
-            skill = getSkill(S_TECH_MEK);
-        }
-
-        if (part.isRightTechType(S_TECH_BA) && hasSkill(S_TECH_BA)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(skillModifierData) >
-                             getSkill(S_TECH_BA).getFinalSkillValue(skillModifierData))) {
-                skill = getSkill(S_TECH_BA);
-            }
-        }
-
-        if (part.isRightTechType(S_TECH_AERO) && hasSkill(S_TECH_AERO)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(skillModifierData) >
-                             getSkill(S_TECH_AERO).getFinalSkillValue(skillModifierData))) {
-                skill = getSkill(S_TECH_AERO);
-            }
-        }
-
-        if (part.isRightTechType(S_TECH_MECHANIC) && hasSkill(S_TECH_MECHANIC)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(skillModifierData) >
-                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(skillModifierData))) {
-                skill = getSkill(S_TECH_MECHANIC);
-            }
-        }
-
-        if (part.isRightTechType(S_TECH_VESSEL) && hasSkill(S_TECH_VESSEL)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(skillModifierData) >
-                             getSkill(S_TECH_VESSEL).getFinalSkillValue(skillModifierData))) {
-                skill = getSkill(S_TECH_VESSEL);
+        // Find the best skill the tech possesses among those the part accepts. Each part reports only its most
+        // appropriate skill(s) via isRightTechType, so the granular specialist skill (e.g. Technician/Weapons) is
+        // preferred wherever one applies, falling back to a "global" skill (Technician/Mek, etc.) only for parts that
+        // map to no more specific skill.
+        Skill skill = null;
+        for (String techSkillName : SkillType.getTechSkills()) {
+            if (part.isRightTechType(techSkillName) && hasSkill(techSkillName)) {
+                Skill candidate = getSkill(techSkillName);
+                if ((skill == null) ||
+                          (skill.getFinalSkillValue(skillModifierData) >
+                                 candidate.getFinalSkillValue(skillModifierData))) {
+                    skill = candidate;
+                }
             }
         }
 
         if (skill != null) {
             return skill;
         }
-        // if we are still here then we didn't have the right tech skill, so return the
-        // highest
-        // of any tech skills that we do have
-        if (hasSkill(S_TECH_MEK)) {
-            skill = getSkill(S_TECH_MEK);
-        }
 
-        if (hasSkill(S_TECH_BA)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(skillModifierData) >
-                             getSkill(S_TECH_BA).getFinalSkillValue(skillModifierData))) {
-                skill = getSkill(S_TECH_BA);
-            }
-        }
-
-        if (hasSkill(S_TECH_MECHANIC)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(skillModifierData) >
-                             getSkill(S_TECH_MECHANIC).getFinalSkillValue(skillModifierData))) {
-                skill = getSkill(S_TECH_MECHANIC);
-            }
-        }
-
-        if (hasSkill(S_TECH_AERO)) {
-            if ((skill == null) ||
-                      (skill.getFinalSkillValue(skillModifierData) >
-                             getSkill(S_TECH_AERO).getFinalSkillValue(skillModifierData))) {
-                skill = getSkill(S_TECH_AERO);
+        // If we are still here then the tech doesn't have the right skill for this part, so return the highest of any
+        // tech skill they do have (they will be working out of their specialty).
+        for (String techSkillName : SkillType.getTechSkills()) {
+            if (hasSkill(techSkillName)) {
+                Skill candidate = getSkill(techSkillName);
+                if ((skill == null) ||
+                          (skill.getFinalSkillValue(skillModifierData) >
+                                 candidate.getFinalSkillValue(skillModifierData))) {
+                    skill = candidate;
+                }
             }
         }
 
@@ -7590,13 +7546,7 @@ public class Person implements ILocatable {
     /**
      * Returns the highest effective tech skill level the person possesses.
      *
-     * <p>This method considers the four primary tech skills:</p>
-     * <ul>
-     *   <li>{@link SkillType#S_TECH_MEK}</li>
-     *   <li>{@link SkillType#S_TECH_MECHANIC}</li>
-     *   <li>{@link SkillType#S_TECH_BA}</li>
-     *   <li>{@link SkillType#S_TECH_AERO}</li>
-     * </ul>
+     * <p>This method considers every technician skill used for part work (see {@link SkillType#getTechSkills()}).</p>
      *
      * <p>For each skill the person has, the method computes its total effective level using the active
      * {@link SkillModifierData} and returns the maximum among them. If none of the skills are present,
@@ -7609,14 +7559,8 @@ public class Person implements ILocatable {
         SkillModifierData modifierData = getSkillModifierData();
         int bestLevel = EXP_NONE;
 
-        Skill[] skills = {
-              getSkill(S_TECH_MEK),
-              getSkill(S_TECH_MECHANIC),
-              getSkill(S_TECH_BA),
-              getSkill(S_TECH_AERO)
-        };
-
-        for (Skill skill : skills) {
+        for (String techSkillName : SkillType.getTechSkills()) {
+            Skill skill = getSkill(techSkillName);
             if (skill != null) {
                 int level = skill.getTotalSkillLevel(modifierData);
                 if (level > bestLevel) {
@@ -7629,26 +7573,15 @@ public class Person implements ILocatable {
     }
 
     public boolean isRightTechTypeFor(final IPartWork part) {
-        Unit unit = part.getUnit();
-        if (unit == null) {
-            return (hasSkill(S_TECH_MEK) && part.isRightTechType(S_TECH_MEK)) ||
-                         (hasSkill(S_TECH_AERO) && part.isRightTechType(S_TECH_AERO)) ||
-                         (hasSkill(S_TECH_MECHANIC) && part.isRightTechType(S_TECH_MECHANIC)) ||
-                         (hasSkill(S_TECH_BA) && part.isRightTechType(S_TECH_BA)) ||
-                         (hasSkill(S_TECH_VESSEL) && part.isRightTechType(S_TECH_VESSEL));
-        } else if ((unit.getEntity() instanceof Mek) || (unit.getEntity() instanceof ProtoMek)) {
-            return hasSkill(S_TECH_MEK);
-        } else if (unit.getEntity() instanceof BattleArmor) {
-            return hasSkill(S_TECH_BA);
-        } else if ((unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof Infantry)) {
-            return hasSkill(S_TECH_MECHANIC);
-        } else if ((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) {
-            return hasSkill(S_TECH_VESSEL);
-        } else if (unit.getEntity() instanceof Aero) {
-            return hasSkill(S_TECH_AERO);
-        } else {
-            return false;
+        // A tech is the right type for a part if they possess any of the tech skills the part accepts. Parts report
+        // their most appropriate skill via isRightTechType, so this naturally favors specialist skills while still
+        // allowing a "global" skill (Technician/Mek, etc.) for parts that map to no more specific skill.
+        for (String techSkillName : SkillType.getTechSkills()) {
+            if (hasSkill(techSkillName) && part.isRightTechType(techSkillName)) {
+                return true;
+            }
         }
+        return false;
     }
 
     public @Nullable UUID getDoctorId() {

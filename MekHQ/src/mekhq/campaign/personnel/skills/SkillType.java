@@ -247,6 +247,26 @@ public class SkillType {
                                                S_CAREER_ANY, S_SWIMMING, S_ZERO_G_OPERATIONS, S_RUNNING, S_TRAINING,
                                                S_MELEE_WEAPONS, S_THROWN_WEAPONS, S_SUPPORT_WEAPONS };
 
+    /**
+     * The technician skills usable for repairing, maintaining, and replacing unit parts, ordered from the legacy
+     * "global" skills (used only when no more specific skill applies to a part) to the granular specialist skills. This
+     * deliberately excludes {@link #S_ASTECH} (an assistant-only skill) and {@link #S_TECH_MILITARY}/
+     * {@link #S_TECH_CIVILIAN} (broad groupings that do not correspond to any component subskill), none of which are
+     * ever returned by a part's {@link mekhq.campaign.parts.Part#isRightTechType(String)}.
+     */
+    public static final String[] techSkillList = { S_TECH_MEK, S_TECH_MECHANIC, S_TECH_AERO, S_TECH_BA, S_TECH_VESSEL,
+                                                   S_TECH_ELECTRONIC, S_TECH_NUCLEAR, S_TECH_AERONAUTICS,
+                                                   S_TECH_MECHANICAL, S_TECH_MYOMER, S_TECH_JETS, S_TECH_WEAPONS,
+                                                   S_TECH_CYBERNETICS };
+
+    /**
+     * @return the technician skills used for repairing, maintaining, and replacing unit parts. See
+     *       {@link #techSkillList} for what is included and excluded.
+     */
+    public static String[] getTechSkills() {
+        return techSkillList;
+    }
+
     public static Map<String, SkillType> lookupHash;
 
     public static final int SKILL_NONE = 0;
