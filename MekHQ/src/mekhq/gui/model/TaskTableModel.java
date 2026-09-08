@@ -52,6 +52,7 @@ import mekhq.IconPackage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.PodSpace;
+import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
@@ -108,19 +109,26 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
      * @return an HTML fragment (with a leading {@code <br>}) naming the required skill(s)
      */
     public static String getRequiredSkillText(IPartWork part) {
-        String[] techSkills = SkillType.getTechSkills();
-        List<String> accepted = new ArrayList<>();
-        for (String skillName : techSkills) {
-            if (part.isRightTechType(skillName)) {
-                accepted.add(skillName);
-            }
-        }
-
         String label;
-        if (accepted.isEmpty() || (accepted.size() == techSkills.length)) {
-            label = getTextAt(RESOURCE_BUNDLE, "TaskTableModel.requiredSkill.any");
+        if (part instanceof Refit) {
+            String globalSkill = Person.getGlobalTechSkillNameFor(part.getUnit());
+            label = (globalSkill != null) ?
+                          globalSkill :
+                          getTextAt(RESOURCE_BUNDLE, "TaskTableModel.requiredSkill.any");
         } else {
-            label = String.join(", ", accepted);
+            String[] techSkills = SkillType.getTechSkills();
+            List<String> accepted = new ArrayList<>();
+            for (String skillName : techSkills) {
+                if (part.isRightTechType(skillName)) {
+                    accepted.add(skillName);
+                }
+            }
+
+            if (accepted.isEmpty() || (accepted.size() == techSkills.length)) {
+                label = getTextAt(RESOURCE_BUNDLE, "TaskTableModel.requiredSkill.any");
+            } else {
+                label = String.join(", ", accepted);
+            }
         }
 
         return "<br><i>" + getFormattedTextAt(RESOURCE_BUNDLE, "TaskTableModel.requiredSkill.format", label) + "</i>";

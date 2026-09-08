@@ -7494,6 +7494,10 @@ public class Person implements ILocatable {
             return new Skill(S_TECH_VEHICLE, mechanicSkillType.getRegularLevel(), 0);
         }
 
+        if (part instanceof Refit) {
+            return getMaintenanceOrRefitSkill(unit);
+        }
+
         SkillModifierData skillModifierData = getSkillModifierData();
 
         // Find the best skill the tech possesses among those the part accepts. Each part reports only its most
@@ -7554,6 +7558,101 @@ public class Person implements ILocatable {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Determines whether this person is of the appropriate technician <em>profession</em> to maintain or refit the
+     * given unit - that is, they hold the matching tech role <b>and</b> the matching global technician skill for the
+     * unit's type (Meks by Mek Techs, vehicles by Mechanics, and so on).
+     *
+     * <p>Unlike part repair - which is resolved by specialist skill regardless of profession - whole-unit maintenance
+     * and refits are gated on profession, so this uses the role-aware {@link #isTechMek()}-style predicates rather than
+     * a bare skill check. Conventional infantry are self-maintaining and always qualify.</p>
+     *
+     * @param unit the unit to be maintained or refit
+     *
+     * @return {@code true} if this person may maintain or refit the unit; {@code false} otherwise
+     */
+    public boolean isRightTechProfessionFor(final @Nullable Unit unit) {
+        if ((unit == null) || (unit.getEntity() == null)) {
+            return false;
+        }
+
+        if (unit.isConventionalInfantry()) {
+            return true;
+        }
+
+        final String globalSkill = getGlobalTechSkillNameFor(unit);
+        if (globalSkill == null) {
+            return false;
+        }
+
+        return switch (globalSkill) {
+            case S_TECH_MEK -> isTechMek();
+            case S_TECH_BA -> isTechBA();
+            case S_TECH_VESSEL -> isTechLargeVessel();
+            case S_TECH_AERO -> isTechAero();
+            case S_TECH_VEHICLE -> isTechMechanic();
+            default -> false;
+        };
+    }
+
+    /**
+     * Returns the name of the whole-unit global technician skill used to maintain or refit the given unit, based purely
+     * on the unit's type - independent of any person's skills or profession. This is the single source of truth for the
+     * unit-type-to-global-skill mapping used by maintenance and refit logic.
+     *
+     * @param unit the unit whose maintenance/refit skill type is wanted
+     *
+     * @return the global technician skill name (e.g. {@link SkillType#S_TECH_MEK}), or {@code null} if the unit type
+     *       has no associated global technician skill
+     */
+    public static @Nullable String getGlobalTechSkillNameFor(final @Nullable Unit unit) {
+        if ((unit == null) || (unit.getEntity() == null)) {
+            return null;
+        }
+
+        final Entity entity = unit.getEntity();
+        if (entity instanceof Mek || entity instanceof ProtoMek || entity instanceof HandheldWeapon) {
+            return S_TECH_MEK;
+        } else if (entity instanceof BattleArmor) {
+            return S_TECH_BA;
+        } else if (entity instanceof AeroSpaceFighter) {
+            return S_TECH_AERO;
+        } else if (entity instanceof Aero) {
+            return S_TECH_VESSEL;
+        } else if (entity instanceof Tank || entity instanceof Infantry) {
+            return S_TECH_VEHICLE;
+        }
+
+        return null;
+    }
+
+    /**
+     * Returns the skill this person would use to maintain or refit the given unit, or {@code null} if they are not of
+     * the appropriate profession to do so.
+     *
+     * <p>Maintenance and refits always use the whole-unit global technician skill for the unit's type (see
+     * {@link #getSkillForWorkingOn(Unit)}), never a per-part specialist skill, and require the matching profession (see
+     * {@link #isRightTechProfessionFor(Unit)}).</p>
+     *
+     * @param unit the unit to be maintained or refit
+     *
+     * @return the global technician skill to use, or {@code null} if this person cannot maintain/refit the unit
+     */
+    public @Nullable Skill getMaintenanceOrRefitSkill(final @Nullable Unit unit) {
+        if ((unit != null) && unit.isConventionalInfantry()) {
+            // Conventional infantry are self-maintaining and refit automatically; mirror the stock mechanic skill used
+            // for them elsewhere so downstream automatic-success handling still has a non-null skill to work with.
+            final SkillType vehicleSkillType = SkillType.getType(S_TECH_VEHICLE);
+            return (vehicleSkillType == null) ? null : new Skill(S_TECH_VEHICLE, vehicleSkillType.getRegularLevel(), 0);
+        }
+
+        if (!isRightTechProfessionFor(unit)) {
+            return null;
+        }
+
+        return getSkillForWorkingOn(unit);
     }
 
     public @Nullable Skill getSkillForWorkingOn(final @Nullable String skillName) {

@@ -421,7 +421,7 @@ public class Maintenance {
         String skillLevel = "Unmaintained";
         SkillModifierData skillModifierData = null;
         if (null != tech) {
-            Skill skill = tech.getSkillForWorkingOn(partWork);
+            Skill skill = tech.getMaintenanceOrRefitSkill(partWork.getUnit());
             skillModifierData = tech.getSkillModifierData();
             if (null != skill) {
                 value = skill.getFinalSkillValue(skillModifierData);
