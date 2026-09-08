@@ -47,6 +47,27 @@ import testUtilities.MHQTestUtilities;
 
 class PlanetViewPanelTest {
     @Test
+    void animatedDossierResetsPreviouslyScrolledViewportBeforeReveal() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            Campaign campaign = MHQTestUtilities.getTestCampaign();
+            PlanetViewPanel panel = new PlanetViewPanel(campaign.getCurrentSystem(), campaign, 0, true);
+            JScrollPane scrollPane = new JScrollPane(panel);
+            JViewport viewport = scrollPane.getViewport();
+            viewport.setExtentSize(new Dimension(320, 200));
+            viewport.setViewSize(new Dimension(320, 1_000));
+            viewport.setViewPosition(new Point(0, 160));
+
+            panel.addNotify();
+            try {
+                assertTrue(viewport.getViewPosition().y == 0);
+                assertTrue(panel.isRevealAnimationRunning());
+            } finally {
+                panel.removeNotify();
+            }
+        });
+    }
+
+    @Test
     void verticalViewportMovementFinishesRevealAnimation() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             Campaign campaign = MHQTestUtilities.getTestCampaign();

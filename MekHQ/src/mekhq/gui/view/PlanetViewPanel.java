@@ -153,6 +153,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         if (animateReveal && !revealComplete) {
             revealViewport = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, this);
             if (revealViewport != null) {
+                revealViewport.setViewPosition(new java.awt.Point(0, 0));
                 revealViewportY = revealViewport.getViewPosition().y;
                 revealViewport.addChangeListener(revealScrollListener);
             }
