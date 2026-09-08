@@ -51,6 +51,7 @@ import javax.swing.JTextField;
 import megamek.client.ui.Messages;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
 import megamek.client.ui.dialogs.helpDialogs.HelpDialog;
+import megamek.client.ui.settings.SettingsCheckBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import megamek.client.ui.settings.SettingsLabel;
 import megamek.client.ui.settings.SettingsSpinner;
@@ -75,6 +76,7 @@ class MHQAdvancedPage extends MHQOptionsPage {
     private SettingsSpinner spinnerStartGameClientRetryCount;
     private SettingsSpinner spinnerStartGameBotClientDelay;
     private SettingsSpinner spinnerStartGameBotClientRetryCount;
+    private SettingsCheckBox chkEnableAbstractCombatAutoResolve;
 
     MHQAdvancedPage(MHQOptionsModel model, JFrame frame) {
         super(model);
@@ -153,6 +155,9 @@ class MHQAdvancedPage extends MHQOptionsPage {
         spinnerStartGameBotClientRetryCount = advancedSpinner(panel, "lblStartGameBotClientRetryCount", 250, 100, 2500,
               50, model.startGameBotClientRetryCount);
 
+        chkEnableAbstractCombatAutoResolve = checkBox("optionEnableAbstractCombatAutoResolve",
+              model.enableAbstractCombatAutoResolve);
+        panel.addCheckBoxGrid(1, chkEnableAbstractCombatAutoResolve);
 
         Component page = buildMHQPage("MHQAdvancedPage", "lblMHQAdvancedSection.text", "lblMHQAdvancedSection.summary",
               panel);
@@ -185,5 +190,6 @@ class MHQAdvancedPage extends MHQOptionsPage {
         model.startGameClientRetryCount = (int) spinnerStartGameClientRetryCount.getValue();
         model.startGameBotClientDelay = (int) spinnerStartGameBotClientDelay.getValue();
         model.startGameBotClientRetryCount = (int) spinnerStartGameBotClientRetryCount.getValue();
+        model.enableAbstractCombatAutoResolve = chkEnableAbstractCombatAutoResolve.isSelected();
     }
 }

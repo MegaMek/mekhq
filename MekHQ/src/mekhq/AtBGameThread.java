@@ -137,7 +137,10 @@ public class AtBGameThread extends GameThread {
             var acarGui = new CommanderGUI(client, controller);
             localBots = acarGui;
             swingGui = acarGui;
-            acarGui.start();
+            // Give the "Request Victory" button the server password so it authenticates on a passworded server, then
+            // build the window on the EDT. CommanderGUI is no longer a Thread. See issue #8891.
+            acarGui.setServerPassword(password);
+            acarGui.initialize();
         } else {
             var clientGui = new ClientGUI(client, controller);
             localBots = clientGui;
@@ -292,6 +295,7 @@ public class AtBGameThread extends GameThread {
                         copyDeploymentParameters(benchedEntity, entity);
                     }
                 }
+                logPlayerDeployment(entities);
                 client.sendAddEntity(entities);
 
                 // Run through the units again. This time add
@@ -336,6 +340,7 @@ public class AtBGameThread extends GameThread {
                     entity.setDeployRound(deploymentRound);
                     entities.add(entity);
                 }
+                logPlayerDeployment(entities);
                 client.sendAddEntity(entities);
                 client.sendPlayerInfo();
                 var botClients = new ArrayList<BotClient>();
@@ -700,6 +705,24 @@ public class AtBGameThread extends GameThread {
         }
         Unit towedUnit = campaign.getUnit(towedUnitIds.getFirst());
         return ((towedUnit == null) || (towedUnit.getEntity() == null)) ? null : towedUnit;
+    }
+
+    /**
+     * Logs each player entity's owner, start zone and deploy round at INFO before it is sent to the server. In
+     * Commander mode the lobby is skipped, so a misplaced unit (e.g. a reinforcement in the enemy's start zone) can
+     * only be diagnosed from mekhq.log; this makes that possible without a screenshot. See issue #9960.
+     *
+     * @param entities the player entities about to be sent to the server
+     */
+    private void logPlayerDeployment(List<Entity> entities) {
+        for (Entity entity : entities) {
+            Player owner = entity.getOwner();
+            LOGGER.info("[Deployment] {} owner={} startZone={} deployRound={}",
+                  entity.getShortName(),
+                  (owner == null) ? "none" : owner.getName(),
+                  entity.getStartingPos(),
+                  entity.getDeployRound());
+        }
     }
 
     private BotClient setupPlayerBotForAutoResolve(Player player) throws InterruptedException, PrincessException {

@@ -301,6 +301,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String START_GAME_CLIENT_RETRY_COUNT = "startGameClientRetryCount";
     public static final String START_GAME_BOT_CLIENT_DELAY = "startGameBotClientDelay";
     public static final String START_GAME_BOT_CLIENT_RETRY_COUNT = "startGameBotClientRetryCount";
+    public static final String ENABLE_ABSTRACT_COMBAT_AUTO_RESOLVE = "enableAbstractCombatAutoResolve";
 
     // The augmentation rules last chosen in the Command Generator, remembered so a new campaign
     // starts from the player's own answer rather than from the all-off defaults every time.
