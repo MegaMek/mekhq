@@ -78,6 +78,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityListFile;
+import megamek.common.units.UnitType;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
@@ -129,9 +130,9 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -1896,6 +1897,30 @@ public final class BriefingTab extends CampaignGuiTab {
         return scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
     }
 
+    /**
+     * Determines whether a unit is a space-only craft being sent to a board it cannot operate on.
+     *
+     * <p>WarShips, JumpShips and space stations can only fight on a space map; on a ground or atmospheric map they
+     * have no legal deployment. Aerospace fighters, DropShips and small craft are not blocked here - they follow the
+     * scenario's own rules. The check uses the entity's unit type rather than matching on chassis names. See issue
+     * #9960 (#9952).</p>
+     *
+     * @param entity    the player entity being considered
+     * @param boardType the scenario board type ({@link Scenario#T_GROUND}, {@link Scenario#T_ATMOSPHERE} or
+     *                  {@link Scenario#T_SPACE})
+     *
+     * @return {@code true} if the entity is space-only and the board is not a space map
+     */
+    static boolean isSpaceOnlyUnitOnNonSpaceBoard(Entity entity, int boardType) {
+        if (boardType == Scenario.T_SPACE) {
+            return false;
+        }
+        int unitType = entity.getUnitType();
+        return (unitType == UnitType.WARSHIP)
+                     || (unitType == UnitType.JUMPSHIP)
+                     || (unitType == UnitType.SPACE_STATION);
+    }
+
     private void startScenario(Scenario scenario, BehaviorSettings autoResolveBehaviorSettings) {
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(false);
         if (uids.isEmpty()) {
@@ -1925,6 +1950,19 @@ public final class BriefingTab extends CampaignGuiTab {
 
             if (entity == null) {
                 logger.error("Skipping unit {} because it's entity is null", uid);
+                continue;
+            }
+
+            // A space-only unit (WarShip, JumpShip, space station) cannot fight on a ground or atmospheric map. In
+            // Commander mode there is no lobby to catch this, so it is refused here for both launch modes rather than
+            // deployed onto a map it cannot operate on. See issue #9960 (#9952).
+            if (isSpaceOnlyUnitOnNonSpaceBoard(entity, scenario.getBoardType())) {
+                unDeployed.append('\n')
+                      .append(unit.getName())
+                      .append(" (a space-only unit cannot deploy on a ")
+                      .append(Scenario.getBoardTypeName(scenario.getBoardType()).toLowerCase())
+                      .append(" map)");
+                unDeployedUnits.add(unit);
                 continue;
             }
 
