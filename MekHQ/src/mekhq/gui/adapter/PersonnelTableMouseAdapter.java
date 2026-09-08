@@ -178,7 +178,7 @@ import mekhq.gui.PersonnelTab;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.dialog.*;
-import mekhq.gui.dialog.quartermaster.IssueArmorKitsDialog;
+import mekhq.gui.dialog.quartermaster.IssueEquipmentDialog;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.menus.AssignPersonToUnitMenu;
 import mekhq.gui.menus.LocationMenu;
@@ -2575,9 +2575,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         if (Arrays.stream(selected)
                   .anyMatch(candidate -> ArmorKitCatalog.canBeIssuedKit(candidate)
                                                || RepairKitCatalog.canBeIssuedKit(candidate))) {
-            JMenuItem issueKits = new JMenuItem(getTextAt("mekhq.resources.IssueArmorKitsDialog",
+            JMenuItem issueKits = new JMenuItem(getTextAt("mekhq.resources.IssueEquipmentDialog",
                   "menu.issueArmorKits"));
-            issueKits.addActionListener(ev -> IssueArmorKitsDialog.showFor(getFrame(),
+            issueKits.addActionListener(ev -> IssueEquipmentDialog.showFor(getFrame(),
                   getCampaign(), Arrays.asList(selected), null));
             popup.add(issueKits);
         }

@@ -33,6 +33,7 @@
 package mekhq.gui.enums;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Hashtable;
 import java.util.List;
@@ -45,6 +46,7 @@ import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.Mek;
@@ -432,6 +434,8 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           PersonnelTableModelColumn::getArmorKit),
     ARMOR_KIT_INTENDED("Column.ARMOR_KIT_INTENDED.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getIntendedArmorKit),
+    EQUIPMENT("Column.EQUIPMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
+          PersonnelTableModelColumn::getEquipment),
     COMBAT_ROLE("Column.COMBAT_ROLE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getCombatRole);
 
@@ -887,7 +891,40 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
         if (ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(internalName)) {
             return getTextAt("Cell.ARMOR_KIT.none");
         }
-        return internalName;
+        return kitDisplayName(internalName);
+    }
+
+    /**
+     * Every equipment kit a person is carrying, listed by display name: the personal armor kit (unless it is the
+     * default coveralls) followed by any tool, medical, computer, or other equipment kits, separated by commas.
+     * Displays "-" when the person carries nothing.
+     */
+    private static String getEquipment(Person person) {
+        List<String> kits = new ArrayList<>();
+
+        String armorKit = person.getArmorKitName();
+        if ((armorKit != null) && !ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(armorKit)) {
+            kits.add(kitDisplayName(armorKit));
+        }
+
+        for (String kitName : person.getRepairKitNames()) {
+            kits.add(kitDisplayName(kitName));
+        }
+
+        if (kits.isEmpty()) {
+            return "-";
+        }
+        kits.sort(Comparator.naturalOrder());
+        return String.join(", ", kits);
+    }
+
+    /**
+     * Resolves an equipment internal name to its display name, falling back to the raw internal name when the equipment
+     * cannot be looked up.
+     */
+    private static String kitDisplayName(String internalName) {
+        EquipmentType type = EquipmentType.get(internalName);
+        return (type != null) ? type.getName() : internalName;
     }
 
     /**
@@ -1007,6 +1044,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             case PERSONNEL_ROLE -> 120;
             case UNIT_ASSIGNMENT -> 140;
             case ORIGIN, ARMOR_KIT, ARMOR_KIT_INTENDED -> 160;
+            case EQUIPMENT -> 280;
             case TECH_UNIT_ASSIGNMENT -> 280;
             case COMBAT_ROLE -> 100;
             default -> null;

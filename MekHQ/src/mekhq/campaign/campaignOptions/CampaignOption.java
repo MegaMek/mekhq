@@ -324,8 +324,8 @@ public final class CampaignOption<T> {
           of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "adminDefaultToolKit");
     public static final CampaignOption<Boolean> ADD_DEFAULT_KIT_TO_PROCUREMENT =
           of(Boolean.class, false, "addDefaultKitToProcurement");
-    public static final CampaignOption<Boolean> NPC_EQUIPMENT_KITS =
-          of(Boolean.class, false, "npcEquipmentKits");
+    public static final CampaignOption<Boolean> TECHS_NEED_TOOL_KIT =
+          of(Boolean.class, false, "techsNeedToolKit");
     public static final CampaignOption<Boolean> NPC_FACTION_ARMOR_KITS =
           of(Boolean.class, false, "npcFactionArmorKits");
     public static final CampaignOption<Boolean> REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY =

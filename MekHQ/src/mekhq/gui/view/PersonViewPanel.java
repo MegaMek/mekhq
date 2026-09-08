@@ -147,6 +147,7 @@ import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
+import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -268,6 +269,20 @@ public class PersonViewPanel extends JScrollablePanel {
         add(pnlLocation, locationConstraints);
 
         int gridY = 2;
+
+        if (EquipmentSummaryPanel.hasEquipment(person)) {
+            EquipmentSummaryPanel pnlEquipment = new EquipmentSummaryPanel(person);
+            GridBagConstraints equipmentConstraints = new GridBagConstraints();
+            equipmentConstraints.gridx = 0;
+            equipmentConstraints.gridy = gridY;
+            equipmentConstraints.gridwidth = 2;
+            equipmentConstraints.weightx = 1.0;
+            equipmentConstraints.insets = new Insets(0, 5, 10, 10);
+            equipmentConstraints.fill = GridBagConstraints.HORIZONTAL;
+            equipmentConstraints.anchor = GridBagConstraints.NORTHWEST;
+            add(pnlEquipment, equipmentConstraints);
+            gridY++;
+        }
 
         EnhancedTabbedPane tabbedPane = new EnhancedTabbedPane();
         GridBagConstraints tabbedPaneConstraints = new GridBagConstraints();
@@ -3035,7 +3050,7 @@ public class PersonViewPanel extends JScrollablePanel {
             List<InjuryEffect> injuryEffects = person.getActiveInjuryEffects();
             int characterAge = person.getAgeForAttributeModifiers();
             SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
-                  injuryEffects, characterAge);
+                  injuryEffects, characterAge, RepairKitCatalog.generalSkillBonuses(person));
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(),
                   attributes,
                   skill.getType(),

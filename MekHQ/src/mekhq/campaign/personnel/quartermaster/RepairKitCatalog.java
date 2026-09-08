@@ -236,22 +236,28 @@ public final class RepairKitCatalog {
     }
 
     /**
-     * The NPC equipment kit an NPC in the given profession is assumed to carry when the NPC-equipment-kit campaign
-     * option is enabled: field surgeons carry the Field Surgical Kit, so their surgery/medical rolls (e.g. advanced
-     * surgeries) get its bonus. Returns {@code null} when the profession has no assumed NPC kit.
+     * Every non-technician skill this person's owned equipment kits improve, mapped to the best bonus for each (see
+     * {@link #generalSkillBonus(Person, String)}). Only skills with a non-zero bonus are included, so a person with no
+     * relevant kit yields an empty map. Suitable for folding into {@code SkillModifierData} so the bonus reaches every
+     * check made with the skill.
      *
-     * @param profession the NPC's profession
+     * @param person the person, or {@code null}
      *
-     * @return the NPC kit internal name, or {@code null}
+     * @return skill name -&gt; best kit bonus (never {@code null}; empty when nothing applies)
      */
-    public static @Nullable String npcKitFor(@Nullable KitProfession profession) {
-        if (profession == null) {
-            return null;
+    public static Map<String, Integer> generalSkillBonuses(@Nullable Person person) {
+        if (person == null) {
+            return Map.of();
         }
-        return switch (profession) {
-            case DOCTOR -> KIT_FIELD_SURGICAL;
-            default -> null;
-        };
+        Map<String, Integer> bonuses = new LinkedHashMap<>();
+        for (Map.Entry<String, Map<String, Integer>> entry : SKILL_BONUSES.entrySet()) {
+            if (person.hasRepairKit(entry.getKey())) {
+                for (Map.Entry<String, Integer> skillBonus : entry.getValue().entrySet()) {
+                    bonuses.merge(skillBonus.getKey(), skillBonus.getValue(), Math::max);
+                }
+            }
+        }
+        return bonuses;
     }
 
     /**
@@ -383,5 +389,19 @@ public final class RepairKitCatalog {
             bonus = Math.max(bonus, DELUXE_TOOLKIT_ROLL_BONUS);
         }
         return bonus;
+    }
+
+    /**
+     * Whether this technician carries a general tool kit - a Basic Toolkit or the better Deluxe Toolkit - which is the
+     * minimum kit required to perform a repair when the "Techs Need a Tool Kit" campaign option is enabled. Specialized
+     * repair kits augment a tool kit rather than replace it, so they do not satisfy this requirement on their own.
+     *
+     * @param person the technician, or {@code null}
+     *
+     * @return {@code true} if the technician carries at least a Basic Toolkit
+     */
+    public static boolean hasToolKit(@Nullable Person person) {
+        return (person != null)
+                     && (person.hasRepairKit(KIT_BASIC_TOOLKIT) || person.hasRepairKit(KIT_DELUXE_TOOLKIT));
     }
 }

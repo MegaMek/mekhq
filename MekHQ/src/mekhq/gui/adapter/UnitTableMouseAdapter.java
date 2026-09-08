@@ -141,7 +141,7 @@ import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.MassMothballDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
-import mekhq.gui.dialog.quartermaster.IssueArmorKitsDialog;
+import mekhq.gui.dialog.quartermaster.IssueEquipmentDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.dialog.reportDialogs.PartQualityReportDialog;
@@ -1241,9 +1241,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
 
                 if (!nonePresent && Arrays.stream(units).anyMatch(UnitTableMouseAdapter::canIssueKitsFor)) {
-                    JMenuItem issueKits = new JMenuItem(getTextAt("mekhq.resources.IssueArmorKitsDialog",
+                    JMenuItem issueKits = new JMenuItem(getTextAt("mekhq.resources.IssueEquipmentDialog",
                           "menu.issueArmorKits"));
-                    issueKits.addActionListener(evt -> IssueArmorKitsDialog.showFor(gui.getFrame(),
+                    issueKits.addActionListener(evt -> IssueEquipmentDialog.showFor(gui.getFrame(),
                           gui.getCampaign(), null, Arrays.asList(units)));
                     menu.add(issueKits);
                 }

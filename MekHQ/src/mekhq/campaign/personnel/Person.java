@@ -151,6 +151,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuri
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
+import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -10200,7 +10201,8 @@ public class Person implements ILocatable {
         List<InjuryEffect> injuryEffects = excludeInjuryEffects ? new ArrayList<>() :
                                                  getAllActiveInjuryEffects(isAmbidextrous,
                                                        injuries);
-        return new SkillModifierData(options, atowAttributes, 0, injuryEffects, ageForAttributeModifiers);
+        return new SkillModifierData(options, atowAttributes, 0, injuryEffects, ageForAttributeModifiers,
+              RepairKitCatalog.generalSkillBonuses(this));
     }
 
     /**
@@ -10259,7 +10261,8 @@ public class Person implements ILocatable {
               atowAttributes,
               adjustedFame,
               injuryEffects,
-              ageForAttributeModifiers);
+              ageForAttributeModifiers,
+              RepairKitCatalog.generalSkillBonuses(this));
     }
 
     /**

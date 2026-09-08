@@ -75,7 +75,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * @since 0.51.01
  */
 public class ToolKitSection implements KitIssueSection {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.IssueArmorKitsDialog";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.IssueEquipmentDialog";
 
     /** What the player wants done with a kit across the selected technicians. */
     private enum Action {NONE, ISSUE, REMOVE}

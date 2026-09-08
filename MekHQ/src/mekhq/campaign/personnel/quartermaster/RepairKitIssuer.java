@@ -244,7 +244,7 @@ public final class RepairKitIssuer {
         }
         if (fulfilled > 0) {
             campaign.addReport(DailyReportType.PERSONNEL,
-                  getFormattedTextAt("mekhq.resources.IssueArmorKitsDialog", "report.toolKitsFulfilled", fulfilled));
+                  getFormattedTextAt("mekhq.resources.IssueEquipmentDialog", "report.toolKitsFulfilled", fulfilled));
         }
     }
 

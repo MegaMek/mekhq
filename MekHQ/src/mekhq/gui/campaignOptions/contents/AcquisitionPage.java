@@ -174,7 +174,7 @@ class AcquisitionPage {
     private MMComboBox<String> cboDoctorDefaultToolKit;
     private JLabel lblAdminDefaultToolKit;
     private MMComboBox<String> cboAdminDefaultToolKit;
-    private JCheckBox chkNpcEquipmentKits;
+    private JCheckBox chkTechsNeedToolKit;
 
     private boolean created;
 
@@ -380,8 +380,8 @@ class AcquisitionPage {
         lblAdminDefaultToolKit.addMouseListener(createTipPanelUpdater("AdminDefaultToolKit"));
         cboAdminDefaultToolKit.addMouseListener(createTipPanelUpdater("AdminDefaultToolKit"));
 
-        chkNpcEquipmentKits = new CampaignOptionsCheckBox("NpcEquipmentKits", getMetadata(new Version(0, 51, 1)));
-        chkNpcEquipmentKits.addMouseListener(createTipPanelUpdater("NpcEquipmentKits"));
+        chkTechsNeedToolKit = new CampaignOptionsCheckBox("TechsNeedToolKit", getMetadata(new Version(0, 51, 1)));
+        chkTechsNeedToolKit.addMouseListener(createTipPanelUpdater("TechsNeedToolKit"));
 
         final SettingsFormPanel panel = new SettingsFormPanel("ToolKitsPanel",
               acquisitionSectionLabelWidth,
@@ -392,7 +392,7 @@ class AcquisitionPage {
         panel.addRow(lblBATechDefaultToolKit, cboBATechDefaultToolKit);
         panel.addRow(lblDoctorDefaultToolKit, cboDoctorDefaultToolKit);
         panel.addRow(lblAdminDefaultToolKit, cboAdminDefaultToolKit);
-        panel.addCheckBox(chkNpcEquipmentKits);
+        panel.addCheckBox(chkTechsNeedToolKit);
 
         return panel;
     }
@@ -695,7 +695,7 @@ class AcquisitionPage {
         cboBATechDefaultToolKit.setSelectedItem(model.baTechDefaultToolKit);
         cboDoctorDefaultToolKit.setSelectedItem(model.doctorDefaultToolKit);
         cboAdminDefaultToolKit.setSelectedItem(model.adminDefaultToolKit);
-        chkNpcEquipmentKits.setSelected(model.npcEquipmentKits);
+        chkTechsNeedToolKit.setSelected(model.techsNeedToolKit);
         chkAddDefaultKitToProcurement.setSelected(model.addDefaultKitToProcurement);
         chkNpcFactionArmorKits.setSelected(model.npcFactionArmorKits);
         chkRequireMekWarriorKitToDeploy.setSelected(model.requireMekWarriorKitToDeploy);
@@ -745,7 +745,7 @@ class AcquisitionPage {
         model.baTechDefaultToolKit = cboBATechDefaultToolKit.getSelectedItem();
         model.doctorDefaultToolKit = cboDoctorDefaultToolKit.getSelectedItem();
         model.adminDefaultToolKit = cboAdminDefaultToolKit.getSelectedItem();
-        model.npcEquipmentKits = chkNpcEquipmentKits.isSelected();
+        model.techsNeedToolKit = chkTechsNeedToolKit.isSelected();
         model.addDefaultKitToProcurement = chkAddDefaultKitToProcurement.isSelected();
         model.npcFactionArmorKits = chkNpcFactionArmorKits.isSelected();
         model.requireMekWarriorKitToDeploy = chkRequireMekWarriorKitToDeploy.isSelected();

@@ -90,9 +90,9 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * @author Illiani
  * @since 0.51.01
  */
-public class IssueArmorKitsDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(IssueArmorKitsDialog.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.IssueArmorKitsDialog";
+public class IssueEquipmentDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(IssueEquipmentDialog.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.IssueEquipmentDialog";
 
     private final transient Campaign campaign;
     private final transient List<Person> personnel;
@@ -137,7 +137,7 @@ public class IssueArmorKitsDialog extends JDialog {
                   JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        IssueArmorKitsDialog dialog = new IssueArmorKitsDialog(parent, campaign, armorPersonnel, toolTechnicians);
+        IssueEquipmentDialog dialog = new IssueEquipmentDialog(parent, campaign, armorPersonnel, toolTechnicians);
         dialog.setPreferences(dialog); // Must be before setVisible
         dialog.setVisible(true);
     }
@@ -164,7 +164,7 @@ public class IssueArmorKitsDialog extends JDialog {
         return new ArrayList<>(gathered);
     }
 
-    private IssueArmorKitsDialog(JFrame parent, Campaign campaign, List<Person> armorPersonnel,
+    private IssueEquipmentDialog(JFrame parent, Campaign campaign, List<Person> armorPersonnel,
           List<Person> toolTechnicians) {
         super(parent, getTextAt(RESOURCE_BUNDLE, "title"), true);
         this.campaign = campaign;
@@ -919,8 +919,8 @@ public class IssueArmorKitsDialog extends JDialog {
      */
     private void setPreferences(JDialog dialog) {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(IssueArmorKitsDialog.class);
-            dialog.setName("IssueArmorKitsDialog");
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(IssueEquipmentDialog.class);
+            dialog.setName("IssueEquipmentDialog");
             preferences.manage(new JWindowPreference(dialog));
         } catch (Exception ex) {
             LOGGER.error("Failed to set user preferences", ex);

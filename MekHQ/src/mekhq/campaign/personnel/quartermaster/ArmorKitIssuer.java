@@ -288,7 +288,7 @@ public final class ArmorKitIssuer {
 
         if (fulfilled > 0) {
             campaign.addReport(DailyReportType.PERSONNEL,
-                  getFormattedTextAt("mekhq.resources.IssueArmorKitsDialog", "report.fulfilled", fulfilled));
+                  getFormattedTextAt("mekhq.resources.IssueEquipmentDialog", "report.fulfilled", fulfilled));
         }
     }
 

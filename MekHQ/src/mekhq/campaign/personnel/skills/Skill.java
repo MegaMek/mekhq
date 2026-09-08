@@ -51,6 +51,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import megamek.codeUtilities.MathUtility;
@@ -720,7 +721,8 @@ public class Skill {
                   new Attributes(),
                   0,
                   new ArrayList<>(),
-                  IGNORE_AGE);
+                  IGNORE_AGE,
+                  Map.of());
         }
 
         int baseValue = level + bonus;
@@ -753,8 +755,9 @@ public class Skill {
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type,
               skillModifierData.injuryEffects(), skillModifierData.characterOptions(), skillModifierData.age());
         int totalInjuryModifier = getTotalInjuryModifier(skillModifierData, type);
+        int equipmentKitModifier = skillModifierData.equipmentKitBonuses().getOrDefault(type.getName(), 0);
 
-        return spaModifiers + attributeModifiers + totalInjuryModifier;
+        return spaModifiers + attributeModifiers + totalInjuryModifier + equipmentKitModifier;
     }
 
     public static int getTotalInjuryModifier(SkillModifierData skillModifierData, SkillType type) {
@@ -873,7 +876,7 @@ public class Skill {
     @Override
     public String toString() {
         SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), new Attributes(),
-              0, new ArrayList<>(), IGNORE_AGE);
+              0, new ArrayList<>(), IGNORE_AGE, Map.of());
         return toString(skillModifierData);
     }
 
