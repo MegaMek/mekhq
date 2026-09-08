@@ -108,6 +108,12 @@ public class StructuralIntegrity extends Part {
     }
 
     @Override
+    public boolean isRightTechType(String skillType) {
+        // Structural integrity is a structural system, serviced under Technician/Mechanical.
+        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL);
+    }
+
+    @Override
     public StructuralIntegrity clone() {
         StructuralIntegrity clone = new StructuralIntegrity(getUnitTonnage(), campaign);
         clone.copyBaseData(this);

@@ -89,6 +89,12 @@ public class OmniPod extends Part {
      * @return The tech base of the part the OmniPod is meant to contain.
      */
     @Override
+    public boolean isRightTechType(String skillType) {
+        // An omni pod is structural mounting hardware, serviced under Technician/Mechanical.
+        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL);
+    }
+
+    @Override
     public TechBase getTechBase() {
         if (null != partType) {
             return partType.getTechBase();

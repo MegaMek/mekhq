@@ -71,6 +71,12 @@ public class BAArmor extends Armor {
     }
 
     @Override
+    public boolean isRightTechType(String skillType) {
+        // Battle armor plating is serviced as part of the suit by a battle armor technician.
+        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_BA);
+    }
+
+    @Override
     public BAArmor clone() {
         BAArmor clone = new BAArmor(0, amount, type, location, clan, campaign);
         clone.copyBaseData(this);

@@ -60,6 +60,12 @@ public class TurretLock extends Part {
     }
 
     @Override
+    public boolean isRightTechType(String skillType) {
+        // A turret lock is a mechanical system, serviced under Technician/Mechanical.
+        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL);
+    }
+
+    @Override
     public int getBaseTime() {
         return 90;
     }

@@ -83,6 +83,12 @@ public class QuadVeeGear extends Part {
     }
 
     @Override
+    public boolean isRightTechType(String skillType) {
+        // QuadVee conversion gear is a mechanical system, serviced under Technician/Mechanical.
+        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL);
+    }
+
+    @Override
     public QuadVeeGear clone() {
         QuadVeeGear clone = new QuadVeeGear(0, campaign);
         clone.copyBaseData(this);

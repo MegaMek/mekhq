@@ -71,6 +71,12 @@ public class MotiveSystem extends Part {
     }
 
     @Override
+    public boolean isRightTechType(String skillType) {
+        // A vehicle's motive system is a mechanical system, serviced under Technician/Mechanical.
+        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL);
+    }
+
+    @Override
     public int getBaseTime() {
         return 60;
     }

@@ -72,6 +72,12 @@ public class Cubicle extends Part {
     }
 
     @Override
+    public boolean isRightTechType(String skillType) {
+        // A transport cubicle is structural/mechanical hardware, serviced under Technician/Mechanical.
+        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL);
+    }
+
+    @Override
     public String getName() {
         if (null != parentPart) {
             return parentPart.getName() + " Cubicle";
