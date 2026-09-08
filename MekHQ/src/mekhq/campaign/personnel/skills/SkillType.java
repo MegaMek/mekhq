@@ -113,21 +113,21 @@ public class SkillType {
     public static final String S_SUPPORT_WEAPONS = "Support Weapons";
 
     // support skills
-    public static final String S_TECH_MEK = "Technician/Mek";
-    public static final String S_TECH_VEHICLE = "Technician/Vehicle";
-    public static final String S_TECH_AERO = "Technician/Aerospace";
-    public static final String S_TECH_BA = "Technician/BattleArmor";
-    public static final String S_TECH_VESSEL = "Technician/Vessel";
-    public static final String S_TECH_MILITARY = "Technician/Military";
-    public static final String S_TECH_CIVILIAN = "Technician/Civilian";
-    public static final String S_TECH_ELECTRONIC = "Technician/Electronic";
-    public static final String S_TECH_NUCLEAR = "Technician/Nuclear";
-    public static final String S_TECH_AERONAUTICS = "Technician/Aeronautics";
-    public static final String S_TECH_MECHANICAL = "Technician/Mechanical";
-    public static final String S_TECH_MYOMER = "Technician/Myomer";
-    public static final String S_TECH_JETS = "Technician/Jets";
-    public static final String S_TECH_WEAPONS = "Technician/Weapons";
-    public static final String S_TECH_CYBERNETICS = "Technician/Cybernetics";
+    public static final String S_TECH_MEK = "Tech/Mek";
+    public static final String S_TECH_VEHICLE = "Tech/Vehicle";
+    public static final String S_TECH_AERO = "Tech/Aerospace";
+    public static final String S_TECH_BA = "Tech/BattleArmor";
+    public static final String S_TECH_VESSEL = "Tech/Vessel";
+    public static final String S_TECH_MILITARY = "Tech/Military";
+    public static final String S_TECH_CIVILIAN = "Tech/Civilian";
+    public static final String S_TECH_ELECTRONIC = "Tech/Electronic";
+    public static final String S_TECH_NUCLEAR = "Tech/Nuclear";
+    public static final String S_TECH_AERONAUTICS = "Tech/Aeronautics";
+    public static final String S_TECH_MECHANICAL = "Tech/Mechanical";
+    public static final String S_TECH_MYOMER = "Tech/Myomer";
+    public static final String S_TECH_JETS = "Tech/Jets";
+    public static final String S_TECH_WEAPONS = "Tech/Weapons";
+    public static final String S_TECH_CYBERNETICS = "Tech/Cybernetics";
     public static final String S_ASTECH = "Astech";
     public static final String S_SURGERY = "Surgery/Any";
     public static final String S_MEDTECH = "MedTech/Any";
@@ -1222,13 +1222,9 @@ public class SkillType {
             // Anti-Mek gained its ATOW "(Climbing)" alias in its canonical name; map the legacy
             // bare name (from older saves and infantry crew-skill data) to the current one.
             case "Anti-Mek" -> S_ANTI_MEK;
-            // The technician skills were renamed to the "Technician/..." family; map the legacy
-            // "Tech/..." names (from older saves) to their current canonical names.
-            case "Tech/Mek" -> S_TECH_MEK;
+            // <50.01 compatibility handler
             case "Tech/Mechanic" -> S_TECH_VEHICLE;
             case "Tech/Aero" -> S_TECH_AERO;
-            case "Tech/BattleArmor" -> S_TECH_BA;
-            case "Tech/Vessel" -> S_TECH_VESSEL;
             default -> skillName;
         };
         return skillName;
