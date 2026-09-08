@@ -1965,7 +1965,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 unDeployed.append('\n')
                       .append(unit.getName())
                       .append(" (a space-only unit cannot deploy on a ")
-                      .append(Scenario.getBoardTypeName(scenario.getBoardType()).toLowerCase())
+                      .append(Scenario.getBoardTypeName(scenario.getBoardType()).toLowerCase(Locale.ROOT))
                       .append(" map)");
                 unDeployedUnits.add(unit);
                 continue;
