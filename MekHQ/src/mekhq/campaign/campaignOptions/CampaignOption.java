@@ -56,6 +56,7 @@ import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
+import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -225,8 +226,8 @@ public final class CampaignOption<T> {
           of(Integer.class, 15, "autoLogisticsHeadComponents");
     public static final CampaignOption<Integer> AUTO_LOGISTICS_OTHER =
           of(Integer.class, 0, "autoLogisticsOther");
-    public static final CampaignOption<Integer> AUTO_LOGISTICS_ARMOR_KIT =
-          of(Integer.class, 0, "autoLogisticsArmorKit");
+    public static final CampaignOption<Integer> AUTO_LOGISTICS_EQUIPMENT_KIT =
+          of(Integer.class, 0, "autoLogisticsEquipmentKit");
     public static final CampaignOption<Integer> AUTO_LOGISTICS_BOMB =
           of(Integer.class, 0, "autoLogisticsBomb");
     public static final CampaignOption<Integer> UNIT_TRANSIT_TIME =
@@ -309,8 +310,22 @@ public final class CampaignOption<T> {
           of(String.class, ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, "vehicleCrewDefaultKit");
     public static final CampaignOption<String> AIRCRAFT_DEFAULT_KIT =
           of(String.class, ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, "aircraftDefaultKit");
+    public static final CampaignOption<String> MEK_TECH_DEFAULT_TOOL_KIT =
+          of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "mekTechDefaultToolKit");
+    public static final CampaignOption<String> MECHANIC_DEFAULT_TOOL_KIT =
+          of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "mechanicDefaultToolKit");
+    public static final CampaignOption<String> AERO_TECH_DEFAULT_TOOL_KIT =
+          of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "aeroTechDefaultToolKit");
+    public static final CampaignOption<String> BA_TECH_DEFAULT_TOOL_KIT =
+          of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "baTechDefaultToolKit");
+    public static final CampaignOption<String> DOCTOR_DEFAULT_TOOL_KIT =
+          of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "doctorDefaultToolKit");
+    public static final CampaignOption<String> ADMIN_DEFAULT_TOOL_KIT =
+          of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "adminDefaultToolKit");
     public static final CampaignOption<Boolean> ADD_DEFAULT_KIT_TO_PROCUREMENT =
           of(Boolean.class, false, "addDefaultKitToProcurement");
+    public static final CampaignOption<Boolean> NPC_EQUIPMENT_KITS =
+          of(Boolean.class, false, "npcEquipmentKits");
     public static final CampaignOption<Boolean> NPC_FACTION_ARMOR_KITS =
           of(Boolean.class, false, "npcFactionArmorKits");
     public static final CampaignOption<Boolean> REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY =

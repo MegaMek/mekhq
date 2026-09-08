@@ -78,6 +78,7 @@ import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
+import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -271,8 +272,10 @@ public class PartsInUseManager {
             if (equipmentPart.getType() instanceof WeaponType) {
                 return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_WEAPONS);
             }
-            if ((equipmentPart.getType() instanceof MiscType miscType) && miscType.hasFlag(MiscType.F_ARMOR_KIT)) {
-                return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_ARMOR_KIT);
+            if (equipmentPart.getType() instanceof MiscType miscType
+                      && (miscType.hasFlag(MiscType.F_ARMOR_KIT)
+                                || RepairKitCatalog.allKitNames().contains(miscType.getInternalName()))) {
+                return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_EQUIPMENT_KIT);
             }
         }
 
@@ -619,6 +622,9 @@ public class PartsInUseManager {
         for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (placeOf(person) == place) {
                 addWornKit(counts, person.getArmorKitName(), 1);
+                for (String toolKitName : person.getRepairKitNames()) {
+                    addWornKit(counts, toolKitName, 1);
+                }
             }
         }
         for (Unit unit : campaign.getUnits()) {

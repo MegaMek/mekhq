@@ -35,11 +35,18 @@ package mekhq.campaign.personnel.quartermaster;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.Iterator;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.rolls.TargetRoll;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -159,6 +166,86 @@ public final class RepairKitIssuer {
         campaign.getPlayerForce()
               .getShoppingList()
               .addShoppingItem(template(kit, campaign).getAcquisitionWork(), quantity, campaign);
+    }
+
+    /**
+     * On joining the campaign, a new technician is issued the default tool kit configured for each of their technician
+     * professions (Mek Tech, Mechanic, Aero Tech, BA Tech; Astechs excluded). A kit already in local stores is issued
+     * at once; otherwise, when the campaign is set to procure recruits' kits, it is ordered and remembered so it is
+     * issued when it arrives. Does nothing for a profession whose default is "none", a kit the technician already owns,
+     * or an unknown kit.
+     *
+     * @param person   the freshly recruited technician
+     * @param campaign the campaign they joined
+     * @param gmAdd    {@code true} if the character is being added by the GM (kits are granted directly)
+     */
+    public static void equipDefaultToolKitOnRecruitment(Person person, Campaign campaign, boolean gmAdd) {
+        for (RepairKitCatalog.KitProfession profession : RepairKitCatalog.professionsFor(person)) {
+            String kitName = defaultKitFor(profession, campaign);
+            if (kitName.isBlank() || person.hasRepairKit(kitName)) {
+                continue;
+            }
+            EquipmentType kit = EquipmentType.get(kitName);
+            if (kit == null) {
+                continue;
+            }
+            if (issueFromStock(person, kit, campaign)) {
+                continue; // issued straight from local stores
+            }
+            if (campaign.getCampaignOptions().get(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT)) {
+                if (gmAdd) {
+                    person.getRepairKitNames().add(kit.getInternalName());
+                } else {
+                    order(kit, 1, campaign);
+                    person.getIntendedRepairKitNames().add(kit.getInternalName());
+                }
+            }
+        }
+    }
+
+    /** The configured default equipment kit for a profession, or the "none" sentinel. */
+    private static String defaultKitFor(RepairKitCatalog.KitProfession profession, Campaign campaign) {
+        return switch (profession) {
+            case MEK_TECH -> campaign.getCampaignOptions().get(CampaignOption.MEK_TECH_DEFAULT_TOOL_KIT);
+            case MECHANIC -> campaign.getCampaignOptions().get(CampaignOption.MECHANIC_DEFAULT_TOOL_KIT);
+            case AERO_TEK -> campaign.getCampaignOptions().get(CampaignOption.AERO_TECH_DEFAULT_TOOL_KIT);
+            case BA_TECH -> campaign.getCampaignOptions().get(CampaignOption.BA_TECH_DEFAULT_TOOL_KIT);
+            case DOCTOR -> campaign.getCampaignOptions().get(CampaignOption.DOCTOR_DEFAULT_TOOL_KIT);
+            case ADMIN -> campaign.getCampaignOptions().get(CampaignOption.ADMIN_DEFAULT_TOOL_KIT);
+        };
+    }
+
+    /**
+     * Issues any awaited tool kits that have since arrived in local stores. For each active person waiting on a kit, if
+     * their stores now hold it, the kit is drawn and issued and the intent cleared. Run each day, after deliveries.
+     *
+     * @param campaign the campaign to sweep
+     */
+    public static void fulfillPendingToolKits(Campaign campaign) {
+        int fulfilled = 0;
+        for (Person person : campaign.getPlayerForce().getPersonnel().values()) {
+            if (!person.getStatus().isActive() || person.getIntendedRepairKitNames().isEmpty()) {
+                continue;
+            }
+            Iterator<String> iterator = person.getIntendedRepairKitNames().iterator();
+            while (iterator.hasNext()) {
+                String intended = iterator.next();
+                EquipmentType kit = EquipmentType.get(intended);
+                if ((kit == null) || person.hasRepairKit(intended)) {
+                    iterator.remove();
+                    continue;
+                }
+                if (issueFromStock(person, kit, campaign)) {
+                    iterator.remove();
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                    fulfilled++;
+                }
+            }
+        }
+        if (fulfilled > 0) {
+            campaign.addReport(DailyReportType.PERSONNEL,
+                  getFormattedTextAt("mekhq.resources.IssueArmorKitsDialog", "report.toolKitsFulfilled", fulfilled));
+        }
     }
 
     /**

@@ -32,8 +32,6 @@
  */
 package mekhq.gui.commandGeneration.contents;
 
-import megamek.client.ui.util.UIUtil;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -53,9 +51,11 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
@@ -100,7 +100,7 @@ public class SparesAndFinancesTab {
         MEK_LOCATION("SparesMekLocation", CampaignOption.AUTO_LOGISTICS_MEK_LOCATION),
         NON_REPAIRABLE_LOCATION("SparesNonRepairableLocation", CampaignOption.AUTO_LOGISTICS_NON_REPAIRABLE_LOCATION),
         ARMOR("SparesArmor", CampaignOption.AUTO_LOGISTICS_ARMOR),
-        ARMOR_KIT("SparesArmorKit", CampaignOption.AUTO_LOGISTICS_ARMOR_KIT),
+        EQUIPMENT_KIT("SparesEquipmentKit", CampaignOption.AUTO_LOGISTICS_EQUIPMENT_KIT),
         AMMUNITION("SparesAmmunition", CampaignOption.AUTO_LOGISTICS_AMMUNITION),
         BOMB("SparesBomb", CampaignOption.AUTO_LOGISTICS_BOMB),
         HEAT_SINK("SparesHeatSink", CampaignOption.AUTO_LOGISTICS_HEAT_SINK),

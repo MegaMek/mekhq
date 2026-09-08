@@ -50,6 +50,7 @@ import mekhq.campaign.parts.protomeks.ProtoMekJumpJet;
 import mekhq.campaign.parts.protomeks.ProtoMekLegActuator;
 import mekhq.campaign.parts.protomeks.ProtoMekLocation;
 import mekhq.campaign.parts.protomeks.ProtoMekSensor;
+import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
 
 /**
  * The set of category filters shared by the Warehouse tab and the Parts Store dialog. Each group pairs a human-readable
@@ -165,11 +166,14 @@ public enum PartsFilterGroup {
             return part instanceof OmniPod;
         }
     },
-    ARMOR_KIT("ARMOR_KIT") {
+    EQUIPMENT_KIT("EQUIPMENT_KIT") {
         @Override
         public boolean matches(Part part) {
-            return (part instanceof EquipmentPart) &&
-                         ((EquipmentPart) part).getType().hasFlag(MiscType.F_ARMOR_KIT);
+            if (!(part instanceof EquipmentPart equipmentPart)) {
+                return false;
+            }
+            return equipmentPart.getType().hasFlag(MiscType.F_ARMOR_KIT)
+                         || RepairKitCatalog.allKitNames().contains(equipmentPart.getType().getInternalName());
         }
     };
 

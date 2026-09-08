@@ -177,6 +177,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedical
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
+import mekhq.campaign.personnel.quartermaster.RepairKitIssuer;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
@@ -552,6 +553,8 @@ public class CampaignNewDayManager {
 
         // Issue any armor kits that were awaited and have now arrived in local stores.
         ArmorKitIssuer.fulfillPendingIssues(campaign);
+        // Likewise for tool kits.
+        RepairKitIssuer.fulfillPendingToolKits(campaign);
 
         campaign.getCampaignLocationManager().pruneEmptyLocations();
 

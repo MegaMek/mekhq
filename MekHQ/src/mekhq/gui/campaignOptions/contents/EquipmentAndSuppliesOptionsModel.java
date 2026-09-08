@@ -62,7 +62,7 @@ class EquipmentAndSuppliesOptionsModel {
     int autoLogisticsHeatSink;
     int autoLogisticsWeapons;
     int autoLogisticsOther;
-    int autoLogisticsArmorKit;
+    int autoLogisticsEquipmentKit;
     int autoLogisticsBomb;
     int unitTransitTime;
     boolean noDeliveriesInTransit;
@@ -89,6 +89,10 @@ class EquipmentAndSuppliesOptionsModel {
     String mekWarriorDefaultKit;
     String vehicleCrewDefaultKit;
     String aircraftDefaultKit;
+    String mekTechDefaultToolKit;
+    String mechanicDefaultToolKit;
+    String aeroTechDefaultToolKit;
+    String baTechDefaultToolKit;
     boolean addDefaultKitToProcurement;
     boolean npcFactionArmorKits;
     boolean requireMekWarriorKitToDeploy;
@@ -114,7 +118,7 @@ class EquipmentAndSuppliesOptionsModel {
         autoLogisticsHeatSink = options.get(CampaignOption.AUTO_LOGISTICS_HEAT_SINK);
         autoLogisticsWeapons = options.get(CampaignOption.AUTO_LOGISTICS_WEAPONS);
         autoLogisticsOther = options.get(CampaignOption.AUTO_LOGISTICS_OTHER);
-        autoLogisticsArmorKit = options.get(CampaignOption.AUTO_LOGISTICS_ARMOR_KIT);
+        autoLogisticsEquipmentKit = options.get(CampaignOption.AUTO_LOGISTICS_EQUIPMENT_KIT);
         autoLogisticsBomb = options.get(CampaignOption.AUTO_LOGISTICS_BOMB);
         unitTransitTime = options.get(CampaignOption.UNIT_TRANSIT_TIME);
         noDeliveriesInTransit = options.get(CampaignOption.NO_DELIVERIES_IN_TRANSIT);
@@ -141,6 +145,10 @@ class EquipmentAndSuppliesOptionsModel {
         mekWarriorDefaultKit = options.get(CampaignOption.MEKWARRIOR_DEFAULT_KIT);
         vehicleCrewDefaultKit = options.get(CampaignOption.VEHICLE_CREW_DEFAULT_KIT);
         aircraftDefaultKit = options.get(CampaignOption.AIRCRAFT_DEFAULT_KIT);
+        mekTechDefaultToolKit = options.get(CampaignOption.MEK_TECH_DEFAULT_TOOL_KIT);
+        mechanicDefaultToolKit = options.get(CampaignOption.MECHANIC_DEFAULT_TOOL_KIT);
+        aeroTechDefaultToolKit = options.get(CampaignOption.AERO_TECH_DEFAULT_TOOL_KIT);
+        baTechDefaultToolKit = options.get(CampaignOption.BA_TECH_DEFAULT_TOOL_KIT);
         addDefaultKitToProcurement = options.get(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT);
         npcFactionArmorKits = options.get(CampaignOption.NPC_FACTION_ARMOR_KITS);
         requireMekWarriorKitToDeploy = options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY);
@@ -162,6 +170,10 @@ class EquipmentAndSuppliesOptionsModel {
         options.set(CampaignOption.MEKWARRIOR_DEFAULT_KIT, mekWarriorDefaultKit);
         options.set(CampaignOption.VEHICLE_CREW_DEFAULT_KIT, vehicleCrewDefaultKit);
         options.set(CampaignOption.AIRCRAFT_DEFAULT_KIT, aircraftDefaultKit);
+        options.set(CampaignOption.MEK_TECH_DEFAULT_TOOL_KIT, mekTechDefaultToolKit);
+        options.set(CampaignOption.MECHANIC_DEFAULT_TOOL_KIT, mechanicDefaultToolKit);
+        options.set(CampaignOption.AERO_TECH_DEFAULT_TOOL_KIT, aeroTechDefaultToolKit);
+        options.set(CampaignOption.BA_TECH_DEFAULT_TOOL_KIT, baTechDefaultToolKit);
         options.set(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT, addDefaultKitToProcurement);
         options.set(CampaignOption.NPC_FACTION_ARMOR_KITS, npcFactionArmorKits);
         options.set(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY, requireMekWarriorKitToDeploy);
@@ -183,7 +195,7 @@ class EquipmentAndSuppliesOptionsModel {
         options.set(CampaignOption.AUTO_LOGISTICS_HEAT_SINK, autoLogisticsHeatSink);
         options.set(CampaignOption.AUTO_LOGISTICS_WEAPONS, autoLogisticsWeapons);
         options.set(CampaignOption.AUTO_LOGISTICS_OTHER, autoLogisticsOther);
-        options.set(CampaignOption.AUTO_LOGISTICS_ARMOR_KIT, autoLogisticsArmorKit);
+        options.set(CampaignOption.AUTO_LOGISTICS_EQUIPMENT_KIT, autoLogisticsEquipmentKit);
         options.set(CampaignOption.AUTO_LOGISTICS_BOMB, autoLogisticsBomb);
         options.set(CampaignOption.UNIT_TRANSIT_TIME, unitTransitTime);
         options.set(CampaignOption.NO_DELIVERIES_IN_TRANSIT, noDeliveriesInTransit);

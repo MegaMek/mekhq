@@ -58,6 +58,7 @@ import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.Category;
+import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -138,8 +139,8 @@ class AcquisitionPage {
     private JSpinner spnAutoLogisticsGyros;
     private JLabel lblAutoLogisticsOther;
     private JSpinner spnAutoLogisticsOther;
-    private JLabel lblAutoLogisticsArmorKit;
-    private JSpinner spnAutoLogisticsArmorKit;
+    private JLabel lblAutoLogisticsEquipmentKit;
+    private JSpinner spnAutoLogisticsEquipmentKit;
     private JLabel lblAutoLogisticsBomb;
     private JSpinner spnAutoLogisticsBomb;
 
@@ -161,6 +162,20 @@ class AcquisitionPage {
     private JCheckBox chkNpcFactionArmorKits;
     private JCheckBox chkRequireMekWarriorKitToDeploy;
 
+    private JLabel lblMekTechDefaultToolKit;
+    private MMComboBox<String> cboMekTechDefaultToolKit;
+    private JLabel lblMechanicDefaultToolKit;
+    private MMComboBox<String> cboMechanicDefaultToolKit;
+    private JLabel lblAeroTechDefaultToolKit;
+    private MMComboBox<String> cboAeroTechDefaultToolKit;
+    private JLabel lblBATechDefaultToolKit;
+    private MMComboBox<String> cboBATechDefaultToolKit;
+    private JLabel lblDoctorDefaultToolKit;
+    private MMComboBox<String> cboDoctorDefaultToolKit;
+    private JLabel lblAdminDefaultToolKit;
+    private MMComboBox<String> cboAdminDefaultToolKit;
+    private JCheckBox chkNpcEquipmentKits;
+
     private boolean created;
 
     /**
@@ -181,6 +196,12 @@ class AcquisitionPage {
         cboMekWarriorDefaultKit = armorKitCombo("mekWarriorDefaultKit", Category.MEKWARRIOR);
         cboVehicleCrewDefaultKit = armorKitCombo("vehicleCrewDefaultKit", Category.INFANTRY);
         cboAircraftDefaultKit = armorKitCombo("aircraftDefaultKit", Category.AIRCRAFT);
+        cboMekTechDefaultToolKit = toolKitCombo("mekTechDefaultToolKit");
+        cboMechanicDefaultToolKit = toolKitCombo("mechanicDefaultToolKit");
+        cboAeroTechDefaultToolKit = toolKitCombo("aeroTechDefaultToolKit");
+        cboBATechDefaultToolKit = toolKitCombo("baTechDefaultToolKit");
+        cboDoctorDefaultToolKit = toolKitCombo("doctorDefaultToolKit");
+        cboAdminDefaultToolKit = toolKitCombo("adminDefaultToolKit");
 
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_cloud_cobra.png";
@@ -194,6 +215,7 @@ class AcquisitionPage {
         pnlAcquisitions = createAcquisitionPanel();
         JPanel pnlDelivery = createDeliveryPanel();
         JPanel pnlArmorKits = createArmorKitsPanel();
+        JPanel pnlToolKits = createToolKitsPanel();
 
         JPanel panel = CampaignOptionsPagePanel.builder("AcquisitionPage", "AcquisitionPage", imageAddress)
                 .header(acquisitionHeader)
@@ -207,6 +229,9 @@ class AcquisitionPage {
                              .section("lblArmorKitsPanel.text",
                                    "lblArmorKitsPanel.summary",
                                    pnlArmorKits)
+                             .section("lblToolKitsPanel.text",
+                                   "lblToolKitsPanel.summary",
+                                   pnlToolKits)
                 .section("lblAutoLogisticsPanel.text",
                         "lblAutoLogisticsPanel.summary",
                         pnlAutoLogistics)
@@ -307,6 +332,69 @@ class AcquisitionPage {
                                    : value;
             return super.getListCellRendererComponent(list, display, index, isSelected, cellHasFocus);
         }
+    }
+
+    private MMComboBox<String> toolKitCombo(String name) {
+        MMComboBox<String> combo = new MMComboBox<>(name, RepairKitCatalog.optionKitNames().toArray(new String[0]));
+        combo.setRenderer(new ToolKitRenderer());
+        return combo;
+    }
+
+    /** Renders the "none" sentinel as "None" and every other kit by its own name. */
+    private static class ToolKitRenderer extends DefaultListCellRenderer {
+        @Override
+        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
+              boolean cellHasFocus) {
+            Object display = RepairKitCatalog.NO_DEFAULT_KIT.equals(value)
+                                   ? getTextAt(getCampaignOptionsResourceBundle(), "armorKitNone.text")
+                                   : value;
+            return super.getListCellRendererComponent(list, display, index, isSelected, cellHasFocus);
+        }
+    }
+
+    private @Nonnull JPanel createToolKitsPanel() {
+        lblMekTechDefaultToolKit = new CampaignOptionsLabel("MekTechDefaultToolKit",
+              getMetadata(new Version(0, 51, 1)));
+        lblMekTechDefaultToolKit.addMouseListener(createTipPanelUpdater("MekTechDefaultToolKit"));
+        cboMekTechDefaultToolKit.addMouseListener(createTipPanelUpdater("MekTechDefaultToolKit"));
+
+        lblMechanicDefaultToolKit = new CampaignOptionsLabel("MechanicDefaultToolKit",
+              getMetadata(new Version(0, 51, 1)));
+        lblMechanicDefaultToolKit.addMouseListener(createTipPanelUpdater("MechanicDefaultToolKit"));
+        cboMechanicDefaultToolKit.addMouseListener(createTipPanelUpdater("MechanicDefaultToolKit"));
+
+        lblAeroTechDefaultToolKit = new CampaignOptionsLabel("AeroTechDefaultToolKit",
+              getMetadata(new Version(0, 51, 1)));
+        lblAeroTechDefaultToolKit.addMouseListener(createTipPanelUpdater("AeroTechDefaultToolKit"));
+        cboAeroTechDefaultToolKit.addMouseListener(createTipPanelUpdater("AeroTechDefaultToolKit"));
+
+        lblBATechDefaultToolKit = new CampaignOptionsLabel("BATechDefaultToolKit", getMetadata(new Version(0, 51, 1)));
+        lblBATechDefaultToolKit.addMouseListener(createTipPanelUpdater("BATechDefaultToolKit"));
+        cboBATechDefaultToolKit.addMouseListener(createTipPanelUpdater("BATechDefaultToolKit"));
+
+        lblDoctorDefaultToolKit = new CampaignOptionsLabel("DoctorDefaultToolKit", getMetadata(new Version(0, 51, 1)));
+        lblDoctorDefaultToolKit.addMouseListener(createTipPanelUpdater("DoctorDefaultToolKit"));
+        cboDoctorDefaultToolKit.addMouseListener(createTipPanelUpdater("DoctorDefaultToolKit"));
+
+        lblAdminDefaultToolKit = new CampaignOptionsLabel("AdminDefaultToolKit", getMetadata(new Version(0, 51, 1)));
+        lblAdminDefaultToolKit.addMouseListener(createTipPanelUpdater("AdminDefaultToolKit"));
+        cboAdminDefaultToolKit.addMouseListener(createTipPanelUpdater("AdminDefaultToolKit"));
+
+        chkNpcEquipmentKits = new CampaignOptionsCheckBox("NpcEquipmentKits", getMetadata(new Version(0, 51, 1)));
+        chkNpcEquipmentKits.addMouseListener(createTipPanelUpdater("NpcEquipmentKits"));
+
+        final SettingsFormPanel panel = new SettingsFormPanel("ToolKitsPanel",
+              acquisitionSectionLabelWidth,
+              CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblMekTechDefaultToolKit, cboMekTechDefaultToolKit);
+        panel.addRow(lblMechanicDefaultToolKit, cboMechanicDefaultToolKit);
+        panel.addRow(lblAeroTechDefaultToolKit, cboAeroTechDefaultToolKit);
+        panel.addRow(lblBATechDefaultToolKit, cboBATechDefaultToolKit);
+        panel.addRow(lblDoctorDefaultToolKit, cboDoctorDefaultToolKit);
+        panel.addRow(lblAdminDefaultToolKit, cboAdminDefaultToolKit);
+        panel.addCheckBox(chkNpcEquipmentKits);
+
+        return panel;
     }
 
     private @Nonnull JPanel createArmorKitsPanel() {
@@ -426,11 +514,11 @@ class AcquisitionPage {
         spnAutoLogisticsOther = new CampaignOptionsSpinner("AutoLogisticsOther", 50, 0, 10000, 1);
         spnAutoLogisticsOther.addMouseListener(createTipPanelUpdater("AutoLogisticsOther"));
 
-        lblAutoLogisticsArmorKit = new CampaignOptionsLabel("AutoLogisticsArmorKit",
+        lblAutoLogisticsEquipmentKit = new CampaignOptionsLabel("AutoLogisticsEquipmentKit",
               getMetadata(new Version(0, 51, 1)));
-        lblAutoLogisticsArmorKit.addMouseListener(createTipPanelUpdater("AutoLogisticsArmorKit"));
-        spnAutoLogisticsArmorKit = new CampaignOptionsSpinner("AutoLogisticsArmorKit", 0, 0, 10000, 1);
-        spnAutoLogisticsArmorKit.addMouseListener(createTipPanelUpdater("AutoLogisticsArmorKit"));
+        lblAutoLogisticsEquipmentKit.addMouseListener(createTipPanelUpdater("AutoLogisticsEquipmentKit"));
+        spnAutoLogisticsEquipmentKit = new CampaignOptionsSpinner("AutoLogisticsEquipmentKit", 0, 0, 10000, 1);
+        spnAutoLogisticsEquipmentKit.addMouseListener(createTipPanelUpdater("AutoLogisticsEquipmentKit"));
 
         lblAutoLogisticsBomb = new CampaignOptionsLabel("AutoLogisticsBomb",
               getMetadata(new Version(0, 51, 1)));
@@ -456,7 +544,7 @@ class AcquisitionPage {
               lblAutoLogisticsGyros, spnAutoLogisticsGyros,
               lblAutoLogisticsWeapons, spnAutoLogisticsWeapons,
               lblAutoLogisticsOther, spnAutoLogisticsOther,
-              lblAutoLogisticsArmorKit, spnAutoLogisticsArmorKit,
+              lblAutoLogisticsEquipmentKit, spnAutoLogisticsEquipmentKit,
               lblAutoLogisticsBomb, spnAutoLogisticsBomb);
 
         // Compute where this grid's second label column (the "third column") begins, so
@@ -594,13 +682,20 @@ class AcquisitionPage {
         spnAutoLogisticsHeatSink.setValue(model.autoLogisticsHeatSink);
         spnAutoLogisticsWeapons.setValue(model.autoLogisticsWeapons);
         spnAutoLogisticsOther.setValue(model.autoLogisticsOther);
-        spnAutoLogisticsArmorKit.setValue(model.autoLogisticsArmorKit);
+        spnAutoLogisticsEquipmentKit.setValue(model.autoLogisticsEquipmentKit);
         spnAutoLogisticsBomb.setValue(model.autoLogisticsBomb);
         choiceTransitTimeUnits.setSelectedIndex(model.unitTransitTime);
         chkNoDeliveriesInTransit.setSelected(model.noDeliveriesInTransit);
         cboMekWarriorDefaultKit.setSelectedItem(model.mekWarriorDefaultKit);
         cboVehicleCrewDefaultKit.setSelectedItem(model.vehicleCrewDefaultKit);
         cboAircraftDefaultKit.setSelectedItem(model.aircraftDefaultKit);
+        cboMekTechDefaultToolKit.setSelectedItem(model.mekTechDefaultToolKit);
+        cboMechanicDefaultToolKit.setSelectedItem(model.mechanicDefaultToolKit);
+        cboAeroTechDefaultToolKit.setSelectedItem(model.aeroTechDefaultToolKit);
+        cboBATechDefaultToolKit.setSelectedItem(model.baTechDefaultToolKit);
+        cboDoctorDefaultToolKit.setSelectedItem(model.doctorDefaultToolKit);
+        cboAdminDefaultToolKit.setSelectedItem(model.adminDefaultToolKit);
+        chkNpcEquipmentKits.setSelected(model.npcEquipmentKits);
         chkAddDefaultKitToProcurement.setSelected(model.addDefaultKitToProcurement);
         chkNpcFactionArmorKits.setSelected(model.npcFactionArmorKits);
         chkRequireMekWarriorKitToDeploy.setSelected(model.requireMekWarriorKitToDeploy);
@@ -637,13 +732,20 @@ class AcquisitionPage {
         model.autoLogisticsHeatSink = (int) spnAutoLogisticsHeatSink.getValue();
         model.autoLogisticsWeapons = (int) spnAutoLogisticsWeapons.getValue();
         model.autoLogisticsOther = (int) spnAutoLogisticsOther.getValue();
-        model.autoLogisticsArmorKit = (int) spnAutoLogisticsArmorKit.getValue();
+        model.autoLogisticsEquipmentKit = (int) spnAutoLogisticsEquipmentKit.getValue();
         model.autoLogisticsBomb = (int) spnAutoLogisticsBomb.getValue();
         model.unitTransitTime = choiceTransitTimeUnits.getSelectedIndex();
         model.noDeliveriesInTransit = chkNoDeliveriesInTransit.isSelected();
         model.mekWarriorDefaultKit = cboMekWarriorDefaultKit.getSelectedItem();
         model.vehicleCrewDefaultKit = cboVehicleCrewDefaultKit.getSelectedItem();
         model.aircraftDefaultKit = cboAircraftDefaultKit.getSelectedItem();
+        model.mekTechDefaultToolKit = cboMekTechDefaultToolKit.getSelectedItem();
+        model.mechanicDefaultToolKit = cboMechanicDefaultToolKit.getSelectedItem();
+        model.aeroTechDefaultToolKit = cboAeroTechDefaultToolKit.getSelectedItem();
+        model.baTechDefaultToolKit = cboBATechDefaultToolKit.getSelectedItem();
+        model.doctorDefaultToolKit = cboDoctorDefaultToolKit.getSelectedItem();
+        model.adminDefaultToolKit = cboAdminDefaultToolKit.getSelectedItem();
+        model.npcEquipmentKits = chkNpcEquipmentKits.isSelected();
         model.addDefaultKitToProcurement = chkAddDefaultKitToProcurement.isSelected();
         model.npcFactionArmorKits = chkNpcFactionArmorKits.isSelected();
         model.requireMekWarriorKitToDeploy = chkRequireMekWarriorKitToDeploy.isSelected();

@@ -32,22 +32,19 @@
  */
 package mekhq.campaign.personnel.quartermaster;
 
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_AERONAUTICS;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_CYBERNETICS;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_ELECTRONIC;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_JETS;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MYOMER;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_NUCLEAR;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_WEAPONS;
+import static mekhq.campaign.personnel.skills.SkillType.*;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
  * The catalog of CamOps specialized repair kits MekHQ issues to technicians, and which {@code Tech/...} repair skills
@@ -91,6 +88,43 @@ public final class RepairKitCatalog {
     public static final String KIT_DESCARTES_MK_XXI = "Descartes MK XXI";
     public static final String KIT_DESCARTES_MK_XXV = "Descartes MK XXV";
 
+    // General equipment kits that improve a non-technician skill (survival, navigation, medical, or administrative
+    // work). Their bonuses are held in SKILL_BONUSES below.
+    public static final String KIT_ADVANCED_FIELD = "Advanced Field Kit";
+    public static final String KIT_BASIC_FIELD = "Basic Field Kit";
+    public static final String KIT_COMPASS = "Compass";
+    public static final String KIT_ELECTRONIC_COMPASS = "Electronic Compass";
+    public static final String KIT_ADVANCED_MEDICAL = "Advanced Medical Kit";
+    public static final String KIT_FIELD_SURGICAL = "Field Surgical Kit";
+    public static final String KIT_MEDICAL = "Medical Kit";
+    public static final String KIT_COMPAD = "Compad";
+    public static final String KIT_NOTEPUTER = "Noteputer";
+    public static final String KIT_PERSONAL_COMPUTER = "Personal Computer";
+    public static final String KIT_POCKET_TRANSCRIBER = "Pocket Transcriber";
+    public static final String KIT_TELESCAN = "Telescan";
+
+    /**
+     * Kit internal name -> the non-technician skills it improves and by how much. The medical kits' Surgery bonus is
+     * one above the CamOps value (raised by +1, even where the book lists none) per campaign customization. These
+     * bonuses are separate from the specialized-repair-kit repair bonus ({@link #REPAIR_KIT_ROLL_BONUS}).
+     */
+    private static final Map<String, Map<String, Integer>> SKILL_BONUSES = new LinkedHashMap<>();
+
+    static {
+        SKILL_BONUSES.put(KIT_ADVANCED_FIELD, Map.of(S_SURVIVAL, 2));
+        SKILL_BONUSES.put(KIT_BASIC_FIELD, Map.of(S_SURVIVAL, 1));
+        SKILL_BONUSES.put(KIT_COMPASS, Map.of(S_NAVIGATION, 1));
+        SKILL_BONUSES.put(KIT_ELECTRONIC_COMPASS, Map.of(S_NAVIGATION, 2));
+        SKILL_BONUSES.put(KIT_ADVANCED_MEDICAL, Map.of(S_MEDTECH, 2, S_SURGERY, 1));
+        SKILL_BONUSES.put(KIT_FIELD_SURGICAL, Map.of(S_MEDTECH, 2, S_SURGERY, 2));
+        SKILL_BONUSES.put(KIT_MEDICAL, Map.of(S_MEDTECH, 1, S_SURGERY, 1));
+        SKILL_BONUSES.put(KIT_COMPAD, Map.of(S_ADMIN, 1));
+        SKILL_BONUSES.put(KIT_NOTEPUTER, Map.of(S_ADMIN, 1, S_NEGOTIATION, 1));
+        SKILL_BONUSES.put(KIT_PERSONAL_COMPUTER, Map.of(S_ADMIN, 2));
+        SKILL_BONUSES.put(KIT_POCKET_TRANSCRIBER, Map.of(S_NEGOTIATION, 2));
+        SKILL_BONUSES.put(KIT_TELESCAN, Map.of(S_ADMIN, 1));
+    }
+
     /** Kit internal name -> the {@code Tech/...} skills it improves. Insertion-ordered for stable display. */
     private static final Map<String, Set<String>> KIT_SKILLS = new LinkedHashMap<>();
 
@@ -114,9 +148,110 @@ public final class RepairKitCatalog {
         ISSUABLE_KITS.add(KIT_DELUXE_TOOLKIT);
         ISSUABLE_KITS.add(KIT_DESCARTES_MK_XXI);
         ISSUABLE_KITS.add(KIT_DESCARTES_MK_XXV);
+        ISSUABLE_KITS.addAll(SKILL_BONUSES.keySet());
     }
 
+    /** The sentinel value for a per-profession default-kit campaign option meaning "issue no tool kit". */
+    public static final String NO_DEFAULT_KIT = "";
+
+    /**
+     * The professions that receive a per-profession default equipment kit on recruitment: the four technician
+     * professions (Astechs excluded), plus doctors and administrators for their medical and computer kits.
+     */
+    public enum KitProfession {MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, DOCTOR, ADMIN}
+
     private RepairKitCatalog() {
+    }
+
+    /**
+     * The choices for a per-profession default-kit dropdown: the "none" sentinel first, then every issuable tool kit by
+     * internal name.
+     *
+     * @return the option values, "none" first
+     */
+    public static List<String> optionKitNames() {
+        List<String> names = new ArrayList<>();
+        names.add(NO_DEFAULT_KIT);
+        names.addAll(allKitNames());
+        return names;
+    }
+
+    /**
+     * The technician professions this person qualifies for, by primary and secondary role (Astech excluded). Used to
+     * decide which per-profession default tool kits to issue on recruitment.
+     *
+     * @param person the person, or {@code null}
+     *
+     * @return the professions the person holds (possibly empty)
+     */
+    public static Set<KitProfession> professionsFor(@Nullable Person person) {
+        Set<KitProfession> professions = EnumSet.noneOf(KitProfession.class);
+        if (person == null) {
+            return professions;
+        }
+        for (PersonnelRole role : List.of(person.getPrimaryRole(), person.getSecondaryRole())) {
+            if (role.isMekTech()) {
+                professions.add(KitProfession.MEK_TECH);
+            }
+            if (role.isMechanic()) {
+                professions.add(KitProfession.MECHANIC);
+            }
+            if (role.isAeroTek()) {
+                professions.add(KitProfession.AERO_TEK);
+            }
+            if (role.isBATech()) {
+                professions.add(KitProfession.BA_TECH);
+            }
+            if (role.isDoctor()) {
+                professions.add(KitProfession.DOCTOR);
+            }
+            if (role.isAdministrator()) {
+                professions.add(KitProfession.ADMIN);
+            }
+        }
+        return professions;
+    }
+
+    /**
+     * The best bonus this person's owned equipment kits grant to a roll made with the given non-technician skill (for
+     * example a medical kit boosting {@code MedTech}, or a computer boosting {@code Administration}). Bonuses are not
+     * stacked - the single best applicable kit is used.
+     *
+     * @param person    the person, or {@code null}
+     * @param skillName the skill being rolled
+     *
+     * @return the roll bonus (0 if the person owns no kit covering the skill)
+     */
+    public static int generalSkillBonus(@Nullable Person person, @Nullable String skillName) {
+        if ((person == null) || (skillName == null)) {
+            return 0;
+        }
+        int best = 0;
+        for (Map.Entry<String, Map<String, Integer>> entry : SKILL_BONUSES.entrySet()) {
+            if (person.hasRepairKit(entry.getKey())) {
+                best = Math.max(best, entry.getValue().getOrDefault(skillName, 0));
+            }
+        }
+        return best;
+    }
+
+    /**
+     * The NPC equipment kit an NPC in the given profession is assumed to carry when the NPC-equipment-kit campaign
+     * option is enabled: field surgeons carry the Field Surgical Kit, so their surgery/medical rolls (e.g. advanced
+     * surgeries) get its bonus. Returns {@code null} when the profession has no assumed NPC kit.
+     *
+     * @param profession the NPC's profession
+     *
+     * @return the NPC kit internal name, or {@code null}
+     */
+    public static @Nullable String npcKitFor(@Nullable KitProfession profession) {
+        if (profession == null) {
+            return null;
+        }
+        return switch (profession) {
+            case DOCTOR -> KIT_FIELD_SURGICAL;
+            default -> null;
+        };
     }
 
     /**
