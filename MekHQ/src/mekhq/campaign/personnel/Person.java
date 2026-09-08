@@ -302,6 +302,7 @@ public class Person implements ILocatable {
     private int toughness;
     private String armorKitName;
     private String intendedArmorKitName;
+    private Set<String> repairKitNames = new LinkedHashSet<>();
     private int chaosCampaignReputation;
     private int chaosCampaignCriminalRecord;
     private Attributes atowAttributes;
@@ -3796,6 +3797,10 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intendedArmorKitName", intendedArmorKitName);
             }
 
+            for (String repairKitName : repairKitNames) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "repairKitName", repairKitName);
+            }
+
             if (chaosCampaignReputation != STARTING_REPUTATION_SCORE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chaosCampaignReputation", chaosCampaignReputation);
             }
@@ -4424,6 +4429,8 @@ public class Person implements ILocatable {
                     person.armorKitName = wn2.getTextContent().trim();
                 } else if (nodeName.equalsIgnoreCase("intendedArmorKitName")) {
                     person.intendedArmorKitName = wn2.getTextContent().trim();
+                } else if (nodeName.equalsIgnoreCase("repairKitName")) {
+                    person.repairKitNames.add(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("chaosCampaignReputation")) {
                     person.chaosCampaignReputation = MathUtility.parseInt(wn2.getTextContent().trim(),
                           STARTING_REPUTATION_SCORE);
@@ -7784,6 +7791,30 @@ public class Person implements ILocatable {
 
     public void setArmorKitName(final String armorKitName) {
         this.armorKitName = (armorKitName == null) ? ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME : armorKitName;
+    }
+
+    /**
+     * The specialized repair kits this technician owns, by MegaMek internal name. Each kit grants a bonus to certain
+     * {@code Tech/...} repair rolls (see {@code RepairKitCatalog}). Unlike an armor kit, a technician may own several
+     * different repair kits at once.
+     *
+     * @return the owned repair-kit internal names (never {@code null})
+     */
+    public Set<String> getRepairKitNames() {
+        return repairKitNames;
+    }
+
+    public void setRepairKitNames(final Set<String> repairKitNames) {
+        this.repairKitNames = (repairKitNames == null) ? new LinkedHashSet<>() : repairKitNames;
+    }
+
+    /**
+     * @param kitInternalName the MegaMek internal name of a repair kit
+     *
+     * @return {@code true} if this person owns the named repair kit
+     */
+    public boolean hasRepairKit(final String kitInternalName) {
+        return repairKitNames.contains(kitInternalName);
     }
 
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate) {

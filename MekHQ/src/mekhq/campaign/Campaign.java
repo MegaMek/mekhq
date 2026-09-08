@@ -206,6 +206,7 @@ import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
 import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
@@ -4441,6 +4442,12 @@ public class Campaign implements ITechManager {
                     target.addModifier(-bonus, "Chassis Familiarity");
                 }
             }
+        }
+
+        // A technician who owns a matching specialized repair kit (or a Deluxe Toolkit) gets a bonus (a lower target).
+        int repairKitBonus = RepairKitCatalog.repairBonus(tech, skill.getType().getName());
+        if (repairKitBonus != 0) {
+            target.addModifier(-repairKitBonus, "technician kit");
         }
 
         final boolean isOvertime;

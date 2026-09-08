@@ -70,6 +70,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.universe.Planet;
@@ -435,6 +436,12 @@ public class Maintenance {
         }
 
         target.append(partWork.getAllModsForMaintenance());
+
+        // A technician with a Descartes diagnostic scanner (or a Deluxe Toolkit) gets a bonus to the maintenance check.
+        int maintenanceKitBonus = RepairKitCatalog.maintenanceBonus(tech);
+        if (maintenanceKitBonus != 0) {
+            target.addModifier(-maintenanceKitBonus, "technician kit");
+        }
 
         Familiarity familiarity = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         Unit partUnit = partWork.getUnit();
