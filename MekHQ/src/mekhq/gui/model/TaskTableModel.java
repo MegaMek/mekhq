@@ -32,6 +32,9 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
@@ -52,6 +55,7 @@ import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IPartWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
@@ -61,6 +65,7 @@ import mekhq.gui.RepairTaskInfo;
  * A table model for displaying work items
  */
 public class TaskTableModel extends DataTableModel<IPartWork> {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
     private static final Map<String, Person> techCache = new HashMap<>();
 
     private final CampaignGUI gui;
@@ -88,6 +93,37 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
 
     public IPartWork getTaskAt(int row) {
         return data.get(row);
+    }
+
+    /**
+     * Builds a short "Skill Needed" indicator naming the technician skill(s) the given task accepts, for display in the
+     * repair-task cell so the player can see which specialist a task calls for.
+     *
+     * <p>A task reports its most appropriate skill(s) via {@link IPartWork#isRightTechType(String)}. If it accepts
+     * every technician skill (i.e. it has no specialist requirement) - or, defensively, none at all - this reports that
+     * any technician may perform it.</p>
+     *
+     * @param part the task to describe
+     *
+     * @return an HTML fragment (with a leading {@code <br>}) naming the required skill(s)
+     */
+    public static String getRequiredSkillText(IPartWork part) {
+        String[] techSkills = SkillType.getTechSkills();
+        List<String> accepted = new ArrayList<>();
+        for (String skillName : techSkills) {
+            if (part.isRightTechType(skillName)) {
+                accepted.add(skillName);
+            }
+        }
+
+        String label;
+        if (accepted.isEmpty() || (accepted.size() == techSkills.length)) {
+            label = getTextAt(RESOURCE_BUNDLE, "TaskTableModel.requiredSkill.any");
+        } else {
+            label = String.join(", ", accepted);
+        }
+
+        return "<br><i>" + getFormattedTextAt(RESOURCE_BUNDLE, "TaskTableModel.requiredSkill.format", label) + "</i>";
     }
 
     @Deprecated(since = "0.51.0", forRemoval = true)
@@ -119,7 +155,16 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
 
-            setText("<html>" + getValueAt(actualRow, actualCol).toString() + "</html>");
+            String taskDescription = getValueAt(actualRow, actualCol).toString();
+            String requiredSkillText = getRequiredSkillText(getTaskAt(actualRow));
+            int closingTagIndex = taskDescription.lastIndexOf("</html>");
+            if (closingTagIndex >= 0) {
+                setText(taskDescription.substring(0, closingTagIndex) +
+                              requiredSkillText +
+                              taskDescription.substring(closingTagIndex));
+            } else {
+                setText("<html>" + taskDescription + requiredSkillText + "</html>");
+            }
 
             if (isSelected) {
                 highlightBorder();
