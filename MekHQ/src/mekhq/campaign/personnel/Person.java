@@ -7223,8 +7223,9 @@ public class Person implements ILocatable {
         this.minutesLeft = PRIMARY_ROLE_SUPPORT_TIME;
         this.overtimeLeft = PRIMARY_ROLE_OVERTIME_SUPPORT_TIME;
 
-        // Techs get support time adjusted by skill and administration multipliers
-        if (isTechExpanded() && isTechsUseAdministration) {
+        // When the administration option is enabled, every character's support time is adjusted by their own
+        // Administration skill, not just technicians.
+        if (isTechsUseAdministration) {
             double multiplier = calculateTechTimeMultiplier(isTechsUseAdministration);
             this.minutesLeft = (int) Math.round(minutesLeft * multiplier);
             this.overtimeLeft = (int) Math.round(overtimeLeft * multiplier);
@@ -7391,10 +7392,6 @@ public class Person implements ILocatable {
     public double calculateTechTimeMultiplier(boolean isTechsUseAdministration) {
         final double TECH_ADMINISTRATION_MULTIPLIER = 0.05;
         final int REGULAR_EXPERIENCE_LEVEL = REGULAR.getExperienceLevel();
-
-        if (!isTechExpanded()) {
-            return 1;
-        }
 
         if (!isTechsUseAdministration) {
             return 1.0;
