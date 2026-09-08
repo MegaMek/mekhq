@@ -123,6 +123,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private JTable techTable;
     private RoundedJButton btnDoTask;
     private RoundedMMToggleButton btnShowAllTechs;
+    private RoundedMMToggleButton btnShowOnlyUnitTechs;
     private JLabel lblTargetNum;
     private JTextPane txtServicedUnitView;
     private JTextArea textTarget;
@@ -452,6 +453,17 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panTechs.add(btnShowAllTechs, gridBagConstraints);
+
+        btnShowOnlyUnitTechs = new RoundedMMToggleButton(resourceMap.getString("btnShowOnlyUnitTechs.text"));
+        btnShowOnlyUnitTechs.setToolTipText(resourceMap.getString("btnShowOnlyUnitTechs.toolTipText"));
+        btnShowOnlyUnitTechs.setName("btnShowOnlyUnitTechs");
+        btnShowOnlyUnitTechs.setSelected(false);
+        btnShowOnlyUnitTechs.addActionListener(ev -> filterTechs());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panTechs.add(btnShowOnlyUnitTechs, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -807,6 +819,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                                                      partWithUnit.getUnit() :
                                                (ILocation) part;
                 if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
+                    return false;
+                }
+                if (btnShowOnlyUnitTechs.isSelected() && (unit != null) && !tech.isRightTechProfessionFor(unit)) {
                     return false;
                 }
                 if ((unit != null) && unit.isSelfCrewed()) {
