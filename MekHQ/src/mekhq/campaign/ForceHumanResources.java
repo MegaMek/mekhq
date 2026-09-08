@@ -51,6 +51,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import megamek.Version;
@@ -1431,8 +1432,35 @@ public class ForceHumanResources {
     public static List<Person> getTechsExpanded(Collection<Person> people, Collection<Unit> units,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today,
           boolean noZeroMinute, boolean eliteFirst, boolean expanded) {
+        return getTechs(people, units, campaignOptions, isClanCampaign, today, noZeroMinute, eliteFirst,
+              expanded ? Person::isTechExpanded : Person::isTech);
+    }
+
+    /**
+     * Retrieves a list of active technicians eligible under a supplied eligibility predicate, applying the same minute
+     * filtering, self-crewed engineer inclusion, and sorting as the role-based variants.
+     *
+     * <p>This lets callers decide eligibility by whatever rule fits their context - for example a role-based test
+     * ({@link Person#isTech()}) for maintenance capacity, or a purely skill-based test ({@link Person#hasTechSkill()})
+     * for the repair tab, where any person who has the right skill should be offered regardless of their
+     * profession.</p>
+     *
+     * @param people          the collection of people to search
+     * @param units           the collection of units (for self-crewed engineers)
+     * @param campaignOptions the campaign options
+     * @param isClanCampaign  whether this is a Clan campaign
+     * @param today           the current in-game date
+     * @param noZeroMinute    if {@code true}, excludes technicians with no remaining available minutes
+     * @param eliteFirst      if {@code true}, sorts the list to place the most skilled technicians at the top
+     * @param isEligibleTech  the predicate deciding whether a person qualifies as a technician
+     *
+     * @return a list of active technicians sorted appropriately
+     */
+    public static List<Person> getTechs(Collection<Person> people, Collection<Unit> units,
+          CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today,
+          boolean noZeroMinute, boolean eliteFirst, Predicate<Person> isEligibleTech) {
         final List<Person> techs = people.stream()
-                                         .filter(person -> (expanded ? person.isTechExpanded() : person.isTech()) &&
+                                         .filter(person -> isEligibleTech.test(person) &&
                                                                  (!noZeroMinute || (person.getMinutesLeft() > 0)))
                                          .collect(Collectors.toList());
 
@@ -1474,6 +1502,28 @@ public class ForceHumanResources {
           boolean isClanCampaign, LocalDate today, boolean noZeroMinute, boolean eliteFirst, boolean expanded) {
         return getTechsExpanded(getActivePersonnel(false, false), units, campaignOptions, isClanCampaign, today,
               noZeroMinute, eliteFirst, expanded);
+    }
+
+    /**
+     * Retrieves active personnel eligible to work on a part by <em>skill</em> rather than profession: anyone who has a
+     * technician repair skill ({@link Person#hasTechSkill()}) is included, regardless of their assigned role. Self-
+     * crewed unit engineers are added and the list is sorted as with the role-based variants.
+     *
+     * <p>Used by the repair tab so a specialist (e.g. a pilot who happens to have Technician/Weapons) can be offered
+     * for a job even though they hold no tech profession.</p>
+     *
+     * @param units           the collection of units (for self-crewed engineers)
+     * @param campaignOptions the campaign options
+     * @param isClanCampaign  whether this is a Clan campaign
+     * @param today           the current in-game date
+     * @param noZeroMinute    if {@code true}, excludes technicians with no remaining available minutes
+     *
+     * @return a list of skill-eligible technicians sorted appropriately
+     */
+    public List<Person> getSkilledTechs(Collection<Unit> units, CampaignOptions campaignOptions,
+          boolean isClanCampaign, LocalDate today, boolean noZeroMinute) {
+        return getTechs(getActivePersonnel(false, false), units, campaignOptions, isClanCampaign, today,
+              noZeroMinute, false, Person::hasTechSkill);
     }
 
     /**

@@ -67,6 +67,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
@@ -110,7 +111,6 @@ import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.enums.MRMSMode;
 import mekhq.service.mrms.MRMSService;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Shows damaged units and controls for repair.
@@ -445,6 +445,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnShowAllTechs = new RoundedMMToggleButton(resourceMap.getString("btnShowAllTechs.text"));
         btnShowAllTechs.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText"));
         btnShowAllTechs.setName("btnShowAllTechs");
+        btnShowAllTechs.setSelected(true);
         btnShowAllTechs.addActionListener(ev -> filterTechs());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -975,11 +976,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      */
     private void refreshTechsList() {
         int selected = techTable.getSelectedRow();
-        // Get all techs who have more than 0 minutes free, and sort by skill descending (elites at bottom)
+        // Offer anyone with a technician repair skill, regardless of their profession, who has more than 0 minutes
+        // free; sorted by skill descending (elites at bottom). The task's required-skill filtering is applied in
+        // filterTechs().
         mekhq.campaign.Campaign campaign = getCampaign();
         List<Person> techs = campaign.getPlayerForce()
                                    .getHumanResources()
-                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                   .getSkilledTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                          campaign.getCampaignOptions(),
                                          campaign.getPlayerForce().isClanForce(),
                                          campaign.getLocalDate(),

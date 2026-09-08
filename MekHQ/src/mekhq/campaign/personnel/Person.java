@@ -7283,6 +7283,27 @@ public class Person implements ILocatable {
                      isTechLargeVessel();
     }
 
+    /**
+     * Determines whether this person possesses any technician skill usable for repairing, maintaining, or replacing
+     * unit parts, regardless of their assigned profession or role.
+     *
+     * <p>Unlike {@link #isTech()} and {@link #isTechExpanded()}, which additionally require a matching tech role, this
+     * check is purely skill-based. It is used where eligibility to work on a part should depend on what the person can
+     * actually do rather than on their job title - for example the repair tab's technician list.</p>
+     *
+     * @return {@code true} if the person has at least one of {@link SkillType#getTechSkills()}; {@code false} otherwise
+     *
+     * @see SkillType#getTechSkills()
+     */
+    public boolean hasTechSkill() {
+        for (String techSkillName : SkillType.getTechSkills()) {
+            if (hasSkill(techSkillName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean isTechLargeVessel() {
         boolean hasSkill = hasSkill(S_TECH_VESSEL);
         return hasSkill && (getPrimaryRole().isVesselCrew() || getSecondaryRole().isVesselCrew());
