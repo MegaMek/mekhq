@@ -51,6 +51,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -75,6 +76,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.Category;
 import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
+import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -94,6 +96,8 @@ public class IssueArmorKitsDialog extends JDialog {
 
     private final transient Campaign campaign;
     private final transient List<Person> personnel;
+    private final transient List<Person> toolTechnicians;
+    private final transient List<KitIssueSection> sections = new ArrayList<>();
     private final transient Map<Category, List<Person>> byCategory = new EnumMap<>(Category.class);
 
     /** The kit chosen for a group, or absent if the group is left unchanged. */
@@ -124,26 +128,58 @@ public class IssueArmorKitsDialog extends JDialog {
      * @since 0.51.01
      */
     public static void showFor(JFrame parent, Campaign campaign, Collection<Person> people, Collection<Unit> units) {
-        List<Person> gathered = new ArrayList<>(ArmorKitIssuer.gatherPersonnel(people, units));
-        if (gathered.isEmpty()) {
+        List<Person> armorPersonnel = new ArrayList<>(ArmorKitIssuer.gatherPersonnel(people, units));
+        List<Person> toolTechnicians = gatherTechnicians(people, units);
+        if (armorPersonnel.isEmpty() && toolTechnicians.isEmpty()) {
             JOptionPane.showMessageDialog(parent,
                   getTextAt(RESOURCE_BUNDLE, "empty.message"),
                   getTextAt(RESOURCE_BUNDLE, "empty.title"),
                   JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        IssueArmorKitsDialog dialog = new IssueArmorKitsDialog(parent, campaign, gathered);
+        IssueArmorKitsDialog dialog = new IssueArmorKitsDialog(parent, campaign, armorPersonnel, toolTechnicians);
         dialog.setPreferences(dialog); // Must be before setVisible
         dialog.setVisible(true);
     }
 
-    private IssueArmorKitsDialog(JFrame parent, Campaign campaign, List<Person> gathered) {
+    /** Every selected person (and selected units' crew) who can be issued technician tool kits, without duplicates. */
+    private static List<Person> gatherTechnicians(Collection<Person> people, Collection<Unit> units) {
+        LinkedHashSet<Person> gathered = new LinkedHashSet<>();
+        if (people != null) {
+            for (Person person : people) {
+                if (RepairKitCatalog.canBeIssuedKit(person)) {
+                    gathered.add(person);
+                }
+            }
+        }
+        if (units != null) {
+            for (Unit unit : units) {
+                for (Person crew : unit.getCrew()) {
+                    if (RepairKitCatalog.canBeIssuedKit(crew)) {
+                        gathered.add(crew);
+                    }
+                }
+            }
+        }
+        return new ArrayList<>(gathered);
+    }
+
+    private IssueArmorKitsDialog(JFrame parent, Campaign campaign, List<Person> armorPersonnel,
+          List<Person> toolTechnicians) {
         super(parent, getTextAt(RESOURCE_BUNDLE, "title"), true);
         this.campaign = campaign;
-        this.personnel = gathered;
+        this.personnel = armorPersonnel;
+        this.toolTechnicians = toolTechnicians;
 
-        for (Person person : gathered) {
+        for (Person person : armorPersonnel) {
             byCategory.computeIfAbsent(ArmorKitCatalog.categoryFor(person), key -> new ArrayList<>()).add(person);
+        }
+
+        if (!armorPersonnel.isEmpty()) {
+            sections.add(armorSection());
+        }
+        if (!toolTechnicians.isEmpty()) {
+            sections.add(new ToolKitSection(campaign, toolTechnicians, this::recalculate));
         }
 
         buildUI();
@@ -161,8 +197,13 @@ public class IssueArmorKitsDialog extends JDialog {
         content.setBorder(BorderFactory.createEmptyBorder(pad, pad, pad, pad));
 
         content.add(buildHeader(), BorderLayout.NORTH);
-        content.add(buildSections(), BorderLayout.CENTER);
-        content.add(buildBottom(), BorderLayout.SOUTH);
+
+        JTabbedPane tabs = new JTabbedPane();
+        for (KitIssueSection section : sections) {
+            tabs.addTab(section.getTitle(), section.getComponent());
+        }
+        content.add(tabs, BorderLayout.CENTER);
+        content.add(buildFooter(), BorderLayout.SOUTH);
 
         setContentPane(content);
     }
@@ -180,7 +221,9 @@ public class IssueArmorKitsDialog extends JDialog {
         JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "title"));
         title.setFont(title.getFont().deriveFont(Font.BOLD, title.getFont().getSize2D() + 5f));
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
-        JLabel subtitle = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "header.subtitle", personnel.size()));
+        Set<Person> everyone = new HashSet<>(personnel);
+        everyone.addAll(toolTechnicians);
+        JLabel subtitle = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "header.subtitle", everyone.size()));
         subtitle.setForeground(mutedColor());
         subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         left.add(title);
@@ -325,9 +368,41 @@ public class IssueArmorKitsDialog extends JDialog {
     // endregion Sections
 
     // region Bottom (roster + footer)
-    private JPanel buildBottom() {
-        JPanel bottom = new JPanel(new BorderLayout(0, scaleForGUI(6)));
 
+    /** The armor kit family as a section: the category cards plus the "what everyone wears" roster. */
+    private KitIssueSection armorSection() {
+        return new KitIssueSection() {
+            @Override
+            public String getTitle() {
+                return getTextAt(RESOURCE_BUNDLE, "tab.armor");
+            }
+
+            @Override
+            public JComponent getComponent() {
+                JPanel panel = new JPanel(new BorderLayout(0, scaleForGUI(6)));
+                panel.add(buildSections(), BorderLayout.CENTER);
+                panel.add(buildArmorRoster(), BorderLayout.SOUTH);
+                return panel;
+            }
+
+            @Override
+            public boolean hasPendingChanges() {
+                return !chosenKit.isEmpty() || !stripped.isEmpty() || !restoreDesigned.isEmpty();
+            }
+
+            @Override
+            public Tally computeTally() {
+                return armorComputeTally();
+            }
+
+            @Override
+            public void commit(CommitTotals totals) {
+                armorCommit(totals);
+            }
+        };
+    }
+
+    private JComponent buildArmorRoster() {
         rosterModel = new RosterModel();
         JTable table = new JTable(rosterModel);
         table.setRowHeight(scaleForGUI(22));
@@ -338,10 +413,7 @@ public class IssueArmorKitsDialog extends JDialog {
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         rosterScroll.setBorder(RoundedLineBorder.createSubtleRoundedLineBorder());
         rosterScroll.setPreferredSize(scaleForGUI(760, 150));
-        bottom.add(rosterScroll, BorderLayout.CENTER);
-
-        bottom.add(buildFooter(), BorderLayout.SOUTH);
-        return bottom;
+        return rosterScroll;
     }
 
     private JPanel buildFooter() {
@@ -369,6 +441,29 @@ public class IssueArmorKitsDialog extends JDialog {
 
     // region Actions & totals
     private void recalculate() {
+        KitIssueSection.Tally tally = KitIssueSection.Tally.empty();
+        boolean anyChoice = false;
+        for (KitIssueSection section : sections) {
+            tally = tally.plus(section.computeTally());
+            anyChoice |= section.hasPendingChanges();
+        }
+
+        tallyLabel.setText(tally.cost().toAmountString());
+        if (anyChoice) {
+            summaryLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "footer.summary",
+                  tally.fromStores(), tally.toProcure(), tally.cost().toAmountString()));
+        } else {
+            summaryLabel.setText(getTextAt(RESOURCE_BUNDLE, "footer.summary.none"));
+        }
+        issueButton.setEnabled(anyChoice);
+
+        if (rosterModel != null) {
+            rosterModel.fireTableDataChanged();
+        }
+    }
+
+    /** The armor section's footer tally: how many kits come from stores, how many are ordered, and the cost. */
+    private KitIssueSection.Tally armorComputeTally() {
         int fromStores = 0;
         int toProcure = 0;
         Money total = Money.zero();
@@ -391,28 +486,45 @@ public class IssueArmorKitsDialog extends JDialog {
             total = total.plus(ArmorKitIssuer.unitPrice(kit, campaign).multipliedBy(ordered));
         }
 
-        tallyLabel.setText(total.toAmountString());
-        boolean anyChoice = !chosenKit.isEmpty() || !stripped.isEmpty() || !restoreDesigned.isEmpty();
-        if (anyChoice) {
-            summaryLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "footer.summary",
-                  fromStores, toProcure, total.toAmountString()));
-        } else {
-            summaryLabel.setText(getTextAt(RESOURCE_BUNDLE, "footer.summary.none"));
-        }
-        issueButton.setEnabled(anyChoice);
-
-        if (rosterModel != null) {
-            rosterModel.fireTableDataChanged();
-        }
+        return new KitIssueSection.Tally(fromStores, toProcure, total);
     }
 
     private void onIssue() {
-        Set<Person> changed = new HashSet<>();
-        int drawn = 0;
-        int ordered = 0;
-        int returned = 0;
-        int platoons = 0;
+        KitIssueSection.CommitTotals totals = new KitIssueSection.CommitTotals();
+        for (KitIssueSection section : sections) {
+            section.commit(totals);
+        }
 
+        Set<Unit> units = new HashSet<>();
+        for (Person person : totals.changed) {
+            MekHQ.triggerEvent(new PersonChangedEvent(person));
+            if (person.getUnit() != null) {
+                units.add(person.getUnit());
+            }
+        }
+        for (Unit unit : units) {
+            unit.resetPilotAndEntity();
+        }
+
+        if ((totals.issued > 0) || (totals.ordered > 0)) {
+            campaign.addReport(DailyReportType.PERSONNEL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "report.issued",
+                        totals.issued + totals.ordered, totals.issued, totals.ordered));
+        }
+        if (totals.removed > 0) {
+            campaign.addReport(DailyReportType.PERSONNEL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "report.stripped", totals.removed));
+        }
+        if (totals.platoons > 0) {
+            campaign.addReport(DailyReportType.PERSONNEL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "report.platoons", totals.platoons));
+        }
+
+        dispose();
+    }
+
+    /** Applies the armor kit selections, accumulating counts into the shared commit totals. */
+    private void armorCommit(KitIssueSection.CommitTotals totals) {
         for (Map.Entry<Category, List<Person>> entry : byCategory.entrySet()) {
             Category category = entry.getKey();
             List<Person> people = entry.getValue();
@@ -438,7 +550,7 @@ public class IssueArmorKitsDialog extends JDialog {
                     } else {
                         ArmorKitIssuer.issuePlatoonKit(unit, kit, campaign);
                     }
-                    platoons++;
+                    totals.platoons++;
                 }
                 continue;
             }
@@ -448,8 +560,8 @@ public class IssueArmorKitsDialog extends JDialog {
                     person.setIntendedArmorKitName(null);
                     if (!ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(person.getArmorKitName())) {
                         ArmorKitIssuer.strip(person, campaign);
-                        changed.add(person);
-                        returned++;
+                        totals.changed.add(person);
+                        totals.removed++;
                     }
                 }
                 continue;
@@ -463,8 +575,8 @@ public class IssueArmorKitsDialog extends JDialog {
             for (Person person : people) {
                 if (ArmorKitIssuer.issueFromStock(person, kit, campaign)) {
                     person.setIntendedArmorKitName(null);
-                    changed.add(person);
-                    drawn++;
+                    totals.changed.add(person);
+                    totals.issued++;
                 } else {
                     // out of stock now — remember what they are meant to wear so it is issued when a kit arrives
                     person.setIntendedArmorKitName(kit.getInternalName());
@@ -473,35 +585,9 @@ public class IssueArmorKitsDialog extends JDialog {
             }
             if (shortfall > 0) {
                 ArmorKitIssuer.order(kit, shortfall, campaign);
-                ordered += shortfall;
+                totals.ordered += shortfall;
             }
         }
-
-        Set<Unit> units = new HashSet<>();
-        for (Person person : changed) {
-            MekHQ.triggerEvent(new PersonChangedEvent(person));
-            if (person.getUnit() != null) {
-                units.add(person.getUnit());
-            }
-        }
-        for (Unit unit : units) {
-            unit.resetPilotAndEntity();
-        }
-
-        if ((drawn > 0) || (ordered > 0)) {
-            campaign.addReport(DailyReportType.PERSONNEL,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "report.issued", drawn + ordered, drawn, ordered));
-        }
-        if (returned > 0) {
-            campaign.addReport(DailyReportType.PERSONNEL,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "report.stripped", returned));
-        }
-        if (platoons > 0) {
-            campaign.addReport(DailyReportType.PERSONNEL,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "report.platoons", platoons));
-        }
-
-        dispose();
     }
 
     /** Kits stock is per location, so sum across each distinct local warehouse the group draws from. */

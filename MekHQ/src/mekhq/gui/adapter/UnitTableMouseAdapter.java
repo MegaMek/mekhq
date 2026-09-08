@@ -117,6 +117,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
+import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
@@ -271,6 +272,22 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
      * @param unit    the unit whose log is being edited
      * @param logType which of the unit's logs to edit
      */
+    /**
+     * Whether the shared kit-issue dialog has anything to offer for this unit: its crew can wear an armor kit, it is a
+     * conventional infantry platoon (issued a platoon kit), or any crew member can be issued technician tool kits.
+     */
+    private static boolean canIssueKitsFor(Unit unit) {
+        if (ArmorKitCatalog.canWearIssuedKit(unit.getEntity()) || unit.getEntity().isConventionalInfantry()) {
+            return true;
+        }
+        for (Person crew : unit.getCrew()) {
+            if (RepairKitCatalog.canBeIssuedKit(crew)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void editUnitLog(Unit unit, UnitLogType logType) {
         EditUnitLogDialog editUnitLogDialog = new EditUnitLogDialog(gui.getFrame(),
               gui.getCampaign().getLocalDate(),
@@ -1223,14 +1240,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
 
-                if (!nonePresent && Arrays.stream(units).anyMatch(u ->
-                                                                        ArmorKitCatalog.canWearIssuedKit(u.getEntity()) ||
-                                                                              u.getEntity().isConventionalInfantry())) {
-                    JMenuItem issueArmorKits = new JMenuItem(getTextAt("mekhq.resources.IssueArmorKitsDialog",
+                if (!nonePresent && Arrays.stream(units).anyMatch(UnitTableMouseAdapter::canIssueKitsFor)) {
+                    JMenuItem issueKits = new JMenuItem(getTextAt("mekhq.resources.IssueArmorKitsDialog",
                           "menu.issueArmorKits"));
-                    issueArmorKits.addActionListener(evt -> IssueArmorKitsDialog.showFor(gui.getFrame(),
+                    issueKits.addActionListener(evt -> IssueArmorKitsDialog.showFor(gui.getFrame(),
                           gui.getCampaign(), null, Arrays.asList(units)));
-                    menu.add(issueArmorKits);
+                    menu.add(issueKits);
                 }
 
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);

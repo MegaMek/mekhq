@@ -167,15 +167,16 @@ public final class RepairKitCatalog {
     }
 
     /**
-     * Whether the player may buy and issue repair kits for this person: anyone who can perform part repairs, i.e. holds
-     * at least one technician skill, regardless of profession.
+     * Whether the player may buy and issue tool kits for this person. Any character may be issued a tool kit; whether a
+     * kit actually helps depends on the work they do (its bonus applies only to the repair rolls it covers), but
+     * ownership itself is unrestricted.
      *
      * @param person the person being considered, or {@code null}
      *
-     * @return {@code true} if repair kits may be issued to this person
+     * @return {@code true} if tool kits may be issued to this person
      */
     public static boolean canBeIssuedKit(@Nullable Person person) {
-        return (person != null) && person.hasTechSkill();
+        return person != null;
     }
 
     /**

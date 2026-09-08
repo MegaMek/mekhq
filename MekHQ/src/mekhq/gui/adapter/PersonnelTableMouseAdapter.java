@@ -71,7 +71,6 @@ import static mekhq.campaign.randomEvents.personalities.PersonalityController.wr
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.checkForIntelBreachEvent;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -110,7 +109,6 @@ import megamek.client.ui.dialogs.iconChooser.PortraitChooserDialog;
 import megamek.codeUtilities.MathUtility;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
-import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
@@ -157,7 +155,6 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.DiseaseService;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
-import mekhq.campaign.personnel.quartermaster.RepairKitIssuer;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -2575,15 +2572,15 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(getCampaign(), selected));
 
-        if (Arrays.stream(selected).anyMatch(ArmorKitCatalog::canBeIssuedKit)) {
-            JMenuItem issueArmorKits = new JMenuItem(getTextAt("mekhq.resources.IssueArmorKitsDialog",
+        if (Arrays.stream(selected)
+                  .anyMatch(candidate -> ArmorKitCatalog.canBeIssuedKit(candidate)
+                                               || RepairKitCatalog.canBeIssuedKit(candidate))) {
+            JMenuItem issueKits = new JMenuItem(getTextAt("mekhq.resources.IssueArmorKitsDialog",
                   "menu.issueArmorKits"));
-            issueArmorKits.addActionListener(ev -> IssueArmorKitsDialog.showFor(getFrame(),
+            issueKits.addActionListener(ev -> IssueArmorKitsDialog.showFor(getFrame(),
                   getCampaign(), Arrays.asList(selected), null));
-            popup.add(issueArmorKits);
+            popup.add(issueKits);
         }
-
-        JMenuHelpers.addMenuIfNonEmpty(popup, createRepairKitsMenu(selected));
 
         List<mekhq.campaign.personnel.Person> selectedPeople = Arrays.asList(selected);
         JMenuHelpers.addMenuIfNonEmpty(popup, new LocationMenu(getCampaign(), getFrame(), selectedPeople));
@@ -4748,63 +4745,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // endregion GM Menu
 
         return Optional.of(popup);
-    }
-
-    /**
-     * Builds a "Repair Kits" submenu for the selected technicians. For each specialized repair kit, it offers actions
-     * to issue the kit from local stores, add one to procurement, or remove it. The actions apply to every selected
-     * person who can own repair kits (any technician); the menu is empty - and so not shown - when none can.
-     *
-     * @param selected the currently selected personnel
-     *
-     * @return the repair-kits submenu (empty if no selected person can own repair kits)
-     */
-    private JMenu createRepairKitsMenu(Person[] selected) {
-        final String bundle = "mekhq.resources.RepairKits";
-        JMenu menu = new JMenu(getTextAt(bundle, "menu.repairKits"));
-
-        List<Person> techs = Arrays.stream(selected).filter(RepairKitCatalog::canBeIssuedKit).toList();
-        if (techs.isEmpty()) {
-            return menu;
-        }
-
-        for (String kitName : RepairKitCatalog.allKitNames()) {
-            EquipmentType kit = EquipmentType.get(kitName);
-            if (kit == null) {
-                continue;
-            }
-
-            JMenu kitMenu = new JMenu(kit.getName());
-
-            JMenuItem issue = new JMenuItem(getTextAt(bundle, "menu.repairKits.issueFromStock"));
-            issue.addActionListener(ev -> {
-                for (Person tech : techs) {
-                    if (RepairKitIssuer.issueFromStock(tech, kit, getCampaign())) {
-                        MekHQ.triggerEvent(new PersonChangedEvent(tech));
-                    }
-                }
-            });
-            kitMenu.add(issue);
-
-            JMenuItem buy = new JMenuItem(getFormattedTextAt(bundle, "menu.repairKits.buy",
-                  RepairKitIssuer.unitPrice(kit, getCampaign()).toAmountAndSymbolString()));
-            buy.addActionListener(ev -> RepairKitIssuer.order(kit, techs.size(), getCampaign()));
-            kitMenu.add(buy);
-
-            JMenuItem remove = new JMenuItem(getTextAt(bundle, "menu.repairKits.remove"));
-            remove.addActionListener(ev -> {
-                for (Person tech : techs) {
-                    if (RepairKitIssuer.removeKit(tech, kit, getCampaign())) {
-                        MekHQ.triggerEvent(new PersonChangedEvent(tech));
-                    }
-                }
-            });
-            kitMenu.add(remove);
-
-            menu.add(kitMenu);
-        }
-
-        return menu;
     }
 
     /**
