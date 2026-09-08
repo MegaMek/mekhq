@@ -54,6 +54,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.GameEffect;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PatientLogger;
 import mekhq.campaign.personnel.Injury;
@@ -68,7 +69,6 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuri
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Static helper methods implementing the "advanced medical" sub-system
@@ -439,7 +439,7 @@ public final class InjuryUtil {
         Objects.requireNonNull(campaign);
         Objects.requireNonNull(person);
         Skill skill = doctor.getSkill(SkillType.S_SURGERY);
-        int level = skill.getLevel();
+        int level = (skill == null) ? 0 : skill.getLevel();
         final int fumbleLimit = FUMBLE_LIMITS[(level >= 0) && (level <= 10) ? level : 0];
         final int critLimit = CRIT_LIMITS[(level >= 0) && (level <= 10) ? level : 0];
         int xpGained = 0;
