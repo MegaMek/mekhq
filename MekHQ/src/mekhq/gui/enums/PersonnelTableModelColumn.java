@@ -195,7 +195,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     TECH_AERO("Column.TECH_AERO.title", Comparators.SKILL_COMPARATOR,
           skillModelExtractor(SkillType.S_TECH_AERO), PersonnelTableModelColumn::skillToText),
     TECH_MECHANIC("Column.TECH_MECHANIC.title", Comparators.SKILL_COMPARATOR,
-          skillModelExtractor(SkillType.S_TECH_MECHANIC), PersonnelTableModelColumn::skillToText),
+          skillModelExtractor(SkillType.S_TECH_VEHICLE), PersonnelTableModelColumn::skillToText),
     TECH_BA("Column.TECH_BA.title", Comparators.SKILL_COMPARATOR,
           skillModelExtractor(SkillType.S_TECH_BA), PersonnelTableModelColumn::skillToText),
     TECH_VESSEL("Column.TECH_VESSEL.title", Comparators.SKILL_COMPARATOR,
@@ -717,7 +717,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             case PersonnelRole.BA_TECH -> new SkillPair(skillValue.apply(SkillType.S_TECH_BA), SkillType.S_TECH_BA,
                   skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
             case PersonnelRole.MECHANIC ->
-                  new SkillPair(skillValue.apply(SkillType.S_TECH_MECHANIC), SkillType.S_TECH_MECHANIC,
+                  new SkillPair(skillValue.apply(SkillType.S_TECH_VEHICLE), SkillType.S_TECH_VEHICLE,
                         skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
             case PersonnelRole.AERO_TEK -> new SkillPair(skillValue.apply(SkillType.S_TECH_AERO), SkillType.S_TECH_AERO,
                   skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);

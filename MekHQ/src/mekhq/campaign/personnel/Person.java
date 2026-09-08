@@ -7255,10 +7255,10 @@ public class Person implements ILocatable {
             skill = getSkill(S_TECH_AERO);
             level = getSkill(S_TECH_AERO).getExperienceLevel(skillModifierData);
         }
-        if (hasSkill(S_TECH_MECHANIC) &&
-                  getSkill(S_TECH_MECHANIC).getExperienceLevel(skillModifierData) > level) {
-            skill = getSkill(S_TECH_MECHANIC);
-            level = getSkill(S_TECH_MECHANIC).getExperienceLevel(skillModifierData);
+        if (hasSkill(S_TECH_VEHICLE) &&
+                  getSkill(S_TECH_VEHICLE).getExperienceLevel(skillModifierData) > level) {
+            skill = getSkill(S_TECH_VEHICLE);
+            level = getSkill(S_TECH_VEHICLE).getExperienceLevel(skillModifierData);
         }
         if (hasSkill(S_TECH_BA) && getSkill(S_TECH_BA).getExperienceLevel(skillModifierData) > level) {
             skill = getSkill(S_TECH_BA);
@@ -7299,7 +7299,7 @@ public class Person implements ILocatable {
     }
 
     public boolean isTechMechanic() {
-        boolean hasSkill = hasSkill(S_TECH_MECHANIC);
+        boolean hasSkill = hasSkill(S_TECH_VEHICLE);
         return hasSkill && (getPrimaryRole().isMechanic() || getSecondaryRole().isMechanic());
     }
 
@@ -7469,8 +7469,8 @@ public class Person implements ILocatable {
         // Infantry don't need techs to reload or swap out their ammo
         boolean isForConventionalInfantry = unit != null && unit.isConventionalInfantry();
         if (isForConventionalInfantry) {
-            SkillType mechanicSkillType = SkillType.getType(S_TECH_MECHANIC);
-            return new Skill(S_TECH_MECHANIC, mechanicSkillType.getRegularLevel(), 0);
+            SkillType mechanicSkillType = SkillType.getType(S_TECH_VEHICLE);
+            return new Skill(S_TECH_VEHICLE, mechanicSkillType.getRegularLevel(), 0);
         }
 
         SkillModifierData skillModifierData = getSkillModifierData();
@@ -7520,8 +7520,8 @@ public class Person implements ILocatable {
             return getSkill(S_TECH_MEK);
         } else if ((unit.getEntity() instanceof BattleArmor) && hasSkill(S_TECH_BA)) {
             return getSkill(S_TECH_BA);
-        } else if ((unit.getEntity() instanceof Tank) && hasSkill(S_TECH_MECHANIC)) {
-            return getSkill(S_TECH_MECHANIC);
+        } else if ((unit.getEntity() instanceof Tank) && hasSkill(S_TECH_VEHICLE)) {
+            return getSkill(S_TECH_VEHICLE);
         } else if (((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) &&
                          hasSkill(S_TECH_VESSEL)) {
             return getSkill(S_TECH_VESSEL);
@@ -7573,9 +7573,19 @@ public class Person implements ILocatable {
     }
 
     public boolean isRightTechTypeFor(final IPartWork part) {
-        // A tech is the right type for a part if they possess any of the tech skills the part accepts. Parts report
-        // their most appropriate skill via isRightTechType, so this naturally favors specialist skills while still
-        // allowing a "global" skill (Technician/Mek, etc.) for parts that map to no more specific skill.
+        // Conventional infantry handle their own gear: getSkillForWorkingOn returns a stock Technician/Vehicle skill
+        // for them regardless of the part (e.g. reloading or swapping ammo), so any tech is the right type and no
+        // wrong-type penalty should apply. This mirrors the conventional-infantry short-circuit there, and in
+        // particular avoids penalizing that work for parts that map to a specialist skill such as
+        // InfantryWeaponPart -> Technician/Weapons.
+        final Unit unit = part.getUnit();
+        if (unit != null && unit.isConventionalInfantry()) {
+            return true;
+        }
+
+        // Otherwise a tech is the right type for a part if they possess any of the tech skills the part accepts. Parts
+        // report their most appropriate skill via isRightTechType, so this naturally favors specialist skills while
+        // still allowing a "global" skill (Technician/Mek, etc.) for parts that map to no more specific skill.
         for (String techSkillName : SkillType.getTechSkills()) {
             if (hasSkill(techSkillName) && part.isRightTechType(techSkillName)) {
                 return true;

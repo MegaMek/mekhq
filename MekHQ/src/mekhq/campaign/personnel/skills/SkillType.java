@@ -114,7 +114,7 @@ public class SkillType {
 
     // support skills
     public static final String S_TECH_MEK = "Technician/Mek";
-    public static final String S_TECH_MECHANIC = "Technician/Vehicle";
+    public static final String S_TECH_VEHICLE = "Technician/Vehicle";
     public static final String S_TECH_AERO = "Technician/Aerospace";
     public static final String S_TECH_BA = "Technician/BattleArmor";
     public static final String S_TECH_VESSEL = "Technician/Vessel";
@@ -218,7 +218,7 @@ public class SkillType {
     public static final String[] skillList = { S_PILOT_MEK, S_GUN_MEK, S_PILOT_AERO, S_GUN_AERO, S_PILOT_GVEE,
                                                S_PILOT_VTOL, S_PILOT_NVEE, S_GUN_VEE, S_PILOT_JET, S_GUN_JET,
                                                S_PILOT_SPACE, S_GUN_SPACE, S_ARTILLERY, S_GUN_BA, S_GUN_PROTO,
-                                               S_PILOT_PROTO, S_SMALL_ARMS, S_ANTI_MEK, S_TECH_MEK, S_TECH_MECHANIC,
+                                               S_PILOT_PROTO, S_SMALL_ARMS, S_ANTI_MEK, S_TECH_MEK, S_TECH_VEHICLE,
                                                S_TECH_AERO, S_TECH_BA, S_TECH_VESSEL, S_TECH_MILITARY, S_TECH_CIVILIAN,
                                                S_TECH_ELECTRONIC, S_TECH_NUCLEAR, S_TECH_AERONAUTICS, S_TECH_MECHANICAL,
                                                S_TECH_MYOMER, S_TECH_JETS, S_TECH_WEAPONS, S_TECH_CYBERNETICS,
@@ -254,7 +254,7 @@ public class SkillType {
      * {@link #S_TECH_CIVILIAN} (broad groupings that do not correspond to any component subskill), none of which are
      * ever returned by a part's {@link mekhq.campaign.parts.Part#isRightTechType(String)}.
      */
-    public static final String[] techSkillList = { S_TECH_MEK, S_TECH_MECHANIC, S_TECH_AERO, S_TECH_BA, S_TECH_VESSEL,
+    public static final String[] techSkillList = { S_TECH_MEK, S_TECH_VEHICLE, S_TECH_AERO, S_TECH_BA, S_TECH_VESSEL,
                                                    S_TECH_ELECTRONIC, S_TECH_NUCLEAR, S_TECH_AERONAUTICS,
                                                    S_TECH_MECHANICAL, S_TECH_MYOMER, S_TECH_JETS, S_TECH_WEAPONS,
                                                    S_TECH_CYBERNETICS };
@@ -732,7 +732,7 @@ public class SkillType {
     public boolean isAffectedByGremlinsOrTechEmpathy() {
         return Objects.equals(this.name, S_TECH_BA) ||
                      Objects.equals(this.name, S_TECH_AERO) ||
-                     Objects.equals(this.name, S_TECH_MECHANIC) ||
+                     Objects.equals(this.name, S_TECH_VEHICLE) ||
                      Objects.equals(this.name, S_TECH_MEK) ||
                      Objects.equals(this.name, S_TECH_VESSEL) ||
                      Objects.equals(this.name, S_TECH_MILITARY) ||
@@ -1019,7 +1019,7 @@ public class SkillType {
         lookupHash.put(S_SMALL_ARMS, createSmallArms());
         lookupHash.put(S_ANTI_MEK, createAntiMek());
         lookupHash.put(S_TECH_MEK, createTechMek());
-        lookupHash.put(S_TECH_MECHANIC, createTechMechanic());
+        lookupHash.put(S_TECH_VEHICLE, createTechVehicle());
         lookupHash.put(S_TECH_AERO, createTechAero());
         lookupHash.put(S_TECH_BA, createTechBA());
         lookupHash.put(S_TECH_VESSEL, createTechVessel());
@@ -1225,7 +1225,7 @@ public class SkillType {
             // The technician skills were renamed to the "Technician/..." family; map the legacy
             // "Tech/..." names (from older saves) to their current canonical names.
             case "Tech/Mek" -> S_TECH_MEK;
-            case "Tech/Mechanic" -> S_TECH_MECHANIC;
+            case "Tech/Mechanic" -> S_TECH_VEHICLE;
             case "Tech/Aero" -> S_TECH_AERO;
             case "Tech/BattleArmor" -> S_TECH_BA;
             case "Tech/Vessel" -> S_TECH_VESSEL;
@@ -1812,9 +1812,9 @@ public class SkillType {
         );
     }
 
-    public static SkillType createTechMechanic() {
+    public static SkillType createTechVehicle() {
         // This skill corresponds to the ATOW skill 'Technician'
-        return new SkillType(S_TECH_MECHANIC,
+        return new SkillType(S_TECH_VEHICLE,
               10,
               false,
               SUPPORT_TECHNICIAN,

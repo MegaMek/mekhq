@@ -33,14 +33,13 @@
 
 package mekhq.campaign;
 
-import static org.mockito.Mockito.lenient;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -51,8 +50,8 @@ import megamek.common.TechConstants;
 import megamek.common.enums.TechBase;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheck;
 import mekhq.campaign.personnel.skills.SkillCheck;
@@ -138,7 +137,7 @@ public class SkillCheckRulesTest {
 
             when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.ANY_TECH);
             result = campaign.checkAcquisition(mock(IAcquisitionWork.class), null, false);
-            assertEquals(SkillType.S_TECH_MECHANIC, result.getSkillType().getName());
+            assertEquals(SkillType.S_TECH_VEHICLE, result.getSkillType().getName());
 
             when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.NEGOTIATION);
             result = campaign.checkAcquisition(mock(IAcquisitionWork.class), null, false);
@@ -291,8 +290,8 @@ public class SkillCheckRulesTest {
 
             SkillCheck result = campaign.checkAcquisition(mock(IAcquisitionWork.class), new Person(campaign), false);
 
-            // Fallback to S_TECH_MECHANIC chec even though the person does not have it
-            assertEquals(SkillType.S_TECH_MECHANIC, result.getSkillType().getName());
+            // Fallback to S_TECH_VEHICLE chec even though the person does not have it
+            assertEquals(SkillType.S_TECH_VEHICLE, result.getSkillType().getName());
         }
 
         @ParameterizedTest

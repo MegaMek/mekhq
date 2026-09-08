@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
-import mekhq.campaign.ForceHumanResources;
-import mekhq.campaign.force.PlayerForce;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,7 +51,9 @@ import java.util.List;
 import java.util.UUID;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.LocalPersonnel;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
@@ -403,9 +403,9 @@ class SeniorAppointmentAssignerTest {
         Person otherMekTech = junior(PersonnelRole.MEK_TECH);
         withSkill(otherMekTech, SkillType.S_TECH_MEK, 3);
         Person bestMechanic = junior(PersonnelRole.MECHANIC);
-        withSkill(bestMechanic, SkillType.S_TECH_MECHANIC, 7);
+        withSkill(bestMechanic, SkillType.S_TECH_VEHICLE, 7);
         Person otherMechanic = junior(PersonnelRole.MECHANIC);
-        withSkill(otherMechanic, SkillType.S_TECH_MECHANIC, 2);
+        withSkill(otherMechanic, SkillType.S_TECH_VEHICLE, 2);
 
         SeniorAppointmentAssigner.assign(campaign,
               List.of(bestMekTech, otherMekTech, bestMechanic, otherMechanic));

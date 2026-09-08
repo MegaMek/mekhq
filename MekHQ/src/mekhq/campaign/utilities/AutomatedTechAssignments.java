@@ -36,8 +36,8 @@ import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_AERO;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_BA;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MEK;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -159,7 +159,7 @@ public class AutomatedTechAssignments {
         assignUnmaintainedUnitsTechs(techMeks, unmaintainedMeks, S_TECH_MEK);
         assignUnmaintainedUnitsTechs(techAero, unmaintainedAero, S_TECH_AERO);
         assignUnmaintainedUnitsTechs(techBattleArmor, unmaintainedBattleArmor, S_TECH_BA);
-        assignUnmaintainedUnitsTechs(techMechanic, unmaintainedVehicle, S_TECH_MECHANIC);
+        assignUnmaintainedUnitsTechs(techMechanic, unmaintainedVehicle, S_TECH_VEHICLE);
     }
 
     /**
@@ -390,7 +390,7 @@ public class AutomatedTechAssignments {
         sortTechList(techMeks, S_TECH_MEK);
         sortTechList(techAero, S_TECH_AERO);
         sortTechList(techBattleArmor, S_TECH_BA);
-        sortTechList(techMechanic, S_TECH_MECHANIC);
+        sortTechList(techMechanic, S_TECH_VEHICLE);
     }
 
     /**

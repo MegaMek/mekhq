@@ -34,7 +34,7 @@ package mekhq.campaign.personnel.quartermaster;
 
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.Collection;
@@ -529,7 +529,7 @@ public final class ArmorKitIssuer {
     /** A throwaway acquirer at Regular skill, so the displayed difficulty is a fixed reference, not the current staff. */
     private static Person regularAcquirer(Campaign campaign) {
         Person acquirer = new Person(campaign);
-        for (String skill : new String[] { S_NEGOTIATION, S_ADMIN, S_TECH_MECHANIC }) {
+        for (String skill : new String[] { S_NEGOTIATION, S_ADMIN, S_TECH_VEHICLE }) {
             acquirer.addSkill(skill, SkillType.getType(skill).getRegularLevel(), 0);
         }
         return acquirer;

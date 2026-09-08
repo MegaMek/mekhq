@@ -6195,7 +6195,7 @@ public class Unit implements ITechnology, ILocatable {
         } else if (entity instanceof BattleArmor) {
             return SkillType.S_TECH_BA;
         } else if (entity instanceof Tank || entity instanceof AbstractBuildingEntity) {
-            return SkillType.S_TECH_MECHANIC;
+            return SkillType.S_TECH_VEHICLE;
         } else if ((entity instanceof Dropship) || (entity instanceof Jumpship)) {
             return SkillType.S_TECH_VESSEL;
         } else if ((entity instanceof Aero)) {

@@ -54,7 +54,7 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
@@ -4520,7 +4520,7 @@ public class Campaign implements ITechManager {
 
     private Person getGenericAcquisitionPerson() {
         if (genericAcquisitionPerson == null) {
-            genericAcquisitionPerson = createGenericAcquisitionPerson(S_NEGOTIATION, S_ADMIN, S_TECH_MECHANIC);
+            genericAcquisitionPerson = createGenericAcquisitionPerson(S_NEGOTIATION, S_ADMIN, S_TECH_VEHICLE);
         }
         return genericAcquisitionPerson;
     }
@@ -4641,7 +4641,7 @@ public class Campaign implements ITechManager {
             case ANY_TECH -> {
                 Skill bestTechSkill = person.getBestTechSkill();
                 // since the person has no tech skills, we can create the skill check for any of them
-                yield (bestTechSkill == null) ? SkillType.getType(S_TECH_MECHANIC) : bestTechSkill.getType();
+                yield (bestTechSkill == null) ? SkillType.getType(S_TECH_VEHICLE) : bestTechSkill.getType();
             }
         };
         if ((decisiveModifier == null) && !person.hasSkill(skillType.getName())) {

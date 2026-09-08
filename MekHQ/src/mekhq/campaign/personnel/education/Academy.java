@@ -1236,7 +1236,7 @@ public class Academy implements Comparable<Academy> {
             case "small arms" -> SkillType.S_SMALL_ARMS;
             case "anti-mek", "climbing" -> SkillType.S_ANTI_MEK;
             case "tech/mek" -> SkillType.S_TECH_MEK;
-            case "tech/mechanic" -> SkillType.S_TECH_MECHANIC;
+            case "tech/mechanic" -> SkillType.S_TECH_VEHICLE;
             case "tech/aero" -> SkillType.S_TECH_AERO;
             case "tech/battlearmor" -> SkillType.S_TECH_BA;
             case "tech/vessel" -> SkillType.S_TECH_VESSEL;
