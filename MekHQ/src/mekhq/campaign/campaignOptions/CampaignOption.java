@@ -374,7 +374,7 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Integer> MASH_THEATRE_CAPACITY =
           of(Integer.class, 25, "mashTheatreCapacity");
     public static final CampaignOption<Boolean> USE_SUPPORT_TEAMS =
-          of(Boolean.class, true, "useSupportTeams");
+          of(Boolean.class, false, "useSupportTeams");
     public static final CampaignOption<Boolean> USE_BLOB_INFANTRY =
           of(Boolean.class, false, "useBlobInfantry");
     public static final CampaignOption<Boolean> USE_BLOB_BATTLE_ARMOR =
