@@ -2764,7 +2764,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
     private static void resolveRolePerformability(Person person, Campaign campaign, LocalDate today, PersonnelRole role,
           boolean primary) {
-        if (person.canPerformRole(today, role, false)) {
+        if (person.canPerformRole(today, role, primary)) {
             return;
         }
 
