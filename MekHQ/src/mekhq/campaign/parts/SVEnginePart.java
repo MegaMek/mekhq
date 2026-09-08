@@ -324,17 +324,12 @@ public class SVEnginePart extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        if (null != getUnit()) {
-            if (getUnit().getEntity() instanceof Aero) {
-                return skillType.equals(SkillType.S_TECH_AERO);
-            } else {
-                return skillType.equals(SkillType.S_TECH_MECHANIC);
-            }
-        }
-        // We're not tracking whether parts in the warehouse came from ground or
-        // fixed-wing/airships,
-        // so let either tech repair it.
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_MECHANIC));
+        // Support-vehicle power plants are classified by engine type, not by the unit they power: fusion/fission
+        // plants fall under Technician/Nuclear, and internal-combustion and other non-nuclear engines under
+        // Technician/Mechanical.
+        return skillType.equals(EnginePart.isNuclearEngineType(etype) ?
+                                      SkillType.S_TECH_NUCLEAR :
+                                      SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

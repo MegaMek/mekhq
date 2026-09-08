@@ -40,8 +40,8 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.enums.MiscTypeFlag;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.finances.Money;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -158,6 +158,12 @@ public class JumpJet extends EquipmentPart {
             return 0;
         }
         return -3;
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        // Jump jets are thrust-based propulsion systems, serviced under Technician/Jets.
+        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_JETS);
     }
 
     @Override

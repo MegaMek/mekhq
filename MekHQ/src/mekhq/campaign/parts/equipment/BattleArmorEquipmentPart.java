@@ -182,6 +182,13 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
     }
 
     @Override
+    public boolean isRightTechType(String skillType) {
+        // Battle armor equipment is serviced as part of the suit by a battle armor technician, not by a weapons
+        // specialist, so this overrides the weapon handling inherited from EquipmentPart.
+        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_BA);
+    }
+
+    @Override
     public boolean needsFixing() {
         // Can't be critted so shouldn't need to be fixed
         return false;

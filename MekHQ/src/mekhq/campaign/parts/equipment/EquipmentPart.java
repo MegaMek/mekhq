@@ -96,6 +96,16 @@ public class EquipmentPart extends Part {
      */
     protected boolean autocannonHit = false;
 
+    @Override
+    public boolean isRightTechType(String skillType) {
+        // Weapon systems fall under Technician/Weapons. Other equipment has no more specific technician skill, so any
+        // technician may service it.
+        if (getType() instanceof WeaponType) {
+            return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_WEAPONS);
+        }
+        return true;
+    }
+
     public EquipmentType getType() {
         return type;
     }

@@ -46,12 +46,12 @@ import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.LandAirMek;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingLandingGear;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -223,9 +223,9 @@ public class LandingGear extends Part {
     @Override
     public boolean isRightTechType(String skillType) {
         if (unit != null && unit.getEntity() instanceof LandAirMek) {
-            return skillType.equals(SkillType.S_TECH_MEK);
+            return skillType.equals(SkillType.S_TECH_MECHANICAL);
         }
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
+        return skillType.equals(SkillType.S_TECH_AERONAUTICS);
     }
 
     @Override

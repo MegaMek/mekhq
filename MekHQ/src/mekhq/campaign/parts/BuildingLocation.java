@@ -370,7 +370,7 @@ public class BuildingLocation extends Part {
     @Override
     public boolean isRightTechType(String skillType) {
         // Buildings could use construction skills, but we'll use mechanic for now
-        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC);
+        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

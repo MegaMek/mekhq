@@ -42,7 +42,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
-import megamek.common.units.Mek;
 import megamek.common.units.Tank;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -385,14 +384,8 @@ public class PodSpace implements IPartWork {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        if (unit.getEntity() instanceof Mek) {
-            return skillType.equals(SkillType.S_TECH_MEK);
-        } else if (unit.getEntity() instanceof Aero) {
-            return skillType.equals(SkillType.S_TECH_AERO);
-        } else if (unit.getEntity() instanceof Tank) {
-            return skillType.equals(SkillType.S_TECH_MECHANIC);
-        }
-        return false;
+        // Pod-mounting hardware is a structural/mechanical system regardless of the unit it is fitted to.
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

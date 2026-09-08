@@ -185,6 +185,12 @@ public class MASC extends EquipmentPart {
     }
 
     @Override
+    public boolean isRightTechType(String skillType) {
+        // MASC (MyoMer Accelerator Signal Circuitry) is a myomer-based system, serviced under Technician/Myomer.
+        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MYOMER);
+    }
+
+    @Override
     public boolean isOmniPoddable() {
         return isSupercharger();
     }
