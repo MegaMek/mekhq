@@ -303,8 +303,8 @@ public class Person implements ILocatable {
     private int toughness;
     private String armorKitName;
     private String intendedArmorKitName;
-    private Set<String> repairKitNames = new LinkedHashSet<>();
-    private Set<String> intendedRepairKitNames = new LinkedHashSet<>();
+    private String repairKitName;
+    private String intendedRepairKitName;
     private int chaosCampaignReputation;
     private int chaosCampaignCriminalRecord;
     private Attributes atowAttributes;
@@ -3799,11 +3799,11 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intendedArmorKitName", intendedArmorKitName);
             }
 
-            for (String repairKitName : repairKitNames) {
+            if (repairKitName != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "repairKitName", repairKitName);
             }
 
-            for (String intendedRepairKitName : intendedRepairKitNames) {
+            if (intendedRepairKitName != null) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intendedRepairKitName", intendedRepairKitName);
             }
 
@@ -4436,9 +4436,9 @@ public class Person implements ILocatable {
                 } else if (nodeName.equalsIgnoreCase("intendedArmorKitName")) {
                     person.intendedArmorKitName = wn2.getTextContent().trim();
                 } else if (nodeName.equalsIgnoreCase("repairKitName")) {
-                    person.repairKitNames.add(wn2.getTextContent().trim());
+                    person.repairKitName = wn2.getTextContent().trim();
                 } else if (nodeName.equalsIgnoreCase("intendedRepairKitName")) {
-                    person.intendedRepairKitNames.add(wn2.getTextContent().trim());
+                    person.intendedRepairKitName = wn2.getTextContent().trim();
                 } else if (nodeName.equalsIgnoreCase("chaosCampaignReputation")) {
                     person.chaosCampaignReputation = MathUtility.parseInt(wn2.getTextContent().trim(),
                           STARTING_REPUTATION_SCORE);
@@ -7802,41 +7802,42 @@ public class Person implements ILocatable {
     }
 
     /**
-     * The specialized repair kits this technician owns, by MegaMek internal name. Each kit grants a bonus to certain
-     * {@code Tech/...} repair rolls (see {@code RepairKitCatalog}). Unlike an armor kit, a technician may own several
-     * different repair kits at once.
+     * The single tool kit this technician owns, by MegaMek internal name, or {@code null} if they carry none. The kit
+     * grants a bonus to certain skill rolls (see {@code RepairKitCatalog}). Like an armor kit, a technician carries at
+     * most one tool kit at a time.
      *
-     * @return the owned repair-kit internal names (never {@code null})
+     * @return the owned tool-kit internal name, or {@code null}
      */
-    public Set<String> getRepairKitNames() {
-        return repairKitNames;
+    public @Nullable String getRepairKitName() {
+        return repairKitName;
     }
 
-    public void setRepairKitNames(final Set<String> repairKitNames) {
-        this.repairKitNames = (repairKitNames == null) ? new LinkedHashSet<>() : repairKitNames;
+    public void setRepairKitName(final @Nullable String repairKitName) {
+        this.repairKitName = repairKitName;
     }
 
     /**
-     * @param kitInternalName the MegaMek internal name of a repair kit
+     * @param kitInternalName the MegaMek internal name of a tool kit
      *
-     * @return {@code true} if this person owns the named repair kit
+     * @return {@code true} if this is the tool kit this person carries
      */
     public boolean hasRepairKit(final String kitInternalName) {
-        return repairKitNames.contains(kitInternalName);
+        return (kitInternalName != null) && kitInternalName.equals(repairKitName);
     }
 
     /**
-     * The tool kits this person is meant to own but has not yet been issued, pending a kit arriving in their local
-     * stores. The quartermaster fulfills these as kits arrive.
+     * The tool kit this person is meant to own but has not yet been issued, pending a kit arriving in their local
+     * stores; {@code null} once they have it or were never waiting on one. The quartermaster fulfills these as kits
+     * arrive.
      *
-     * @return the internal names of the awaited tool kits (never {@code null})
+     * @return the internal name of the awaited tool kit, or {@code null}
      */
-    public Set<String> getIntendedRepairKitNames() {
-        return intendedRepairKitNames;
+    public @Nullable String getIntendedRepairKitName() {
+        return intendedRepairKitName;
     }
 
-    public void setIntendedRepairKitNames(final Set<String> intendedRepairKitNames) {
-        this.intendedRepairKitNames = (intendedRepairKitNames == null) ? new LinkedHashSet<>() : intendedRepairKitNames;
+    public void setIntendedRepairKitName(final @Nullable String intendedRepairKitName) {
+        this.intendedRepairKitName = intendedRepairKitName;
     }
 
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate) {

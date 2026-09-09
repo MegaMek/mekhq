@@ -38,9 +38,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
@@ -55,12 +52,15 @@ class EquipmentSummaryPanelTest {
         EquipmentType.initializeTypes();
     }
 
-    private static Person person(String armorKit, String... repairKits) {
-        Set<String> owned = new HashSet<>(Set.of(repairKits));
+    private static Person person(String armorKit) {
+        return person(armorKit, null);
+    }
+
+    private static Person person(String armorKit, String toolKit) {
         Person person = mock(Person.class);
         when(person.getArmorKitName()).thenReturn(armorKit);
-        when(person.getRepairKitNames()).thenReturn(owned);
-        when(person.hasRepairKit(anyString())).thenAnswer(invocation -> owned.contains(invocation.getArgument(0)));
+        when(person.getRepairKitName()).thenReturn(toolKit);
+        when(person.hasRepairKit(anyString())).thenAnswer(invocation -> invocation.getArgument(0).equals(toolKit));
         return person;
     }
 

@@ -37,8 +37,6 @@ import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-import java.util.Iterator;
-
 import megamek.common.equipment.EquipmentType;
 import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
@@ -59,9 +57,9 @@ import mekhq.campaign.personnel.skills.SkillType;
  * ordinary shopping list when the shelf is bare.
  *
  * <p>A kit is a spare {@link EquipmentPart} sitting in the {@link LocalWarehouse} nearest the technician. Issuing one
- * consumes it and records the kit on the technician (see {@link Person#getRepairKitNames()}); removing a kit returns
- * one to stores; kits are bought through the ordinary shopping list, so procuring more is the same order the parts
- * store would place. Unlike an armor kit, a technician may own several different repair kits at once.</p>
+ * consumes it and records the kit on the technician (see {@link Person#getRepairKitName()}); removing a kit, or issuing
+ * a replacement, returns the old one to stores; kits are bought through the ordinary shopping list, so procuring more is
+ * the same order the parts store would place. Like an armor kit, a technician carries at most one tool kit at a time.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -128,7 +126,9 @@ public final class RepairKitIssuer {
             return false;
         }
         warehouse.removePart(inStock, 1);
-        person.getRepairKitNames().add(kit.getInternalName());
+        // A technician carries only one tool kit; the one being replaced goes back to stores.
+        returnWornKit(person, campaign);
+        person.setRepairKitName(kit.getInternalName());
         return true;
     }
 
@@ -142,14 +142,29 @@ public final class RepairKitIssuer {
      * @return {@code true} if the kit was owned and has been removed
      */
     public static boolean removeKit(Person person, EquipmentType kit, Campaign campaign) {
-        if (!person.getRepairKitNames().remove(kit.getInternalName())) {
+        if (!person.hasRepairKit(kit.getInternalName())) {
             return false;
         }
+        person.setRepairKitName(null);
         LocalWarehouse warehouse = person.getWarehouse();
         if (warehouse != null) {
             warehouse.addPart(new EquipmentPart(0, kit, -1, 1.0, false, campaign), true);
         }
         return true;
+    }
+
+    /** Returns the tool kit a technician is currently carrying (if any) to their local stores. */
+    private static void returnWornKit(Person person, Campaign campaign) {
+        String worn = person.getRepairKitName();
+        if (worn == null) {
+            return;
+        }
+        EquipmentType kit = EquipmentType.get(worn);
+        LocalWarehouse warehouse = person.getWarehouse();
+        if ((kit != null) && (warehouse != null)) {
+            warehouse.addPart(new EquipmentPart(0, kit, -1, 1.0, false, campaign), true);
+        }
+        person.setRepairKitName(null);
     }
 
     /**
@@ -180,6 +195,7 @@ public final class RepairKitIssuer {
      * @param gmAdd    {@code true} if the character is being added by the GM (kits are granted directly)
      */
     public static void equipDefaultToolKitOnRecruitment(Person person, Campaign campaign, boolean gmAdd) {
+        // A technician carries only one tool kit, so the first profession with a configured default is the one issued.
         for (RepairKitCatalog.KitProfession profession : RepairKitCatalog.professionsFor(person)) {
             String kitName = defaultKitFor(profession, campaign);
             if (kitName.isBlank() || person.hasRepairKit(kitName)) {
@@ -190,15 +206,16 @@ public final class RepairKitIssuer {
                 continue;
             }
             if (issueFromStock(person, kit, campaign)) {
-                continue; // issued straight from local stores
+                return; // issued straight from local stores
             }
             if (campaign.getCampaignOptions().get(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT)) {
                 if (gmAdd) {
-                    person.getRepairKitNames().add(kit.getInternalName());
+                    person.setRepairKitName(kit.getInternalName());
                 } else {
                     order(kit, 1, campaign);
-                    person.getIntendedRepairKitNames().add(kit.getInternalName());
+                    person.setIntendedRepairKitName(kit.getInternalName());
                 }
+                return;
             }
         }
     }
@@ -224,22 +241,19 @@ public final class RepairKitIssuer {
     public static void fulfillPendingToolKits(Campaign campaign) {
         int fulfilled = 0;
         for (Person person : campaign.getPlayerForce().getPersonnel().values()) {
-            if (!person.getStatus().isActive() || person.getIntendedRepairKitNames().isEmpty()) {
+            String intended = person.getIntendedRepairKitName();
+            if (!person.getStatus().isActive() || (intended == null)) {
                 continue;
             }
-            Iterator<String> iterator = person.getIntendedRepairKitNames().iterator();
-            while (iterator.hasNext()) {
-                String intended = iterator.next();
-                EquipmentType kit = EquipmentType.get(intended);
-                if ((kit == null) || person.hasRepairKit(intended)) {
-                    iterator.remove();
-                    continue;
-                }
-                if (issueFromStock(person, kit, campaign)) {
-                    iterator.remove();
-                    MekHQ.triggerEvent(new PersonChangedEvent(person));
-                    fulfilled++;
-                }
+            EquipmentType kit = EquipmentType.get(intended);
+            if ((kit == null) || person.hasRepairKit(intended)) {
+                person.setIntendedRepairKitName(null);
+                continue;
+            }
+            if (issueFromStock(person, kit, campaign)) {
+                person.setIntendedRepairKitName(null);
+                MekHQ.triggerEvent(new PersonChangedEvent(person));
+                fulfilled++;
             }
         }
         if (fulfilled > 0) {

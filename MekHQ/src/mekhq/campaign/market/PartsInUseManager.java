@@ -622,9 +622,7 @@ public class PartsInUseManager {
         for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (placeOf(person) == place) {
                 addWornKit(counts, person.getArmorKitName(), 1);
-                for (String toolKitName : person.getRepairKitNames()) {
-                    addWornKit(counts, toolKitName, 1);
-                }
+                addWornKit(counts, person.getRepairKitName(), 1);
             }
         }
         for (Unit unit : campaign.getUnits()) {

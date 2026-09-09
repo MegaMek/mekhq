@@ -37,19 +37,19 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
 import static mekhq.campaign.personnel.quartermaster.RepairKitCatalog.KIT_BASIC_TOOLKIT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Predicate;
 
 import megamek.common.equipment.EquipmentType;
@@ -81,25 +81,36 @@ class RepairKitIssuerTest {
         kit = EquipmentType.get(KIT_BASIC_TOOLKIT);
     }
 
-    /** A person owning a live, mutable repair-kit set, seeded with the given kits. */
-    private static Person personOwning(String... kits) {
-        Set<String> owned = new HashSet<>(Set.of(kits));
+    /** A person carrying the given single tool kit ({@code null} for none), with a live single-kit get/set/has mock. */
+    private static Person personOwning(String kit) {
         Person person = mock(Person.class);
-        when(person.getRepairKitNames()).thenReturn(owned);
-        when(person.getIntendedRepairKitNames()).thenReturn(new HashSet<>());
-        when(person.hasRepairKit(anyString())).thenAnswer(invocation -> owned.contains(invocation.getArgument(0)));
+        wireKitState(person, kit);
         return person;
     }
 
     private static Person techWithRole(PersonnelRole role) {
-        Set<String> owned = new HashSet<>();
         Person person = mock(Person.class);
         when(person.getPrimaryRole()).thenReturn(role);
         when(person.getSecondaryRole()).thenReturn(NONE);
-        when(person.getRepairKitNames()).thenReturn(owned);
-        when(person.getIntendedRepairKitNames()).thenReturn(new HashSet<>());
-        when(person.hasRepairKit(anyString())).thenAnswer(invocation -> owned.contains(invocation.getArgument(0)));
+        wireKitState(person, null);
         return person;
+    }
+
+    /** Backs the single tool-kit and intended-kit accessors with mutable holders so issue/remove/strip round-trip. */
+    private static void wireKitState(Person person, String initialKit) {
+        String[] held = { initialKit };
+        String[] intended = { null };
+        when(person.getRepairKitName()).thenAnswer(invocation -> held[0]);
+        doAnswer(invocation -> {
+            held[0] = invocation.getArgument(0);
+            return null;
+        }).when(person).setRepairKitName(any());
+        when(person.getIntendedRepairKitName()).thenAnswer(invocation -> intended[0]);
+        doAnswer(invocation -> {
+            intended[0] = invocation.getArgument(0);
+            return null;
+        }).when(person).setIntendedRepairKitName(any());
+        when(person.hasRepairKit(anyString())).thenAnswer(invocation -> invocation.getArgument(0).equals(held[0]));
     }
 
     /** A present, spare warehouse part of the given kit type. */
@@ -156,12 +167,12 @@ class RepairKitIssuerTest {
     @Test
     void issueFromStockDrawsAPresentKitAndRecordsItOnTheTech() {
         LocalWarehouse warehouse = warehouseHolding(List.of(kitPart()));
-        Person person = personOwning();
+        Person person = personOwning(null);
         when(person.getWarehouse()).thenReturn(warehouse);
 
         assertTrue(RepairKitIssuer.issueFromStock(person, kit, campaign));
         verify(warehouse).removePart(any(), eq(1));
-        assertTrue(person.getRepairKitNames().contains(kit.getInternalName()));
+        assertEquals(kit.getInternalName(), person.getRepairKitName());
     }
 
     @Test
@@ -169,12 +180,12 @@ class RepairKitIssuerTest {
         EquipmentPart inTransit = kitPart();
         when(inTransit.isPresent()).thenReturn(false);
         LocalWarehouse warehouse = warehouseHolding(List.of(inTransit));
-        Person person = personOwning();
+        Person person = personOwning(null);
         when(person.getWarehouse()).thenReturn(warehouse);
 
         assertFalse(RepairKitIssuer.issueFromStock(person, kit, campaign));
         verify(warehouse, never()).removePart(any(), anyInt());
-        assertFalse(person.getRepairKitNames().contains(kit.getInternalName()));
+        assertNull(person.getRepairKitName());
     }
 
     @Test
@@ -194,13 +205,13 @@ class RepairKitIssuerTest {
         when(person.getWarehouse()).thenReturn(warehouse);
 
         assertTrue(RepairKitIssuer.removeKit(person, kit, campaign));
-        assertFalse(person.getRepairKitNames().contains(kit.getInternalName()));
+        assertNull(person.getRepairKitName());
         verify(warehouse).addPart(any(), eq(true));
     }
 
     @Test
     void removeKitIsANoOpWhenTheTechDoesNotOwnIt() {
-        Person person = personOwning();
+        Person person = personOwning(null);
         assertFalse(RepairKitIssuer.removeKit(person, kit, campaign));
         verify(person, never()).getWarehouse();
     }
@@ -216,7 +227,7 @@ class RepairKitIssuerTest {
 
         RepairKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, false);
 
-        assertTrue(tech.getRepairKitNames().contains(kit.getInternalName()));
+        assertEquals(kit.getInternalName(), tech.getRepairKitName());
         verify(warehouse).removePart(any(), eq(1));
     }
 
@@ -229,7 +240,7 @@ class RepairKitIssuerTest {
 
         RepairKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, false);
 
-        assertTrue(tech.getRepairKitNames().isEmpty());
+        assertNull(tech.getRepairKitName());
         verify(warehouse, never()).removePart(any(), anyInt());
     }
 
@@ -242,7 +253,7 @@ class RepairKitIssuerTest {
 
         RepairKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, true);
 
-        assertTrue(tech.getRepairKitNames().contains(kit.getInternalName()));
+        assertEquals(kit.getInternalName(), tech.getRepairKitName());
     }
 
     @Test
@@ -254,8 +265,8 @@ class RepairKitIssuerTest {
 
         RepairKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, false);
 
-        assertFalse(tech.getRepairKitNames().contains(kit.getInternalName()), "not yet owned — awaiting delivery");
-        assertTrue(tech.getIntendedRepairKitNames().contains(kit.getInternalName()));
+        assertNull(tech.getRepairKitName(), "not yet owned — awaiting delivery");
+        assertEquals(kit.getInternalName(), tech.getIntendedRepairKitName());
     }
 
     @Test
@@ -267,8 +278,8 @@ class RepairKitIssuerTest {
 
         RepairKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, false);
 
-        assertTrue(tech.getRepairKitNames().isEmpty());
-        assertTrue(tech.getIntendedRepairKitNames().isEmpty());
+        assertNull(tech.getRepairKitName());
+        assertNull(tech.getIntendedRepairKitName());
     }
     // endregion equipDefaultToolKitOnRecruitment
 }

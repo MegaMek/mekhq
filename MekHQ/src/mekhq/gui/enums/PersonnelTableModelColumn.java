@@ -907,8 +907,9 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             kits.add(kitDisplayName(armorKit));
         }
 
-        for (String kitName : person.getRepairKitNames()) {
-            kits.add(kitDisplayName(kitName));
+        String toolKit = person.getRepairKitName();
+        if (toolKit != null) {
+            kits.add(kitDisplayName(toolKit));
         }
 
         if (kits.isEmpty()) {
