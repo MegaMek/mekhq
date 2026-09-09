@@ -106,7 +106,7 @@ public class TechnicianSkills {
         int targetLevel = sample.getLevel();
         for (String skillName : supplementalSkills) {
             Skill existing = person.getSkill(skillName);
-            
+
             if (existing == null) {
                 person.addSkill(skillName, targetLevel, 0);
             } else if (existing.getLevel() < targetLevel) {

@@ -4720,7 +4720,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(CMD_REMOVE_ROLEPLAY_SKILLS);
             menuItem.addActionListener(this);
             personalityMenu.add(menuItem);
-            
+
             if (oneSelected && getCampaignOptions().get(CampaignOption.CHASSIS_FAMILIARITY_MODE).isEnabled()) {
                 menuItem = new JMenuItem(getText("editFamiliarity.text"));
                 menuItem.setActionCommand(CMD_EDIT_FAMILIARITY);
