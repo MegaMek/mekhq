@@ -121,7 +121,7 @@ class KitCard extends JPanel {
 
         for (String line : detail) {
             body.add(Box.createVerticalStrut(scaleForGUI(3)));
-            JLabel label = new JLabel(line);
+            JLabel label = new JLabel(wordWrap(line, 34));
             label.setForeground(mutedColor());
             label.setFont(label.getFont().deriveFont(label.getFont().getSize2D() - 1f));
             label.setAlignmentX(LEFT_ALIGNMENT);

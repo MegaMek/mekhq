@@ -236,20 +236,48 @@ public final class RepairKitCatalog {
     }
 
     /**
-     * Every non-technician skill this person's owned equipment kits improve, mapped to the best bonus for each (see
-     * {@link #generalSkillBonus(Person, String)}). Only skills with a non-zero bonus are included, so a person with no
-     * relevant kit yields an empty map. Suitable for folding into {@code SkillModifierData} so the bonus reaches every
-     * check made with the skill.
+     * Every skill this person's owned tool kit improves, mapped to the modifier for each - the single source of truth
+     * folded into {@code SkillModifierData} so a kit acts as a plain modifier to the skill (raising its effective value)
+     * rather than a bespoke modifier on a particular roll. This covers:
+     *
+     * <ul>
+     *     <li>a specialized repair kit: {@link #REPAIR_KIT_ROLL_BONUS} to each {@code Tech/...} skill it covers;</li>
+     *     <li>the Deluxe Toolkit: {@link #DELUXE_TOOLKIT_ROLL_BONUS} to every technician skill (so it reaches both part
+     *     repairs and, through the whole-unit global skills, maintenance and refits);</li>
+     *     <li>a field/medical/computer kit: its {@link #SKILL_BONUSES} bonus to the non-technician skill(s) it aids.</li>
+     * </ul>
+     *
+     * <p>Maintenance-only diagnostic bonuses (the Descartes scanners) are <em>not</em> here - they modify the
+     * maintenance roll itself, not a skill, so they stay bespoke in {@link #maintenanceBonus(Person)}.</p>
      *
      * @param person the person, or {@code null}
      *
-     * @return skill name -&gt; best kit bonus (never {@code null}; empty when nothing applies)
+     * @return skill name -&gt; best kit modifier (never {@code null}; empty when nothing applies)
      */
-    public static Map<String, Integer> generalSkillBonuses(@Nullable Person person) {
+    public static Map<String, Integer> kitSkillBonuses(@Nullable Person person) {
         if (person == null) {
             return Map.of();
         }
         Map<String, Integer> bonuses = new LinkedHashMap<>();
+
+        // Specialized repair kits: +REPAIR_KIT_ROLL_BONUS to each Tech skill they cover.
+        for (Map.Entry<String, Set<String>> entry : KIT_SKILLS.entrySet()) {
+            if (person.hasRepairKit(entry.getKey())) {
+                for (String skill : entry.getValue()) {
+                    bonuses.merge(skill, REPAIR_KIT_ROLL_BONUS, Math::max);
+                }
+            }
+        }
+
+        // Deluxe Toolkit: +DELUXE_TOOLKIT_ROLL_BONUS to every technician skill (globals included, so maintenance/refits
+        // pick it up through the whole-unit skill).
+        if (person.hasRepairKit(KIT_DELUXE_TOOLKIT)) {
+            for (String skill : getTechSkills()) {
+                bonuses.merge(skill, DELUXE_TOOLKIT_ROLL_BONUS, Math::max);
+            }
+        }
+
+        // Field/medical/computer kits: their non-technician skill bonuses.
         for (Map.Entry<String, Map<String, Integer>> entry : SKILL_BONUSES.entrySet()) {
             if (person.hasRepairKit(entry.getKey())) {
                 for (Map.Entry<String, Integer> skillBonus : entry.getValue().entrySet()) {
@@ -341,54 +369,27 @@ public final class RepairKitCatalog {
     }
 
     /**
-     * The bonus this technician's owned kits grant to a <em>repair</em> roll made with the given skill: the best of a
-     * matching specialized repair kit ({@link #REPAIR_KIT_ROLL_BONUS}) and a Deluxe Toolkit
-     * ({@link #DELUXE_TOOLKIT_ROLL_BONUS}). Bonuses are not stacked - the single best applicable is used - so a Deluxe
-     * Toolkit never adds on top of a matching specialist kit.
-     *
-     * @param person    the technician, or {@code null}
-     * @param skillName the {@code Tech/...} skill being rolled
-     *
-     * @return the roll bonus (0 if none applies)
-     */
-    public static int repairBonus(@Nullable Person person, @Nullable String skillName) {
-        if (person == null) {
-            return 0;
-        }
-        int bonus = 0;
-        if (ownsKitBoostingSkill(person, skillName)) {
-            bonus = REPAIR_KIT_ROLL_BONUS;
-        }
-        if (person.hasRepairKit(KIT_DELUXE_TOOLKIT)) {
-            bonus = Math.max(bonus, DELUXE_TOOLKIT_ROLL_BONUS);
-        }
-        return bonus;
-    }
-
-    /**
-     * The bonus this technician's owned kits grant to a <em>maintenance</em> check: the best of a Descartes diagnostic
-     * scanner (MK XXV grants +3, MK XXI grants +2, for "diagnosing damage") and a Deluxe Toolkit (+1 to any technician
-     * roll). The Descartes bonuses are set one above their base CamOps values so a Deluxe Toolkit's general +1 does not
-     * invalidate them. Bonuses are not stacked - the single best applicable is used.
+     * The bespoke bonus a Descartes diagnostic scanner grants to a <em>maintenance</em> check (MK XXV grants +3, MK XXI
+     * grants +2, for "diagnosing damage"). This modifies the maintenance roll itself rather than a skill, so unlike the
+     * repair and Deluxe-Toolkit bonuses - which are skill modifiers folded into {@link #kitSkillBonuses(Person)} and so
+     * reach maintenance automatically through the whole-unit skill's value - it must be applied by the maintenance logic
+     * directly. The Descartes values sit one above their base CamOps figures so a Deluxe Toolkit's general +1 (already
+     * in the skill value) does not invalidate them.
      *
      * @param person the technician, or {@code null}
      *
-     * @return the maintenance-check bonus (0 if none applies)
+     * @return the Descartes maintenance-check bonus (0 if none applies)
      */
     public static int maintenanceBonus(@Nullable Person person) {
         if (person == null) {
             return 0;
         }
-        int bonus = 0;
         if (person.hasRepairKit(KIT_DESCARTES_MK_XXV)) {
-            bonus = 3;
+            return 3;
         } else if (person.hasRepairKit(KIT_DESCARTES_MK_XXI)) {
-            bonus = 2;
+            return 2;
         }
-        if (person.hasRepairKit(KIT_DELUXE_TOOLKIT)) {
-            bonus = Math.max(bonus, DELUXE_TOOLKIT_ROLL_BONUS);
-        }
-        return bonus;
+        return 0;
     }
 
     /**

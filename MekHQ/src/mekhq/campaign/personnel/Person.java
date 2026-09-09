@@ -10203,7 +10203,7 @@ public class Person implements ILocatable {
                                                  getAllActiveInjuryEffects(isAmbidextrous,
                                                        injuries);
         return new SkillModifierData(options, atowAttributes, 0, injuryEffects, ageForAttributeModifiers,
-              RepairKitCatalog.generalSkillBonuses(this));
+              RepairKitCatalog.kitSkillBonuses(this));
     }
 
     /**
@@ -10263,7 +10263,7 @@ public class Person implements ILocatable {
               adjustedFame,
               injuryEffects,
               ageForAttributeModifiers,
-              RepairKitCatalog.generalSkillBonuses(this));
+              RepairKitCatalog.kitSkillBonuses(this));
     }
 
     /**

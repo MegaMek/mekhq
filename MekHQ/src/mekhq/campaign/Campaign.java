@@ -4447,11 +4447,8 @@ public class Campaign implements ITechManager {
             }
         }
 
-        // A technician who owns a matching specialized repair kit (or a Deluxe Toolkit) gets a bonus (a lower target).
-        int repairKitBonus = RepairKitCatalog.repairBonus(tech, skill.getType().getName());
-        if (repairKitBonus != 0) {
-            target.addModifier(-repairKitBonus, "technician kit");
-        }
+        // A technician's tool kit is a modifier to the skill itself (folded into the skill value via
+        // SkillModifierData / RepairKitCatalog.kitSkillBonuses), so the repair target already reflects it here.
 
         final boolean isOvertime;
         if (isOvertimeAllowed() && (tech.isTaskOvertime(partWork) || partWork.hasWorkedOvertime())) {

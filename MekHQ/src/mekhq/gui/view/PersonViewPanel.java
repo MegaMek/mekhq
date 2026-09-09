@@ -3050,7 +3050,7 @@ public class PersonViewPanel extends JScrollablePanel {
             List<InjuryEffect> injuryEffects = person.getActiveInjuryEffects();
             int characterAge = person.getAgeForAttributeModifiers();
             SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
-                  injuryEffects, characterAge, RepairKitCatalog.generalSkillBonuses(person));
+                  injuryEffects, characterAge, RepairKitCatalog.kitSkillBonuses(person));
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(),
                   attributes,
                   skill.getType(),
