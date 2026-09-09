@@ -354,8 +354,8 @@ class ActionCheckTest {
 
         assertFalse(result.hasUsedEdge());
         assertEquals(4, result.getRollResult());
+        assertEquals(0, conditionCalls.get(), "edge reroll condition must not be evaluated when edge is unavailable");
         verify(person, never()).spendEdge();
-    }
 
     @Test
     void testMarginOfSuccessClamping_AutomaticSuccess() {
