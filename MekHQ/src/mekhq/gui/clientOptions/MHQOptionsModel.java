@@ -206,6 +206,7 @@ class MHQOptionsModel {
     int startGameClientRetryCount;
     int startGameBotClientDelay;
     int startGameBotClientRetryCount;
+    boolean enableAbstractCombatAutoResolve;
     // endregion Advanced
 
     MHQOptionsModel(MHQOptions options) {
@@ -378,6 +379,7 @@ class MHQOptionsModel {
         startGameClientRetryCount = options.getStartGameClientRetryCount();
         startGameBotClientDelay = options.getStartGameBotClientDelay();
         startGameBotClientRetryCount = options.getStartGameBotClientRetryCount();
+        enableAbstractCombatAutoResolve = options.getEnableAbstractCombatAutoResolve();
     }
 
     /**
@@ -562,5 +564,6 @@ class MHQOptionsModel {
         options.setStartGameClientRetryCount(startGameClientRetryCount);
         options.setStartGameBotClientDelay(startGameBotClientDelay);
         options.setStartGameBotClientRetryCount(startGameBotClientRetryCount);
+        options.setEnableAbstractCombatAutoResolve(enableAbstractCombatAutoResolve);
     }
 }

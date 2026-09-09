@@ -204,6 +204,8 @@ public class SetupTab {
     // who has not gone looking through two other options dialogs cannot generate an augmented command.
     private CommandGenerationCheckBox chkUseImplants;
     private MMComboBox<NeuralInterfaceMode> cmbNeuralInterfaceMode;
+    private JPanel augmentationSection;
+    private Component augmentationStrut;
 
     // Random origin
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
@@ -258,10 +260,14 @@ public class SetupTab {
         rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
         rightColumn.add(buildRandomOriginSection());
         rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
-        rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         rightColumn.add(buildTechAssignmentSection());
-        rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
-        rightColumn.add(buildAugmentationSection());
+        // Held so the section and the gap above it can be hidden together; hiding the section alone
+        // would leave the gap behind and the column would look like it had lost something.
+        augmentationStrut = Box.createVerticalStrut(UIUtil.scaleForGUI(6));
+        rightColumn.add(augmentationStrut);
+        augmentationSection = buildAugmentationSection();
+        rightColumn.add(augmentationSection);
+        setAugmentationSectionVisible(false);
         constraints.gridx = 1;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
@@ -725,6 +731,51 @@ public class SetupTab {
         return section;
     }
 
+    /**
+     * Shows or hides the augmentation section.
+     *
+     * <p>The two controls only reach a generation for the factions that can be augmented, so for every other
+     * faction they are two settings the player can change to no effect. Hidden rather than greyed out because a
+     * disabled control still reads as "this could apply to you".</p>
+     *
+     * @param visible whether the selected faction can be augmented
+     */
+    public void setAugmentationSectionVisible(boolean visible) {
+        if (augmentationSection == null) {
+            return;
+        }
+        augmentationSection.setVisible(visible);
+        if (augmentationStrut != null) {
+            augmentationStrut.setVisible(visible);
+        }
+    }
+
+
+    /**
+     * Writes the augmentation choices onto {@code targetOptions} and remembers them as the player's own answer.
+     *
+     * @param targetOptions the options to write to
+     */
+    private void writeAugmentationValues(CommandGenerationOptions targetOptions) {
+        targetOptions.setUseImplants(chkUseImplants.isSelected());
+        NeuralInterfaceMode mode = NeuralInterfaceMode.OFF;
+        if (cmbNeuralInterfaceMode.getSelectedItem() instanceof NeuralInterfaceMode selected) {
+            mode = selected;
+            targetOptions.setNeuralInterfaceMode(selected);
+        }
+
+        // Remembered as the player's own answer, so the next new campaign opens on it rather than
+        // asking again. The campaign still holds its own copy; this only decides what a campaign that
+        // has chosen nothing is shown.
+        MekHQ.getMHQOptions().setLastUseImplants(chkUseImplants.isSelected());
+        MekHQ.getMHQOptions().setLastNeuralInterfaceMode(mode);
+    }
+
+    /** @return whether the augmentation section is currently shown, which decides whether its values are written */
+    public boolean isAugmentationSectionVisible() {
+        return (augmentationSection != null) && augmentationSection.isVisible();
+    }
+
     /** Greys the rule out while the campaign is not tracking implants at all. */
     private void refreshAugmentationEnablement() {
         cmbNeuralInterfaceMode.setEnabled(chkUseImplants.isSelected());
@@ -1041,18 +1092,12 @@ public class SetupTab {
         targetOptions.setAssignMekWarriorsCallSigns(chkAssignMekWarriorsCallSigns.isSelected());
         targetOptions.setAssignFounderFlag(chkAssignFounderFlag.isSelected());
 
-        targetOptions.setUseImplants(chkUseImplants.isSelected());
-        NeuralInterfaceMode mode = NeuralInterfaceMode.OFF;
-        if (cmbNeuralInterfaceMode.getSelectedItem() instanceof NeuralInterfaceMode selected) {
-            mode = selected;
-            targetOptions.setNeuralInterfaceMode(selected);
+        // Only written when the section is on screen. A player who set implants for a Shadow Division and then
+        // switched to a faction that cannot be augmented would otherwise still have that choice written to the
+        // campaign from a panel they can no longer see.
+        if (isAugmentationSectionVisible()) {
+            writeAugmentationValues(targetOptions);
         }
-
-        // Remembered as the player's own answer, so the next new campaign opens on it rather than
-        // asking again. The campaign still holds its own copy; this only decides what a campaign that
-        // has chosen nothing is shown.
-        MekHQ.getMHQOptions().setLastUseImplants(chkUseImplants.isSelected());
-        MekHQ.getMHQOptions().setLastNeuralInterfaceMode(mode);
     }
 
     public RandomOriginOptionsPanel getRandomOriginOptionsPanel() {

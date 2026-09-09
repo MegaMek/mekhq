@@ -34,6 +34,7 @@
 package mekhq;
 
 import static megamek.MMConstants.LOCALHOST_IP;
+import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
 
 import java.awt.Desktop;
@@ -476,6 +477,9 @@ public class MekHQ implements GameListener {
     }
 
     public void joinGame(Scenario scenario, List<Unit> meks) {
+        // Force down any game left over from a previous scenario
+        stopHost();
+
         ConnectDialog joinGameDialog = new ConnectDialog(campaignGUI.getFrame(), campaignGUI.getCampaign().getPlayerForce().getName());
         joinGameDialog.setVisible(true);
 
@@ -527,6 +531,9 @@ public class MekHQ implements GameListener {
      */
     public void startHost(Scenario scenario, boolean loadSaveGame, List<Unit> meks,
           @Nullable BehaviorSettings autoResolveBehaviorSettings) {
+        // Force down any game left over from a previous scenario whose hand-off never completed.
+        stopHost();
+
         HostDialog hostDialog = new HostDialog(campaignGUI.getFrame(), getCampaign().getPlayerForce().getName());
         hostDialog.setVisible(true);
 
@@ -567,6 +574,9 @@ public class MekHQ implements GameListener {
         } catch (Exception ex) {
             LOGGER.error(ex, "Failed to start up server");
             stopHost();
+            LOGGER.errorDialog(ex,
+                  getFormattedText("startHost.serverStartFailed.message", String.valueOf(port)),
+                  getText("startHost.serverStartFailed.title"));
             return;
         }
         // Refactor this into a factory
@@ -599,11 +609,41 @@ public class MekHQ implements GameListener {
 
     // Stop & send the close game event to the Server
     public synchronized void stopHost() {
-        if (getMyServer() != null) {
-            getMyServer().die();
-            myServer = null;
-        }
+        // Snapshot and immediately null the fields before we start tearing anything down. Client.die() synchronously
+        // fires CloseClientListener.clientClosed(), which calls back into stopHost() (see GameThread#clientClosed); by
+        // nulling first, that re-entrant call sees a clean state and becomes a no-op instead of recursing.
+        final GameThread stoppingThread = gameThread;
+        final Client stoppingClient = client;
+        final Server stoppingServer = myServer;
+
+        gameThread = null;
+        client = null;
+        myServer = null;
         currentScenario = null;
+
+        // Stop the game thread so its run loop exits and it releases the client GUI and bot clients.
+        if (stoppingThread != null) {
+            stoppingThread.requestStop();
+        }
+
+        // Deregister ourselves as a game listener and close the client connection so no stale listeners linger.
+        if (stoppingClient != null) {
+            try {
+                stoppingClient.getGame().removeGameListener(this);
+                stoppingClient.die();
+            } catch (Exception ex) {
+                LOGGER.error(ex, "Failed to tear down the game client while stopping the host.");
+            }
+        }
+
+        // Finally, kill the server so it releases its port; a lingering server is what blocks the next launch.
+        if (stoppingServer != null) {
+            try {
+                stoppingServer.die();
+            } catch (Exception ex) {
+                LOGGER.error(ex, "Failed to shut down the game server while stopping the host.");
+            }
+        }
     }
 
     @Override

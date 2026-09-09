@@ -71,7 +71,8 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
       boolean trackPrisoners, boolean useMASHTheatres, boolean useFatigue, boolean useAdvancedSalvage,
       boolean useStratCon, boolean useMapless, boolean useAdvancedScouting, boolean useAltAdvancedMedical,
       boolean useDiseases, boolean useNormalizedContractPayModel, boolean useDiminishingContractPay,
-      boolean useChaosReputation, boolean useLegacyContractOptions, boolean requireMekWarriorKitToDeploy) {
+      boolean useChaosReputation, boolean useLegacyContractOptions, boolean requireMekWarriorKitToDeploy,
+      boolean useSupportTeams) {
     /**
      * Creates a tracker snapshot from the provided {@link CampaignOptions}.
      *
@@ -105,7 +106,8 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
               options.get(CampaignOption.USE_DIMINISHING_CONTRACT_PAY) && isDiminishingContractPayRelevant(options),
               options.get(CampaignOption.USE_CHAOS_REPUTATION),
               options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY),
-              options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY)
+              options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY),
+              options.get(CampaignOption.USE_SUPPORT_TEAMS)
         );
     }
 

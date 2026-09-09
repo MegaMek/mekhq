@@ -365,6 +365,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("repairBaysRented")) {
                     int repairBaysRented = parseInt(childNode.getTextContent().trim());
                     playerForce.setRepairBaysRented(repairBaysRented);
+                } else if (nodeName.equalsIgnoreCase("supportCommandFormationId")) {
+                    playerForce.setSupportCommandFormationId(parseInt(childNode.getTextContent().trim(),
+                          FORMATION_NONE));
                 } else if (nodeName.equalsIgnoreCase("id")) {
                     campaign.setId(UUID.fromString(childNode.getTextContent().trim()));
                 }
@@ -2526,14 +2529,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 campaign.addReport(GENERAL, report);
             }
 
-            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
-            // potentially as far back as 2014. The next two handlers should never be removed.
-            if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
-                resolveRolePerformability(person, campaign);
-            }
-
-            if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
-            }
+            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase potentially as far back as
+            // 2014. The next two handlers should never be removed. It makes a good place to add missing skills, in
+            // the event we change the skill requirements for a role.
+            resolveRolePerformability(person, campaign);
         }
 
         campaign.getPlayerForce().getHangar().forEachUnit(unit -> {
@@ -2765,7 +2764,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
     private static void resolveRolePerformability(Person person, Campaign campaign, LocalDate today, PersonnelRole role,
           boolean primary) {
-        if (person.canPerformRole(today, role, false)) {
+        if (person.canPerformRole(today, role, primary)) {
             return;
         }
 
@@ -2790,7 +2789,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             reportInvalidProfession(person, campaign, "ineligibleForSecondaryRole");
         }
     }
-
 
     private static void reportInvalidProfession(Person person, Campaign campaign, String key) {
         campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, key,
