@@ -152,6 +152,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "resetToFirstTech");
     public static final CampaignOption<Boolean> TECHS_USE_ADMINISTRATION =
           of(Boolean.class, false, "techsUseAdministration");
+    public static final CampaignOption<Boolean> USE_GLOBAL_TECH_SKILLS_ONLY =
+          of(Boolean.class, true, "useGlobalTechSkillsOnly");
     public static final CampaignOption<Boolean> USE_USEFUL_AS_TECHS =
           of(Boolean.class, false, "useUsefulAsTechs");
     public static final CampaignOption<Boolean> USE_QUIRKS =

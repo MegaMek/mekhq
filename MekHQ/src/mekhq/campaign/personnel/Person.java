@@ -7440,6 +7440,18 @@ public class Person implements ILocatable {
             return getMaintenanceOrRefitSkill(unit);
         }
 
+        // "Use global tech skills only" campaign option: repairs are resolved with the whole-unit global technician
+        // skill (Tech/Mek, Tech/Vehicle, ...) instead of the granular specialist skill, for players who prefer the
+        // classic single-skill model. Fall through to the normal specialist resolution when no global skill applies
+        // (for example a spare part with no unit), so unattached parts are never left without a skill.
+        if ((unit != null)
+                  && unit.getCampaign().getCampaignOptions().get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)) {
+            Skill globalSkill = getSkillForWorkingOn(unit);
+            if (globalSkill != null) {
+                return globalSkill;
+            }
+        }
+
         SkillModifierData skillModifierData = getSkillModifierData();
 
         // Find the best skill the tech possesses among those the part accepts. Each part reports only its most

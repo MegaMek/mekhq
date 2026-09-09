@@ -145,8 +145,8 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
-        // roll supplemental tech skills
-        if (person.isTechExpanded()) {
+        // roll supplemental tech skills (skipped when the campaign uses only the global tech skills)
+        if (person.isTechExpanded() && !campaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)) {
             List<String> supplementalSkills = TechnicianSkills.getTechSupplementalSkills(person, false);
             for (String skillName : supplementalSkills) {
                 addSkill(person, skillName, expLvl, skillPreferences.randomizeSkill(), 0, mod);

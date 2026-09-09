@@ -34,10 +34,12 @@ package mekhq.campaign.personnel;
 
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_AERO;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_BA;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MEK;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VESSEL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,14 +53,26 @@ import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.Tank;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.IPartWork;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests the single source of truth mapping a unit type to the whole-unit "global" technician skill used by maintenance
- * and refit routing.
+ * and refit routing, and the campaign option that forces part repairs onto that same global skill.
  */
 class PersonTechSkillRoutingTest {
+
+    @BeforeAll
+    static void beforeAll() {
+        SkillType.initializeTypes();
+    }
 
     private static Unit unitOf(Entity entity) {
         Unit unit = mock(Unit.class);
@@ -98,5 +112,55 @@ class PersonTechSkillRoutingTest {
     void aNullUnitOrEntityMapsToNoSkill() {
         assertNull(Person.getGlobalTechSkillNameFor(null));
         assertNull(Person.getGlobalTechSkillNameFor(unitOf(null)));
+    }
+
+    /** A Mek tech who also holds the granular Tech/Mechanical specialist skill. */
+    private static Person mekTechWithSpecialist() {
+        Person person = new Person("Test", "Tech", null, "MERC");
+        person.addSkill(S_TECH_MEK, 5, 0);
+        person.addSkill(S_TECH_MECHANICAL, 5, 0);
+        return person;
+    }
+
+    /** A Mek unit whose campaign reports the given "use global tech skills only" setting. */
+    private static Unit mekUnitWithGlobalOnly(boolean globalOnly) {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions options = new CampaignOptions();
+        options.set(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY, globalOnly);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+
+        Unit unit = unitOf(new BipedMek());
+        when(unit.getCampaign()).thenReturn(campaign);
+        return unit;
+    }
+
+    /** A part on the given unit that accepts only the granular Tech/Mechanical specialist skill. */
+    private static IPartWork mechanicalPartOn(Unit unit) {
+        IPartWork part = mock(IPartWork.class);
+        when(part.getUnit()).thenReturn(unit);
+        when(part.isRightTechType(S_TECH_MECHANICAL)).thenReturn(true);
+        return part;
+    }
+
+    @Test
+    void byDefaultPartRepairUsesTheGranularSpecialistSkill() {
+        Person tech = mekTechWithSpecialist();
+        IPartWork part = mechanicalPartOn(mekUnitWithGlobalOnly(false));
+
+        Skill skill = tech.getSkillForWorkingOn(part);
+        assertNotNull(skill);
+        assertEquals(S_TECH_MECHANICAL, skill.getType().getName(),
+              "with the option off, the granular specialist skill the part accepts should be used");
+    }
+
+    @Test
+    void withGlobalTechSkillsOnlyPartRepairUsesTheGlobalSkill() {
+        Person tech = mekTechWithSpecialist();
+        IPartWork part = mechanicalPartOn(mekUnitWithGlobalOnly(true));
+
+        Skill skill = tech.getSkillForWorkingOn(part);
+        assertNotNull(skill);
+        assertEquals(S_TECH_MEK, skill.getType().getName(),
+              "with the option on, the whole-unit global tech skill should be used instead of the specialist skill");
     }
 }
