@@ -39,6 +39,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
@@ -68,6 +69,33 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
 
     protected final Person person;
     protected final TargetRoll targetNumber;
+
+    /**
+     * Optional override for the roll type. When {@code null}, the roll type is derived from natural aptitude
+     * ({@link RollType#ADVANTAGE} when the character has aptitude, otherwise {@link RollType#NORMAL}). Callers that
+     * need to force a specific roll type - notably {@link RollType#DISADVANTAGE}, which no aptitude-derived default can
+     * produce - set this via {@link #withRollType(RollType)}.
+     */
+    private RollType rollTypeOverride = null;
+
+    /**
+     * Whether {@link #resolve(boolean, String)} should log the standard results line. Callers that splice the outcome
+     * into their own running report disable this via {@link #withoutLogging()}.
+     */
+    private boolean logResult = true;
+
+    /**
+     * Optional caller-supplied gate deciding whether edge should be spent, evaluated against the first roll. When set,
+     * it fully replaces the default {@code failed && canSucceed} gate. See
+     * {@link #withEdgeRerollCondition(Predicate)}.
+     */
+    private Predicate<ActionCheckRoll> edgeRerollCondition = null;
+
+    /**
+     * Optional callback fired immediately after edge is spent, for bookkeeping that has nowhere else to live (e.g.
+     * adjusting an engineer's {@code edgeUsedThisRound}). See {@link #withOnEdgeSpent(Runnable)}.
+     */
+    private Runnable onEdgeSpent = null;
 
     /**
      * Initializes a new action check for the specified person and target number.
@@ -160,6 +188,69 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
         return getThis();
     }
 
+    /**
+     * Forces this check to use a specific {@link RollType}, overriding the default derived from natural aptitude.
+     *
+     * <p>This is the only way for a caller to request {@link RollType#DISADVANTAGE} (3d6 keeping the lowest two),
+     * which
+     * the aptitude-derived default - {@link RollType#ADVANTAGE} or {@link RollType#NORMAL} - can never produce. The
+     * forced roll type is applied verbatim, so it wins over natural aptitude.</p>
+     *
+     * @param rollType the roll type to force
+     *
+     * @return updated action check
+     */
+    public T withRollType(RollType rollType) {
+        this.rollTypeOverride = rollType;
+        return getThis();
+    }
+
+    /**
+     * Suppresses the standard results-line logging performed by {@link #resolve(boolean, String)}.
+     *
+     * <p>Callers that assemble their own running report and merely need the roll, edge handling, and margin from this
+     * utility use this to avoid the utility logging a line that does not slot into their report.</p>
+     *
+     * @return updated action check
+     */
+    public T withoutLogging() {
+        this.logResult = false;
+        return getThis();
+    }
+
+    /**
+     * Overrides the edge-spending gate with a caller-supplied condition evaluated against the first roll.
+     *
+     * <p>By default, edge is spent whenever the initial roll fails and the target number is still achievable. Some
+     * callers spend edge only under narrower, rules-specific circumstances - for example, a repair only spends edge
+     * when the failure would actually destroy the part, not on every failure. When a condition is supplied here it
+     * fully replaces the default gate; edge is still only spent when the caller passed {@code useEdge} and the person
+     * has edge remaining.</p>
+     *
+     * @param condition predicate that, given the first {@link ActionCheckRoll}, returns whether edge should be spent
+     *
+     * @return updated action check
+     */
+    public T withEdgeRerollCondition(Predicate<ActionCheckRoll> condition) {
+        this.edgeRerollCondition = condition;
+        return getThis();
+    }
+
+    /**
+     * Registers a callback fired immediately after edge is spent on a re-roll.
+     *
+     * <p>This exists for bookkeeping that the utility cannot perform itself, such as adjusting an engineer's
+     * {@code edgeUsedThisRound} counter so that individual crew members' edge values stay in sync.</p>
+     *
+     * @param onEdgeSpent the callback to run when edge is spent
+     *
+     * @return updated action check
+     */
+    public T withOnEdgeSpent(Runnable onEdgeSpent) {
+        this.onEdgeSpent = onEdgeSpent;
+        return getThis();
+    }
+
 
     /**
      * Executes action check for the specified person.
@@ -172,28 +263,42 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      * @param reason  the reason for the check; can be {@code null}
      */
     public ActionCheckResult resolve(boolean useEdge, @Nullable String reason) {
-        RollType rollType = hasNaturalAptitude() ? RollType.ADVANTAGE : RollType.NORMAL;
+        RollType rollType = (rollTypeOverride != null)
+                                  ? rollTypeOverride
+                                  : (hasNaturalAptitude() ? RollType.ADVANTAGE : RollType.NORMAL);
 
         ActionCheckRoll roll = ActionCheckRoll.perform(rollType);
         boolean usedEdge = false;
-        boolean failed = roll.result() < targetNumber.getValue();
-        boolean canSucceed = !targetNumber.cannotSucceed() && targetNumber.getValue() <= 12;
         boolean canSpendEdge = useEdge && person.getCurrentEdge() > 0;
 
-        if (failed && canSucceed && canSpendEdge) {
+        final boolean shouldReroll;
+        if (edgeRerollCondition != null) {
+            shouldReroll = canSpendEdge && edgeRerollCondition.test(roll);
+        } else {
+            boolean failed = roll.result() < targetNumber.getValue();
+            boolean canSucceed = !targetNumber.cannotSucceed() && targetNumber.getValue() <= 12;
+            shouldReroll = failed && canSucceed && canSpendEdge;
+        }
+
+        if (shouldReroll) {
             // reroll using edge
             roll = ActionCheckRoll.perform(rollType);
             usedEdge = true;
 
             person.spendEdge();
+            if (onEdgeSpent != null) {
+                onEdgeSpent.run();
+            }
         }
 
         long difference = (long) targetNumber.getValue() - roll.result();
         int marginOfSuccess = Math.clamp(isCountUp() ? difference : -difference,
               MARGIN_OF_SUCCESS_MIN, MARGIN_OF_SUCCESS_MAX);
-        String resultsText = generateResultsText(roll.result(), marginOfSuccess, reason);
+        String resultsText = generateResultsText(roll.result(), marginOfSuccess, reason, rollType);
 
-        LOGGER.info(resultsText);
+        if (logResult) {
+            LOGGER.info(resultsText);
+        }
 
         return new ActionCheckResult(roll, marginOfSuccess, usedEdge, resultsText);
     }
@@ -220,13 +325,14 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
      * @param roll            Roll result for the action check
      * @param marginOfSuccess Calculated margin of success for this action check
      * @param reason          A string describing the reason for the action check
+     * @param rollType        the {@link RollType} actually used to produce the roll
      *
      * @return a localized HTML {@link String} representing the outcomes of the skill check
      *
      * @author Illiani
      * @since 0.50.05
      */
-    private String generateResultsText(int roll, int marginOfSuccess, @Nullable String reason) {
+    private String generateResultsText(int roll, int marginOfSuccess, @Nullable String reason, RollType rollType) {
         String fullTitle = person.getHyperlinkedFullTitle();
         String genderedReferenced = HIS_HER_THEIR.getDescriptor(person.getGender());
 
@@ -243,7 +349,7 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
               roll,
               targetNumber.getValue()));
 
-        if (hasNaturalAptitude()) {
+        if (rollType == RollType.ADVANTAGE) {
             resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "actionCheckResult.naturalAptitude"));
         }
 
