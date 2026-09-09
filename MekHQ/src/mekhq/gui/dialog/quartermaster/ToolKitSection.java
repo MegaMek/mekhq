@@ -35,6 +35,7 @@ package mekhq.gui.dialog.quartermaster;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -57,6 +58,7 @@ import javax.swing.JTable;
 import javax.swing.table.AbstractTableModel;
 
 import megamek.common.equipment.EquipmentType;
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.finances.Money;
@@ -150,19 +152,20 @@ public class ToolKitSection implements KitIssueSection {
         name.setAlignmentX(Component.LEFT_ALIGNMENT);
         info.add(name);
 
-        Set<String> boosted = RepairKitCatalog.skillsBoostedBy(kit.getInternalName());
-        String detail;
-        if (boosted.isEmpty()) {
-            detail = getFormattedTextAt(RESOURCE_BUNDLE, "tools.row.detail.noSkill",
-                  RepairKitIssuer.unitPrice(kit, campaign).toAmountString(), stockFor(kit));
-        } else {
-            detail = getFormattedTextAt(RESOURCE_BUNDLE, "tools.row.detail",
-                  String.join(", ", boosted), RepairKitIssuer.unitPrice(kit, campaign).toAmountString(), stockFor(kit));
+        String effect = kitEffect(kit.getInternalName());
+        if (effect != null) {
+            JLabel effectLabel = new JLabel(effect);
+            effectLabel.setFont(effectLabel.getFont().deriveFont(effectLabel.getFont().getSize2D() - 1f));
+            effectLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+            info.add(effectLabel);
         }
-        JLabel detailLabel = new JLabel(detail);
-        detailLabel.setFont(detailLabel.getFont().deriveFont(detailLabel.getFont().getSize2D() - 1f));
-        detailLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        info.add(detailLabel);
+
+        String meta = getFormattedTextAt(RESOURCE_BUNDLE, "tools.row.meta",
+              RepairKitIssuer.unitPrice(kit, campaign).toAmountString(), stockFor(kit), acquisitionText(kit));
+        JLabel metaLabel = new JLabel(meta);
+        metaLabel.setFont(metaLabel.getFont().deriveFont(metaLabel.getFont().getSize2D() - 1f));
+        metaLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        info.add(metaLabel);
         row.add(info, BorderLayout.CENTER);
 
         JPanel actionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
@@ -244,6 +247,28 @@ public class ToolKitSection implements KitIssueSection {
                 }
             }
         }
+    }
+
+    /**
+     * The authored one-line effect summary for a kit (bonus magnitude and what it improves), looked up under
+     * {@code tools.effect.<kit name with non-alphanumerics stripped>}. Returns {@code null} when no summary is
+     * authored, so the row simply omits the effect line rather than showing a missing-resource marker.
+     */
+    private static String kitEffect(String internalName) {
+        String text = getTextAt(RESOURCE_BUNDLE, "tools.effect." + internalName.replaceAll("[^A-Za-z0-9]", ""));
+        return isResourceKeyValid(text) ? text : null;
+    }
+
+    /** How hard a Regular acquirer would find this kit, rendered for the row (mirrors the armor-kit cards). */
+    private String acquisitionText(EquipmentType kit) {
+        TargetRoll target = RepairKitIssuer.acquisitionTarget(kit, campaign);
+        if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
+            return getTextAt(RESOURCE_BUNDLE, "card.acquire.automatic");
+        }
+        if (target.cannotSucceed()) {
+            return getTextAt(RESOURCE_BUNDLE, "card.acquire.unavailable");
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "card.acquire.tn", target.getValue());
     }
 
     /** Selected technicians who do not yet own the given kit. */
