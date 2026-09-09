@@ -109,8 +109,15 @@ jobs:
             git diff | head -c 900000
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
-          git diff --name-only | while read -r changedFile; do
-            echo "::error file=${changedFile}::Formatting violation. Run ./gradlew spotlessApply"
+          # -z gives raw paths (git would otherwise quote unusual ones), and the annotation property must
+          # have % : , and line breaks percent-encoded or the path is cut short.
+          git diff --name-only -z | while IFS= read -r -d '' changedFile; do
+            escapedFile=${changedFile//%/%25}
+            escapedFile=${escapedFile//$'\r'/%0D}
+            escapedFile=${escapedFile//$'\n'/%0A}
+            escapedFile=${escapedFile//:/%3A}
+            escapedFile=${escapedFile//,/%2C}
+            echo "::error file=${escapedFile}::Formatting violation. Run ./gradlew spotlessApply"
           done
           exit 1
 
