@@ -66,6 +66,7 @@ package mekhq.campaign.campaignOptions;
  * @param specialistTechSkillsEnabled   whether the granular specialist tech skills are in use (the inverse of the
  *                                      "use global tech skills only" option), so enabling them reads as a
  *                                      {@code false -> true} transition like every other tracked freebie
+ * @param techsNeedToolKit              whether technicians require a tool kit to make repairs
  *
  * @author Illiani
  * @since 0.50.11
@@ -75,7 +76,7 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
       boolean useStratCon, boolean useMapless, boolean useAdvancedScouting, boolean useAltAdvancedMedical,
       boolean useDiseases, boolean useNormalizedContractPayModel, boolean useDiminishingContractPay,
       boolean useChaosReputation, boolean useLegacyContractOptions, boolean requireMekWarriorKitToDeploy,
-      boolean useSupportTeams, boolean specialistTechSkillsEnabled) {
+      boolean useSupportTeams, boolean specialistTechSkillsEnabled, boolean techsNeedToolKit) {
     /**
      * Creates a tracker snapshot from the provided {@link CampaignOptions}.
      *
@@ -111,7 +112,8 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
               options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY),
               options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY),
               options.get(CampaignOption.USE_SUPPORT_TEAMS),
-              !options.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)
+              !options.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY),
+              options.get(CampaignOption.TECHS_NEED_TOOL_KIT)
         );
     }
 

@@ -1059,6 +1059,11 @@ public class CampaignOptionsPane extends JPanel {
                   && !oldOptions.specialistTechSkillsEnabled()) { // Specialist tech skills newly enabled?
             new SpecialistTechSkillsCampaignOptionsChangedConfirmationDialog(campaign);
         }
+
+        boolean newTechsNeedToolKit = newOptions.techsNeedToolKit();
+        if (!isStartUp && newTechsNeedToolKit && !oldOptions.techsNeedToolKit()) { // Has tracking changed?
+            new TechsNeedToolKitCampaignOptionsChangedConfirmationDialog(campaign);
+        }
     }
 
     /**

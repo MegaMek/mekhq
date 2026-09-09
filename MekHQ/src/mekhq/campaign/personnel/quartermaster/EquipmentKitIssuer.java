@@ -126,6 +126,28 @@ public final class EquipmentKitIssuer extends AbstractKitIssuer {
     }
 
     /**
+     * Issues a Basic Toolkit to every active technician who carries no tool kit at all — a one-off convenience granted
+     * when the "Techs Need a Tool Kit" requirement is first enabled, so the workforce is not immediately unable to make
+     * repairs. No stock is consumed and nothing is charged; the kit is simply recorded on each technician. Technicians
+     * who already carry a Basic or Deluxe Toolkit are left untouched.
+     *
+     * @param campaign the campaign whose technicians are equipped
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void equipAllTechsWithBasicToolKit(Campaign campaign) {
+        for (Person person : campaign.getPlayerForce().getPersonnel().values()) {
+            if (person.getStatus().isActive()
+                      && person.isTechExpanded()
+                      && !EquipmentKitCatalog.hasToolKit(person)) {
+                person.setRepairKitName(EquipmentKitCatalog.KIT_BASIC_TOOLKIT);
+                MekHQ.triggerEvent(new PersonChangedEvent(person));
+            }
+        }
+    }
+
+    /**
      * On joining the campaign, a new technician is issued the default tool kit configured for each of their technician
      * professions (Mek Tech, Mechanic, Aero Tech, BA Tech; Astechs excluded). A kit already in local stores is issued
      * at once; otherwise, when the campaign is set to procure recruits' kits, it is ordered and remembered so it is
