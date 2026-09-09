@@ -41,6 +41,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -186,8 +187,7 @@ public class MASC extends EquipmentPart {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        // MASC (MyoMer Accelerator Signal Circuitry) is a myomer-based system, serviced under Technician/Myomer.
-        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MYOMER);
+        return skillType.equals(SkillType.S_TECH_MYOMER);
     }
 
     @Override

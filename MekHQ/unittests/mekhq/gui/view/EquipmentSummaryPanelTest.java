@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
-import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -67,7 +67,7 @@ class EquipmentSummaryPanelTest {
     @Test
     void hasEquipmentIsTrueWhenTheTechCarriesAToolKit() {
         assertTrue(EquipmentSummaryPanel.hasEquipment(
-              person(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, RepairKitCatalog.KIT_BASIC_TOOLKIT)));
+              person(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, EquipmentKitCatalog.KIT_BASIC_TOOLKIT)));
     }
 
     @Test

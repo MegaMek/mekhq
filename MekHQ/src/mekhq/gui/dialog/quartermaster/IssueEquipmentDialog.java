@@ -63,7 +63,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.Category;
 import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
-import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -137,7 +137,7 @@ public class IssueEquipmentDialog extends JDialog {
         LinkedHashSet<Person> gathered = new LinkedHashSet<>();
         if (people != null) {
             for (Person person : people) {
-                if (RepairKitCatalog.canBeIssuedKit(person)) {
+                if (EquipmentKitCatalog.canBeIssuedKit(person)) {
                     gathered.add(person);
                 }
             }
@@ -145,7 +145,7 @@ public class IssueEquipmentDialog extends JDialog {
         if (units != null) {
             for (Unit unit : units) {
                 for (Person crew : unit.getCrew()) {
-                    if (RepairKitCatalog.canBeIssuedKit(crew)) {
+                    if (EquipmentKitCatalog.canBeIssuedKit(crew)) {
                         gathered.add(crew);
                     }
                 }

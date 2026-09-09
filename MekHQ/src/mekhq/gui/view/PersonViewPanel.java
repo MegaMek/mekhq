@@ -147,7 +147,7 @@ import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.familyTree.FormerSpouse;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
-import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -1326,7 +1326,7 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         List<String> relevantSkills = person.getKnownSkillsBySkillSubType(List.of(COMBAT_GUNNERY, COMBAT_PILOTING,
-              SUPPORT, SUPPORT_TECHNICIAN));
+              SUPPORT, SUPPORT_TECHNICIAN), false);
         if (!relevantSkills.isEmpty()) {
             JPanel pnlCombatSkills = fillSkills(relevantSkills, "pnlSkills.profession");
             gridBagConstraints = new GridBagConstraints();
@@ -1342,7 +1342,7 @@ public class PersonViewPanel extends JScrollablePanel {
             gridY++;
         }
 
-        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(UTILITY, UTILITY_COMMAND));
+        relevantSkills = person.getKnownSkillsBySkillSubType(List.of(UTILITY, UTILITY_COMMAND), false);
         if (!relevantSkills.isEmpty()) {
             JPanel pnlSupportSkills = fillSkills(relevantSkills, "pnlSkills.utility");
             gridBagConstraints = new GridBagConstraints();
@@ -1362,7 +1362,7 @@ public class PersonViewPanel extends JScrollablePanel {
               ROLEPLAY_ART,
               ROLEPLAY_INTEREST,
               ROLEPLAY_SCIENCE,
-              ROLEPLAY_SECURITY));
+              ROLEPLAY_SECURITY), false);
         if (!relevantSkills.isEmpty()) {
             JPanel pnlRoleplaySkills = fillSkills(relevantSkills, "pnlSkills.roleplay");
             gridBagConstraints = new GridBagConstraints();
@@ -3050,7 +3050,7 @@ public class PersonViewPanel extends JScrollablePanel {
             List<InjuryEffect> injuryEffects = person.getActiveInjuryEffects();
             int characterAge = person.getAgeForAttributeModifiers();
             SkillModifierData skillModifierData = new SkillModifierData(options, attributes, adjustedReputation,
-                  injuryEffects, characterAge, RepairKitCatalog.kitSkillBonuses(person));
+                  injuryEffects, characterAge, EquipmentKitCatalog.kitSkillBonuses(person));
             int attributeModifier = getTotalAttributeModifier(new TargetRoll(),
                   attributes,
                   skill.getType(),

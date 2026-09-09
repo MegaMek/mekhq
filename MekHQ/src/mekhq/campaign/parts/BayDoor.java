@@ -46,6 +46,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingBayDoor;
 import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 
 /**
@@ -63,8 +64,7 @@ public class BayDoor extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        // A transport bay door is a mechanical system, serviced under Technician/Mechanical.
-        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL);
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

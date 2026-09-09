@@ -58,7 +58,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 
 /**
- * The warehouse side of issuing specialized repair kits, mirroring {@link ArmorKitIssuer}: what a technician's local
+ * The warehouse side of issuing specialized equipment kits, mirroring {@link ArmorKitIssuer}: what a technician's local
  * stores hold, drawing a kit out to issue it, returning one when a kit is removed, and ordering more through the
  * ordinary shopping list when the shelf is bare.
  *
@@ -70,8 +70,8 @@ import mekhq.campaign.personnel.skills.SkillType;
  * @author Illiani
  * @since 0.51.01
  */
-public final class RepairKitIssuer {
-    private RepairKitIssuer() {
+public final class EquipmentKitIssuer {
+    private EquipmentKitIssuer() {
     }
 
     /**
@@ -202,7 +202,7 @@ public final class RepairKitIssuer {
      */
     public static void equipDefaultToolKitOnRecruitment(Person person, Campaign campaign, boolean gmAdd) {
         // A technician carries only one tool kit, so the first profession with a configured default is the one issued.
-        for (RepairKitCatalog.KitProfession profession : RepairKitCatalog.professionsFor(person)) {
+        for (EquipmentKitCatalog.KitProfession profession : EquipmentKitCatalog.professionsFor(person)) {
             String kitName = defaultKitFor(profession, campaign);
             if (kitName.isBlank() || person.hasRepairKit(kitName)) {
                 continue;
@@ -227,7 +227,7 @@ public final class RepairKitIssuer {
     }
 
     /** The configured default equipment kit for a profession, or the "none" sentinel. */
-    private static String defaultKitFor(RepairKitCatalog.KitProfession profession, Campaign campaign) {
+    private static String defaultKitFor(EquipmentKitCatalog.KitProfession profession, Campaign campaign) {
         return switch (profession) {
             case MEK_TECH -> campaign.getCampaignOptions().get(CampaignOption.MEK_TECH_DEFAULT_TOOL_KIT);
             case MECHANIC -> campaign.getCampaignOptions().get(CampaignOption.MECHANIC_DEFAULT_TOOL_KIT);

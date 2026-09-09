@@ -437,9 +437,6 @@ public class EnginePart extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        // Fusion and fission power plants fall under Technician/Nuclear; internal-combustion and other non-nuclear
-        // engines (and their cooling and fuel systems) fall under Technician/Mechanical, regardless of the unit they
-        // power.
         return skillType.equals(isNuclearEngineType(getEngine().getEngineType()) ?
                                       SkillType.S_TECH_NUCLEAR :
                                       SkillType.S_TECH_MECHANICAL);
@@ -453,7 +450,7 @@ public class EnginePart extends Part {
      *
      * @return {@code true} if the engine is a fusion or fission plant; {@code false} otherwise
      *
-     * @since 0.50.10
+     * @since 0.51.01
      */
     public static boolean isNuclearEngineType(int engineType) {
         return switch (engineType) {

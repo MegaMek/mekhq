@@ -39,6 +39,7 @@ import megamek.common.equipment.ArmorType;
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
@@ -72,8 +73,7 @@ public class BAArmor extends Armor {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        // Battle armor plating is serviced as part of the suit by a battle armor technician.
-        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_BA);
+        return skillType.equals(SkillType.S_TECH_BA);
     }
 
     @Override

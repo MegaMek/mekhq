@@ -222,9 +222,6 @@ public class LandingGear extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        if (unit != null && unit.getEntity() instanceof LandAirMek) {
-            return skillType.equals(SkillType.S_TECH_MECHANICAL);
-        }
         return skillType.equals(SkillType.S_TECH_AERONAUTICS);
     }
 

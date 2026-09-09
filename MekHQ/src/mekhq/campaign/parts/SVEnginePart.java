@@ -324,9 +324,6 @@ public class SVEnginePart extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        // Support-vehicle power plants are classified by engine type, not by the unit they power: fusion/fission
-        // plants fall under Technician/Nuclear, and internal-combustion and other non-nuclear engines under
-        // Technician/Mechanical.
         return skillType.equals(EnginePart.isNuclearEngineType(etype) ?
                                       SkillType.S_TECH_NUCLEAR :
                                       SkillType.S_TECH_MECHANICAL);

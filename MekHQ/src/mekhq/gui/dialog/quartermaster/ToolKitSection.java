@@ -56,8 +56,8 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
-import mekhq.campaign.personnel.quartermaster.RepairKitIssuer;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitIssuer;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
@@ -110,7 +110,7 @@ public class ToolKitSection implements KitIssueSection {
 
         cards.clear();
         cards.add(stripCard());
-        for (String kitName : RepairKitCatalog.allKitNames()) {
+        for (String kitName : EquipmentKitCatalog.allKitNames()) {
             EquipmentType kit = EquipmentType.get(kitName);
             if (kit != null) {
                 cards.add(kitCard(kit));
@@ -151,7 +151,7 @@ public class ToolKitSection implements KitIssueSection {
         }
         detail.add(acquisitionText(kit));
         int stock = stockFor(kit);
-        String priceText = RepairKitIssuer.unitPrice(kit, campaign).toAmountString()
+        String priceText = EquipmentKitIssuer.unitPrice(kit, campaign).toAmountString()
                                  + " " + getTextAt(RESOURCE_BUNDLE, "card.each");
         return new KitCard(ACCENT, kit.getName(), false, detail, List.of(),
               getFormattedTextAt(RESOURCE_BUNDLE, "card.stock", stock), stock < technicians.size(), priceText,
@@ -188,7 +188,7 @@ public class ToolKitSection implements KitIssueSection {
         int need = countLacking(kit);
         int drawn = Math.min(stockFor(kit), need);
         int ordered = need - drawn;
-        Money cost = RepairKitIssuer.unitPrice(kit, campaign).multipliedBy(ordered);
+        Money cost = EquipmentKitIssuer.unitPrice(kit, campaign).multipliedBy(ordered);
         return new Tally(drawn, ordered, cost);
     }
 
@@ -204,7 +204,7 @@ public class ToolKitSection implements KitIssueSection {
                     continue;
                 }
                 EquipmentType worn = EquipmentType.get(wornName);
-                if ((worn != null) && RepairKitIssuer.removeKit(tech, worn, campaign)) {
+                if ((worn != null) && EquipmentKitIssuer.removeKit(tech, worn, campaign)) {
                     totals.removed++;
                     totals.changed.add(tech);
                 }
@@ -220,7 +220,7 @@ public class ToolKitSection implements KitIssueSection {
             if (tech.hasRepairKit(kit.getInternalName())) {
                 continue;
             }
-            if (RepairKitIssuer.issueFromStock(tech, kit, campaign)) {
+            if (EquipmentKitIssuer.issueFromStock(tech, kit, campaign)) {
                 totals.issued++;
                 totals.changed.add(tech);
             } else {
@@ -228,7 +228,7 @@ public class ToolKitSection implements KitIssueSection {
             }
         }
         if (shortfall > 0) {
-            RepairKitIssuer.order(kit, shortfall, campaign);
+            EquipmentKitIssuer.order(kit, shortfall, campaign);
             totals.ordered += shortfall;
         }
     }
@@ -245,7 +245,7 @@ public class ToolKitSection implements KitIssueSection {
 
     /** How hard a Regular acquirer would find this kit, rendered for the card (mirrors the armor-kit cards). */
     private String acquisitionText(EquipmentType kit) {
-        TargetRoll target = RepairKitIssuer.acquisitionTarget(kit, campaign);
+        TargetRoll target = EquipmentKitIssuer.acquisitionTarget(kit, campaign);
         if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
             return getTextAt(RESOURCE_BUNDLE, "card.acquire.automatic");
         }
@@ -272,7 +272,7 @@ public class ToolKitSection implements KitIssueSection {
      */
     private int stockFor(EquipmentType kit) {
         if (stockCache == null) {
-            stockCache = RepairKitIssuer.localStock(technicians);
+            stockCache = EquipmentKitIssuer.localStock(technicians);
         }
         return stockCache.getOrDefault(kit, 0);
     }

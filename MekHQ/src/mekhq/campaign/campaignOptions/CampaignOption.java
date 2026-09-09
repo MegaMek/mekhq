@@ -56,7 +56,7 @@ import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
-import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -311,17 +311,17 @@ public final class CampaignOption<T> {
     public static final CampaignOption<String> AIRCRAFT_DEFAULT_KIT =
           of(String.class, ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, "aircraftDefaultKit");
     public static final CampaignOption<String> MEK_TECH_DEFAULT_TOOL_KIT =
-          of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "mekTechDefaultToolKit");
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "mekTechDefaultToolKit");
     public static final CampaignOption<String> MECHANIC_DEFAULT_TOOL_KIT =
-          of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "mechanicDefaultToolKit");
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "mechanicDefaultToolKit");
     public static final CampaignOption<String> AERO_TECH_DEFAULT_TOOL_KIT =
-          of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "aeroTechDefaultToolKit");
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "aeroTechDefaultToolKit");
     public static final CampaignOption<String> BA_TECH_DEFAULT_TOOL_KIT =
-          of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "baTechDefaultToolKit");
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "baTechDefaultToolKit");
     public static final CampaignOption<String> DOCTOR_DEFAULT_TOOL_KIT =
-          of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "doctorDefaultToolKit");
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "doctorDefaultToolKit");
     public static final CampaignOption<String> ADMIN_DEFAULT_TOOL_KIT =
-          of(String.class, RepairKitCatalog.NO_DEFAULT_KIT, "adminDefaultToolKit");
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "adminDefaultToolKit");
     public static final CampaignOption<Boolean> ADD_DEFAULT_KIT_TO_PROCUREMENT =
           of(Boolean.class, false, "addDefaultKitToProcurement");
     public static final CampaignOption<Boolean> TECHS_NEED_TOOL_KIT =

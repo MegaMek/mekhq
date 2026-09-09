@@ -101,7 +101,7 @@ import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
-import mekhq.campaign.personnel.quartermaster.RepairKitIssuer;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitIssuer;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -2558,7 +2558,7 @@ public class ForceHumanResources {
 
         if (employ && prisonerStatus.isFreeOrBondsman()) {
             ArmorKitIssuer.equipDefaultKitOnRecruitment(person, campaign, gmAdd);
-            RepairKitIssuer.equipDefaultToolKitOnRecruitment(person, campaign, gmAdd);
+            EquipmentKitIssuer.equipDefaultToolKitOnRecruitment(person, campaign, gmAdd);
         }
 
         MekHQ.triggerEvent(new PersonNewEvent(person));

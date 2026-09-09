@@ -384,7 +384,6 @@ public class PodSpace implements IPartWork {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        // Pod-mounting hardware is a structural/mechanical system regardless of the unit it is fitted to.
         return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 

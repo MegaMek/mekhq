@@ -45,6 +45,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -72,8 +73,7 @@ public class MotiveSystem extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        // A vehicle's motive system is a mechanical system, serviced under Technician/Mechanical.
-        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL);
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

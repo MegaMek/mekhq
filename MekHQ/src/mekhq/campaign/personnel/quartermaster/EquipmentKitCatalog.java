@@ -47,10 +47,10 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
- * The catalog of CamOps specialized repair kits MekHQ issues to technicians, and which {@code Tech/...} repair skills
+ * The catalog of CamOps specialized equipment kits MekHQ issues to technicians, and which {@code Tech/...} repair skills
  * each kit improves.
  *
- * <p>This mirrors {@link ArmorKitCatalog} for repair kits: the kits are MegaMek {@code MiscType} equipment (defined in
+ * <p>This mirrors {@link ArmorKitCatalog} for equipment kits: the kits are MegaMek {@code MiscType} equipment (defined in
  * {@code MiscType.createXxxRepairKit()}), referenced here by internal name, and grouped by the specialist skill they
  * assist. A technician who owns a kit gets a bonus to rolls made with the skills that kit covers (applied by the repair
  * target logic). Only the granular {@code Tech/...} skills are covered, so kits assist part repairs, not whole-unit
@@ -59,7 +59,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
  * @author Illiani
  * @since 0.51.01
  */
-public final class RepairKitCatalog {
+public final class EquipmentKitCatalog {
     /**
      * The bonus a matching specialized repair kit grants to a covered repair roll (a reduction to the target number).
      * Set to +2 so a specialist kit remains worthwhile alongside a Deluxe Toolkit, which grants +1 to every technician
@@ -70,7 +70,7 @@ public final class RepairKitCatalog {
     /** The bonus a Deluxe Toolkit grants to any technician roll (repairs and maintenance). */
     public static final int DELUXE_TOOLKIT_ROLL_BONUS = 1;
 
-    // The specialized repair kits the catalog reasons about, by their MegaMek internal name
+    // The specialized equipment kits the catalog reasons about, by their MegaMek internal name
     // (see MiscType.createXxxRepairKit()).
     public static final String KIT_AEROSPACE = "Aerospace Repair Kit";
     public static final String KIT_BIONIC_MAINTENANCE = "Bionic Maintenance Kit";
@@ -139,7 +139,7 @@ public final class RepairKitCatalog {
         KIT_SKILLS.put(KIT_WEAPON, Set.of(S_TECH_WEAPONS));
     }
 
-    /** Every technician-gear item the quartermaster can issue, in display order: the repair kits, then general gear. */
+    /** Every technician-gear item the quartermaster can issue, in display order: the equipment kits, then general gear. */
     private static final Set<String> ISSUABLE_KITS = new LinkedHashSet<>();
 
     static {
@@ -160,7 +160,7 @@ public final class RepairKitCatalog {
      */
     public enum KitProfession {MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, DOCTOR, ADMIN}
 
-    private RepairKitCatalog() {
+    private EquipmentKitCatalog() {
     }
 
     /**
@@ -260,7 +260,7 @@ public final class RepairKitCatalog {
         }
         Map<String, Integer> bonuses = new LinkedHashMap<>();
 
-        // Specialized repair kits: +REPAIR_KIT_ROLL_BONUS to each Tech skill they cover.
+        // Specialized equipment kits: +REPAIR_KIT_ROLL_BONUS to each Tech skill they cover.
         for (Map.Entry<String, Set<String>> entry : KIT_SKILLS.entrySet()) {
             if (person.hasRepairKit(entry.getKey())) {
                 for (String skill : entry.getValue()) {
@@ -319,7 +319,7 @@ public final class RepairKitCatalog {
     }
 
     /**
-     * The repair kits that improve a given skill.
+     * The equipment kits that improve a given skill.
      *
      * @param skillName a {@code Tech/...} skill name
      *
@@ -395,7 +395,7 @@ public final class RepairKitCatalog {
     /**
      * Whether this technician carries a general tool kit - a Basic Toolkit or the better Deluxe Toolkit - which is the
      * minimum kit required to perform a repair when the "Techs Need a Tool Kit" campaign option is enabled. Specialized
-     * repair kits augment a tool kit rather than replace it, so they do not satisfy this requirement on their own.
+     * equipment kits augment a tool kit rather than replace it, so they do not satisfy this requirement on their own.
      *
      * @param person the technician, or {@code null}
      *

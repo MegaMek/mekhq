@@ -99,8 +99,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        // Armor plating is a structural component, serviced under Technician/Mechanical regardless of the unit it protects.
-        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL);
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

@@ -40,7 +40,7 @@ import static mekhq.campaign.personnel.enums.PersonnelRole.MECHANIC;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEK_TECH;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
-import static mekhq.campaign.personnel.quartermaster.RepairKitCatalog.*;
+import static mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog.*;
 import static mekhq.campaign.personnel.skills.SkillType.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -60,7 +60,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-class RepairKitCatalogTest {
+class EquipmentKitCatalogTest {
 
     @BeforeAll
     static void beforeAll() {
@@ -88,7 +88,7 @@ class RepairKitCatalogTest {
     // lookup returns null and the kit silently drops out of the catalog — these tests turn that into a loud failure.
     @Test
     void everyIssuableKitNameStillResolvesToARealKit() {
-        for (String name : RepairKitCatalog.allKitNames()) {
+        for (String name : EquipmentKitCatalog.allKitNames()) {
             assertNotNull(EquipmentType.get(name),
                   "Kit name '" + name + "' no longer resolves — it was renamed or removed in MegaMek");
         }
@@ -109,43 +109,46 @@ class RepairKitCatalogTest {
     // region professionsFor
     @Test
     void professionsForMapsEachTechnicianRoleToItsProfession() {
-        assertEquals(Set.of(KitProfession.MEK_TECH), RepairKitCatalog.professionsFor(personWithRoles(MEK_TECH, NONE)));
-        assertEquals(Set.of(KitProfession.MECHANIC), RepairKitCatalog.professionsFor(personWithRoles(MECHANIC, NONE)));
-        assertEquals(Set.of(KitProfession.AERO_TEK), RepairKitCatalog.professionsFor(personWithRoles(AERO_TEK, NONE)));
-        assertEquals(Set.of(KitProfession.BA_TECH), RepairKitCatalog.professionsFor(personWithRoles(BA_TECH, NONE)));
+        assertEquals(Set.of(KitProfession.MEK_TECH),
+              EquipmentKitCatalog.professionsFor(personWithRoles(MEK_TECH, NONE)));
+        assertEquals(Set.of(KitProfession.MECHANIC),
+              EquipmentKitCatalog.professionsFor(personWithRoles(MECHANIC, NONE)));
+        assertEquals(Set.of(KitProfession.AERO_TEK),
+              EquipmentKitCatalog.professionsFor(personWithRoles(AERO_TEK, NONE)));
+        assertEquals(Set.of(KitProfession.BA_TECH), EquipmentKitCatalog.professionsFor(personWithRoles(BA_TECH, NONE)));
     }
 
     @Test
     void professionsForNowIncludesDoctorsAndAdministrators() {
-        assertEquals(Set.of(KitProfession.DOCTOR), RepairKitCatalog.professionsFor(personWithRoles(DOCTOR, NONE)));
+        assertEquals(Set.of(KitProfession.DOCTOR), EquipmentKitCatalog.professionsFor(personWithRoles(DOCTOR, NONE)));
         assertEquals(Set.of(KitProfession.ADMIN),
-              RepairKitCatalog.professionsFor(personWithRoles(ADMINISTRATOR, NONE)));
+              EquipmentKitCatalog.professionsFor(personWithRoles(ADMINISTRATOR, NONE)));
     }
 
     @Test
     void professionsForReadsBothPrimaryAndSecondaryRoles() {
         assertEquals(Set.of(KitProfession.MEK_TECH, KitProfession.DOCTOR),
-              RepairKitCatalog.professionsFor(personWithRoles(MEK_TECH, DOCTOR)));
+              EquipmentKitCatalog.professionsFor(personWithRoles(MEK_TECH, DOCTOR)));
     }
 
     @Test
     void professionsForIsEmptyForNonKitRolesAndNull() {
-        assertTrue(RepairKitCatalog.professionsFor(personWithRoles(MEKWARRIOR, NONE)).isEmpty());
-        assertTrue(RepairKitCatalog.professionsFor(null).isEmpty());
+        assertTrue(EquipmentKitCatalog.professionsFor(personWithRoles(MEKWARRIOR, NONE)).isEmpty());
+        assertTrue(EquipmentKitCatalog.professionsFor(null).isEmpty());
     }
     // endregion professionsFor
 
     // region repair bonuses via kitSkillBonuses (skill modifiers, not roll modifiers)
     @Test
     void specialistRepairKitModifiesTheTechSkillsItCovers() {
-        Map<String, Integer> bonuses = RepairKitCatalog.kitSkillBonuses(personWithKit(KIT_WEAPON));
+        Map<String, Integer> bonuses = EquipmentKitCatalog.kitSkillBonuses(personWithKit(KIT_WEAPON));
         assertEquals(REPAIR_KIT_ROLL_BONUS, bonuses.get(S_TECH_WEAPONS));
         assertNull(bonuses.get(S_TECH_ELECTRONIC), "a Weapon kit does not touch other Tech skills");
     }
 
     @Test
     void deluxeToolkitModifiesEveryTechSkillIncludingTheGlobalOnes() {
-        Map<String, Integer> bonuses = RepairKitCatalog.kitSkillBonuses(personWithKit(KIT_DELUXE_TOOLKIT));
+        Map<String, Integer> bonuses = EquipmentKitCatalog.kitSkillBonuses(personWithKit(KIT_DELUXE_TOOLKIT));
         // A granular repair skill and a global (maintenance/refit) skill both get the Deluxe +1.
         assertEquals(DELUXE_TOOLKIT_ROLL_BONUS, bonuses.get(S_TECH_ELECTRONIC));
         assertEquals(DELUXE_TOOLKIT_ROLL_BONUS, bonuses.get(S_TECH_MEK));
@@ -153,68 +156,69 @@ class RepairKitCatalogTest {
 
     @Test
     void basicToolkitGrantsNoSkillModifier() {
-        assertTrue(RepairKitCatalog.kitSkillBonuses(personWithKit(KIT_BASIC_TOOLKIT)).isEmpty());
+        assertTrue(EquipmentKitCatalog.kitSkillBonuses(personWithKit(KIT_BASIC_TOOLKIT)).isEmpty());
     }
     // endregion repair bonuses
 
     // region maintenanceBonus (bespoke Descartes only)
     @Test
     void descartesScannersGiveGradedMaintenanceBonuses() {
-        assertEquals(3, RepairKitCatalog.maintenanceBonus(personWithKit(KIT_DESCARTES_MK_XXV)));
-        assertEquals(2, RepairKitCatalog.maintenanceBonus(personWithKit(KIT_DESCARTES_MK_XXI)));
+        assertEquals(3, EquipmentKitCatalog.maintenanceBonus(personWithKit(KIT_DESCARTES_MK_XXV)));
+        assertEquals(2, EquipmentKitCatalog.maintenanceBonus(personWithKit(KIT_DESCARTES_MK_XXI)));
     }
 
     @Test
     void deluxeToolkitIsNotABespokeMaintenanceBonusItReachesMaintenanceThroughTheSkillValue() {
         // The Deluxe Toolkit's maintenance +1 is a skill modifier (kitSkillBonuses on the global skill), not a bespoke
         // maintenance-roll modifier, so maintenanceBonus itself returns 0 for it.
-        assertEquals(0, RepairKitCatalog.maintenanceBonus(personWithKit(KIT_DELUXE_TOOLKIT)));
+        assertEquals(0, EquipmentKitCatalog.maintenanceBonus(personWithKit(KIT_DELUXE_TOOLKIT)));
     }
 
     @Test
     void maintenanceBonusIsZeroWithoutRelevantGearOrForNull() {
-        assertEquals(0, RepairKitCatalog.maintenanceBonus(personWithKit(KIT_WEAPON)));
-        assertEquals(0, RepairKitCatalog.maintenanceBonus(null));
+        assertEquals(0, EquipmentKitCatalog.maintenanceBonus(personWithKit(KIT_WEAPON)));
+        assertEquals(0, EquipmentKitCatalog.maintenanceBonus(null));
     }
     // endregion maintenanceBonus
 
     // region generalSkillBonus
     @Test
     void generalSkillBonusReadsTheNonTechnicianSkillTables() {
-        assertEquals(2, RepairKitCatalog.generalSkillBonus(personWithKit(KIT_ADVANCED_FIELD), S_SURVIVAL));
-        assertEquals(1, RepairKitCatalog.generalSkillBonus(personWithKit(KIT_BASIC_FIELD), S_SURVIVAL));
-        assertEquals(2, RepairKitCatalog.generalSkillBonus(personWithKit(KIT_PERSONAL_COMPUTER), S_ADMIN));
-        assertEquals(2, RepairKitCatalog.generalSkillBonus(personWithKit(KIT_POCKET_TRANSCRIBER), S_NEGOTIATION));
+        assertEquals(2, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_ADVANCED_FIELD), S_SURVIVAL));
+        assertEquals(1, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_BASIC_FIELD), S_SURVIVAL));
+        assertEquals(2, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_PERSONAL_COMPUTER), S_ADMIN));
+        assertEquals(2, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_POCKET_TRANSCRIBER), S_NEGOTIATION));
     }
 
     @Test
     void medicalKitsRaiseBothMedTechAndSurgery() {
-        assertEquals(2, RepairKitCatalog.generalSkillBonus(personWithKit(KIT_FIELD_SURGICAL), S_MEDTECH));
-        assertEquals(2, RepairKitCatalog.generalSkillBonus(personWithKit(KIT_FIELD_SURGICAL), S_SURGERY));
+        assertEquals(2, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_FIELD_SURGICAL), S_MEDTECH));
+        assertEquals(2, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_FIELD_SURGICAL), S_SURGERY));
         // The plain Medical Kit still grants the customized +1 surgery bonus even though the book lists none.
-        assertEquals(1, RepairKitCatalog.generalSkillBonus(personWithKit(KIT_MEDICAL), S_SURGERY));
-        assertEquals(1, RepairKitCatalog.generalSkillBonus(personWithKit(KIT_ADVANCED_MEDICAL), S_SURGERY));
+        assertEquals(1, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_MEDICAL), S_SURGERY));
+        assertEquals(1, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_ADVANCED_MEDICAL), S_SURGERY));
     }
 
     @Test
     void generalSkillBonusIsZeroForAnUncoveredSkillOrNull() {
-        assertEquals(0, RepairKitCatalog.generalSkillBonus(personWithKit(KIT_COMPAD), S_SURVIVAL));
-        assertEquals(0, RepairKitCatalog.generalSkillBonus(null, S_ADMIN));
-        assertEquals(0, RepairKitCatalog.generalSkillBonus(personWithKit(KIT_COMPAD), null));
+        assertEquals(0, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_COMPAD), S_SURVIVAL));
+        assertEquals(0, EquipmentKitCatalog.generalSkillBonus(null, S_ADMIN));
+        assertEquals(0, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_COMPAD), null));
     }
 
     @Test
     void noteputerHelpsBothAdministrationAndNegotiation() {
         Person clerk = personWithKit(KIT_NOTEPUTER);
-        assertEquals(1, RepairKitCatalog.generalSkillBonus(clerk, S_ADMIN));
-        assertEquals(1, RepairKitCatalog.generalSkillBonus(clerk, S_NEGOTIATION));
+        assertEquals(1, EquipmentKitCatalog.generalSkillBonus(clerk, S_ADMIN));
+        assertEquals(1, EquipmentKitCatalog.generalSkillBonus(clerk, S_NEGOTIATION));
     }
 
     @Test
     void compassKitsAssistNavigation() {
-        assertEquals(1, RepairKitCatalog.generalSkillBonus(personWithKit(RepairKitCatalog.KIT_COMPASS), S_NAVIGATION));
+        assertEquals(1,
+              EquipmentKitCatalog.generalSkillBonus(personWithKit(EquipmentKitCatalog.KIT_COMPASS), S_NAVIGATION));
         assertEquals(2,
-              RepairKitCatalog.generalSkillBonus(personWithKit(RepairKitCatalog.KIT_ELECTRONIC_COMPASS),
+              EquipmentKitCatalog.generalSkillBonus(personWithKit(EquipmentKitCatalog.KIT_ELECTRONIC_COMPASS),
                     S_NAVIGATION));
     }
     // endregion generalSkillBonus
@@ -222,7 +226,7 @@ class RepairKitCatalogTest {
     // region kitSkillBonuses (map)
     @Test
     void kitSkillBonusesCollectsEverySkillTheOwnedKitImproves() {
-        Map<String, Integer> bonuses = RepairKitCatalog.kitSkillBonuses(personWithKit(KIT_FIELD_SURGICAL));
+        Map<String, Integer> bonuses = EquipmentKitCatalog.kitSkillBonuses(personWithKit(KIT_FIELD_SURGICAL));
         assertEquals(2, bonuses.get(S_MEDTECH));
         assertEquals(2, bonuses.get(S_SURGERY));
         assertEquals(2, bonuses.size());
@@ -230,7 +234,7 @@ class RepairKitCatalogTest {
 
     @Test
     void aKitCoveringTwoSkillsMapsBoth() {
-        Map<String, Integer> bonuses = RepairKitCatalog.kitSkillBonuses(personWithKit(KIT_NOTEPUTER));
+        Map<String, Integer> bonuses = EquipmentKitCatalog.kitSkillBonuses(personWithKit(KIT_NOTEPUTER));
         assertEquals(1, bonuses.get(S_ADMIN));
         assertEquals(1, bonuses.get(S_NEGOTIATION));
     }
@@ -238,60 +242,60 @@ class RepairKitCatalogTest {
     @Test
     void kitSkillBonusesIsEmptyWithNoBonusKitOrForNull() {
         // The Basic Toolkit is the only issuable kit that grants no skill modifier at all.
-        assertTrue(RepairKitCatalog.kitSkillBonuses(personWithKit(KIT_BASIC_TOOLKIT)).isEmpty());
-        assertTrue(RepairKitCatalog.kitSkillBonuses(null).isEmpty());
+        assertTrue(EquipmentKitCatalog.kitSkillBonuses(personWithKit(KIT_BASIC_TOOLKIT)).isEmpty());
+        assertTrue(EquipmentKitCatalog.kitSkillBonuses(null).isEmpty());
     }
     // endregion kitSkillBonuses
 
     // region hasToolKit
     @Test
     void hasToolKitIsTrueForBasicOrDeluxeToolkits() {
-        assertTrue(RepairKitCatalog.hasToolKit(personWithKit(KIT_BASIC_TOOLKIT)));
-        assertTrue(RepairKitCatalog.hasToolKit(personWithKit(KIT_DELUXE_TOOLKIT)));
+        assertTrue(EquipmentKitCatalog.hasToolKit(personWithKit(KIT_BASIC_TOOLKIT)));
+        assertTrue(EquipmentKitCatalog.hasToolKit(personWithKit(KIT_DELUXE_TOOLKIT)));
     }
 
     @Test
     void hasToolKitIsFalseForSpecialistKitsAloneOrNoKitsOrNull() {
         // A specialist repair kit augments a tool kit but does not replace one.
-        assertFalse(RepairKitCatalog.hasToolKit(personWithKit(KIT_WEAPON)));
-        assertFalse(RepairKitCatalog.hasToolKit(personWithKit(null)));
-        assertFalse(RepairKitCatalog.hasToolKit(null));
+        assertFalse(EquipmentKitCatalog.hasToolKit(personWithKit(KIT_WEAPON)));
+        assertFalse(EquipmentKitCatalog.hasToolKit(personWithKit(null)));
+        assertFalse(EquipmentKitCatalog.hasToolKit(null));
     }
     // endregion hasToolKit
 
     // region canBeIssuedKit
     @Test
     void anyCharacterMayBeIssuedAKitButNullMayNot() {
-        assertTrue(RepairKitCatalog.canBeIssuedKit(mock(Person.class)));
-        assertFalse(RepairKitCatalog.canBeIssuedKit(null));
+        assertTrue(EquipmentKitCatalog.canBeIssuedKit(mock(Person.class)));
+        assertFalse(EquipmentKitCatalog.canBeIssuedKit(null));
     }
     // endregion canBeIssuedKit
 
     // region skill/kit lookups
     @Test
     void skillsBoostedByAndKitsBoostingSkillAreConsistent() {
-        assertTrue(RepairKitCatalog.skillsBoostedBy(KIT_WEAPON).contains(S_TECH_WEAPONS));
-        assertTrue(RepairKitCatalog.kitsBoostingSkill(S_TECH_WEAPONS).contains(KIT_WEAPON));
-        assertTrue(RepairKitCatalog.isKitBoostedSkill(S_TECH_MECHANICAL));
-        assertFalse(RepairKitCatalog.isKitBoostedSkill(S_ADMIN));
-        assertTrue(RepairKitCatalog.skillsBoostedBy("Not A Kit").isEmpty());
+        assertTrue(EquipmentKitCatalog.skillsBoostedBy(KIT_WEAPON).contains(S_TECH_WEAPONS));
+        assertTrue(EquipmentKitCatalog.kitsBoostingSkill(S_TECH_WEAPONS).contains(KIT_WEAPON));
+        assertTrue(EquipmentKitCatalog.isKitBoostedSkill(S_TECH_MECHANICAL));
+        assertFalse(EquipmentKitCatalog.isKitBoostedSkill(S_ADMIN));
+        assertTrue(EquipmentKitCatalog.skillsBoostedBy("Not A Kit").isEmpty());
     }
 
     @Test
     void ownsKitBoostingSkillTracksOwnership() {
-        assertTrue(RepairKitCatalog.ownsKitBoostingSkill(personWithKit(KIT_ELECTRONICS), S_TECH_ELECTRONIC));
-        assertFalse(RepairKitCatalog.ownsKitBoostingSkill(personWithKit(KIT_WEAPON), S_TECH_ELECTRONIC));
-        assertFalse(RepairKitCatalog.ownsKitBoostingSkill(null, S_TECH_ELECTRONIC));
+        assertTrue(EquipmentKitCatalog.ownsKitBoostingSkill(personWithKit(KIT_ELECTRONICS), S_TECH_ELECTRONIC));
+        assertFalse(EquipmentKitCatalog.ownsKitBoostingSkill(personWithKit(KIT_WEAPON), S_TECH_ELECTRONIC));
+        assertFalse(EquipmentKitCatalog.ownsKitBoostingSkill(null, S_TECH_ELECTRONIC));
     }
     // endregion skill/kit lookups
 
     // region optionKitNames
     @Test
     void optionKitNamesLeadWithTheNoneSentinelThenEveryIssuableKit() {
-        List<String> options = RepairKitCatalog.optionKitNames();
+        List<String> options = EquipmentKitCatalog.optionKitNames();
         assertEquals(NO_DEFAULT_KIT, options.get(0));
-        assertTrue(options.containsAll(RepairKitCatalog.allKitNames()));
-        assertEquals(RepairKitCatalog.allKitNames().size() + 1, options.size());
+        assertTrue(options.containsAll(EquipmentKitCatalog.allKitNames()));
+        assertEquals(EquipmentKitCatalog.allKitNames().size() + 1, options.size());
     }
     // endregion optionKitNames
 }

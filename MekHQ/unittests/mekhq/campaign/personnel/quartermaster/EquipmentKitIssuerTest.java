@@ -34,7 +34,7 @@ package mekhq.campaign.personnel.quartermaster;
 
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEK_TECH;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
-import static mekhq.campaign.personnel.quartermaster.RepairKitCatalog.KIT_BASIC_TOOLKIT;
+import static mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog.KIT_BASIC_TOOLKIT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -66,7 +66,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
 
-class RepairKitIssuerTest {
+class EquipmentKitIssuerTest {
     private EquipmentType kit;
     private Campaign campaign;
 
@@ -152,14 +152,14 @@ class RepairKitIssuerTest {
         Person person = mock(Person.class);
         when(person.getWarehouse()).thenReturn(warehouse);
 
-        assertEquals(1, RepairKitIssuer.localStock(person, kit));
+        assertEquals(1, EquipmentKitIssuer.localStock(person, kit));
     }
 
     @Test
     void localStockIsZeroWithoutAWarehouse() {
         Person person = mock(Person.class);
         when(person.getWarehouse()).thenReturn(null);
-        assertEquals(0, RepairKitIssuer.localStock(person, kit));
+        assertEquals(0, EquipmentKitIssuer.localStock(person, kit));
     }
     // endregion localStock
 
@@ -170,7 +170,7 @@ class RepairKitIssuerTest {
         Person person = personOwning(null);
         when(person.getWarehouse()).thenReturn(warehouse);
 
-        assertTrue(RepairKitIssuer.issueFromStock(person, kit, campaign));
+        assertTrue(EquipmentKitIssuer.issueFromStock(person, kit, campaign));
         verify(warehouse).removePart(any(), eq(1));
         assertEquals(kit.getInternalName(), person.getRepairKitName());
     }
@@ -183,7 +183,7 @@ class RepairKitIssuerTest {
         Person person = personOwning(null);
         when(person.getWarehouse()).thenReturn(warehouse);
 
-        assertFalse(RepairKitIssuer.issueFromStock(person, kit, campaign));
+        assertFalse(EquipmentKitIssuer.issueFromStock(person, kit, campaign));
         verify(warehouse, never()).removePart(any(), anyInt());
         assertNull(person.getRepairKitName());
     }
@@ -192,7 +192,7 @@ class RepairKitIssuerTest {
     void issueFromStockIsANoOpWhenTheTechAlreadyOwnsTheKit() {
         Person person = personOwning(kit.getInternalName());
 
-        assertTrue(RepairKitIssuer.issueFromStock(person, kit, campaign));
+        assertTrue(EquipmentKitIssuer.issueFromStock(person, kit, campaign));
         verify(person, never()).getWarehouse();
     }
     // endregion issueFromStock
@@ -204,7 +204,7 @@ class RepairKitIssuerTest {
         Person person = personOwning(kit.getInternalName());
         when(person.getWarehouse()).thenReturn(warehouse);
 
-        assertTrue(RepairKitIssuer.removeKit(person, kit, campaign));
+        assertTrue(EquipmentKitIssuer.removeKit(person, kit, campaign));
         assertNull(person.getRepairKitName());
         verify(warehouse).addPart(any(), eq(true));
     }
@@ -212,7 +212,7 @@ class RepairKitIssuerTest {
     @Test
     void removeKitIsANoOpWhenTheTechDoesNotOwnIt() {
         Person person = personOwning(null);
-        assertFalse(RepairKitIssuer.removeKit(person, kit, campaign));
+        assertFalse(EquipmentKitIssuer.removeKit(person, kit, campaign));
         verify(person, never()).getWarehouse();
     }
     // endregion removeKit
@@ -225,7 +225,7 @@ class RepairKitIssuerTest {
         when(tech.getWarehouse()).thenReturn(warehouse);
         when(campaign.getCampaignOptions()).thenReturn(optionsWith(KIT_BASIC_TOOLKIT, false));
 
-        RepairKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, false);
+        EquipmentKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, false);
 
         assertEquals(kit.getInternalName(), tech.getRepairKitName());
         verify(warehouse).removePart(any(), eq(1));
@@ -236,9 +236,9 @@ class RepairKitIssuerTest {
         LocalWarehouse warehouse = warehouseHolding(List.of(kitPart()));
         Person tech = techWithRole(MEK_TECH);
         when(tech.getWarehouse()).thenReturn(warehouse);
-        when(campaign.getCampaignOptions()).thenReturn(optionsWith(RepairKitCatalog.NO_DEFAULT_KIT, false));
+        when(campaign.getCampaignOptions()).thenReturn(optionsWith(EquipmentKitCatalog.NO_DEFAULT_KIT, false));
 
-        RepairKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, false);
+        EquipmentKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, false);
 
         assertNull(tech.getRepairKitName());
         verify(warehouse, never()).removePart(any(), anyInt());
@@ -251,7 +251,7 @@ class RepairKitIssuerTest {
         when(tech.getWarehouse()).thenReturn(warehouse);
         when(campaign.getCampaignOptions()).thenReturn(optionsWith(KIT_BASIC_TOOLKIT, true));
 
-        RepairKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, true);
+        EquipmentKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, true);
 
         assertEquals(kit.getInternalName(), tech.getRepairKitName());
     }
@@ -263,7 +263,7 @@ class RepairKitIssuerTest {
         when(tech.getWarehouse()).thenReturn(warehouse);
         when(campaign.getCampaignOptions()).thenReturn(optionsWith(KIT_BASIC_TOOLKIT, true));
 
-        RepairKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, false);
+        EquipmentKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, false);
 
         assertNull(tech.getRepairKitName(), "not yet owned — awaiting delivery");
         assertEquals(kit.getInternalName(), tech.getIntendedRepairKitName());
@@ -276,7 +276,7 @@ class RepairKitIssuerTest {
         when(tech.getWarehouse()).thenReturn(warehouse);
         when(campaign.getCampaignOptions()).thenReturn(optionsWith(KIT_BASIC_TOOLKIT, false));
 
-        RepairKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, false);
+        EquipmentKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, false);
 
         assertNull(tech.getRepairKitName());
         assertNull(tech.getIntendedRepairKitName());

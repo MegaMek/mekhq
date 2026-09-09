@@ -78,7 +78,7 @@ import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
-import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
 
@@ -274,7 +274,7 @@ public class PartsInUseManager {
             }
             if (equipmentPart.getType() instanceof MiscType miscType
                       && (miscType.hasFlag(MiscType.F_ARMOR_KIT)
-                                || RepairKitCatalog.allKitNames().contains(miscType.getInternalName()))) {
+                                || EquipmentKitCatalog.allKitNames().contains(miscType.getInternalName()))) {
                 return campaignOptions.get(CampaignOption.AUTO_LOGISTICS_EQUIPMENT_KIT);
             }
         }

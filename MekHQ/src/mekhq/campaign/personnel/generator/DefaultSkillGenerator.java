@@ -192,7 +192,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
     private static void generateCommandUtilitySkills(Person person, int expLvl,
           RandomSkillPreferences skillPreferences) {
-        for (String skillName : SkillType.getSkillsBySkillSubType(List.of(UTILITY_COMMAND))) {
+        for (String skillName : SkillType.getSkillsBySkillSubType(List.of(UTILITY_COMMAND), false)) {
             if (person.getSkills().hasSkill(skillName)) {
                 continue;
             }

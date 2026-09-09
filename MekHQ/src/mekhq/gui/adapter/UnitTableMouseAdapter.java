@@ -117,7 +117,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
-import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
@@ -267,12 +267,6 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
-     * Opens the log editor for the given unit and log type, then fires a {@link UnitLogEvent}.
-     *
-     * @param unit    the unit whose log is being edited
-     * @param logType which of the unit's logs to edit
-     */
-    /**
      * Whether the shared kit-issue dialog has anything to offer for this unit: its crew can wear an armor kit, it is a
      * conventional infantry platoon (issued a platoon kit), or any crew member can be issued technician tool kits.
      */
@@ -281,13 +275,19 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             return true;
         }
         for (Person crew : unit.getCrew()) {
-            if (RepairKitCatalog.canBeIssuedKit(crew)) {
+            if (EquipmentKitCatalog.canBeIssuedKit(crew)) {
                 return true;
             }
         }
         return false;
     }
 
+    /**
+     * Opens the log editor for the given unit and log type, then fires a {@link UnitLogEvent}.
+     *
+     * @param unit    the unit whose log is being edited
+     * @param logType which of the unit's logs to edit
+     */
     private void editUnitLog(Unit unit, UnitLogType logType) {
         EditUnitLogDialog editUnitLogDialog = new EditUnitLogDialog(gui.getFrame(),
               gui.getCampaign().getLocalDate(),
@@ -1240,7 +1240,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
 
-                if (!nonePresent && Arrays.stream(units).anyMatch(UnitTableMouseAdapter::canIssueKitsFor)) {
+                if (Arrays.stream(units).anyMatch(UnitTableMouseAdapter::canIssueKitsFor)) {
                     JMenuItem issueKits = new JMenuItem(getTextAt("mekhq.resources.IssueEquipmentDialog",
                           "menu.issueArmorKits"));
                     issueKits.addActionListener(evt -> IssueEquipmentDialog.showFor(gui.getFrame(),

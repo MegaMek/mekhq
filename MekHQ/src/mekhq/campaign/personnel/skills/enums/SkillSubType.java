@@ -66,7 +66,7 @@ public enum SkillSubType {
     /**
      * Represents technician skills.
      */
-    SUPPORT_TECHNICIAN(),
+    SUPPORT_TECHNICIAN,
 
     /**
      * Represents skills with mechanical effects that are not specifically profession-based skills

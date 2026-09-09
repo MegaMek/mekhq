@@ -67,6 +67,7 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.events.AcquisitionEvent;
@@ -994,7 +995,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         // Offer anyone with a technician repair skill, regardless of their profession, who has more than 0 minutes
         // free; sorted by skill descending (elites at bottom). The task's required-skill filtering is applied in
         // filterTechs().
-        mekhq.campaign.Campaign campaign = getCampaign();
+        Campaign campaign = getCampaign();
         List<Person> techs = campaign.getPlayerForce()
                                    .getHumanResources()
                                    .getSkilledTechs(campaign.getPlayerForce().getHangar().getUnits(),

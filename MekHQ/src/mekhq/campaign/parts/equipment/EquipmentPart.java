@@ -56,6 +56,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -98,10 +99,8 @@ public class EquipmentPart extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        // Weapon systems fall under Technician/Weapons. Other equipment has no more specific technician skill, so any
-        // technician may service it.
         if (getType() instanceof WeaponType) {
-            return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_WEAPONS);
+            return skillType.equals(SkillType.S_TECH_WEAPONS);
         }
         return true;
     }

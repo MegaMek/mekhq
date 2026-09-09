@@ -151,7 +151,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuri
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
-import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -6215,13 +6215,16 @@ public class Person implements ILocatable {
      * @param skillSubTypes the list of {@link SkillSubType} to use for filtering skills
      *
      * @return a {@link List} of skill names that are both of the specified subtypes and known to the object
+     * @param treatAllTechSkillsAsTech Whether to treat all tech skills as tech skills, instead of their individual
+     *                                 classifications
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public List<String> getKnownSkillsBySkillSubType(List<SkillSubType> skillSubTypes) {
+    public List<String> getKnownSkillsBySkillSubType(List<SkillSubType> skillSubTypes,
+          boolean treatAllTechSkillsAsTech) {
         List<String> knownSkills = new ArrayList<>();
-        for (String skillName : getSkillsBySkillSubType(skillSubTypes)) {
+        for (String skillName : getSkillsBySkillSubType(skillSubTypes, treatAllTechSkillsAsTech)) {
             if (hasSkill(skillName)) {
                 knownSkills.add(skillName);
             }
@@ -10203,7 +10206,7 @@ public class Person implements ILocatable {
                                                  getAllActiveInjuryEffects(isAmbidextrous,
                                                        injuries);
         return new SkillModifierData(options, atowAttributes, 0, injuryEffects, ageForAttributeModifiers,
-              RepairKitCatalog.kitSkillBonuses(this));
+              EquipmentKitCatalog.kitSkillBonuses(this));
     }
 
     /**
@@ -10263,7 +10266,7 @@ public class Person implements ILocatable {
               adjustedFame,
               injuryEffects,
               ageForAttributeModifiers,
-              RepairKitCatalog.kitSkillBonuses(this));
+              EquipmentKitCatalog.kitSkillBonuses(this));
     }
 
     /**

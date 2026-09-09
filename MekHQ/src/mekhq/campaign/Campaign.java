@@ -206,7 +206,7 @@ import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
-import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
@@ -4353,7 +4353,9 @@ public class Campaign implements ITechManager {
         } else if (skill == null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
         } else if (getCampaignOptions().get(CampaignOption.TECHS_NEED_TOOL_KIT)
-                         && !RepairKitCatalog.hasToolKit(tech)) {
+                                                                                                                                                                                                                                                        &&
+                                                                                                                                                                                                                                                        !EquipmentKitCatalog.hasToolKit(
+                                                                                                                                                                                                                                                              tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no tool kit");
         } else if (!getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN) && (partWork.getSkillMin() > effectiveSkillLevel)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this tech's skill level");
@@ -4446,9 +4448,6 @@ public class Campaign implements ITechManager {
                 }
             }
         }
-
-        // A technician's tool kit is a modifier to the skill itself (folded into the skill value via
-        // SkillModifierData / RepairKitCatalog.kitSkillBonuses), so the repair target already reflects it here.
 
         final boolean isOvertime;
         if (isOvertimeAllowed() && (tech.isTaskOvertime(partWork) || partWork.hasWorkedOvertime())) {

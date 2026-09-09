@@ -154,7 +154,7 @@ import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.DiseaseService;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
-import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -2574,7 +2574,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         if (Arrays.stream(selected)
                   .anyMatch(candidate -> ArmorKitCatalog.canBeIssuedKit(candidate)
-                                               || RepairKitCatalog.canBeIssuedKit(candidate))) {
+                                               || EquipmentKitCatalog.canBeIssuedKit(candidate))) {
             JMenuItem issueKits = new JMenuItem(getTextAt("mekhq.resources.IssueEquipmentDialog",
                   "menu.issueArmorKits"));
             issueKits.addActionListener(ev -> IssueEquipmentDialog.showFor(getFrame(),

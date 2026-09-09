@@ -59,7 +59,7 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.enums.MiscTypeFlag;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.Category;
-import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -266,7 +266,7 @@ class PersonnelEquipmentPage {
     }
 
     private MMComboBox<String> toolKitCombo(String name) {
-        MMComboBox<String> combo = new MMComboBox<>(name, RepairKitCatalog.optionKitNames().toArray(new String[0]));
+        MMComboBox<String> combo = new MMComboBox<>(name, EquipmentKitCatalog.optionKitNames().toArray(new String[0]));
         combo.setRenderer(new ToolKitRenderer());
         return combo;
     }
@@ -276,7 +276,7 @@ class PersonnelEquipmentPage {
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
               boolean cellHasFocus) {
-            boolean isNone = RepairKitCatalog.NO_DEFAULT_KIT.equals(value);
+            boolean isNone = EquipmentKitCatalog.NO_DEFAULT_KIT.equals(value);
             Object display = isNone ? getTextAt(getCampaignOptionsResourceBundle(), "armorKitNone.text") : value;
             super.getListCellRendererComponent(list, display, index, isSelected, cellHasFocus);
             setToolTipText(kitTooltip(isNone ? "NoDefaultKit" : (String) value));

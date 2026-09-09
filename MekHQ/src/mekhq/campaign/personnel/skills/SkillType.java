@@ -404,17 +404,28 @@ public class SkillType {
      * resulting list, even if multiple {@code SkillType}s with the same name are found.</p>
      *
      * @param skillSubTypes List of {@link SkillSubType}s for which to find matching skill names.
+     * @param treatAllTechSkillsAsTech Whether to treat all tech skills as tech skills, instead of their individual
+     *                                 classifications
      *
      * @return A list of unique skill names that belong to one of the specified skill subtypes.
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public static List<String> getSkillsBySkillSubType(List<SkillSubType> skillSubTypes) {
+    public static List<String> getSkillsBySkillSubType(List<SkillSubType> skillSubTypes,
+          boolean treatAllTechSkillsAsTech) {
+        // Certain tech skills are marked as utility or roleplay so would not normally be included. However, they are
+        // still tech skills.
+        boolean isTechSubType = treatAllTechSkillsAsTech && skillSubTypes.contains(SUPPORT_TECHNICIAN);
+        List<String> specialTechSkills = List.of(S_TECH_MILITARY, S_TECH_CIVILIAN, S_TECH_ELECTRONIC, S_TECH_NUCLEAR,
+              S_TECH_AERONAUTICS, S_TECH_MECHANICAL, S_TECH_MYOMER, S_TECH_JETS, S_TECH_WEAPONS, S_TECH_CYBERNETICS);
+
         List<String> relevantSkills = new ArrayList<>();
         for (SkillType skillType : lookupHash.values()) {
+            boolean isSpecialTech = isTechSubType && specialTechSkills.contains(skillType.getName());
+
             SkillSubType subType = skillType.getSubType();
-            if (skillSubTypes.contains(subType)) {
+            if (isSpecialTech || skillSubTypes.contains(subType)) {
                 if (!relevantSkills.contains(skillType.name)) {
                     relevantSkills.add(skillType.name);
                 }
@@ -1889,7 +1900,7 @@ public class SkillType {
         return new SkillType(S_TECH_MILITARY,
               10,
               false,
-              SUPPORT_TECHNICIAN,
+              ROLEPLAY_GENERAL,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1908,7 +1919,7 @@ public class SkillType {
         return new SkillType(S_TECH_CIVILIAN,
               10,
               false,
-              SUPPORT_TECHNICIAN,
+              ROLEPLAY_GENERAL,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1927,7 +1938,7 @@ public class SkillType {
         return new SkillType(S_TECH_ELECTRONIC,
               10,
               false,
-              SUPPORT_TECHNICIAN,
+              UTILITY,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1946,7 +1957,7 @@ public class SkillType {
         return new SkillType(S_TECH_NUCLEAR,
               10,
               false,
-              SUPPORT_TECHNICIAN,
+              UTILITY,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1965,7 +1976,7 @@ public class SkillType {
         return new SkillType(S_TECH_AERONAUTICS,
               10,
               false,
-              SUPPORT_TECHNICIAN,
+              UTILITY,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -1984,7 +1995,7 @@ public class SkillType {
         return new SkillType(S_TECH_MECHANICAL,
               10,
               false,
-              SUPPORT_TECHNICIAN,
+              UTILITY,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -2003,7 +2014,7 @@ public class SkillType {
         return new SkillType(S_TECH_MYOMER,
               10,
               false,
-              SUPPORT_TECHNICIAN,
+              UTILITY,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -2022,7 +2033,7 @@ public class SkillType {
         return new SkillType(S_TECH_JETS,
               10,
               false,
-              SUPPORT_TECHNICIAN,
+              UTILITY,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -2041,7 +2052,7 @@ public class SkillType {
         return new SkillType(S_TECH_WEAPONS,
               10,
               false,
-              SUPPORT_TECHNICIAN,
+              UTILITY,
               DEXTERITY,
               INTELLIGENCE,
               null,
@@ -2060,7 +2071,7 @@ public class SkillType {
         return new SkillType(S_TECH_CYBERNETICS,
               10,
               false,
-              SUPPORT_TECHNICIAN,
+              ROLEPLAY_GENERAL,
               DEXTERITY,
               INTELLIGENCE,
               null,

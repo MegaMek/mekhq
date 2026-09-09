@@ -44,6 +44,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.personnel.skills.SkillType;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -125,8 +126,7 @@ public class HeatSink extends EquipmentPart {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        // Heat sinks fall under the Technician/Mechanical subskill (per ATOW, they are not a nuclear-engine system).
-        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL);
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

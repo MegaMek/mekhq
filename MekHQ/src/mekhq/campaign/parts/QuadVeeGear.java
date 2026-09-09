@@ -48,6 +48,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.missing.MissingQuadVeeGear;
+import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 
 /**
@@ -84,8 +85,7 @@ public class QuadVeeGear extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        // QuadVee conversion gear is a mechanical system, serviced under Technician/Mechanical.
-        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANICAL);
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

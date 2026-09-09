@@ -42,6 +42,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -183,9 +184,7 @@ public class BattleArmorEquipmentPart extends EquipmentPart {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        // Battle armor equipment is serviced as part of the suit by a battle armor technician, not by a weapons
-        // specialist, so this overrides the weapon handling inherited from EquipmentPart.
-        return skillType.equals(mekhq.campaign.personnel.skills.SkillType.S_TECH_BA);
+        return skillType.equals(SkillType.S_TECH_BA);
     }
 
     @Override
