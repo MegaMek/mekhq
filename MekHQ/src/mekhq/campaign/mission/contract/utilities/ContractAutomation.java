@@ -40,7 +40,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -99,12 +98,11 @@ public class ContractAutomation {
         PlayerForce playerForce = campaign.getPlayerForce();
         AbstractLocation currentLocation = playerForce.getForceDetachment().getCurrentLocation();
 
-        // Work out the journey. If we are already in the target system there is no jump and travel time is zero.
-        boolean alreadyAtTarget = Objects.equals(campaign.getPlayerForce()
-                                                       .getForceDetachment()
-                                                       .getCurrentLocation()
-                                                       .getCurrentPlanetDirect(),
-              contract.getTargetPlanet());
+        // Work out the journey. If we have already arrived at the contract location there is no jump and travel time is
+        // zero. This is judged on the system first (and the world only when both worlds are known), so a save predating
+        // planet tracking - where the current world is unknown - is not treated as "not arrived" and needlessly
+        // mothballed.
+        boolean alreadyAtTarget = ContractUtilities.hasArrivedAtContractLocation(currentLocation, contract);
 
         // Only mothball when there is actually a journey ahead.
         if (mothball && !alreadyAtTarget) {
