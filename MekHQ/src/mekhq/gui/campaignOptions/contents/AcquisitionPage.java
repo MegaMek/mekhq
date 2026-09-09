@@ -37,19 +37,12 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelU
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
-import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
-import java.awt.Component;
-import java.util.ArrayList;
-import java.util.List;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
@@ -59,13 +52,7 @@ import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.equipment.EquipmentType;
-import megamek.common.equipment.MiscType;
-import megamek.common.equipment.enums.MiscTypeFlag;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
-import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
-import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.Category;
-import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -159,30 +146,6 @@ class AcquisitionPage {
     private static final int TRANSIT_UNIT_NUM = 3;
     private JCheckBox chkNoDeliveriesInTransit;
 
-    private JLabel lblMekWarriorDefaultKit;
-    private MMComboBox<String> cboMekWarriorDefaultKit;
-    private JLabel lblVehicleCrewDefaultKit;
-    private MMComboBox<String> cboVehicleCrewDefaultKit;
-    private JLabel lblAircraftDefaultKit;
-    private MMComboBox<String> cboAircraftDefaultKit;
-    private JCheckBox chkAddDefaultKitToProcurement;
-    private JCheckBox chkNpcFactionArmorKits;
-    private JCheckBox chkRequireMekWarriorKitToDeploy;
-
-    private JLabel lblMekTechDefaultToolKit;
-    private MMComboBox<String> cboMekTechDefaultToolKit;
-    private JLabel lblMechanicDefaultToolKit;
-    private MMComboBox<String> cboMechanicDefaultToolKit;
-    private JLabel lblAeroTechDefaultToolKit;
-    private MMComboBox<String> cboAeroTechDefaultToolKit;
-    private JLabel lblBATechDefaultToolKit;
-    private MMComboBox<String> cboBATechDefaultToolKit;
-    private JLabel lblDoctorDefaultToolKit;
-    private MMComboBox<String> cboDoctorDefaultToolKit;
-    private JLabel lblAdminDefaultToolKit;
-    private MMComboBox<String> cboAdminDefaultToolKit;
-    private JCheckBox chkTechsNeedToolKit;
-
     private boolean created;
 
     /**
@@ -200,15 +163,6 @@ class AcquisitionPage {
         cboProcurementPersonnelPick = new MMComboBox<>("procurementPersonnelPick",
               buildProcurementPersonnelPickComboOptions());
         choiceTransitTimeUnits = new MMComboBox<>("choiceTransitTimeUnits", getTransitUnitOptions());
-        cboMekWarriorDefaultKit = armorKitCombo("mekWarriorDefaultKit", Category.MEKWARRIOR);
-        cboVehicleCrewDefaultKit = armorKitCombo("vehicleCrewDefaultKit", Category.INFANTRY);
-        cboAircraftDefaultKit = armorKitCombo("aircraftDefaultKit", Category.AIRCRAFT);
-        cboMekTechDefaultToolKit = toolKitCombo("mekTechDefaultToolKit");
-        cboMechanicDefaultToolKit = toolKitCombo("mechanicDefaultToolKit");
-        cboAeroTechDefaultToolKit = toolKitCombo("aeroTechDefaultToolKit");
-        cboBATechDefaultToolKit = toolKitCombo("baTechDefaultToolKit");
-        cboDoctorDefaultToolKit = toolKitCombo("doctorDefaultToolKit");
-        cboAdminDefaultToolKit = toolKitCombo("adminDefaultToolKit");
 
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_cloud_cobra.png";
@@ -221,8 +175,6 @@ class AcquisitionPage {
         pnlAutoLogistics = createAutoLogisticsPanel();
         pnlAcquisitions = createAcquisitionPanel();
         JPanel pnlDelivery = createDeliveryPanel();
-        JPanel pnlArmorKits = createArmorKitsPanel();
-        JPanel pnlToolKits = createToolKitsPanel();
 
         JPanel panel = CampaignOptionsPagePanel.builder("AcquisitionPage", "AcquisitionPage", imageAddress)
                 .header(acquisitionHeader)
@@ -233,12 +185,6 @@ class AcquisitionPage {
                 .section("lblDeliveryPanel.text",
                         "lblDeliveryPanel.summary",
                         pnlDelivery)
-                             .section("lblArmorKitsPanel.text",
-                                   "lblArmorKitsPanel.summary",
-                                   pnlArmorKits)
-                             .section("lblToolKitsPanel.text",
-                                   "lblToolKitsPanel.summary",
-                                   pnlToolKits)
                 .section("lblAutoLogisticsPanel.text",
                         "lblAutoLogisticsPanel.summary",
                         pnlAutoLogistics)
@@ -318,206 +264,6 @@ class AcquisitionPage {
                 CONTROL_COLUMN_WIDTH);
         panel.addRow(lblTransitTimeUnits, choiceTransitTimeUnits);
         panel.addCheckBox(chkNoDeliveriesInTransit);
-
-        return panel;
-    }
-
-    private MMComboBox<String> armorKitCombo(String name, Category category) {
-        MMComboBox<String> combo = new MMComboBox<>(name,
-              ArmorKitCatalog.optionKitNames(category).toArray(new String[0]));
-        combo.setRenderer(new ArmorKitRenderer());
-        return combo;
-    }
-
-    /** Renders the coveralls entry as "None" and every other kit by its own name, with a per-kit explanatory tooltip. */
-    private static class ArmorKitRenderer extends DefaultListCellRenderer {
-        @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-              boolean cellHasFocus) {
-            boolean isNone = ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(value);
-            Object display = isNone ? getTextAt(getCampaignOptionsResourceBundle(), "armorKitNone.text") : value;
-            super.getListCellRendererComponent(list, display, index, isSelected, cellHasFocus);
-            setToolTipText(armorKitMechanics((String) value));
-            return this;
-        }
-    }
-
-    private MMComboBox<String> toolKitCombo(String name) {
-        MMComboBox<String> combo = new MMComboBox<>(name, RepairKitCatalog.optionKitNames().toArray(new String[0]));
-        combo.setRenderer(new ToolKitRenderer());
-        return combo;
-    }
-
-    /** Renders the "none" sentinel as "None" and every other kit by its own name, with a per-kit explanatory tooltip. */
-    private static class ToolKitRenderer extends DefaultListCellRenderer {
-        @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-              boolean cellHasFocus) {
-            boolean isNone = RepairKitCatalog.NO_DEFAULT_KIT.equals(value);
-            Object display = isNone ? getTextAt(getCampaignOptionsResourceBundle(), "armorKitNone.text") : value;
-            super.getListCellRendererComponent(list, display, index, isSelected, cellHasFocus);
-            setToolTipText(kitTooltip(isNone ? "NoDefaultKit" : (String) value));
-            return this;
-        }
-    }
-
-    /**
-     * The explanatory tooltip for a kit dropdown entry, describing what the kit does so the player can choose. Looked
-     * up in the campaign-options bundle under {@code kitTooltip.<sanitized name>} (the kit's own name with all
-     * non-alphanumeric characters stripped). Returns {@code null} when no description is authored, leaving the entry
-     * with no tooltip rather than a visible missing-resource marker.
-     *
-     * @param kitName the kit's internal name, or the pseudo-name {@code "NoDefaultKit"} for the tool-kit "none" entry
-     *
-     * @return the tooltip text, or {@code null} if none is authored
-     */
-    private static String kitTooltip(String kitName) {
-        if (kitName == null) {
-            return null;
-        }
-        String text = getTextAt(getCampaignOptionsResourceBundle(),
-              "kitTooltip." + kitName.replaceAll("[^A-Za-z0-9]", ""));
-        return isResourceKeyValid(text) ? text : null;
-    }
-
-    /**
-     * A tooltip stating an armor kit's game mechanics only - its damage divisor, the environmental conditions it seals
-     * against, and whether it is encumbering - read straight from the kit's own data so the text always matches what
-     * the kit actually does. Coveralls (and any kit with no protective effect) read as "no protection".
-     *
-     * @param kitName the armor kit's internal name
-     *
-     * @return the mechanics tooltip, or {@code null} if the kit cannot be resolved to build one
-     */
-    private static String armorKitMechanics(String kitName) {
-        String bundle = getCampaignOptionsResourceBundle();
-        EquipmentType kit = EquipmentType.get(kitName);
-        if (kit == null) {
-            // The coveralls default may not resolve; it grants no protection, which is itself the mechanic to state.
-            return ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(kitName)
-                         ? getTextAt(bundle, "armorKitMechanics.none")
-                         : null;
-        }
-
-        List<String> parts = new ArrayList<>();
-        double divisor = (kit instanceof MiscType misc) ? misc.getDamageDivisor() : 1.0;
-        parts.add(getFormattedTextAt(bundle, "armorKitMechanics.divisor", formatDivisor(divisor)));
-        List<String> protections = armorKitProtections(kit, bundle);
-        if (!protections.isEmpty()) {
-            parts.add(getFormattedTextAt(bundle, "armorKitMechanics.protects", String.join(", ", protections)));
-        }
-        if (kit.hasFlag(MiscTypeFlag.S_ENCUMBERING)) {
-            parts.add(getTextAt(bundle, "armorKitMechanics.encumbering"));
-        }
-        return parts.isEmpty() ? getTextAt(bundle, "armorKitMechanics.none") : String.join("  ·  ", parts);
-    }
-
-    /** The environmental conditions an armor kit seals against, by display name (mirrors the issue dialog's badges). */
-    private static List<String> armorKitProtections(EquipmentType kit, String bundle) {
-        List<String> protections = new ArrayList<>();
-        boolean combatSuit = kit.hasFlag(MiscTypeFlag.S_COMBAT_SUIT);
-        if (kit.hasFlag(MiscTypeFlag.S_SPACE_SUIT) || kit.hasFlag(MiscTypeFlag.S_XCT_VACUUM)) {
-            protections.add(getTextAt(bundle, "armorKitEnv.vacuum"));
-        }
-        if (kit.hasFlag(MiscTypeFlag.S_COLD_WEATHER)) {
-            protections.add(getTextAt(bundle, "armorKitEnv.cold"));
-        }
-        if (kit.hasFlag(MiscTypeFlag.S_HOT_WEATHER) || combatSuit) {
-            protections.add(getTextAt(bundle, "armorKitEnv.hot"));
-        }
-        if (kit.hasFlag(MiscTypeFlag.S_TAINTED_ATMOSPHERE) || combatSuit) {
-            protections.add(getTextAt(bundle, "armorKitEnv.tainted"));
-        }
-        if (kit.hasFlag(MiscTypeFlag.S_TOXIC_ATMOSPHERE) || combatSuit) {
-            protections.add(getTextAt(bundle, "armorKitEnv.toxic"));
-        }
-        return protections;
-    }
-
-    /** Renders a damage divisor without a trailing ".0" for whole numbers. */
-    private static String formatDivisor(double divisor) {
-        return (divisor == Math.rint(divisor)) ? String.valueOf((int) divisor) : String.valueOf(divisor);
-    }
-
-    private @Nonnull JPanel createToolKitsPanel() {
-        lblMekTechDefaultToolKit = new CampaignOptionsLabel("MekTechDefaultToolKit",
-              getMetadata(new Version(0, 51, 1)));
-        lblMekTechDefaultToolKit.addMouseListener(createTipPanelUpdater("MekTechDefaultToolKit"));
-        cboMekTechDefaultToolKit.addMouseListener(createTipPanelUpdater("MekTechDefaultToolKit"));
-
-        lblMechanicDefaultToolKit = new CampaignOptionsLabel("MechanicDefaultToolKit",
-              getMetadata(new Version(0, 51, 1)));
-        lblMechanicDefaultToolKit.addMouseListener(createTipPanelUpdater("MechanicDefaultToolKit"));
-        cboMechanicDefaultToolKit.addMouseListener(createTipPanelUpdater("MechanicDefaultToolKit"));
-
-        lblAeroTechDefaultToolKit = new CampaignOptionsLabel("AeroTechDefaultToolKit",
-              getMetadata(new Version(0, 51, 1)));
-        lblAeroTechDefaultToolKit.addMouseListener(createTipPanelUpdater("AeroTechDefaultToolKit"));
-        cboAeroTechDefaultToolKit.addMouseListener(createTipPanelUpdater("AeroTechDefaultToolKit"));
-
-        lblBATechDefaultToolKit = new CampaignOptionsLabel("BATechDefaultToolKit", getMetadata(new Version(0, 51, 1)));
-        lblBATechDefaultToolKit.addMouseListener(createTipPanelUpdater("BATechDefaultToolKit"));
-        cboBATechDefaultToolKit.addMouseListener(createTipPanelUpdater("BATechDefaultToolKit"));
-
-        lblDoctorDefaultToolKit = new CampaignOptionsLabel("DoctorDefaultToolKit", getMetadata(new Version(0, 51, 1)));
-        lblDoctorDefaultToolKit.addMouseListener(createTipPanelUpdater("DoctorDefaultToolKit"));
-        cboDoctorDefaultToolKit.addMouseListener(createTipPanelUpdater("DoctorDefaultToolKit"));
-
-        lblAdminDefaultToolKit = new CampaignOptionsLabel("AdminDefaultToolKit", getMetadata(new Version(0, 51, 1)));
-        lblAdminDefaultToolKit.addMouseListener(createTipPanelUpdater("AdminDefaultToolKit"));
-        cboAdminDefaultToolKit.addMouseListener(createTipPanelUpdater("AdminDefaultToolKit"));
-
-        chkTechsNeedToolKit = new CampaignOptionsCheckBox("TechsNeedToolKit", getMetadata(new Version(0, 51, 1)));
-        chkTechsNeedToolKit.addMouseListener(createTipPanelUpdater("TechsNeedToolKit"));
-
-        final SettingsFormPanel panel = new SettingsFormPanel("ToolKitsPanel",
-              acquisitionSectionLabelWidth,
-              CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblMekTechDefaultToolKit, cboMekTechDefaultToolKit);
-        panel.addRow(lblMechanicDefaultToolKit, cboMechanicDefaultToolKit);
-        panel.addRow(lblAeroTechDefaultToolKit, cboAeroTechDefaultToolKit);
-        panel.addRow(lblBATechDefaultToolKit, cboBATechDefaultToolKit);
-        panel.addRow(lblDoctorDefaultToolKit, cboDoctorDefaultToolKit);
-        panel.addRow(lblAdminDefaultToolKit, cboAdminDefaultToolKit);
-        panel.addCheckBox(chkTechsNeedToolKit);
-
-        return panel;
-    }
-
-    private @Nonnull JPanel createArmorKitsPanel() {
-        lblMekWarriorDefaultKit = new CampaignOptionsLabel("MekWarriorDefaultKit", getMetadata(new Version(0, 51, 1)));
-        lblMekWarriorDefaultKit.addMouseListener(createTipPanelUpdater("MekWarriorDefaultKit"));
-        cboMekWarriorDefaultKit.addMouseListener(createTipPanelUpdater("MekWarriorDefaultKit"));
-
-        lblVehicleCrewDefaultKit = new CampaignOptionsLabel("VehicleCrewDefaultKit",
-              getMetadata(new Version(0, 51, 1)));
-        lblVehicleCrewDefaultKit.addMouseListener(createTipPanelUpdater("VehicleCrewDefaultKit"));
-        cboVehicleCrewDefaultKit.addMouseListener(createTipPanelUpdater("VehicleCrewDefaultKit"));
-
-        lblAircraftDefaultKit = new CampaignOptionsLabel("AircraftDefaultKit", getMetadata(new Version(0, 51, 1)));
-        lblAircraftDefaultKit.addMouseListener(createTipPanelUpdater("AircraftDefaultKit"));
-        cboAircraftDefaultKit.addMouseListener(createTipPanelUpdater("AircraftDefaultKit"));
-
-        chkAddDefaultKitToProcurement = new CampaignOptionsCheckBox("AddDefaultKitToProcurement",
-              getMetadata(new Version(0, 51, 1)));
-        chkAddDefaultKitToProcurement.addMouseListener(createTipPanelUpdater("AddDefaultKitToProcurement"));
-
-        chkNpcFactionArmorKits = new CampaignOptionsCheckBox("NpcFactionArmorKits", getMetadata(new Version(0, 51, 1)));
-        chkNpcFactionArmorKits.addMouseListener(createTipPanelUpdater("NpcFactionArmorKits"));
-
-        chkRequireMekWarriorKitToDeploy = new CampaignOptionsCheckBox("RequireMekWarriorKitToDeploy",
-              getMetadata(new Version(0, 51, 1)));
-        chkRequireMekWarriorKitToDeploy.addMouseListener(createTipPanelUpdater("RequireMekWarriorKitToDeploy"));
-
-        final SettingsFormPanel panel = new SettingsFormPanel("ArmorKitsPanel",
-              acquisitionSectionLabelWidth,
-              CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblMekWarriorDefaultKit, cboMekWarriorDefaultKit);
-        panel.addRow(lblVehicleCrewDefaultKit, cboVehicleCrewDefaultKit);
-        panel.addRow(lblAircraftDefaultKit, cboAircraftDefaultKit);
-        panel.addCheckBox(chkAddDefaultKitToProcurement);
-        panel.addCheckBox(chkNpcFactionArmorKits);
-        panel.addCheckBox(chkRequireMekWarriorKitToDeploy);
 
         return panel;
     }
@@ -773,19 +519,6 @@ class AcquisitionPage {
         spnAutoLogisticsBomb.setValue(model.autoLogisticsBomb);
         choiceTransitTimeUnits.setSelectedIndex(model.unitTransitTime);
         chkNoDeliveriesInTransit.setSelected(model.noDeliveriesInTransit);
-        cboMekWarriorDefaultKit.setSelectedItem(model.mekWarriorDefaultKit);
-        cboVehicleCrewDefaultKit.setSelectedItem(model.vehicleCrewDefaultKit);
-        cboAircraftDefaultKit.setSelectedItem(model.aircraftDefaultKit);
-        cboMekTechDefaultToolKit.setSelectedItem(model.mekTechDefaultToolKit);
-        cboMechanicDefaultToolKit.setSelectedItem(model.mechanicDefaultToolKit);
-        cboAeroTechDefaultToolKit.setSelectedItem(model.aeroTechDefaultToolKit);
-        cboBATechDefaultToolKit.setSelectedItem(model.baTechDefaultToolKit);
-        cboDoctorDefaultToolKit.setSelectedItem(model.doctorDefaultToolKit);
-        cboAdminDefaultToolKit.setSelectedItem(model.adminDefaultToolKit);
-        chkTechsNeedToolKit.setSelected(model.techsNeedToolKit);
-        chkAddDefaultKitToProcurement.setSelected(model.addDefaultKitToProcurement);
-        chkNpcFactionArmorKits.setSelected(model.npcFactionArmorKits);
-        chkRequireMekWarriorKitToDeploy.setSelected(model.requireMekWarriorKitToDeploy);
     }
 
     /**
@@ -823,18 +556,5 @@ class AcquisitionPage {
         model.autoLogisticsBomb = (int) spnAutoLogisticsBomb.getValue();
         model.unitTransitTime = choiceTransitTimeUnits.getSelectedIndex();
         model.noDeliveriesInTransit = chkNoDeliveriesInTransit.isSelected();
-        model.mekWarriorDefaultKit = cboMekWarriorDefaultKit.getSelectedItem();
-        model.vehicleCrewDefaultKit = cboVehicleCrewDefaultKit.getSelectedItem();
-        model.aircraftDefaultKit = cboAircraftDefaultKit.getSelectedItem();
-        model.mekTechDefaultToolKit = cboMekTechDefaultToolKit.getSelectedItem();
-        model.mechanicDefaultToolKit = cboMechanicDefaultToolKit.getSelectedItem();
-        model.aeroTechDefaultToolKit = cboAeroTechDefaultToolKit.getSelectedItem();
-        model.baTechDefaultToolKit = cboBATechDefaultToolKit.getSelectedItem();
-        model.doctorDefaultToolKit = cboDoctorDefaultToolKit.getSelectedItem();
-        model.adminDefaultToolKit = cboAdminDefaultToolKit.getSelectedItem();
-        model.techsNeedToolKit = chkTechsNeedToolKit.isSelected();
-        model.addDefaultKitToProcurement = chkAddDefaultKitToProcurement.isSelected();
-        model.npcFactionArmorKits = chkNpcFactionArmorKits.isSelected();
-        model.requireMekWarriorKitToDeploy = chkRequireMekWarriorKitToDeploy.isSelected();
     }
 }
