@@ -83,7 +83,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
-import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.InjuryType;
@@ -94,6 +93,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -261,6 +261,8 @@ public class CampaignOptionsPane extends JPanel {
         registerParentRoute("human-resources.personnel", "humanResourcesCategory", "personnelCategory");
         registerDirectRoute("human-resources.personnel.general", this::createPersonnelGeneralPage,
               "humanResourcesCategory", "personnelCategory", "personnelGeneralPage");
+        registerDirectRoute("human-resources.personnel.equipment", this::createPersonnelEquipmentPage,
+              "humanResourcesCategory", "personnelCategory", "personnelEquipmentPage");
         registerDirectRoute("human-resources.personnel.awards", this::createPersonnelAwardsPage,
               "humanResourcesCategory", "personnelCategory", "awardsPage");
         registerDirectRoute("human-resources.personnel.medical", this::createPersonnelMedicalPage,
@@ -582,6 +584,11 @@ public class CampaignOptionsPane extends JPanel {
     private JPanel createPersonnelGeneralPage() {
         ensureCategoryLoaded("humanResourcesCategory");
         return personnelPages.createGeneralPage();
+    }
+
+    private JPanel createPersonnelEquipmentPage() {
+        ensureCategoryLoaded("humanResourcesCategory");
+        return personnelPages.createEquipmentPage();
     }
 
     private JPanel createPersonnelAwardsPage() {

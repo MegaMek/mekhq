@@ -898,8 +898,8 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 if (formation.getTechID() == null) {
                     menu = new JMenu("Add Tech to Force");
 
-                    JMenu mekTechs = new JMenu("Mek Techs");
-                    JMenu aeroTechs = new JMenu("Aero Techs");
+                    JMenu mekTechs = new JMenu("MekTechs");
+                    JMenu aeroTechs = new JMenu("AeroTeks");
                     JMenu mechanics = new JMenu("Mechanics");
                     JMenu baTechs = new JMenu("BA Techs");
 
