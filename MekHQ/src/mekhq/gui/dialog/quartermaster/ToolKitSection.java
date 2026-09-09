@@ -40,9 +40,8 @@ import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -55,7 +54,6 @@ import megamek.common.equipment.EquipmentType;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.quartermaster.RepairKitCatalog;
@@ -87,6 +85,8 @@ public class ToolKitSection implements KitIssueSection {
     private String selected;
     private final transient List<KitCard> cards = new ArrayList<>();
     private transient RosterModel rosterModel;
+    /** Kit stock tallied once across the technicians' warehouses; see {@link #stockFor(EquipmentType)}. */
+    private transient Map<EquipmentType, Integer> stockCache;
 
     public ToolKitSection(Campaign campaign, List<Person> technicians, Runnable onChange) {
         this.campaign = campaign;
@@ -266,17 +266,15 @@ public class ToolKitSection implements KitIssueSection {
         return count;
     }
 
-    /** Kit stock is per location, so sum across each distinct local warehouse the technicians draw from. */
+    /**
+     * Kit stock across the technicians' distinct local warehouses. Tallied once (a single spare-parts pass) and cached
+     * for the dialog's lifetime, so building all the cards does not rescan each warehouse per kit.
+     */
     private int stockFor(EquipmentType kit) {
-        Set<LocalWarehouse> counted = new HashSet<>();
-        int total = 0;
-        for (Person tech : technicians) {
-            LocalWarehouse warehouse = tech.getWarehouse();
-            if ((warehouse != null) && counted.add(warehouse)) {
-                total += RepairKitIssuer.localStock(tech, kit);
-            }
+        if (stockCache == null) {
+            stockCache = RepairKitIssuer.localStock(technicians);
         }
-        return total;
+        return stockCache.getOrDefault(kit, 0);
     }
 
     /** The single tool kit a technician will carry after the pending selection is applied, or {@code null} for none. */

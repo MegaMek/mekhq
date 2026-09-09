@@ -38,7 +38,10 @@ import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import megamek.common.equipment.EquipmentType;
@@ -526,13 +529,50 @@ public final class ArmorKitIssuer {
                      .getTargetNumber();
     }
 
-    /** A throwaway acquirer at Regular skill, so the displayed difficulty is a fixed reference, not the current staff. */
+    /**
+     * A reference acquirer at Regular skill, so the displayed difficulty is a fixed benchmark, not the current staff.
+     * Only its acquisition skill matters to {@code checkAcquisition} (the campaign supplies every other modifier), and
+     * MekHQ only ever has one campaign, so it is built once and reused rather than reconstructed for every card - a
+     * {@link Person} is expensive to build and a kit dialog builds dozens of cards on the EDT. The acquirer holds no
+     * reference back to the campaign.
+     */
+    private static Person regularAcquirer;
+
     private static Person regularAcquirer(Campaign campaign) {
-        Person acquirer = new Person(campaign);
-        for (String skill : new String[] { S_NEGOTIATION, S_ADMIN, S_TECH_VEHICLE }) {
-            acquirer.addSkill(skill, SkillType.getType(skill).getRegularLevel(), 0);
+        if (regularAcquirer == null) {
+            Person acquirer = new Person(campaign);
+            for (String skill : new String[] { S_NEGOTIATION, S_ADMIN, S_TECH_VEHICLE }) {
+                acquirer.addSkill(skill, SkillType.getType(skill).getRegularLevel(), 0);
+            }
+            regularAcquirer = acquirer;
         }
-        return acquirer;
+        return regularAcquirer;
+    }
+
+    /**
+     * The number of each present, spare kit these people's distinct local warehouses hold, tallied by kit type in a
+     * single pass. Callers building many cards should use this once instead of
+     * {@link #localStock(Person, EquipmentType)} per kit, which rescans the whole spare-parts list every call.
+     *
+     * @param people the people whose local warehouses to tally
+     *
+     * @return kit equipment type -&gt; count in stock across those warehouses
+     */
+    public static Map<EquipmentType, Integer> localStock(Collection<Person> people) {
+        Map<EquipmentType, Integer> counts = new HashMap<>();
+        Set<LocalWarehouse> counted = new HashSet<>();
+        for (Person person : people) {
+            LocalWarehouse warehouse = person.getWarehouse();
+            if ((warehouse == null) || !counted.add(warehouse)) {
+                continue;
+            }
+            for (Part part : warehouse.getSpareParts()) {
+                if (part.isPresent() && part.isSpare() && (part instanceof EquipmentPart equipmentPart)) {
+                    counts.merge(equipmentPart.getType(), Math.max(1, part.getQuantity()), Integer::sum);
+                }
+            }
+        }
+        return counts;
     }
 
     private static boolean isKitPart(Part part, EquipmentType kit) {

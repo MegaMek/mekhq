@@ -41,15 +41,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 
@@ -103,6 +95,9 @@ public class IssueEquipmentDialog extends JDialog {
     private final transient Set<Category> restoreDesigned = new HashSet<>();
     /** The cards drawn for each group, so a click can re-mark the selected one. */
     private final transient Map<Category, List<KitCard>> cardsByCategory = new EnumMap<>(Category.class);
+    /** Per-kit unit price and acquisition-difficulty text, cached so building many cards prices each kit once. */
+    private final transient Map<EquipmentType, Money> priceCache = new HashMap<>();
+    private final transient Map<EquipmentType, String> acquireTextCache = new HashMap<>();
 
     private transient RosterModel rosterModel;
     private transient JLabel tallyLabel;
@@ -282,16 +277,19 @@ public class IssueEquipmentDialog extends JDialog {
         tab.add(hint, BorderLayout.NORTH);
 
         List<EquipmentType> kits = new ArrayList<>(ArmorKitCatalog.availableKits(category));
-        kits.sort(Comparator.comparing(candidate -> ArmorKitIssuer.unitPrice(candidate, campaign)));
+        kits.sort(Comparator.comparing(this::price));
+
+        // Tally this group's warehouse stock once, rather than rescanning per kit inside each card.
+        Map<EquipmentType, Integer> stock = ArmorKitIssuer.localStock(people);
 
         List<KitCard> cards = new ArrayList<>();
         for (EquipmentType kit : kits) {
-            cards.add(buildArmorCard(category, kit, false, people));
+            cards.add(buildArmorCard(category, kit, false, people, stock));
         }
         // Every group can strip to coveralls; soldiers can also return to the platoon's designed armor.
-        cards.add(buildArmorCard(category, null, false, people));
+        cards.add(buildArmorCard(category, null, false, people, stock));
         if (category == Category.SOLDIER) {
-            cards.add(buildArmorCard(category, null, true, people));
+            cards.add(buildArmorCard(category, null, true, people, stock));
         }
         cardsByCategory.put(category, cards);
 
@@ -448,7 +446,7 @@ public class IssueEquipmentDialog extends JDialog {
             int ordered = quantity - drawn;
             fromStores += drawn;
             toProcure += ordered;
-            total = total.plus(ArmorKitIssuer.unitPrice(kit, campaign).multipliedBy(ordered));
+            total = total.plus(price(kit).multipliedBy(ordered));
         }
 
         return new KitIssueSection.Tally(fromStores, toProcure, total);
@@ -582,8 +580,17 @@ public class IssueEquipmentDialog extends JDialog {
         return EquipmentType.get(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME);
     }
 
-    /** How hard a Regular acquirer would find this kit, rendered for the card. */
+    /** The unit price of a kit, cached so repeated card/sort lookups price each kit only once. */
+    private Money price(EquipmentType kit) {
+        return priceCache.computeIfAbsent(kit, candidate -> ArmorKitIssuer.unitPrice(candidate, campaign));
+    }
+
+    /** How hard a Regular acquirer would find this kit, rendered for the card. Cached per kit (see {@link #price}). */
     private String acquisitionText(EquipmentType kit) {
+        return acquireTextCache.computeIfAbsent(kit, this::computeAcquisitionText);
+    }
+
+    private String computeAcquisitionText(EquipmentType kit) {
         TargetRoll target = ArmorKitIssuer.acquisitionTarget(kit, campaign);
         if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
             return getTextAt(RESOURCE_BUNDLE, "card.acquire.automatic");
@@ -633,7 +640,8 @@ public class IssueEquipmentDialog extends JDialog {
      * badges, stock and price), or - when {@code kit} is null - the "strip to coveralls" or "return to designed" action
      * tile. Selection and click are wired back to this section's per-category state.
      */
-    private KitCard buildArmorCard(Category category, EquipmentType kit, boolean designed, List<Person> people) {
+    private KitCard buildArmorCard(Category category, EquipmentType kit, boolean designed, List<Person> people,
+          Map<EquipmentType, Integer> stockByKit) {
         Color accent = accentFor(category);
         if (kit == null) {
             String title = getTextAt(RESOURCE_BUNDLE, designed ? "card.designed.name" : "card.strip.name");
@@ -657,9 +665,8 @@ public class IssueEquipmentDialog extends JDialog {
                 badges.add(new KitCard.Badge(flag, true));
             }
         }
-        int stock = stockFor(people, kit);
-        String priceText = ArmorKitIssuer.unitPrice(kit, campaign).toAmountString()
-                                 + " " + getTextAt(RESOURCE_BUNDLE, "card.each");
+        int stock = stockByKit.getOrDefault(kit, 0);
+        String priceText = price(kit).toAmountString() + " " + getTextAt(RESOURCE_BUNDLE, "card.each");
         return new KitCard(accent, kit.getName(), false,
               List.of(stats, acquisitionText(kit)), badges,
               getFormattedTextAt(RESOURCE_BUNDLE, "card.stock", stock), stock < people.size(), priceText,
