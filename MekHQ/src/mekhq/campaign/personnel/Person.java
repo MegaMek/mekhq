@@ -7571,10 +7571,10 @@ public class Person implements ILocatable {
             return S_TECH_MEK;
         } else if (entity instanceof BattleArmor) {
             return S_TECH_BA;
-        } else if (entity instanceof AeroSpaceFighter) {
-            return S_TECH_AERO;
-        } else if (entity instanceof Aero) {
+        } else if (entity instanceof Dropship || entity instanceof Jumpship) {
             return S_TECH_VESSEL;
+        } else if (entity instanceof Aero) {
+            return S_TECH_AERO;
         } else if (entity instanceof Tank || entity instanceof Infantry) {
             return S_TECH_VEHICLE;
         }

@@ -46,13 +46,7 @@ import static org.mockito.Mockito.when;
 
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.HandheldWeapon;
-import megamek.common.units.AeroSpaceFighter;
-import megamek.common.units.BipedMek;
-import megamek.common.units.ConvInfantry;
-import megamek.common.units.Dropship;
-import megamek.common.units.Entity;
-import megamek.common.units.ProtoMek;
-import megamek.common.units.Tank;
+import megamek.common.units.*;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -98,8 +92,15 @@ class PersonTechSkillRoutingTest {
     }
 
     @Test
+    void conventionalFightersAndSmallCraftAreMaintainedByAeroTechs() {
+        assertEquals(S_TECH_AERO, Person.getGlobalTechSkillNameFor(unitOf(new ConvFighter())));
+        assertEquals(S_TECH_AERO, Person.getGlobalTechSkillNameFor(unitOf(new SmallCraft())));
+    }
+
+    @Test
     void largeCraftAreMaintainedByVesselCrews() {
         assertEquals(S_TECH_VESSEL, Person.getGlobalTechSkillNameFor(unitOf(new Dropship())));
+        assertEquals(S_TECH_VESSEL, Person.getGlobalTechSkillNameFor(unitOf(new Jumpship())));
     }
 
     @Test
