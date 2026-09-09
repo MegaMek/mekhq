@@ -1052,6 +1052,13 @@ public class CampaignOptionsPane extends JPanel {
                   !oldRequireMekWarriorKitToDeploy) { // Has tracking changed?
             new MekWarriorKitCampaignOptionsChangedConfirmationDialog(campaign);
         }
+
+        boolean newSpecialistTechSkillsEnabled = newOptions.specialistTechSkillsEnabled();
+        if (!isStartUp
+                  && newSpecialistTechSkillsEnabled
+                  && !oldOptions.specialistTechSkillsEnabled()) { // Specialist tech skills newly enabled?
+            new SpecialistTechSkillsCampaignOptionsChangedConfirmationDialog(campaign);
+        }
     }
 
     /**
