@@ -237,6 +237,8 @@ class ContractAutomationTest {
 
             AbstractLocation currentLocation = mock(AbstractLocation.class);
             when(currentLocation.getCurrentPlanetDirect()).thenReturn(currentPlanet);
+            // A force that has settled at a world is out of transit; arrival is judged on that, not just the planet.
+            when(currentLocation.isOnPlanet()).thenReturn(true);
 
             LocalHangar hangar = mock(LocalHangar.class);
             when(hangar.getUnits()).thenReturn(List.of(unit));
