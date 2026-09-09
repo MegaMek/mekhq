@@ -32,80 +32,32 @@
  */
 package mekhq.campaign.personnel.quartermaster;
 
-import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
-import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import megamek.common.equipment.EquipmentType;
-import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.persons.PersonChangedEvent;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.SkillType;
 
 /**
- * The warehouse side of issuing specialized equipment kits, mirroring {@link ArmorKitIssuer}: what a technician's local
- * stores hold, drawing a kit out to issue it, returning one when a kit is removed, and ordering more through the
- * ordinary shopping list when the shelf is bare.
+ * The warehouse side of issuing specialized equipment kits, mirroring {@link ArmorKitIssuer}: drawing a kit out of a
+ * technician's local stores to issue it, returning one when a kit is removed, and issuing the configured defaults on
+ * recruitment.
  *
- * <p>A kit is a spare {@link EquipmentPart} sitting in the {@link LocalWarehouse} nearest the technician. Issuing one
- * consumes it and records the kit on the technician (see {@link Person#getRepairKitName()}); removing a kit, or issuing
- * a replacement, returns the old one to stores; kits are bought through the ordinary shopping list, so procuring more is
- * the same order the parts store would place. Like an armor kit, a technician carries at most one tool kit at a time.</p>
+ * <p>The shared warehouse mechanics — counting local stock, pricing, ordering, and the acquisition-difficulty
+ * benchmark — live in {@link AbstractKitIssuer}. This class adds the equipment-kit specifics: a technician records their
+ * kit on {@link Person#getRepairKitName()}, and, like an armor kit, carries at most one tool kit at a time.</p>
  *
  * @author Illiani
  * @since 0.51.01
  */
-public final class EquipmentKitIssuer {
+public final class EquipmentKitIssuer extends AbstractKitIssuer {
     private EquipmentKitIssuer() {
-    }
-
-    /**
-     * How many of this kit the technician's local stores hold.
-     *
-     * @param person the technician whose local warehouse is asked
-     * @param kit    the kit to count
-     *
-     * @return the number in stock, or {@code 0} if the technician has no local warehouse
-     */
-    public static int localStock(Person person, EquipmentType kit) {
-        LocalWarehouse warehouse = person.getWarehouse();
-        if (warehouse == null) {
-            return 0;
-        }
-        int count = 0;
-        for (Part part : warehouse.getSpareParts()) {
-            if (isKitPart(part, kit)) {
-                count += Math.max(1, part.getQuantity());
-            }
-        }
-        return count;
-    }
-
-    /**
-     * The price of one kit, for display alongside the choice.
-     *
-     * @param kit      the kit being priced
-     * @param campaign the campaign the price is quoted to
-     *
-     * @return the sticker price of a single kit
-     */
-    public static Money unitPrice(EquipmentType kit, Campaign campaign) {
-        return template(kit, campaign).getStickerPrice();
     }
 
     /**
@@ -154,7 +106,7 @@ public final class EquipmentKitIssuer {
         person.setRepairKitName(null);
         LocalWarehouse warehouse = person.getWarehouse();
         if (warehouse != null) {
-            warehouse.addPart(new EquipmentPart(0, kit, -1, 1.0, false, campaign), true);
+            warehouse.addPart(returnedKit(kit, campaign), true);
         }
         return true;
     }
@@ -168,25 +120,9 @@ public final class EquipmentKitIssuer {
         EquipmentType kit = EquipmentType.get(worn);
         LocalWarehouse warehouse = person.getWarehouse();
         if ((kit != null) && (warehouse != null)) {
-            warehouse.addPart(new EquipmentPart(0, kit, -1, 1.0, false, campaign), true);
+            warehouse.addPart(returnedKit(kit, campaign), true);
         }
         person.setRepairKitName(null);
-    }
-
-    /**
-     * Orders more of a kit through the ordinary shopping list, the same purchase the parts store would place.
-     *
-     * @param kit      the kit to order
-     * @param quantity how many to order
-     * @param campaign the campaign placing the order
-     */
-    public static void order(EquipmentType kit, int quantity, Campaign campaign) {
-        if (quantity <= 0) {
-            return;
-        }
-        campaign.getPlayerForce()
-              .getShoppingList()
-              .addShoppingItem(template(kit, campaign).getAcquisitionWork(), quantity, campaign);
     }
 
     /**
@@ -266,77 +202,5 @@ public final class EquipmentKitIssuer {
             campaign.addReport(DailyReportType.PERSONNEL,
                   getFormattedTextAt("mekhq.resources.IssueEquipmentDialog", "report.toolKitsFulfilled", fulfilled));
         }
-    }
-
-    /**
-     * The acquisition target number a Regular-skilled acquirer would face to procure this kit — a measure of how hard
-     * it is to come by.
-     *
-     * @param kit      the kit being priced for difficulty
-     * @param campaign the campaign the acquisition is quoted to
-     *
-     * @return the acquisition {@link TargetRoll} for a Regular acquirer
-     */
-    public static TargetRoll acquisitionTarget(EquipmentType kit, Campaign campaign) {
-        return campaign.checkAcquisition(template(kit, campaign).getAcquisitionWork(), regularAcquirer(campaign), false)
-                     .getTargetNumber();
-    }
-
-    /**
-     * A reference acquirer at Regular skill, so the displayed difficulty is a fixed benchmark, not the current staff.
-     * Only its acquisition skill matters to {@code checkAcquisition} (the campaign supplies every other modifier), and
-     * MekHQ only ever has one campaign, so it is built once and reused rather than reconstructed for every card - a
-     * {@link Person} is expensive to build and a kit dialog builds dozens of cards on the EDT. The acquirer holds no
-     * reference back to the campaign.
-     */
-    private static Person regularAcquirer;
-
-    private static Person regularAcquirer(Campaign campaign) {
-        if (regularAcquirer == null) {
-            Person acquirer = new Person(campaign);
-            for (String skill : new String[] { S_NEGOTIATION, S_ADMIN, S_TECH_VEHICLE }) {
-                acquirer.addSkill(skill, SkillType.getType(skill).getRegularLevel(), 0);
-            }
-            regularAcquirer = acquirer;
-        }
-        return regularAcquirer;
-    }
-
-    /**
-     * The number of each present, spare kit these people's distinct local warehouses hold, tallied by kit type in a
-     * single pass. Callers building many cards should use this once instead of
-     * {@link #localStock(Person, EquipmentType)} per kit, which rescans the whole spare-parts list every call.
-     *
-     * @param people the people whose local warehouses to tally
-     *
-     * @return kit equipment type -&gt; count in stock across those warehouses
-     */
-    public static Map<EquipmentType, Integer> localStock(Collection<Person> people) {
-        Map<EquipmentType, Integer> counts = new HashMap<>();
-        Set<LocalWarehouse> counted = new HashSet<>();
-        for (Person person : people) {
-            LocalWarehouse warehouse = person.getWarehouse();
-            if ((warehouse == null) || !counted.add(warehouse)) {
-                continue;
-            }
-            for (Part part : warehouse.getSpareParts()) {
-                if (part.isPresent() && part.isSpare() && (part instanceof EquipmentPart equipmentPart)) {
-                    counts.merge(equipmentPart.getType(), Math.max(1, part.getQuantity()), Integer::sum);
-                }
-            }
-        }
-        return counts;
-    }
-
-    private static boolean isKitPart(Part part, EquipmentType kit) {
-        // Only present (delivered) kits count — a part still in transit cannot be issued yet.
-        return part.isPresent()
-                     && part.isSpare()
-                     && (part instanceof EquipmentPart equipmentPart)
-                     && kit.equals(equipmentPart.getType());
-    }
-
-    private static EquipmentPart template(EquipmentType kit, Campaign campaign) {
-        return new EquipmentPart(0, kit, -1, 1.0, false, campaign);
     }
 }

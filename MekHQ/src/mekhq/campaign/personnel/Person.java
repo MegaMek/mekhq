@@ -7806,7 +7806,7 @@ public class Person implements ILocatable {
 
     /**
      * The single tool kit this technician owns, by MegaMek internal name, or {@code null} if they carry none. The kit
-     * grants a bonus to certain skill rolls (see {@code RepairKitCatalog}). Like an armor kit, a technician carries at
+     * grants a bonus to certain skill rolls (see {@code EquipmentKitCatalog}). Like an armor kit, a technician carries at
      * most one tool kit at a time.
      *
      * @return the owned tool-kit internal name, or {@code null}

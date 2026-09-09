@@ -53,7 +53,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
  * @param injuryEffects       a list of injury effects currently affecting the character
  * @param age                 the age of the character, in years
  * @param equipmentKitBonuses skill name -&gt; bonus granted by the equipment kits the person carries (empty when none);
- *                            see {@code RepairKitCatalog.kitSkillBonuses(Person)}
+ *                            see {@code EquipmentKitCatalog.kitSkillBonuses(Person)}
  *
  * @author Illiani
  * @since 0.50.10

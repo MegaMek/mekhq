@@ -34,7 +34,6 @@ package mekhq.campaign.personnel.quartermaster;
 
 import static mekhq.campaign.personnel.skills.SkillType.*;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -59,7 +58,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
  * @author Illiani
  * @since 0.51.01
  */
-public final class EquipmentKitCatalog {
+public final class EquipmentKitCatalog extends AbstractKitCatalog {
     /**
      * The bonus a matching specialized repair kit grants to a covered repair roll (a reduction to the target number).
      * Set to +2 so a specialist kit remains worthwhile alongside a Deluxe Toolkit, which grants +1 to every technician
@@ -170,10 +169,7 @@ public final class EquipmentKitCatalog {
      * @return the option values, "none" first
      */
     public static List<String> optionKitNames() {
-        List<String> names = new ArrayList<>();
-        names.add(NO_DEFAULT_KIT);
-        names.addAll(allKitNames());
-        return names;
+        return optionKitNames(NO_DEFAULT_KIT, allKitNames());
     }
 
     /**
