@@ -64,7 +64,6 @@ import javax.swing.JTextPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
-import javax.swing.event.ChangeListener;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
@@ -116,12 +115,7 @@ public class PlanetViewPanel extends JScrollablePanel {
 
     private Timer revealTimer;
     private JViewport revealViewport;
-    private int revealViewportY;
-    private final ChangeListener revealScrollListener = event -> {
-        if ((revealViewport != null) && (revealViewport.getViewPosition().y != revealViewportY)) {
-            finishRevealAnimation();
-        }
-    };
+    private int previousViewportScrollMode;
     private long revealStartTime;
     private int detailRevealIndex;
     private boolean revealComplete;
@@ -154,11 +148,18 @@ public class PlanetViewPanel extends JScrollablePanel {
             revealViewport = (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class, this);
             if (revealViewport != null) {
                 revealViewport.setViewPosition(new java.awt.Point(0, 0));
-                revealViewportY = revealViewport.getViewPosition().y;
-                revealViewport.addChangeListener(revealScrollListener);
+                previousViewportScrollMode = revealViewport.getScrollMode();
+                revealViewport.setScrollMode(JViewport.SIMPLE_SCROLL_MODE);
             }
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics graphics) {
+        if (animateReveal && !revealComplete && (revealTimer == null) && isDisplayable()) {
             startRevealAnimation();
         }
+        super.paintComponent(graphics);
     }
 
     @Override
@@ -616,7 +617,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     private void finishRevealAnimation() {
         stopRevealTimer();
         if (revealViewport != null) {
-            revealViewport.removeChangeListener(revealScrollListener);
+            revealViewport.setScrollMode(previousViewportScrollMode);
             revealViewport = null;
         }
         revealBands.forEach(panel -> panel.setRevealAlpha(1.0f));

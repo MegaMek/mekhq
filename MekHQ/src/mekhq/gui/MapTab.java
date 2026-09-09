@@ -57,6 +57,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.awt.Point;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -402,7 +403,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         navigationHud.add(centerOnFleet, constraints);
 
                 FramedCommandButton layers = createHudButton("mapHud.layers.text", "mapHud.layers.toolTipText");
-                layers.addActionListener(event -> panMap.toggleLayerControls());
+                layers.addActionListener(event -> panMap.toggleLayerControls(layers));
         constraints = new GridBagConstraints();
                 constraints.gridx = 5;
         constraints.gridy = 0;
@@ -1566,9 +1567,22 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private void showDossier(PlanetarySystem system, int planetPosition) {
                 DossierIdentity dossierIdentity = new DossierIdentity(system.getId(), planetPosition);
                 boolean animateReveal = shouldAnimateDossierReveal(presentedDossierIdentity, dossierIdentity);
-                systemView.getVerticalScrollBar().setValue(0);
-                systemView.setViewportView(new PlanetViewPanel(system, getCampaign(), planetPosition, animateReveal));
+                setViewportViewAtTop(systemView,
+                    new PlanetViewPanel(system, getCampaign(), planetPosition, animateReveal));
         presentedDossierIdentity = dossierIdentity;
+    }
+
+    static void setViewportViewAtTop(JScrollPane scrollPane, Component view) {
+        scrollPane.setViewportView(view);
+        resetViewportToTop(scrollPane, view);
+        SwingUtilities.invokeLater(() -> resetViewportToTop(scrollPane, view));
+    }
+
+    private static void resetViewportToTop(JScrollPane scrollPane, Component expectedView) {
+        JViewport viewport = scrollPane.getViewport();
+        if (viewport.getView() == expectedView) {
+            viewport.setViewPosition(new Point(0, 0));
+        }
     }
 
         static boolean shouldAnimateDossierReveal(DossierIdentity previous,

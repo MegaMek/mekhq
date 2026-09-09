@@ -77,6 +77,15 @@ class InterstellarMapPanelRenderLayerCacheTest {
         assertFalse(InterstellarMapPanel.shouldRenderSystem(false, false, true, true));
     }
 
+    @Test
+    void optionalOverlaysDoNotResurrectHiddenEmptySystems() {
+        assertFalse(InterstellarMapPanel.shouldRenderOptionalSystemOverlay(true, false, false, false));
+        assertTrue(InterstellarMapPanel.shouldRenderOptionalSystemOverlay(true, true, false, false));
+        assertTrue(InterstellarMapPanel.shouldRenderOptionalSystemOverlay(true, false, true, false));
+        assertTrue(InterstellarMapPanel.shouldRenderOptionalSystemOverlay(true, false, false, true));
+        assertTrue(InterstellarMapPanel.shouldRenderOptionalSystemOverlay(false, false, false, false));
+    }
+
         @Test
         void retainedCartographyRequiresStableStaticMapState() {
           assertTrue(InterstellarMapPanel.canUseRetainedCartography(

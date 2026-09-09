@@ -38,11 +38,37 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.Dimension;
+import java.awt.Point;
 import java.util.concurrent.atomic.AtomicReference;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.SwingUtilities;
 
 import org.junit.jupiter.api.Test;
 
 class MapTabLayoutStateTest {
+    @Test
+    void dossierViewReturnsToTopAfterDeferredLayoutAdjustment() throws Exception {
+        AtomicReference<JScrollPane> scrollPaneReference = new AtomicReference<>();
+        AtomicReference<Point> viewPositionReference = new AtomicReference<>();
+
+        SwingUtilities.invokeAndWait(() -> {
+            JScrollPane scrollPane = new JScrollPane();
+            scrollPane.setSize(120, 100);
+            JPanel dossier = new JPanel();
+            dossier.setPreferredSize(new Dimension(100, 500));
+            MapTab.setViewportViewAtTop(scrollPane, dossier);
+            scrollPane.doLayout();
+            scrollPane.getViewport().setViewPosition(new Point(0, 120));
+            scrollPaneReference.set(scrollPane);
+        });
+        SwingUtilities.invokeAndWait(() -> viewPositionReference.set(
+              scrollPaneReference.get().getViewport().getViewPosition()));
+
+        assertEquals(new Point(0, 0), viewPositionReference.get());
+    }
+
     @Test
     void dossierRevealRunsForFirstAndChangedSelectionsOnly() {
         MapTab.DossierIdentity first = new MapTab.DossierIdentity("first", 0);

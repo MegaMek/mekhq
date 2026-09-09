@@ -33,10 +33,13 @@
 package mekhq.gui.view;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.image.BufferedImage;
 import javax.swing.JScrollPane;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
@@ -60,6 +63,8 @@ class PlanetViewPanelTest {
             panel.addNotify();
             try {
                 assertTrue(viewport.getViewPosition().y == 0);
+                assertFalse(panel.isRevealAnimationRunning());
+                paintDossier(panel);
                 assertTrue(panel.isRevealAnimationRunning());
             } finally {
                 panel.removeNotify();
@@ -68,7 +73,7 @@ class PlanetViewPanelTest {
     }
 
     @Test
-    void verticalViewportMovementFinishesRevealAnimation() throws Exception {
+    void layoutAndScrollMovementsPreserveRevealUntilRemoval() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
             Campaign campaign = MHQTestUtilities.getTestCampaign();
             PlanetViewPanel panel = new PlanetViewPanel(campaign.getCurrentSystem(), campaign, 0, true);
@@ -78,16 +83,34 @@ class PlanetViewPanelTest {
             viewport.setViewSize(new Dimension(320, 1_000));
             panel.addNotify();
             try {
+                assertFalse(panel.isRevealAnimationRunning());
+                viewport.setViewPosition(new Point(0, 160));
+                viewport.setViewPosition(new Point(0, 0));
+                paintDossier(panel);
                 assertTrue(panel.isRevealAnimationRunning());
+                assertEquals(JViewport.SIMPLE_SCROLL_MODE, viewport.getScrollMode());
 
                 viewport.setExtentSize(new Dimension(300, 200));
                 assertTrue(panel.isRevealAnimationRunning());
 
                 viewport.setViewPosition(new Point(0, 16));
-                assertFalse(panel.isRevealAnimationRunning());
+                assertTrue(panel.isRevealAnimationRunning());
             } finally {
                 panel.removeNotify();
             }
+            assertFalse(panel.isRevealAnimationRunning());
+            assertEquals(JViewport.BLIT_SCROLL_MODE, viewport.getScrollMode());
         });
+    }
+
+    private static void paintDossier(PlanetViewPanel panel) {
+        panel.setSize(320, 1_000);
+        BufferedImage image = new BufferedImage(320, 200, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        try {
+            panel.paint(graphics);
+        } finally {
+            graphics.dispose();
+        }
     }
 }

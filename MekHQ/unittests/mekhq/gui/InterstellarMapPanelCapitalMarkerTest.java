@@ -52,6 +52,7 @@ import java.util.Set;
 
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.enums.CapitalType;
 import mekhq.campaign.universe.enums.HPGRating;
 import org.junit.jupiter.api.Test;
 
@@ -128,6 +129,7 @@ class InterstellarMapPanelCapitalMarkerTest {
         PlanetarySystem system = mock(PlanetarySystem.class);
         when(system.getId()).thenReturn("Galatea");
         when(system.getFactionSet(date)).thenReturn(Set.of(capitalOwner));
+        when(system.getCapitalType(date)).thenReturn(CapitalType.REGION);
         when(system.getHPG(date)).thenReturn(HPGRating.X);
         when(system.getPrintableName(date)).thenReturn("Galatea");
 
@@ -136,6 +138,7 @@ class InterstellarMapPanelCapitalMarkerTest {
               mercenaries, "Galatea");
 
         assertEquals(List.of(mercenaries, capitalOwner), renderData.capitalFactions());
+        assertEquals(CapitalType.REGION, renderData.capitalType());
     }
 
     @Test
@@ -151,6 +154,37 @@ class InterstellarMapPanelCapitalMarkerTest {
 
         assertTrue(Arrays.equals(pixels(expectedStar), pixels(ordinaryCapital)));
         assertTrue(Arrays.equals(pixels(expectedStar), pixels(mercenaryCapital)));
+    }
+
+    @Test
+    void hierarchyUsesDistinctFilledShapesWithDecreasingComplexity() {
+        BufferedImage national = renderHierarchyCapital(CapitalType.NATIONAL);
+        BufferedImage region = renderHierarchyCapital(CapitalType.REGION);
+        BufferedImage district = renderHierarchyCapital(CapitalType.DISTRICT);
+
+        assertTrue(Arrays.equals(pixels(renderCapital(faction(TEST_FACTION_COLOR, false, false), 7.5)),
+              pixels(national)));
+        assertFalse(Arrays.equals(pixels(national), pixels(region)));
+        assertFalse(Arrays.equals(pixels(region), pixels(district)));
+            assertTrue((national.getRGB(24, 24) >>> 24) > 0);
+            assertTrue((region.getRGB(24, 24) >>> 24) > 0);
+            assertTrue((district.getRGB(24, 24) >>> 24) > 0);
+        }
+
+        @Test
+        void capitalDetailIsCumulativeAndDistrictsRequireNavigationDetail() {
+          assertTrue(InterstellarMapPanel.CapitalDisplayDetail.NATIONAL.includes(CapitalType.NATIONAL));
+          assertFalse(InterstellarMapPanel.CapitalDisplayDetail.NATIONAL.includes(CapitalType.REGION));
+          assertTrue(InterstellarMapPanel.CapitalDisplayDetail.NATIONAL_REGION.includes(CapitalType.REGION));
+          assertFalse(InterstellarMapPanel.CapitalDisplayDetail.NATIONAL_REGION.includes(CapitalType.DISTRICT));
+          assertTrue(InterstellarMapPanel.CapitalDisplayDetail.ALL.includes(CapitalType.DISTRICT));
+
+          assertEquals(0.8, InterstellarMapPanel.capitalVisibilityAlpha(CapitalType.REGION,
+              InterstellarMapPanel.CapitalDisplayDetail.NATIONAL_REGION, 0.8, 0.0));
+          assertEquals(0.0, InterstellarMapPanel.capitalVisibilityAlpha(CapitalType.DISTRICT,
+              InterstellarMapPanel.CapitalDisplayDetail.ALL, 0.8, 0.0));
+          assertEquals(0.4, InterstellarMapPanel.capitalVisibilityAlpha(CapitalType.DISTRICT,
+              InterstellarMapPanel.CapitalDisplayDetail.ALL, 0.8, 0.5));
     }
 
     private static Faction faction(Color color, boolean major, boolean clan) {
@@ -175,6 +209,15 @@ class InterstellarMapPanelCapitalMarkerTest {
         Graphics2D graphics = canvas.createGraphics();
         InterstellarMapPanel.drawDatedCapitalMarker(graphics, new Point2D.Double(24, 24), 7.5,
               faction, systemId, capitalSystemId);
+        graphics.dispose();
+        return canvas;
+    }
+
+    private static BufferedImage renderHierarchyCapital(CapitalType capitalType) {
+        BufferedImage canvas = new BufferedImage(48, 48, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = canvas.createGraphics();
+        InterstellarMapPanel.drawCapitalHierarchyMarker(graphics, new Point2D.Double(24, 24), 7.5,
+              capitalType, TEST_FACTION_COLOR);
         graphics.dispose();
         return canvas;
     }
