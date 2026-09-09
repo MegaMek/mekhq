@@ -61,6 +61,7 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.TechnicianSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
@@ -142,6 +143,14 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
         if (campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION) && (primaryRole.isDoctor())) {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+        }
+
+        // roll supplemental tech skills
+        if (person.isTechExpanded()) {
+            List<String> supplementalSkills = TechnicianSkills.getTechSupplementalSkills(person, false);
+            for (String skillName : supplementalSkills) {
+                addSkill(person, skillName, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+            }
         }
 
         // roll Infantry Gunnery Skills

@@ -44,7 +44,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Verifies that the equipment-kit bonus carried by {@link SkillModifierData} feeds into {@link Skill}'s final skill
- * value, so a kit's bonus reaches every check made through the {@code SkillModifierData} path.
+ * value, so a kit's bonus reaches every check made through the {@code SkillModifierData} path — but is kept out of the
+ * skill level and experience rating, which a kit must not inflate.
  */
 class SkillEquipmentKitBonusTest {
 
@@ -89,5 +90,23 @@ class SkillEquipmentKitBonusTest {
     void anEmptyKitMapChangesNothing() {
         Skill surgery = new Skill(SkillType.S_SURGERY, 4, 0);
         assertEquals(0, delta(surgery, 0));
+    }
+
+    @Test
+    void aKitBonusDoesNotChangeTheTotalSkillLevel() {
+        // A kit modifies the skill check (final skill value) only; the underlying skill level, used for a character's
+        // experience rating, must be untouched by any kit they happen to carry.
+        Skill surgery = new Skill(SkillType.S_SURGERY, 4, 0);
+        int base = surgery.getTotalSkillLevel(modifierData(Map.of()));
+        int withKit = surgery.getTotalSkillLevel(modifierData(Map.of(surgery.getType().getName(), 2)));
+        assertEquals(base, withKit, "a medical-kit bonus must not raise the Surgery skill level");
+    }
+
+    @Test
+    void aKitBonusDoesNotChangeTheExperienceLevel() {
+        Skill surgery = new Skill(SkillType.S_SURGERY, 4, 0);
+        int base = surgery.getExperienceLevel(modifierData(Map.of()));
+        int withKit = surgery.getExperienceLevel(modifierData(Map.of(surgery.getType().getName(), 2)));
+        assertEquals(base, withKit, "a medical-kit bonus must not raise the Surgery experience level");
     }
 }

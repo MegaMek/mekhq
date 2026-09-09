@@ -292,6 +292,11 @@ public class Skill {
     public int getFinalSkillValue(SkillModifierData skillModifierData, int familiarityBonus) {
         int modifiers = getModifiers(skillModifierData, familiarityBonus);
 
+        // Equipment-kit bonuses modify the skill check only, never the underlying skill level: they are applied here at
+        // the final skill value but deliberately kept out of getModifiers(), so getTotalSkillLevel()/getExperienceLevel()
+        // (a character's rating) do not pick them up.
+        modifiers += skillModifierData.equipmentKitBonuses().getOrDefault(type.getName(), 0);
+
         if (isCountUp()) {
             return min(COUNT_UP_MAX_VALUE, getSkillValue() + modifiers);
         } else {
@@ -755,9 +760,10 @@ public class Skill {
         int attributeModifiers = getTotalAttributeModifier(new TargetRoll(), skillModifierData.attributes(), type,
               skillModifierData.injuryEffects(), skillModifierData.characterOptions(), skillModifierData.age());
         int totalInjuryModifier = getTotalInjuryModifier(skillModifierData, type);
-        int equipmentKitModifier = skillModifierData.equipmentKitBonuses().getOrDefault(type.getName(), 0);
 
-        return spaModifiers + attributeModifiers + totalInjuryModifier + equipmentKitModifier;
+        // Equipment-kit bonuses are intentionally NOT summed here: they modify a skill check (the final skill value)
+        // but not the character's skill level or experience rating. See getFinalSkillValue().
+        return spaModifiers + attributeModifiers + totalInjuryModifier;
     }
 
     public static int getTotalInjuryModifier(SkillModifierData skillModifierData, SkillType type) {

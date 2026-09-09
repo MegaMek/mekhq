@@ -625,8 +625,7 @@ public enum PersonnelRole {
      * @param isDoctorsUseAdministration if {@code true}, includes Administration skill for medical roles
      * @param isTechsUseAdministration   if {@code true}, includes Administration skill for technical roles
      * @param isUseArtillery             if {@code true}, includes Artillery skills where applicable
-     * @param includeExpandedSkills      if {@code true}, includes expanded skills for conventional infantry and vehicle
-     *                                   crewmember roles
+     * @param includeExpandedSkills      if {@code true}, includes expanded skills for conventional infantry
      *
      * @return a list of skill names representing the profession-appropriate skills
      */

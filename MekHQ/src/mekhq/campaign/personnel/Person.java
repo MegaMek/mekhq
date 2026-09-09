@@ -5788,10 +5788,6 @@ public class Person implements ILocatable {
      */
     public int getExperienceLevel(final CampaignOptions campaignOptions, final boolean isClanCampaign,
           final LocalDate today, final boolean secondary, boolean excludeInjuryEffects) {
-        final PersonnelRole role = secondary ? getSecondaryRole() : getPrimaryRole();
-
-        final boolean doAdminCountNegotiation = campaignOptions.get(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION);
-        final boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
         final boolean isAlternativeQualityAveraging = campaignOptions.get(CampaignOption.ALTERNATIVE_QUALITY_AVERAGING);
         final boolean isUseAgingEffects = campaignOptions.get(CampaignOption.USE_AGE_EFFECTS);
 
@@ -5802,79 +5798,9 @@ public class Person implements ILocatable {
 
         // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
         // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
-        List<String> associatedSkillNames = role.getSkillsForProfession();
-
-        return switch (role) {
-            case VEHICLE_CREW_GROUND, VEHICLE_CREW_NAVAL, VEHICLE_CREW_VTOL -> {
-                if (!isUseArtillery) {
-                    yield calculateExperienceLevelForProfession(associatedSkillNames,
-                          isAlternativeQualityAveraging,
-                          skillModifierData);
-                } else {
-                    Skill gunnery = getSkill(S_GUN_VEE);
-                    int gunneryExperienceLevel = gunnery == null ?
-                                                       EXP_NONE :
-                                                       gunnery.getExperienceLevel(skillModifierData);
-                    Skill artillery = getSkill(S_ARTILLERY);
-                    int artilleryExperienceLevel = artillery == null ?
-                                                         EXP_NONE :
-                                                         artillery.getExperienceLevel(skillModifierData);
-
-                    if (artilleryExperienceLevel > gunneryExperienceLevel) {
-                        associatedSkillNames.remove(S_GUN_VEE);
-                        associatedSkillNames.add(S_ARTILLERY);
-                    }
-
-                    yield calculateExperienceLevelForProfession(associatedSkillNames,
-                          isAlternativeQualityAveraging,
-                          skillModifierData);
-                }
-            }
-            case SOLDIER -> {
-                int highestExperienceLevel = EXP_NONE;
-                for (String relevantSkill : INFANTRY_GUNNERY_SKILLS) {
-                    Skill skill = getSkill(relevantSkill);
-
-                    if (skill == null) {
-                        continue;
-                    }
-
-                    int currentExperienceLevel = skill.getExperienceLevel(skillModifierData);
-                    if (currentExperienceLevel > highestExperienceLevel) {
-                        highestExperienceLevel = currentExperienceLevel;
-                    }
-                }
-
-                yield highestExperienceLevel;
-            }
-            case ADMINISTRATOR -> {
-                int adminLevel = getSkillLevelOrNegative(S_ADMIN, skillModifierData);
-                adminLevel = adminLevel == -1 ? 0 : adminLevel;
-
-                int negotiationLevel = getSkillLevelOrNegative(S_NEGOTIATION, skillModifierData);
-                negotiationLevel = negotiationLevel == -1 ? 0 : negotiationLevel;
-
-                int levelSum;
-                int divisor;
-
-                if (doAdminCountNegotiation) {
-                    levelSum = adminLevel + negotiationLevel;
-                    divisor = 2;
-                } else {
-                    levelSum = adminLevel;
-                    divisor = 1;
-                }
-
-                if (levelSum == -divisor) {
-                    yield EXP_NONE;
-                } else {
-                    yield max(0, levelSum / divisor);
-                }
-            }
-            default -> calculateExperienceLevelForProfession(associatedSkillNames,
-                  isAlternativeQualityAveraging,
-                  skillModifierData);
-        };
+        List<String> associatedSkillNames = getProfessionSkills(campaignOptions, secondary);
+        return calculateExperienceLevelForProfession(associatedSkillNames, isAlternativeQualityAveraging,
+              skillModifierData);
     }
 
     /**
@@ -5964,26 +5890,27 @@ public class Person implements ILocatable {
      * personnel's primary or secondary role is being queried and may also vary based on the campaign's configuration
      * settings, such as whether artillery skills are enabled.
      *
-     * @param campaign  the current {@link Campaign}
+     * @param campaignOptions  the current {@link CampaignOptions}
      * @param secondary a boolean indicating whether to retrieve skills for the secondary ({@code true}) or primary
      *                  ({@code false}) profession of the character
      *
      * @return a {@link List} of skill identifiers ({@link String}) associated with the personnel's role, possibly
      *       modified by campaign settings
      */
-    public List<String> getProfessionSkills(final Campaign campaign, final boolean secondary) {
+    public List<String> getProfessionSkills(final CampaignOptions campaignOptions, final boolean secondary) {
         final PersonnelRole profession = secondary ? getSecondaryRole() : getPrimaryRole();
 
-        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final boolean isAdminsHaveNegotiation = campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION);
         final boolean isDoctorsUseAdministration = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
         final boolean isTechsUseAdministration = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
         final boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
+        final boolean isUseSmallArmsOnly = campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY);
 
         return profession.getSkillsForProfession(isAdminsHaveNegotiation,
               isDoctorsUseAdministration,
               isTechsUseAdministration,
-              isUseArtillery);
+              isUseArtillery,
+              !isUseSmallArmsOnly);
     }
 
     /**

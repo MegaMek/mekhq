@@ -165,6 +165,7 @@ import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.TechnicianSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -273,6 +274,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_LOYALTY = "LOYALTY";
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
+    private static final String CMD_ADD_MISSING_TECH_SKILLS = "ADD_MISSING_TECH_SKILLS";
     private static final String CMD_EDIT_FAMILIARITY = "EDIT_FAMILIARITY";
     private static final String CMD_GENERATE_ROLEPLAY_SKILLS = "GENERATE_ROLEPLAY_SKILLS";
     private static final String CMD_REMOVE_ROLEPLAY_SKILLS = "REMOVE_ROLEPLAY_SKILLS";
@@ -1835,6 +1837,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
                 for (Person person : people) {
                     singleSpecialAbilityGenerator.rollSPA(getCampaign(), person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
+            case CMD_ADD_MISSING_TECH_SKILLS: {
+                for (Person person : people) {
+                    TechnicianSkills.addMissingSkills(person);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                 }
                 break;
@@ -4458,6 +4467,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.addActionListener(this);
                 skillsXpMenu.add(menuItem);
             }
+
+            menuItem = new JMenuItem(resources.getString("addMissingTechSkills.text"));
+            menuItem.setToolTipText(wordWrap(resources.getString("addMissingTechSkills.tooltip")));
+            menuItem.setActionCommand(CMD_ADD_MISSING_TECH_SKILLS);
+            menuItem.addActionListener(this);
+            skillsXpMenu.add(menuItem);
 
             JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.set"));
             for (SkillAttribute attribute : SkillAttribute.values()) {
