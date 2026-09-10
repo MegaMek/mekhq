@@ -72,7 +72,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
-import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -305,16 +304,19 @@ public class Maintenance {
         int roll;
         if (maintenanceSkill == null) {
             roll = d6(2);
+            // getValueAsString() renders an IMPOSSIBLE target as a word rather than its Integer.MAX_VALUE sentinel.
             partReport += getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.check.reportNoSkill",
-                  String.valueOf(target.getValue()), target.getDesc(), String.valueOf(roll));
+                  target.getValueAsString(), target.getDesc(), String.valueOf(roll));
         } else {
+            // withoutSubject: this report already names the tech; getReport(false): the numeric margin is appended
+            // once, below, so the utility's own margin label is suppressed to avoid printing the margin twice.
             ActionCheckResult result = new SkillCheck(maintenanceTech, maintenanceSkill.getType(), target)
-                                             .withRollType(RollType.NORMAL)
                                              .withoutLogging()
+                                             .withoutSubject()
                                              .resolve(false, null);
             roll = result.getRollResult();
             partReport += getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.check.report",
-                  result.getReport(true), target.getDesc());
+                  result.getReport(false), target.getDesc());
         }
         int margin = roll - target.getValue();
         partReport += getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.check.margin", String.valueOf(margin));

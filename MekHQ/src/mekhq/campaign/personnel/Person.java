@@ -329,9 +329,6 @@ public class Person implements ILocatable {
     private int hitsPrior;
     private PrisonerStatus prisonerStatus;
 
-    // Supports edge usage by a ship's engineer composite crewman
-    private int edgeUsedThisRound;
-
     // phenotype and background
     private Phenotype phenotype;
     private String bloodname;
@@ -6659,14 +6656,6 @@ public class Person implements ILocatable {
      */
     public int getCurrentEdge() {
         return atowAttributes.getCurrentEdge();
-    }
-
-    public void setEdgeUsedThisRound(final int edgeUsedThisRound) {
-        this.edgeUsedThisRound = edgeUsedThisRound;
-    }
-
-    public int getEdgeUsedThisRound() {
-        return edgeUsedThisRound;
     }
 
     public int getUsedEdge() {

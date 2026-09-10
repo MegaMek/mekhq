@@ -92,10 +92,10 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     private Predicate<ActionCheckRoll> edgeRerollCondition = null;
 
     /**
-     * Optional callback fired immediately after edge is spent, for bookkeeping that has nowhere else to live (e.g.
-     * adjusting an engineer's {@code edgeUsedThisRound}). See {@link #withOnEdgeSpent(Runnable)}.
+     * Whether {@link #resolve(boolean, String)} names the person in its results line. Callers that have already
+     * introduced the person in their own running report suppress the repeated name via {@link #withoutSubject()}.
      */
-    private Runnable onEdgeSpent = null;
+    private boolean includeSubject = true;
 
     /**
      * Initializes a new action check for the specified person and target number.
@@ -191,8 +191,7 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     /**
      * Forces this check to use a specific {@link RollType}, overriding the default derived from natural aptitude.
      *
-     * <p>This is the only way for a caller to request {@link RollType#DISADVANTAGE} (3d6 keeping the lowest two),
-     * which
+     * <p>This is the only way for a caller to request {@link RollType#DISADVANTAGE} (3d6 keeping the lowest two), which
      * the aptitude-derived default - {@link RollType#ADVANTAGE} or {@link RollType#NORMAL} - can never produce. The
      * forced roll type is applied verbatim, so it wins over natural aptitude.</p>
      *
@@ -237,20 +236,17 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     }
 
     /**
-     * Registers a callback fired immediately after edge is spent on a re-roll.
+     * Suppresses the person's name in the results line produced by {@link #resolve(boolean, String)}.
      *
-     * <p>This exists for bookkeeping that the utility cannot perform itself, such as adjusting an engineer's
-     * {@code edgeUsedThisRound} counter so that individual crew members' edge values stay in sync.</p>
-     *
-     * @param onEdgeSpent the callback to run when edge is spent
+     * <p>Callers that have already named the person in their own running report use this so the name is not repeated;
+     * the line still opens with the gendered pronoun, so it reads naturally after the introducing sentence.</p>
      *
      * @return updated action check
      */
-    public T withOnEdgeSpent(Runnable onEdgeSpent) {
-        this.onEdgeSpent = onEdgeSpent;
+    public T withoutSubject() {
+        this.includeSubject = false;
         return getThis();
     }
-
 
     /**
      * Executes action check for the specified person.
@@ -271,12 +267,14 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
         boolean usedEdge = false;
         boolean canSpendEdge = useEdge && person.getCurrentEdge() > 0;
 
+        // A check that cannot be beaten (AUTOMATIC_FAIL, IMPOSSIBLE) never re-rolls, so edge is never wasted on it -
+        // this guard applies to a caller-supplied condition as well, which may only narrow it further.
+        boolean canSucceed = !targetNumber.cannotSucceed() && targetNumber.getValue() <= 12;
         final boolean shouldReroll;
         if (edgeRerollCondition != null) {
-            shouldReroll = canSpendEdge && edgeRerollCondition.test(roll);
+            shouldReroll = canSpendEdge && canSucceed && edgeRerollCondition.test(roll);
         } else {
             boolean failed = roll.result() < targetNumber.getValue();
-            boolean canSucceed = !targetNumber.cannotSucceed() && targetNumber.getValue() <= 12;
             shouldReroll = failed && canSucceed && canSpendEdge;
         }
 
@@ -284,11 +282,7 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
             // reroll using edge
             roll = ActionCheckRoll.perform(rollType);
             usedEdge = true;
-
             person.spendEdge();
-            if (onEdgeSpent != null) {
-                onEdgeSpent.run();
-            }
         }
 
         long difference = (long) targetNumber.getValue() - roll.result();
@@ -338,16 +332,30 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
 
         String reportKey =
               ActionCheckResult.isSuccess(marginOfSuccess) ? "actionCheckResult.success" : "actionCheckResult.failure";
+        String reasonText = reason == null ? "" : "<b>" + reason + ":</b> ";
+        String color = getMarginOfSuccessObject(marginOfSuccess).getColor();
+        // getValueAsString() renders AUTOMATIC_SUCCESS/AUTOMATIC_FAIL/IMPOSSIBLE as words; getValue() would print their
+        // raw Integer.MIN_VALUE/MAX_VALUE sentinels.
+        String targetText = targetNumber.getValueAsString();
 
-        StringBuilder resultsText = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
-              reportKey,
-              reason == null ? "" : "<b>" + reason + ":</b> ",
-              fullTitle,
-              getMarginOfSuccessObject(marginOfSuccess).getColor(),
-              genderedReferenced,
-              getActionName(),
-              roll,
-              targetNumber.getValue()));
+        StringBuilder resultsText = includeSubject
+              ? new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
+                    reportKey,
+                    reasonText,
+                    fullTitle,
+                    color,
+                    genderedReferenced,
+                    getActionName(),
+                    roll,
+                    targetText))
+              : new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
+                    reportKey + "NoSubject",
+                    reasonText,
+                    color,
+                    genderedReferenced,
+                    getActionName(),
+                    roll,
+                    targetText));
 
         if (rollType == RollType.ADVANTAGE) {
             resultsText.append(" ").append(getTextAt(RESOURCE_BUNDLE, "actionCheckResult.naturalAptitude"));

@@ -51,7 +51,6 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
-import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -203,8 +202,8 @@ public class SupportPointNegotiation {
         while (iterator.hasNext() && ((negotiatedSupportPoints + currentSupportPoints) < maxSupportPoints)) {
             Person admin = iterator.next();
 
+            // No forced roll type: the check derives ADVANTAGE from the admin's Natural Aptitude when they have it.
             SkillCheck skillCheck = admin.checkSkill(S_ADMIN, campaign)
-                                          .withRollType(RollType.NORMAL)
                                           .withoutLogging();
             if (modifier != 0) {
                 skillCheck.withMiscModifier(-modifier);
