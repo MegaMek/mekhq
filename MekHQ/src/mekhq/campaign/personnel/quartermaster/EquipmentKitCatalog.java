@@ -110,18 +110,18 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
     private static final Map<String, Map<String, Integer>> SKILL_BONUSES = new LinkedHashMap<>();
 
     static {
-        SKILL_BONUSES.put(KIT_ADVANCED_FIELD, Map.of(S_SURVIVAL, 2));
+        SKILL_BONUSES.put(KIT_ADVANCED_FIELD, Map.of(S_NAVIGATION, 1, S_SURVIVAL, 1));
         SKILL_BONUSES.put(KIT_BASIC_FIELD, Map.of(S_SURVIVAL, 1));
         SKILL_BONUSES.put(KIT_COMPASS, Map.of(S_NAVIGATION, 1));
         SKILL_BONUSES.put(KIT_ELECTRONIC_COMPASS, Map.of(S_NAVIGATION, 2));
-        SKILL_BONUSES.put(KIT_ADVANCED_MEDICAL, Map.of(S_MEDTECH, 2, S_SURGERY, 1));
-        SKILL_BONUSES.put(KIT_FIELD_SURGICAL, Map.of(S_MEDTECH, 2, S_SURGERY, 2));
-        SKILL_BONUSES.put(KIT_MEDICAL, Map.of(S_MEDTECH, 1, S_SURGERY, 1));
-        SKILL_BONUSES.put(KIT_COMPAD, Map.of(S_ADMIN, 1));
-        SKILL_BONUSES.put(KIT_NOTEPUTER, Map.of(S_ADMIN, 1, S_NEGOTIATION, 1));
-        SKILL_BONUSES.put(KIT_PERSONAL_COMPUTER, Map.of(S_ADMIN, 2));
-        SKILL_BONUSES.put(KIT_POCKET_TRANSCRIBER, Map.of(S_NEGOTIATION, 2));
-        SKILL_BONUSES.put(KIT_TELESCAN, Map.of(S_ADMIN, 1));
+        SKILL_BONUSES.put(KIT_ADVANCED_MEDICAL, Map.of(S_MEDTECH, 1, S_SURGERY, 1));
+        SKILL_BONUSES.put(KIT_FIELD_SURGICAL, Map.of(S_MEDTECH, 2, S_SURGERY, 1));
+        SKILL_BONUSES.put(KIT_MEDICAL, Map.of(S_MEDTECH, 1, S_SURGERY, 0));
+        SKILL_BONUSES.put(KIT_COMPAD, Map.of(S_COMMUNICATIONS, 1));
+        SKILL_BONUSES.put(KIT_NOTEPUTER, Map.of(S_ADMIN, 1, S_COMMUNICATIONS, 1));
+        SKILL_BONUSES.put(KIT_PERSONAL_COMPUTER, Map.of(S_ADMIN, 1));
+        SKILL_BONUSES.put(KIT_POCKET_TRANSCRIBER, Map.of(S_NEGOTIATION, 1));
+        SKILL_BONUSES.put(KIT_TELESCAN, Map.of(S_APPRAISAL, 1));
     }
 
     /** Kit internal name -> the {@code Tech/...} skills it improves. Insertion-ordered for stable display. */
