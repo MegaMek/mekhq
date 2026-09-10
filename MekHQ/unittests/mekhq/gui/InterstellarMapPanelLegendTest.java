@@ -63,7 +63,7 @@ import org.junit.jupiter.api.Test;
 class InterstellarMapPanelLegendTest {
     private static final List<String> GROUPS = List.of(
           "NAVIGATION", "ROUTES", "LAYERS", "OVERLAYS", "RANGE RINGS", "SYSTEM STATUS");
-    private static final List<Integer> GROUP_ENTRY_COUNTS = List.of(5, 8, 12, 7, 4, 4);
+        private static final List<Integer> GROUP_ENTRY_COUNTS = List.of(5, 8, 12, 8, 4, 4);
     private static final List<String> TITLES = List.of(
                 "Selected system", "Hovered system", "Planned route",
                   "Active route", "Reachability shells", "Reachability caution", "Blocked reachability",
@@ -73,8 +73,8 @@ class InterstellarMapPanelLegendTest {
                   "50 ly HPG range", "Capital hierarchy", "Operation flag",
         "Restricted system", "GM-edited system", "Faction ownership", "Technology", "Industry", "Raw Materials",
         "Output", "Agriculture", "Population", "HPG", "Recharge Stations", "Academies", "Hiring Halls",
-        "Disease Outbreaks", "HPG station classes", "Faction emblem", "HPG network", "Sovereign border",
-        "Disputed territory", "Unclaimed pocket", "Enclave");
+        "Disease Outbreaks", "HPG station classes", "Faction emblem", "HPG network",
+        "Administrative boundaries", "Sovereign border", "Disputed territory", "Unclaimed pocket", "Enclave");
     private static final List<String> DESCRIPTIONS = List.of(
         "An amber ring identifies the selected system at distant zoom; corner brackets replace it as navigation detail appears.",
         "A cyan ring identifies the system under the pointer at distant zoom; corner brackets replace it closer in. Selected systems suppress hover.",
@@ -111,7 +111,8 @@ class InterstellarMapPanelLegendTest {
         "None is black; one outbreak yellow; two orange; three magenta; four or more purple.",
         "Hexagonal badges identify included HPG stations: A cyan, B blue, C amber, and D red. Network links are drawn only for A and B stations.",
         "A faint emblem watermark identifies territory; its tint identifies the faction.",
-        "Layers controls maximum station detail. Distant zoom keeps only Class A links; navigation zoom adds Class B, and close zoom honors the selected station classes.",
+        "Class A uses restrained solid cyan links; Class B uses thinner muted dashes. Distant zoom keeps only Class A, while lower-class station badges wait for close detail.",
+        "Solid faction-color lines divide regions; quieter dashed lines add districts. Boundaries stop where membership is missing or conflicts.",
         "Translucent faction fill and a solid edge mark territory inferred from dated ownership.",
         "Multiple faction colors, diagonal hatching, and a dashed border mark shared control.",
         "A dark enclosed void with a dotted boundary marks locally unclaimed space.",
@@ -210,7 +211,7 @@ class InterstellarMapPanelLegendTest {
               0, 1, 8, 9, 7,
               2, 3, 10, 4, 5, 6, 11, 12,
               21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
-              33, 34, 35, 36, 37, 38, 39,
+              33, 34, 35, 36, 37, 38, 39, 40,
               13, 14, 15, 16,
               17, 18, 19, 20);
         return displayOrder.stream().map(values::get).toList();

@@ -82,6 +82,14 @@ class InterstellarMapPanelOperationMarkerTest {
         }
 
     @Test
+    void hpgBadgesReserveNavigationDetailForClassA() {
+        assertEquals(0.6, InterstellarMapPanel.hpgStationMarkerAlpha(HPGRating.A, 0.6, 0.2));
+        assertEquals(0.2, InterstellarMapPanel.hpgStationMarkerAlpha(HPGRating.B, 0.6, 0.2));
+        assertTrue(InterstellarMapPanel.hpgStationMarkerRadius(10.0, HPGRating.A)
+              > InterstellarMapPanel.hpgStationMarkerRadius(10.0, HPGRating.B));
+    }
+
+    @Test
     void semanticZoomKeepsOnlyUrgentOperationsVisibleAtAtlasZoom() {
         InterstellarMapPanel.SemanticZoomProfile atlas =
               InterstellarMapPanel.SemanticZoomProfile.create(0.9, 3.0);

@@ -144,7 +144,6 @@ import mekhq.gui.dialog.PlanetarySystemEditorDialog;
 public class InterstellarMapPanel extends JPanel {
     private static final MMLogger LOGGER = MMLogger.create(InterstellarMapPanel.class);
     private static final int MATERIAL_EDIT_SYMBOL = 0xE3C9;
-    private static final int MATERIAL_STAR_SYMBOL = 0xE838;
 
     interface RoutePlanningHandler {
         void plotRoute(PlanetarySystem destination);
@@ -217,8 +216,8 @@ public class InterstellarMapPanel extends JPanel {
     private static final String CURRENT_LOCATION_ICON_PATH =
           "data/images/universe/default_jumpship_fleet.png";
         private static final int CURRENT_LOCATION_ICON_SIZE = 34;
-    private static final Color MAP_BACKGROUND_TOP = new Color(7, 16, 27);
-    private static final Color MAP_BACKGROUND_BOTTOM = new Color(3, 8, 15);
+    private static final Color MAP_BACKGROUND_TOP = new Color(5, 12, 21);
+    private static final Color MAP_BACKGROUND_BOTTOM = MAP_BACKGROUND_TOP;
     private static final Color MAP_GRID_MINOR = new Color(35, 66, 82, 45);
     private static final Color MAP_GRID_MAJOR = new Color(50, 91, 108, 75);
     private static final Color PLANNED_ROUTE_COLOR = new Color(65, 210, 224);
@@ -238,6 +237,8 @@ public class InterstellarMapPanel extends JPanel {
     private static final Color URGENT_OPERATION_COLOR = new Color(255, 220, 122);
     private static final Color HPG_CLASS_A_COLOR = new Color(89, 226, 238);
     private static final Color HPG_CLASS_B_COLOR = new Color(105, 175, 255);
+    private static final Color HPG_CLASS_A_LINK_COLOR = new Color(89, 226, 238, 185);
+    private static final Color HPG_CLASS_B_LINK_COLOR = new Color(86, 132, 205, 105);
     private static final Color HPG_CLASS_C_COLOR = new Color(242, 184, 72);
     private static final Color HPG_CLASS_D_COLOR = new Color(234, 86, 86);
     private static final Color REACHABILITY_DEEP_COLOR = new Color(126, 169, 188);
@@ -343,9 +344,10 @@ public class InterstellarMapPanel extends JPanel {
     private static final int TERRITORY_HEX_MARGIN = 2;
         private static final Stroke TERRITORY_CONTOUR_SOFTENING_STROKE = new BasicStroke(5.0f,
                     BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
-    private static final Color TERRITORY_BORDER_DARK = new Color(2, 6, 10, 215);
-    private static final Color TERRITORY_NEUTRAL_EDGE = new Color(198, 211, 214, 185);
-    private static final Color TERRITORY_POCKET_FILL = new Color(1, 5, 9, 105);
+    private static final Color TERRITORY_BORDER_DARK = new Color(2, 6, 10, 175);
+    private static final Color TERRITORY_NEUTRAL_EDGE = new Color(198, 211, 214, 145);
+    private static final Color TERRITORY_POCKET_FILL = new Color(1, 5, 9, 70);
+    private static final Color ADMINISTRATIVE_BOUNDARY_DARK = new Color(2, 6, 10, 205);
     private static final double TERRITORY_LAYER_OPACITY = 0.72;
     private static final double FACTION_LOGO_OPACITY = 0.34;
     private static final int FACTION_LOGO_MIN_SIZE = 36;
@@ -443,6 +445,26 @@ public class InterstellarMapPanel extends JPanel {
         }
     }
 
+    enum AdministrativeDisplayDetail {
+        REGIONS("Regions"),
+        REGIONS_AND_DISTRICTS("Regions + Districts");
+
+        private final String label;
+
+        AdministrativeDisplayDetail(String label) {
+            this.label = label;
+        }
+
+        boolean includes(AdministrativeBoundaryLevel level) {
+            return (level == AdministrativeBoundaryLevel.REGION) || (this == REGIONS_AND_DISTRICTS);
+        }
+
+        @Override
+        public String toString() {
+            return label;
+        }
+    }
+
         private enum MapLegendSymbol {
           FACTION_OWNERSHIP,
           LAYER_TECHNOLOGY,
@@ -480,6 +502,7 @@ public class InterstellarMapPanel extends JPanel {
           RESTRICTED_SYSTEM,
           GM_EDITED_SYSTEM,
           HPG_NETWORK,
+          ADMINISTRATIVE_BOUNDARIES,
           SOVEREIGN_TERRITORY,
           DISPUTED_TERRITORY,
           UNCLAIMED_POCKET,
@@ -576,7 +599,9 @@ public class InterstellarMapPanel extends JPanel {
                 new MapLegendEntry(MapLegendSymbol.FACTION_EMBLEM, "Faction emblem",
                     "A faint emblem watermark identifies territory; its tint identifies the faction."),
                 new MapLegendEntry(MapLegendSymbol.HPG_NETWORK, "HPG network",
-                    "Layers controls maximum station detail. Distant zoom keeps only Class A links; navigation zoom adds Class B, and close zoom honors the selected station classes."),
+                    "Class A uses restrained solid cyan links; Class B uses thinner muted dashes. Distant zoom keeps only Class A, while lower-class station badges wait for close detail."),
+                new MapLegendEntry(MapLegendSymbol.ADMINISTRATIVE_BOUNDARIES, "Administrative boundaries",
+                    "Solid faction-color lines divide regions; quieter dashed lines add districts. Boundaries stop where membership is missing or conflicts."),
                 new MapLegendEntry(MapLegendSymbol.SOVEREIGN_TERRITORY, "Sovereign border",
                     "Translucent faction fill and a solid edge mark territory inferred from dated ownership."),
                 new MapLegendEntry(MapLegendSymbol.DISPUTED_TERRITORY, "Disputed territory",
@@ -761,7 +786,46 @@ public class InterstellarMapPanel extends JPanel {
         ENCLAVE
     }
 
-    record TerritoryCell(TerritoryHex hex, double centerX, double centerY, List<Faction> factions) {
+    enum AdministrativeBoundaryLevel {
+        REGION,
+        DISTRICT
+    }
+
+    record AdministrativeKey(Faction faction, List<String> path) {
+        AdministrativeKey {
+            path = List.copyOf(path);
+        }
+
+        String region() {
+            return path.getFirst();
+        }
+    }
+
+    record TerritoryClassification(List<Faction> factions, List<PlanetarySystem> evidenceSystems) {
+        TerritoryClassification {
+            factions = List.copyOf(factions);
+            evidenceSystems = List.copyOf(evidenceSystems);
+        }
+    }
+
+    record AdministrativeBoundary(AdministrativeBoundaryLevel level, List<Faction> factions, Shape shape,
+          double minMapX, double maxMapX, double minMapY, double maxMapY) {
+        AdministrativeBoundary {
+            factions = List.copyOf(factions);
+        }
+    }
+
+    private record AdministrativeBoundaryGroup(AdministrativeBoundaryLevel level, List<Faction> factions) {
+        AdministrativeBoundaryGroup {
+            factions = List.copyOf(factions);
+        }
+    }
+
+    record TerritoryCell(TerritoryHex hex, double centerX, double centerY, List<Faction> factions,
+          @Nullable AdministrativeKey administration) {
+        TerritoryCell(TerritoryHex hex, double centerX, double centerY, List<Faction> factions) {
+            this(hex, centerX, centerY, factions, null);
+        }
     }
 
     record TerritoryComponent(Faction faction, TerritoryHex anchorHex, double anchorX, double anchorY,
@@ -774,7 +838,12 @@ public class InterstellarMapPanel extends JPanel {
 
     record TerritoryAtlas(LocalDate date, int minColumn, int maxColumn, int minRow, int maxRow,
             Map<TerritoryHex, TerritoryCell> cells, List<TerritoryContour> contours,
-            List<TerritoryComponent> components) {
+            List<TerritoryComponent> components, List<AdministrativeBoundary> administrativeBoundaries) {
+        TerritoryAtlas(LocalDate date, int minColumn, int maxColumn, int minRow, int maxRow,
+              Map<TerritoryHex, TerritoryCell> cells, List<TerritoryContour> contours,
+              List<TerritoryComponent> components) {
+            this(date, minColumn, maxColumn, minRow, maxRow, cells, contours, components, List.of());
+        }
     }
 
     record RenderViewKey(int width, int height, long centerXBits, long centerYBits, long scaleBits) {
@@ -1196,6 +1265,9 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     record TerritoryDataKey(LocalDate date, long dataRevision) {
+    }
+
+    record AdministrativeRenderKey(TerritoryDataKey dataKey, AdministrativeDisplayDetail detail) {
     }
 
             record RetainedCartographyRenderRequest(RetainedCartographyKey key, RenderViewKey viewKey,
@@ -2101,6 +2173,8 @@ public class InterstellarMapPanel extends JPanel {
     private final JCheckBox optCapitals;
     private final ImmersiveComboBox<CapitalDisplayDetail> optCapitalDetail;
     private final JCheckBox optTerritory;
+    private final JCheckBox optAdministrativeBoundaries;
+    private final ImmersiveComboBox<AdministrativeDisplayDetail> optAdministrativeDetail;
     private final JCheckBox optOperations;
     private final JCheckBox optReachability;
     private final ImmersiveSpinner reachabilityHops;
@@ -2235,6 +2309,8 @@ public class InterstellarMapPanel extends JPanel {
     private final RenderLayerCache<RenderViewKey> backgroundRenderCache = new RenderLayerCache<>();
         private final PannableRenderLayerCache<TerritoryDataKey> territoryRenderCache =
             new PannableRenderLayerCache<>();
+        private final PannableRenderLayerCache<AdministrativeRenderKey> administrativeRenderCache =
+                    new PannableRenderLayerCache<>();
     private final PannableRenderLayerCache<RetainedCartographyKey> retainedCartographyRenderCache =
           new PannableRenderLayerCache<>();
         private final PannableRenderLayerCache<RetainedCartographyKey> retainedSystemArtRenderCache =
@@ -2673,9 +2749,10 @@ public class InterstellarMapPanel extends JPanel {
                 long backgroundFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
                 double size = getSystemMarkerSize();
 
-                final Stroke thick = new BasicStroke(2.0f);
-                final Stroke dashed = new BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0,
-                      new float[] { 3 }, 0);
+                    final Stroke thick = new BasicStroke(1.35f, BasicStroke.CAP_ROUND,
+                        BasicStroke.JOIN_ROUND);
+                    final Stroke dashed = new BasicStroke(0.8f, BasicStroke.CAP_BUTT,
+                        BasicStroke.JOIN_BEVEL, 10.0f, new float[] { 8.0f, 8.0f }, 0.0f);
 
                     TerritoryAtlas atlas = getPreparedTerritoryAtlas(now);
                     TerritoryRenderKey territoryRenderKey = atlas == null ? null
@@ -2869,6 +2946,13 @@ public class InterstellarMapPanel extends JPanel {
                     paintStaticFactionLogoLayer(g2, atlas, factionLogoRenderKey,
                           visibleFactionLogoAlpha * FACTION_LOGO_OPACITY);
                 }
+                    if (optAdministrativeBoundaries.isSelected() && (atlas != null)
+                        && (territoryRenderKey != null)) {
+                      AdministrativeDisplayDetail administrativeDetail = ObjectUtility.nonNull(
+                          (AdministrativeDisplayDetail) optAdministrativeDetail.getSelectedItem(),
+                          AdministrativeDisplayDetail.REGIONS);
+                      paintAdministrativeBoundaryLayer(g2, atlas, territoryRenderKey, administrativeDetail);
+                    }
                 long factionLogoFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
                 long staticPhaseFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
 
@@ -3108,10 +3192,12 @@ public class InterstellarMapPanel extends JPanel {
                                     semanticZoom.systemDetailAlpha()));
                         }
                         HPGRating hpgRating = renderData.hpgRating();
+                        double hpgStationAlpha = hpgStationMarkerAlpha(hpgRating,
+                            semanticZoom.detailedOverlayAlpha(), semanticZoom.systemDetailAlpha());
                         if ((visibleHpgNetworkAlpha > 0.0) && hpgNetworkDetail.includes(hpgRating)
-                              && (semanticZoom.detailedOverlayAlpha() > 0.0)) {
+                            && (hpgStationAlpha > 0.0)) {
                             paintLayerWithAlpha(g2,
-                                  visibleHpgNetworkAlpha * semanticZoom.detailedOverlayAlpha(),
+                                visibleHpgNetworkAlpha * hpgStationAlpha,
                                   markerGraphics -> drawHpgStationMarker(markerGraphics, markerLayout, hpgRating));
                         }
                     }
@@ -3188,9 +3274,11 @@ public class InterstellarMapPanel extends JPanel {
                                 double markerRadius = Math.max(5.0, size * 0.9);
                                   double ordinaryLabelX = markerLayout.labelX();
                                   HPGRating hpgRating = renderData.hpgRating();
+                                                                    double hpgStationAlpha = hpgStationMarkerAlpha(hpgRating,
+                                                                                semanticZoom.detailedOverlayAlpha(), semanticZoom.systemDetailAlpha());
                                   if ((visibleHpgNetworkAlpha > 0.0) && hpgNetworkDetail.includes(hpgRating)
-                                      && (semanticZoom.detailedOverlayAlpha() > 0.0)) {
-                                    double hpgMarkerRadius = hpgStationMarkerRadius(markerLayout.size());
+                                                                            && (hpgStationAlpha > 0.0)) {
+                                                                        double hpgMarkerRadius = hpgStationMarkerRadius(markerLayout.size(), hpgRating);
                                     ordinaryLabelX = Math.max(ordinaryLabelX,
                                         markerLayout.hpgStationAnchor(hpgMarkerRadius).x
                                             + hpgMarkerRadius + UIUtil.scaleForGUI(4));
@@ -3325,6 +3413,38 @@ public class InterstellarMapPanel extends JPanel {
         optTerritory.setSelected(true);
         optTerritory.addActionListener(e -> startTerritoryLayerAnimation());
         optionPanel.add(optTerritory);
+        optAdministrativeBoundaries = createOptionCheckBox("Administrative Boundaries");
+        optAdministrativeBoundaries.setSelected(false);
+          Dimension administrativeCheckSize = new Dimension(UIUtil.scaleForGUI(190),
+              optAdministrativeBoundaries.getPreferredSize().height);
+          optAdministrativeBoundaries.setPreferredSize(administrativeCheckSize);
+          optAdministrativeBoundaries.setMinimumSize(administrativeCheckSize);
+          optAdministrativeBoundaries.setMaximumSize(administrativeCheckSize);
+        optAdministrativeDetail = new ImmersiveComboBox<>(AdministrativeDisplayDetail.values());
+        optAdministrativeDetail.setSelectedItem(AdministrativeDisplayDetail.REGIONS);
+        optAdministrativeDetail.setEnabled(false);
+        Dimension administrativeDetailSize = new Dimension(UIUtil.scaleForGUI(148),
+              optAdministrativeDetail.getPreferredSize().height);
+        optAdministrativeDetail.setPreferredSize(administrativeDetailSize);
+        optAdministrativeDetail.setMinimumSize(administrativeDetailSize);
+        optAdministrativeDetail.setMaximumSize(administrativeDetailSize);
+        optAdministrativeDetail.setToolTipText("Show regional boundaries or add district boundaries.");
+        optAdministrativeDetail.addActionListener(event -> {
+            administrativeRenderCache.clear();
+            repaint();
+        });
+        optAdministrativeBoundaries.addActionListener(event -> {
+            optAdministrativeDetail.setEnabled(optAdministrativeBoundaries.isSelected());
+            repaint();
+        });
+        JPanel administrativeControl = new JPanel();
+        administrativeControl.setLayout(new BoxLayout(administrativeControl, BoxLayout.X_AXIS));
+        administrativeControl.setOpaque(false);
+        administrativeControl.setAlignmentX(Component.LEFT_ALIGNMENT);
+        administrativeControl.add(optAdministrativeBoundaries);
+        administrativeControl.add(Box.createHorizontalGlue());
+        administrativeControl.add(optAdministrativeDetail);
+        optionPanel.add(administrativeControl);
                 optCapitals = createOptionCheckBox("Capitals");
                 optCapitals.setSelected(true);
                 optCapitalDetail = new ImmersiveComboBox<>(CapitalDisplayDetail.values());
@@ -4422,6 +4542,7 @@ public class InterstellarMapPanel extends JPanel {
             case RESTRICTED_SYSTEM -> paintLegendRestrictedSystem(graphics);
             case GM_EDITED_SYSTEM -> paintLegendGmEditedSystem(graphics);
             case HPG_NETWORK -> paintLegendHpgNetwork(graphics);
+            case ADMINISTRATIVE_BOUNDARIES -> paintLegendAdministrativeBoundaries(graphics);
             case SOVEREIGN_TERRITORY -> paintLegendTerritorySemantic(graphics,
                 TerritorySemantic.SOVEREIGN);
             case DISPUTED_TERRITORY -> paintLegendTerritorySemantic(graphics,
@@ -4445,6 +4566,24 @@ public class InterstellarMapPanel extends JPanel {
         graphics.setPaint(color);
         graphics.fill(ring);
         paintLegendRangeRingCenter(graphics);
+    }
+
+    private static void paintLegendAdministrativeBoundaries(Graphics2D graphics) {
+        Color factionColor = new Color(70, 156, 220);
+        graphics.setPaint(ADMINISTRATIVE_BOUNDARY_DARK);
+          graphics.setStroke(new BasicStroke(3.8f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
+        graphics.draw(new Line2D.Double(8, 12, 56, 12));
+          graphics.setPaint(withAlpha(factionColor, 215));
+          graphics.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
+        graphics.draw(new Line2D.Double(8, 12, 56, 12));
+        graphics.setPaint(ADMINISTRATIVE_BOUNDARY_DARK);
+          graphics.setStroke(new BasicStroke(2.6f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10.0f,
+              new float[] { 4.0f, 5.0f }, 0.0f));
+        graphics.draw(new Line2D.Double(8, 27, 56, 27));
+          graphics.setPaint(withAlpha(factionColor, 165));
+          graphics.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10.0f,
+              new float[] { 4.0f, 5.0f }, 0.0f));
+        graphics.draw(new Line2D.Double(8, 27, 56, 27));
     }
 
     private static void paintLegendRangeRingCenter(Graphics2D graphics) {
@@ -4728,13 +4867,13 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     private static void paintLegendHpgNetwork(Graphics2D graphics) {
-        graphics.setPaint(Color.CYAN);
-        graphics.setStroke(new BasicStroke(2.8f));
+          graphics.setPaint(HPG_CLASS_A_LINK_COLOR);
+          graphics.setStroke(new BasicStroke(1.35f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         graphics.draw(new Line2D.Double(5, 12, 59, 12));
         graphics.draw(new Ellipse2D.Double(8, 7, 10, 10));
-        graphics.setPaint(Color.BLUE);
-        graphics.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0,
-              new float[] { 6, 4 }, 0));
+          graphics.setPaint(HPG_CLASS_B_LINK_COLOR);
+          graphics.setStroke(new BasicStroke(0.8f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 10.0f,
+              new float[] { 8.0f, 8.0f }, 0.0f));
         graphics.draw(new Line2D.Double(5, 27, 59, 27));
         graphics.draw(new Ellipse2D.Double(46, 22, 10, 10));
     }
@@ -5595,6 +5734,23 @@ public class InterstellarMapPanel extends JPanel {
           drawPannableRenderLayer(graphics, territory, viewKey.width(), viewKey.height(), alpha);
     }
 
+        private void paintAdministrativeBoundaryLayer(Graphics2D graphics, TerritoryAtlas atlas,
+            TerritoryRenderKey renderKey, AdministrativeDisplayDetail detail) {
+          RenderViewKey viewKey = renderKey.viewKey();
+          int overscan = renderLayerOverscan(viewKey.width(), viewKey.height());
+          if (overscan == 0) {
+            administrativeRenderCache.clear();
+            drawAdministrativeBoundaryLayer(graphics, atlas, viewKey, 0, detail);
+            return;
+          }
+          AdministrativeRenderKey administrativeKey = new AdministrativeRenderKey(
+              new TerritoryDataKey(renderKey.date(), renderKey.dataRevision()), detail);
+          PannableRenderLayer boundaries = administrativeRenderCache.getOrRender(
+              administrativeKey, viewKey, overscan,
+              layerGraphics -> drawAdministrativeBoundaryLayer(layerGraphics, atlas, viewKey, overscan, detail));
+          drawPannableRenderLayer(graphics, boundaries, viewKey.width(), viewKey.height(), 1.0);
+        }
+
         private void paintRetainedMapModeTransition(Graphics2D graphics, TerritoryAtlas atlas,
             TerritoryRenderKey renderKey, Map<String, SystemRenderData> systemRenderData,
             MapMode previousMode, MapMode targetMode, HpgNetworkDetail hpgNetworkDetail,
@@ -6210,6 +6366,56 @@ public class InterstellarMapPanel extends JPanel {
         }
     }
 
+    static void drawAdministrativeBoundaryLayer(Graphics2D graphics, TerritoryAtlas atlas,
+          RenderViewKey viewKey, int overscan, AdministrativeDisplayDetail detail) {
+        double scale = Double.longBitsToDouble(viewKey.scaleBits());
+        double centerX = Double.longBitsToDouble(viewKey.centerXBits());
+        double centerY = Double.longBitsToDouble(viewKey.centerYBits());
+        double visibleMinX = (-overscan - (viewKey.width() / 2.0)) / scale - centerX;
+        double visibleMaxX = (viewKey.width() + overscan - (viewKey.width() / 2.0)) / scale - centerX;
+        double visibleMinY = ((viewKey.height() / 2.0) - viewKey.height() - overscan) / scale + centerY;
+        double visibleMaxY = ((viewKey.height() / 2.0) + overscan) / scale + centerY;
+        AffineTransform mapToScreen = new AffineTransform();
+        mapToScreen.translate(viewKey.width() / 2.0, viewKey.height() / 2.0);
+        mapToScreen.scale(scale, -scale);
+        mapToScreen.translate(centerX, -centerY);
+        for (AdministrativeBoundary boundary : atlas.administrativeBoundaries()) {
+            if (!detail.includes(boundary.level()) || (boundary.maxMapX() < visibleMinX)
+                  || (boundary.minMapX() > visibleMaxX) || (boundary.maxMapY() < visibleMinY)
+                  || (boundary.minMapY() > visibleMaxY)) {
+                continue;
+            }
+            paintAdministrativeBoundary(graphics, boundary, mapToScreen);
+        }
+    }
+
+    private static void paintAdministrativeBoundary(Graphics2D graphics, AdministrativeBoundary boundary,
+          AffineTransform mapToScreen) {
+        Graphics2D boundaryGraphics = (Graphics2D) graphics.create();
+        try {
+            boundaryGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            Shape screenShape = mapToScreen.createTransformedShape(boundary.shape());
+            boolean region = boundary.level() == AdministrativeBoundaryLevel.REGION;
+            float[] dash = region ? null : new float[] { 4.0f, 5.0f };
+            boundaryGraphics.setPaint(ADMINISTRATIVE_BOUNDARY_DARK);
+            boundaryGraphics.setStroke(new BasicStroke(region ? 3.8f : 2.6f, BasicStroke.CAP_BUTT,
+                  BasicStroke.JOIN_ROUND, 10.0f, dash, 0.0f));
+            boundaryGraphics.draw(screenShape);
+            boundaryGraphics.setPaint(withAlpha(boundary.factions().getFirst().getColor(), region ? 215 : 165));
+            boundaryGraphics.setStroke(new BasicStroke(region ? 1.8f : 1.0f, BasicStroke.CAP_BUTT,
+                  BasicStroke.JOIN_ROUND, 10.0f, dash, 0.0f));
+            boundaryGraphics.draw(screenShape);
+            if (boundary.factions().size() > 1) {
+                boundaryGraphics.setPaint(withAlpha(boundary.factions().get(1).getColor(), 240));
+                boundaryGraphics.setStroke(new BasicStroke(1.2f, BasicStroke.CAP_BUTT,
+                      BasicStroke.JOIN_ROUND));
+                boundaryGraphics.draw(screenShape);
+            }
+        } finally {
+            boundaryGraphics.dispose();
+        }
+    }
+
     static void paintTerritoryContour(Graphics2D graphics, TerritoryContour contour,
           AffineTransform mapToScreen, TerritoryVisualProfile visualProfile) {
         if (contour.semantic() == TerritorySemantic.UNCLAIMED_EXTERIOR) {
@@ -6260,20 +6466,20 @@ public class InterstellarMapPanel extends JPanel {
 
     private static void drawSovereignBoundary(Graphics2D graphics, Shape shape, Color factionColor) {
         graphics.setPaint(TERRITORY_BORDER_DARK);
-        graphics.setStroke(new BasicStroke(3.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        graphics.setStroke(new BasicStroke(2.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         graphics.draw(shape);
-        graphics.setPaint(withAlpha(factionColor, 205));
-        graphics.setStroke(new BasicStroke(1.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        graphics.setPaint(withAlpha(factionColor, 170));
+        graphics.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         graphics.draw(shape);
     }
 
     private static void drawDisputedTerritory(Graphics2D graphics, Shape shape, List<Faction> factions,
           double secondaryDetailAlpha) {
         graphics.setPaint(TERRITORY_BORDER_DARK);
-        graphics.setStroke(new BasicStroke(3.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+          graphics.setStroke(new BasicStroke(3.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         graphics.draw(shape);
         graphics.setPaint(TERRITORY_NEUTRAL_EDGE);
-        graphics.setStroke(new BasicStroke(1.4f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 0,
+          graphics.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 0,
               new float[] { 7.0f, 4.0f }, 0));
         graphics.draw(shape);
     }
@@ -6306,7 +6512,7 @@ public class InterstellarMapPanel extends JPanel {
             Color bandColor = new Color(
                   (float) interpolate(average[0], faction[0], detailAlpha),
                   (float) interpolate(average[1], faction[1], detailAlpha),
-                  (float) interpolate(average[2], faction[2], detailAlpha), 0.25f);
+                  (float) interpolate(average[2], faction[2], detailAlpha), 0.18f);
             colors[factionIndex * 2] = bandColor;
             colors[factionIndex * 2 + 1] = bandColor;
         }
@@ -6335,14 +6541,14 @@ public class InterstellarMapPanel extends JPanel {
             return;
         }
         graphics.setComposite(deriveCompositeWithAlpha(graphics.getComposite(), detailAlpha));
-        graphics.setPaint(withAlpha(factionColor, 180));
-        graphics.setStroke(new BasicStroke(5.6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        graphics.setPaint(withAlpha(factionColor, 150));
+        graphics.setStroke(new BasicStroke(4.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         graphics.draw(shape);
         graphics.setPaint(TERRITORY_BORDER_DARK);
-        graphics.setStroke(new BasicStroke(2.7f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        graphics.setStroke(new BasicStroke(2.1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         graphics.draw(shape);
-        graphics.setPaint(withAlpha(factionColor, 225));
-        graphics.setStroke(new BasicStroke(0.9f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        graphics.setPaint(withAlpha(factionColor, 180));
+        graphics.setStroke(new BasicStroke(0.7f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         graphics.draw(shape);
     }
 
@@ -6364,6 +6570,7 @@ public class InterstellarMapPanel extends JPanel {
         }
         preparedTerritoryAtlas.prepare(requestedKey, () -> buildTerritoryAtlas(date));
         territoryRenderCache.clear();
+        administrativeRenderCache.clear();
         clearRetainedCartographyRenderCache();
         retainedSystemArtRenderCache.clear();
         retainedNavigationRenderCache.clear();
@@ -6451,6 +6658,7 @@ public class InterstellarMapPanel extends JPanel {
     void clearRenderLayerCaches() {
         backgroundRenderCache.clear();
         territoryRenderCache.clear();
+        administrativeRenderCache.clear();
         clearRetainedCartographyRenderCache();
         retainedSystemArtRenderCache.clear();
         retainedNavigationRenderCache.clear();
@@ -6492,7 +6700,7 @@ public class InterstellarMapPanel extends JPanel {
 
     private TerritoryAtlas buildTerritoryAtlas(LocalDate date) {
         if (systems.isEmpty()) {
-            return new TerritoryAtlas(date, 0, -1, 0, -1, Map.of(), List.of(), List.of());
+            return new TerritoryAtlas(date, 0, -1, 0, -1, Map.of(), List.of(), List.of(), List.of());
         }
 
         double systemMinX = systems.stream().mapToDouble(PlanetarySystem::getX).min().orElse(0.0);
@@ -6512,13 +6720,19 @@ public class InterstellarMapPanel extends JPanel {
                 double centerX = column * TERRITORY_HEX_SPACING_X;
                 double centerY = row * TERRITORY_HEX_SIZE
                       + (column % 2) * TERRITORY_HEX_SIZE / 2.0;
-                List<Faction> factions = classifyTerritoryHex(centerX, centerY, date, independentFaction);
-                cells.put(hex, new TerritoryCell(hex, centerX, centerY, factions));
+                    TerritoryClassification classification = classifyTerritoryHex(
+                        centerX, centerY, date, independentFaction);
+                    AdministrativeKey administration = classifyAdministrativeKey(
+                        classification.factions(), classification.evidenceSystems(), date);
+                    cells.put(hex, new TerritoryCell(hex, centerX, centerY,
+                        classification.factions(), administration));
             }
         }
         List<TerritoryContour> contours = buildTerritoryContours(cells);
         List<TerritoryComponent> components = buildTerritoryComponents(cells);
-        return new TerritoryAtlas(date, minColumn, maxColumn, minRow, maxRow, cells, contours, components);
+              List<AdministrativeBoundary> administrativeBoundaries = buildAdministrativeBoundaries(cells);
+              return new TerritoryAtlas(date, minColumn, maxColumn, minRow, maxRow, cells, contours, components,
+                  administrativeBoundaries);
     }
 
     static List<TerritoryContour> buildTerritoryContours(Map<TerritoryHex, TerritoryCell> cells) {
@@ -6611,12 +6825,12 @@ public class InterstellarMapPanel extends JPanel {
 
     private static Paint createTerritoryPaint(List<Faction> factions) {
         if (factions.isEmpty()) {
-            return new Color(0.0f, 0.0f, 0.0f, 0.25f);
+            return new Color(0.0f, 0.0f, 0.0f, 0.18f);
         }
         if (factions.size() == 1) {
             Color factionColor = factions.getFirst().getColor();
             float[] colorComponents = factionColor.getComponents(null);
-            return new Color(colorComponents[0], colorComponents[1], colorComponents[2], 0.25f);
+            return new Color(colorComponents[0], colorComponents[1], colorComponents[2], 0.16f);
         }
 
         float red = 0.0f;
@@ -6629,27 +6843,31 @@ public class InterstellarMapPanel extends JPanel {
             blue += colorComponents[2];
         }
         float factionCount = factions.size();
-        return new Color(red / factionCount, green / factionCount, blue / factionCount, 0.25f);
+        return new Color(red / factionCount, green / factionCount, blue / factionCount, 0.18f);
     }
 
-    private List<Faction> classifyTerritoryHex(double centerX, double centerY, LocalDate date,
+    private TerritoryClassification classifyTerritoryHex(double centerX, double centerY, LocalDate date,
           Faction independentFaction) {
         GeneralPath path = new GeneralPath();
         setupHexPath(path, centerX, centerY, TERRITORY_HEX_SIZE / 2.0);
         List<PlanetarySystem> nearbySystems = Systems.getInstance().getNearbySystems(centerX, centerY,
               (int) Math.round(TERRITORY_HEX_SIZE * 1.3));
         Set<Faction> hexFactions = new HashSet<>();
+        List<PlanetarySystem> evidenceSystems = new ArrayList<>();
 
         for (PlanetarySystem system : nearbySystems) {
             if (!isSystemEmpty(system, date) && path.contains(system.getX(), system.getY())) {
+                evidenceSystems.add(system);
                 Set<Faction> factions = new HashSet<>(system.getFactionSet(date));
                 factions.remove(independentFaction);
                 hexFactions.addAll(factions);
             }
         }
         if (hexFactions.isEmpty()) {
+            evidenceSystems.clear();
             for (PlanetarySystem system : nearbySystems) {
                 if (!isSystemEmpty(system, date)) {
+                    evidenceSystems.add(system);
                     hexFactions.addAll(new HashSet<>(system.getFactionSet(date)));
                 }
             }
@@ -6658,9 +6876,95 @@ public class InterstellarMapPanel extends JPanel {
             hexFactions.remove(independentFaction);
         }
 
-        return hexFactions.stream()
+        List<Faction> factions = hexFactions.stream()
               .sorted(Comparator.comparing(Faction::getShortName))
               .toList();
+        return new TerritoryClassification(factions, evidenceSystems);
+    }
+
+    static @Nullable AdministrativeKey classifyAdministrativeKey(List<Faction> cellFactions,
+          List<PlanetarySystem> evidenceSystems, LocalDate date) {
+        if ((cellFactions.size() != 1) || evidenceSystems.isEmpty()) {
+            return null;
+        }
+        Faction owner = cellFactions.getFirst();
+        PlanetarySystem nearestSystem = evidenceSystems.getFirst();
+        Set<Faction> systemFactions = nearestSystem.getFactionSet(date);
+        if ((systemFactions == null) || (systemFactions.size() != 1) || !systemFactions.contains(owner)) {
+            return null;
+        }
+        List<String> administration = nearestSystem.getAdministration(date);
+        if (administration.isEmpty() || administration.stream()
+              .anyMatch(component -> (component == null) || component.isBlank())) {
+            return null;
+        }
+        return new AdministrativeKey(owner, administration);
+    }
+
+    static List<AdministrativeBoundary> buildAdministrativeBoundaries(
+          Map<TerritoryHex, TerritoryCell> cells) {
+        Map<AdministrativeBoundaryGroup, GeneralPath> paths = new HashMap<>();
+        List<TerritoryCell> orderedCells = cells.values().stream()
+              .sorted(Comparator.comparingInt((TerritoryCell cell) -> cell.hex().column())
+                    .thenComparingInt(cell -> cell.hex().row()))
+              .toList();
+        for (TerritoryCell cell : orderedCells) {
+            if (cell.administration() == null) {
+                continue;
+            }
+            for (TerritoryHex neighborHex : getTerritoryNeighbors(cell.hex())) {
+                if (!isHexBefore(cell.hex(), neighborHex)) {
+                    continue;
+                }
+                TerritoryCell neighbor = cells.get(neighborHex);
+                if ((neighbor == null) || (neighbor.administration() == null)) {
+                    continue;
+                }
+                AdministrativeKey first = cell.administration();
+                AdministrativeKey second = neighbor.administration();
+                AdministrativeBoundaryLevel level;
+                if (!first.faction().equals(second.faction()) || !first.region().equals(second.region())) {
+                    level = AdministrativeBoundaryLevel.REGION;
+                } else if (!first.path().equals(second.path())) {
+                    level = AdministrativeBoundaryLevel.DISTRICT;
+                } else {
+                    continue;
+                }
+                List<Faction> factions = first.faction().equals(second.faction())
+                      ? List.of(first.faction())
+                      : List.of(first.faction(), second.faction()).stream()
+                            .sorted(Comparator.comparing(Faction::getShortName)).toList();
+                GeneralPath boundaryPath = paths.computeIfAbsent(
+                      new AdministrativeBoundaryGroup(level, factions), ignored -> new GeneralPath());
+                appendSharedTerritoryEdge(boundaryPath, cell, neighbor);
+            }
+        }
+
+        List<AdministrativeBoundary> boundaries = new ArrayList<>();
+        paths.entrySet().stream()
+              .sorted(Comparator.comparing((Map.Entry<AdministrativeBoundaryGroup, GeneralPath> entry) ->
+                          entry.getKey().level())
+                    .thenComparing(entry -> entry.getKey().factions().stream()
+                          .map(Faction::getShortName).reduce((first, second) -> first + ":" + second).orElse("")))
+              .forEach(entry -> {
+                  Rectangle2D bounds = entry.getValue().getBounds2D();
+                  boundaries.add(new AdministrativeBoundary(entry.getKey().level(), entry.getKey().factions(),
+                        entry.getValue(), bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY()));
+              });
+        return List.copyOf(boundaries);
+    }
+
+    private static void appendSharedTerritoryEdge(GeneralPath path, TerritoryCell first, TerritoryCell second) {
+        double deltaX = second.centerX() - first.centerX();
+        double deltaY = second.centerY() - first.centerY();
+        double distance = Point2D.distance(0.0, 0.0, deltaX, deltaY);
+        double halfEdge = TERRITORY_HEX_RADIUS / 2.0;
+        double offsetX = -deltaY / distance * halfEdge;
+        double offsetY = deltaX / distance * halfEdge;
+        double midpointX = (first.centerX() + second.centerX()) / 2.0;
+        double midpointY = (first.centerY() + second.centerY()) / 2.0;
+        path.moveTo(midpointX - offsetX, midpointY - offsetY);
+        path.lineTo(midpointX + offsetX, midpointY + offsetY);
     }
 
     private List<TerritoryComponent> buildTerritoryComponents(Map<TerritoryHex, TerritoryCell> cells) {
@@ -7021,13 +7325,13 @@ public class InterstellarMapPanel extends JPanel {
             PlanetarySystem secondary = link.secondary();
             if (!cullToViewport || isSystemVisible(primary, false) || isSystemVisible(secondary, false)) {
                 if (link.rating() == HPGRating.A) {
-                    graphics.setPaint(Color.CYAN);
+                    graphics.setPaint(HPG_CLASS_A_LINK_COLOR);
                     graphics.setStroke(thick);
                     graphics.draw(new Line2D.Double(map2scrX(primary.getX()), map2scrY(primary.getY()),
                           map2scrX(secondary.getX()), map2scrY(secondary.getY())));
                 }
                 if (link.rating() == HPGRating.B) {
-                    graphics.setPaint(Color.BLUE);
+                    graphics.setPaint(HPG_CLASS_B_LINK_COLOR);
                     graphics.setStroke(dashed);
                     graphics.draw(new Line2D.Double(map2scrX(primary.getX()), map2scrY(primary.getY()),
                           map2scrX(secondary.getX()), map2scrY(secondary.getY())));
@@ -7038,7 +7342,7 @@ public class InterstellarMapPanel extends JPanel {
 
     private static void drawHpgStationMarker(Graphics2D graphics, SystemMarkerLayout layout,
           HPGRating rating) {
-        double radius = hpgStationMarkerRadius(layout.size());
+                double radius = hpgStationMarkerRadius(layout.size(), rating);
         Point2D.Double anchor = layout.hpgStationAnchor(radius);
           drawHpgStationBadge(graphics, anchor, radius, rating);
         }
@@ -7070,8 +7374,13 @@ public class InterstellarMapPanel extends JPanel {
         }
     }
 
-    private static double hpgStationMarkerRadius(double systemSize) {
-        return Math.clamp(systemSize * 0.72, 7.0, 10.0);
+    static double hpgStationMarkerAlpha(HPGRating rating, double navigationAlpha, double closeDetailAlpha) {
+        return rating == HPGRating.A ? navigationAlpha : closeDetailAlpha;
+    }
+
+    static double hpgStationMarkerRadius(double systemSize, HPGRating rating) {
+        double radius = Math.clamp(systemSize * 0.62, 6.0, 8.5);
+        return rating == HPGRating.A ? radius : radius * 0.85;
     }
 
     private static Color hpgStationColor(HPGRating rating) {
@@ -7647,30 +7956,27 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     private static float nationalCapitalOutlineWidth(double markerSize) {
-        return (float) Math.clamp(markerSize * 0.42, 4.0, 5.0);
+        return (float) Math.clamp(markerSize * 0.28, 2.2, 3.2);
     }
 
     static void drawNationalCapitalMarker(Graphics2D graphics, Point2D.Double anchor, double size,
           Color factionColor) {
         double outerRadius = nationalCapitalHalfWidth(size);
-        Shape star = createCenteredMaterialSymbol(graphics, MATERIAL_STAR_SYMBOL, anchor, outerRadius * 2.0);
-        if (star == null) {
-            star = createFallbackStar(anchor, outerRadius);
-        }
+        Shape star = createFallbackStar(anchor, outerRadius);
 
-        graphics.setPaint(withAlpha(Color.BLACK, 205));
+        graphics.setPaint(withAlpha(Color.BLACK, 220));
         graphics.setStroke(new BasicStroke(nationalCapitalOutlineWidth(size), BasicStroke.CAP_ROUND,
               BasicStroke.JOIN_ROUND));
         graphics.draw(star);
         graphics.setPaint(factionColor);
         graphics.fill(star);
-        graphics.setPaint(withAlpha(Color.WHITE, 115));
-        graphics.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        graphics.setPaint(withAlpha(Color.WHITE, 85));
+        graphics.setStroke(new BasicStroke(0.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         graphics.draw(star);
     }
 
     private static GeneralPath createFallbackStar(Point2D.Double anchor, double outerRadius) {
-        double innerRadius = outerRadius * 0.43;
+        double innerRadius = outerRadius * 0.47;
         GeneralPath star = new GeneralPath();
         for (int pointIndex = 0; pointIndex < 10; pointIndex++) {
             double radius = (pointIndex % 2 == 0) ? outerRadius : innerRadius;
@@ -8776,7 +9082,7 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     private void drawMapBackground(Graphics2D graphics, int width, int height) {
-        graphics.setPaint(new GradientPaint(0, 0, MAP_BACKGROUND_TOP, 0, height, MAP_BACKGROUND_BOTTOM));
+        graphics.setPaint(MAP_BACKGROUND_TOP);
         graphics.fillRect(0, 0, width, height);
 
         double spacing = getGridSpacing(conf.scale);

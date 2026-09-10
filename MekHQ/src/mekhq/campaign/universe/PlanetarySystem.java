@@ -335,6 +335,25 @@ public class PlanetarySystem {
     }
 
     /**
+     * @return the shared nonempty administration path recorded by this system's planets, or an empty list when none is
+     *       recorded or the planets disagree
+     */
+    public List<String> getAdministration(LocalDate when) {
+        List<String> administration = null;
+        for (Planet planet : planets.values()) {
+            List<String> planetAdministration = planet.getAdministration(when);
+            if (planetAdministration.isEmpty()) {
+                continue;
+            }
+            if ((administration != null) && !administration.equals(planetAdministration)) {
+                return List.of();
+            }
+            administration = planetAdministration;
+        }
+        return (administration == null) ? List.of() : List.copyOf(administration);
+    }
+
+    /**
      * The look-back window, in years, over which prior rulers still count toward a world's living population. A native
      * up to this old could have been born under a faction that has since lost the world, so those factions remain a
      * plausible birth origin.
