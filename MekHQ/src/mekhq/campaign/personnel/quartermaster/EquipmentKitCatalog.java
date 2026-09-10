@@ -59,14 +59,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
  * @since 0.51.01
  */
 public final class EquipmentKitCatalog extends AbstractKitCatalog {
-    /**
-     * The bonus a matching specialized repair kit grants to a covered repair roll (a reduction to the target number).
-     * Set to +2 so a specialist kit remains worthwhile alongside a Deluxe Toolkit, which grants +1 to every technician
-     * roll.
-     */
-    public static final int REPAIR_KIT_ROLL_BONUS = 2;
-
-    /** The bonus a Deluxe Toolkit grants to any technician roll (repairs and maintenance). */
+    public static final int REPAIR_KIT_ROLL_BONUS = 1;
     public static final int DELUXE_TOOLKIT_ROLL_BONUS = 1;
 
     // The specialized equipment kits the catalog reasons about, by their MegaMek internal name
@@ -265,12 +258,8 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
             }
         }
 
-        // Deluxe Toolkit: +DELUXE_TOOLKIT_ROLL_BONUS to every technician skill (globals included, so maintenance/refits
-        // pick it up through the whole-unit skill).
         if (person.hasRepairKit(KIT_DELUXE_TOOLKIT)) {
-            for (String skill : getTechSkills()) {
-                bonuses.merge(skill, DELUXE_TOOLKIT_ROLL_BONUS, Math::max);
-            }
+            bonuses.merge(S_ASTECH, DELUXE_TOOLKIT_ROLL_BONUS, Math::max);
         }
 
         // Field/medical/computer kits: their non-technician skill bonuses.
@@ -381,9 +370,9 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
             return 0;
         }
         if (person.hasRepairKit(KIT_DESCARTES_MK_XXV)) {
-            return 3;
-        } else if (person.hasRepairKit(KIT_DESCARTES_MK_XXI)) {
             return 2;
+        } else if (person.hasRepairKit(KIT_DESCARTES_MK_XXI)) {
+            return 1;
         }
         return 0;
     }
