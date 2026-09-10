@@ -344,7 +344,7 @@ public class InterstellarMapPanel extends JPanel {
     private static final double TERRITORY_HEX_SPACING_X = TERRITORY_HEX_SIZE * Math.sqrt(3) / 2.0;
     private static final double TERRITORY_HEX_RADIUS = TERRITORY_HEX_SIZE / Math.sqrt(3);
     private static final int TERRITORY_HEX_MARGIN = 2;
-        private static final Stroke TERRITORY_CONTOUR_SOFTENING_STROKE = new BasicStroke(5.0f,
+        private static final BasicStroke TERRITORY_CONTOUR_SOFTENING_STROKE = new BasicStroke(5.0f,
                     BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
     private static final Color TERRITORY_BORDER_DARK = new Color(2, 6, 10, 175);
     private static final Color TERRITORY_NEUTRAL_EDGE = new Color(198, 211, 214, 145);
@@ -6749,7 +6749,7 @@ public class InterstellarMapPanel extends JPanel {
         }
         List<TerritoryContour> contours = buildTerritoryContours(cells);
         List<TerritoryComponent> components = buildTerritoryComponents(cells);
-              List<AdministrativeBoundary> administrativeBoundaries = buildAdministrativeBoundaries(cells);
+              List<AdministrativeBoundary> administrativeBoundaries = buildAdministrativeBoundaries(cells, contours);
               return new TerritoryAtlas(date, minColumn, maxColumn, minRow, maxRow, cells, contours, components,
                   administrativeBoundaries);
     }
@@ -6922,6 +6922,11 @@ public class InterstellarMapPanel extends JPanel {
 
     static List<AdministrativeBoundary> buildAdministrativeBoundaries(
           Map<TerritoryHex, TerritoryCell> cells) {
+          return buildAdministrativeBoundaries(cells, buildTerritoryContours(cells));
+        }
+
+        private static List<AdministrativeBoundary> buildAdministrativeBoundaries(
+            Map<TerritoryHex, TerritoryCell> cells, List<TerritoryContour> contours) {
         Map<AdministrativeBoundaryGroup, GeneralPath> paths = new HashMap<>();
         List<TerritoryCell> orderedCells = cells.values().stream()
               .sorted(Comparator.comparingInt((TerritoryCell cell) -> cell.hex().column())
@@ -6941,21 +6946,21 @@ public class InterstellarMapPanel extends JPanel {
                 }
                 AdministrativeKey first = cell.administration();
                 AdministrativeKey second = neighbor.administration();
+                if (!first.faction().equals(second.faction())) {
+                    continue;
+                }
                 AdministrativeBoundaryLevel level;
-                if (!first.faction().equals(second.faction()) || !first.region().equals(second.region())) {
+                if (!first.region().equals(second.region())) {
                     level = AdministrativeBoundaryLevel.REGION;
                 } else if (!first.path().equals(second.path())) {
                     level = AdministrativeBoundaryLevel.DISTRICT;
                 } else {
                     continue;
                 }
-                List<Faction> factions = first.faction().equals(second.faction())
-                      ? List.of(first.faction())
-                      : List.of(first.faction(), second.faction()).stream()
-                            .sorted(Comparator.comparing(Faction::getShortName)).toList();
+                    List<Faction> factions = List.of(first.faction());
                 GeneralPath boundaryPath = paths.computeIfAbsent(
                       new AdministrativeBoundaryGroup(level, factions), ignored -> new GeneralPath());
-                appendSharedTerritoryEdge(boundaryPath, cell, neighbor);
+                appendSharedTerritoryEdge(boundaryPath, cell, neighbor, cells);
             }
         }
 
@@ -6970,10 +6975,30 @@ public class InterstellarMapPanel extends JPanel {
                   boundaries.add(new AdministrativeBoundary(entry.getKey().level(), entry.getKey().factions(),
                         entry.getValue(), bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY()));
               });
+        Map<Faction, List<TerritoryCell>> administeredCells = new HashMap<>();
+        for (TerritoryCell cell : orderedCells) {
+            if (cell.administration() != null) {
+                administeredCells.computeIfAbsent(cell.administration().faction(), ignored -> new ArrayList<>())
+                      .add(cell);
+            }
+        }
+        for (TerritoryContour contour : contours) {
+            if ((contour.semantic() != TerritorySemantic.SOVEREIGN)
+                  && (contour.semantic() != TerritorySemantic.ENCLAVE)) {
+                continue;
+            }
+            List<TerritoryCell> knownCells = administeredCells.get(contour.factions().getFirst());
+            if ((knownCells != null) && knownCells.stream()
+                  .anyMatch(cell -> contour.shape().contains(cell.centerX(), cell.centerY()))) {
+                boundaries.add(new AdministrativeBoundary(AdministrativeBoundaryLevel.REGION, contour.factions(),
+                      contour.shape(), contour.minMapX(), contour.maxMapX(), contour.minMapY(), contour.maxMapY()));
+            }
+        }
         return List.copyOf(boundaries);
     }
 
-    private static void appendSharedTerritoryEdge(GeneralPath path, TerritoryCell first, TerritoryCell second) {
+    private static void appendSharedTerritoryEdge(GeneralPath path, TerritoryCell first, TerritoryCell second,
+          Map<TerritoryHex, TerritoryCell> cells) {
         double deltaX = second.centerX() - first.centerX();
         double deltaY = second.centerY() - first.centerY();
         double distance = Point2D.distance(0.0, 0.0, deltaX, deltaY);
@@ -6982,8 +7007,30 @@ public class InterstellarMapPanel extends JPanel {
         double offsetY = deltaX / distance * halfEdge;
         double midpointX = (first.centerX() + second.centerX()) / 2.0;
         double midpointY = (first.centerY() + second.centerY()) / 2.0;
-        path.moveTo(midpointX - offsetX, midpointY - offsetY);
-        path.lineTo(midpointX + offsetX, midpointY + offsetY);
+        double startExtension = 0.0;
+        double endExtension = 0.0;
+        if (first.factions().equals(second.factions())) {
+            List<TerritoryHex> secondNeighbors = getTerritoryNeighbors(second.hex());
+            for (TerritoryHex neighborHex : getTerritoryNeighbors(first.hex())) {
+                TerritoryCell neighbor = cells.get(neighborHex);
+                if (!secondNeighbors.contains(neighborHex) || (neighbor == null)
+                      || first.factions().equals(neighbor.factions())) {
+                    continue;
+                }
+                double extension = TERRITORY_CONTOUR_SOFTENING_STROKE.getLineWidth() / Math.sqrt(3.0);
+                double direction = (neighbor.centerX() - midpointX) * offsetX
+                      + (neighbor.centerY() - midpointY) * offsetY;
+                if (direction < 0.0) {
+                    startExtension = extension;
+                } else {
+                    endExtension = extension;
+                }
+            }
+        }
+        path.moveTo(midpointX - offsetX * (1.0 + startExtension / halfEdge),
+              midpointY - offsetY * (1.0 + startExtension / halfEdge));
+        path.lineTo(midpointX + offsetX * (1.0 + endExtension / halfEdge),
+              midpointY + offsetY * (1.0 + endExtension / halfEdge));
     }
 
     private List<TerritoryComponent> buildTerritoryComponents(Map<TerritoryHex, TerritoryCell> cells) {
