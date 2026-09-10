@@ -124,7 +124,7 @@ public class ToolKitSection implements KitIssueSection {
         scroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
         tab.add(scroll, BorderLayout.CENTER);
 
-        rosterModel = new RosterModel();
+        rosterModel = new RosterModel(technicians);
         JTable roster = new JTable(rosterModel);
         roster.setEnabled(false);
         roster.getTableHeader().setReorderingAllowed(false);
@@ -166,7 +166,7 @@ public class ToolKitSection implements KitIssueSection {
             card.refreshSelected();
         }
         if (rosterModel != null) {
-            rosterModel.fireTableDataChanged();
+            rosterModel.setSelected(selected);
         }
         onChange.run();
     }
@@ -277,29 +277,24 @@ public class ToolKitSection implements KitIssueSection {
         return stockCache.getOrDefault(kit, 0);
     }
 
-    /** The single tool kit a technician will carry after the pending selection is applied, or {@code null} for none. */
-    private String pendingOwnedKit(Person tech) {
-        String kitName;
-        if (STRIP.equals(selected)) {
-            kitName = null;
-        } else if (selected != null) {
-            kitName = selected; // issuing replaces whatever they carried
-        } else {
-            kitName = tech.getRepairKitName();
-        }
-        if (kitName == null) {
-            return null;
-        }
-        EquipmentType kit = EquipmentType.get(kitName);
-        return (kit != null) ? kit.getName() : kitName;
-    }
+    private static final class RosterModel extends AbstractTableModel {
+        private final List<Person> technicians;
+        private String selected;
 
-    private final class RosterModel extends AbstractTableModel {
         private final String[] columnNames = {
               getTextAt(RESOURCE_BUNDLE, "tools.col.name"),
               getTextAt(RESOURCE_BUNDLE, "tools.col.assignment"),
               getTextAt(RESOURCE_BUNDLE, "tools.col.owned")
         };
+
+        RosterModel(List<Person> technicians) {
+            this.technicians = technicians;
+        }
+
+        void setSelected(String selected) {
+            this.selected = selected;
+            fireTableDataChanged();
+        }
 
         @Override
         public int getRowCount() {
@@ -330,6 +325,24 @@ public class ToolKitSection implements KitIssueSection {
                 }
                 default -> "";
             };
+        }
+
+        private String pendingOwnedKit(Person tech) {
+            String kitName;
+            if (STRIP.equals(selected)) {
+                kitName = null;
+            } else if (selected != null) {
+                kitName = selected;
+            } else {
+                kitName = tech.getRepairKitName();
+            }
+
+            if (kitName == null) {
+                return null;
+            }
+
+            EquipmentType kit = EquipmentType.get(kitName);
+            return (kit != null) ? kit.getName() : kitName;
         }
     }
 }
