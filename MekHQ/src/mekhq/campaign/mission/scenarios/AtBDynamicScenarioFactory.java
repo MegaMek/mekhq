@@ -394,8 +394,16 @@ public class AtBDynamicScenarioFactory {
         ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
 
         String factionCode = contract.getEnemyFactionCode();
+        if (factionCode.isBlank()) {
+            LOGGER.error("Enemy faction code is blank; using fallback faction code. This is indicative of a deeper problem and should be reported.");
+            factionCode = "IS";
+        }
+
         Faction faction = Factions.getInstance().getFaction(factionCode);
-        MekSummary mekSummary = MekSummaryCache.getInstance().getMek("Mob (Small)");
+        if (faction == null) {
+            LOGGER.error("Enemy faction {} does not exist; aborting escapee generation.", factionCode);
+            return 0;
+        }
         if (mekSummary == null) {
             LOGGER.error("Cannot find entry for Mob (Small)");
             return 0;
