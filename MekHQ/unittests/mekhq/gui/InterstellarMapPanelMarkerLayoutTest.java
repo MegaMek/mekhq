@@ -54,6 +54,22 @@ class InterstellarMapPanelMarkerLayoutTest {
     private static final double CENTER_Y = 82.75;
     private static final double DELTA = 0.000_001;
 
+    @ParameterizedTest
+    @ValueSource(doubles = { 3.0, 7.5, 12.0, 18.0, 25.0 })
+    void hpgStationUsesLeftMiddleSlotClearOfSystemAndName(double markerSize) {
+        for (InterstellarMapPanel.RouteMarkerState routeState : InterstellarMapPanel.RouteMarkerState.values()) {
+            InterstellarMapPanel.SystemMarkerLayout layout = createLayout(markerSize, routeState, false, false);
+            double radius = 7.0;
+            Point2D.Double anchor = layout.hpgStationAnchor(radius);
+
+            assertEquals(CENTER_Y, anchor.y, DELTA);
+            assertTrue(anchor.x + radius < CENTER_X - layout.externalOrbitRadius());
+            assertTrue(anchor.x + radius < layout.labelX());
+            assertTrue(anchor.y > layout.operationAnchor().y + radius);
+            assertTrue(anchor.y < layout.playerBaseAnchor(radius, 1.0).y - radius);
+        }
+    }
+
         @Test
         void systemDiveInterpolatesCameraExactlyAndZoomsMonotonically() {
           InterstellarMapPanel.SystemDiveFrame start = InterstellarMapPanel.calculateSystemDiveFrame(

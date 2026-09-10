@@ -140,6 +140,61 @@ class InterstellarMapPanelRenderLayerCacheTest {
         assertFalse(InterstellarMapPanel.canUseRetainedSystemArt(false, false, true, true));
     }
 
+        @Test
+        void retainedTransitionDoesNotPaintTargetSystemArtAgain() {
+          boolean retainedTransition = InterstellarMapPanel.canUseRetainedMapModeTransition(
+              true, true, false, false, false);
+          boolean retainedSystemArt = InterstellarMapPanel.canUseRetainedSystemArt(
+              false, retainedTransition, false, false);
+
+          assertFalse(InterstellarMapPanel.shouldPaintSeparateSystemArt(retainedSystemArt, retainedTransition));
+          assertFalse(InterstellarMapPanel.shouldPaintSeparateSystemArt(true, true));
+          assertTrue(InterstellarMapPanel.shouldPaintSeparateSystemArt(true, false));
+          assertFalse(InterstellarMapPanel.shouldPaintSeparateSystemArt(false, false));
+        }
+
+        @Test
+        void territoryRasterSurvivesModeChangesAfterPanning() {
+          InterstellarMapPanel.PannableRenderLayerCache<InterstellarMapPanel.RetainedCartographyKey> cache =
+              new InterstellarMapPanel.PannableRenderLayerCache<>();
+          InterstellarMapPanel.TerritoryDataKey dataKey =
+              new InterstellarMapPanel.TerritoryDataKey(LocalDate.of(3050, 12, 23), 1L);
+          AtomicInteger rendererCalls = new AtomicInteger();
+          InterstellarMapPanel.RetainedCartographyKey faction = new InterstellarMapPanel.RetainedCartographyKey(
+              dataKey, InterstellarMapPanel.MapMode.FACTION, InterstellarMapPanel.HpgNetworkDetail.CLASS_A_B,
+              false, Double.doubleToLongBits(0.5), 1L, 2L, 3L, 4L, 5L, 6L, 24, 16, 100, 8, 2);
+          InterstellarMapPanel.RetainedCartographyKey technology = new InterstellarMapPanel.RetainedCartographyKey(
+              dataKey, InterstellarMapPanel.MapMode.TECHNOLOGY, InterstellarMapPanel.HpgNetworkDetail.CLASS_A_B,
+              true, Double.doubleToLongBits(0.5), 0L, 0L, 0L, 0L, 0L, 0L, 0, 0, 0, 0, 0);
+          InterstellarMapPanel.RenderViewKey pannedView = viewKey(100, 80, 5.0, -3.0, 2.0);
+          InterstellarMapPanel.PannableRenderLayer initial = cache.getOrRender(
+              faction.territoryOnly(), viewKey(100, 80, 0.0, 0.0, 2.0), 20,
+              graphics -> rendererCalls.incrementAndGet());
+          InterstellarMapPanel.PannableRenderLayer panned = cache.getOrRender(
+              faction.territoryOnly(), pannedView, 20, graphics -> rendererCalls.incrementAndGet());
+          InterstellarMapPanel.PannableRenderLayer switched = cache.getOrRefresh(
+              technology.territoryOnly(), pannedView, 20, 0, graphics -> rendererCalls.incrementAndGet());
+
+          assertEquals(faction.territoryOnly(), technology.territoryOnly());
+          assertSame(initial.image(), switched.image());
+          assertEquals(panned.drawX(), switched.drawX());
+          assertEquals(panned.drawY(), switched.drawY());
+          assertEquals(1, rendererCalls.get());
+        }
+
+        @Test
+        void territoryCacheIdentityPreservesDataAndOpacity() {
+          InterstellarMapPanel.TerritoryDataKey dataKey =
+              new InterstellarMapPanel.TerritoryDataKey(LocalDate.of(3050, 12, 23), 7L);
+          InterstellarMapPanel.RetainedCartographyKey key = new InterstellarMapPanel.RetainedCartographyKey(
+              dataKey, InterstellarMapPanel.MapMode.TECHNOLOGY, InterstellarMapPanel.HpgNetworkDetail.CLASS_A_B,
+              true, Double.doubleToLongBits(0.5), 1L, 2L, 3L, 4L, 5L, 6L, 24, 16, 100, 8, 2);
+
+          assertEquals(dataKey, key.territoryOnly().dataKey());
+          assertEquals(key.territoryAlphaBits(), key.territoryOnly().territoryAlphaBits());
+          assertEquals(key.territoryOnly(), key.territoryOnly().territoryOnly());
+        }
+
     @Test
     void territoryOpacityRemainsStableAcrossSemanticZoomBands() {
         double atlasAlpha = InterstellarMapPanel.SemanticZoomProfile.create(0.8, 3.0).territoryAlpha();
@@ -815,7 +870,85 @@ class InterstellarMapPanelRenderLayerCacheTest {
         assertEquals(19.0, bounds.maxY());
     }
 
-    private static void assertPremultipliedImagesEquivalent(BufferedImage expected, BufferedImage actual) {
+    @Test
+    void viewportQueryIncludesLeftHpgBadgeBeforeSystemEntersRightEdge() {
+        for (double size : new double[] { 3.0, 7.5, 12.0, 18.0, 25.0 }) {
+            double extent = InterstellarMapPanel.viewportMarkerQueryExtent(size, true);
+            InterstellarMapPanel.MapQueryBounds bounds = InterstellarMapPanel.viewportSystemQueryBounds(
+                  viewKey(100, 80, 0.0, 0.0, 2.0), extent, extent);
+            for (InterstellarMapPanel.RouteMarkerState state : InterstellarMapPanel.RouteMarkerState.values()) {
+                InterstellarMapPanel.SystemMarkerLayout layout = InterstellarMapPanel.SystemMarkerLayout.create(
+                      0.0, 0.0, size, state, false, false);
+                double radius = InterstellarMapPanel.hpgStationMarkerRadius(size,
+                      mekhq.campaign.universe.enums.HPGRating.A);
+                double badgeExtent = -layout.hpgStationAnchor(radius).x + radius + 2.0;
+                double enteringSystemX = (50.0 + badgeExtent) / 2.0;
+                assertTrue(enteringSystemX < bounds.maxX());
+            }
+            assertEquals(size * 2.0, InterstellarMapPanel.viewportMarkerQueryExtent(size, false));
+        }
+    }
+
+    @Test
+    void hpgClipRetainsCrossingLinksAndRejectsUnrelatedLinks() {
+        Rectangle2D clip = new Rectangle2D.Double(40, 20, 10, 60);
+        assertTrue(InterstellarMapPanel.isHpgLinkVisible(new Line2D.Double(-100, 50, 200, 50), clip));
+        assertTrue(InterstellarMapPanel.isHpgLinkVisible(new Line2D.Double(45, -100, 45, 200), clip));
+        assertFalse(InterstellarMapPanel.isHpgLinkVisible(new Line2D.Double(-100, 10, 200, 10), clip));
+        assertFalse(InterstellarMapPanel.isHpgLinkVisible(new Line2D.Double(0, 0, 35, 90), clip));
+        assertTrue(InterstellarMapPanel.isHpgLinkVisible(new Line2D.Double(0, 0, 35, 90), null));
+    }
+
+    @Test
+    void hpgClipFilteringPreservesDashedStripPixels() {
+        BufferedImage expected = new BufferedImage(100, 80, BufferedImage.TYPE_INT_ARGB_PRE);
+        BufferedImage actual = new BufferedImage(100, 80, BufferedImage.TYPE_INT_ARGB_PRE);
+        Rectangle strip = new Rectangle(40, 0, 10, 80);
+        Rectangle2D paddedClip = new Rectangle2D.Double(36, -4, 18, 88);
+        List<Line2D.Double> segments = List.of(
+              new Line2D.Double(-100, 35, 200, 35),
+              new Line2D.Double(39.5, -20, 39.5, 100),
+              new Line2D.Double(-100, -100, 200, 200),
+              new Line2D.Double(0, 10, 20, 70));
+        for (BufferedImage image : List.of(expected, actual)) {
+            Graphics2D graphics = image.createGraphics();
+            try {
+                graphics.setClip(strip);
+                graphics.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                      java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+                graphics.setColor(Color.CYAN);
+                graphics.setStroke(new java.awt.BasicStroke(0.8f, java.awt.BasicStroke.CAP_BUTT,
+                      java.awt.BasicStroke.JOIN_ROUND, 10.0f, new float[] { 12.0f, 8.0f }, 0.0f));
+                for (Line2D.Double segment : segments) {
+                      if ((image == expected) || (InterstellarMapPanel.isHpgLinkVisible(segment, paddedClip)
+                          && InterstellarMapPanel.hpgLinkIntersectsDamage(segment, strip, 4.0))) {
+                        graphics.draw(segment);
+                    }
+                }
+            } finally {
+                graphics.dispose();
+            }
+        }
+        assertTrue((expected.getRGB(40, 35) >>> 24) > 0);
+        assertPremultipliedImagesEquivalent(expected, actual);
+    }
+
+        @Test
+        void hpgDamageClipExcludesRetainedInteriorDuringDiagonalPan() {
+          java.awt.geom.Area damage = new java.awt.geom.Area(new Rectangle(0, 0, 100, 80));
+          damage.subtract(new java.awt.geom.Area(new Rectangle(10, 10, 90, 70)));
+          Line2D interior = new Line2D.Double(30, 30, 80, 60);
+
+          assertTrue(InterstellarMapPanel.isHpgLinkVisible(interior, damage.getBounds2D()));
+          assertFalse(InterstellarMapPanel.hpgLinkIntersectsDamage(interior, damage, 4.0));
+          assertTrue(InterstellarMapPanel.hpgLinkIntersectsDamage(
+              new Line2D.Double(-20, 40, 120, 40), damage, 4.0));
+          assertTrue(InterstellarMapPanel.hpgLinkIntersectsDamage(
+              new Line2D.Double(12, 20, 12, 70), damage, 4.0));
+          assertTrue(InterstellarMapPanel.hpgLinkIntersectsDamage(interior, null, 4.0));
+        }
+
+        private static void assertPremultipliedImagesEquivalent(BufferedImage expected, BufferedImage actual) {
         assertEquals(expected.getWidth(), actual.getWidth());
         assertEquals(expected.getHeight(), actual.getHeight());
         int[] expectedPixels = ((DataBufferInt) expected.getRaster().getDataBuffer()).getData();

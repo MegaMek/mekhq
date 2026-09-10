@@ -35,12 +35,18 @@ package mekhq.gui;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.font.FontRenderContext;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -87,6 +93,26 @@ class InterstellarMapPanelOperationMarkerTest {
         assertEquals(0.2, InterstellarMapPanel.hpgStationMarkerAlpha(HPGRating.B, 0.6, 0.2));
         assertTrue(InterstellarMapPanel.hpgStationMarkerRadius(10.0, HPGRating.A)
               > InterstellarMapPanel.hpgStationMarkerRadius(10.0, HPGRating.B));
+    }
+
+    @Test
+    void hpgBadgeTextReusesFontAndPreservesGlyphCenter() {
+        Font base = new Font(Font.DIALOG, Font.PLAIN, 12);
+        FontRenderContext context = new FontRenderContext(new AffineTransform(), true, true);
+        InterstellarMapPanel.HpgBadgeText text = InterstellarMapPanel.hpgBadgeText(base, context, 8.5, HPGRating.A);
+        Font expectedFont = base.deriveFont(Font.BOLD, (float) (8.5 * 1.15));
+        Rectangle2D expectedBounds = expectedFont.createGlyphVector(context, "A").getVisualBounds();
+
+        assertSame(text, InterstellarMapPanel.hpgBadgeText(base, context, 8.5, HPGRating.A));
+        assertEquals(expectedFont, text.font());
+        assertEquals(expectedBounds.getCenterX(), text.centerX(), DELTA);
+        assertEquals(expectedBounds.getCenterY(), text.centerY(), DELTA);
+        assertNotSame(text, InterstellarMapPanel.hpgBadgeText(base, context, 8.5, HPGRating.B));
+        assertNotSame(text, InterstellarMapPanel.hpgBadgeText(base, context, 6.0, HPGRating.A));
+        assertNotSame(text, InterstellarMapPanel.hpgBadgeText(base.deriveFont(14.0f), context, 8.5, HPGRating.A));
+        FontRenderContext scaledContext = new FontRenderContext(
+              AffineTransform.getScaleInstance(2.0, 2.0), true, true);
+        assertNotSame(text, InterstellarMapPanel.hpgBadgeText(base, scaledContext, 8.5, HPGRating.A));
     }
 
     @Test
