@@ -133,7 +133,7 @@ public abstract class AbstractContractDeterminationEmployer {
         }
         HiringHallLevel hiringHall = currentPlanet.getHiringHallLevel(currentDate);
 
-        Person negotiator = EmployerNegotiator.generateNegotiator(campaign, searchType, employer, hiringHall);
+        Person negotiator = EmployerNegotiator.generateNegotiator(campaign, searchType, employer, hiringHall, type);
         Person liaison = EmployerLiaison.generateLiaison(campaign,
               searchType,
               employer.isClan(),

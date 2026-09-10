@@ -1313,7 +1313,8 @@ public class ContractEditorDialog extends JDialog {
         Person liaison = null;
         if (employerFaction != null && currentSystem != null) {
             HiringHallLevel hiringHall = currentSystem.getHiringHallLevel(currentDate);
-            negotiator = EmployerNegotiator.generateNegotiator(campaign, bucket, employerFaction, hiringHall);
+            negotiator = EmployerNegotiator.generateNegotiator(campaign, bucket, employerFaction, hiringHall,
+                  enumValue(employerTypeCombo, contract.getEmployerType()));
             liaison = EmployerLiaison.generateLiaison(campaign, bucket, employerFaction.isClan(),
                   employerFaction.getShortName());
         }
