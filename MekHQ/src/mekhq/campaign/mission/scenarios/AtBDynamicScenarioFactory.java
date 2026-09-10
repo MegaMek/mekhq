@@ -410,7 +410,9 @@ public class AtBDynamicScenarioFactory {
                 continue;
             }
 
-            updateArmorKits(scenario, escapee);
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
+                updateArmorKits(scenario, escapee);
+            }
 
             generatedEntities.add(escapee);
         }
@@ -441,7 +443,9 @@ public class AtBDynamicScenarioFactory {
             return 0;
         }
 
-        updateArmorKits(scenario, vip);
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
+            updateArmorKits(scenario, vip);
+        }
 
         Vector<Entity> generatedEntities = new Vector<>();
         generatedEntities.add(vip);
