@@ -290,7 +290,7 @@ public class SkillCheckRulesTest {
 
             SkillCheck result = campaign.checkAcquisition(mock(IAcquisitionWork.class), new Person(campaign), false);
 
-            // Fallback to S_TECH_VEHICLE chec even though the person does not have it
+            // Fallback to S_TECH_VEHICLE check even though the person does not have it
             assertEquals(SkillType.S_TECH_VEHICLE, result.getSkillType().getName());
         }
 
