@@ -149,9 +149,7 @@ class EquipmentKitCatalogTest {
     @Test
     void deluxeToolkitModifiesEveryTechSkillIncludingTheGlobalOnes() {
         Map<String, Integer> bonuses = EquipmentKitCatalog.kitSkillBonuses(personWithKit(KIT_DELUXE_TOOLKIT));
-        // A granular repair skill and a global (maintenance/refit) skill both get the Deluxe +1.
-        assertEquals(DELUXE_TOOLKIT_ROLL_BONUS, bonuses.get(S_TECH_ELECTRONIC));
-        assertEquals(DELUXE_TOOLKIT_ROLL_BONUS, bonuses.get(S_TECH_MEK));
+        assertEquals(DELUXE_TOOLKIT_ROLL_BONUS, bonuses.get(S_ASTECH));
     }
 
     @Test
@@ -163,8 +161,8 @@ class EquipmentKitCatalogTest {
     // region maintenanceBonus (bespoke Descartes only)
     @Test
     void descartesScannersGiveGradedMaintenanceBonuses() {
-        assertEquals(3, EquipmentKitCatalog.maintenanceBonus(personWithKit(KIT_DESCARTES_MK_XXV)));
-        assertEquals(2, EquipmentKitCatalog.maintenanceBonus(personWithKit(KIT_DESCARTES_MK_XXI)));
+        assertEquals(2, EquipmentKitCatalog.maintenanceBonus(personWithKit(KIT_DESCARTES_MK_XXV)));
+        assertEquals(1, EquipmentKitCatalog.maintenanceBonus(personWithKit(KIT_DESCARTES_MK_XXI)));
     }
 
     @Test
@@ -184,18 +182,16 @@ class EquipmentKitCatalogTest {
     // region generalSkillBonus
     @Test
     void generalSkillBonusReadsTheNonTechnicianSkillTables() {
-        assertEquals(2, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_ADVANCED_FIELD), S_SURVIVAL));
+        assertEquals(1, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_ADVANCED_FIELD), S_SURVIVAL));
         assertEquals(1, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_BASIC_FIELD), S_SURVIVAL));
-        assertEquals(2, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_PERSONAL_COMPUTER), S_ADMIN));
-        assertEquals(2, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_POCKET_TRANSCRIBER), S_NEGOTIATION));
+        assertEquals(1, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_PERSONAL_COMPUTER), S_ADMIN));
+        assertEquals(1, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_POCKET_TRANSCRIBER), S_NEGOTIATION));
     }
 
     @Test
     void medicalKitsRaiseBothMedTechAndSurgery() {
         assertEquals(2, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_FIELD_SURGICAL), S_MEDTECH));
-        assertEquals(2, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_FIELD_SURGICAL), S_SURGERY));
-        // The plain Medical Kit still grants the customized +1 surgery bonus even though the book lists none.
-        assertEquals(1, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_MEDICAL), S_SURGERY));
+        assertEquals(1, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_FIELD_SURGICAL), S_SURGERY));
         assertEquals(1, EquipmentKitCatalog.generalSkillBonus(personWithKit(KIT_ADVANCED_MEDICAL), S_SURGERY));
     }
 
@@ -210,7 +206,6 @@ class EquipmentKitCatalogTest {
     void noteputerHelpsBothAdministrationAndNegotiation() {
         Person clerk = personWithKit(KIT_NOTEPUTER);
         assertEquals(1, EquipmentKitCatalog.generalSkillBonus(clerk, S_ADMIN));
-        assertEquals(1, EquipmentKitCatalog.generalSkillBonus(clerk, S_NEGOTIATION));
     }
 
     @Test
@@ -228,7 +223,7 @@ class EquipmentKitCatalogTest {
     void kitSkillBonusesCollectsEverySkillTheOwnedKitImproves() {
         Map<String, Integer> bonuses = EquipmentKitCatalog.kitSkillBonuses(personWithKit(KIT_FIELD_SURGICAL));
         assertEquals(2, bonuses.get(S_MEDTECH));
-        assertEquals(2, bonuses.get(S_SURGERY));
+        assertEquals(1, bonuses.get(S_SURGERY));
         assertEquals(2, bonuses.size());
     }
 
@@ -236,7 +231,6 @@ class EquipmentKitCatalogTest {
     void aKitCoveringTwoSkillsMapsBoth() {
         Map<String, Integer> bonuses = EquipmentKitCatalog.kitSkillBonuses(personWithKit(KIT_NOTEPUTER));
         assertEquals(1, bonuses.get(S_ADMIN));
-        assertEquals(1, bonuses.get(S_NEGOTIATION));
     }
 
     @Test

@@ -158,6 +158,7 @@ import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.Attributes;
+import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -5796,6 +5797,8 @@ public class Person implements ILocatable {
         // Optional skills such as Admin for Techs are not counted towards the character's experience level, except
         // in the special case of Vehicle Gunners. So we only want to fetch the base professions.
         List<String> associatedSkillNames = getProfessionSkills(campaignOptions, secondary);
+
+
         return calculateExperienceLevelForProfession(associatedSkillNames, isAlternativeQualityAveraging,
               skillModifierData);
     }
@@ -5903,11 +5906,19 @@ public class Person implements ILocatable {
         final boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
         final boolean isUseSmallArmsOnly = campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY);
 
-        return profession.getSkillsForProfession(isAdminsHaveNegotiation,
+        List<String> professionSkills = profession.getSkillsForProfession(isAdminsHaveNegotiation,
               isDoctorsUseAdministration,
               isTechsUseAdministration,
               isUseArtillery,
               !isUseSmallArmsOnly);
+
+        // Soldiers need a special handler as only their best gunnery skill is used.
+        if (profession.isSoldier()) {
+            String bestSkill = InfantryGunnerySkills.getBestInfantryGunnerySkill(this, isUseSmallArmsOnly);
+            professionSkills = List.of(bestSkill == null ? S_SMALL_ARMS : bestSkill);
+        }
+
+        return professionSkills;
     }
 
     /**
