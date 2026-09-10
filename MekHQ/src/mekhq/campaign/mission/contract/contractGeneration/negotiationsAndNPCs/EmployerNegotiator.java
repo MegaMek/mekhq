@@ -175,8 +175,8 @@ public class EmployerNegotiator {
             case CIVILIAN_ORGANIZATION_REBELS -> SkillLevel.ULTRA_GREEN;
         };
 
-        if (experienceLevel != targetSkillLevel.getExperienceLevel()) {
-            PersonUtility.overrideSkills(campaign, negotiator, role, SkillLevel.VETERAN, true);
+        if (experienceLevel > targetSkillLevel.getExperienceLevel()) {
+            PersonUtility.overrideSkills(campaign, negotiator, role, targetSkillLevel, true);
         }
     }
 
