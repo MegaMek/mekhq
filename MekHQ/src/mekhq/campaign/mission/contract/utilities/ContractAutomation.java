@@ -260,6 +260,10 @@ public class ContractAutomation {
 
     private static void fillTempPools(Campaign campaign) {
         final MHQOptions mhqOptions = MekHQ.getMHQOptions();
+        if (mhqOptions == null) { // This makes unit testing easier
+            return;
+        }
+
         ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
 
         if (mhqOptions.getNewDaySoldierPoolFill()) {
