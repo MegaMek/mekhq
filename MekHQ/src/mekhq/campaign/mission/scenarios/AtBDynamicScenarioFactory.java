@@ -362,7 +362,15 @@ public class AtBDynamicScenarioFactory {
                 LOGGER.info("++ Generating a force for the {} template ++",
                       forceTemplate.getForceName().toUpperCase());
 
-                if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedMUL.ordinal()) {
+                if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.None.ordinal()) {
+                    if (scenario.getStratConScenarioType().isMoleHunt() &&
+                              forceTemplate.getForceName().contains("Mole")) {
+                        generatedLanceCount += generateMole(scenario, contract, campaign, forceTemplate);
+                    } else if (scenario.getStratConScenarioType().isPrisonerLiberation() &&
+                                     forceTemplate.getForceName().contains("Prisoners")) {
+                        generatedLanceCount += generateEscapees(scenario, contract, campaign, forceTemplate);
+                    }
+                } else if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedMUL.ordinal()) {
                     generatedLanceCount += generateFixedForce(scenario, contract, campaign, forceTemplate);
                 } else {
                     int weightClass = randomForceWeight();
@@ -379,6 +387,80 @@ public class AtBDynamicScenarioFactory {
         }
 
         return generatedLanceCount;
+    }
+
+    public static int generateEscapees(AtBDynamicScenario scenario, AbstractContract contract, Campaign campaign,
+          ScenarioForceTemplate forceTemplate) {
+        ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
+
+        String factionCode = contract.getEnemyFactionCode();
+        Faction faction = Factions.getInstance().getFaction(factionCode);
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek("Mob (Small)");
+        if (mekSummary == null) {
+            LOGGER.error("Cannot find entry for Mob (Small)");
+            return 0;
+        }
+
+        Vector<Entity> generatedEntities = new Vector<>();
+        int mobCount = forceTemplate.getFixedUnitCount();
+        for (int i = 0; i < mobCount; i++) {
+            Entity escapee = createEntityWithCrew(faction, SkillLevel.ULTRA_GREEN, campaign, mekSummary, false);
+            if (escapee == null) {
+                LOGGER.error("Cannot create entity for Mob (Small)");
+                continue;
+            }
+
+            updateArmorKits(scenario, escapee);
+
+            generatedEntities.add(escapee);
+        }
+
+        BotForce generatedForce = new BotForce();
+        generatedForce.setFixedEntityList(generatedEntities);
+        setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
+        scenario.addBotForce(generatedForce, forceTemplate, campaign);
+
+        return (int) floor(generatedEntities.size() / 4.0);
+    }
+
+    public static int generateMole(AtBDynamicScenario scenario, AbstractContract contract, Campaign campaign,
+          ScenarioForceTemplate forceTemplate) {
+        ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
+
+        String factionCode = contract.getEnemyFactionCode();
+        Faction faction = Factions.getInstance().getFaction(factionCode);
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek("VIP");
+        if (mekSummary == null) {
+            LOGGER.error("Cannot find entry for VIP");
+            return 0;
+        }
+
+        Entity vip = createEntityWithCrew(faction, SkillLevel.ULTRA_GREEN, campaign, mekSummary, false);
+        if (vip == null) {
+            LOGGER.error("Cannot create entity for VIP");
+            return 0;
+        }
+
+        updateArmorKits(scenario, vip);
+
+        Vector<Entity> generatedEntities = new Vector<>();
+        generatedEntities.add(vip);
+
+        BotForce generatedForce = new BotForce();
+        generatedForce.setFixedEntityList(generatedEntities);
+        setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
+        scenario.addBotForce(generatedForce, forceTemplate, campaign);
+
+        return (int) floor(generatedEntities.size() / 4.0);
+    }
+
+    private static void updateArmorKits(AtBDynamicScenario scenario, Entity entity) {
+        if (entity instanceof ConvInfantry infantry) {
+            boolean isLowPressure = scenario.getAtmosphere().isLighterThan(THIN);
+            boolean isPoisonous = !scenario.getAtmosphericTaint().isBreathable();
+            int temperature = scenario.getTemperature();
+            changeInfantryKit(infantry, isLowPressure, isPoisonous, temperature);
+        }
     }
 
     /**
