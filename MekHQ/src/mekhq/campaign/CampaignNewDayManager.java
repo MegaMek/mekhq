@@ -107,7 +107,6 @@ import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
-
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
