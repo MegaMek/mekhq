@@ -45,6 +45,7 @@ import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.awt.event.MouseEvent;
 import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -61,6 +62,7 @@ import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextPane;
+import javax.swing.JToolTip;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -79,6 +81,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Satellite;
 import mekhq.campaign.universe.SocioIndustrialData;
+import mekhq.campaign.universe.enums.CapitalType;
 import mekhq.campaign.universe.enums.PlanetaryType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.SourceableValueLabel;
@@ -332,6 +335,17 @@ public class PlanetViewPanel extends JScrollablePanel {
                                            "</i></nobr></html>");
         section.addRow("lblOwner.text", lblOwner);
 
+        List<String> administration = planet.getAdministration(currentDate);
+        if (!administration.isEmpty()) {
+            section.addRow("lblAdministration.text",
+                  createClippedDossierValue(formatAdministrationPath(administration)));
+        }
+
+        CapitalType capitalType = planet.getCapitalType(currentDate);
+        if (!capitalType.isNone()) {
+            section.addRow("lblCapitalStatus.text", new JLabel(capitalType.getLabel()));
+        }
+
         //Planet type
         SourceableValueLabel txtPlanetType = new SourceableValueLabel(planet.getSourcedPlanetType());
         section.addRow("lblPlanetaryType1.text", txtPlanetType);
@@ -387,6 +401,14 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         return section;
+    }
+
+    static String formatAdministrationPath(List<String> administration) {
+        return String.join(" > ", administration);
+    }
+
+    static JLabel createClippedDossierValue(String text) {
+        return new DossierTooltipLabel(text);
     }
 
     private DossierSection getEnvironmentPanel(Planet planet) {
@@ -784,6 +806,33 @@ public class PlanetViewPanel extends JScrollablePanel {
             GridBagConstraints constraints = createFullWidthConstraints(row++);
             constraints.insets = new Insets(2, 0, 3, 0);
             add(value, constraints);
+        }
+    }
+
+    private static final class DossierTooltipLabel extends JLabel {
+        private final String fullText;
+
+        private DossierTooltipLabel(String text) {
+            super(text);
+            fullText = text;
+            setToolTipText(text);
+            getAccessibleContext().setAccessibleDescription(text);
+        }
+
+        @Override
+        public String getToolTipText(MouseEvent event) {
+            return (getWidth() > 0) && (getPreferredSize().width > getWidth()) ? fullText : null;
+        }
+
+        @Override
+        public JToolTip createToolTip() {
+            JToolTip tooltip = super.createToolTip();
+            tooltip.setBackground(DOSSIER_BACKGROUND);
+            tooltip.setForeground(DOSSIER_TEXT);
+            tooltip.setBorder(BorderFactory.createCompoundBorder(
+                  BorderFactory.createLineBorder(DOSSIER_ACCENT, 1),
+                  BorderFactory.createEmptyBorder(5, 8, 5, 8)));
+            return tooltip;
         }
     }
 }

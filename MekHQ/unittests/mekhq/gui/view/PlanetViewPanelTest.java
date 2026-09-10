@@ -34,13 +34,19 @@ package mekhq.gui.view;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.util.List;
+import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+import javax.swing.JToolTip;
 import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
@@ -49,6 +55,31 @@ import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
 
 class PlanetViewPanelTest {
+    @Test
+    void administrationPathPreservesHierarchyOrder() {
+        assertEquals("Pesht Military District > Kagoshima Prefecture",
+              PlanetViewPanel.formatAdministrationPath(
+                    List.of("Pesht Military District", "Kagoshima Prefecture")));
+        assertEquals("", PlanetViewPanel.formatAdministrationPath(List.of()));
+    }
+
+    @Test
+    void administrationTooltipAppearsOnlyWhenClippedAndUsesDossierStyle() {
+        JLabel label = PlanetViewPanel.createClippedDossierValue(
+              "Tamarind March > Solihull Operational Area");
+        MouseEvent hover = new MouseEvent(label, MouseEvent.MOUSE_MOVED, 0, 0, 1, 1, 0, false);
+
+        label.setSize(label.getPreferredSize());
+        assertNull(label.getToolTipText(hover));
+
+        label.setSize(label.getPreferredSize().width - 1, label.getPreferredSize().height);
+        assertEquals(label.getText(), label.getToolTipText(hover));
+        JToolTip tooltip = label.createToolTip();
+        assertEquals(new Color(7, 16, 27), tooltip.getBackground());
+        assertEquals(new Color(218, 231, 235), tooltip.getForeground());
+        assertTrue(tooltip.getBorder() != null);
+    }
+
     @Test
     void animatedDossierResetsPreviouslyScrolledViewportBeforeReveal() throws Exception {
         SwingUtilities.invokeAndWait(() -> {
