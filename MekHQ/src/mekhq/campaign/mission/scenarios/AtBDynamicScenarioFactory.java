@@ -404,6 +404,8 @@ public class AtBDynamicScenarioFactory {
             LOGGER.error("Enemy faction {} does not exist; aborting escapee generation.", factionCode);
             return 0;
         }
+
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek("Mob (Small)");
         if (mekSummary == null) {
             LOGGER.error("Cannot find entry for Mob (Small)");
             return 0;
