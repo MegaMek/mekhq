@@ -32,10 +32,11 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
@@ -117,7 +118,7 @@ public record LifePath(
       Map<Integer, Map<String, Integer>> flexibleXPAbilities,
       Integer flexibleXPPickCount
 ) {
-    static MMLogger LOGGER = MMLogger.create(LifePath.class);
+    private static final MMLogger LOGGER = MMLogger.create(LifePath.class);
 
     public LifePath {
         // Preliminary Checks
@@ -138,7 +139,7 @@ public record LifePath(
             throw new IllegalArgumentException("Unsupported version: " + version);
         }
 
-        if (version.isLowerThan(currentVersion) || version.is(currentVersion)) {
+
             // Perform any necessary conversions here. Largely this will be adding new fields to the record. The is()
             // call is important, as it means these conversions will still occur for Nightly releases. Otherwise,
             // we'll end up in a situation where players on the Nightlies can't load their Life Paths any time this
@@ -150,37 +151,6 @@ public record LifePath(
             //                LOGGER.warn("{} - {}: minimumYear is null, setting to 0", id, name);
             //                minimumYear = 0;
             //            }
-
-            if (fixedXPNaturalAptitudes == null) { // Added in 50.11
-                LOGGER.warn("{} - {}: fixedXPNaturalAptitudes is null, setting to empty map", id, name);
-                fixedXPNaturalAptitudes = new HashMap<>();
-            }
-
-            if (fixedXPNaturalAptitudesMetaSkills == null) { // Added in 50.11
-                LOGGER.warn("{} - {}: fixedXPNaturalAptitudesMetaSkills is null, setting to empty map", id, name);
-                fixedXPNaturalAptitudesMetaSkills = new HashMap<>();
-            }
-
-            if (flexibleXPNaturalAptitudes == null) { // Added in 50.11
-                LOGGER.warn("{} - {}: flexibleXPNaturalAptitudes is null, setting to empty map", id, name);
-                flexibleXPNaturalAptitudes = new HashMap<>();
-            }
-
-            if (flexibleXPNaturalAptitudesMetaSkills == null) { // Added in 50.11
-                LOGGER.warn("{} - {}: flexibleXPNaturalAptitudesMetaSkills is null, setting to empty map", id, name);
-                flexibleXPNaturalAptitudesMetaSkills = new HashMap<>();
-            }
-
-            if (requirementsSystems == null) { // Added in 50.11
-                LOGGER.warn("{} - {}: requirementsSystems is null, setting to empty map", id, name);
-                requirementsSystems = new HashMap<>();
-            }
-
-            if (exclusionsSystems == null) { // Added in 50.11
-                LOGGER.warn("{} - {}: exclusionsSystems is null, setting to empty map", id, name);
-                exclusionsSystems = new HashMap<>();
-            }
-        }
 
         // Data Validation Checks
 
@@ -197,6 +167,7 @@ public record LifePath(
         }
         if (source.isBlank()) {
             LOGGER.warn("{} - {}: Source is blank, setting to empty string", id, name);
+            source = "";
         }
         if (name == null) {
             throw new IllegalArgumentException("name cannot be null");
@@ -209,6 +180,7 @@ public record LifePath(
         }
         if (flavorText.isBlank()) {
             LOGGER.warn("{} - {}: Flavor text is blank, setting to empty string", id, name);
+            flavorText = "";
         }
         if (age == null) {
             throw new IllegalArgumentException("age cannot be null");
@@ -231,20 +203,22 @@ public record LifePath(
         if (maximumYear < minimumYear) {
             throw new IllegalArgumentException("maximumYear must be greater than or equal to minimumYear");
         }
-        if (randomWeight == null) {
-            throw new IllegalArgumentException("randomWeight cannot be null");
+        if (randomWeight == null || randomWeight < 0) {
+            throw new IllegalArgumentException("randomWeight cannot be null or below zero");
         }
         if (lifeStages == null) {
             throw new IllegalArgumentException("lifeStages cannot be null");
         }
         if (lifeStages.isEmpty()) {
-            LOGGER.warn("{} - {}: Life stages is empty, setting to empty list", id, name);
+            LOGGER.warn("{} - {}: Life stages is empty, setting to empty array", id, name);
+            lifeStages = new HashSet<>();
         }
         if (categories == null) {
             throw new IllegalArgumentException("categories cannot be null");
         }
         if (categories.isEmpty()) {
             LOGGER.warn("{} - {}: Categories is empty, setting to empty list", id, name);
+            categories = new HashSet<>();
         }
         if (isPlayerRestricted == null) {
             throw new IllegalArgumentException("isPlayerRestricted cannot be null");
@@ -380,7 +354,7 @@ public record LifePath(
             throw new IllegalArgumentException("flexibleXPPickCount must be a non-negative integer");
         }
 
-        int groupCount = java.util.stream.Stream.of(
+        int groupCount = Stream.of(
               flexibleXPAttributes.size(),
               flexibleXPEdge.size(),
               flexibleXPFlexibleAttribute.size(),
