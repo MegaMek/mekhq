@@ -162,15 +162,20 @@ public class EmployerNegotiator {
 
         // Due to modifiers, the final skill level will usually be one step above
         SkillLevel targetSkillLevel = switch (chaosEmployerType) {
-            case ANY_PLANETARY_GOVERNMENT, ANY_SYSTEM_OWNER, LOCAL_SYSTEM_OWNER -> {
-                if (faction.isMajorOrSuperPower() || faction.isClan() || faction.isComStarOrWoB()) {
+            case ANY_SYSTEM_OWNER, LOCAL_SYSTEM_OWNER -> {
+                if (faction.isMajorOrSuperPower() || faction.isClan()) {
                     yield SkillLevel.VETERAN;
+                } else if (faction.isComStarOrWoB()) {
+                    yield SkillLevel.ELITE;
                 } else {
                     yield SkillLevel.REGULAR;
                 }
             }
             case NOBLE, MERCENARY_SUBCONTRACT, CORPORATION -> SkillLevel.REGULAR;
-            case CIVILIAN_ORGANIZATION_BUSINESS, CIVILIAN_ORGANIZATION_MILITIA, LOCAL_PLANETARY_GOVERNMENT ->
+            case CIVILIAN_ORGANIZATION_BUSINESS,
+                 CIVILIAN_ORGANIZATION_MILITIA,
+                 LOCAL_PLANETARY_GOVERNMENT,
+                 ANY_PLANETARY_GOVERNMENT ->
                   SkillLevel.GREEN;
             case CIVILIAN_ORGANIZATION_REBELS -> SkillLevel.ULTRA_GREEN;
         };
