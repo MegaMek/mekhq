@@ -49,17 +49,16 @@ import megamek.logging.MMLogger;
 public enum LifePathEntryDataTraitLookup {
     BLOODMARK("BLOODMARK"),
     CONNECTIONS("CONNECTIONS"),
-    DEPENDENTS("DEPENDENTS"), // character creation only
     ENEMY("ENEMY"),
-    EQUIPPED("EQUIPPED"),
     EXTRA_INCOME("EXTRA_INCOME"),
-    LOST_LIMB("LOST_LIMB"), // character creation only
+    ORIGIN_DEPENDENTS("ORIGIN_DEPENDENTS"), // character creation only
+    ORIGIN_EQUIPPED("ORIGIN_EQUIPPED"),
     ORIGIN_MISSING_LIMB("ORIGIN_MISSING_LIMB"), // character creation only
+    ORIGIN_OWNED_VEHICLE("ORIGIN_OWNED_VEHICLE"), // character creation only
     ORIGIN_PROSTHETIC("ORIGIN_PROSTHETIC"), // character creation only
     ORIGIN_RANK("ORIGIN_RANK"), // character creation only
-    OWNED_VEHICLE("OWNED_VEHICLE"), // character creation only
     PROPERTY("PROPERTY"),
-    REPUTATION("REPUTATION"),
+    FAME("FAME"),
     TITLE("TITLE"),
     UNLUCKY("UNLUCKY"),
     WEALTH("WEALTH");
@@ -67,14 +66,6 @@ public enum LifePathEntryDataTraitLookup {
     private final static String RESOURCE_BUNDLE = "mekhq.resources.LifePathEntryDataTraitLookup";
     private static final MMLogger LOGGER = MMLogger.create(LifePathEntryDataTraitLookup.class);
 
-    public static final int MINIMUM_DEPENDENTS = -Integer.MAX_VALUE;
-    public static final int MAXIMUM_DEPENDENTS = 0;
-    public static final int MINIMUM_EQUIPPED = -1;
-    public static final int MAXIMUM_EQUIPPED = 8;
-    public static final int MINIMUM_LOST_LIMB = -5;
-    public static final int MAXIMUM_LOST_LIMB = 0;
-    public static final int MINIMUM_OWNED_VEHICLE = 0;
-    public static final int MAXIMUM_OWNED_VEHICLE = 12;
 
     private final String lookupName;
 

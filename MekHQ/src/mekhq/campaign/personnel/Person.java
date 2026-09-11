@@ -234,17 +234,29 @@ public class Person implements ILocatable {
     public static final int MINIMUM_BLOODMARK = 0;
     public static final int MAXIMUM_BLOODMARK = 5;
 
-    public static final String ORIGIN_PROSTHETIC = "ORIGIN_PROSTHETIC";
-    public static final int MINIMUM_ORIGIN_PROSTHETIC = 0;
-    public static final int MAXIMUM_ORIGIN_PROSTHETIC = 6;
-
-    public static final String ORIGIN_MISSING_LIMB = "ORIGIN_MISSING_LIMB";
-    public static final int MINIMUM_ORIGIN_MISSING_LIMB = 0;
-    public static final int MAXIMUM_ORIGIN_MISSING_LIMB = 6;
-
     public static final String EXTRA_INCOME_LABEL = "EXTRA_INCOME";
     public static final int MINIMUM_EXTRA_INCOME = ExtraIncome.NEGATIVE_TEN.getTraitLevel();
     public static final int MAXIMUM_EXTRA_INCOME = ExtraIncome.POSITIVE_TEN.getTraitLevel();
+
+    public static final String ORIGIN_DEPENDENTS_LABEL = "ORIGIN_DEPENDENTS";
+    public static final int MINIMUM_ORIGIN_DEPENDENTS = -Integer.MAX_VALUE;
+    public static final int MAXIMUM_ORIGIN_DEPENDENTS = 0;
+
+    public static final String ORIGIN_PROSTHETIC_LABEL = "ORIGIN_PROSTHETIC";
+    public static final int MINIMUM_ORIGIN_PROSTHETIC = 0;
+    public static final int MAXIMUM_ORIGIN_PROSTHETIC = 6;
+
+    public static final String ORIGIN_MISSING_LIMB_LABEL = "ORIGIN_MISSING_LIMB";
+    public static final int MINIMUM_ORIGIN_MISSING_LIMB = -5;
+    public static final int MAXIMUM_ORIGIN_MISSING_LIMB = 0;
+
+    public static final String ORIGIN_EQUIPPED_LABEL = "ORIGIN_EQUIPPED";
+    public static final int MINIMUM_ORIGIN_EQUIPPED = -1;
+    public static final int MAXIMUM_ORIGIN_EQUIPPED = 8;
+
+    public static final String ORIGIN_OWNED_VEHICLE_LABEL = "OWNED_VEHICLE";
+    public static final int MINIMUM_ORIGIN_OWNED_VEHICLE = 0;
+    public static final int MAXIMUM_ORIGIN_OWNED_VEHICLE = 12;
 
     public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 

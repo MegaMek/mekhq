@@ -35,14 +35,6 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.personnel.Person.*;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MAXIMUM_DEPENDENTS;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MAXIMUM_EQUIPPED;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MAXIMUM_LOST_LIMB;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MAXIMUM_OWNED_VEHICLE;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MINIMUM_DEPENDENTS;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MINIMUM_EQUIPPED;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MINIMUM_LOST_LIMB;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup.MINIMUM_OWNED_VEHICLE;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -208,35 +200,35 @@ class LifePathTraitPicker extends JDialog {
                             traitMinimumValue = MINIMUM_CONNECTIONS;
                             traitMaximumValue = MAXIMUM_CONNECTIONS;
                         }
-                        case DEPENDENTS -> {
-                            traitMinimumValue = MINIMUM_DEPENDENTS;
-                            traitMaximumValue = MAXIMUM_DEPENDENTS;
+                        case ORIGIN_DEPENDENTS -> {
+                            traitMinimumValue = MINIMUM_ORIGIN_DEPENDENTS;
+                            traitMaximumValue = MAXIMUM_ORIGIN_DEPENDENTS;
                         }
                         case ENEMY -> {
                             traitMinimumValue = MINIMUM_ENEMY;
                             traitMaximumValue = MAXIMUM_ENEMY;
                         }
-                        case EQUIPPED -> {
-                            traitMinimumValue = MINIMUM_EQUIPPED;
-                            traitMaximumValue = MAXIMUM_EQUIPPED;
+                        case ORIGIN_EQUIPPED -> {
+                            traitMinimumValue = MINIMUM_ORIGIN_EQUIPPED;
+                            traitMaximumValue = MAXIMUM_ORIGIN_EQUIPPED;
                         }
                         case EXTRA_INCOME -> {
                             traitMinimumValue = MINIMUM_EXTRA_INCOME;
                             traitMaximumValue = MAXIMUM_EXTRA_INCOME;
                         }
-                        case LOST_LIMB -> {
-                            traitMinimumValue = MINIMUM_LOST_LIMB;
-                            traitMaximumValue = MAXIMUM_LOST_LIMB;
+                        case ORIGIN_MISSING_LIMB -> {
+                            traitMinimumValue = MINIMUM_ORIGIN_MISSING_LIMB;
+                            traitMaximumValue = MAXIMUM_ORIGIN_MISSING_LIMB;
                         }
-                        case OWNED_VEHICLE -> {
-                            traitMinimumValue = MINIMUM_OWNED_VEHICLE;
-                            traitMaximumValue = MAXIMUM_OWNED_VEHICLE;
+                        case ORIGIN_OWNED_VEHICLE -> {
+                            traitMinimumValue = MINIMUM_ORIGIN_OWNED_VEHICLE;
+                            traitMaximumValue = MAXIMUM_ORIGIN_OWNED_VEHICLE;
                         }
                         case PROPERTY -> {
                             traitMinimumValue = MINIMUM_PROPERTY;
                             traitMaximumValue = MAXIMUM_PROPERTY;
                         }
-                        case REPUTATION -> {
+                        case FAME -> {
                             traitMinimumValue = MINIMUM_FAME;
                             traitMaximumValue = MAXIMUM_FAME;
                         }
@@ -259,10 +251,6 @@ class LifePathTraitPicker extends JDialog {
                         case ORIGIN_PROSTHETIC -> {
                             traitMinimumValue = MINIMUM_ORIGIN_PROSTHETIC;
                             traitMaximumValue = MAXIMUM_ORIGIN_PROSTHETIC;
-                        }
-                        case ORIGIN_MISSING_LIMB -> {
-                            traitMinimumValue = MINIMUM_ORIGIN_MISSING_LIMB;
-                            traitMaximumValue = MAXIMUM_ORIGIN_MISSING_LIMB;
                         }
                         default -> {}
                     }
