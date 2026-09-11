@@ -39,7 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.EnumSet;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
@@ -120,9 +119,33 @@ class CommandGenerationOptionsTest {
         assertFalse(options.isUseOriginNodeFormationIconLogo());
 
         // Finances: the command is granted free, with working capital defaulting to 10% of the
-        // generated units' purchase cost.
+        // generated units' purchase cost, floored so it can pay its first month's wages.
         assertTrue(options.isProcessFinances());
         assertEquals(10, options.getStartingCashPercent());
+        assertEquals(10_000_000L, options.getMinimumStartingFloat());
+    }
+
+    /**
+     * The recommended defaults from issue #9955. These are the values a player gets without touching
+     * the dialog, so they are pinned rather than left to drift.
+     */
+    @Test
+    void constructor_officerAndSimulationDefaults_matchTheRecommendedValues() {
+        CommandGenerationOptions options = new CommandGenerationOptions();
+
+        // The command is led by its best people rather than whoever the roll happened to seat first.
+        assertTrue(options.isAssignBestCompanyCommander());
+        assertTrue(options.isAssignBestOfficers());
+        assertTrue(options.isAssignMostSkilledToPrimaryLances());
+        assertTrue(options.isGenerateCaptains());
+
+        // A medical reserve so the command can absorb casualties from its first contract.
+        assertTrue(options.isGenerateMedicalReserve());
+
+        // The command arrives with a history: marriages and children from the years before play.
+        assertTrue(options.isRunStartingSimulation());
+        assertTrue(options.isSimulateRandomMarriages());
+        assertTrue(options.isSimulateRandomProcreation());
     }
 
     @Test
@@ -144,8 +167,8 @@ class CommandGenerationOptionsTest {
     void aChangedSettingBreaksEquality() {
         CommandGenerationOptions options = new CommandGenerationOptions();
         CommandGenerationOptions changed = new CommandGenerationOptions();
-        changed.setTemporaryCrewRoles(EnumSet.of(TemporaryCrewRole.INFANTRY));
-        assertNotEquals(options, changed, "a temporary-crew choice is part of the settings");
+        changed.setGenerateCaptains(!options.isGenerateCaptains());
+        assertNotEquals(options, changed, "an officer toggle is part of the settings");
 
         changed = new CommandGenerationOptions();
         changed.getSupportPersonnelCoveragePercents().put(PersonnelRole.DOCTOR, 200);

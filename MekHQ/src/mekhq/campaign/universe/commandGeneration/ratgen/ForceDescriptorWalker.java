@@ -34,6 +34,7 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.function.BiConsumer;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -144,6 +145,18 @@ public final class ForceDescriptorWalker {
      */
     public static int walk(ForceDescriptor root, Campaign campaign, Formation parentInCampaign,
           FormationNamer namer, LeafHandler onLeaf) {
+        return walk(root, campaign, parentInCampaign, namer, onLeaf, null);
+    }
+
+    /**
+     * As {@link #walk(ForceDescriptor, Campaign, Formation, FormationNamer, LeafHandler)}, also telling
+     * {@code onFormation} which descriptor each created Formation mirrors. The root descriptor, when it is merged
+     * into {@code parentInCampaign}, is reported against that Formation.
+     *
+     * @param onFormation told of each Formation and the descriptor it mirrors; {@code null} for none
+     */
+    public static int walk(ForceDescriptor root, Campaign campaign, Formation parentInCampaign,
+          FormationNamer namer, LeafHandler onLeaf, @Nullable BiConsumer<ForceDescriptor, Formation> onFormation) {
         if (root == null) {
             LOGGER.warn("[CompanyGen][Walker] walk called with null root; returning 0");
             return 0;
@@ -183,6 +196,9 @@ public final class ForceDescriptorWalker {
                 LOGGER.info("[CompanyGen][Walker]   Formation registered id={} name='{}' formationLevel={} parentId={}",
                       formation.getId(), named.name(), level,
                       parent == null ? "null" : parent.getId());
+                if ((descriptor != null) && (onFormation != null)) {
+                    onFormation.accept(descriptor, formation);
+                }
                 return formation;
             }
 
@@ -198,6 +214,9 @@ public final class ForceDescriptorWalker {
         };
 
         int leaves = traverse(root, namer, buildSink, parentInCampaign, mergeRoot);
+        if (mergeRoot && (onFormation != null)) {
+            onFormation.accept(root, parentInCampaign);
+        }
         LOGGER.info("[CompanyGen][Walker] walk DONE; {} leaves visited", leaves);
         return leaves;
     }

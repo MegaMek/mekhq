@@ -51,6 +51,7 @@ import megamek.common.units.Mek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Warship;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.missing.MissingPart;
@@ -59,7 +60,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -327,7 +327,7 @@ public class SpacecraftEngine extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
+        return skillType.equals(SkillType.S_TECH_NUCLEAR);
     }
 
     @Override

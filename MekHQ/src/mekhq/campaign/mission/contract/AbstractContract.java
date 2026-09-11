@@ -631,14 +631,6 @@ public abstract class AbstractContract {
         intensityData = intensityData.withScale(scale);
     }
 
-    public int getRequiredCombatElements() {
-        return intensityData.requiredCombatElements();
-    }
-
-    public void setRequiredCombatElements(int requiredCombatElements) {
-        intensityData = intensityData.withRequiredCombatElements(requiredCombatElements);
-    }
-
     public int getTrackCount() {
         return intensityData.trackCount();
     }

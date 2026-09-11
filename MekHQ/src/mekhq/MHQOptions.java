@@ -1507,6 +1507,17 @@ public final class MHQOptions extends SuiteOptions {
     // endregion Nag Tab
 
     // region Miscellaneous Options
+
+    public boolean getEnableAbstractCombatAutoResolve() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                     .getBoolean(MHQConstants.ENABLE_ABSTRACT_COMBAT_AUTO_RESOLVE, false);
+    }
+
+    public void setEnableAbstractCombatAutoResolve(final boolean value) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .putBoolean(MHQConstants.ENABLE_ABSTRACT_COMBAT_AUTO_RESOLVE, value);
+    }
+
     public int getStartGameDelay() {
         return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_DELAY, 1000);
     }
@@ -1567,19 +1578,6 @@ public final class MHQOptions extends SuiteOptions {
     public void setLastUseImplants(final boolean value) {
         userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
               .putBoolean(MHQConstants.LAST_USE_IMPLANTS, value);
-    }
-
-    /**
-     * @return whether the Command Generator last had MegaMek's Manei Domini rules switched on
-     */
-    public boolean getLastUseManeiDomini() {
-        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
-                     .getBoolean(MHQConstants.LAST_USE_MANEI_DOMINI, false);
-    }
-
-    public void setLastUseManeiDomini(final boolean value) {
-        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
-              .putBoolean(MHQConstants.LAST_USE_MANEI_DOMINI, value);
     }
 
     /**

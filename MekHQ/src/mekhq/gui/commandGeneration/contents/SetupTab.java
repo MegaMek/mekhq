@@ -54,7 +54,6 @@ import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.SkillLevel;
-import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -62,7 +61,6 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
-import mekhq.campaign.universe.commandGeneration.TemporaryCrewRole;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.campaign.universe.enums.TechAssignmentSortFactor;
 import mekhq.gui.commandGeneration.components.CommandGenerationCheckBox;
@@ -202,17 +200,12 @@ public class SetupTab {
     private CommandGenerationCheckBox chkAssignFounderFlag;
 
     // Augmentation. These three live on the campaign and on MegaMek's game options rather than on a
-    // generation run; they are surfaced here because all three are off in a new campaign and a player
+    // generation run; they are surfaced here because both are off in a new campaign and a player
     // who has not gone looking through two other options dialogs cannot generate an augmented command.
     private CommandGenerationCheckBox chkUseImplants;
-    private CommandGenerationCheckBox chkUseManeiDomini;
     private MMComboBox<NeuralInterfaceMode> cmbNeuralInterfaceMode;
-
-    // Temporary crew. Campaign settings, surfaced here for the same reason as the augmentation toggles: a
-    // player building a starting force decides here whether a tank's crew are named warriors or an
-    // anonymous pool, without going through the campaign options dialog first.
-    private final Map<TemporaryCrewRole, CommandGenerationCheckBox> chkTemporaryCrew =
-          new EnumMap<>(TemporaryCrewRole.class);
+    private JPanel augmentationSection;
+    private Component augmentationStrut;
 
     // Random origin
     private RandomOriginOptionsPanel randomOriginOptionsPanel;
@@ -267,11 +260,14 @@ public class SetupTab {
         rightColumn.setLayout(new BoxLayout(rightColumn, BoxLayout.Y_AXIS));
         rightColumn.add(buildRandomOriginSection());
         rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
-        rightColumn.add(buildTemporaryCrewSection());
-        rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
         rightColumn.add(buildTechAssignmentSection());
-        rightColumn.add(Box.createVerticalStrut(UIUtil.scaleForGUI(6)));
-        rightColumn.add(buildAugmentationSection());
+        // Held so the section and the gap above it can be hidden together; hiding the section alone
+        // would leave the gap behind and the column would look like it had lost something.
+        augmentationStrut = Box.createVerticalStrut(UIUtil.scaleForGUI(6));
+        rightColumn.add(augmentationStrut);
+        augmentationSection = buildAugmentationSection();
+        rightColumn.add(augmentationSection);
+        setAugmentationSectionVisible(false);
         constraints.gridx = 1;
         constraints.gridy = 0;
         constraints.gridwidth = 1;
@@ -681,13 +677,13 @@ public class SetupTab {
      * Cybernetic augmentation: whether the campaign tracks implants at all, and which of MegaMek's
      * augmentation rules are in play.
      *
-     * <p>All three are off in a new campaign, and all three have to be on before the generator will
-     * fit anything - Manei Domini implants to a Shadow Division, enhanced imaging to Clan warriors.
-     * Setting them anywhere else means finding one in Campaign Options and two in MegaMek's game
+     * <p>Both are off in a new campaign, and both have to be on before the generator will fit
+     * anything - Manei Domini implants to a Shadow Division, enhanced imaging to Clan warriors.
+     * Setting them anywhere else means finding one in Campaign Options and one in MegaMek's game
      * options, which is why they are repeated here: this is the screen where the decision is being
      * made. What is chosen here is written to the campaign, so it holds for the saved game too.</p>
      *
-     * <p>Neither rule can be applied to warriors after the fact, so the choice has to be made before
+     * <p>Neither can be applied to warriors after the fact, so the choice has to be made before
      * generating rather than discovered afterwards.</p>
      */
     private JPanel buildAugmentationSection() {
@@ -697,7 +693,6 @@ public class SetupTab {
         GridBagConstraints constraints = sectionConstraints();
 
         chkUseImplants = new CommandGenerationCheckBox("UseImplants");
-        chkUseManeiDomini = new CommandGenerationCheckBox("UseManeiDomini");
         cmbNeuralInterfaceMode = new MMComboBox<>("cmbNeuralInterfaceMode",
               NeuralInterfaceMode.values());
         cmbNeuralInterfaceMode.setRenderer(new DefaultListCellRenderer() {
@@ -714,8 +709,7 @@ public class SetupTab {
             }
         });
 
-        // Implants gate the other two: with the campaign not tracking them, neither rule has anything
-        // to act on.
+        // Implants gate the rule: with the campaign not tracking them, it has nothing to act on.
         chkUseImplants.addActionListener(actionEvent -> refreshAugmentationEnablement());
 
         constraints.gridy = 0;
@@ -723,15 +717,10 @@ public class SetupTab {
         constraints.gridwidth = 2;
         section.add(chkUseImplants, constraints);
 
-        constraints.gridy = 1;
-        constraints.gridwidth = 2;
-        indentAsSubOption(chkUseManeiDomini);
-        section.add(chkUseManeiDomini, constraints);
-
         CommandGenerationLabel neuralInterfaceLabel = new CommandGenerationLabel("NeuralInterfaceMode");
         indentAsSubOption(neuralInterfaceLabel);
         cmbNeuralInterfaceMode.setToolTipText(neuralInterfaceLabel.getToolTipText());
-        constraints.gridy = 2;
+        constraints.gridy = 1;
         constraints.gridwidth = 1;
         constraints.gridx = 0;
         section.add(neuralInterfaceLabel, constraints);
@@ -742,43 +731,60 @@ public class SetupTab {
         return section;
     }
 
-    /** Greys the two rules out while the campaign is not tracking implants at all. */
+    /**
+     * Shows or hides the augmentation section.
+     *
+     * <p>The two controls only reach a generation for the factions that can be augmented, so for every other
+     * faction they are two settings the player can change to no effect. Hidden rather than greyed out because a
+     * disabled control still reads as "this could apply to you".</p>
+     *
+     * @param visible whether the selected faction can be augmented
+     */
+    public void setAugmentationSectionVisible(boolean visible) {
+        if (augmentationSection == null) {
+            return;
+        }
+        augmentationSection.setVisible(visible);
+        if (augmentationStrut != null) {
+            augmentationStrut.setVisible(visible);
+        }
+    }
+
+
+    /**
+     * Writes the augmentation choices onto {@code targetOptions} and remembers them as the player's own answer.
+     *
+     * @param targetOptions the options to write to
+     */
+    private void writeAugmentationValues(CommandGenerationOptions targetOptions) {
+        targetOptions.setUseImplants(chkUseImplants.isSelected());
+        NeuralInterfaceMode mode = NeuralInterfaceMode.OFF;
+        if (cmbNeuralInterfaceMode.getSelectedItem() instanceof NeuralInterfaceMode selected) {
+            mode = selected;
+            targetOptions.setNeuralInterfaceMode(selected);
+        }
+
+        // Remembered as the player's own answer, so the next new campaign opens on it rather than
+        // asking again. The campaign still holds its own copy; this only decides what a campaign that
+        // has chosen nothing is shown.
+        MekHQ.getMHQOptions().setLastUseImplants(chkUseImplants.isSelected());
+        MekHQ.getMHQOptions().setLastNeuralInterfaceMode(mode);
+    }
+
+    /** @return whether the augmentation section is currently shown, which decides whether its values are written */
+    public boolean isAugmentationSectionVisible() {
+        return (augmentationSection != null) && augmentationSection.isVisible();
+    }
+
+    /** Greys the rule out while the campaign is not tracking implants at all. */
     private void refreshAugmentationEnablement() {
-        boolean tracksImplants = chkUseImplants.isSelected();
-        chkUseManeiDomini.setEnabled(tracksImplants);
-        cmbNeuralInterfaceMode.setEnabled(tracksImplants);
+        cmbNeuralInterfaceMode.setEnabled(chkUseImplants.isSelected());
     }
 
     /**
      * The eight temporary-crew toggles, laid out as the campaign options dialog lays them out so the same
      * setting reads the same in both places.
      */
-    private JPanel buildTemporaryCrewSection() {
-        CommandGenerationStandardPanel section = new CommandGenerationStandardPanel(
-              "TemporaryCrew", true, "TemporaryCrew");
-        section.setLayout(new GridBagLayout());
-        GridBagConstraints constraints = sectionConstraints();
-
-        constraints.gridy = 0;
-        constraints.gridx = 0;
-        constraints.gridwidth = 2;
-        section.add(new CommandGenerationLabel("TemporaryCrewDescription"), constraints);
-
-        constraints.gridwidth = 1;
-        chkTemporaryCrew.clear();
-        int index = 0;
-        for (TemporaryCrewRole role : TemporaryCrewRole.values()) {
-            CommandGenerationCheckBox checkBox = new CommandGenerationCheckBox(role.getLabelKey());
-            chkTemporaryCrew.put(role, checkBox);
-            constraints.gridy = 1 + (index / 2);
-            constraints.gridx = index % 2;
-            section.add(checkBox, constraints);
-            index++;
-        }
-
-        addLeftAlignFiller(section, 2);
-        return section;
-    }
 
     private static GridBagConstraints sectionConstraints() {
         GridBagConstraints constraints = new GridBagConstraints();
@@ -984,7 +990,6 @@ public class SetupTab {
         chkAssignFounderFlag.setSelected(sourceOptions.isAssignFounderFlag());
 
         loadAugmentationValues();
-        loadTemporaryCrewValues();
     }
 
     /**
@@ -992,25 +997,21 @@ public class SetupTab {
      * campaign has none of its own.
      *
      * <p>These mirror live campaign and game settings, so a campaign that has made a choice must see
-     * it reported rather than overridden. A new campaign has made none - all three sit at their
+     * it reported rather than overridden. A new campaign has made none - both sit at their
      * all-off defaults - and seeding from those meant answering the same question again for every new
      * campaign, which is the one case where the remembered answer is the better one to show.</p>
      */
     private void loadAugmentationValues() {
         boolean tracksImplants = campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS);
-        boolean usesManeiDomini =
-              campaign.getGameOptions().booleanOption(OptionsConstants.RPG_MANEI_DOMINI);
         NeuralInterfaceMode mode = NeuralInterfaceMode.from(campaign.getGameOptions());
 
-        boolean campaignHasChosen = tracksImplants || usesManeiDomini || mode.isOn();
+        boolean campaignHasChosen = tracksImplants || mode.isOn();
         if (!campaignHasChosen) {
             tracksImplants = MekHQ.getMHQOptions().getLastUseImplants();
-            usesManeiDomini = MekHQ.getMHQOptions().getLastUseManeiDomini();
             mode = MekHQ.getMHQOptions().getLastNeuralInterfaceMode();
         }
 
         chkUseImplants.setSelected(tracksImplants);
-        chkUseManeiDomini.setSelected(usesManeiDomini);
         cmbNeuralInterfaceMode.setSelectedItem(mode);
         refreshAugmentationEnablement();
     }
@@ -1020,15 +1021,6 @@ public class SetupTab {
      * options, so what the campaign holds is what the player must see; the toggles are written back to the
      * campaign when the command is generated.
      */
-    private void loadTemporaryCrewValues() {
-        if (campaign == null) {
-            return;
-        }
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        for (Map.Entry<TemporaryCrewRole, CommandGenerationCheckBox> entry : chkTemporaryCrew.entrySet()) {
-            entry.getValue().setSelected(campaignOptions.get(entry.getKey().getCampaignOption()));
-        }
-    }
 
     /**
      * Reads values back from this tab's controls into the supplied options. Same mapping as
@@ -1100,28 +1092,12 @@ public class SetupTab {
         targetOptions.setAssignMekWarriorsCallSigns(chkAssignMekWarriorsCallSigns.isSelected());
         targetOptions.setAssignFounderFlag(chkAssignFounderFlag.isSelected());
 
-        EnumSet<TemporaryCrewRole> temporaryCrewRoles = EnumSet.noneOf(TemporaryCrewRole.class);
-        for (Map.Entry<TemporaryCrewRole, CommandGenerationCheckBox> entry : chkTemporaryCrew.entrySet()) {
-            if (entry.getValue().isSelected()) {
-                temporaryCrewRoles.add(entry.getKey());
-            }
+        // Only written when the section is on screen. A player who set implants for a Shadow Division and then
+        // switched to a faction that cannot be augmented would otherwise still have that choice written to the
+        // campaign from a panel they can no longer see.
+        if (isAugmentationSectionVisible()) {
+            writeAugmentationValues(targetOptions);
         }
-        targetOptions.setTemporaryCrewRoles(temporaryCrewRoles);
-
-        targetOptions.setUseImplants(chkUseImplants.isSelected());
-        targetOptions.setUseManeiDomini(chkUseManeiDomini.isSelected());
-        NeuralInterfaceMode mode = NeuralInterfaceMode.OFF;
-        if (cmbNeuralInterfaceMode.getSelectedItem() instanceof NeuralInterfaceMode selected) {
-            mode = selected;
-            targetOptions.setNeuralInterfaceMode(selected);
-        }
-
-        // Remembered as the player's own answer, so the next new campaign opens on it rather than
-        // asking again. The campaign still holds its own copy; this only decides what a campaign that
-        // has chosen nothing is shown.
-        MekHQ.getMHQOptions().setLastUseImplants(chkUseImplants.isSelected());
-        MekHQ.getMHQOptions().setLastUseManeiDomini(chkUseManeiDomini.isSelected());
-        MekHQ.getMHQOptions().setLastNeuralInterfaceMode(mode);
     }
 
     public RandomOriginOptionsPanel getRandomOriginOptionsPanel() {

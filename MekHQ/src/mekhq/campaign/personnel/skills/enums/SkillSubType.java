@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -66,7 +66,7 @@ public enum SkillSubType {
     /**
      * Represents technician skills.
      */
-    SUPPORT_TECHNICIAN(),
+    SUPPORT_TECHNICIAN,
 
     /**
      * Represents skills with mechanical effects that are not specifically profession-based skills

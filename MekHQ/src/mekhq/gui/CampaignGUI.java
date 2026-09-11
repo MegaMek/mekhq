@@ -119,7 +119,15 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
 import mekhq.gui.commandGeneration.CommandGenerationDialog;
-import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.AdvanceDaysDialog;
+import mekhq.gui.dialog.EasyBugReportDialog;
+import mekhq.gui.dialog.HireBulkPersonnelDialog;
+import mekhq.gui.dialog.MekHQUnitSelectorDialog;
+import mekhq.gui.dialog.NewsDialog;
+import mekhq.gui.dialog.PartsStoreDialog;
+import mekhq.gui.dialog.RefitNameDialog;
+import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
 import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
 import mekhq.gui.enums.MHQTabType;
@@ -196,7 +204,7 @@ public class CampaignGUI extends JPanel {
 
     /* Top Panel */
     private JPanel pnlTop;
-    private RoundedJButton btnCommandGenerator;
+    private AccentRoundedJButton btnCommandGenerator;
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
@@ -502,8 +510,11 @@ public class CampaignGUI extends JPanel {
      *
      * @return the button
      */
-    private RoundedJButton createCommandGeneratorButton() {
-        btnCommandGenerator = new RoundedJButton(resourceMap.getString("btnCommandGenerator.text"));
+    private AccentRoundedJButton createCommandGeneratorButton() {
+        // Painted in hazard yellow and black: it is only on screen while the campaign is empty, and players
+        // regularly miss that they have to press something to get a starting force at all.
+        btnCommandGenerator = new AccentRoundedJButton(resourceMap.getString("btnCommandGenerator.text"),
+              Accent.CAUTION);
         btnCommandGenerator.setToolTipText(resourceMap.getString("btnCommandGenerator.toolTipText"));
         btnCommandGenerator.setHorizontalAlignment(SwingConstants.CENTER);
         btnCommandGenerator.addActionListener(event -> {
@@ -845,8 +856,7 @@ public class CampaignGUI extends JPanel {
     /**
      * Opens the recruitment dialog to hire a person, using the appropriate market style based on campaign options.
      *
-     * <p>If the style recruitment is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
-     * displayed. Otherwise, the new recruitment dialog is shown according to the campaign's current market style.</p>
+     * <p>The new recruitment dialog is shown according to the campaign's current market style.</p>
      *
      * <p>If all recruitment options are disabled, display the bulk recruitment dialog (GM), instead.</p>
      */
@@ -854,17 +864,8 @@ public class CampaignGUI extends JPanel {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
         PersonnelMarketStyle marketStyle = campaignOptions.get(CampaignOption.PERSONNEL_MARKET_STYLE);
 
-        if (marketStyle != PERSONNEL_MARKET_DISABLED || !getCampaign().getPlayerForce()
-                                                               .getHumanResources()
-                                                               .getPersonnelMarket()
-                                                               .isNone()) {
-            if (marketStyle == PERSONNEL_MARKET_DISABLED) {
-                PersonnelMarketDialog personnelMarketDialog =
-                      new PersonnelMarketDialog(getFrame(), this, getCampaign());
-                personnelMarketDialog.setVisible(true);
-            } else {
-                getCampaign().getPlayerForce().getHumanResources().getNewPersonnelMarket().showPersonnelMarketDialog();
-            }
+        if (marketStyle != PERSONNEL_MARKET_DISABLED) {
+            getCampaign().getPlayerForce().getHumanResources().getNewPersonnelMarket().showPersonnelMarketDialog();
         } else {
             openBulkRecruitmentDialog();
         }

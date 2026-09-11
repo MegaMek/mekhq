@@ -154,6 +154,7 @@ import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.DiseaseService;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -164,6 +165,7 @@ import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.TechnicianSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -177,7 +179,7 @@ import mekhq.gui.PersonnelTab;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.dialog.*;
-import mekhq.gui.dialog.quartermaster.IssueArmorKitsDialog;
+import mekhq.gui.dialog.quartermaster.IssueEquipmentDialog;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.menus.AssignPersonToUnitMenu;
 import mekhq.gui.menus.LocationMenu;
@@ -272,6 +274,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_LOYALTY = "LOYALTY";
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
+    private static final String CMD_ADD_MISSING_TECH_SKILLS = "ADD_MISSING_TECH_SKILLS";
     private static final String CMD_EDIT_FAMILIARITY = "EDIT_FAMILIARITY";
     private static final String CMD_GENERATE_ROLEPLAY_SKILLS = "GENERATE_ROLEPLAY_SKILLS";
     private static final String CMD_REMOVE_ROLEPLAY_SKILLS = "REMOVE_ROLEPLAY_SKILLS";
@@ -1838,6 +1841,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
+            case CMD_ADD_MISSING_TECH_SKILLS: {
+                for (Person person : people) {
+                    TechnicianSkills.addMissingSkills(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
             case CMD_EDIT_FAMILIARITY: {
                 new EditFamiliarityDialog(getFrame(), getCampaign(), selectedPerson).setVisible(true);
                 break;
@@ -2571,12 +2581,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(getCampaign(), selected));
 
-        if (Arrays.stream(selected).anyMatch(ArmorKitCatalog::canBeIssuedKit)) {
-            JMenuItem issueArmorKits = new JMenuItem(getTextAt("mekhq.resources.IssueArmorKitsDialog",
+        if (Arrays.stream(selected)
+                  .anyMatch(candidate -> ArmorKitCatalog.canBeIssuedKit(candidate)
+                                               || EquipmentKitCatalog.canBeIssuedKit(candidate))) {
+            JMenuItem issueKits = new JMenuItem(getTextAt("mekhq.resources.IssueEquipmentDialog",
                   "menu.issueArmorKits"));
-            issueArmorKits.addActionListener(ev -> IssueArmorKitsDialog.showFor(getFrame(),
+            issueKits.addActionListener(ev -> IssueEquipmentDialog.showFor(getFrame(),
                   getCampaign(), Arrays.asList(selected), null));
-            popup.add(issueArmorKits);
+            popup.add(issueKits);
         }
 
         List<mekhq.campaign.personnel.Person> selectedPeople = Arrays.asList(selected);
@@ -4049,6 +4061,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(CMD_EDIT_PORTRAIT);
             menuItem.addActionListener(this);
             changeProfileMenu.add(menuItem);
+
+            JMenuHelpers.addMenuIfNonEmpty(popup, changeProfileMenu);
         }
 
         JMenu editLogsMenu = new JMenu(resources.getString("editLogs.text"));
@@ -4454,6 +4468,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 skillsXpMenu.add(menuItem);
             }
 
+            menuItem = new JMenuItem(resources.getString("addMissingTechSkills.text"));
+            menuItem.setToolTipText(wordWrap(resources.getString("addMissingTechSkills.tooltip")));
+            menuItem.setActionCommand(CMD_ADD_MISSING_TECH_SKILLS);
+            menuItem.addActionListener(this);
+            skillsXpMenu.add(menuItem);
+
             JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.set"));
             for (SkillAttribute attribute : SkillAttribute.values()) {
                 if (attribute.isNoAttribute()) {
@@ -4700,7 +4720,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(CMD_REMOVE_ROLEPLAY_SKILLS);
             menuItem.addActionListener(this);
             personalityMenu.add(menuItem);
-            
+
             if (oneSelected && getCampaignOptions().get(CampaignOption.CHASSIS_FAMILIARITY_MODE).isEnabled()) {
                 menuItem = new JMenuItem(getText("editFamiliarity.text"));
                 menuItem.setActionCommand(CMD_EDIT_FAMILIARITY);

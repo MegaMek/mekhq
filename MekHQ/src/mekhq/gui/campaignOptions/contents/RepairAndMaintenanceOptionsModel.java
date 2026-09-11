@@ -38,6 +38,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 
 class RepairAndMaintenanceOptionsModel {
     boolean techsUseAdministration;
+    boolean useGlobalTechSkillsOnly;
     boolean useUsefulAsTechs;
     boolean useEraMods;
     boolean assignedTechFirst;
@@ -64,6 +65,7 @@ class RepairAndMaintenanceOptionsModel {
 
     RepairAndMaintenanceOptionsModel(@Nonnull CampaignOptions options) {
         techsUseAdministration = options.get(CampaignOption.TECHS_USE_ADMINISTRATION);
+        useGlobalTechSkillsOnly = options.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY);
         useUsefulAsTechs = options.get(CampaignOption.USE_USEFUL_AS_TECHS);
         useEraMods = options.get(CampaignOption.USE_ERA_MODS);
         assignedTechFirst = options.get(CampaignOption.ASSIGNED_TECH_FIRST);
@@ -91,6 +93,7 @@ class RepairAndMaintenanceOptionsModel {
 
     void applyTo(@Nonnull CampaignOptions options) {
         options.set(CampaignOption.TECHS_USE_ADMINISTRATION, techsUseAdministration);
+        options.set(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY, useGlobalTechSkillsOnly);
         options.set(CampaignOption.USE_USEFUL_AS_TECHS, useUsefulAsTechs);
         options.set(CampaignOption.USE_ERA_MODS, useEraMods);
         options.set(CampaignOption.ASSIGNED_TECH_FIRST, assignedTechFirst);

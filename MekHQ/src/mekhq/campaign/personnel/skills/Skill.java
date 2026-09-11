@@ -51,6 +51,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import megamek.codeUtilities.MathUtility;
@@ -290,6 +291,11 @@ public class Skill {
      */
     public int getFinalSkillValue(SkillModifierData skillModifierData, int familiarityBonus) {
         int modifiers = getModifiers(skillModifierData, familiarityBonus);
+
+        // Equipment-kit bonuses modify the skill check only, never the underlying skill level: they are applied here at
+        // the final skill value but deliberately kept out of getModifiers(), so getTotalSkillLevel()/getExperienceLevel()
+        // (a character's rating) do not pick them up.
+        modifiers += skillModifierData.equipmentKitBonuses().getOrDefault(type.getName(), 0);
 
         if (isCountUp()) {
             return min(COUNT_UP_MAX_VALUE, getSkillValue() + modifiers);
@@ -565,6 +571,17 @@ public class Skill {
             }
         }
 
+        // Tech Specialist SPAs: a technician who specializes in one granular Tech/... discipline gets +1 to it and -1 to
+        // every other specialist discipline. The abilities are mutually exclusive, so at most one is ever set.
+        String techSpecialistSpa = TECH_SPECIALIST_SPA_BY_SKILL.get(name);
+        if (techSpecialistSpa != null) {
+            if (characterOptions.booleanOption(techSpecialistSpa)) {
+                modifier += 1;
+            } else if (hasAnyTechSpecialistSpa(characterOptions)) {
+                modifier -= 1;
+            }
+        }
+
         // Chassis Familiarity (combat): the caller supplies the bonus already computed for this skill's role (piloting
         // or gunnery) from the crew member's familiarity and the active FamiliarityMode; it may be negative (Hard
         // mode). It applies to every skill a unit is driven or fought with - which is exactly the combat
@@ -575,6 +592,31 @@ public class Skill {
         }
 
         return modifier;
+    }
+
+    /**
+     * Maps each granular Tech/... specialist skill name to the Tech Specialist SPA that boosts it. A person holding the
+     * SPA for one skill gets +1 to that skill and -1 to every other skill in this map (see
+     * {@link #getSPAModifiers(PersonnelOptions, int, int)}).
+     */
+    private static final Map<String, String> TECH_SPECIALIST_SPA_BY_SKILL = Map.of(
+          S_TECH_ELECTRONIC, TECH_SPECIALIST_ELECTRONIC,
+          S_TECH_NUCLEAR, TECH_SPECIALIST_NUCLEAR,
+          S_TECH_AERONAUTICS, TECH_SPECIALIST_AERONAUTICS,
+          S_TECH_MECHANICAL, TECH_SPECIALIST_MECHANICAL,
+          S_TECH_MYOMER, TECH_SPECIALIST_MYOMER,
+          S_TECH_JETS, TECH_SPECIALIST_JETS,
+          S_TECH_WEAPONS, TECH_SPECIALIST_WEAPONS,
+          S_TECH_CYBERNETICS, TECH_SPECIALIST_CYBERNETICS);
+
+    /** Whether the character holds any Tech Specialist SPA (they are mutually exclusive, so at most one). */
+    private static boolean hasAnyTechSpecialistSpa(PersonnelOptions characterOptions) {
+        for (String spa : TECH_SPECIALIST_SPA_BY_SKILL.values()) {
+            if (characterOptions.booleanOption(spa)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -720,7 +762,8 @@ public class Skill {
                   new Attributes(),
                   0,
                   new ArrayList<>(),
-                  IGNORE_AGE);
+                  IGNORE_AGE,
+                  Map.of());
         }
 
         int baseValue = level + bonus;
@@ -754,6 +797,8 @@ public class Skill {
               skillModifierData.injuryEffects(), skillModifierData.characterOptions(), skillModifierData.age());
         int totalInjuryModifier = getTotalInjuryModifier(skillModifierData, type);
 
+        // Equipment-kit bonuses are intentionally NOT summed here: they modify a skill check (the final skill value)
+        // but not the character's skill level or experience rating. See getFinalSkillValue().
         return spaModifiers + attributeModifiers + totalInjuryModifier;
     }
 
@@ -873,7 +918,7 @@ public class Skill {
     @Override
     public String toString() {
         SkillModifierData skillModifierData = new SkillModifierData(new PersonnelOptions(), new Attributes(),
-              0, new ArrayList<>(), IGNORE_AGE);
+              0, new ArrayList<>(), IGNORE_AGE, Map.of());
         return toString(skillModifierData);
     }
 

@@ -91,7 +91,6 @@ class MHQRemindersPage extends MHQOptionsPage {
               { "optionInsufficientAstechsNag", MHQConstants.NAG_INSUFFICIENT_AS_TECHS },
               { "optionInsufficientAstechTimeNag", MHQConstants.NAG_INSUFFICIENT_AS_TECH_TIME },
               { "optionInsufficientMedicsNag", MHQConstants.NAG_INSUFFICIENT_MEDICS },
-              { "optionShortDeploymentNag", MHQConstants.NAG_SHORT_DEPLOYMENT },
               { "optionCombatChallengeNag", MHQConstants.NAG_COMBAT_CHALLENGE },
               { "optionUnresolvedStratConContactsNag", MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS },
               { "optionOutstandingScenariosNag", MHQConstants.NAG_OUTSTANDING_SCENARIOS },

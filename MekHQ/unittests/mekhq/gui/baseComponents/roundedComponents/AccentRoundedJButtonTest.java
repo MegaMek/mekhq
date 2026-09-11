@@ -95,4 +95,51 @@ class AccentRoundedJButtonTest {
         // The middle of the top edge is the yellow frame.
         assertEquals(Accent.HAZARD.getFrame().getRGB(), image.getRGB(60, 1));
     }
+
+    @Test
+    void cautionAccentUsesItsOwnColours() {
+        AccentRoundedJButton button = new AccentRoundedJButton("Generate Starting Command", Accent.CAUTION);
+
+        assertEquals(Accent.CAUTION, button.getAccent());
+        assertEquals(Accent.CAUTION.getFace(), button.getBackground());
+        assertEquals(Accent.CAUTION.getLabel(), button.getForeground());
+    }
+
+    @Test
+    void cautionIsTheHazardYellowSoTheTwoReadAsOnePalette() {
+        assertEquals(Accent.HAZARD.getFrame(), Accent.CAUTION.getFace(),
+              "the caution face is the same yellow the hazard button is framed in");
+    }
+
+    @Test
+    void paintsYellowFaceInsideAFrameOfHazardTape() {
+        // A short label, so the sampled face pixel cannot land on an antialiased glyph. The caution label is
+        // the same near-black as its dark stripe, which would otherwise read as a stripe hit.
+        AccentRoundedJButton button = new AccentRoundedJButton("Go", Accent.CAUTION);
+        button.setFont(button.getFont().deriveFont(Font.BOLD, 12f));
+        button.setSize(120, 40);
+
+        BufferedImage image = new BufferedImage(120, 40, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        try {
+            button.paint(graphics);
+        } finally {
+            graphics.dispose();
+        }
+
+        // A point well inside the face, away from the text, is the hazard yellow.
+        assertEquals(Accent.CAUTION.getFace().getRGB(), image.getRGB(12, 20));
+
+        // The frame is tape rather than a line, so the top edge alternates: both stripe colours appear along it.
+        // Asserting a single pixel would only be testing where the diagonal happens to fall.
+        boolean sawLight = false;
+        boolean sawDark = false;
+        for (int x = 8; x < 112; x++) {
+            int pixel = image.getRGB(x, 1);
+            sawLight |= (pixel == Accent.CAUTION.getFace().getRGB());
+            sawDark |= (pixel == Accent.CAUTION.getFrame().getRGB());
+        }
+        assertTrue(sawLight, "the tape's light bars must show along the top edge");
+        assertTrue(sawDark, "the tape's dark bars must show along the top edge");
+    }
 }

@@ -39,13 +39,10 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.Component;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
@@ -56,8 +53,6 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
-import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
-import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.Category;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -138,8 +133,8 @@ class AcquisitionPage {
     private JSpinner spnAutoLogisticsGyros;
     private JLabel lblAutoLogisticsOther;
     private JSpinner spnAutoLogisticsOther;
-    private JLabel lblAutoLogisticsArmorKit;
-    private JSpinner spnAutoLogisticsArmorKit;
+    private JLabel lblAutoLogisticsEquipmentKit;
+    private JSpinner spnAutoLogisticsEquipmentKit;
     private JLabel lblAutoLogisticsBomb;
     private JSpinner spnAutoLogisticsBomb;
 
@@ -150,16 +145,6 @@ class AcquisitionPage {
     private static final int TRANSIT_UNIT_MONTH = 2;
     private static final int TRANSIT_UNIT_NUM = 3;
     private JCheckBox chkNoDeliveriesInTransit;
-
-    private JLabel lblMekWarriorDefaultKit;
-    private MMComboBox<String> cboMekWarriorDefaultKit;
-    private JLabel lblVehicleCrewDefaultKit;
-    private MMComboBox<String> cboVehicleCrewDefaultKit;
-    private JLabel lblAircraftDefaultKit;
-    private MMComboBox<String> cboAircraftDefaultKit;
-    private JCheckBox chkAddDefaultKitToProcurement;
-    private JCheckBox chkNpcFactionArmorKits;
-    private JCheckBox chkRequireMekWarriorKitToDeploy;
 
     private boolean created;
 
@@ -178,9 +163,6 @@ class AcquisitionPage {
         cboProcurementPersonnelPick = new MMComboBox<>("procurementPersonnelPick",
               buildProcurementPersonnelPickComboOptions());
         choiceTransitTimeUnits = new MMComboBox<>("choiceTransitTimeUnits", getTransitUnitOptions());
-        cboMekWarriorDefaultKit = armorKitCombo("mekWarriorDefaultKit", Category.MEKWARRIOR);
-        cboVehicleCrewDefaultKit = armorKitCombo("vehicleCrewDefaultKit", Category.INFANTRY);
-        cboAircraftDefaultKit = armorKitCombo("aircraftDefaultKit", Category.AIRCRAFT);
 
         // Header
         String imageAddress = getImageDirectory() + "logo_clan_cloud_cobra.png";
@@ -193,7 +175,6 @@ class AcquisitionPage {
         pnlAutoLogistics = createAutoLogisticsPanel();
         pnlAcquisitions = createAcquisitionPanel();
         JPanel pnlDelivery = createDeliveryPanel();
-        JPanel pnlArmorKits = createArmorKitsPanel();
 
         JPanel panel = CampaignOptionsPagePanel.builder("AcquisitionPage", "AcquisitionPage", imageAddress)
                 .header(acquisitionHeader)
@@ -204,9 +185,6 @@ class AcquisitionPage {
                 .section("lblDeliveryPanel.text",
                         "lblDeliveryPanel.summary",
                         pnlDelivery)
-                             .section("lblArmorKitsPanel.text",
-                                   "lblArmorKitsPanel.summary",
-                                   pnlArmorKits)
                 .section("lblAutoLogisticsPanel.text",
                         "lblAutoLogisticsPanel.summary",
                         pnlAutoLogistics)
@@ -290,63 +268,6 @@ class AcquisitionPage {
         return panel;
     }
 
-    private MMComboBox<String> armorKitCombo(String name, Category category) {
-        MMComboBox<String> combo = new MMComboBox<>(name,
-              ArmorKitCatalog.optionKitNames(category).toArray(new String[0]));
-        combo.setRenderer(new ArmorKitRenderer());
-        return combo;
-    }
-
-    /** Renders the coveralls entry as "None" and every other kit by its own name. */
-    private static class ArmorKitRenderer extends DefaultListCellRenderer {
-        @Override
-        public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
-              boolean cellHasFocus) {
-            Object display = ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(value)
-                                   ? getTextAt(getCampaignOptionsResourceBundle(), "armorKitNone.text")
-                                   : value;
-            return super.getListCellRendererComponent(list, display, index, isSelected, cellHasFocus);
-        }
-    }
-
-    private @Nonnull JPanel createArmorKitsPanel() {
-        lblMekWarriorDefaultKit = new CampaignOptionsLabel("MekWarriorDefaultKit", getMetadata(new Version(0, 51, 1)));
-        lblMekWarriorDefaultKit.addMouseListener(createTipPanelUpdater("MekWarriorDefaultKit"));
-        cboMekWarriorDefaultKit.addMouseListener(createTipPanelUpdater("MekWarriorDefaultKit"));
-
-        lblVehicleCrewDefaultKit = new CampaignOptionsLabel("VehicleCrewDefaultKit",
-              getMetadata(new Version(0, 51, 1)));
-        lblVehicleCrewDefaultKit.addMouseListener(createTipPanelUpdater("VehicleCrewDefaultKit"));
-        cboVehicleCrewDefaultKit.addMouseListener(createTipPanelUpdater("VehicleCrewDefaultKit"));
-
-        lblAircraftDefaultKit = new CampaignOptionsLabel("AircraftDefaultKit", getMetadata(new Version(0, 51, 1)));
-        lblAircraftDefaultKit.addMouseListener(createTipPanelUpdater("AircraftDefaultKit"));
-        cboAircraftDefaultKit.addMouseListener(createTipPanelUpdater("AircraftDefaultKit"));
-
-        chkAddDefaultKitToProcurement = new CampaignOptionsCheckBox("AddDefaultKitToProcurement",
-              getMetadata(new Version(0, 51, 1)));
-        chkAddDefaultKitToProcurement.addMouseListener(createTipPanelUpdater("AddDefaultKitToProcurement"));
-
-        chkNpcFactionArmorKits = new CampaignOptionsCheckBox("NpcFactionArmorKits", getMetadata(new Version(0, 51, 1)));
-        chkNpcFactionArmorKits.addMouseListener(createTipPanelUpdater("NpcFactionArmorKits"));
-
-        chkRequireMekWarriorKitToDeploy = new CampaignOptionsCheckBox("RequireMekWarriorKitToDeploy",
-              getMetadata(new Version(0, 51, 1)));
-        chkRequireMekWarriorKitToDeploy.addMouseListener(createTipPanelUpdater("RequireMekWarriorKitToDeploy"));
-
-        final SettingsFormPanel panel = new SettingsFormPanel("ArmorKitsPanel",
-              acquisitionSectionLabelWidth,
-              CONTROL_COLUMN_WIDTH);
-        panel.addRow(lblMekWarriorDefaultKit, cboMekWarriorDefaultKit);
-        panel.addRow(lblVehicleCrewDefaultKit, cboVehicleCrewDefaultKit);
-        panel.addRow(lblAircraftDefaultKit, cboAircraftDefaultKit);
-        panel.addCheckBox(chkAddDefaultKitToProcurement);
-        panel.addCheckBox(chkNpcFactionArmorKits);
-        panel.addCheckBox(chkRequireMekWarriorKitToDeploy);
-
-        return panel;
-    }
-
     /**
      * Creates and returns a {@code JPanel} for configuring autoLogistics-related options. This panel includes various
      * components such as labels, checkboxes, and spinners to allow users to set values for acquisition settings,
@@ -426,11 +347,11 @@ class AcquisitionPage {
         spnAutoLogisticsOther = new CampaignOptionsSpinner("AutoLogisticsOther", 50, 0, 10000, 1);
         spnAutoLogisticsOther.addMouseListener(createTipPanelUpdater("AutoLogisticsOther"));
 
-        lblAutoLogisticsArmorKit = new CampaignOptionsLabel("AutoLogisticsArmorKit",
+        lblAutoLogisticsEquipmentKit = new CampaignOptionsLabel("AutoLogisticsEquipmentKit",
               getMetadata(new Version(0, 51, 1)));
-        lblAutoLogisticsArmorKit.addMouseListener(createTipPanelUpdater("AutoLogisticsArmorKit"));
-        spnAutoLogisticsArmorKit = new CampaignOptionsSpinner("AutoLogisticsArmorKit", 0, 0, 10000, 1);
-        spnAutoLogisticsArmorKit.addMouseListener(createTipPanelUpdater("AutoLogisticsArmorKit"));
+        lblAutoLogisticsEquipmentKit.addMouseListener(createTipPanelUpdater("AutoLogisticsEquipmentKit"));
+        spnAutoLogisticsEquipmentKit = new CampaignOptionsSpinner("AutoLogisticsEquipmentKit", 0, 0, 10000, 1);
+        spnAutoLogisticsEquipmentKit.addMouseListener(createTipPanelUpdater("AutoLogisticsEquipmentKit"));
 
         lblAutoLogisticsBomb = new CampaignOptionsLabel("AutoLogisticsBomb",
               getMetadata(new Version(0, 51, 1)));
@@ -456,7 +377,7 @@ class AcquisitionPage {
               lblAutoLogisticsGyros, spnAutoLogisticsGyros,
               lblAutoLogisticsWeapons, spnAutoLogisticsWeapons,
               lblAutoLogisticsOther, spnAutoLogisticsOther,
-              lblAutoLogisticsArmorKit, spnAutoLogisticsArmorKit,
+              lblAutoLogisticsEquipmentKit, spnAutoLogisticsEquipmentKit,
               lblAutoLogisticsBomb, spnAutoLogisticsBomb);
 
         // Compute where this grid's second label column (the "third column") begins, so
@@ -594,16 +515,10 @@ class AcquisitionPage {
         spnAutoLogisticsHeatSink.setValue(model.autoLogisticsHeatSink);
         spnAutoLogisticsWeapons.setValue(model.autoLogisticsWeapons);
         spnAutoLogisticsOther.setValue(model.autoLogisticsOther);
-        spnAutoLogisticsArmorKit.setValue(model.autoLogisticsArmorKit);
+        spnAutoLogisticsEquipmentKit.setValue(model.autoLogisticsEquipmentKit);
         spnAutoLogisticsBomb.setValue(model.autoLogisticsBomb);
         choiceTransitTimeUnits.setSelectedIndex(model.unitTransitTime);
         chkNoDeliveriesInTransit.setSelected(model.noDeliveriesInTransit);
-        cboMekWarriorDefaultKit.setSelectedItem(model.mekWarriorDefaultKit);
-        cboVehicleCrewDefaultKit.setSelectedItem(model.vehicleCrewDefaultKit);
-        cboAircraftDefaultKit.setSelectedItem(model.aircraftDefaultKit);
-        chkAddDefaultKitToProcurement.setSelected(model.addDefaultKitToProcurement);
-        chkNpcFactionArmorKits.setSelected(model.npcFactionArmorKits);
-        chkRequireMekWarriorKitToDeploy.setSelected(model.requireMekWarriorKitToDeploy);
     }
 
     /**
@@ -637,15 +552,9 @@ class AcquisitionPage {
         model.autoLogisticsHeatSink = (int) spnAutoLogisticsHeatSink.getValue();
         model.autoLogisticsWeapons = (int) spnAutoLogisticsWeapons.getValue();
         model.autoLogisticsOther = (int) spnAutoLogisticsOther.getValue();
-        model.autoLogisticsArmorKit = (int) spnAutoLogisticsArmorKit.getValue();
+        model.autoLogisticsEquipmentKit = (int) spnAutoLogisticsEquipmentKit.getValue();
         model.autoLogisticsBomb = (int) spnAutoLogisticsBomb.getValue();
         model.unitTransitTime = choiceTransitTimeUnits.getSelectedIndex();
         model.noDeliveriesInTransit = chkNoDeliveriesInTransit.isSelected();
-        model.mekWarriorDefaultKit = cboMekWarriorDefaultKit.getSelectedItem();
-        model.vehicleCrewDefaultKit = cboVehicleCrewDefaultKit.getSelectedItem();
-        model.aircraftDefaultKit = cboAircraftDefaultKit.getSelectedItem();
-        model.addDefaultKitToProcurement = chkAddDefaultKitToProcurement.isSelected();
-        model.npcFactionArmorKits = chkNpcFactionArmorKits.isSelected();
-        model.requireMekWarriorKitToDeploy = chkRequireMekWarriorKitToDeploy.isSelected();
     }
 }

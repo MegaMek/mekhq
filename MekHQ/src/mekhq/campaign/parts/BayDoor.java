@@ -46,6 +46,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingBayDoor;
 import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 
 /**
@@ -59,6 +60,11 @@ public class BayDoor extends Part {
     public BayDoor(int tonnage, Campaign c) {
         super(tonnage, false, c);
         name = "Bay Door";
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

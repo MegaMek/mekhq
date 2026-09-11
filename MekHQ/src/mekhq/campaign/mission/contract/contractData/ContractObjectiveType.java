@@ -39,133 +39,112 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
 import mekhq.campaign.mission.contract.contractGeneration.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.mission.contract.contractGeneration.targetFinder.MissionLocationProfile;
-import mekhq.campaign.mission.utilities.CombatRole;
 
 public enum ContractObjectiveType {
     ASSASSINATION("ContractObjectiveType.ASSASSINATION.text", "ContractObjectiveType.ASSASSINATION.toolTipText",
           ChaosObjectiveType.GUERILLA_OPERATION,
           1.9,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.DEEP_RAID,
-          CombatRole.MANEUVER),
+          MissionLocationProfile.DEEP_RAID),
     CADRE_DUTY("ContractObjectiveType.CADRE_DUTY.text", "ContractObjectiveType.CADRE_DUTY.toolTipText",
           ChaosObjectiveType.CADRE_DUTY,
           0.8,
           EnemySelectionProfile.RAIDERS,
-          MissionLocationProfile.REAR_AREA,
-          CombatRole.CADRE),
+          MissionLocationProfile.REAR_AREA),
     DIVERSIONARY_RAID("ContractObjectiveType.DIVERSIONARY_RAID.text",
           "ContractObjectiveType.DIVERSIONARY_RAID.toolTipText",
           ChaosObjectiveType.RAID,
           1.8,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.DEEP_RAID,
-          CombatRole.MANEUVER),
+          MissionLocationProfile.DEEP_RAID),
     ESPIONAGE("ContractObjectiveType.ESPIONAGE.text", "ContractObjectiveType.ESPIONAGE.toolTipText",
           ChaosObjectiveType.EXPEDITION,
           2.4,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.HIGH_VALUE,
-          CombatRole.PATROL),
+          MissionLocationProfile.HIGH_VALUE),
     EXTRACTION_RAID("ContractObjectiveType.EXTRACTION_RAID.text", "ContractObjectiveType.EXTRACTION_RAID.toolTipText",
           ChaosObjectiveType.RAID,
           1.6,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.DEEP_RAID,
-          CombatRole.MANEUVER),
+          MissionLocationProfile.DEEP_RAID),
     GARRISON_DUTY("ContractObjectiveType.GARRISON_DUTY.text", "ContractObjectiveType.GARRISON_DUTY.toolTipText",
           ChaosObjectiveType.GARRISON,
           1.0,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.DEFAULT,
-          CombatRole.FRONTLINE),
+          MissionLocationProfile.DEFAULT),
     GUERRILLA_WARFARE("ContractObjectiveType.GUERRILLA_WARFARE.text",
           "ContractObjectiveType.GUERRILLA_WARFARE.toolTipText",
           ChaosObjectiveType.GUERILLA_OPERATION,
           2.1,
           EnemySelectionProfile.OCCUPYING_POWER,
-          MissionLocationProfile.OCCUPIED_TERRITORY,
-          CombatRole.MANEUVER),
+          MissionLocationProfile.OCCUPIED_TERRITORY),
     MOLE_HUNTING("ContractObjectiveType.MOLE_HUNTING.text", "ContractObjectiveType.MOLE_HUNTING.toolTipText",
           ChaosObjectiveType.EXPEDITION,
           1.2,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.DEFAULT,
-          CombatRole.PATROL),
+          MissionLocationProfile.DEFAULT),
     OBJECTIVE_RAID("ContractObjectiveType.OBJECTIVE_RAID.text", "ContractObjectiveType.OBJECTIVE_RAID.toolTipText",
           ChaosObjectiveType.RAID,
           1.6,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.DEEP_RAID,
-          CombatRole.MANEUVER),
+          MissionLocationProfile.DEEP_RAID),
     OBSERVATION_RAID("ContractObjectiveType.OBSERVATION_RAID.text",
           "ContractObjectiveType.OBSERVATION_RAID.toolTipText",
           ChaosObjectiveType.RAID,
           1.6,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.DEEP_RAID,
-          CombatRole.PATROL),
+          MissionLocationProfile.DEEP_RAID),
     PIRATE_HUNTING("ContractObjectiveType.PIRATE_HUNTING.text", "ContractObjectiveType.PIRATE_HUNTING.toolTipText",
           ChaosObjectiveType.PIRATE_HUNT,
           1.0,
           EnemySelectionProfile.PIRATES,
-          MissionLocationProfile.DEFAULT,
-          CombatRole.PATROL),
+          MissionLocationProfile.DEFAULT),
     PLANETARY_ASSAULT("ContractObjectiveType.PLANETARY_ASSAULT.text",
           "ContractObjectiveType.PLANETARY_ASSAULT.toolTipText",
           ChaosObjectiveType.INVASION,
           1.5,
           EnemySelectionProfile.AT_WAR,
-          MissionLocationProfile.INVASION,
-          CombatRole.FRONTLINE),
+          MissionLocationProfile.INVASION),
     RECON_RAID("ContractObjectiveType.RECON_RAID.text", "ContractObjectiveType.RECON_RAID.toolTipText",
           ChaosObjectiveType.RAID,
           1.6,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.DEEP_RAID,
-          CombatRole.MANEUVER),
+          MissionLocationProfile.DEEP_RAID),
     RELIEF_DUTY("ContractObjectiveType.RELIEF_DUTY.text", "ContractObjectiveType.RELIEF_DUTY.toolTipText",
           ChaosObjectiveType.INVASION,
           1.4,
           EnemySelectionProfile.AT_WAR,
-          MissionLocationProfile.DEFAULT,
-          CombatRole.MANEUVER),
+          MissionLocationProfile.DEFAULT),
     RETAINER("ContractObjectiveType.RETAINER.text", "ContractObjectiveType.RETAINER.toolTipText",
           ChaosObjectiveType.GARRISON,
           1.3,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.REAR_AREA,
-          CombatRole.FRONTLINE),
+          MissionLocationProfile.REAR_AREA),
     RIOT_DUTY("ContractObjectiveType.RIOT_DUTY.text", "ContractObjectiveType.RIOT_DUTY.toolTipText",
           ChaosObjectiveType.GARRISON,
           1.0,
           EnemySelectionProfile.REBELS,
-          MissionLocationProfile.INTERIOR_POPULATED,
-          CombatRole.MANEUVER),
+          MissionLocationProfile.INTERIOR_POPULATED),
     SABOTAGE("ContractObjectiveType.SABOTAGE.text", "ContractObjectiveType.SABOTAGE.toolTipText",
           ChaosObjectiveType.EXPEDITION,
           2.4,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.HIGH_VALUE,
-          CombatRole.MANEUVER),
+          MissionLocationProfile.HIGH_VALUE),
     SECURITY_DUTY("ContractObjectiveType.SECURITY_DUTY.text", "ContractObjectiveType.SECURITY_DUTY.toolTipText",
           ChaosObjectiveType.GARRISON,
           1.2,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.INTERIOR_POPULATED,
-          CombatRole.FRONTLINE),
+          MissionLocationProfile.INTERIOR_POPULATED),
     TERRORISM("ContractObjectiveType.TERRORISM.text", "ContractObjectiveType.TERRORISM.toolTipText",
           ChaosObjectiveType.EXPEDITION,
           1.9,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.HIGH_VALUE,
-          CombatRole.MANEUVER),
+          MissionLocationProfile.HIGH_VALUE),
     UNDEFINED("ContractObjectiveType.UNDEFINED.text", "ContractObjectiveType.UNDEFINED.toolTipText",
           ChaosObjectiveType.RAID,
           1.0,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.DEFAULT,
-          CombatRole.FRONTLINE);
+          MissionLocationProfile.DEFAULT);
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -177,20 +156,18 @@ public enum ContractObjectiveType {
     private final ChaosObjectiveType chaosObjectiveType;
     private final EnemySelectionProfile enemySelectionProfile;
     private final MissionLocationProfile missionLocationProfile;
-    private final CombatRole requiredCombatRole;
     // endregion Variable Declarations
 
     // region Constructors
     ContractObjectiveType(final String name, final String toolTipText, final ChaosObjectiveType chaosObjectiveType,
           final double operationsTempoMultiplier, final EnemySelectionProfile enemySelectionProfile,
-          final MissionLocationProfile missionLocationProfile, final CombatRole requiredCombatRole) {
+          final MissionLocationProfile missionLocationProfile) {
         this.name = getTextAt(RESOURCE_BUNDLE, name);
         this.toolTipText = getTextAt(RESOURCE_BUNDLE, toolTipText);
         this.operationsTempoMultiplier = operationsTempoMultiplier;
         this.chaosObjectiveType = chaosObjectiveType;
         this.enemySelectionProfile = enemySelectionProfile;
         this.missionLocationProfile = missionLocationProfile;
-        this.requiredCombatRole = requiredCombatRole;
     }
     // endregion Constructors
 
@@ -335,13 +312,6 @@ public enum ContractObjectiveType {
      */
     public int calculatePartsAvailabilityLevel() {
         return chaosObjectiveType.getProcurementTargetNumberModifier();
-    }
-
-    /**
-     * @return the {@link CombatRole} required for the current contract type.
-     */
-    public CombatRole getRequiredCombatRole() {
-        return requiredCombatRole;
     }
 
     // region File I/O

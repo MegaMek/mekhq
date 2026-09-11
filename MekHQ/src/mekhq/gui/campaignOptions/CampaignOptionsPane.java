@@ -93,6 +93,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -260,6 +261,8 @@ public class CampaignOptionsPane extends JPanel {
         registerParentRoute("human-resources.personnel", "humanResourcesCategory", "personnelCategory");
         registerDirectRoute("human-resources.personnel.general", this::createPersonnelGeneralPage,
               "humanResourcesCategory", "personnelCategory", "personnelGeneralPage");
+        registerDirectRoute("human-resources.personnel.equipment", this::createPersonnelEquipmentPage,
+              "humanResourcesCategory", "personnelCategory", "personnelEquipmentPage");
         registerDirectRoute("human-resources.personnel.awards", this::createPersonnelAwardsPage,
               "humanResourcesCategory", "personnelCategory", "awardsPage");
         registerDirectRoute("human-resources.personnel.medical", this::createPersonnelMedicalPage,
@@ -581,6 +584,11 @@ public class CampaignOptionsPane extends JPanel {
     private JPanel createPersonnelGeneralPage() {
         ensureCategoryLoaded("humanResourcesCategory");
         return personnelPages.createGeneralPage();
+    }
+
+    private JPanel createPersonnelEquipmentPage() {
+        ensureCategoryLoaded("humanResourcesCategory");
+        return personnelPages.createEquipmentPage();
     }
 
     private JPanel createPersonnelAwardsPage() {
@@ -965,6 +973,12 @@ public class CampaignOptionsPane extends JPanel {
             new VeterancyAwardsCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
+        boolean newIsUseSupportTeams = newOptions.useSupportTeams();
+        if (!isStartUp && newIsUseSupportTeams && !oldOptions.useSupportTeams()
+                  && SupportCarrierReconciler.hasStaffToOrganize(campaign)) { // Has tracking changed?
+            new SupportTeamsCampaignOptionsChangedConfirmationDialog(campaign, false);
+        }
+
         boolean newIsUseMASHTheatres = newOptions.useMASHTheatres();
         if (!isStartUp && newIsUseMASHTheatres && !oldIsUseMASHTheatres) { // Has tracking changed?
             new MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(campaign);
@@ -1037,6 +1051,18 @@ public class CampaignOptionsPane extends JPanel {
                   newRequireMekWarriorKitToDeploy &&
                   !oldRequireMekWarriorKitToDeploy) { // Has tracking changed?
             new MekWarriorKitCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newSpecialistTechSkillsEnabled = newOptions.specialistTechSkillsEnabled();
+        if (!isStartUp
+                  && newSpecialistTechSkillsEnabled
+                  && !oldOptions.specialistTechSkillsEnabled()) { // Specialist tech skills newly enabled?
+            new SpecialistTechSkillsCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        boolean newTechsNeedToolKit = newOptions.techsNeedToolKit();
+        if (!isStartUp && newTechsNeedToolKit && !oldOptions.techsNeedToolKit()) { // Has tracking changed?
+            new TechsNeedToolKitCampaignOptionsChangedConfirmationDialog(campaign);
         }
     }
 

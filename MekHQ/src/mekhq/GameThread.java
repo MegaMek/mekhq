@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.sentry.Sentry;
 import megamek.client.AbstractClient;
@@ -81,6 +82,9 @@ class GameThread extends Thread implements CloseClientListener {
     protected List<Unit> units;
 
     protected volatile boolean stop = false;
+
+    /** Ensures {@link #clientClosed()} triggers the host teardown at most once for this thread. */
+    private final AtomicBoolean closed = new AtomicBoolean(false);
 
     private final Scenario scenario;
     // endregion Variable Declarations
@@ -370,6 +374,13 @@ class GameThread extends Thread implements CloseClientListener {
      */
     @Override
     public void clientClosed() {
+        // Tear the host down at most once per game thread. A thread's client can be die()d twice - once when MekHQ
+        // tears the game down, and again from this thread's own run() finally block - and each die() fires this
+        // callback. Without this guard, a previous scenario's thread finishing after a new scenario has started could
+        // call app.stopHost() and tear down the new host/client/server. See issue #9959.
+        if (!closed.compareAndSet(false, true)) {
+            return;
+        }
         requestStop();
         app.stopHost();
     }

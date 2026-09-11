@@ -56,6 +56,7 @@ import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -151,6 +152,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "resetToFirstTech");
     public static final CampaignOption<Boolean> TECHS_USE_ADMINISTRATION =
           of(Boolean.class, false, "techsUseAdministration");
+    public static final CampaignOption<Boolean> USE_GLOBAL_TECH_SKILLS_ONLY =
+          of(Boolean.class, true, "useGlobalTechSkillsOnly");
     public static final CampaignOption<Boolean> USE_USEFUL_AS_TECHS =
           of(Boolean.class, false, "useUsefulAsTechs");
     public static final CampaignOption<Boolean> USE_QUIRKS =
@@ -184,7 +187,7 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Boolean> MRMS_REPLACE_POD =
           of(Boolean.class, true, "mrmsReplacePod");
     public static final CampaignOption<List<MRMSOption>> MRMS_OPTIONS =
-          ofRaw(List.class, () -> new ArrayList<>(), "mrmsOptions");
+          ofRaw(List.class, ArrayList::new, "mrmsOptions");
     public static final CampaignOption<Integer> WAITING_PERIOD =
           of(Integer.class, 7, "waitingPeriod");
     public static final CampaignOption<AcquisitionsType> ACQUISITIONS_TYPE =
@@ -225,8 +228,8 @@ public final class CampaignOption<T> {
           of(Integer.class, 15, "autoLogisticsHeadComponents");
     public static final CampaignOption<Integer> AUTO_LOGISTICS_OTHER =
           of(Integer.class, 0, "autoLogisticsOther");
-    public static final CampaignOption<Integer> AUTO_LOGISTICS_ARMOR_KIT =
-          of(Integer.class, 0, "autoLogisticsArmorKit");
+    public static final CampaignOption<Integer> AUTO_LOGISTICS_EQUIPMENT_KIT =
+          of(Integer.class, 0, "autoLogisticsEquipmentKit");
     public static final CampaignOption<Integer> AUTO_LOGISTICS_BOMB =
           of(Integer.class, 0, "autoLogisticsBomb");
     public static final CampaignOption<Integer> UNIT_TRANSIT_TIME =
@@ -309,8 +312,26 @@ public final class CampaignOption<T> {
           of(String.class, ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, "vehicleCrewDefaultKit");
     public static final CampaignOption<String> AIRCRAFT_DEFAULT_KIT =
           of(String.class, ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, "aircraftDefaultKit");
+    public static final CampaignOption<String> MEK_TECH_DEFAULT_TOOL_KIT =
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "mekTechDefaultToolKit");
+    public static final CampaignOption<String> MECHANIC_DEFAULT_TOOL_KIT =
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "mechanicDefaultToolKit");
+    public static final CampaignOption<String> AERO_TECH_DEFAULT_TOOL_KIT =
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "aeroTechDefaultToolKit");
+    public static final CampaignOption<String> BA_TECH_DEFAULT_TOOL_KIT =
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "baTechDefaultToolKit");
+    public static final CampaignOption<String> ASTECH_DEFAULT_TOOL_KIT =
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "asTechDefaultToolKit");
+    public static final CampaignOption<String> DOCTOR_DEFAULT_TOOL_KIT =
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "doctorDefaultToolKit");
+    public static final CampaignOption<String> MEDIC_DEFAULT_TOOL_KIT =
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "medicDefaultToolKit");
+    public static final CampaignOption<String> ADMIN_DEFAULT_TOOL_KIT =
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "adminDefaultToolKit");
     public static final CampaignOption<Boolean> ADD_DEFAULT_KIT_TO_PROCUREMENT =
           of(Boolean.class, false, "addDefaultKitToProcurement");
+    public static final CampaignOption<Boolean> TECHS_NEED_TOOL_KIT =
+          of(Boolean.class, false, "techsNeedToolKit");
     public static final CampaignOption<Boolean> NPC_FACTION_ARMOR_KITS =
           of(Boolean.class, false, "npcFactionArmorKits");
     public static final CampaignOption<Boolean> REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY =
@@ -373,6 +394,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "useMASHTheatres");
     public static final CampaignOption<Integer> MASH_THEATRE_CAPACITY =
           of(Integer.class, 25, "mashTheatreCapacity");
+    public static final CampaignOption<Boolean> USE_SUPPORT_TEAMS =
+          of(Boolean.class, false, "useSupportTeams");
     public static final CampaignOption<Boolean> USE_BLOB_INFANTRY =
           of(Boolean.class, false, "useBlobInfantry");
     public static final CampaignOption<Boolean> USE_BLOB_BATTLE_ARMOR =
@@ -414,7 +437,7 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Double> SALARY_SPECIALIST_INFANTRY_MULTIPLIER =
           of(Double.class, 1.28, "salarySpecialistInfantryMultiplier");
     public static final CampaignOption<Map<SkillLevel, Double>> SALARY_XP_MULTIPLIERS =
-          ofRaw(Map.class, () -> new HashMap<>(), "salaryXPMultipliers");
+          ofRaw(Map.class, HashMap::new, "salaryXPMultipliers");
     public static final CampaignOption<AwardBonus> AWARD_BONUS_STYLE =
           of(AwardBonus.class, AwardBonus.BOTH, "awardBonusStyle");
     public static final CampaignOption<Boolean> ENABLE_AUTO_AWARDS =
@@ -504,7 +527,7 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Boolean> LOG_MARRIAGE_NAME_CHANGES =
           of(Boolean.class, false, "logMarriageNameChanges");
     public static final CampaignOption<Map<MergingSurnameStyle, Integer>> MARRIAGE_SURNAME_WEIGHTS =
-          ofRaw(Map.class, () -> new HashMap<>(), "marriageSurnameWeights");
+          ofRaw(Map.class, HashMap::new, "marriageSurnameWeights");
     public static final CampaignOption<RandomMarriageMethod> RANDOM_MARRIAGE_METHOD =
           of(RandomMarriageMethod.class, RandomMarriageMethod.NONE, "randomMarriageMethod");
     public static final CampaignOption<Boolean> USE_RANDOM_CLAN_PERSONNEL_MARRIAGES =
@@ -524,7 +547,7 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Boolean> USE_PRISONER_DIVORCE =
           of(Boolean.class, false, "usePrisonerDivorce");
     public static final CampaignOption<Map<SplittingSurnameStyle, Integer>> DIVORCE_SURNAME_WEIGHTS =
-          ofRaw(Map.class, () -> new HashMap<>(), "divorceSurnameWeights");
+          ofRaw(Map.class, HashMap::new, "divorceSurnameWeights");
     public static final CampaignOption<RandomDivorceMethod> RANDOM_DIVORCE_METHOD =
           of(RandomDivorceMethod.class, RandomDivorceMethod.NONE, "randomDivorceMethod");
     public static final CampaignOption<Boolean> USE_RANDOM_OPPOSITE_SEX_DIVORCE =
@@ -613,7 +636,7 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Integer> MILITARY_ACADEMY_ACCIDENTS =
           of(Integer.class, 10000, "militaryAcademyAccidents");
     public static final CampaignOption<Map<AgeGroup, Boolean>> ENABLED_RANDOM_DEATH_AGE_GROUPS =
-          ofRaw(Map.class, () -> new HashMap<>(), "enabledRandomDeathAgeGroups");
+          ofRaw(Map.class, HashMap::new, "enabledRandomDeathAgeGroups");
     public static final CampaignOption<Boolean> USE_RANDOM_DEATH_SUICIDE_CAUSE =
           of(Boolean.class, false, "useRandomDeathSuicideCause");
     public static final CampaignOption<Double> RANDOM_DEATH_MULTIPLIER =
@@ -886,8 +909,6 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "usePersonnelHireHiringHallOnly");
     public static final CampaignOption<Boolean> PERSONNEL_MARKET_REPORT_REFRESH =
           of(Boolean.class, true, "personnelMarketReportRefresh");
-    public static final CampaignOption<Double> PERSONNEL_MARKET_DYLANS_WEIGHT =
-          of(Double.class, 0.3, "personnelMarketDylansWeight");
     public static final CampaignOption<UnitMarketMethod> UNIT_MARKET_METHOD =
           of(UnitMarketMethod.class, UnitMarketMethod.NONE, "unitMarketMethod");
     public static final CampaignOption<Boolean> UNIT_MARKET_REGIONAL_MEK_VARIATIONS =
@@ -936,6 +957,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "useAdvancedScouting");
     public static final CampaignOption<Boolean> ESSENTIAL_SCENARIOS_ONLY =
           of(Boolean.class, false, "essentialScenariosOnly");
+    public static final CampaignOption<Boolean> RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY =
+          of(Boolean.class, false, "restrictScenariosToFleetCapability");
     public static final CampaignOption<StratConSectorCountMethod> STRAT_CON_SECTOR_COUNT_METHOD =
           of(StratConSectorCountMethod.class,
                 StratConSectorCountMethod.ALTERNATE_REGIMENTAL,
@@ -960,8 +983,6 @@ public final class CampaignOption<T> {
           of(Integer.class, -3, "moraleDecisiveDefeatEffect");
     public static final CampaignOption<Boolean> RESTRICT_PARTS_BY_MISSION =
           of(Boolean.class, true, "restrictPartsByMission");
-    public static final CampaignOption<Boolean> GENERATE_CHASES =
-          of(Boolean.class, true, "generateChases");
     public static final CampaignOption<Boolean> USE_GENERIC_BATTLE_VALUE =
           of(Boolean.class, true, "useGenericBattleValue");
     public static final CampaignOption<Boolean> USE_VERBOSE_BIDDING =
@@ -1087,7 +1108,7 @@ public final class CampaignOption<T> {
     public static final CampaignOption<EnumMap<PlanetaryRating, Integer>> PLANET_OUTPUT_ACQUISITION_BONUS =
           ofRaw(EnumMap.class, () -> new EnumMap<>(PlanetaryRating.class), "planetOutputAcquisitionBonus");
     public static final CampaignOption<Map<SkillLevel, Integer>> PERSONNEL_MARKET_RANDOM_REMOVAL_TARGETS =
-          ofRaw(Map.class, () -> new HashMap<>(), "personnelMarketRandomRemovalTargets");
+          ofRaw(Map.class, HashMap::new, "personnelMarketRandomRemovalTargets");
     public static final CampaignOption<Boolean> LIMIT_CLAN_TECH =
           of(Boolean.class, true, "limitClanTech");
     public static final CampaignOption<Boolean> USE_TWIST_OF_FATE_SURVIVAL =

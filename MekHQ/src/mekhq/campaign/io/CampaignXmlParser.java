@@ -43,7 +43,6 @@ import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SK
 import static mekhq.campaign.reputation.chaosReputation.ChaosReputation.STARTING_REPUTATION_SCORE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
@@ -109,7 +108,6 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.market.ForceShoppingList;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ContractMarket;
@@ -148,8 +146,10 @@ import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.TechnicianSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.LegacyRelinkResult;
@@ -366,6 +366,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("repairBaysRented")) {
                     int repairBaysRented = parseInt(childNode.getTextContent().trim());
                     playerForce.setRepairBaysRented(repairBaysRented);
+                } else if (nodeName.equalsIgnoreCase("supportCommandFormationId")) {
+                    playerForce.setSupportCommandFormationId(parseInt(childNode.getTextContent().trim(),
+                          FORMATION_NONE));
                 } else if (nodeName.equalsIgnoreCase("id")) {
                     campaign.setId(UUID.fromString(childNode.getTextContent().trim()));
                 }
@@ -393,6 +396,16 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based)
         for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             performEdgeConversion(campaign, person);
+        }
+
+        // <51.01 compatibility handler: technicians from before the granular Tech/... skills existed carry only their
+        // global tech skill, so give them the supplementary specialist skills their profession now expects. Skipped when
+        // the campaign uses only the global tech skills, where the granular skills would go unused.
+        if (version.isLowerThan(new Version("0.51.01"))
+                  && !campaign.getCampaignOptions().get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)) {
+            for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+                TechnicianSkills.addMissingSkills(person);
+            }
         }
 
         // this block verifies all in-use academies are valid
@@ -2242,7 +2255,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             // We can safely ignore it even if it isn't, for now.
         }
 
-        boolean foundPersonnelMarket = false;
         boolean foundUnitMarket = false;
 
         // Saves made in 0.51.00 do not have a <location> but will have a <locations> with a single item.
@@ -2278,9 +2290,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                           campaign,
                           version);
                     campaign.getPlayerForce().setHumanResources(humanResources);
-                    // The loaded object always carries a default market, so ask the save itself whether the block
-                    // held one; only then is a later top-level market node a duplicate rather than the real data.
-                    foundPersonnelMarket = foundPersonnelMarket || hasChildElement(workingNode, "personnelMarket");
                 } else if (nodeName.equalsIgnoreCase("parts")) {
                     processPartNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("personnel")) {
@@ -2326,18 +2335,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 } else if (nodeName.equalsIgnoreCase("shoppingList")) {
                     ForceShoppingList sl = ForceShoppingList.generateInstanceFromXML(workingNode, campaign, version);
                     campaign.getPlayerForce().setShoppingList(sl);
-                } else if (nodeName.equalsIgnoreCase("personnelMarket")) {
-                    if (foundPersonnelMarket) {
-                        // Saves written between the human-resources refactor and the fix that stopped the second
-                        // write carry the market twice; the copy inside <humanResources> has already been loaded.
-                        LOGGER.info("[PersonnelMarket] Skipping the duplicate top-level personnelMarket node");
-                    } else {
-                        final PersonnelMarket personnelMarket = PersonnelMarket.generateInstanceFromXML(workingNode,
-                              campaign,
-                              version);
-                        campaign.getPlayerForce().getHumanResources().setPersonnelMarket(personnelMarket);
-                        foundPersonnelMarket = true;
-                    }
                 } else if (nodeName.equalsIgnoreCase("unitMarket")) {
                     // Windchild: implicit DEPENDS ON to the <campaignOptions> nodes
                     campaign.setUnitMarket(campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
@@ -2543,25 +2540,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 campaign.addReport(GENERAL, report);
             }
 
-            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase
-            // potentially as far back as 2014. The next two handlers should never be removed.
-            if (!person.canPerformRole(today, person.getSecondaryRole(), false)) {
-                person.setSecondaryRole(PersonnelRole.NONE);
-
-                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForSecondaryRole",
-                      spanOpeningWithCustomColor(getWarningColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
-            }
-
-            if (!person.canPerformRole(today, person.getPrimaryRole(), true)) {
-                person.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT);
-
-                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "ineligibleForPrimaryRole",
-                      spanOpeningWithCustomColor(getNegativeColor()),
-                      CLOSING_SPAN_TAG,
-                      person.getHyperlinkedFullTitle()));
-            }
+            // This resolves a bug squashed in 2025 (50.03) but lurked in our codebase potentially as far back as
+            // 2014. The next two handlers should never be removed. It makes a good place to add missing skills, in
+            // the event we change the skill requirements for a role.
+            resolveRolePerformability(person, campaign);
         }
 
         campaign.getPlayerForce().getHangar().forEachUnit(unit -> {
@@ -2642,12 +2624,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         LOGGER.info("[Campaign Load] News loaded in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
-
-        // If we don't have a personnel market, create one.
-        if (!foundPersonnelMarket) {
-            final PersonnelMarket personnelMarket = new PersonnelMarket(campaign);
-            campaign.getPlayerForce().getHumanResources().setPersonnelMarket(personnelMarket);
-        }
 
         if (!foundUnitMarket) {
             campaign.setUnitMarket(campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_METHOD).getUnitMarket());
@@ -2789,6 +2765,47 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;
+    }
+
+    private static void resolveRolePerformability(Person person, Campaign campaign) {
+        LocalDate today = campaign.getLocalDate();
+        resolveRolePerformability(person, campaign, today, person.getPrimaryRole(), true);
+        resolveRolePerformability(person, campaign, today, person.getSecondaryRole(), false);
+    }
+
+    private static void resolveRolePerformability(Person person, Campaign campaign, LocalDate today, PersonnelRole role,
+          boolean primary) {
+        if (person.canPerformRole(today, role, primary)) {
+            return;
+        }
+
+        // <51.01 compatibility handler
+        if (role == PersonnelRole.PROTOMEK_PILOT) {
+            Skill skill = person.getSkill(SkillType.S_GUN_PROTO);
+            if (skill != null) {
+                person.addSkill(
+                      SkillType.S_PILOT_PROTO,
+                      skill.getLevel(),
+                      skill.getBonus()
+                );
+                return;
+            }
+        }
+
+        if (primary) {
+            person.setPrimaryRole(today, PersonnelRole.NONE);
+            reportInvalidProfession(person, campaign, "ineligibleForPrimaryRole");
+        } else {
+            person.setSecondaryRole(PersonnelRole.NONE);
+            reportInvalidProfession(person, campaign, "ineligibleForSecondaryRole");
+        }
+    }
+
+    private static void reportInvalidProfession(Person person, Campaign campaign, String key) {
+        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, key,
+              spanOpeningWithCustomColor(getWarningColor()),
+              CLOSING_SPAN_TAG,
+              person.getHyperlinkedFullTitle()));
     }
 
     //region Migration Methods

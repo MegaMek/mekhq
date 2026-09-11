@@ -38,6 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
@@ -53,6 +54,7 @@ import java.util.concurrent.TimeUnit;
 import megamek.client.generator.RandomCallsignGenerator;
 import megamek.client.ratgenerator.C3NetworkConfigurator;
 import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.client.ratgenerator.CrewDescriptor;
 import megamek.client.ratgenerator.Ruleset;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.NeuralInterfaceMode;
@@ -67,6 +69,7 @@ import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.enums.FinancialTerm;
 import mekhq.campaign.market.PartsInUseManager;
@@ -87,9 +90,10 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.EnhancedImagingAugmentor;
 import mekhq.campaign.universe.commandGeneration.LiftTopUp;
 import mekhq.campaign.universe.commandGeneration.ManeiDominiAugmentor;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
-import mekhq.campaign.universe.commandGeneration.TemporaryCrewRole;
+import mekhq.campaign.utilities.AutomatedTechAssignments;
 
 /**
  * Single entry point for the ratgen-driven Command Generator pipeline.
@@ -151,12 +155,6 @@ public final class CommandGenerator {
 
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerator.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CommandGenerator";
-
-    // Bloodname target shifts for the calibre of the force. Negative lowers the target a 2d6 roll has
-    // to beat, so these make a Bloodname likelier; kept small because the warrior's own skills
-    // already weigh on the same roll.
-    private static final int BLOODNAME_MODIFIER_VETERAN = -1;
-    private static final int BLOODNAME_MODIFIER_ELITE = -2;
 
     /** How many undercrewed units the diagnostic names before it summarises the rest. */
     private static final int UNDERCREWED_UNITS_NAMED_IN_LOG = 20;
@@ -343,10 +341,6 @@ public final class CommandGenerator {
      */
     public static Result applyToCampaign(Campaign campaign, CommandGenerationOptions options,
           ForceDescriptor fd, Ruleset.ProgressListener listener, boolean generateSupport) {
-        // Before the first unit is crewed: the crew assembler decides per unit whether a seat is a named
-        // person or left for temporary crew, reading the campaign options at that moment.
-        applyTemporaryCrewChoices(campaign, options);
-
         // Snapshot the hangar before any unit is created so the starting-cash stage can price only
         // the units this build adds (see processStartingCash).
         Set<UUID> preExistingUnitIds = snapshotHangarUnitIds(campaign);
@@ -381,6 +375,9 @@ public final class CommandGenerator {
         // The Unit built for each unit descriptor, so stage 7a can put the units the tree nests under a ship
         // aboard it once every unit exists.
         Map<ForceDescriptor, Unit> unitsByDescriptor = new IdentityHashMap<>();
+        // Which descriptor each Formation mirrors, so the rank pass can read levels and commanders from the
+        // roll rather than guessing them from depth.
+        Map<Formation, ForceDescriptor> descriptorsByFormation = new IdentityHashMap<>();
         ForceDescriptorWalker.walk(fd, campaign, root, namer, (leaf, parent) -> {
             long leafStart = System.nanoTime();
             String parentInfo = parent == null ? "null"
@@ -484,7 +481,7 @@ public final class CommandGenerator {
             }
             LOGGER.info("[CompanyGen][Leaf] EXIT leaf #{} chassis='{}' model='{}' crew={} parent={} totalMs={}",
                   leafCount[0], entityChassis, entityModel, crew.size(), parentInfo, leafTotalMs);
-        });
+        }, (descriptor, formation) -> descriptorsByFormation.put(formation, descriptor));
 
         LOGGER.info("[CompanyGen][Pipeline]Stage 4-7 summary: {} leaves placed, {} skipped (no entity), {} skipped (addNewUnit failed)",
               leafCount[0], skippedNoEntity[0], skippedAddFailed[0]);
@@ -509,16 +506,34 @@ public final class CommandGenerator {
         }
         FormationIconBuilder.applyIcons(campaign.getPlayerForce().getFormations(), campaign, options);
 
-        // 7c. Tree-aware rank assignment. Walks the Formation tree post-order and assigns each
-        // node's commander the officer rank matching their FormationLevel (Lt → Lance, Capt →
-        // Company, Major → Battalion, …). Non-officer combat crew get Sergeant-equivalent; any
-        // support crew already attached to a Unit at this point get Corporal-equivalent. Gated on
-        // isAutomaticallyAssignRanks.
+        // 7b2. The most skilled pilots take the seats in the leading lances, when asked. Before ranks,
+        // so the commanders chosen next are chosen from where the pilots will actually sit.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7b2: seating the most skilled pilots in the leading lances");
+        PilotSkillSorter.apply(campaign, options);
+
+        // 7b3. Bloodnames, for the Clan warriors who earn one. Before the ranks, so the picks that follow can
+        // put the Bloodnamed in command; the roll carries the force's calibre but no rank bonus, since nobody
+        // holds a rank yet. This is the force's only roll: the one MekHQ makes when it creates a Clan warrior
+        // is cleared by the crew adapter.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7b3: Bloodnames");
+        assignBloodnames(campaign, options, generatedPersons);
+
+        // 7c. Tree-aware rank assignment. Walks the Formation tree and assigns each node's commander
+        // the officer rank matching their FormationLevel (Lt -> Lance, Capt -> Company, Major ->
+        // Battalion, ...), choosing by skill when the Officer Selection options ask for it. Non-officer
+        // combat crew get Sergeant-equivalent; any support crew already attached to a Unit at this
+        // point get Corporal-equivalent. Gated on isAutomaticallyAssignRanks.
         LOGGER.info("[CompanyGen][Pipeline]Stage 7c: tree-aware rank assignment");
         if (listener != null) {
             listener.updateProgress(0.0, "Assigning ranks...");
         }
-        Person rootCommander = RulesetRankAssigner.apply(campaign, options);
+        RulesetRankAssigner.Guidance guidance = rankGuidance(descriptorsByFormation, unitsByDescriptor);
+        RulesetRankAssigner.Result ranks = RulesetRankAssigner.applyAndReport(campaign, options, guidance);
+        Person rootCommander = ranks.rootCommander();
+
+        // 7c2. Officers get the skills that come with the post, when Generate Captains is on.
+        LOGGER.info("[CompanyGen][Pipeline]Stage 7c2: officer skill increases");
+        OfficerSkillBooster.apply(options, ranks);
 
         // 7e. Support: generate support personnel and standalone support vehicles sized to the
         // campaign's current force, and organize the support staff into the TOE. Extracted into
@@ -542,10 +557,6 @@ public final class CommandGenerator {
             listener.updateProgress(0.0, "Applying personnel flags...");
         }
         applyPersonnelFlags(campaign, options, generatedPersons, rootCommander);
-
-        // Bloodnames, for the Clan warriors who earn one. Runs here because the roll is made against
-        // the person's rank, which stage 7c has just assigned.
-        assignBloodnames(campaign, options, generatedPersons);
 
         // Manei Domini rank, class and cybernetics, for a Word of Blake Shadow Division. Runs here for
         // the same reason as bloodnames: implant availability is read off the person's rank.
@@ -644,7 +655,15 @@ public final class CommandGenerator {
         // Medical / Command) becomes infantry-style carrier units crewed by the staff, nested under a
         // Support Command formation. Crewing a carrier is separate from the setTech maintenance
         // assignment above, so techs still maintain the combat units.
-        SupportPersonnelToTOE.organize(campaign, supportResult.generatedPersons(), campaign.getPlayerForce().isClanForce());
+        // Support teams are a campaign option: with it off the staff are still generated and hired, they simply stay
+        // on the roster instead of being organized into carriers.
+        if (SupportCarrierReconciler.isEnabled(campaign)) {
+            SupportPersonnelToTOE.organize(campaign, supportResult.generatedPersons(),
+                  campaign.getPlayerForce().isClanForce());
+        } else {
+            LOGGER.info("[CompanyGen][SupportTOE] support teams are switched off; {} support person(s) stay unorganized",
+                  supportResult.generatedPersons().size());
+        }
 
         // Grant the standalone support vehicles a command gets for each enabled capability that has no
         // matching personnel section (logistics convoy, canteen, security). Salvage and medical
@@ -662,12 +681,13 @@ public final class CommandGenerator {
             SupportUnitGenerator.generateSecurityUnits(campaign, supportFaction, true);
         }
 
-        // Assign techs to units using the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight /
-        // Pilot Skill, each with its own direction). Gated on isAssignTechsToUnits; pulls only from the
-        // techs SupportPersonnelGenerator just created so we don't steal a pre-existing campaign tech.
-        // Runs once every vehicle exists, the support stage's own included, so the flatbeds and the
-        // recovery vehicles get their mechanics too.
-        SupportPersonnelAssigner.assign(campaign, options, supportResult);
+        // Assign techs to units with MekHQ's own assigner, the one the new day and the Hangar's quick-assign
+        // button use, ordered by the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight / Pilot Skill,
+        // each with its own direction). Gated on isAssignTechsToUnits; drawn only from the techs
+        // SupportPersonnelGenerator just created, so a pre-existing campaign tech is never claimed. Runs once
+        // every vehicle exists, the support stage's own included, so the flatbeds and the recovery vehicles get
+        // their mechanics too.
+        assignTechsToGeneratedUnits(campaign, options, supportResult.generatedPersons());
 
         // Decorate the support formations created above with layered TOE icons. This must happen here
         // (not only at the tail of applyToCampaign) because the two-phase Command Designer flow calls
@@ -693,6 +713,39 @@ public final class CommandGenerator {
         logOrphanAudit(campaign);
 
         return supportResult.generatedPersons();
+    }
+
+    /**
+     * Stage 7e: hands the freshly generated techs to {@link AutomatedTechAssignments}, the assigner the rest of
+     * MekHQ uses, ordered by the Setup tab's sort grid.
+     *
+     * <p>Only the techs generated this run are offered, so a tech the campaign already had keeps the units they
+     * were already maintaining. Units are offered a tech in the player's chosen order; with every sort slot left
+     * unset the assigner uses its own battle value ordering.</p>
+     *
+     * @param campaign         the campaign whose units are being assigned techs
+     * @param options          the generation options holding the assignment toggle and the sort grid
+     * @param generatedPersons everyone this generation run produced; the techs among them form the pool
+     *
+     * @since 0.51.01
+     */
+    private static void assignTechsToGeneratedUnits(Campaign campaign, CommandGenerationOptions options,
+          Collection<Person> generatedPersons) {
+        if (!options.isAssignTechsToUnits()) {
+            LOGGER.info("[CompanyGen][Pipeline][Assign] disabled by isAssignTechsToUnits");
+            return;
+        }
+
+        List<Person> techs = TechAssignmentOrder.techsAmong(generatedPersons);
+        if (techs.isEmpty()) {
+            LOGGER.info("[CompanyGen][Pipeline][Assign] no support techs available to assign");
+            return;
+        }
+
+        AutomatedTechAssignments assignments = new AutomatedTechAssignments(techs, campaign.getUnits(),
+              TechAssignmentOrder.unitOrderFor(campaign, options));
+        LOGGER.info("[CompanyGen][Pipeline][Assign] {} tech(s) offered {} unit(s); assigner reported {} outcome(s)",
+              techs.size(), campaign.getUnits().size(), assignments.getReports().size());
     }
 
     /**
@@ -1028,83 +1081,81 @@ public final class CommandGenerator {
     }
 
     /**
-     * Awards bloodnames to the Clan warriors this generation produced who earn one.
+     * What the rank pass should know from the roll: each formation's level from its descriptor's echelon, and
+     * the commander the engine designated for it, resolved to the person built for that crew.
      *
-     * <p>A generated Clan command previously had none at all. The ratgen layer carries a bloodname
-     * field on its crew descriptor, but the engine call that would fill it is commented out in
-     * {@code Ruleset.processRoot} and the method it referred to no longer exists, so the field is
-     * always empty - and nothing on this path asked MekHQ for one either. Hiring a Clan MekWarrior
-     * through the normal personnel generator has always rolled for a bloodname; generating a whole
-     * Galaxy did not.</p>
+     * @param descriptorsByFormation the descriptor each built Formation mirrors
+     * @param unitsByDescriptor      the unit built for each leaf descriptor
      *
-     * <p>Every generated person is offered to
-     * {@link ForceHumanResources#checkBloodnameAdd(Campaign, Person, boolean)}, which applies the
-     * existing rules rather than a second set: non-Clan personnel and anyone without a phenotype are
-     * turned away, so support staff and Inner Sphere commands are untouched. The dice are rolled
-     * normally, so era, unit rating, rank and the warrior's own skills decide it exactly as they do
-     * for a hire.</p>
+     * @return the guidance for {@link RulesetRankAssigner#applyAndReport(Campaign, CommandGenerationOptions,
+     *       RulesetRankAssigner.Guidance)}
+     */
+    static RulesetRankAssigner.Guidance rankGuidance(Map<Formation, ForceDescriptor> descriptorsByFormation,
+          Map<ForceDescriptor, Unit> unitsByDescriptor) {
+        Map<Formation, FormationLevel> levels = new IdentityHashMap<>();
+        Map<Formation, Person> engineCommanders = new IdentityHashMap<>();
+        for (Map.Entry<Formation, ForceDescriptor> entry : descriptorsByFormation.entrySet()) {
+            Formation formation = entry.getKey();
+            ForceDescriptor descriptor = entry.getValue();
+            levels.put(formation, ForceDescriptorWalker.mapEchelonToFormationLevel(descriptor.getEchelon(),
+                  descriptor.getFaction()));
+            Person commander = builtCommanderOf(descriptor, unitsByDescriptor);
+            if (commander != null) {
+                engineCommanders.put(formation, commander);
+            }
+        }
+        LOGGER.info("[CompanyGen][RankAssign] guidance from the roll: {} formation level(s), {} engine commander(s)",
+              levels.size(), engineCommanders.size());
+        return new RulesetRankAssigner.Guidance(levels, engineCommanders);
+    }
+
+    /**
+     * The person built for the crew the engine designated as a formation's commander: the leaf beneath the
+     * formation whose crew descriptor is the formation's own, resolved to its unit's commander.
+     */
+    private static @Nullable Person builtCommanderOf(ForceDescriptor formation,
+          Map<ForceDescriptor, Unit> unitsByDescriptor) {
+        CrewDescriptor designated = formation.getCo();
+        if (designated == null) {
+            return null;
+        }
+        ForceDescriptor leaf = leafCrewedBy(formation, designated);
+        Unit unit = (leaf == null) ? null : unitsByDescriptor.get(leaf);
+        return (unit == null) ? null : unit.getCommander();
+    }
+
+    private static @Nullable ForceDescriptor leafCrewedBy(ForceDescriptor node, CrewDescriptor crew) {
+        boolean isLeaf = node.getSubForces().isEmpty() && node.getAttached().isEmpty();
+        if (isLeaf) {
+            return (node.getCo() == crew) ? node : null;
+        }
+        for (ForceDescriptor child : node.getSubForces()) {
+            ForceDescriptor found = leafCrewedBy(child, crew);
+            if (found != null) {
+                return found;
+            }
+        }
+        for (ForceDescriptor child : node.getAttached()) {
+            ForceDescriptor found = leafCrewedBy(child, crew);
+            if (found != null) {
+                return found;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Awards the force its Bloodnames, as a share of its Clan warriors set by the force's calibre. The rule
+     * and the numbers behind it are in {@link BloodnameQuota}; non-Clan personnel and anyone without a
+     * phenotype are passed over, so support staff and Inner Sphere commands are untouched.
      *
-     * <p>The calibre of the force shifts the target: a veteran or elite command carries more
-     * Bloodnamed warriors than a garrison unit whose members happen to have the same individual
-     * skills, because the Clans post their Bloodnamed to their better formations. The individual
-     * warrior's own skills already count towards the roll, so this is a modest thumb on the scale
-     * rather than a second helping of the same thing.</p>
-     *
-     * @param campaign         the campaign the warriors belong to, supplying era and unit rating
+     * @param campaign         the campaign the warriors belong to
      * @param options          the generation options, read for the force's experience level
      * @param generatedPersons every person this generation created
      */
     private static void assignBloodnames(Campaign campaign, CommandGenerationOptions options,
           List<Person> generatedPersons) {
-        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
-        int targetModifier = bloodnameTargetModifier(options);
-        int awarded = 0;
-        int alreadyHeld = 0;
-        for (Person person : generatedPersons) {
-            if (person == null) {
-                continue;
-            }
-            if (holdsBloodname(person)) {
-                alreadyHeld++;
-                continue;
-            }
-            humanResources.checkBloodnameAdd(campaign, person, false, targetModifier);
-            if (holdsBloodname(person)) {
-                awarded++;
-            }
-        }
-        LOGGER.info("[CompanyGen][Pipeline][Bloodname] awarded {} bloodname(s) across {} generated "
-                    + "person(s); {} already held one (force calibre modifier {})",
-              awarded, generatedPersons.size(), alreadyHeld, targetModifier);
-    }
-
-    /**
-     * @return {@code true} if this person already carries a Bloodname
-     */
-    private static boolean holdsBloodname(Person person) {
-        String bloodname = person.getBloodname();
-        return (bloodname != null) && !bloodname.isBlank();
-    }
-
-    /**
-     * How much the force's own experience level shifts the Bloodname target. Negative makes a
-     * Bloodname likelier, and only the top two tiers get one so a green or regular command rolls
-     * exactly as it did before.
-     *
-     * @param options the generation options, read for the force's experience level
-     *
-     * @return the target modifier, or {@code 0} when the experience level was left to chance
-     */
-    static int bloodnameTargetModifier(CommandGenerationOptions options) {
-        ForceDescriptorSnapshot snapshot = options.getForceDescriptorSnapshot();
-        if ((snapshot == null) || (snapshot.getExperience() == null)) {
-            return 0;
-        }
-        return switch (snapshot.getExperience()) {
-            case ForceDescriptor.EXP_VETERAN -> BLOODNAME_MODIFIER_VETERAN;
-            case ForceDescriptor.EXP_ELITE -> BLOODNAME_MODIFIER_ELITE;
-            default -> 0;
-        };
+        BloodnameQuota.award(campaign, options, generatedPersons);
     }
 
     /**
@@ -1166,38 +1217,12 @@ public final class CommandGenerator {
      * makes the choice take effect for the generation that follows and, because both option sets are
      * saved with the campaign, hold for the saved game.</p>
      */
-    /**
-     * Stage 3b: writes the designer's temporary-crew choices to the campaign.
-     *
-     * <p>Whether a unit's seats are filled with named people or left for temporary crew is decided by
-     * {@link MultiCrewAssembler} as each unit is built, reading the campaign options at that moment. So the
-     * choices have to reach the campaign before the first unit is crewed; written any later, every unit would
-     * already hold named crew under the previous settings and the toggles would appear to do nothing.</p>
-     *
-     * @param campaign the campaign being generated into
-     * @param options  the designer's choices
-     */
-    // Package-private so the regression test can check the choices reach the campaign.
-    static void applyTemporaryCrewChoices(Campaign campaign, CommandGenerationOptions options) {
-        Set<TemporaryCrewRole> chosenRoles = options.getTemporaryCrewRoles();
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        for (TemporaryCrewRole role : TemporaryCrewRole.values()) {
-            campaignOptions.set(role.getCampaignOption(), chosenRoles.contains(role));
-        }
-        LOGGER.info("[CompanyGen][Pipeline] Stage 3b: temporary crew written to the campaign - enabled for {}",
-              chosenRoles.isEmpty() ? "no roles" : chosenRoles);
-    }
-
     // Package-private so the regression test can check the choice reaches the campaign.
     static void applyAugmentationRules(Campaign campaign, CommandGenerationOptions options) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean tracksImplants = options.isUseImplants();
         campaignOptions.set(CampaignOption.USE_IMPLANTS, tracksImplants);
 
-        IOption maneiDomini = campaign.getGameOptions().getOption(OptionsConstants.RPG_MANEI_DOMINI);
-        if (maneiDomini != null) {
-            maneiDomini.setValue(tracksImplants && options.isUseManeiDomini());
-        }
         IOption neuralInterface = campaign.getGameOptions()
                                         .getOption(OptionsConstants.ADVANCED_NEURAL_INTERFACE_MODE);
         if (neuralInterface != null) {
@@ -1210,9 +1235,8 @@ public final class CommandGenerator {
                                            : mode.optionValue());
         }
         LOGGER.info("[CompanyGen][Pipeline] Stage 7e2: augmentation rules written to the campaign -"
-                    + " Use Implants={}, Manei Domini={}, Neural Interface='{}'",
+                    + " Use Implants={}, Pilot Implants='{}'",
               campaignOptions.get(CampaignOption.USE_IMPLANTS),
-              (maneiDomini == null) ? "unavailable" : maneiDomini.booleanValue(),
               (neuralInterface == null) ? "unavailable" : neuralInterface.stringValue());
     }
 

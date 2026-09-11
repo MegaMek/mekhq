@@ -56,9 +56,9 @@ import mekhq.campaign.universe.Faction;
  *   <li><b>Mechanic</b>: 1 per ground / VTOL / naval vehicle.</li>
  *   <li><b>Aero Tek</b>: 1 per aerospace fighter, conventional fighter, or small craft.
  *       Note: {@code SupportRating.calculateTechnicianRequirements} omits conventional fighters
- *       from this bucket — that's a bug in the rating code. The maintenance tech for a
- *       conventional fighter is {@code S_TECH_AERO} per {@code Avionics.isRightTechType}, so we
- *       count them here.</li>
+ *       from this bucket — that's a bug in the rating code. A conventional fighter is maintained by
+ *       an aerospace technician ({@code S_TECH_AERO}) at the whole-unit level (see
+ *       {@code Person.getSkillForWorkingOn(Unit)}), so we count them here.</li>
  *   <li><b>BA Tech</b>: 1 per BA squad of 5 suits.</li>
  * </ul>
  *

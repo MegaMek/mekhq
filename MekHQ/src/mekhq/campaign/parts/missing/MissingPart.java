@@ -48,6 +48,7 @@ import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
@@ -60,7 +61,6 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.WorkTime;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A missing part is a placeholder on a unit to indicate that a replacement task needs to be performed
@@ -476,6 +476,19 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
     }
 
     public abstract Part getNewPart();
+
+    /**
+     * A missing part requires the same technician skill to replace as the corresponding installed part requires to
+     * repair, so this delegates to the replacement part's mapping rather than duplicating it on every missing part.
+     *
+     * <p>A few missing parts (e.g. docking collars, grav decks) do not supply a replacement part; for those we fall
+     * back to the default behavior, which accepts any technician skill.</p>
+     */
+    @Override
+    public boolean isRightTechType(String skillType) {
+        Part newPart = getNewPart();
+        return (newPart != null) ? newPart.isRightTechType(skillType) : super.isRightTechType(skillType);
+    }
 
     @Override
     public String failToFind() {

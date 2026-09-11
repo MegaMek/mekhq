@@ -72,6 +72,8 @@ class CommandGeneratorStartingCashTest {
         options.setStartingCashPercent(percent);
         options.setRandomizeStartingCash(false);
         options.setPayForSetup(false);
+        // These cases assert the percentage arithmetic itself, so the float must not floor it.
+        options.setMinimumStartingFloat(0);
         return options;
     }
 

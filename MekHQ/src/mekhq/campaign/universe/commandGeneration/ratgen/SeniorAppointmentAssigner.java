@@ -129,7 +129,7 @@ public final class SeniorAppointmentAssigner {
          */
         HEAD_TECHNICIAN("head technician",
               PersonnelRole::isTech,
-              Set.of(SkillType.S_TECH_MEK, SkillType.S_TECH_MECHANIC, SkillType.S_TECH_AERO,
+              Set.of(SkillType.S_TECH_MEK, SkillType.S_TECH_VEHICLE, SkillType.S_TECH_AERO,
                     SkillType.S_TECH_BA, SkillType.S_TECH_VESSEL),
               Person::isHeadTechnician,
               Person::setHeadTechnician),

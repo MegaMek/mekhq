@@ -268,7 +268,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_INSUFFICIENT_AS_TECHS = "nagInsufficientAstechs";
     public static final String NAG_INSUFFICIENT_AS_TECH_TIME = "nagInsufficientAstechTime";
     public static final String NAG_INSUFFICIENT_MEDICS = "nagInsufficientMedics";
-    public static final String NAG_SHORT_DEPLOYMENT = "nagShortDeployment";
     public static final String NAG_COMBAT_CHALLENGE = "nagCombatChallenge";
     public static final String NAG_UNRESOLVED_STRAT_CON_CONTACTS = "nagUnresolvedStratConContacts";
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
@@ -302,11 +301,11 @@ public final class MHQConstants extends SuiteConstants {
     public static final String START_GAME_CLIENT_RETRY_COUNT = "startGameClientRetryCount";
     public static final String START_GAME_BOT_CLIENT_DELAY = "startGameBotClientDelay";
     public static final String START_GAME_BOT_CLIENT_RETRY_COUNT = "startGameBotClientRetryCount";
+    public static final String ENABLE_ABSTRACT_COMBAT_AUTO_RESOLVE = "enableAbstractCombatAutoResolve";
 
     // The augmentation rules last chosen in the Command Generator, remembered so a new campaign
     // starts from the player's own answer rather than from the all-off defaults every time.
     public static final String LAST_USE_IMPLANTS = "lastUseImplants";
-    public static final String LAST_USE_MANEI_DOMINI = "lastUseManeiDomini";
     public static final String LAST_NEURAL_INTERFACE_MODE = "lastNeuralInterfaceMode";
     // endregion Miscellaneous Options
     // endregion MHQOptions

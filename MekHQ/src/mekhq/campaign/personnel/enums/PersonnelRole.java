@@ -625,8 +625,7 @@ public enum PersonnelRole {
      * @param isDoctorsUseAdministration if {@code true}, includes Administration skill for medical roles
      * @param isTechsUseAdministration   if {@code true}, includes Administration skill for technical roles
      * @param isUseArtillery             if {@code true}, includes Artillery skills where applicable
-     * @param includeExpandedSkills      if {@code true}, includes expanded skills for conventional infantry and vehicle
-     *                                   crewmember roles
+     * @param includeExpandedSkills      if {@code true}, includes expanded skills for conventional infantry
      *
      * @return a list of skill names representing the profession-appropriate skills
      */
@@ -665,14 +664,14 @@ public enum PersonnelRole {
             }
             case MECHANIC -> {
                 if (isTechsUseAdministration) {
-                    yield List.of(SkillType.S_TECH_MECHANIC, SkillType.S_ADMIN);
+                    yield List.of(SkillType.S_TECH_VEHICLE, SkillType.S_ADMIN);
                 } else {
-                    yield List.of(SkillType.S_TECH_MECHANIC);
+                    yield List.of(SkillType.S_TECH_VEHICLE);
                 }
             }
             case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
             case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
-            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO);
+            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO, SkillType.S_PILOT_PROTO);
             case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
             case SOLDIER -> {
                 if (includeExpandedSkills) {
@@ -741,16 +740,16 @@ public enum PersonnelRole {
             case BRAWLER -> List.of(SkillType.S_MARTIAL_ARTS, SkillType.S_STREETWISE);
             case BROKER -> List.of(SkillType.S_STREETWISE, SkillType.S_NEGOTIATION);
             case CHEF -> List.of(SkillType.S_ART_COOKING, SkillType.S_LEADER);
-            case CIVILIAN_AERO_MECHANIC -> List.of(SkillType.S_TECH_AERO, SkillType.S_TECH_MECHANIC);
+            case CIVILIAN_AERO_MECHANIC -> List.of(SkillType.S_TECH_AERO, SkillType.S_TECH_VEHICLE);
             case CIVILIAN_DROPSHIP_PILOT -> List.of(SkillType.S_PILOT_SPACE, SkillType.S_PROTOCOLS);
             case POLICE_OFFICER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_INVESTIGATION);
-            case CIVILIAN_VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL, SkillType.S_TECH_MECHANIC);
+            case CIVILIAN_VTOL_PILOT -> List.of(SkillType.S_PILOT_VTOL, SkillType.S_TECH_VEHICLE);
             case CIVIL_CLERK -> List.of(SkillType.S_ADMIN, SkillType.S_PROTOCOLS);
             case CLOWN -> List.of(SkillType.S_ACROBATICS, SkillType.S_ACTING);
             case CON_ARTIST -> List.of(SkillType.S_DISGUISE, SkillType.S_ACTING);
             case MILITARY_CORONER -> List.of(SkillType.S_SURGERY, SkillType.S_SCIENCE_PHARMACOLOGY);
             case COURIER -> List.of(SkillType.S_RUNNING, SkillType.S_STREETWISE);
-            case CRIMINAL_MECHANIC -> List.of(SkillType.S_STREETWISE, SkillType.S_TECH_MECHANIC);
+            case CRIMINAL_MECHANIC -> List.of(SkillType.S_STREETWISE, SkillType.S_TECH_VEHICLE);
             case CULTURAL_CENSOR -> List.of(SkillType.S_INTEREST_POLITICS, SkillType.S_INTEREST_LITERATURE);
             case CULTURAL_LIAISON -> List.of(SkillType.S_PROTOCOLS, SkillType.S_LANGUAGES);
             case CUSTOMS_INSPECTOR -> List.of(SkillType.S_INVESTIGATION, SkillType.S_PROTOCOLS);
@@ -758,7 +757,7 @@ public enum PersonnelRole {
             case DATA_ANALYST -> List.of(SkillType.S_COMPUTERS, SkillType.S_SCIENCE_MATHEMATICS);
             case SPACEPORT_WORKER -> List.of(SkillType.S_ASTECH, SkillType.S_PILOT_GVEE);
             case DRUG_DEALER -> List.of(SkillType.S_STREETWISE, SkillType.S_SCIENCE_PHARMACOLOGY);
-            case FACTORY_WORKER -> List.of(SkillType.S_ASTECH, SkillType.S_TECH_MECHANIC);
+            case FACTORY_WORKER -> List.of(SkillType.S_ASTECH, SkillType.S_TECH_VEHICLE);
             case LIVESTOCK_FARMER -> List.of(SkillType.S_ANIMAL_HANDLING, SkillType.S_SCIENCE_XENOBIOLOGY);
             case AGRI_FARMER -> List.of(SkillType.S_ASTECH, SkillType.S_SCIENCE_BIOLOGY);
             case FIREFIGHTER -> List.of(SkillType.S_PILOT_GVEE, SkillType.S_ANTI_MEK);
@@ -789,12 +788,12 @@ public enum PersonnelRole {
             case MILITARY_ANALYST -> List.of(SkillType.S_STRATEGY, SkillType.S_SCIENCE_MATHEMATICS);
             case SPY -> List.of(SkillType.S_STEALTH, SkillType.S_DISGUISE);
             case MILITARY_THEORIST -> List.of(SkillType.S_TACTICS, SkillType.S_INTEREST_MILITARY);
-            case MINER -> List.of(SkillType.S_DEMOLITIONS, SkillType.S_TECH_MECHANIC);
+            case MINER -> List.of(SkillType.S_DEMOLITIONS, SkillType.S_TECH_VEHICLE);
             case MOUNTAIN_CLIMBER -> List.of(SkillType.S_ANTI_MEK, SkillType.S_SURVIVAL);
             case FACTORY_FOREMAN -> List.of(SkillType.S_ASTECH, SkillType.S_ADMIN);
             case MUNITIONS_FACTORY_WORKER -> List.of(SkillType.S_DEMOLITIONS, SkillType.S_ASTECH);
             case MUSICIAN -> List.of(SkillType.S_ART_INSTRUMENT, SkillType.S_INTEREST_MUSIC);
-            case ORBITAL_DEFENSE_GUNNER -> List.of(SkillType.S_GUN_VEE, SkillType.S_TECH_MECHANIC);
+            case ORBITAL_DEFENSE_GUNNER -> List.of(SkillType.S_GUN_VEE, SkillType.S_TECH_VEHICLE);
             case ORBITAL_SHUTTLE_PILOT -> List.of(SkillType.S_PILOT_SPACE, SkillType.S_PROTOCOLS);
             case PARAMEDIC -> List.of(SkillType.S_MEDTECH, SkillType.S_PILOT_GVEE);
             case PAINTER -> List.of(SkillType.S_ART_PAINTING, SkillType.S_INTEREST_MYTHOLOGY);
@@ -807,10 +806,10 @@ public enum PersonnelRole {
             case FIRING_RANGE_SAFETY_OFFICER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_LEADER);
             case RECRUITMENT_SCREENING_OFFICER -> List.of(SkillType.S_INTERROGATION, SkillType.S_SCIENCE_PSYCHOLOGY);
             case RELIGIOUS_LEADER -> List.of(SkillType.S_INTEREST_THEOLOGY, SkillType.S_LEADER);
-            case REPAIR_BAY_SUPERVISOR -> List.of(SkillType.S_TECH_MECHANIC, SkillType.S_LEADER);
+            case REPAIR_BAY_SUPERVISOR -> List.of(SkillType.S_TECH_VEHICLE, SkillType.S_LEADER);
             case REVOLUTIONIST -> List.of(SkillType.S_INTEREST_POLITICS, SkillType.S_LEADER);
             case RITUALIST -> List.of(SkillType.S_INTEREST_THEOLOGY, SkillType.S_ART_DANCING);
-            case SALVAGE_RAT -> List.of(SkillType.S_TECH_MECHANIC, SkillType.S_TECH_MEK);
+            case SALVAGE_RAT -> List.of(SkillType.S_TECH_VEHICLE, SkillType.S_TECH_MEK);
             case SCRIBE -> List.of(SkillType.S_ADMIN, SkillType.S_ART_WRITING);
             case SCULPTURER -> List.of(SkillType.S_ART_SCULPTURE, SkillType.S_APPRAISAL);
             case SENSOR_TECHNICIAN -> List.of(SkillType.S_SENSOR_OPERATIONS, SkillType.S_COMPUTERS);
@@ -820,7 +819,7 @@ public enum PersonnelRole {
             case TACTICAL_ANALYST -> List.of(SkillType.S_TACTICS, SkillType.S_COMPUTERS);
             case TAILOR -> List.of(SkillType.S_ART_OTHER, SkillType.S_INTEREST_FASHION);
             case TEACHER -> List.of(SkillType.S_LEADER, SkillType.S_TRAINING);
-            case TECH_COMMUNICATIONS -> List.of(SkillType.S_COMMUNICATIONS, SkillType.S_TECH_MECHANIC);
+            case TECH_COMMUNICATIONS -> List.of(SkillType.S_COMMUNICATIONS, SkillType.S_TECH_VEHICLE);
             case TECH_ZERO_G -> List.of(SkillType.S_ZERO_G_OPERATIONS, SkillType.S_TECH_VESSEL);
             case TECH_HYDROPONICS -> List.of(SkillType.S_ASTECH, SkillType.S_SCIENCE_BIOLOGY);
             case TECH_FUSION_PLANT -> List.of(SkillType.S_ASTECH, SkillType.S_SCIENCE_PHYSICS);
@@ -831,7 +830,7 @@ public enum PersonnelRole {
             case THIEF -> List.of(SkillType.S_SLEIGHT_OF_HAND, SkillType.S_STREETWISE);
             case BURGLAR -> List.of(SkillType.S_STEALTH, SkillType.S_ACROBATICS);
             case TRAINING_SIM_OPERATOR -> List.of(SkillType.S_COMPUTERS, SkillType.S_TRAINING);
-            case TRANSPORT_DRIVER -> List.of(SkillType.S_PILOT_GVEE, SkillType.S_TECH_MECHANIC);
+            case TRANSPORT_DRIVER -> List.of(SkillType.S_PILOT_GVEE, SkillType.S_TECH_VEHICLE);
             case ARTIST -> List.of(SkillType.S_ART_DRAWING, SkillType.S_COMPUTERS);
             case COUNTERFEITER -> List.of(SkillType.S_APPRAISAL, SkillType.S_STREETWISE);
             case WAREHOUSE_WORKER -> List.of(SkillType.S_ASTECH, SkillType.S_ADMIN);
@@ -864,12 +863,12 @@ public enum PersonnelRole {
             case SPACEPORT_BUREAUCRAT -> List.of(SkillType.S_ADMIN, SkillType.S_PROTOCOLS);
             case VR_ENTERTAINER -> List.of(SkillType.S_ACTING, SkillType.S_COMPUTERS);
             case PERSONAL_ARCHIVIST -> List.of(SkillType.S_ART_WRITING, SkillType.S_INTEREST_HISTORY);
-            case INDUSTRIAL_INSPECTOR -> List.of(SkillType.S_INVESTIGATION, SkillType.S_TECH_MECHANIC);
+            case INDUSTRIAL_INSPECTOR -> List.of(SkillType.S_INVESTIGATION, SkillType.S_TECH_VEHICLE);
             case SPACEPORT_COURIER -> List.of(SkillType.S_RUNNING, SkillType.S_PILOT_GVEE);
             case MEKBAY_SCHEDULER -> List.of(SkillType.S_ADMIN, SkillType.S_ASTECH);
-            case MILITARY_CONTRACTOR -> List.of(SkillType.S_NEGOTIATION, SkillType.S_TECH_MECHANIC);
+            case MILITARY_CONTRACTOR -> List.of(SkillType.S_NEGOTIATION, SkillType.S_TECH_VEHICLE);
             case MILITARY_HOLO_FILMER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_INTEREST_HOLO_CINEMA);
-            case WEAPONS_TESTER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_TECH_MECHANIC);
+            case WEAPONS_TESTER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_TECH_VEHICLE);
             case PARAMILITARY_TRAINER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_TRAINING);
             case MILITIA_LEADER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_LEADER);
             case FIELD_HOSPITAL_ADMINISTRATOR -> List.of(SkillType.S_ADMIN, SkillType.S_MEDTECH);
@@ -915,7 +914,7 @@ public enum PersonnelRole {
             case LOYALTY_MONITOR -> List.of(SkillType.S_INVESTIGATION, SkillType.S_SCIENCE_PSYCHOLOGY);
             case MEDIA_MANIPULATOR -> List.of(SkillType.S_ART_WRITING, SkillType.S_ACTING);
             case CIVILIAN_DEBRIEFER -> List.of(SkillType.S_INTERROGATION, SkillType.S_LEADER);
-            case SPACEPORT_ENGINEER -> List.of(SkillType.S_TECH_VESSEL, SkillType.S_TECH_MECHANIC);
+            case SPACEPORT_ENGINEER -> List.of(SkillType.S_TECH_VESSEL, SkillType.S_TECH_VEHICLE);
             case FRONTIER_DOCTOR -> List.of(SkillType.S_SURGERY, SkillType.S_SURVIVAL);
             case DOOMSDAY_PREACHER -> List.of(SkillType.S_ACTING, SkillType.S_INTEREST_ASTROLOGY);
             case TAX_AUDITOR -> List.of(SkillType.S_INTEREST_ECONOMICS, SkillType.S_INVESTIGATION);
@@ -956,11 +955,11 @@ public enum PersonnelRole {
             case MILITARY_TATTOO_ARTIST -> List.of(SkillType.S_ART_DRAWING, SkillType.S_INTEREST_MILITARY);
             case RATION_DISTRIBUTOR -> List.of(SkillType.S_ADMIN, SkillType.S_NEGOTIATION);
             case MINEFIELD_PLANNER -> List.of(SkillType.S_TACTICS, SkillType.S_DEMOLITIONS);
-            case CARGO_SEAL_INSPECTOR -> List.of(SkillType.S_INVESTIGATION, SkillType.S_TECH_MECHANIC);
+            case CARGO_SEAL_INSPECTOR -> List.of(SkillType.S_INVESTIGATION, SkillType.S_TECH_VEHICLE);
             case INTERIOR_DECORATOR -> List.of(SkillType.S_ART_DRAWING, SkillType.S_ART_PAINTING);
             case RIOT_RESPONSE_PLANNER -> List.of(SkillType.S_TACTICS, SkillType.S_SMALL_ARMS);
             case SYSTEMS_CONSULTANT -> List.of(SkillType.S_COMPUTERS, SkillType.S_SECURITY_SYSTEMS_ELECTRONIC);
-            case TECH_AIR_FILTRATION -> List.of(SkillType.S_TECH_MECHANIC, SkillType.S_SCIENCE_CHEMISTRY);
+            case TECH_AIR_FILTRATION -> List.of(SkillType.S_TECH_VEHICLE, SkillType.S_SCIENCE_CHEMISTRY);
             case EARLY_DETECTION_SYSTEMS_OPERATOR -> List.of(SkillType.S_SENSOR_OPERATIONS, SkillType.S_INVESTIGATION);
             case CIVIC_CONTROLLER -> List.of(SkillType.S_ADMIN, SkillType.S_MELEE_WEAPONS);
             case PUBLIC_EXECUTION_BROADCASTER -> List.of(SkillType.S_ACTING, SkillType.S_INTEREST_POLITICS);

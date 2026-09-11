@@ -147,11 +147,19 @@ public abstract class AbstractForce {
     // Capacity / facility state
     private int temporaryPrisonerCapacity = DEFAULT_TEMPORARY_CAPACITY;
     private int mashTheatreCapacity = 0;
+    private FleetAltitudeCapability fleetAltitudeCapability = FleetAltitudeCapability.UNRESTRICTED;
     private boolean fieldKitchenWithinCapacity = false;
     private int repairBaysRented = 0;
     // Table of Organisation & Equipment (TO&E) and StratCon combat teams
     private Formation formations;
     private int lastFormationId;
+    /**
+     * Id of the Support Command formation built by {@code SupportPersonnelToTOE}, or {@link Formation#FORMATION_NONE}
+     * when this campaign has no support structure. Held as an id rather than found by name because formation names are
+     * localized and players can rename them. A deleted formation simply resolves to {@code null}, which the carrier
+     * reconciler treats as "this campaign has no support structure" and leaves alone.
+     */
+    private int supportCommandFormationId = Formation.FORMATION_NONE;
     private Hashtable<Integer, CombatTeam> combatTeams = new Hashtable<>();
 
     protected AbstractForce(ForceOptions forceOptions, megamek.common.enums.Faction techFaction, RankSystem rankSystem,
@@ -615,6 +623,75 @@ public abstract class AbstractForce {
         return baseCapacity + rentedCapacity;
     }
 
+    /**
+     * The force's cached {@link FleetAltitudeCapability}, describing the range of altitudes its units can fight at.
+     * This is refreshed once per day (see {@link #calculateFleetAltitudeCapability(Campaign)}) so consumers can read it
+     * in O(1) rather than rescanning the roster.
+     */
+    public FleetAltitudeCapability getFleetAltitudeCapability() {
+        return fleetAltitudeCapability;
+    }
+
+    public void setFleetAltitudeCapability(FleetAltitudeCapability fleetAltitudeCapability) {
+        this.fleetAltitudeCapability = fleetAltitudeCapability;
+    }
+
+    /**
+     * Determines the {@link FleetAltitudeCapability} of this force from the composition of its combat teams.
+     *
+     * <p>Only units organised into combat teams are considered, since those are the units that actually deploy to
+     * StratCon scenarios; unassigned or reserve units in the roster are ignored. A single ground-capable unit ('Mek,
+     * vehicle, infantry, and so on) among the combat teams - or having no combat-team units at all - yields
+     * {@link FleetAltitudeCapability#UNRESTRICTED}. An all-airborne set of combat teams yields
+     * {@link FleetAltitudeCapability#SPACE_AND_ATMOSPHERE} if any unit is space-capable (aerospace fighter, small
+     * craft, DropShip, and so on) and {@link FleetAltitudeCapability#ATMOSPHERE_ONLY} otherwise (conventional fighters
+     * only).</p>
+     *
+     * @param campaign the current {@link Campaign}
+     *
+     * @return the force's fleet altitude capability
+     */
+    public FleetAltitudeCapability calculateFleetAltitudeCapability(Campaign campaign) {
+        boolean hasSpaceCapable = false;
+        boolean hasAnyUnit = false;
+
+        for (CombatTeam combatTeam : getCombatTeamsAsList(campaign)) {
+            Formation formation = combatTeam.getFormation(campaign);
+            if (formation == null) {
+                continue;
+            }
+
+            for (UUID unitId : formation.getAllUnits(false)) {
+                Unit unit = campaign.getUnit(unitId);
+                if (unit == null) {
+                    continue;
+                }
+
+                Entity entity = unit.getEntity();
+                if (entity == null) {
+                    continue;
+                }
+
+                hasAnyUnit = true;
+
+                if (entity.isAerospace()) {
+                    hasSpaceCapable = true;
+                } else if (!entity.isConventionalFighter()) {
+                    // A single ground unit lifts every restriction, so there is nothing more to learn.
+                    return FleetAltitudeCapability.UNRESTRICTED;
+                }
+            }
+        }
+
+        if (!hasAnyUnit) {
+            return FleetAltitudeCapability.UNRESTRICTED;
+        }
+
+        return hasSpaceCapable ?
+                     FleetAltitudeCapability.SPACE_AND_ATMOSPHERE :
+                     FleetAltitudeCapability.ATMOSPHERE_ONLY;
+    }
+
     public boolean getFieldKitchenWithinCapacity() {
         return fieldKitchenWithinCapacity;
     }
@@ -653,6 +730,30 @@ public abstract class AbstractForce {
 
     public int getLastFormationId() {
         return lastFormationId;
+    }
+
+    /**
+     * @return the id of the Support Command formation, or {@link Formation#FORMATION_NONE} if this campaign has none
+     */
+    public int getSupportCommandFormationId() {
+        return supportCommandFormationId;
+    }
+
+    public void setSupportCommandFormationId(int supportCommandFormationId) {
+        this.supportCommandFormationId = supportCommandFormationId;
+    }
+
+    /**
+     * Resolves the Support Command formation, or {@code null} when this campaign has no support structure or the player
+     * has deleted the formation.
+     *
+     * @return the Support Command {@link Formation}, or {@code null}
+     */
+    public @Nullable Formation getSupportCommandFormation() {
+        if (supportCommandFormationId == Formation.FORMATION_NONE) {
+            return null;
+        }
+        return getFormation(supportCommandFormationId);
     }
 
     /** The raw, unsanitized combat-team table (keyed by formation id); used for serialization and iteration. */

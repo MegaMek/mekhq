@@ -39,6 +39,7 @@ import megamek.common.equipment.ArmorType;
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IAcquisitionWork;
 
 /**
@@ -68,6 +69,11 @@ public class BAArmor extends Armor {
     public BAArmor(int tonnage, int points, int type, int loc, boolean clan, Campaign c) {
         // Amount is used for armor quantity, not tonnage
         super(tonnage, type, points, loc, false, clan, c);
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_BA);
     }
 
     @Override

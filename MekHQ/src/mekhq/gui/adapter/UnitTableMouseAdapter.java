@@ -117,6 +117,7 @@ import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
@@ -140,7 +141,7 @@ import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.MassMothballDialog;
 import mekhq.gui.dialog.QuirksDialog;
 import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
-import mekhq.gui.dialog.quartermaster.IssueArmorKitsDialog;
+import mekhq.gui.dialog.quartermaster.IssueEquipmentDialog;
 import mekhq.gui.dialog.reportDialogs.MaintenanceReportDialog;
 import mekhq.gui.dialog.reportDialogs.MonthlyUnitCostReportDialog;
 import mekhq.gui.dialog.reportDialogs.PartQualityReportDialog;
@@ -263,6 +264,22 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
             }
         }.connect(unitTable);
+    }
+
+    /**
+     * Whether the shared kit-issue dialog has anything to offer for this unit: its crew can wear an armor kit, it is a
+     * conventional infantry platoon (issued a platoon kit), or any crew member can be issued technician tool kits.
+     */
+    private static boolean canIssueKitsFor(Unit unit) {
+        if (ArmorKitCatalog.canWearIssuedKit(unit.getEntity()) || unit.getEntity().isConventionalInfantry()) {
+            return true;
+        }
+        for (Person crew : unit.getCrew()) {
+            if (EquipmentKitCatalog.canBeIssuedKit(crew)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1223,14 +1240,12 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     }
                 }
 
-                if (!nonePresent && Arrays.stream(units).anyMatch(u ->
-                                                                        ArmorKitCatalog.canWearIssuedKit(u.getEntity()) ||
-                                                                              u.getEntity().isConventionalInfantry())) {
-                    JMenuItem issueArmorKits = new JMenuItem(getTextAt("mekhq.resources.IssueArmorKitsDialog",
+                if (Arrays.stream(units).anyMatch(UnitTableMouseAdapter::canIssueKitsFor)) {
+                    JMenuItem issueKits = new JMenuItem(getTextAt("mekhq.resources.IssueEquipmentDialog",
                           "menu.issueArmorKits"));
-                    issueArmorKits.addActionListener(evt -> IssueArmorKitsDialog.showFor(gui.getFrame(),
+                    issueKits.addActionListener(evt -> IssueEquipmentDialog.showFor(gui.getFrame(),
                           gui.getCampaign(), null, Arrays.asList(units)));
-                    menu.add(issueArmorKits);
+                    menu.add(issueKits);
                 }
 
                 JMenuHelpers.addMenuIfNonEmpty(popup, menu);

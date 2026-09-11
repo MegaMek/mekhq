@@ -56,6 +56,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -95,6 +96,14 @@ public class EquipmentPart extends Part {
      * Whether an autocannon has absorbed its first critical hit (Core rules only).
      */
     protected boolean autocannonHit = false;
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        if (getType() instanceof WeaponType) {
+            return skillType.equals(SkillType.S_TECH_WEAPONS);
+        }
+        return true;
+    }
 
     public EquipmentType getType() {
         return type;

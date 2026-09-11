@@ -37,7 +37,6 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.PersonUtility.setVeterancyAwardEligibility;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_ILL_DO_IT_MYSELF;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
@@ -52,6 +51,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import megamek.Version;
@@ -82,7 +82,6 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.InjuryType;
@@ -102,6 +101,7 @@ import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitIssuer;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -157,9 +157,6 @@ public class ForceHumanResources {
     private RetirementDefectionTracker retirementDefectionTracker;
 
     private NewPersonnelMarket newPersonnelMarket;
-
-    @Deprecated(since = "0.50.06")
-    private PersonnelMarket personnelMarket;
 
     private transient AbstractDivorce divorce;
     private transient AbstractMarriage marriage;
@@ -1015,34 +1012,12 @@ public class ForceHumanResources {
         emptyTempCrewPoolForRole(campaign, role);
     }
 
-
-    @Deprecated(since = "0.50.06")
-    public PersonnelMarket getPersonnelMarket() {
-        return personnelMarket;
-    }
-
-    @Deprecated(since = "0.50.06")
-    public void setPersonnelMarket(final PersonnelMarket personnelMarket) {
-        this.personnelMarket = personnelMarket;
-    }
-
     public NewPersonnelMarket getNewPersonnelMarket() {
         return newPersonnelMarket;
     }
 
     public void setNewPersonnelMarket(final NewPersonnelMarket newPersonnelMarket) {
         this.newPersonnelMarket = newPersonnelMarket;
-    }
-
-    /**
-     * Returns {@code true} when campaign options select the legacy (deprecated) personnel market.
-     *
-     * <p>The market style named {@code PERSONNEL_MARKET_DISABLED} disables the <em>new</em> market
-     * and causes the legacy market to run instead — the name is counterintuitive, so this predicate makes the intent
-     * explicit at every call site.</p>
-     */
-    public static boolean isUsingLegacyPersonnelMarket(CampaignOptions options) {
-        return options.get(CampaignOption.PERSONNEL_MARKET_STYLE) == PERSONNEL_MARKET_DISABLED;
     }
 
     /**
@@ -1053,17 +1028,10 @@ public class ForceHumanResources {
      *                               campaign start
      */
     public void refreshApplicants(Campaign campaign, boolean bypassDateRestrictions) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDay = campaign.getLocalDate();
 
-        if (isUsingLegacyPersonnelMarket(campaignOptions)) {
-            if (personnelMarket != null) {
-                personnelMarket.generatePersonnelForDay(campaign);
-            }
-        } else {
-            if (currentDay.getDayOfMonth() == 1 || bypassDateRestrictions) {
+        if (currentDay.getDayOfMonth() == 1 || bypassDateRestrictions) {
                 newPersonnelMarket.gatherApplications();
-            }
         }
     }
 
@@ -1465,8 +1433,35 @@ public class ForceHumanResources {
     public static List<Person> getTechsExpanded(Collection<Person> people, Collection<Unit> units,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today,
           boolean noZeroMinute, boolean eliteFirst, boolean expanded) {
+        return getTechs(people, units, campaignOptions, isClanCampaign, today, noZeroMinute, eliteFirst,
+              expanded ? Person::isTechExpanded : Person::isTech);
+    }
+
+    /**
+     * Retrieves a list of active technicians eligible under a supplied eligibility predicate, applying the same minute
+     * filtering, self-crewed engineer inclusion, and sorting as the role-based variants.
+     *
+     * <p>This lets callers decide eligibility by whatever rule fits their context - for example a role-based test
+     * ({@link Person#isTech()}) for maintenance capacity, or a purely skill-based test ({@link Person#hasTechSkill()})
+     * for the repair tab, where any person who has the right skill should be offered regardless of their
+     * profession.</p>
+     *
+     * @param people          the collection of people to search
+     * @param units           the collection of units (for self-crewed engineers)
+     * @param campaignOptions the campaign options
+     * @param isClanCampaign  whether this is a Clan campaign
+     * @param today           the current in-game date
+     * @param noZeroMinute    if {@code true}, excludes technicians with no remaining available minutes
+     * @param eliteFirst      if {@code true}, sorts the list to place the most skilled technicians at the top
+     * @param isEligibleTech  the predicate deciding whether a person qualifies as a technician
+     *
+     * @return a list of active technicians sorted appropriately
+     */
+    public static List<Person> getTechs(Collection<Person> people, Collection<Unit> units,
+          CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today,
+          boolean noZeroMinute, boolean eliteFirst, Predicate<Person> isEligibleTech) {
         final List<Person> techs = people.stream()
-                                         .filter(person -> (expanded ? person.isTechExpanded() : person.isTech()) &&
+                                         .filter(person -> isEligibleTech.test(person) &&
                                                                  (!noZeroMinute || (person.getMinutesLeft() > 0)))
                                          .collect(Collectors.toList());
 
@@ -1511,6 +1506,28 @@ public class ForceHumanResources {
     }
 
     /**
+     * Retrieves active personnel eligible to work on a part by <em>skill</em> rather than profession: anyone who has a
+     * technician repair skill ({@link Person#hasTechSkill()}) is included, regardless of their assigned role. Self-
+     * crewed unit engineers are added and the list is sorted as with the role-based variants.
+     *
+     * <p>Used by the repair tab so a specialist (e.g. a pilot who happens to have Technician/Weapons) can be offered
+     * for a job even though they hold no tech profession.</p>
+     *
+     * @param units           the collection of units (for self-crewed engineers)
+     * @param campaignOptions the campaign options
+     * @param isClanCampaign  whether this is a Clan campaign
+     * @param today           the current in-game date
+     * @param noZeroMinute    if {@code true}, excludes technicians with no remaining available minutes
+     *
+     * @return a list of skill-eligible technicians sorted appropriately
+     */
+    public List<Person> getSkilledTechs(Collection<Unit> units, CampaignOptions campaignOptions,
+          boolean isClanCampaign, LocalDate today, boolean noZeroMinute) {
+        return getTechs(getActivePersonnel(false, false), units, campaignOptions, isClanCampaign, today,
+              noZeroMinute, false, Person::hasTechSkill);
+    }
+
+    /**
      * Parses a {@code <humanResources>} node and returns a populated {@link ForceHumanResources} instance.
      *
      * @param wn       the {@code <humanResources>} node
@@ -1551,8 +1568,6 @@ public class ForceHumanResources {
                 } else if (nodeName.equalsIgnoreCase("personnel")) {
                     InjuryTypes.registerAll();
                     LocalPersonnel.loadFromXML(childNode, campaign, version);
-                } else if (nodeName.equalsIgnoreCase("personnelMarket")) {
-                    hr.personnelMarket = PersonnelMarket.generateInstanceFromXML(childNode, campaign, version);
                 } else if (nodeName.equalsIgnoreCase("retirementDefectionTracker")) {
                     hr.retirementDefectionTracker = RetirementDefectionTracker.generateInstanceFromXML(childNode,
                           campaign);
@@ -2543,6 +2558,7 @@ public class ForceHumanResources {
 
         if (employ && prisonerStatus.isFreeOrBondsman()) {
             ArmorKitIssuer.equipDefaultKitOnRecruitment(person, campaign, gmAdd);
+            EquipmentKitIssuer.equipDefaultToolKitOnRecruitment(person, campaign, gmAdd);
         }
 
         MekHQ.triggerEvent(new PersonNewEvent(person));
@@ -2748,11 +2764,6 @@ public class ForceHumanResources {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "personWhoAdvancedInXP", person.getId());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "personnelWhoAdvancedInXP");
-
-        // Personnel market (deprecated)
-        if (personnelMarket != null) {
-            personnelMarket.writeToXML(writer, indent, campaign);
-        }
 
         // New recruitment is managed at campaign level (newPersonnelMarket) — not written here
         // as it writes at campaign info level

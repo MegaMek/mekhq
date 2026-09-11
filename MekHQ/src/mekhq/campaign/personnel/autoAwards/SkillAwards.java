@@ -121,7 +121,8 @@ public class SkillAwards {
                       SkillType.S_PILOT_VTOL,
                       SkillType.S_PILOT_NVEE,
                       SkillType.S_PILOT_JET,
-                      SkillType.S_PILOT_SPACE);
+                      SkillType.S_PILOT_SPACE,
+                      SkillType.S_PILOT_PROTO);
                 break;
 
             case "accuracy":
@@ -148,7 +149,7 @@ public class SkillAwards {
             case "techwithmedical":
                 relevantSkills = Arrays.asList(SkillType.S_TECH_MEK,
                       SkillType.S_TECH_AERO,
-                      SkillType.S_TECH_MECHANIC,
+                      SkillType.S_TECH_VEHICLE,
                       SkillType.S_TECH_VESSEL,
                       SkillType.S_TECH_BA,
                       SkillType.S_ASTECH,
@@ -159,7 +160,7 @@ public class SkillAwards {
             case "tech":
                 relevantSkills = Arrays.asList(SkillType.S_TECH_MEK,
                       SkillType.S_TECH_AERO,
-                      SkillType.S_TECH_MECHANIC,
+                      SkillType.S_TECH_VEHICLE,
                       SkillType.S_TECH_VESSEL,
                       SkillType.S_TECH_BA,
                       SkillType.S_ASTECH);
@@ -201,6 +202,10 @@ public class SkillAwards {
                 relevantSkills = List.of(SkillType.S_PILOT_SPACE);
                 break;
 
+            case "piloting/protomek":
+                relevantSkills = List.of(SkillType.S_PILOT_PROTO);
+                break;
+
             case "gunnery/mek":
                 relevantSkills = List.of(SkillType.S_GUN_MEK);
                 break;
@@ -234,7 +239,7 @@ public class SkillAwards {
                 break;
 
             case "tech/mechanic":
-                relevantSkills = List.of(SkillType.S_TECH_MECHANIC);
+                relevantSkills = List.of(SkillType.S_TECH_VEHICLE);
                 break;
 
             case "tech/aero":

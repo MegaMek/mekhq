@@ -45,13 +45,14 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
@@ -200,12 +201,16 @@ public class SupportPointNegotiation {
 
         while (iterator.hasNext() && ((negotiatedSupportPoints + currentSupportPoints) < maxSupportPoints)) {
             Person admin = iterator.next();
-            SkillModifierData skillModifierData = admin.getSkillModifierData();
 
-            int rollResult = Compute.d6(2) + modifier;
+            // No forced roll type: the check derives ADVANTAGE from the admin's Natural Aptitude when they have it.
+            SkillCheck skillCheck = admin.checkSkill(S_ADMIN, campaign)
+                                          .withoutLogging();
+            if (modifier != 0) {
+                skillCheck.withMiscModifier(-modifier);
+            }
 
-            int adminSkill = admin.getSkill(S_ADMIN).getFinalSkillValue(skillModifierData);
-            if (rollResult >= adminSkill) {
+            ActionCheckResult result = skillCheck.resolve(false, null);
+            if (result.isSuccess()) {
                 negotiatedSupportPoints++;
             }
             iterator.remove();
@@ -324,6 +329,9 @@ public class SupportPointNegotiation {
     private static int getSkillValue(Person person, boolean isUseAgingEffects, boolean isClanCampaign,
           LocalDate today) {
         Skill skill = person.getSkill(S_ADMIN);
+        if (skill == null) {
+            return Integer.MIN_VALUE;
+        }
         SkillModifierData skillModifierData = person.getSkillModifierData(isUseAgingEffects, isClanCampaign, today);
         return skill.getTotalSkillLevel(skillModifierData);
     }

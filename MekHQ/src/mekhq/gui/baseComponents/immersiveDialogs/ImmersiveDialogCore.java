@@ -381,22 +381,6 @@ public class ImmersiveDialogCore extends JDialog {
         setVisible(true);
     }
 
-    @Override
-    public void dispose() {
-        if (responseActivationController != null) {
-            responseActivationController.cancel();
-        }
-        super.dispose();
-    }
-
-    @Override
-    public void removeNotify() {
-        if (responseActivationController != null) {
-            responseActivationController.cancel();
-        }
-        super.removeNotify();
-    }
-
     /**
      * Sets the title of the dialog window using localized text.
      */
@@ -898,12 +882,7 @@ public class ImmersiveDialogCore extends JDialog {
             TransmissionResponseButton responseButton = button;
             int responseIndex = buttons.indexOf(buttonStrings);
             button.addActionListener(evt -> responseActivationController.activate(
-                  responseButton,
-                  buttonList,
-                  () -> captureResponseState(responseIndex),
-                getText("ImmersiveDialog.response.transmitting.text"),
-                getText("ImmersiveDialog.response.transmitting.compact"),
-                getText("ImmersiveDialog.response.transmitting.accessible")));
+                () -> captureResponseState(responseIndex)));
 
             buttonList.add(button);
         }
@@ -1194,86 +1173,22 @@ public class ImmersiveDialogCore extends JDialog {
     }
 
     static final class ResponseActivationController {
-        static final int TRANSMISSION_CONFIRMATION_DELAY_MS = 350;
-
         private final Runnable dialogDisposer;
-        private Timer confirmationTimer;
-        private TransmissionResponseButton selectedButton;
         private boolean responseActivated;
-        private boolean completionPending;
-        private boolean transmissionFeedbackVisible;
 
-          ResponseActivationController(Runnable dialogDisposer) {
+                ResponseActivationController(Runnable dialogDisposer) {
             this.dialogDisposer = dialogDisposer;
         }
 
-        boolean activate(TransmissionResponseButton selectedButton,
-              List<TransmissionResponseButton> responseButtons, Runnable captureResponse,
-              String confirmationText, String compactConfirmationText, String accessibleFeedbackText) {
+        boolean activate(Runnable captureResponse) {
             if (responseActivated) {
                 return false;
             }
 
             responseActivated = true;
             captureResponse.run();
-            for (TransmissionResponseButton responseButton : responseButtons) {
-                if (responseButton != selectedButton) {
-                    responseButton.setEnabled(false);
-                }
-            }
-            this.selectedButton = selectedButton;
-            selectedButton.lockTransmissionConfirmation(
-                confirmationText, compactConfirmationText, accessibleFeedbackText);
-            transmissionFeedbackVisible = true;
-
-            completionPending = true;
-            confirmationTimer = new Timer(TRANSMISSION_CONFIRMATION_DELAY_MS,
-                  event -> completeTransmission());
-            confirmationTimer.setRepeats(false);
-            confirmationTimer.start();
-            return true;
-        }
-
-        void completeTransmission() {
-            if (!completionPending) {
-                return;
-            }
-
-            completionPending = false;
-            stopTimer();
-            clearTransmissionFeedback();
             dialogDisposer.run();
-        }
-
-        void cancel() {
-            completionPending = false;
-            stopTimer();
-            clearTransmissionFeedback();
-        }
-
-        boolean isConfirmationTimerRunning() {
-            return confirmationTimer != null && confirmationTimer.isRunning();
-        }
-
-        boolean isConfirmationTimerRepeating() {
-            return confirmationTimer != null && confirmationTimer.isRepeats();
-        }
-
-        private void stopTimer() {
-            if (confirmationTimer != null) {
-                confirmationTimer.stop();
-                confirmationTimer = null;
-            }
-        }
-
-        private void clearTransmissionFeedback() {
-            if (!transmissionFeedbackVisible) {
-                return;
-            }
-
-            transmissionFeedbackVisible = false;
-            selectedButton.clearTransmissionConfirmation();
-            selectedButton = null;
+            return true;
         }
     }
 

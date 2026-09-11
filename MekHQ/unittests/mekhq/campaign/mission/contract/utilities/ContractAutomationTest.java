@@ -35,6 +35,8 @@ package mekhq.campaign.mission.contract.utilities;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -43,6 +45,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -50,12 +53,17 @@ import java.util.Vector;
 
 import megamek.common.units.Entity;
 import mekhq.MekHQ;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.Planet;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -170,6 +178,12 @@ class ContractAutomationTest {
             Campaign campaign = mock(Campaign.class);
             when(campaign.getUnit(idA)).thenReturn(unitA);
 
+            PlayerForce playerForce = mock(PlayerForce.class);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+
+            ForceHumanResources forceHumanResources = mock(ForceHumanResources.class);
+            when(playerForce.getHumanResources()).thenReturn(forceHumanResources);
+
             Detachment detachmentA = new Detachment();
             detachmentA.setAutomatedMothballUnits(new ArrayList<>(List.of(idA)));
             Detachment detachmentB = new Detachment();
@@ -195,6 +209,12 @@ class ContractAutomationTest {
             Campaign campaign = mock(Campaign.class);
             when(campaign.getUnit(id)).thenReturn(alreadyActive);
 
+            PlayerForce playerForce = mock(PlayerForce.class);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+
+            ForceHumanResources forceHumanResources = mock(ForceHumanResources.class);
+            when(playerForce.getHumanResources()).thenReturn(forceHumanResources);
+
             Detachment detachment = new Detachment();
             detachment.setAutomatedMothballUnits(new ArrayList<>(List.of(id)));
 
@@ -203,6 +223,102 @@ class ContractAutomationTest {
 
                 verify(alreadyActive, never()).startActivating(null, true);
                 assertTrue(detachment.getAutomatedMothballUnits().isEmpty());
+            }
+        }
+    }
+
+    @Nested
+    class ContractStart {
+        /** The mocks {@link ContractAutomation#performContractStart} touches, bundled for reuse across tests. */
+        private record Fixture(Campaign campaign, AbstractContract contract, Unit unit, Detachment detachment,
+              LocalDate today) {}
+
+        /**
+         * Wires up a campaign whose sole force detachment holds one mothballable unit and is offered a contract. When
+         * {@code alreadyAtTarget} is set the detachment's current planet is the contract's target planet (no travel);
+         * otherwise the two planets differ.
+         */
+        private static Fixture fixture(boolean alreadyAtTarget) {
+            LocalDate today = LocalDate.of(3025, 1, 1);
+
+            UUID id = UUID.randomUUID();
+            Unit unit = mothballableUnit();
+            when(unit.getId()).thenReturn(id);
+
+            Planet targetPlanet = mock(Planet.class);
+            Planet currentPlanet = alreadyAtTarget ? targetPlanet : mock(Planet.class);
+
+            AbstractLocation currentLocation = mock(AbstractLocation.class);
+            when(currentLocation.getCurrentPlanetDirect()).thenReturn(currentPlanet);
+            // A force that has settled at a world is out of transit; arrival is judged on that, not just the planet.
+            when(currentLocation.isOnPlanet()).thenReturn(true);
+
+            LocalHangar hangar = mock(LocalHangar.class);
+            when(hangar.getUnits()).thenReturn(List.of(unit));
+
+            Detachment detachment = mock(Detachment.class);
+            when(detachment.getCurrentLocation()).thenReturn(currentLocation);
+            when(detachment.getHangar()).thenReturn(hangar);
+
+            PlayerForce force = mock(PlayerForce.class);
+            when(force.getForceDetachment()).thenReturn(detachment);
+            Formation formation = mock(Formation.class);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(id)));
+            when(force.getAllFormations()).thenReturn(List.of(formation));
+
+            Campaign campaign = mock(Campaign.class);
+            when(campaign.getPlayerForce()).thenReturn(force);
+            when(campaign.getUnit(id)).thenReturn(unit);
+            when(campaign.getLocalDate()).thenReturn(today);
+
+            AbstractContract contract = mock(AbstractContract.class);
+            when(contract.getTargetPlanet()).thenReturn(targetPlanet);
+
+            return new Fixture(campaign, contract, unit, detachment, today);
+        }
+
+        @Test
+        void mothballsUnitsWhenThereIsAJourneyAhead() {
+            Fixture f = fixture(false);
+
+            try (MockedStatic<MekHQ> ignoredMekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractUtilities> ignoredUtilities = mockStatic(ContractUtilities.class)) {
+                // No automated jump plotted; we only care that mothballing ran.
+                ignoredUtilities.when(() -> ContractUtilities.getJumpPath(any(), any(), any())).thenReturn(null);
+
+                ContractAutomation.performContractStart(f.campaign(), f.contract(), true, false);
+
+                verify(f.unit()).startMothballing(null, true);
+            }
+        }
+
+        @Test
+        void doesNotMothballWhenAlreadyAtTargetPlanet() {
+            Fixture f = fixture(true);
+
+            try (MockedStatic<MekHQ> ignoredMekHQ = mockStatic(MekHQ.class)) {
+                ContractAutomation.performContractStart(f.campaign(), f.contract(), true, false);
+
+                // Regression test for issue #9945: with no travel there is no arrival event to reactivate the units,
+                // so the mothball must be skipped entirely rather than stranding them mothballed indefinitely.
+                verify(f.unit(), never()).startMothballing(null, true);
+                verify(f.detachment(), never()).setAutomatedMothballUnits(anyList());
+                // ...and, there being no journey, the contract still starts today.
+                verify(f.contract()).setStartAndEndDate(f.today());
+            }
+        }
+
+        @Test
+        void doesNotMothballWhenMothballFlagIsUnset() {
+            Fixture f = fixture(false);
+
+            try (MockedStatic<MekHQ> ignoredMekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractUtilities> ignoredUtilities = mockStatic(ContractUtilities.class)) {
+                ignoredUtilities.when(() -> ContractUtilities.getJumpPath(any(), any(), any())).thenReturn(null);
+
+                ContractAutomation.performContractStart(f.campaign(), f.contract(), false, false);
+
+                verify(f.unit(), never()).startMothballing(null, true);
             }
         }
     }

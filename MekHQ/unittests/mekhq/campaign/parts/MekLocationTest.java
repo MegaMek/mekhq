@@ -32,10 +32,6 @@
  */
 package mekhq.campaign.parts;
 
-import mekhq.campaign.campaignOptions.CampaignOption;
-
-import static org.mockito.Mockito.lenient;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
@@ -49,6 +45,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -76,6 +73,7 @@ import megamek.common.units.LandAirMek;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -2051,8 +2049,8 @@ class MekLocationTest {
               false,
               mockCampaign);
 
-        assertTrue(centerTorso.isRightTechType(SkillType.S_TECH_MEK));
-        assertFalse(centerTorso.isRightTechType(SkillType.S_TECH_MECHANIC));
+        assertTrue(centerTorso.isRightTechType(SkillType.S_TECH_MECHANICAL));
+        assertFalse(centerTorso.isRightTechType(SkillType.S_TECH_VEHICLE));
     }
 
     @Test

@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -42,6 +42,7 @@ import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
 
 /**
@@ -57,6 +58,11 @@ public class TurretLock extends Part {
     public TurretLock(Campaign c) {
         super(0, c);
         this.name = "Turret Lock";
+    }
+
+    @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

@@ -43,6 +43,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.missing.MissingThrusters;
@@ -50,7 +51,6 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -270,7 +270,7 @@ public class Thrusters extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return (skillType.equals(SkillType.S_TECH_AERO) || skillType.equals(SkillType.S_TECH_VESSEL));
+        return skillType.equals(SkillType.S_TECH_JETS);
     }
 
     public boolean isLeftThrusters() {

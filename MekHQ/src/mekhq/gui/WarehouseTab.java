@@ -65,6 +65,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
@@ -112,12 +113,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     // parts views
     private static final int SV_ALL = 0;
-    private static final int SV_IN_TRANSIT = 1;
-    private static final int SV_RESERVED = 2;
-    private static final int SV_SPARE = 3;
-    private static final int SV_UNDAMAGED = 4;
-    private static final int SV_DAMAGED = 5;
-    private static final int SV_NUM = 6;
+    private static final int SV_PRESENT = 1;
+    private static final int SV_SPARE = 2;
+    private static final int SV_IN_TRANSIT = 3;
+    private static final int SV_RESERVED = 4;
+    private static final int SV_UNDAMAGED = 5;
+    private static final int SV_DAMAGED = 6;
+    private static final int SV_NUM = 7;
 
     private JTable partsTable;
     private JTable techTable;
@@ -539,6 +541,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                     inView = !part.needsFixing();
                 } else if (nGroupView == SV_DAMAGED) {
                     inView = part.needsFixing();
+                } else if (nGroupView == SV_PRESENT) {
+                    inView = part.isSpare() && part.isPresent();
                 }
 
                 String searchText = txtPartsSearch.getText().trim();
@@ -556,12 +560,13 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     public static String getPartsGroupViewName(int view) {
         return switch (view) {
-            case SV_ALL -> "All";
-            case SV_IN_TRANSIT -> "In Transit";
-            case SV_RESERVED -> "Reserved for Refit/Repair";
-            case SV_SPARE -> "Spares";
-            case SV_UNDAMAGED -> "Undamaged";
-            case SV_DAMAGED -> "Damaged";
+            case SV_ALL -> getTextAt(RESOURCE_BUNDLE, "partsView.All.text");
+            case SV_IN_TRANSIT -> getTextAt(RESOURCE_BUNDLE, "partsView.InTransit.text");
+            case SV_RESERVED -> getTextAt(RESOURCE_BUNDLE, "partsView.Reserved.text");
+            case SV_SPARE -> getTextAt(RESOURCE_BUNDLE, "partsView.Spares.text");
+            case SV_UNDAMAGED -> getTextAt(RESOURCE_BUNDLE, "partsView.Undamaged.text");
+            case SV_DAMAGED -> getTextAt(RESOURCE_BUNDLE, "partsView.Damaged.text");
+            case SV_PRESENT -> getTextAt(RESOURCE_BUNDLE, "partsView.Present.text");
             default -> "?";
         };
     }
@@ -835,6 +840,17 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         // which would race the EDT for the underlying Document/table locks the same way the
         // ReportEvent deadlock did.
         SwingUtilities.invokeLater(this::filterParts);
+    }
+
+    /**
+     * A force generation adds its parts while {@link Campaign#isBulkGenerationInProgress()} is true, so every
+     * {@link PartNewEvent} it raises is dropped by the guard at the top of {@link #refreshPartsList()}. Generation ends
+     * by firing this event and nothing else, so without this handler no refresh ever runs against the finished
+     * campaign: the warehouse is full and the table still shows what it held before the build.
+     */
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
+        partsScheduler.schedule();
     }
 
     @Subscribe

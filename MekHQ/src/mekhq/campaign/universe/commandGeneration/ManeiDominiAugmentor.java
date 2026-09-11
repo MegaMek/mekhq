@@ -39,7 +39,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.enums.AugmentedUnitType;
 import megamek.common.enums.ManeiDominiAugmentationRank;
 import megamek.common.enums.ManeiDominiImplants;
-import megamek.common.options.OptionsConstants;
+import megamek.common.enums.NeuralInterfaceMode;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -81,12 +81,12 @@ public final class ManeiDominiAugmentor {
     public static void augment(Campaign campaign, @Nullable String generationFaction,
           List<Person> generatedPersons) {
         boolean campaignAllowsImplants = campaign.getCampaignOptions().get(CampaignOption.USE_IMPLANTS);
-        boolean gameAllowsImplants =
-              campaign.getGameOptions().booleanOption(OptionsConstants.RPG_MANEI_DOMINI);
+        boolean gameAllowsImplants = NeuralInterfaceMode.from(campaign.getGameOptions()).allowsImplants();
         // One line that answers "did this even get a chance to run", so a playtest never has to infer
         // it from the absence of later lines. Logged before any gate so it appears whatever happens.
         LOGGER.info("[ManeiDomini] ENTER: generationFaction='{}' (Shadow Divisions key '{}'),"
-                    + " campaign Use Implants={}, MegaMek Manei Domini rule={}, generatedPersons={}",
+                    + " campaign Use Implants={}, MegaMek Pilot Implants option allows implants={},"
+                    + " generatedPersons={}",
               generationFaction, SHADOW_DIVISION_FACTION_KEY, campaignAllowsImplants,
               gameAllowsImplants, generatedPersons.size());
 
@@ -106,14 +106,14 @@ public final class ManeiDominiAugmentor {
                         + " Use Implants and generate again; this cannot be applied retrospectively.");
             return;
         }
-        // The campaign option above is MekHQ's mirror of MegaMek's Manei Domini rule, and the two are
-        // only synced when the options dialog is used. The game option is what actually decides
-        // whether implants survive into a battle: with it off, ChatLounge clears the whole implant
+        // The campaign option above is MekHQ's mirror of MegaMek's pilot implants option, and the two
+        // are only synced when the options dialog is used. The game option is what actually decides
+        // whether implants survive into a battle: with it Off, ChatLounge clears the whole implant
         // group as the unit enters the lobby and MULParser refuses to restore it. Issuing implants
         // then would leave the roster claiming augmentations that silently vanish in play.
         if (!gameAllowsImplants) {
             LOGGER.info("[ManeiDomini] SKIPPED - a Shadow Division was generated with campaign implants"
-                        + " on, but MegaMek's Manei Domini rule is off in this campaign's game options,"
+                        + " on, but MegaMek's Pilot Implants option is Off in this campaign's game options,"
                         + " so any implants issued would be stripped the moment a unit reached the"
                         + " lobby. Re-open Campaign Options and accept it to push the rule across.");
             return;
