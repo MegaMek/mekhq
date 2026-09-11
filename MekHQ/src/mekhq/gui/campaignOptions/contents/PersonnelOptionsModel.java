@@ -143,7 +143,9 @@ class PersonnelOptionsModel {
     String mechanicDefaultToolKit;
     String aeroTechDefaultToolKit;
     String baTechDefaultToolKit;
+    String astechDefaultToolKit;
     String doctorDefaultToolKit;
+    String medicDefaultToolKit;
     String adminDefaultToolKit;
     boolean techsNeedToolKit;
 
@@ -246,7 +248,9 @@ class PersonnelOptionsModel {
         mechanicDefaultToolKit = options.get(CampaignOption.MECHANIC_DEFAULT_TOOL_KIT);
         aeroTechDefaultToolKit = options.get(CampaignOption.AERO_TECH_DEFAULT_TOOL_KIT);
         baTechDefaultToolKit = options.get(CampaignOption.BA_TECH_DEFAULT_TOOL_KIT);
+        astechDefaultToolKit = options.get(CampaignOption.ASTECH_DEFAULT_TOOL_KIT);
         doctorDefaultToolKit = options.get(CampaignOption.DOCTOR_DEFAULT_TOOL_KIT);
+        medicDefaultToolKit = options.get(CampaignOption.MEDIC_DEFAULT_TOOL_KIT);
         adminDefaultToolKit = options.get(CampaignOption.ADMIN_DEFAULT_TOOL_KIT);
         techsNeedToolKit = options.get(CampaignOption.TECHS_NEED_TOOL_KIT);
     }
@@ -353,7 +357,9 @@ class PersonnelOptionsModel {
         options.set(CampaignOption.MECHANIC_DEFAULT_TOOL_KIT, mechanicDefaultToolKit);
         options.set(CampaignOption.AERO_TECH_DEFAULT_TOOL_KIT, aeroTechDefaultToolKit);
         options.set(CampaignOption.BA_TECH_DEFAULT_TOOL_KIT, baTechDefaultToolKit);
+        options.set(CampaignOption.ASTECH_DEFAULT_TOOL_KIT, astechDefaultToolKit);
         options.set(CampaignOption.DOCTOR_DEFAULT_TOOL_KIT, doctorDefaultToolKit);
+        options.set(CampaignOption.MEDIC_DEFAULT_TOOL_KIT, medicDefaultToolKit);
         options.set(CampaignOption.ADMIN_DEFAULT_TOOL_KIT, adminDefaultToolKit);
         options.set(CampaignOption.TECHS_NEED_TOOL_KIT, techsNeedToolKit);
     }

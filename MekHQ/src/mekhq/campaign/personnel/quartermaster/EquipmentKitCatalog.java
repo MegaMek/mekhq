@@ -150,7 +150,7 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
      * The professions that receive a per-profession default equipment kit on recruitment: the four technician
      * professions (Astechs excluded), plus doctors and administrators for their medical and computer kits.
      */
-    public enum KitProfession {MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, DOCTOR, ADMIN}
+    public enum KitProfession {MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, ASTECH, DOCTOR, MEDIC, ADMIN}
 
     private EquipmentKitCatalog() {
     }
@@ -166,8 +166,8 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
     }
 
     /**
-     * The technician professions this person qualifies for, by primary and secondary role (Astech excluded). Used to
-     * decide which per-profession default tool kits to issue on recruitment.
+     * The technician professions this person qualifies for, by primary and secondary role. Used to decide which
+     * per-profession default tool kits to issue on recruitment.
      *
      * @param person the person, or {@code null}
      *
@@ -181,21 +181,35 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
         for (PersonnelRole role : List.of(person.getPrimaryRole(), person.getSecondaryRole())) {
             if (role.isMekTech()) {
                 professions.add(KitProfession.MEK_TECH);
+                continue;
             }
             if (role.isMechanic()) {
                 professions.add(KitProfession.MECHANIC);
+                continue;
             }
             if (role.isAeroTek()) {
                 professions.add(KitProfession.AERO_TEK);
+                continue;
             }
             if (role.isBATech()) {
                 professions.add(KitProfession.BA_TECH);
+                continue;
             }
             if (role.isDoctor()) {
                 professions.add(KitProfession.DOCTOR);
+                continue;
             }
             if (role.isAdministrator()) {
                 professions.add(KitProfession.ADMIN);
+                continue;
+            }
+            if (role.isMedic()) {
+                professions.add(KitProfession.MEDIC);
+                continue;
+            }
+            if (role.isAstech()) {
+                professions.add(KitProfession.ASTECH);
+                continue;
             }
         }
         return professions;

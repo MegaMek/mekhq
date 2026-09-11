@@ -320,8 +320,12 @@ public final class CampaignOption<T> {
           of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "aeroTechDefaultToolKit");
     public static final CampaignOption<String> BA_TECH_DEFAULT_TOOL_KIT =
           of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "baTechDefaultToolKit");
+    public static final CampaignOption<String> ASTECH_DEFAULT_TOOL_KIT =
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "asTechDefaultToolKit");
     public static final CampaignOption<String> DOCTOR_DEFAULT_TOOL_KIT =
           of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "doctorDefaultToolKit");
+    public static final CampaignOption<String> MEDIC_DEFAULT_TOOL_KIT =
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "medicDefaultToolKit");
     public static final CampaignOption<String> ADMIN_DEFAULT_TOOL_KIT =
           of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "adminDefaultToolKit");
     public static final CampaignOption<Boolean> ADD_DEFAULT_KIT_TO_PROCUREMENT =

@@ -97,8 +97,12 @@ class PersonnelEquipmentPage {
     private MMComboBox<String> cboAeroTechDefaultToolKit;
     private JLabel lblBATechDefaultToolKit;
     private MMComboBox<String> cboBATechDefaultToolKit;
+    private JLabel lblAstechDefaultToolKit;
+    private MMComboBox<String> cboAstechDefaultToolKit;
     private JLabel lblDoctorDefaultToolKit;
     private MMComboBox<String> cboDoctorDefaultToolKit;
+    private JLabel lblMedicDefaultToolKit;
+    private MMComboBox<String> cboMedicDefaultToolKit;
     private JLabel lblAdminDefaultToolKit;
     private MMComboBox<String> cboAdminDefaultToolKit;
     private JCheckBox chkTechsNeedToolKit;
@@ -124,7 +128,9 @@ class PersonnelEquipmentPage {
         cboMechanicDefaultToolKit = toolKitCombo("mechanicDefaultToolKit");
         cboAeroTechDefaultToolKit = toolKitCombo("aeroTechDefaultToolKit");
         cboBATechDefaultToolKit = toolKitCombo("baTechDefaultToolKit");
+        cboAstechDefaultToolKit = toolKitCombo("astechDefaultToolKit");
         cboDoctorDefaultToolKit = toolKitCombo("doctorDefaultToolKit");
+        cboMedicDefaultToolKit = toolKitCombo("medicDefaultToolKit");
         cboAdminDefaultToolKit = toolKitCombo("adminDefaultToolKit");
 
         JPanel pnlGeneral = createGeneralPanel();
@@ -220,9 +226,17 @@ class PersonnelEquipmentPage {
         lblBATechDefaultToolKit.addMouseListener(createTipPanelUpdater("BATechDefaultToolKit"));
         cboBATechDefaultToolKit.addMouseListener(createTipPanelUpdater("BATechDefaultToolKit"));
 
+        lblAstechDefaultToolKit = new CampaignOptionsLabel("AstechDefaultToolKit", getMetadata(new Version(0, 51, 1)));
+        lblAstechDefaultToolKit.addMouseListener(createTipPanelUpdater("AstechDefaultToolKit"));
+        cboAstechDefaultToolKit.addMouseListener(createTipPanelUpdater("AstechDefaultToolKit"));
+
         lblDoctorDefaultToolKit = new CampaignOptionsLabel("DoctorDefaultToolKit", getMetadata(new Version(0, 51, 1)));
         lblDoctorDefaultToolKit.addMouseListener(createTipPanelUpdater("DoctorDefaultToolKit"));
         cboDoctorDefaultToolKit.addMouseListener(createTipPanelUpdater("DoctorDefaultToolKit"));
+
+        lblMedicDefaultToolKit = new CampaignOptionsLabel("MedicDefaultToolKit", getMetadata(new Version(0, 51, 1)));
+        lblMedicDefaultToolKit.addMouseListener(createTipPanelUpdater("MedicDefaultToolKit"));
+        cboMedicDefaultToolKit.addMouseListener(createTipPanelUpdater("MedicDefaultToolKit"));
 
         lblAdminDefaultToolKit = new CampaignOptionsLabel("AdminDefaultToolKit", getMetadata(new Version(0, 51, 1)));
         lblAdminDefaultToolKit.addMouseListener(createTipPanelUpdater("AdminDefaultToolKit"));
@@ -238,7 +252,9 @@ class PersonnelEquipmentPage {
         panel.addRow(lblMechanicDefaultToolKit, cboMechanicDefaultToolKit);
         panel.addRow(lblAeroTechDefaultToolKit, cboAeroTechDefaultToolKit);
         panel.addRow(lblBATechDefaultToolKit, cboBATechDefaultToolKit);
+        panel.addRow(lblAstechDefaultToolKit, cboAstechDefaultToolKit);
         panel.addRow(lblDoctorDefaultToolKit, cboDoctorDefaultToolKit);
+        panel.addRow(lblMedicDefaultToolKit, cboMedicDefaultToolKit);
         panel.addRow(lblAdminDefaultToolKit, cboAdminDefaultToolKit);
         panel.addCheckBox(chkTechsNeedToolKit);
 
@@ -383,7 +399,9 @@ class PersonnelEquipmentPage {
         cboMechanicDefaultToolKit.setSelectedItem(model.mechanicDefaultToolKit);
         cboAeroTechDefaultToolKit.setSelectedItem(model.aeroTechDefaultToolKit);
         cboBATechDefaultToolKit.setSelectedItem(model.baTechDefaultToolKit);
+        cboAstechDefaultToolKit.setSelectedItem(model.astechDefaultToolKit);
         cboDoctorDefaultToolKit.setSelectedItem(model.doctorDefaultToolKit);
+        cboMedicDefaultToolKit.setSelectedItem(model.medicDefaultToolKit);
         cboAdminDefaultToolKit.setSelectedItem(model.adminDefaultToolKit);
         chkTechsNeedToolKit.setSelected(model.techsNeedToolKit);
     }
@@ -409,7 +427,9 @@ class PersonnelEquipmentPage {
         model.mechanicDefaultToolKit = cboMechanicDefaultToolKit.getSelectedItem();
         model.aeroTechDefaultToolKit = cboAeroTechDefaultToolKit.getSelectedItem();
         model.baTechDefaultToolKit = cboBATechDefaultToolKit.getSelectedItem();
+        model.astechDefaultToolKit = cboAstechDefaultToolKit.getSelectedItem();
         model.doctorDefaultToolKit = cboDoctorDefaultToolKit.getSelectedItem();
+        model.medicDefaultToolKit = cboMedicDefaultToolKit.getSelectedItem();
         model.adminDefaultToolKit = cboAdminDefaultToolKit.getSelectedItem();
         model.techsNeedToolKit = chkTechsNeedToolKit.isSelected();
     }
