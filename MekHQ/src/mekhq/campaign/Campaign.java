@@ -4242,12 +4242,6 @@ public class Campaign implements ITechManager {
     private NavigationRouteAnalysis.Policy createNavigationPolicy(boolean skipAccessCheck,
           boolean skipEmptySystemCheck, List<AbstractContract> activeContracts, FactionHints factionHints) {
         class CampaignNavigationPolicy implements NavigationRouteAnalysis.Policy {
-            private final boolean escapingOutlawedOrigin;
-
-            private CampaignNavigationPolicy(boolean escapingOutlawedOrigin) {
-                this.escapingOutlawedOrigin = escapingOutlawedOrigin;
-            }
-
             @Override
             public Collection<PlanetarySystem> getNeighbors(PlanetarySystem system) {
                 return systemsInstance.getNearbySystems(system, MHQConstants.MAX_JUMP_RADIUS);
@@ -4265,22 +4259,10 @@ public class Campaign implements ITechManager {
 
             @Override
             public boolean canTraverse(PlanetarySystem origin, PlanetarySystem destination) {
-                return skipAccessCheck || escapingOutlawedOrigin
-                             || !campaignOptions.isUseFactionStandingOutlawedSafe()
+                return skipAccessCheck || !campaignOptions.isUseFactionStandingOutlawedSafe()
                              || FactionStandingUtilities.canEnterTargetSystem(getPlayerForce().getFaction(),
                                    getPlayerForce().getFactionStandings(), origin, destination, currentDay,
                                    activeContracts, factionHints);
-            }
-
-            @Override
-            public NavigationRouteAnalysis.Policy forSegment(PlanetarySystem origin,
-                  PlanetarySystem destination) {
-                boolean escaping = !skipAccessCheck && campaignOptions.isUseFactionStandingOutlawedSafe()
-                                         && !FactionStandingUtilities.canEnterTargetSystem(
-                                               getPlayerForce().getFaction(),
-                                               getPlayerForce().getFactionStandings(), null, origin, currentDay,
-                                               activeContracts, factionHints);
-                return new CampaignNavigationPolicy(escaping);
             }
 
             @Override
@@ -4293,7 +4275,7 @@ public class Campaign implements ITechManager {
                 return !skipEmptySystemCheck && getPlayerForce().isAvoidingEmptySystems();
             }
         }
-        return new CampaignNavigationPolicy(false);
+        return new CampaignNavigationPolicy();
     }
 
     /**

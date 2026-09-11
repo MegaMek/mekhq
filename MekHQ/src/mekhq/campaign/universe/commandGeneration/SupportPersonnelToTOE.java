@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.universe.commandGeneration;
 
-import mekhq.campaign.campaignOptions.CampaignOption;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.ArrayList;
@@ -46,6 +45,7 @@ import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;

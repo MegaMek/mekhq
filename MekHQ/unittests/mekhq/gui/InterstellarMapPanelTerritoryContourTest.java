@@ -46,7 +46,6 @@ import java.awt.Graphics2D;
 import java.awt.Paint;
 import java.awt.Shape;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.PathIterator;
@@ -59,7 +58,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
 
 class InterstellarMapPanelTerritoryContourTest {

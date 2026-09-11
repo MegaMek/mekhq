@@ -33,20 +33,20 @@
 package mekhq.campaign.universe.commandGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import org.junit.jupiter.api.BeforeAll;

@@ -61,7 +61,7 @@ class InterstellarMapPanelAdministrativeBoundaryTest {
     private static final double HEX_SPACING_X = HEX_SIZE * Math.sqrt(3) / 2.0;
 
     @Test
-    void administrativeKeyUsesNearestCompleteMatchingFactionEvidence() {
+            void administrativeKeyRequiresConsistentCompleteMatchingFactionEvidence() {
         Faction owner = faction("FS", Color.BLUE);
         Faction other = faction("DC", Color.RED);
         PlanetarySystem first = system(owner, List.of("Crucis March", "Coreward PDZ"));
@@ -75,15 +75,15 @@ class InterstellarMapPanelAdministrativeBoundaryTest {
 
         assertEquals(owner, key.faction());
         assertEquals(List.of("Crucis March", "Coreward PDZ"), key.path());
-        assertEquals(List.of("Crucis March", "Coreward PDZ"),
-              InterstellarMapPanel.classifyAdministrativeKey(
-                    List.of(owner), List.of(first, conflicting), DATE).path());
-        assertEquals(List.of("Draconis March", "Robinson PDZ"),
-              InterstellarMapPanel.classifyAdministrativeKey(
-                    List.of(owner), List.of(conflicting, first), DATE).path());
+        assertNull(InterstellarMapPanel.classifyAdministrativeKey(
+              List.of(owner), List.of(first, conflicting), DATE));
+        assertNull(InterstellarMapPanel.classifyAdministrativeKey(
+              List.of(owner), List.of(conflicting, first), DATE));
         assertNull(InterstellarMapPanel.classifyAdministrativeKey(List.of(owner), List.of(), DATE));
         assertNull(InterstellarMapPanel.classifyAdministrativeKey(
               List.of(owner), List.of(missing, first), DATE));
+        assertNull(InterstellarMapPanel.classifyAdministrativeKey(
+              List.of(owner), List.of(first, missing), DATE));
         assertNull(InterstellarMapPanel.classifyAdministrativeKey(
               List.of(owner), List.of(wrongOwner, first), DATE));
         assertNull(InterstellarMapPanel.classifyAdministrativeKey(

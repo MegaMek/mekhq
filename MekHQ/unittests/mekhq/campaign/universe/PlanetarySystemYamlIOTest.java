@@ -491,4 +491,3 @@ class PlanetarySystemYamlIOTest {
         assertEquals(25, system.getPrimaryPlanet().getTemperature(when));
     }
 }
-

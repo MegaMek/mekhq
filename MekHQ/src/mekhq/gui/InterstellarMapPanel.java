@@ -97,8 +97,8 @@ import javax.swing.plaf.basic.BasicMenuItemUI;
 import javax.swing.plaf.basic.BasicMenuUI;
 import javax.vecmath.Vector2d;
 
-import megamek.client.ui.util.UIUtil;
 import megamek.client.ui.util.FontHandler;
+import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.universe.FactionTag;
@@ -111,8 +111,8 @@ import mekhq.campaign.NavigationRouteAnalysis;
 import mekhq.campaign.NavigationRouteAnalysis.LegAssessment;
 import mekhq.campaign.NavigationRouteAnalysis.PathAssessment;
 import mekhq.campaign.NavigationRouteAnalysis.Severity;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.InjuryType;
@@ -128,8 +128,8 @@ import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.gui.baseComponents.ImmersiveComboBox;
 import mekhq.gui.baseComponents.ImmersiveCheckBox;
+import mekhq.gui.baseComponents.ImmersiveComboBox;
 import mekhq.gui.baseComponents.ImmersiveRadioButton;
 import mekhq.gui.baseComponents.ImmersiveScrollBarStyle;
 import mekhq.gui.baseComponents.ImmersiveSpinner;
@@ -6907,15 +6907,22 @@ public class InterstellarMapPanel extends JPanel {
             return null;
         }
         Faction owner = cellFactions.getFirst();
-        PlanetarySystem nearestSystem = evidenceSystems.getFirst();
-        Set<Faction> systemFactions = nearestSystem.getFactionSet(date);
-        if ((systemFactions == null) || (systemFactions.size() != 1) || !systemFactions.contains(owner)) {
-            return null;
-        }
-        List<String> administration = nearestSystem.getAdministration(date);
-        if (administration.isEmpty() || administration.stream()
-              .anyMatch(component -> (component == null) || component.isBlank())) {
-            return null;
+        List<String> administration = null;
+        for (PlanetarySystem evidenceSystem : evidenceSystems) {
+            Set<Faction> systemFactions = evidenceSystem.getFactionSet(date);
+            if ((systemFactions == null) || (systemFactions.size() != 1) || !systemFactions.contains(owner)) {
+                return null;
+            }
+            List<String> systemAdministration = evidenceSystem.getAdministration(date);
+            if (systemAdministration.isEmpty() || systemAdministration.stream()
+                  .anyMatch(component -> (component == null) || component.isBlank())) {
+                return null;
+            }
+            if (administration == null) {
+                administration = systemAdministration;
+            } else if (!administration.equals(systemAdministration)) {
+                return null;
+            }
         }
         return new AdministrativeKey(owner, administration);
     }

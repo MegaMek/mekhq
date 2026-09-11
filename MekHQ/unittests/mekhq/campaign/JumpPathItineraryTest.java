@@ -36,17 +36,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-import mekhq.campaign.JumpPathItinerary.Plan;
 import mekhq.campaign.JumpPathItinerary.CircuitPlan;
+import mekhq.campaign.JumpPathItinerary.Plan;
 import mekhq.campaign.JumpPathItinerary.TimelineEntry;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;

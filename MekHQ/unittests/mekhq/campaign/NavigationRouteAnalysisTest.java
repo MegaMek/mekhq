@@ -207,6 +207,46 @@ class NavigationRouteAnalysisTest {
                                                .toList());
     }
 
+    @Test
+    void finalArrivalDoesNotRequireRecharge() {
+        PlanetarySystem origin = system("ORIGIN");
+        PlanetarySystem intermediate = system("INTERMEDIATE", Double.POSITIVE_INFINITY,
+              Double.POSITIVE_INFINITY, 0);
+        PlanetarySystem finalDestination = system("FINAL", Double.POSITIVE_INFINITY,
+              Double.POSITIVE_INFINITY, 0);
+
+        NavigationRouteAnalysis.PathAssessment assessment = NavigationRouteAnalysis.assessPath(
+              List.of(origin, intermediate, finalDestination), TEST_DATE, false,
+              policy(Map.of(), Set.of(), false, Set.of()));
+
+        LegAssessment finalLeg = assessment.legs().getLast();
+        assertEquals(Severity.BLOCKED, assessment.legs().getFirst().severity());
+        assertEquals(Severity.CLEAR, finalLeg.severity());
+        assertTrue(finalLeg.findings().stream().anyMatch(finding ->
+              (finding.kind() == FindingKind.RECHARGE_IMPOSSIBLE) && (finding.severity() == Severity.INFO)));
+    }
+
+    @Test
+    void reachabilityAllowsArrivalWithoutRechargeButDoesNotContinueThroughIt() {
+        PlanetarySystem anchor = system("ANCHOR");
+        PlanetarySystem noRecharge = system("NO_RECHARGE", Double.POSITIVE_INFINITY,
+              Double.POSITIVE_INFINITY, 0);
+        PlanetarySystem beyond = system("BEYOND");
+        Policy policy = policy(Map.of(anchor, List.of(noRecharge), noRecharge, List.of(beyond)),
+              Set.of(), false, Set.of());
+
+        Reachability reachability = NavigationRouteAnalysis.assessReachability(anchor, 2, TEST_DATE, false, policy);
+
+        assertEquals(List.of("NO_RECHARGE"), reachability.reachableSystems().stream()
+                                                   .map(entry -> entry.system().getId())
+                                                   .toList());
+        assertEquals(Severity.CLEAR, reachability.reachableSystems().getFirst().arrivalAssessment().severity());
+        assertTrue(reachability.reachableSystems().getFirst().arrivalAssessment().findings().stream()
+                         .anyMatch(finding -> (finding.kind() == FindingKind.RECHARGE_IMPOSSIBLE)
+                                                   && (finding.severity() == Severity.INFO)));
+        assertTrue(reachability.blockedFrontier().isEmpty());
+    }
+
         @Test
         void requestedEmptyStopsAreCautionsWhileAutomaticEmptyIntermediatesRemainBlocked() {
           PlanetarySystem origin = system("ORIGIN");

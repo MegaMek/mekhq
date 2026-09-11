@@ -34,8 +34,8 @@ package mekhq.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -63,7 +63,6 @@ import javax.swing.JPanel;
 import javax.swing.JViewport;
 
 import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
 

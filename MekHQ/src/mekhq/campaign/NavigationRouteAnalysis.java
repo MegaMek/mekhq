@@ -161,11 +161,11 @@ public final class NavigationRouteAnalysis {
 
     public static LegAssessment assessLeg(PlanetarySystem origin, PlanetarySystem destination, LocalDate date,
           boolean useCommandCircuit, Policy policy) {
-          return assessLeg(origin, destination, date, useCommandCircuit, policy, false);
-        }
+        return assessLeg(origin, destination, date, useCommandCircuit, policy, false, true);
+    }
 
-        private static LegAssessment assessLeg(PlanetarySystem origin, PlanetarySystem destination, LocalDate date,
-            boolean useCommandCircuit, Policy policy, boolean requestedDestination) {
+    private static LegAssessment assessLeg(PlanetarySystem origin, PlanetarySystem destination, LocalDate date,
+          boolean useCommandCircuit, Policy policy, boolean requestedDestination, boolean rechargeRequired) {
         Objects.requireNonNull(date);
         Objects.requireNonNull(policy);
 
@@ -198,7 +198,8 @@ public final class NavigationRouteAnalysis {
         if (Double.isFinite(rechargeHours)) {
             findings.add(new Finding(FindingKind.RECHARGE_DURATION, Severity.INFO));
         } else {
-            findings.add(new Finding(FindingKind.RECHARGE_IMPOSSIBLE, Severity.BLOCKED));
+            findings.add(new Finding(FindingKind.RECHARGE_IMPOSSIBLE,
+                  rechargeRequired ? Severity.BLOCKED : Severity.INFO));
         }
         if (rechargeStations > 0) {
             findings.add(new Finding(FindingKind.RECHARGE_STATION_AVAILABLE, Severity.INFO));
@@ -249,7 +250,8 @@ public final class NavigationRouteAnalysis {
                                                  && sameSystem(destination,
                                                        effectiveStops.get(requestedStopIndex));
             legs.add(assessLeg(systems.get(index - 1), destination, date,
-                  useCommandCircuitAtDestination.test(index), segmentPolicy, requestedDestination));
+                useCommandCircuitAtDestination.test(index), segmentPolicy, requestedDestination,
+                index < systems.size() - 1));
             if (requestedDestination && (++requestedStopIndex < effectiveStops.size())) {
                 segmentOrigin = destination;
                 segmentPolicy = policy.forSegment(segmentOrigin, effectiveStops.get(requestedStopIndex));
@@ -289,7 +291,8 @@ public final class NavigationRouteAnalysis {
                     continue;
                 }
 
-                LegAssessment assessment = assessLeg(origin, destination, date, useCommandCircuit, segmentPolicy);
+                                LegAssessment assessment = assessLeg(origin, destination, date, useCommandCircuit, segmentPolicy,
+                                            false, false);
                 ReachabilityEntry entry = new ReachabilityEntry(destination, nextHop, assessment);
                 if (!segmentPolicy.isSystemAllowed(destination)
                           || (assessment.severity() == Severity.BLOCKED)) {
@@ -300,7 +303,9 @@ public final class NavigationRouteAnalysis {
                 reachedHops.put(destinationId, nextHop);
                 reached.put(destinationId, entry);
                 blocked.remove(destinationId);
-                frontier.add(destination);
+                if (Double.isFinite(assessment.facts().rechargeHours())) {
+                    frontier.add(destination);
+                }
             }
         }
 

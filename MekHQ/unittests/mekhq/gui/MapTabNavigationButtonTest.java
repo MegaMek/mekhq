@@ -45,8 +45,8 @@ import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollBar;
 import javax.swing.JSeparator;
-import javax.swing.SwingUtilities;
 import javax.swing.JToggleButton;
+import javax.swing.SwingUtilities;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.gui.baseComponents.FramedCommandButton;
