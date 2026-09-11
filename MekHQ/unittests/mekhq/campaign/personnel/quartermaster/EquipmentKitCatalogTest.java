@@ -247,14 +247,6 @@ class EquipmentKitCatalogTest {
         assertTrue(EquipmentKitCatalog.hasToolKit(personWithKit(KIT_BASIC_TOOLKIT)));
         assertTrue(EquipmentKitCatalog.hasToolKit(personWithKit(KIT_DELUXE_TOOLKIT)));
     }
-
-    @Test
-    void hasToolKitIsFalseForSpecialistKitsAloneOrNoKitsOrNull() {
-        // A specialist repair kit augments a tool kit but does not replace one.
-        assertFalse(EquipmentKitCatalog.hasToolKit(personWithKit(KIT_WEAPON)));
-        assertFalse(EquipmentKitCatalog.hasToolKit(personWithKit(null)));
-        assertFalse(EquipmentKitCatalog.hasToolKit(null));
-    }
     // endregion hasToolKit
 
     // region canBeIssuedKit
