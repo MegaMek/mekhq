@@ -37,7 +37,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import jakarta.annotation.Nullable;
 import mekhq.campaign.JumpPathItinerary.Plan;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 
 /**
@@ -57,6 +59,7 @@ public final class JumpPathSchedule {
      * Builds a schedule at the same whole-hour precision used by the itinerary timeline.
      *
      * @param itinerary                  immutable route forecast
+    * @param destinationPlanet          specific destination planet, or {@code null} when unavailable
      * @param requestedStops             explicit requested stops in route-planning order
      * @param dwellHoursByRequestedStop  dwell hours aligned with {@code requestedStops}; missing values are zero
      * @param mode                       whether {@code anchor} is departure or arrival
@@ -65,7 +68,8 @@ public final class JumpPathSchedule {
      *
      * @return immutable anchored schedule
      */
-    public static Result calculate(Plan itinerary, List<PlanetarySystem> requestedStops,
+        public static Result calculate(Plan itinerary, @Nullable Planet destinationPlanet,
+            List<PlanetarySystem> requestedStops,
           List<Integer> dwellHoursByRequestedStop, Mode mode, LocalDateTime anchor,
           LocalDateTime earliestFeasibleDeparture) {
         Objects.requireNonNull(itinerary);
@@ -74,6 +78,10 @@ public final class JumpPathSchedule {
         Objects.requireNonNull(mode);
         Objects.requireNonNull(anchor);
         Objects.requireNonNull(earliestFeasibleDeparture);
+                if ((destinationPlanet != null) && (itinerary.entries().isEmpty()
+                            || !Objects.equals(destinationPlanet.getParentSystem(), itinerary.entries().getLast().system()))) {
+                        throw new IllegalArgumentException("destination planet must belong to the final itinerary system");
+                }
         if (dwellHoursByRequestedStop.stream().anyMatch(hours -> (hours == null) || (hours < 0))) {
             throw new IllegalArgumentException("dwell hours must be non-negative");
         }
@@ -120,7 +128,8 @@ public final class JumpPathSchedule {
                   readyForDeparture.plusHours(entryDwellHours), endpointArrival, entryDwellHours));
         }
 
-        return new Result(mode, anchor, earliestFeasibleDeparture, departure, arrival, totalDwellHours,
+          return new Result(mode, destinationPlanet, anchor, earliestFeasibleDeparture, departure, arrival,
+              totalDwellHours,
               feasible, entries, dwells);
     }
 
@@ -174,7 +183,8 @@ public final class JumpPathSchedule {
     }
 
     /** An anchored route schedule. */
-    public record Result(Mode mode, LocalDateTime anchor, LocalDateTime earliestFeasibleDeparture,
+    public record Result(Mode mode, @Nullable Planet destinationPlanet, LocalDateTime anchor,
+                         LocalDateTime earliestFeasibleDeparture,
                          LocalDateTime departure, LocalDateTime arrival, long totalDwellHours, boolean feasible,
                          List<Entry> entries, List<Dwell> dwells) {
         public Result {

@@ -98,10 +98,12 @@ public final class PiratePointAnalysis {
         ApproachFacts piratePoint = analyzeApproach(input.pirateDistanceKm(), input.detectionRadiusKm(),
               input.accelerationG());
 
-        long modifierTotal = input.modifiers().stream()
-                                   .filter(Modifier::enabled)
-                                   .mapToLong(Modifier::value)
-                                   .sum();
+        long modifierTotal = 0;
+        for (Modifier modifier : input.modifiers()) {
+            if (modifier.enabled()) {
+                modifierTotal += modifier.value();
+            }
+        }
         int enabledModifierTotal = clampToInt(modifierTotal);
         int targetNumber = clampToInt((long) input.baseTargetNumber() + modifierTotal);
         DifficultyFacts difficulty = new DifficultyFacts(input.baseTargetNumber(), enabledModifierTotal,

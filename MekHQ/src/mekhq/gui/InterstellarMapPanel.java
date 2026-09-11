@@ -36,6 +36,7 @@ import static java.lang.Math.min;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveBioweapons;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
+import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 
 import java.awt.*;
 import java.awt.MultipleGradientPaint.CycleMethod;
@@ -43,7 +44,6 @@ import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.HierarchyEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -67,22 +67,18 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;
-import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -113,6 +109,7 @@ import mekhq.campaign.NavigationRouteAnalysis.PathAssessment;
 import mekhq.campaign.NavigationRouteAnalysis.Severity;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.InjuryType;
@@ -131,9 +128,9 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.baseComponents.ImmersiveCheckBox;
 import mekhq.gui.baseComponents.ImmersiveComboBox;
 import mekhq.gui.baseComponents.ImmersiveRadioButton;
-import mekhq.gui.baseComponents.ImmersiveScrollBarStyle;
 import mekhq.gui.baseComponents.ImmersiveSpinner;
 import mekhq.gui.dialog.PlanetarySystemEditorDialog;
+import mekhq.utilities.MHQInternationalization;
 
 /**
  * This is not functional yet. Just testing things out. A lot of this code is borrowed from InterstellarMap.java in
@@ -143,6 +140,7 @@ import mekhq.gui.dialog.PlanetarySystemEditorDialog;
  */
 public class InterstellarMapPanel extends JPanel {
     private static final MMLogger LOGGER = MMLogger.create(InterstellarMapPanel.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
     private static final int MATERIAL_EDIT_SYMBOL = 0xE3C9;
 
     interface RoutePlanningHandler {
@@ -257,27 +255,9 @@ public class InterstellarMapPanel extends JPanel {
     private static final long PROPOSED_ROUTE_MIN_LEG_DURATION_NS = 90_000_000L;
     private static final int TRAVEL_ANIMATION_DELAY_MS = 16;
     private static final int SYSTEM_DIVE_ANIMATION_DELAY_MS = 16;
-    private static final boolean RENDER_PROFILING_ENABLED = Boolean.getBoolean("mekhq.map.renderProfiling");
-    private static final long RENDER_PROFILE_REPORT_INTERVAL_NS = 5_000_000_000L;
-    private static final boolean RENDER_BENCHMARK_ENABLED = isRenderBenchmarkEnabled(RENDER_PROFILING_ENABLED,
-          Boolean.getBoolean("mekhq.map.renderBenchmark"));
-    private static final String RENDER_BENCHMARK_PATH_ID = "pan-v2";
-    private static final int RENDER_BENCHMARK_DELAY_MS = 16;
-    private static final long RENDER_BENCHMARK_WARMUP_NS = 5_000_000_000L;
-    private static final long RENDER_BENCHMARK_DURATION_NS = 30_000_000_000L;
-    private static final String TRANSITION_BENCHMARK_PATH_ID = "transition-cold-v1";
-    private static final long TRANSITION_BENCHMARK_TIMEOUT_NS = 10_000_000_000L;
-    private static final String ZOOM_BENCHMARK_PATH_ID = "zoom-v1";
-    private static final long ZOOM_BENCHMARK_DURATION_NS = 8_000_000_000L;
-    private static final long ZOOM_BENCHMARK_TIMEOUT_NS = 10_000_000_000L;
-    private static final double ZOOM_WHEEL_FACTOR = 1.175;
     private static final int ZOOM_SETTLE_DELAY_MS = 180;
     private static final double MINIMUM_MAP_SCALE = 0.1;
     private static final double MAXIMUM_MAP_SCALE = 10.0;
-    private static final double[] RENDER_BENCHMARK_X_OFFSETS = { 0.0, 640.0, 0.0, -640.0, 0.0, 0.0, 0.0,
-        0.0, 0.0 };
-    private static final double[] RENDER_BENCHMARK_Y_OFFSETS = { 0.0, 0.0, 0.0, 0.0, 0.0, 360.0, 0.0,
-        -360.0, 0.0 };
     private static final double STATIC_AMBIENT_PHASE_SECONDS = 0.0;
     private static final long SYSTEM_DIVE_ANIMATION_DURATION_NS = 700_000_000L;
     private static final double SYSTEM_DIVE_MINIMUM_TARGET_SCALE = 18.0;
@@ -294,21 +274,12 @@ public class InterstellarMapPanel extends JPanel {
     private static final Color LAYER_CONTROL_BUTTON_PRESSED = new Color(33, 73, 82, 255);
     private static final Color LAYER_CONTROL_BUTTON_ICON = new Color(125, 230, 238);
     private static final Color NAVIGATION_UTILITY_BACKGROUND = new Color(15, 30, 43);
-    private static final String LAYER_CONTROL_HEADING = "MAP LAYER";
-    private static final String OVERLAY_CONTROL_HEADING = "OVERLAYS";
-    private static final int MAP_LEGEND_CONTENT_WIDTH = 560;
     private static final int MAP_LEGEND_DIALOG_MARGIN = 16;
     private static final int MAP_LEGEND_BUTTON_SIZE = 24;
-    private static final int MAP_LEGEND_SWATCH_WIDTH = 64;
-    private static final int MAP_LEGEND_SWATCH_HEIGHT = 38;
-    private static final int MAP_LEGEND_MAX_VIEWPORT_HEIGHT = 620;
     private static final Color MAP_LEGEND_BACKGROUND = new Color(5, 13, 23);
     private static final Color MAP_LEGEND_MUTED_TEXT = new Color(158, 179, 187);
-    private static final Color MAP_LEGEND_DIVIDER = new Color(65, 210, 224, 45);
     private static final Color MAP_LEGEND_TITLE_BACKGROUND = new Color(17, 64, 78);
     private static final Color MAP_LEGEND_TITLE_FOREGROUND = new Color(222, 235, 239);
-    private static final Color MAP_LEGEND_SCROLLBAR_THUMB = new Color(54, 101, 113);
-    private static final int MAP_LEGEND_SCROLLBAR_WIDTH = 10;
     private static final Color PLAYER_BASE_COLOR = new Color(87, 214, 190);
     private static final Color PLAYER_BASE_DARK = new Color(4, 19, 25, 235);
     private static final Color NAVIGATION_INSTRUMENT_SHADOW = new Color(3, 8, 15, 215);
@@ -373,19 +344,6 @@ public class InterstellarMapPanel extends JPanel {
         DISEASE_OUTBREAKS
     }
 
-    private enum TransitionBenchmarkPhase {
-        WARMUP,
-        MODE_TRANSITION,
-        CACHE_REGENERATION,
-        RESTORE
-    }
-
-    private enum ZoomBenchmarkPhase {
-        WARMUP,
-        ACTIVE_ZOOM,
-        SETTLED_REGENERATION
-    }
-
     private enum MapModeTransitionCacheStage {
         INACTIVE,
         CARTOGRAPHY,
@@ -396,14 +354,14 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     enum HpgNetworkDetail {
-        CLASS_A("A only"),
-        CLASS_A_B("A-B network"),
-        ALL_STATIONS("A-D stations");
+        CLASS_A("map.overlay.hpgDetail.classA.text"),
+        CLASS_A_B("map.overlay.hpgDetail.classAB.text"),
+        ALL_STATIONS("map.overlay.hpgDetail.all.text");
 
-        private final String label;
+        private final String labelKey;
 
-        HpgNetworkDetail(String label) {
-            this.label = label;
+        HpgNetworkDetail(String labelKey) {
+            this.labelKey = labelKey;
         }
 
         boolean includes(HPGRating rating) {
@@ -417,19 +375,19 @@ public class InterstellarMapPanel extends JPanel {
 
         @Override
         public String toString() {
-            return label;
+            return text(labelKey);
         }
     }
 
     enum CapitalDisplayDetail {
-        NATIONAL("National only"),
-        NATIONAL_REGION("National + Region"),
-        ALL("All capitals");
+        NATIONAL("map.overlay.capitalDetail.national.text"),
+        NATIONAL_REGION("map.overlay.capitalDetail.region.text"),
+        ALL("map.overlay.capitalDetail.all.text");
 
-        private final String label;
+        private final String labelKey;
 
-        CapitalDisplayDetail(String label) {
-            this.label = label;
+        CapitalDisplayDetail(String labelKey) {
+            this.labelKey = labelKey;
         }
 
         boolean includes(CapitalType capitalType) {
@@ -443,18 +401,18 @@ public class InterstellarMapPanel extends JPanel {
 
         @Override
         public String toString() {
-            return label;
+            return text(labelKey);
         }
     }
 
     enum AdministrativeDisplayDetail {
-        REGIONS("Regions"),
-        REGIONS_AND_DISTRICTS("Regions + Districts");
+        REGIONS("map.overlay.administrativeDetail.regions.text"),
+        REGIONS_AND_DISTRICTS("map.overlay.administrativeDetail.districts.text");
 
-        private final String label;
+        private final String labelKey;
 
-        AdministrativeDisplayDetail(String label) {
-            this.label = label;
+        AdministrativeDisplayDetail(String labelKey) {
+            this.labelKey = labelKey;
         }
 
         boolean includes(AdministrativeBoundaryLevel level) {
@@ -463,192 +421,9 @@ public class InterstellarMapPanel extends JPanel {
 
         @Override
         public String toString() {
-            return label;
+            return text(labelKey);
         }
     }
-
-        private enum MapLegendSymbol {
-          FACTION_OWNERSHIP,
-          LAYER_TECHNOLOGY,
-          LAYER_INDUSTRY,
-          LAYER_RAW_MATERIALS,
-          LAYER_OUTPUT,
-          LAYER_AGRICULTURE,
-          LAYER_POPULATION,
-          LAYER_HPG,
-          HPG_STATIONS,
-          LAYER_RECHARGE_STATIONS,
-          LAYER_ACADEMIES,
-          LAYER_HIRING_HALLS,
-          LAYER_DISEASE_OUTBREAKS,
-          FACTION_EMBLEM,
-          SELECTED_SYSTEM,
-          HOVERED_SYSTEM,
-          CURRENT_FLEET,
-          PLAYER_BASE,
-          PLANNED_ROUTE,
-          ACTIVE_ROUTE,
-          WAYPOINT_BADGE,
-          REACHABILITY,
-          REACHABILITY_CAUTION,
-          REACHABILITY_BLOCKED,
-          ROUTE_CAUTION,
-          ROUTE_BLOCKED,
-          MEASUREMENT,
-          CONTRACT_SEARCH_RADIUS,
-          PLANETARY_ACQUISITION_RADIUS,
-          JUMP_RADIUS,
-          HPG_RANGE,
-          CAPITAL_HIERARCHY,
-          OPERATION,
-          RESTRICTED_SYSTEM,
-          GM_EDITED_SYSTEM,
-          HPG_NETWORK,
-          ADMINISTRATIVE_BOUNDARIES,
-          SOVEREIGN_TERRITORY,
-          DISPUTED_TERRITORY,
-          UNCLAIMED_POCKET,
-          ENCLAVE
-        }
-
-        private record MapLegendEntry(MapLegendSymbol symbol, String title, String meaning) {
-        }
-
-        private record MapLegendSection(String heading, List<MapLegendEntry> entries) {
-        }
-
-        private static final List<MapLegendSection> MAP_LEGEND_SECTIONS = List.of(
-            new MapLegendSection("NAVIGATION", List.of(
-                new MapLegendEntry(MapLegendSymbol.SELECTED_SYSTEM, "Selected system",
-                    "An amber ring identifies the selected system at distant zoom; corner brackets replace it as navigation detail appears."),
-                new MapLegendEntry(MapLegendSymbol.HOVERED_SYSTEM, "Hovered system",
-                    "A cyan ring identifies the system under the pointer at distant zoom; corner brackets replace it closer in. Selected systems suppress hover."),
-                new MapLegendEntry(MapLegendSymbol.CURRENT_FLEET, "Current fleet",
-                    "An amber JumpShip above-right of a system marks the fleet. At distant zoom, an amber ring surrounding the system replaces the ship."),
-                new MapLegendEntry(MapLegendSymbol.PLAYER_BASE, "Player base",
-                    "A teal marker identifies a system with player bases. Navigation detail adds the number of bases when more than one share the system."),
-                new MapLegendEntry(MapLegendSymbol.MEASUREMENT,
-                    getMapResource("map.legend.measurement.title"),
-                    getMapResource("map.legend.measurement.description")))),
-            new MapLegendSection("ROUTES", List.of(
-                new MapLegendEntry(MapLegendSymbol.PLANNED_ROUTE, "Planned route",
-                    "A cyan dashed path remains visible at distant zoom; complete thin stop rings appear with navigation detail."),
-                new MapLegendEntry(MapLegendSymbol.ACTIVE_ROUTE, "Active route",
-                    "Amber paths remain visible at distant zoom; complete stop rings appear with navigation detail."),
-                new MapLegendEntry(MapLegendSymbol.WAYPOINT_BADGE, "Waypoint number",
-                    "At navigation zoom, a numbered badge below-right of a system gives each requested route stop's order."),
-                new MapLegendEntry(MapLegendSymbol.REACHABILITY,
-                    getMapResource("map.legend.reachability.title"),
-                    getMapResource("map.legend.reachability.description")),
-                new MapLegendEntry(MapLegendSymbol.REACHABILITY_CAUTION,
-                    getMapResource("map.legend.reachabilityCaution.title"),
-                    getMapResource("map.legend.reachabilityCaution.description")),
-                new MapLegendEntry(MapLegendSymbol.REACHABILITY_BLOCKED,
-                    getMapResource("map.legend.reachabilityBlocked.title"),
-                    getMapResource("map.legend.reachabilityBlocked.description")),
-                new MapLegendEntry(MapLegendSymbol.ROUTE_CAUTION,
-                    getMapResource("map.legend.routeCaution.title"),
-                    getMapResource("map.legend.routeCaution.description")),
-                new MapLegendEntry(MapLegendSymbol.ROUTE_BLOCKED,
-                    getMapResource("map.legend.routeBlocked.title"),
-                    getMapResource("map.legend.routeBlocked.description")))),
-            new MapLegendSection("RANGE RINGS", List.of(
-                new MapLegendEntry(MapLegendSymbol.CONTRACT_SEARCH_RADIUS, "Contract-search radius",
-                    "A configurable-color thick dashed ring centered on the selected system bounds contract searches; campaign and MekHQ options control visibility."),
-                new MapLegendEntry(MapLegendSymbol.PLANETARY_ACQUISITION_RADIUS, "Planetary-acquisition radius",
-                    "A configurable-color thick dash-dot ring centered on the selected system bounds planetary acquisition; campaign, MekHQ, and zoom options control visibility."),
-                new MapLegendEntry(MapLegendSymbol.JUMP_RADIUS, "Jump radius",
-                    "A configurable-color thick solid ring centered on the selected system shows one-jump reach; MekHQ and zoom options control visibility."),
-                new MapLegendEntry(MapLegendSymbol.HPG_RANGE, "50 ly HPG range",
-                    "A dark-green dotted ring centered on the selected system marks 50 ly; HPG layer visibility controls when it appears."))),
-            new MapLegendSection("SYSTEM STATUS", List.of(
-                new MapLegendEntry(MapLegendSymbol.CAPITAL_HIERARCHY, "Capital hierarchy",
-                    "National capitals use five-point stars, regional capitals use four-ray compass stars, and district capitals use simple pips. Layers controls the visible tiers; districts appear only at navigation detail."),
-                new MapLegendEntry(MapLegendSymbol.OPERATION, "Operation flag",
-                    "At distant zoom, a centered red diamond marks an urgent active scenario. Closer in, flags show missions, scenarios, and mission counts."),
-                new MapLegendEntry(MapLegendSymbol.RESTRICTED_SYSTEM, "Restricted system",
-                    "A red prohibition ring marks a system barred by outlaw or restricted-entry standing rules."),
-                new MapLegendEntry(MapLegendSymbol.GM_EDITED_SYSTEM, "GM-edited system",
-                    "At detail zoom, a cyan pencil below a system marks a non-canon override."))),
-            new MapLegendSection("LAYERS", List.of(
-                new MapLegendEntry(MapLegendSymbol.FACTION_OWNERSHIP, "Faction ownership",
-                    "Compact contacts use faction color at navigation zoom; detail zoom shows intrinsic stars with crisp ownership rings. Shared systems divide both equally."),
-                new MapLegendEntry(MapLegendSymbol.LAYER_TECHNOLOGY, "Technology",
-                    "Regressed is dark gray; F purple; D blue; C teal; B green; A or Advanced yellow; no population is black."),
-                new MapLegendEntry(MapLegendSymbol.LAYER_INDUSTRY, "Industry",
-                    "F is near-black; D purple; C magenta; B coral; A pale yellow; no population is black."),
-                new MapLegendEntry(MapLegendSymbol.LAYER_RAW_MATERIALS, "Raw Materials",
-                    "F is blue; D purple; C magenta; B orange; A yellow; no population is black."),
-                new MapLegendEntry(MapLegendSymbol.LAYER_OUTPUT, "Output",
-                    "F is near-black; D purple; C magenta; B orange; A pale yellow; no population is black."),
-                new MapLegendEntry(MapLegendSymbol.LAYER_AGRICULTURE, "Agriculture",
-                    "F is dark blue; D blue-gray; C gray; B tan; A yellow; no population is black."),
-                new MapLegendEntry(MapLegendSymbol.LAYER_POPULATION, "Population",
-                    "Purple marks under 1M, then colors progress through violet, blue, teal, and green across 1M, 25M, 100M, 200M, 300M, 500M, 1B, and 1.5B; 3B+ is yellow; none is black."),
-                new MapLegendEntry(MapLegendSymbol.LAYER_HPG, "HPG",
-                    "No HPG is black; D dark gray; C light gray; B pink; A pale yellow."),
-                new MapLegendEntry(MapLegendSymbol.LAYER_RECHARGE_STATIONS, "Recharge Stations",
-                    "No station is gray; one station coral; two stations yellow; unavailable data black."),
-                new MapLegendEntry(MapLegendSymbol.LAYER_ACADEMIES, "Academies",
-                    "None is black; academy counts 1 through 6 progress from blue-teal through teal and green to yellow."),
-                new MapLegendEntry(MapLegendSymbol.LAYER_HIRING_HALLS, "Hiring Halls",
-                    "None is black; Questionable magenta; Minor orange; Standard yellow; Great green."),
-                new MapLegendEntry(MapLegendSymbol.LAYER_DISEASE_OUTBREAKS, "Disease Outbreaks",
-                    "None is black; one outbreak yellow; two orange; three magenta; four or more purple."))),
-            new MapLegendSection("OVERLAYS", List.of(
-                new MapLegendEntry(MapLegendSymbol.HPG_STATIONS, "HPG station classes",
-                    "Hexagonal badges identify included HPG stations: A cyan, B blue, C amber, and D red. Network links are drawn only for A and B stations."),
-                new MapLegendEntry(MapLegendSymbol.FACTION_EMBLEM, "Faction emblem",
-                    "A faint emblem watermark identifies territory; its tint identifies the faction."),
-                new MapLegendEntry(MapLegendSymbol.HPG_NETWORK, "HPG network",
-                    "Class A uses restrained solid cyan links; Class B uses thinner muted dashes. Distant zoom keeps only Class A, while lower-class station badges wait for close detail."),
-                new MapLegendEntry(MapLegendSymbol.ADMINISTRATIVE_BOUNDARIES, "Administrative boundaries",
-                    "Solid faction-color lines divide regions; quieter dashed lines add districts. Boundaries stop where membership is missing or conflicts."),
-                new MapLegendEntry(MapLegendSymbol.SOVEREIGN_TERRITORY, "Sovereign border",
-                    "Translucent faction fill and a solid edge mark territory inferred from dated ownership."),
-                new MapLegendEntry(MapLegendSymbol.DISPUTED_TERRITORY, "Disputed territory",
-                    "Multiple faction colors, diagonal hatching, and a dashed border mark shared control."),
-                new MapLegendEntry(MapLegendSymbol.UNCLAIMED_POCKET, "Unclaimed pocket",
-                    "A dark enclosed void with a dotted boundary marks locally unclaimed space."),
-                new MapLegendEntry(MapLegendSymbol.ENCLAVE, "Enclave",
-                    "A closed double border marks one faction's territory enclosed by another."))));
-
-        private static final class MapLegendSwatch extends JComponent {
-          private final MapLegendSymbol symbol;
-
-          private MapLegendSwatch(MapLegendEntry entry) {
-            symbol = entry.symbol();
-            Dimension swatchSize = UIUtil.scaleForGUI(MAP_LEGEND_SWATCH_WIDTH, MAP_LEGEND_SWATCH_HEIGHT);
-            setPreferredSize(swatchSize);
-            setMinimumSize(swatchSize);
-            setMaximumSize(swatchSize);
-            setFocusable(false);
-            putClientProperty("mapLegendSwatch", Boolean.TRUE);
-            putClientProperty("mapLegendTitle", entry.title());
-          }
-
-          @Override
-          protected void paintComponent(Graphics graphics) {
-            Graphics2D swatchGraphics = (Graphics2D) graphics.create();
-            try {
-                swatchGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                swatchGraphics.scale(getWidth() / (double) MAP_LEGEND_SWATCH_WIDTH,
-                    getHeight() / (double) MAP_LEGEND_SWATCH_HEIGHT);
-                swatchGraphics.setPaint(new GradientPaint(0, 0, MAP_BACKGROUND_TOP,
-                    0, MAP_LEGEND_SWATCH_HEIGHT, MAP_BACKGROUND_BOTTOM));
-                swatchGraphics.fillRect(0, 0, MAP_LEGEND_SWATCH_WIDTH, MAP_LEGEND_SWATCH_HEIGHT);
-                paintMapLegendSymbol(swatchGraphics, symbol);
-                swatchGraphics.setPaint(LAYER_CONTROL_BORDER);
-                float borderWidth = 0.8f;
-                double borderInset = borderWidth / 2.0;
-                swatchGraphics.setStroke(new BasicStroke(borderWidth));
-                swatchGraphics.draw(new Rectangle2D.Double(borderInset, borderInset,
-                    MAP_LEGEND_SWATCH_WIDTH - borderWidth, MAP_LEGEND_SWATCH_HEIGHT - borderWidth));
-            } finally {
-                swatchGraphics.dispose();
-            }
-          }
-        }
 
     enum RouteMarkerState {
         NONE,
@@ -900,116 +675,8 @@ public class InterstellarMapPanel extends JPanel {
     record SystemDiveFrame(double centerX, double centerY, double scale) {
     }
 
-        record RenderBenchmarkCamera(double centerX, double centerY, double scale) {
-        }
-
-        record RenderBenchmarkRun(RenderBenchmarkCamera origin, int width, int height, LocalDate date,
-              String mapMode, boolean territory, boolean hpgNetwork, boolean operations, boolean reachability,
-              boolean emptySystems) {
-        }
-
-          record TransitionBenchmarkRun(RenderBenchmarkCamera origin, int width, int height, LocalDate date,
-              MapMode originMode, MapMode targetMode, boolean territory, boolean hpgNetwork, boolean operations,
-              boolean reachability, boolean emptySystems) {
-          }
-
-                record ZoomBenchmarkRange(double atlasScale, double detailScale) {
-                }
-
-                record ZoomBenchmarkRun(RenderBenchmarkCamera origin, int width, int height, LocalDate date,
-                            MapMode mapMode, boolean territory, boolean hpgNetwork, boolean operations, boolean reachability,
-                            boolean emptySystems, int anchorX, int anchorY, double semanticReference,
-                            ZoomBenchmarkRange range) {
-                }
-
-        static boolean isRenderBenchmarkEnabled(boolean profilingEnabled, boolean benchmarkRequested) {
-            return profilingEnabled && benchmarkRequested;
-        }
-
-                static boolean isExactTransitionBenchmarkFrame(boolean mapModeAnimating,
-                            boolean retainedCartographyProvisional, boolean retainedCartography,
-                            boolean mergedNavigation) {
-                        return !mapModeAnimating && !retainedCartographyProvisional
-                                    && retainedCartography && mergedNavigation;
-                }
-
-                static boolean isExactZoomBenchmarkFrame(boolean retainedCartographyProvisional,
-                            boolean retainedCartography, boolean mergedNavigation) {
-                        return !retainedCartographyProvisional && retainedCartography && mergedNavigation;
-                }
-
-        static RenderBenchmarkCamera renderBenchmarkCameraAt(RenderBenchmarkCamera origin, double progress) {
-          double clampedProgress = Math.clamp(progress, 0.0, 1.0);
-          double pathPosition = clampedProgress * (RENDER_BENCHMARK_X_OFFSETS.length - 1);
-          int startIndex = Math.min((int) pathPosition, RENDER_BENCHMARK_X_OFFSETS.length - 2);
-          double segmentProgress = pathPosition - startIndex;
-          double xOffset = Math.rint(interpolate(RENDER_BENCHMARK_X_OFFSETS[startIndex],
-              RENDER_BENCHMARK_X_OFFSETS[startIndex + 1], segmentProgress));
-          double yOffset = Math.rint(interpolate(RENDER_BENCHMARK_Y_OFFSETS[startIndex],
-              RENDER_BENCHMARK_Y_OFFSETS[startIndex + 1], segmentProgress));
-          return new RenderBenchmarkCamera(origin.centerX() + (xOffset / origin.scale()),
-              origin.centerY() + (yOffset / origin.scale()), origin.scale());
-        }
-
-        static ZoomBenchmarkRange zoomBenchmarkRange(double semanticReference) {
-            double boundedReference = Math.clamp(semanticReference, 2.4, 3.6);
-            double atlasEnd = Math.clamp(boundedReference / 3.0, 0.8, 1.0);
-            double fullSystemDetail = Math.clamp(boundedReference * 1.6, 4.2, 5.6);
-            return new ZoomBenchmarkRange(atlasEnd * 0.95, fullSystemDetail * 1.05);
-        }
-
-        static boolean isValidZoomBenchmarkOrigin(RenderBenchmarkCamera origin) {
-            return Double.isFinite(origin.centerX()) && Double.isFinite(origin.centerY())
-                  && Double.isFinite(origin.scale())
-                  && (origin.scale() >= MINIMUM_MAP_SCALE) && (origin.scale() <= MAXIMUM_MAP_SCALE);
-        }
-
         static double boundedMapScale(double scale) {
             return Math.clamp(scale, MINIMUM_MAP_SCALE, MAXIMUM_MAP_SCALE);
-        }
-
-        static RenderBenchmarkCamera zoomBenchmarkCameraAt(RenderBenchmarkCamera origin, int width, int height,
-              int anchorX, int anchorY, ZoomBenchmarkRange range, double progress) {
-            double clampedProgress = Math.clamp(progress, 0.0, 1.0);
-            if ((clampedProgress == 0.0) || (clampedProgress == 1.0)) {
-                return origin;
-            }
-
-            double pathPosition = clampedProgress * 4.0;
-            int segment = Math.min((int) pathPosition, 3);
-            double segmentProgress = pathPosition - segment;
-            double startScale = switch (segment) {
-                case 0 -> origin.scale();
-                case 1, 3 -> range.atlasScale();
-                case 2 -> range.detailScale();
-                default -> throw new IllegalStateException("Unexpected zoom benchmark segment: " + segment);
-            };
-            double endScale = switch (segment) {
-                case 0, 2 -> range.atlasScale();
-                case 1 -> range.detailScale();
-                case 3 -> origin.scale();
-                default -> throw new IllegalStateException("Unexpected zoom benchmark segment: " + segment);
-            };
-            double scale = zoomBenchmarkScaleAt(startScale, endScale, segmentProgress);
-            return zoomBenchmarkCameraAtScale(origin, width, height, anchorX, anchorY, scale);
-        }
-
-        static double zoomBenchmarkScaleAt(double startScale, double endScale, double progress) {
-            double scaleDistance = Math.abs(Math.log(endScale / startScale));
-            int stepCount = Math.max(1, (int) Math.ceil(scaleDistance / Math.log(ZOOM_WHEEL_FACTOR)));
-            int completedSteps = Math.min(stepCount,
-                  (int) Math.floor(Math.clamp(progress, 0.0, 1.0) * stepCount));
-            double stepProgress = (double) completedSteps / stepCount;
-            return Math.exp(interpolate(Math.log(startScale), Math.log(endScale), stepProgress));
-        }
-
-        private static RenderBenchmarkCamera zoomBenchmarkCameraAtScale(RenderBenchmarkCamera origin,
-              int width, int height, int anchorX, int anchorY, double scale) {
-            double anchorMapX = (anchorX - width / 2.0) / origin.scale() - origin.centerX();
-            double anchorMapY = (height / 2.0 - anchorY) / origin.scale() + origin.centerY();
-            double centerX = (anchorX - width / 2.0) / scale - anchorMapX;
-            double centerY = anchorMapY - (height / 2.0 - anchorY) / scale;
-            return new RenderBenchmarkCamera(centerX, centerY, scale);
         }
 
     record TerritoryRenderKey(RenderViewKey viewKey, LocalDate date, long dataRevision) {
@@ -1021,257 +688,6 @@ public class InterstellarMapPanel extends JPanel {
         record PannableRenderLayerSnapshot<K>(K key, RenderViewKey renderedView,
             BufferedImage image, int overscan) {
         }
-
-    static final class RenderPerformanceTracker {
-        private long[] frameSamplesNanos = new long[512];
-        private int frameSampleCount;
-        private long reportStartedNanos;
-        private long frameCount;
-        private long totalNanos;
-        private long staticNanos;
-        private long backgroundNanos;
-        private long territoryNanos;
-        private long factionLogoNanos;
-        private long routeNanos;
-        private long systemNanos;
-        private long overlayNanos;
-        private long maximumNanos;
-        private long framesOver16Millis;
-        private long framesOver33Millis;
-        private long visibleSystemCount;
-        private long territoryCacheHits;
-        private long territoryStripRefreshes;
-        private long territoryFullRenders;
-        private long retainedCartographyFrames;
-        private long mergedNavigationFrames;
-        private long cacheHitFrameCount;
-        private long cacheHitFrameNanos;
-        private long cacheHitFrameMaximumNanos;
-        private long stripRefreshFrameCount;
-        private long stripRefreshFrameNanos;
-        private long stripRefreshFrameMaximumNanos;
-        private long fullRenderFrameCount;
-        private long fullRenderFrameNanos;
-        private long fullRenderFrameMaximumNanos;
-        private long uncachedFrameCount;
-        private long uncachedFrameNanos;
-        private long uncachedFrameMaximumNanos;
-        private long retainedRenderCount;
-        private long retainedCartographyNanos;
-        private long retainedRouteNanos;
-        private long retainedHpgNanos;
-        private long retainedActiveRouteNanos;
-        private long retainedSystemNanos;
-        private long zoomSnapshotFrameCount;
-        private long zoomSnapshotFrameNanos;
-        private long zoomSnapshotFrameMaximumNanos;
-        private long zoomSnapshotTransformNanos;
-        private long zoomSnapshotBackgroundNanos;
-        private long zoomSnapshotSystemNanos;
-        private long zoomSnapshotResidualNanos;
-        private boolean zoomSnapshotPaintedInCurrentFrame;
-        private long currentZoomSnapshotTransformNanos;
-
-        RenderPerformanceTracker(long nowNanos) {
-            reportStartedNanos = nowNanos;
-        }
-
-        void record(long frameNanos, long staticPhaseNanos, long backgroundLayerNanos, long territoryLayerNanos,
-              long factionLogoLayerNanos, long routePhaseNanos, long systemPhaseNanos, long overlayPhaseNanos,
-              int visibleSystems, int cacheHits, int stripRefreshes, int fullRenders,
-              boolean retainedCartography, boolean mergedNavigation) {
-            if (frameSampleCount == frameSamplesNanos.length) {
-                frameSamplesNanos = Arrays.copyOf(frameSamplesNanos, frameSamplesNanos.length * 2);
-            }
-            frameSamplesNanos[frameSampleCount++] = frameNanos;
-            frameCount++;
-            totalNanos += frameNanos;
-            staticNanos += staticPhaseNanos;
-                        backgroundNanos += backgroundLayerNanos;
-                        territoryNanos += territoryLayerNanos;
-                        factionLogoNanos += factionLogoLayerNanos;
-            routeNanos += routePhaseNanos;
-            systemNanos += systemPhaseNanos;
-            overlayNanos += overlayPhaseNanos;
-            maximumNanos = Math.max(maximumNanos, frameNanos);
-            framesOver16Millis += frameNanos > 16_000_000L ? 1 : 0;
-            framesOver33Millis += frameNanos > 33_000_000L ? 1 : 0;
-            visibleSystemCount += visibleSystems;
-            territoryCacheHits += cacheHits;
-            territoryStripRefreshes += stripRefreshes;
-            territoryFullRenders += fullRenders;
-            retainedCartographyFrames += retainedCartography ? 1 : 0;
-            mergedNavigationFrames += mergedNavigation ? 1 : 0;
-            recordCacheOutcome(frameNanos, cacheHits, stripRefreshes, fullRenders);
-            recordZoomSnapshotFrame(frameNanos, backgroundLayerNanos, systemPhaseNanos);
-        }
-
-        boolean shouldReport(long nowNanos) {
-            return (frameCount > 0) && ((nowNanos - reportStartedNanos) >= RENDER_PROFILE_REPORT_INTERVAL_NS);
-        }
-
-        void recordRetainedRender(long cartographyNanos, long routeNanos, long hpgNanos,
-              long activeRouteNanos, long systemNanos) {
-            retainedRenderCount++;
-            retainedCartographyNanos += cartographyNanos;
-            retainedRouteNanos += routeNanos;
-            retainedHpgNanos += hpgNanos;
-            retainedActiveRouteNanos += activeRouteNanos;
-            retainedSystemNanos += systemNanos;
-        }
-
-        void recordZoomSnapshotTransform(long transformNanos) {
-            zoomSnapshotPaintedInCurrentFrame = true;
-            currentZoomSnapshotTransformNanos += transformNanos;
-        }
-
-        String reportAndReset(long nowNanos) {
-            Arrays.sort(frameSamplesNanos, 0, frameSampleCount);
-            String report = String.format(
-                "Map render: frames=%d avg=%.1fms p50=%.1fms p95=%.1fms p99=%.1fms max=%.1fms "
-                    + ">16ms=%d >33ms=%d "
-                    + "static=%.1fms [background=%.1fms territory=%.1fms logos=%.1fms] "
-                    + "routes/hpg=%.1fms systems=%.1fms overlays=%.1fms visibleSystems=%.0f "
-                    + "territoryCache[hits=%d strips=%d full=%d] retainedFrames=%d/%d mergedFrames=%d/%d "
-                    + "cacheFrames[hit=%d avg=%.1fms max=%.1fms; strip=%d avg=%.1fms max=%.1fms; "
-                    + "full=%d avg=%.1fms max=%.1fms; none=%d avg=%.1fms max=%.1fms] "
-                    + "zoomSnapshots[count=%d frame=%.1fms max=%.1fms transform=%.1fms "
-                    + "background=%.1fms liveSystems=%.1fms residual=%.1fms] "
-                    + "cachePaints[count=%d cartography=%.1fms routes=%.1fms hpg=%.1fms active=%.1fms systems=%.1fms]",
-                  frameCount, millis(totalNanos) / frameCount, millis(percentile(0.50)), millis(percentile(0.95)),
-                  millis(percentile(0.99)), millis(maximumNanos), framesOver16Millis, framesOver33Millis,
-                  millis(staticNanos) / frameCount, millis(backgroundNanos) / frameCount,
-                  millis(territoryNanos) / frameCount, millis(factionLogoNanos) / frameCount,
-                  millis(routeNanos) / frameCount,
-                  millis(systemNanos) / frameCount, millis(overlayNanos) / frameCount,
-                  (double) visibleSystemCount / frameCount, territoryCacheHits, territoryStripRefreshes,
-                  territoryFullRenders, retainedCartographyFrames, frameCount, mergedNavigationFrames, frameCount,
-                  cacheHitFrameCount, averageMillis(cacheHitFrameNanos, cacheHitFrameCount),
-                  millis(cacheHitFrameMaximumNanos), stripRefreshFrameCount,
-                  averageMillis(stripRefreshFrameNanos, stripRefreshFrameCount),
-                  millis(stripRefreshFrameMaximumNanos), fullRenderFrameCount,
-                  averageMillis(fullRenderFrameNanos, fullRenderFrameCount),
-                  millis(fullRenderFrameMaximumNanos), uncachedFrameCount,
-                  averageMillis(uncachedFrameNanos, uncachedFrameCount), millis(uncachedFrameMaximumNanos),
-                  zoomSnapshotFrameCount, averageMillis(zoomSnapshotFrameNanos, zoomSnapshotFrameCount),
-                  millis(zoomSnapshotFrameMaximumNanos),
-                  averageMillis(zoomSnapshotTransformNanos, zoomSnapshotFrameCount),
-                  averageMillis(zoomSnapshotBackgroundNanos, zoomSnapshotFrameCount),
-                  averageMillis(zoomSnapshotSystemNanos, zoomSnapshotFrameCount),
-                  averageMillis(zoomSnapshotResidualNanos, zoomSnapshotFrameCount),
-                  retainedRenderCount, averageMillis(retainedCartographyNanos, retainedRenderCount),
-                  averageMillis(retainedRouteNanos, retainedRenderCount),
-                  averageMillis(retainedHpgNanos, retainedRenderCount),
-                  averageMillis(retainedActiveRouteNanos, retainedRenderCount),
-                  averageMillis(retainedSystemNanos, retainedRenderCount));
-            reset(nowNanos);
-            return report;
-        }
-
-        boolean hasSamples() {
-            return frameCount > 0;
-        }
-
-        void reset(long nowNanos) {
-            reportStartedNanos = nowNanos;
-            frameSampleCount = 0;
-            frameCount = 0;
-            totalNanos = 0;
-            staticNanos = 0;
-            backgroundNanos = 0;
-            territoryNanos = 0;
-            factionLogoNanos = 0;
-            routeNanos = 0;
-            systemNanos = 0;
-            overlayNanos = 0;
-            maximumNanos = 0;
-            framesOver16Millis = 0;
-            framesOver33Millis = 0;
-            visibleSystemCount = 0;
-            territoryCacheHits = 0;
-            territoryStripRefreshes = 0;
-            territoryFullRenders = 0;
-            retainedCartographyFrames = 0;
-            mergedNavigationFrames = 0;
-            cacheHitFrameCount = 0;
-            cacheHitFrameNanos = 0;
-            cacheHitFrameMaximumNanos = 0;
-            stripRefreshFrameCount = 0;
-            stripRefreshFrameNanos = 0;
-            stripRefreshFrameMaximumNanos = 0;
-            fullRenderFrameCount = 0;
-            fullRenderFrameNanos = 0;
-            fullRenderFrameMaximumNanos = 0;
-            uncachedFrameCount = 0;
-            uncachedFrameNanos = 0;
-            uncachedFrameMaximumNanos = 0;
-            retainedRenderCount = 0;
-            retainedCartographyNanos = 0;
-            retainedRouteNanos = 0;
-            retainedHpgNanos = 0;
-            retainedActiveRouteNanos = 0;
-            retainedSystemNanos = 0;
-            zoomSnapshotFrameCount = 0;
-            zoomSnapshotFrameNanos = 0;
-            zoomSnapshotFrameMaximumNanos = 0;
-            zoomSnapshotTransformNanos = 0;
-            zoomSnapshotBackgroundNanos = 0;
-            zoomSnapshotSystemNanos = 0;
-            zoomSnapshotResidualNanos = 0;
-            zoomSnapshotPaintedInCurrentFrame = false;
-            currentZoomSnapshotTransformNanos = 0;
-        }
-
-        private void recordZoomSnapshotFrame(long frameNanos, long backgroundLayerNanos,
-              long systemPhaseNanos) {
-            if (!zoomSnapshotPaintedInCurrentFrame) {
-                return;
-            }
-            zoomSnapshotFrameCount++;
-            zoomSnapshotFrameNanos += frameNanos;
-            zoomSnapshotFrameMaximumNanos = Math.max(zoomSnapshotFrameMaximumNanos, frameNanos);
-            zoomSnapshotTransformNanos += currentZoomSnapshotTransformNanos;
-            zoomSnapshotBackgroundNanos += backgroundLayerNanos;
-            zoomSnapshotSystemNanos += systemPhaseNanos;
-            zoomSnapshotResidualNanos += Math.max(0L,
-                  frameNanos - currentZoomSnapshotTransformNanos - backgroundLayerNanos - systemPhaseNanos);
-            zoomSnapshotPaintedInCurrentFrame = false;
-            currentZoomSnapshotTransformNanos = 0;
-        }
-
-        private void recordCacheOutcome(long frameNanos, int cacheHits, int stripRefreshes, int fullRenders) {
-            if (fullRenders > 0) {
-                fullRenderFrameCount++;
-                fullRenderFrameNanos += frameNanos;
-                fullRenderFrameMaximumNanos = Math.max(fullRenderFrameMaximumNanos, frameNanos);
-            } else if (stripRefreshes > 0) {
-                stripRefreshFrameCount++;
-                stripRefreshFrameNanos += frameNanos;
-                stripRefreshFrameMaximumNanos = Math.max(stripRefreshFrameMaximumNanos, frameNanos);
-            } else if (cacheHits > 0) {
-                cacheHitFrameCount++;
-                cacheHitFrameNanos += frameNanos;
-                cacheHitFrameMaximumNanos = Math.max(cacheHitFrameMaximumNanos, frameNanos);
-            } else {
-                uncachedFrameCount++;
-                uncachedFrameNanos += frameNanos;
-                uncachedFrameMaximumNanos = Math.max(uncachedFrameMaximumNanos, frameNanos);
-            }
-        }
-
-        private long percentile(double quantile) {
-            int index = Math.clamp((int) Math.ceil(frameSampleCount * quantile) - 1, 0, frameSampleCount - 1);
-            return frameSamplesNanos[index];
-        }
-
-        private static double millis(long nanos) {
-            return nanos / 1_000_000.0;
-        }
-
-        private static double averageMillis(long nanos, long count) {
-            return count == 0 ? 0.0 : millis(nanos) / count;
-        }
-    }
 
     record FactionLogoRenderKey(TerritoryRenderKey territoryKey, int majorMinimumSize,
           int compactMinimumSize, int maximumSize, int collisionPadding, int shadowOffset) {
@@ -1335,13 +751,18 @@ public class InterstellarMapPanel extends JPanel {
               @Nullable String mercenaryCapitalSystem) {
             Set<Faction> datedFactions = system.getFactionSet(date);
             Set<Faction> factions = datedFactions == null ? Set.of() : Set.copyOf(datedFactions);
-            List<Faction> orderedFactions = factions.stream()
-                  .sorted(Comparator.comparing(Faction::getShortName))
-                  .toList();
-            boolean empty = factions.isEmpty()
-                  || factions.stream().allMatch(faction -> faction.is(FactionTag.ABANDONED));
+            List<Faction> orderedFactions = new ArrayList<>(factions);
+            orderedFactions.sort(Comparator.comparing(Faction::getShortName));
+            List<Color> factionColors = new ArrayList<>(orderedFactions.size());
+            boolean empty = true;
+            for (Faction faction : orderedFactions) {
+                factionColors.add(faction.getColor());
+                if (!faction.is(FactionTag.ABANDONED)) {
+                    empty = false;
+                }
+            }
             String stellarDetail = system.getStar() == null ? null : "  [" + system.getStar() + "]";
-            return new SystemRenderData(factions, orderedFactions.stream().map(Faction::getColor).toList(),
+            return new SystemRenderData(factions, List.copyOf(factionColors),
                 resolveDatedCapitalFactions(factions, capitals, system.getId(), mercenaryFaction,
                     mercenaryCapitalSystem), system.getCapitalType(date), empty, system.getPopulation(date),
                 ObjectUtility.nonNull(system.getHPG(date), HPGRating.X), system.getPrintableName(date),
@@ -2169,7 +1590,6 @@ public class InterstellarMapPanel extends JPanel {
     private final JPanel optionControl;
     private final JViewport optionView;
     private final JPanel optionPanel;
-    private final ResourceBundle resourceMap;
 
     // Map view options
     private final JRadioButton optFactions;
@@ -2203,12 +1623,7 @@ public class InterstellarMapPanel extends JPanel {
     private final Timer proposedRouteAnimationTimer;
     private final Timer travelAnimationTimer;
     private final Timer systemDiveAnimationTimer;
-    private final Timer renderBenchmarkTimer;
-    private final Timer transitionBenchmarkTimer;
-    private final Timer zoomBenchmarkTimer;
     private final Timer zoomSettlingTimer;
-    private final RenderPerformanceTracker renderPerformanceTracker =
-          new RenderPerformanceTracker(System.nanoTime());
     private boolean optionPanelHidden;
     private Component layerControlsInvoker;
     private boolean layerDismissalListenerInstalled;
@@ -2288,20 +1703,6 @@ public class InterstellarMapPanel extends JPanel {
     private SystemDiveFrame systemDiveReturnFrame;
     private boolean systemDiveReturning;
     private Runnable systemDiveCompletion;
-    private RenderBenchmarkRun renderBenchmarkRun;
-    private long renderBenchmarkPhaseStartedNanos;
-    private boolean renderBenchmarkMeasuring;
-    private TransitionBenchmarkRun transitionBenchmarkRun;
-    private TransitionBenchmarkPhase transitionBenchmarkPhase;
-    private long transitionBenchmarkPhaseStartedNanos;
-    private boolean transitionBenchmarkExactFramePainted;
-    private ZoomBenchmarkRun zoomBenchmarkRun;
-    private ZoomBenchmarkPhase zoomBenchmarkPhase;
-    private long zoomBenchmarkPhaseStartedNanos;
-    private RenderBenchmarkCamera zoomBenchmarkExpectedCamera;
-    private boolean zoomBenchmarkCameraPainted;
-    private boolean zoomBenchmarkExactFramePainted;
-    private boolean zoomBenchmarkPathComplete;
     private boolean zoomInteractionActive;
     private NavigationRouteAnalysis.Reachability cachedReachability;
     private long reachabilityRevision;
@@ -2366,8 +1767,6 @@ public class InterstellarMapPanel extends JPanel {
 
     public InterstellarMapPanel(Campaign campaign, CampaignGUI view) {
         this.campaign = campaign;
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-              MekHQ.getMHQOptions().getLocale());
         systems = this.campaign.getSystems();
         systemSpatialIndex = new SystemSpatialIndex(systems);
         refreshMapPresentationData();
@@ -2386,13 +1785,6 @@ public class InterstellarMapPanel extends JPanel {
                 systemDiveAnimationTimer = new Timer(SYSTEM_DIVE_ANIMATION_DELAY_MS,
               e -> updateSystemDiveAnimation());
                 systemDiveAnimationTimer.setCoalesce(true);
-            renderBenchmarkTimer = new Timer(RENDER_BENCHMARK_DELAY_MS, e -> updateRenderBenchmark());
-            renderBenchmarkTimer.setCoalesce(true);
-            transitionBenchmarkTimer = new Timer(RENDER_BENCHMARK_DELAY_MS,
-                e -> updateTransitionBenchmark());
-            transitionBenchmarkTimer.setCoalesce(true);
-            zoomBenchmarkTimer = new Timer(RENDER_BENCHMARK_DELAY_MS, e -> updateZoomBenchmark());
-            zoomBenchmarkTimer.setCoalesce(true);
             zoomSettlingTimer = new Timer(ZOOM_SETTLE_DELAY_MS, e -> finishZoomInteraction());
             zoomSettlingTimer.setRepeats(false);
 
@@ -2475,21 +1867,21 @@ public class InterstellarMapPanel extends JPanel {
                     final Point popupAnchor = new Point(e.getPoint());
                     final PlanetarySystem popupSystem = findSystemAt(popupAnchor);
                     JPopupMenu popup = new JPopupMenu();
-                    JMenuItem item = new JMenuItem("Zoom In");
+                    JMenuItem item = new JMenuItem(text("map.context.zoomIn.text"));
                     item.addActionListener(ae -> zoom(1.5, popupAnchor));
                     popup.add(item);
-                    item = new JMenuItem("Zoom Out");
+                    item = new JMenuItem(text("map.context.zoomOut.text"));
                     item.addActionListener(ae -> zoom(0.5, popupAnchor));
                     popup.add(item);
-                    JMenu centerM = new JMenu("Center Map");
-                    item = new JMenuItem("On Selected Planet");
+                    JMenu centerM = new JMenu(text("map.context.center.text"));
+                    item = new JMenuItem(text("map.context.center.selected.text"));
                     item.setEnabled(selectedSystem != null);
                     if (selectedSystem != null) {
                         // only add if there is a planet to center on
                         item.addActionListener(ae -> center(selectedSystem));
                     }
                     centerM.add(item);
-                    item = new JMenuItem("On Current Location");
+                    item = new JMenuItem(text("map.context.center.current.text"));
                     item.setEnabled(InterstellarMapPanel.this.campaign.getCurrentSystem() != null);
                     if (InterstellarMapPanel.this.campaign.getCurrentSystem() != null) {
                         // only add if there is a planet to center on
@@ -2499,7 +1891,7 @@ public class InterstellarMapPanel extends JPanel {
                         });
                     }
                     centerM.add(item);
-                    item = new JMenuItem("On Terra");
+                    item = new JMenuItem(text("map.context.center.terra.text"));
                     item.addActionListener(evt -> {
                         conf.centerX = 0.0;
                         conf.centerY = 0.0;
@@ -2526,11 +1918,11 @@ public class InterstellarMapPanel extends JPanel {
                           routePlanningHandler.hasPlannedRoute(),
                           routePlanningHandler::clearPlannedRoute));
                       popup.addSeparator();
-                    item = new JMenuItem("Cancel Current Trip");
+                    item = new JMenuItem(text("map.context.cancelTrip.text"));
                     item.setEnabled(routePlanningHandler.hasActiveTrip());
                     item.addActionListener(evt -> routePlanningHandler.cancelCurrentTrip());
                     popup.add(item);
-                    item = new JMenuItem("Save Map (64 Mpx at current zoom level) ...");
+                    item = new JMenuItem(text("map.context.save.text"));
                     item.setEnabled(true);
                     item.addActionListener(evt -> {
                         final int imgSize = 8192;
@@ -2561,8 +1953,8 @@ public class InterstellarMapPanel extends JPanel {
                         mapPanel.repaint();
                     });
                     popup.add(item);
-                    JMenu menuGM = new JMenu("GM Mode");
-                    item = new JMenuItem("Move to selected planet");
+                    JMenu menuGM = new JMenu(text("map.context.gm.text"));
+                    item = new JMenuItem(text("map.context.gm.move.text"));
                       item.setEnabled((selectedSystem != null)
                           && InterstellarMapPanel.this.campaign.isGM());
                     if (selectedSystem != null) {
@@ -2576,26 +1968,8 @@ public class InterstellarMapPanel extends JPanel {
                         });
                     }
                     menuGM.add(item);
-                    /*
-                     * TODO: re-enable this later
-                     * item = new JMenuItem("Edit planetary events");
-                     * item.setEnabled(selectedSystem != null && campaign.isGM());
-                     * if (selectedSystem != null) {
-                     * item.setText("Edit planetary events for " +
-                     * selectedSystem.getPrintableName(Utilities.getDateTimeDay(campaign.getCalendar
-                     * ())));
-                     * item.addActionListener(new ActionListener() {
-                     *
-                     * @Override
-                     * public void actionPerformed(ActionEvent attackingEntity) {
-                     * openPlanetEventEditor(selectedSystem);
-                     * }
-                     * });
-                     * }
-                     * menuGM.add(item);
-                     */
 
-                    item = new JMenuItem("Edit System (GM)...");
+                    item = new JMenuItem(text("map.context.gm.editSystem.text"));
                                             item.setEnabled((selectedSystem != null)
                           && InterstellarMapPanel.this.campaign.isGM());
                     if (selectedSystem != null) {
@@ -2604,7 +1978,7 @@ public class InterstellarMapPanel extends JPanel {
                     }
                     menuGM.add(item);
 
-                    item = new JMenuItem("Recharge Jumpdrive");
+                    item = new JMenuItem(text("map.context.gm.recharge.text"));
                     item.setEnabled(InterstellarMapPanel.this.campaign.getPlayerForce()
                                           .getForceDetachment()
                                           .getCurrentLocation()
@@ -2613,7 +1987,8 @@ public class InterstellarMapPanel extends JPanel {
                     item.addActionListener(evt -> {
                         InterstellarMapPanel.this.campaign.getPlayerForce().getForceDetachment().getCurrentLocation()
                               .chargeFully(InterstellarMapPanel.this.campaign);
-                        InterstellarMapPanel.this.campaign.addReport(GENERAL, "GM: Jumpship drives fully charged");
+                        InterstellarMapPanel.this.campaign.addReport(GENERAL,
+                            text("map.context.gm.recharge.report"));
                     });
                     menuGM.add(item);
 
@@ -2709,39 +2084,6 @@ public class InterstellarMapPanel extends JPanel {
                 }
             }
         });
-        if (RENDER_BENCHMARK_ENABLED) {
-            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                  KeyStroke.getKeyStroke(KeyEvent.VK_B,
-                        InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK), "toggleRenderBenchmark");
-            getActionMap().put("toggleRenderBenchmark", new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    toggleRenderBenchmark();
-                }
-            });
-            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                  KeyStroke.getKeyStroke(KeyEvent.VK_T,
-                        InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
-                  "toggleTransitionBenchmark");
-            getActionMap().put("toggleTransitionBenchmark", new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    toggleTransitionBenchmark();
-                }
-            });
-            getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(
-                  KeyStroke.getKeyStroke(KeyEvent.VK_Z,
-                        InputEvent.CTRL_DOWN_MASK | InputEvent.SHIFT_DOWN_MASK),
-                  "toggleZoomBenchmark");
-            getActionMap().put("toggleZoomBenchmark", new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent event) {
-                    toggleZoomBenchmark();
-                }
-            });
-            LOGGER.info("Map render benchmarks enabled; Ctrl+Shift+B runs warm pan, "
-                  + "Ctrl+Shift+T runs transition/cache regeneration, and Ctrl+Shift+Z runs zoom");
-        }
 
         addMouseWheelListener(new MouseAdapter() {
             @Override
@@ -2754,7 +2096,6 @@ public class InterstellarMapPanel extends JPanel {
         mapPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
-                long frameStartedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
                 now = InterstellarMapPanel.this.campaign.getLocalDate();
                 refreshTravelVisualState();
                 Graphics2D g2 = (Graphics2D) g;
@@ -2762,9 +2103,7 @@ public class InterstellarMapPanel extends JPanel {
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     RenderViewKey renderViewKey = RenderViewKey.create(getWidth(), getHeight(), conf.centerX,
                         conf.centerY, conf.scale);
-                long backgroundStartedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
                 paintStaticCartographyBackground(g2, renderViewKey);
-                long backgroundFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
                 double size = getSystemMarkerSize();
 
                     final Stroke thick = new BasicStroke(1.35f, BasicStroke.CAP_ROUND,
@@ -2801,18 +2140,18 @@ public class InterstellarMapPanel extends JPanel {
                           semanticZoomReference);
 
                 Arc2D.Double arc = new Arc2D.Double();
+                CampaignOptions campaignOptions = InterstellarMapPanel.this.campaign.getCampaignOptions();
 
                 // Draw auras around a selected planet
                 if (selectedSystem != null) {
                     final double x = map2scrX(selectedSystem.getX());
                     final double y = map2scrY(selectedSystem.getY());
                     // Contract Search Radius Aura
-                    if (!InterstellarMapPanel.this.campaign.getCampaignOptions().get(CampaignOption.CONTRACT_MARKET_METHOD).isNone()
+                      if (!campaignOptions.get(CampaignOption.CONTRACT_MARKET_METHOD).isNone()
                               && MekHQ.getMHQOptions().getInterstellarMapShowContractSearchRadius()) {
                         final double z = map2scrX(selectedSystem.getX()
                                                         +
-                                                        InterstellarMapPanel.this.campaign.getCampaignOptions()
-                                                              .get(CampaignOption.CONTRACT_SEARCH_RADIUS));
+                                              campaignOptions.get(CampaignOption.CONTRACT_SEARCH_RADIUS));
                         final double contractSearchRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapContractSearchRadiusColour());
                         g2.setStroke(CONTRACT_SEARCH_RANGE_RING_STROKE);
@@ -2821,15 +2160,15 @@ public class InterstellarMapPanel extends JPanel {
                     }
 
                     // Acquisition Search Radius Aura
-                    if (InterstellarMapPanel.this.campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_ACQUISITION)
+                    if (campaignOptions.get(CampaignOption.USE_PLANETARY_ACQUISITION)
                               && MekHQ.getMHQOptions().getInterstellarMapShowPlanetaryAcquisitionRadius()
                               && (conf.scale > MekHQ.getMHQOptions()
                                                      .getInterstellarMapShowPlanetaryAcquisitionRadiusMinimumZoom())) {
                         final double z = map2scrX(selectedSystem.getX()
                                                         + (MHQConstants.MAX_JUMP_RADIUS
                                                                  *
-                                                                 InterstellarMapPanel.this.campaign.getCampaignOptions()
-                                                                       .get(CampaignOption.MAX_JUMPS_PLANETARY_ACQUISITION)));
+                                                                     campaignOptions.get(
+                                                                         CampaignOption.MAX_JUMPS_PLANETARY_ACQUISITION)));
                         final double acquisitionRadius = z - x;
                         g2.setPaint(MekHQ.getMHQOptions().getInterstellarMapPlanetaryAcquisitionRadiusColour());
                         g2.setStroke(PLANETARY_ACQUISITION_RANGE_RING_STROKE);
@@ -2897,34 +2236,6 @@ public class InterstellarMapPanel extends JPanel {
                     boolean useRetainedSystemArt = canUseRetainedSystemArt(
                         useRetainedCartography, useRetainedMapModeTransition,
                         supportingLayerAnimating, scaleChanging);
-                long territoryStartedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
-                    int territoryCacheHitsBefore = RENDER_PROFILING_ENABLED
-                        ? territoryRenderCache.getReuseCount()
-                            + retainedCartographyRenderCache.getReuseCount()
-                            + retainedSystemArtRenderCache.getReuseCount()
-                            + retainedNavigationRenderCache.getReuseCount()
-                            + mapModeTransitionBaseRenderCache.getReuseCount()
-                            + mapModeTransitionSystemRenderCache.getReuseCount()
-                            + previousMapModeRenderCache.getReuseCount()
-                            + targetMapModeRenderCache.getReuseCount() : 0;
-                    int territoryStripRefreshesBefore = RENDER_PROFILING_ENABLED
-                        ? territoryRenderCache.getStripRefreshCount()
-                            + retainedCartographyRenderCache.getStripRefreshCount()
-                            + retainedSystemArtRenderCache.getStripRefreshCount()
-                            + retainedNavigationRenderCache.getStripRefreshCount()
-                            + mapModeTransitionBaseRenderCache.getStripRefreshCount()
-                            + mapModeTransitionSystemRenderCache.getStripRefreshCount()
-                            + previousMapModeRenderCache.getStripRefreshCount()
-                            + targetMapModeRenderCache.getStripRefreshCount() : 0;
-                    int territoryFullRendersBefore = RENDER_PROFILING_ENABLED
-                        ? territoryRenderCache.getFullRenderCount()
-                            + retainedCartographyRenderCache.getFullRenderCount()
-                            + retainedSystemArtRenderCache.getFullRenderCount()
-                            + retainedNavigationRenderCache.getFullRenderCount()
-                            + mapModeTransitionBaseRenderCache.getFullRenderCount()
-                            + mapModeTransitionSystemRenderCache.getFullRenderCount()
-                            + previousMapModeRenderCache.getFullRenderCount()
-                            + targetMapModeRenderCache.getFullRenderCount() : 0;
                 if (!useRetainedNavigation) {
                     retainedNavigationRenderCache.clear();
                 }
@@ -2955,8 +2266,6 @@ public class InterstellarMapPanel extends JPanel {
                           visibleFactionLogoAlpha * FACTION_LOGO_OPACITY,
                           visibleHpgNetworkAlpha, semanticZoom);
                     }
-                long territoryFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
-                long factionLogoStartedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
                         if (!useRetainedCartography && !useRetainedMapModeTransition
                             && (atlas != null) && (territoryRenderKey != null)
                             && (visibleFactionLogoAlpha > 0.0)) {
@@ -2971,8 +2280,6 @@ public class InterstellarMapPanel extends JPanel {
                           AdministrativeDisplayDetail.REGIONS);
                       paintAdministrativeBoundaryLayer(g2, atlas, territoryRenderKey, administrativeDetail);
                     }
-                long factionLogoFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
-                long staticPhaseFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
 
                 if (!useRetainedNavigation) {
                     drawReachability(g2, size, semanticZoom.detailedOverlayAlpha(), systemRenderData);
@@ -2994,7 +2301,6 @@ public class InterstellarMapPanel extends JPanel {
                           showRouteActivation ? routeActivationProgress : 1.0,
                           semanticZoom.detailedOverlayAlpha());
                 }
-                long routePhaseFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
                     if (shouldPaintSeparateSystemArt(useRetainedSystemArt, useRetainedNavigation)
                         && (territoryRenderKey != null)) {
                     paintRetainedSystemArtLayer(g2, territoryRenderKey, systemRenderData,
@@ -3002,35 +2308,6 @@ public class InterstellarMapPanel extends JPanel {
                           visibleFactionLogoAlpha * FACTION_LOGO_OPACITY,
                           visibleHpgNetworkAlpha, semanticZoom);
                 }
-                int territoryCacheHits = RENDER_PROFILING_ENABLED
-                      ? territoryRenderCache.getReuseCount()
-                          + retainedCartographyRenderCache.getReuseCount()
-                          + retainedSystemArtRenderCache.getReuseCount()
-                          + retainedNavigationRenderCache.getReuseCount()
-                          + mapModeTransitionBaseRenderCache.getReuseCount()
-                          + mapModeTransitionSystemRenderCache.getReuseCount()
-                          + previousMapModeRenderCache.getReuseCount()
-                          + targetMapModeRenderCache.getReuseCount() - territoryCacheHitsBefore : 0;
-                int territoryStripRefreshes = RENDER_PROFILING_ENABLED
-                      ? territoryRenderCache.getStripRefreshCount()
-                          + retainedCartographyRenderCache.getStripRefreshCount()
-                          + retainedSystemArtRenderCache.getStripRefreshCount()
-                          + retainedNavigationRenderCache.getStripRefreshCount()
-                          + mapModeTransitionBaseRenderCache.getStripRefreshCount()
-                          + mapModeTransitionSystemRenderCache.getStripRefreshCount()
-                          + previousMapModeRenderCache.getStripRefreshCount()
-                          + targetMapModeRenderCache.getStripRefreshCount()
-                          - territoryStripRefreshesBefore : 0;
-                int territoryFullRenders = RENDER_PROFILING_ENABLED
-                      ? territoryRenderCache.getFullRenderCount()
-                          + retainedCartographyRenderCache.getFullRenderCount()
-                          + retainedSystemArtRenderCache.getFullRenderCount()
-                          + retainedNavigationRenderCache.getFullRenderCount()
-                          + mapModeTransitionBaseRenderCache.getFullRenderCount()
-                          + mapModeTransitionSystemRenderCache.getFullRenderCount()
-                          + previousMapModeRenderCache.getFullRenderCount()
-                          + targetMapModeRenderCache.getFullRenderCount()
-                          - territoryFullRendersBefore : 0;
 
                                 Set<PlanetarySystem> activeRouteWaypoints = new HashSet<>(activeRouteSystems);
                                 Set<PlanetarySystem> routeWaypoints = new HashSet<>();
@@ -3082,7 +2359,6 @@ public class InterstellarMapPanel extends JPanel {
                       minX, minY, maxX, maxY, currentSystem, selectedSystem);
                 List<PlanetarySystem> renderedSystems = new ArrayList<>(viewportSystems.size());
                 List<SystemMarkerLayout> renderedSystemLayouts = new ArrayList<>(viewportSystems.size());
-                int visibleSystemCount = 0;
                 for (PlanetarySystem system : viewportSystems) {
                     SystemRenderData renderData = systemRenderData.get(system.getId());
                     boolean routeWaypoint = routeWaypoints.contains(system);
@@ -3092,7 +2368,6 @@ public class InterstellarMapPanel extends JPanel {
                     if (shouldRenderSystem(true, renderData.empty(), optEmptySystems.isSelected(),
                           requiredNavigationSystem)) {
                         renderedSystems.add(system);
-                    visibleSystemCount++;
                         double x = map2scrX(system.getX());
                         double y = map2scrY(system.getY());
                         boolean systemEmpty = renderData.empty();
@@ -3233,7 +2508,6 @@ public class InterstellarMapPanel extends JPanel {
                 if (targetMapModeGraphics != g2) {
                     targetMapModeGraphics.dispose();
                 }
-                long systemPhaseFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
 
                 if (!activeRouteSystems.isEmpty()) {
                     drawActiveRouteWaypointBadges(g2, activeRouteSystems, size,
@@ -3308,47 +2582,7 @@ public class InterstellarMapPanel extends JPanel {
                     drawMeasurement(g2, instrumentLayout);
                 drawNavigationInstrument(g2, instrumentLayout);
                 drawSystemDiveOverlay(g2, getWidth(), getHeight());
-                if (RENDER_PROFILING_ENABLED) {
-                    long frameFinishedNanos = System.nanoTime();
-                    renderPerformanceTracker.record(frameFinishedNanos - frameStartedNanos,
-                          staticPhaseFinishedNanos - frameStartedNanos,
-                          backgroundFinishedNanos - backgroundStartedNanos,
-                          territoryFinishedNanos - territoryStartedNanos,
-                          factionLogoFinishedNanos - factionLogoStartedNanos,
-                          routePhaseFinishedNanos - staticPhaseFinishedNanos,
-                          systemPhaseFinishedNanos - routePhaseFinishedNanos,
-                          frameFinishedNanos - systemPhaseFinishedNanos, visibleSystemCount, territoryCacheHits,
-                          territoryStripRefreshes, territoryFullRenders,
-                          useRetainedCartography || useRetainedMapModeTransition,
-                          useMergedNavigation || useRetainedMapModeTransition);
-                    if (transitionBenchmarkRun != null
-                          && isExactTransitionBenchmarkFrame(mapModeAnimating,
-                              retainedCartographyProvisional,
-                              useRetainedCartography || useRetainedMapModeTransition,
-                              useMergedNavigation || useRetainedMapModeTransition)) {
-                        transitionBenchmarkExactFramePainted = true;
-                    }
-                    if (zoomBenchmarkRun != null) {
-                        RenderBenchmarkCamera paintedCamera = new RenderBenchmarkCamera(
-                              conf.centerX, conf.centerY, conf.scale);
-                        zoomBenchmarkCameraPainted = paintedCamera.equals(zoomBenchmarkExpectedCamera);
-                        if (isExactZoomBenchmarkFrame(retainedCartographyProvisional,
-                              useRetainedCartography || useRetainedMapModeTransition,
-                              useMergedNavigation || useRetainedMapModeTransition)) {
-                            zoomBenchmarkExactFramePainted = true;
-                        }
-                    }
-                      if (!renderBenchmarkTimer.isRunning() && !transitionBenchmarkTimer.isRunning()
-                          && !zoomBenchmarkTimer.isRunning()
-                          && renderPerformanceTracker.shouldReport(frameFinishedNanos)) {
-                        LOGGER.info("{} timers[layer={}, selection={}, proposedRoute={}, travel={}, dive={}]",
-                              renderPerformanceTracker.reportAndReset(frameFinishedNanos),
-                              layerAnimationTimer.isRunning(), selectionAnimationTimer.isRunning(),
-                                                        proposedRouteAnimationTimer.isRunning(), travelAnimationTimer.isRunning(),
-                            systemDiveAnimationTimer.isRunning());
-                    }
-                }
-                if (mapModeTransitionSettling && !isTransitionBenchmarkAwaitingSettledFrame()) {
+                if (mapModeTransitionSettling) {
                     finishSettledMapModeTransitionFrame();
                 }
             }
@@ -3365,32 +2599,37 @@ public class InterstellarMapPanel extends JPanel {
                 optionHeader.setLayout(new BoxLayout(optionHeader, BoxLayout.X_AXIS));
                 optionHeader.setOpaque(false);
                 optionHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
-                optionHeader.add(createLabel(LAYER_CONTROL_HEADING));
+                optionHeader.add(createLabel(text("map.layer.heading.text")));
                 optionPanel.add(optionHeader);
 
-                                optFactions = createOptionRadioButton("Faction", MapMode.FACTION);
+                                optFactions = createOptionRadioButton(text("map.layer.faction.text"), MapMode.FACTION);
         optionPanel.add(optFactions);
-                    optTech = createOptionRadioButton("Technology", MapMode.TECHNOLOGY);
+                    optTech = createOptionRadioButton(text("map.layer.technology.text"), MapMode.TECHNOLOGY);
         optionPanel.add(optTech);
-                    optIndustry = createOptionRadioButton("Industry", MapMode.INDUSTRY);
+                    optIndustry = createOptionRadioButton(text("map.layer.industry.text"), MapMode.INDUSTRY);
         optionPanel.add(optIndustry);
-                    optRawMaterials = createOptionRadioButton("Raw Materials", MapMode.RAW_MATERIALS);
+                      optRawMaterials = createOptionRadioButton(text("map.layer.rawMaterials.text"),
+                          MapMode.RAW_MATERIALS);
         optionPanel.add(optRawMaterials);
-                    optOutput = createOptionRadioButton("Output", MapMode.OUTPUT);
+                    optOutput = createOptionRadioButton(text("map.layer.output.text"), MapMode.OUTPUT);
         optionPanel.add(optOutput);
-                    optAgriculture = createOptionRadioButton("Agriculture", MapMode.AGRICULTURE);
+                      optAgriculture = createOptionRadioButton(text("map.layer.agriculture.text"),
+                          MapMode.AGRICULTURE);
         optionPanel.add(optAgriculture);
-                    optPopulation = createOptionRadioButton("Population", MapMode.POPULATION);
+                    optPopulation = createOptionRadioButton(text("map.layer.population.text"), MapMode.POPULATION);
         optionPanel.add(optPopulation);
-                    optHPG = createOptionRadioButton("HPG", MapMode.HPG);
+                    optHPG = createOptionRadioButton(text("map.layer.hpg.text"), MapMode.HPG);
         optionPanel.add(optHPG);
-                    optRecharge = createOptionRadioButton("Recharge Stations", MapMode.RECHARGE_STATIONS);
+                      optRecharge = createOptionRadioButton(text("map.layer.recharge.text"),
+                          MapMode.RECHARGE_STATIONS);
         optionPanel.add(optRecharge);
-                    optAcademies = createOptionRadioButton("Academies", MapMode.ACADEMIES);
+                    optAcademies = createOptionRadioButton(text("map.layer.academies.text"), MapMode.ACADEMIES);
         optionPanel.add(optAcademies);
-                    optHiringHalls = createOptionRadioButton("Hiring Halls", MapMode.HIRING_HALLS);
+                      optHiringHalls = createOptionRadioButton(text("map.layer.hiringHalls.text"),
+                          MapMode.HIRING_HALLS);
         optionPanel.add(optHiringHalls);
-                    optDiseases = createOptionRadioButton("Disease Outbreaks", MapMode.DISEASE_OUTBREAKS);
+                      optDiseases = createOptionRadioButton(text("map.layer.diseases.text"),
+                          MapMode.DISEASE_OUTBREAKS);
         optionPanel.add(optDiseases);
 
         ButtonGroup colorChoice = new ButtonGroup();
@@ -3409,19 +2648,19 @@ public class InterstellarMapPanel extends JPanel {
         // factions by default
         optFactions.setSelected(true);
 
-        optionPanel.add(Box.createRigidArea(new Dimension(0, 7)));
+        optionPanel.add(Box.createRigidArea(new Dimension(0, UIUtil.scaleForGUI(7))));
         optionPanel.add(createOptionDivider());
-        optionPanel.add(Box.createRigidArea(new Dimension(0, 7)));
-        optionPanel.add(createLabel(OVERLAY_CONTROL_HEADING));
-        optEmptySystems = createOptionCheckBox("Empty systems");
+        optionPanel.add(Box.createRigidArea(new Dimension(0, UIUtil.scaleForGUI(7))));
+        optionPanel.add(createLabel(text("map.overlay.heading.text")));
+        optEmptySystems = createOptionCheckBox(text("map.overlay.emptySystems.text"));
         optEmptySystems.setSelected(false);
         optEmptySystems.addActionListener(e -> repaint());
         optionPanel.add(optEmptySystems);
-        optTerritory = createOptionCheckBox("Territory");
+        optTerritory = createOptionCheckBox(text("map.overlay.territory.text"));
         optTerritory.setSelected(true);
         optTerritory.addActionListener(e -> startTerritoryLayerAnimation());
         optionPanel.add(optTerritory);
-        optAdministrativeBoundaries = createOptionCheckBox("Administrative Boundaries");
+        optAdministrativeBoundaries = createOptionCheckBox(text("map.overlay.administrative.text"));
         optAdministrativeBoundaries.setSelected(false);
           Dimension administrativeCheckSize = new Dimension(UIUtil.scaleForGUI(190),
               optAdministrativeBoundaries.getPreferredSize().height);
@@ -3436,7 +2675,7 @@ public class InterstellarMapPanel extends JPanel {
         optAdministrativeDetail.setPreferredSize(administrativeDetailSize);
         optAdministrativeDetail.setMinimumSize(administrativeDetailSize);
         optAdministrativeDetail.setMaximumSize(administrativeDetailSize);
-        optAdministrativeDetail.setToolTipText("Show regional boundaries or add district boundaries.");
+        optAdministrativeDetail.setToolTipText(text("map.overlay.administrativeDetail.toolTipText"));
         optAdministrativeDetail.addActionListener(event -> {
             administrativeRenderCache.clear();
             repaint();
@@ -3453,7 +2692,7 @@ public class InterstellarMapPanel extends JPanel {
         administrativeControl.add(Box.createHorizontalGlue());
         administrativeControl.add(optAdministrativeDetail);
         optionPanel.add(administrativeControl);
-                optCapitals = createOptionCheckBox("Capitals");
+                optCapitals = createOptionCheckBox(text("map.overlay.capitals.text"));
                 optCapitals.setSelected(true);
                 optCapitalDetail = new ImmersiveComboBox<>(CapitalDisplayDetail.values());
                 optCapitalDetail.setSelectedItem(CapitalDisplayDetail.NATIONAL);
@@ -3462,8 +2701,7 @@ public class InterstellarMapPanel extends JPanel {
                 optCapitalDetail.setPreferredSize(capitalDetailSize);
                 optCapitalDetail.setMinimumSize(capitalDetailSize);
                 optCapitalDetail.setMaximumSize(capitalDetailSize);
-                optCapitalDetail.setToolTipText(
-              "Maximum capital hierarchy shown. District capitals appear only at navigation detail.");
+                                optCapitalDetail.setToolTipText(text("map.overlay.capitalDetail.toolTipText"));
                 optCapitalDetail.addActionListener(event -> repaint());
                 optCapitals.addActionListener(event -> {
             optCapitalDetail.setEnabled(optCapitals.isSelected());
@@ -3477,7 +2715,7 @@ public class InterstellarMapPanel extends JPanel {
                 capitalControl.add(Box.createHorizontalGlue());
                 capitalControl.add(optCapitalDetail);
                 optionPanel.add(capitalControl);
-        optHPGNetwork = createOptionCheckBox("HPG Network");
+        optHPGNetwork = createOptionCheckBox(text("map.overlay.hpgNetwork.text"));
           optHpgNetworkDetail = new ImmersiveComboBox<>(HpgNetworkDetail.values());
         optHpgNetworkDetail.setSelectedItem(HpgNetworkDetail.CLASS_A_B);
         optHpgNetworkDetail.setEnabled(false);
@@ -3486,8 +2724,7 @@ public class InterstellarMapPanel extends JPanel {
           optHpgNetworkDetail.setPreferredSize(hpgDetailSize);
           optHpgNetworkDetail.setMinimumSize(hpgDetailSize);
           optHpgNetworkDetail.setMaximumSize(hpgDetailSize);
-        optHpgNetworkDetail.setToolTipText(
-              "Maximum HPG detail. Wide zoom shows A only; medium zoom shows A-B; detailed zoom shows station badges.");
+          optHpgNetworkDetail.setToolTipText(text("map.overlay.hpgDetail.toolTipText"));
         optHpgNetworkDetail.addActionListener(e -> repaint());
         optHPGNetwork.addActionListener(e -> {
             optHpgNetworkDetail.setEnabled(optHPGNetwork.isSelected());
@@ -3501,12 +2738,12 @@ public class InterstellarMapPanel extends JPanel {
           hpgControl.add(Box.createHorizontalGlue());
           hpgControl.add(optHpgNetworkDetail);
           optionPanel.add(hpgControl);
-        optOperations = createOptionCheckBox("Operations");
+        optOperations = createOptionCheckBox(text("map.overlay.operations.text"));
         optOperations.setSelected(true);
         optOperations.addActionListener(e -> startOperationsLayerAnimation());
         optionPanel.add(optOperations);
-          optReachability = createOptionCheckBox(resourceMap.getString("map.overlay.reachability.text"));
-          String reachabilityTooltip = resourceMap.getString("map.overlay.reachability.toolTipText");
+          optReachability = createOptionCheckBox(text("map.overlay.reachability.text"));
+          String reachabilityTooltip = text("map.overlay.reachability.toolTipText");
           optReachability.setToolTipText(reachabilityTooltip);
           optReachability.getAccessibleContext().setAccessibleName(optReachability.getText());
           optReachability.getAccessibleContext().setAccessibleDescription(reachabilityTooltip);
@@ -3518,8 +2755,8 @@ public class InterstellarMapPanel extends JPanel {
           reachabilityHops.setPreferredSize(hopSpinnerSize);
           reachabilityHops.setMinimumSize(hopSpinnerSize);
           reachabilityHops.setMaximumSize(hopSpinnerSize);
-          String hopLabelText = resourceMap.getString("map.overlay.reachability.hops.text");
-          String hopTooltip = resourceMap.getString("map.overlay.reachability.hops.toolTipText");
+          String hopLabelText = text("map.overlay.reachability.hops.text");
+          String hopTooltip = text("map.overlay.reachability.hops.toolTipText");
           reachabilityHops.setToolTipText(hopTooltip);
           reachabilityHops.getAccessibleContext().setAccessibleName(hopLabelText);
           reachabilityHops.getAccessibleContext().setAccessibleDescription(hopTooltip);
@@ -3551,8 +2788,8 @@ public class InterstellarMapPanel extends JPanel {
               refreshReachability();
               repaint();
           });
-          optMeasureDistance = createOptionCheckBox(resourceMap.getString("map.overlay.measure.text"));
-          String measurementTooltip = resourceMap.getString("map.overlay.measure.toolTipText");
+          optMeasureDistance = createOptionCheckBox(text("map.overlay.measure.text"));
+          String measurementTooltip = text("map.overlay.measure.toolTipText");
           optMeasureDistance.setToolTipText(measurementTooltip);
           optMeasureDistance.getAccessibleContext().setAccessibleName(optMeasureDistance.getText());
           optMeasureDistance.getAccessibleContext().setAccessibleDescription(measurementTooltip);
@@ -3641,9 +2878,6 @@ public class InterstellarMapPanel extends JPanel {
     public void removeNotify() {
         Toolkit.getDefaultToolkit().removeAWTEventListener(layerDismissalListener);
         layerDismissalListenerInstalled = false;
-        cancelRenderBenchmark("map hidden");
-        cancelTransitionBenchmark("map hidden");
-        cancelZoomBenchmark("map hidden");
         zoomSettlingTimer.stop();
         zoomInteractionActive = false;
         travelAnimationTimer.stop();
@@ -3654,524 +2888,8 @@ public class InterstellarMapPanel extends JPanel {
         super.removeNotify();
     }
 
-    private void toggleRenderBenchmark() {
-        if (transitionBenchmarkRun != null) {
-            LOGGER.info("Map render benchmark not started: transition benchmark is running");
-            return;
-        }
-        if (zoomBenchmarkRun != null) {
-            LOGGER.info("Map render benchmark not started: zoom benchmark is running");
-            return;
-        }
-        if (renderBenchmarkTimer.isRunning()) {
-            cancelRenderBenchmark("cancelled by user");
-            return;
-        }
-        if (!isShowing() || (getWidth() <= 0) || (getHeight() <= 0)) {
-            LOGGER.info("Map render benchmark not started: map is not visible");
-            return;
-        }
-        if (hasActiveRenderAnimation()) {
-            LOGGER.info("Map render benchmark not started: wait for map animations to finish");
-            return;
-        }
-
-        RenderBenchmarkCamera origin = new RenderBenchmarkCamera(conf.centerX, conf.centerY, conf.scale);
-        renderBenchmarkRun = new RenderBenchmarkRun(origin, getWidth(), getHeight(), campaign.getLocalDate(),
-              getSelectedMapMode().name(), optTerritory.isSelected(), optHPGNetwork.isSelected(),
-              optOperations.isSelected(), optReachability.isSelected(), optEmptySystems.isSelected());
-        renderBenchmarkMeasuring = false;
-        renderBenchmarkPhaseStartedNanos = System.nanoTime();
-        renderPerformanceTracker.reset(renderBenchmarkPhaseStartedNanos);
-        renderBenchmarkTimer.start();
-        LOGGER.info("Map render benchmark warmup started: path={} warmup={}s measurement={}s",
-              RENDER_BENCHMARK_PATH_ID, RENDER_BENCHMARK_WARMUP_NS / 1_000_000_000L,
-              RENDER_BENCHMARK_DURATION_NS / 1_000_000_000L);
-    }
-
-    private void updateRenderBenchmark() {
-        RenderBenchmarkRun benchmarkRun = renderBenchmarkRun;
-        if (benchmarkRun == null) {
-            renderBenchmarkTimer.stop();
-            return;
-        }
-        if ((getWidth() != benchmarkRun.width()) || (getHeight() != benchmarkRun.height())) {
-            cancelRenderBenchmark("viewport changed");
-            return;
-        }
-        if (hasActiveRenderAnimation()) {
-            cancelRenderBenchmark("another map animation started");
-            return;
-        }
-
-        long nowNanos = System.nanoTime();
-        long phaseDuration = renderBenchmarkMeasuring
-              ? RENDER_BENCHMARK_DURATION_NS
-              : RENDER_BENCHMARK_WARMUP_NS;
-        double progress = Math.min(1.0,
-              (double) (nowNanos - renderBenchmarkPhaseStartedNanos) / phaseDuration);
-        applyRenderBenchmarkCamera(renderBenchmarkCameraAt(benchmarkRun.origin(), progress));
-        if (progress < 1.0) {
-            return;
-        }
-
-        if (!renderBenchmarkMeasuring) {
-            renderBenchmarkMeasuring = true;
-            renderBenchmarkPhaseStartedNanos = nowNanos;
-            renderPerformanceTracker.reset(nowNanos);
-            LOGGER.info("Map render benchmark measurement started: path={}", RENDER_BENCHMARK_PATH_ID);
-            return;
-        }
-        finishRenderBenchmark(nowNanos);
-    }
-
-    private boolean hasActiveRenderAnimation() {
-        return layerAnimationTimer.isRunning() || selectionAnimationTimer.isRunning()
-              || proposedRouteAnimationTimer.isRunning() || travelAnimationTimer.isRunning()
-              || systemDiveAnimationTimer.isRunning();
-    }
-
-    private void applyRenderBenchmarkCamera(RenderBenchmarkCamera camera) {
-        conf.centerX = camera.centerX();
-        conf.centerY = camera.centerY();
-        conf.scale = camera.scale();
-        repaint();
-    }
-
-    private void finishRenderBenchmark(long nowNanos) {
-        RenderBenchmarkRun benchmarkRun = renderBenchmarkRun;
-        renderBenchmarkTimer.stop();
-        if (benchmarkRun == null) {
-            return;
-        }
-
-        long measuredMillis = (nowNanos - renderBenchmarkPhaseStartedNanos) / 1_000_000L;
-        String report;
-        if (renderPerformanceTracker.hasSamples()) {
-            report = renderPerformanceTracker.reportAndReset(nowNanos);
-        } else {
-            renderPerformanceTracker.reset(nowNanos);
-            report = "Map render: frames=0";
-        }
-        LOGGER.info("Map render benchmark result: path={} viewport={}x{} date={} mode={} "
-                    + "layers[territory={} hpg={} operations={} reachability={} empty={}] "
-                    + "center=({}, {}) scale={} measured={}ms {}",
-              RENDER_BENCHMARK_PATH_ID, benchmarkRun.width(), benchmarkRun.height(), benchmarkRun.date(),
-              benchmarkRun.mapMode(), benchmarkRun.territory(), benchmarkRun.hpgNetwork(),
-              benchmarkRun.operations(), benchmarkRun.reachability(), benchmarkRun.emptySystems(),
-              benchmarkRun.origin().centerX(), benchmarkRun.origin().centerY(), benchmarkRun.origin().scale(),
-              measuredMillis, report);
-        restoreRenderBenchmarkOrigin(benchmarkRun);
-    }
-
-    private void cancelRenderBenchmark(String reason) {
-        RenderBenchmarkRun benchmarkRun = renderBenchmarkRun;
-        if (benchmarkRun == null) {
-            return;
-        }
-        renderBenchmarkTimer.stop();
-        renderPerformanceTracker.reset(System.nanoTime());
-        LOGGER.info("Map render benchmark cancelled: path={} reason={}", RENDER_BENCHMARK_PATH_ID, reason);
-        restoreRenderBenchmarkOrigin(benchmarkRun);
-    }
-
-    private void restoreRenderBenchmarkOrigin(RenderBenchmarkRun benchmarkRun) {
-        renderBenchmarkRun = null;
-        renderBenchmarkMeasuring = false;
-        applyRenderBenchmarkCamera(benchmarkRun.origin());
-    }
-
-    private void toggleTransitionBenchmark() {
-        if (transitionBenchmarkRun != null) {
-            cancelTransitionBenchmark("cancelled by user");
-            return;
-        }
-        if (zoomBenchmarkRun != null) {
-            LOGGER.info("Map transition benchmark not started: zoom benchmark is running");
-            return;
-        }
-        if (renderBenchmarkTimer.isRunning()) {
-            LOGGER.info("Map transition benchmark not started: warm-pan benchmark is running");
-            return;
-        }
-        if (!isShowing() || (getWidth() <= 0) || (getHeight() <= 0)) {
-            LOGGER.info("Map transition benchmark not started: map is not visible");
-            return;
-        }
-        if (hasActiveRenderAnimation()) {
-            LOGGER.info("Map transition benchmark not started: wait for map animations to finish");
-            return;
-        }
-
-        MapMode originMode = getSelectedMapMode();
-        MapMode targetMode = originMode == MapMode.FACTION ? MapMode.TECHNOLOGY : MapMode.FACTION;
-        transitionBenchmarkRun = new TransitionBenchmarkRun(
-              new RenderBenchmarkCamera(conf.centerX, conf.centerY, conf.scale),
-              getWidth(), getHeight(), campaign.getLocalDate(), originMode, targetMode,
-              optTerritory.isSelected(), optHPGNetwork.isSelected(), optOperations.isSelected(),
-              optReachability.isSelected(), optEmptySystems.isSelected());
-        transitionBenchmarkPhase = TransitionBenchmarkPhase.WARMUP;
-        transitionBenchmarkPhaseStartedNanos = System.nanoTime();
-        transitionBenchmarkExactFramePainted = false;
-        renderPerformanceTracker.reset(transitionBenchmarkPhaseStartedNanos);
-        transitionBenchmarkTimer.start();
-        requestStaticCartographyPreparation();
-        repaint();
-        LOGGER.info("Map transition benchmark warmup started: path={}", TRANSITION_BENCHMARK_PATH_ID);
-    }
-
-    private void updateTransitionBenchmark() {
-        TransitionBenchmarkRun benchmarkRun = transitionBenchmarkRun;
-        if (benchmarkRun == null) {
-            transitionBenchmarkTimer.stop();
-            return;
-        }
-        if (!isTransitionBenchmarkConfigurationCurrent(benchmarkRun)) {
-            cancelTransitionBenchmark("map configuration changed");
-            return;
-        }
-        if (hasUnexpectedTransitionBenchmarkAnimation()) {
-            cancelTransitionBenchmark("another map animation started");
-            return;
-        }
-        long nowNanos = System.nanoTime();
-        if ((nowNanos - transitionBenchmarkPhaseStartedNanos) > TRANSITION_BENCHMARK_TIMEOUT_NS) {
-            cancelTransitionBenchmark(transitionBenchmarkPhase.name().toLowerCase(Locale.ROOT) + " timed out");
-            return;
-        }
-        if (!transitionBenchmarkExactFramePainted) {
-            return;
-        }
-
-        switch (transitionBenchmarkPhase) {
-            case WARMUP -> startMeasuredMapModeTransition(benchmarkRun, nowNanos);
-            case MODE_TRANSITION -> finishMapModeTransitionMeasurement(benchmarkRun, nowNanos);
-            case CACHE_REGENERATION -> finishCacheRegenerationMeasurement(benchmarkRun, nowNanos);
-            case RESTORE -> finishTransitionBenchmarkRestore(benchmarkRun, nowNanos);
-        }
-    }
-
-    private boolean hasUnexpectedTransitionBenchmarkAnimation() {
-        return optionPanelAnimating || territoryLayerAnimating || hpgNetworkLayerAnimating
-              || operationsLayerAnimating || selectionAnimationTimer.isRunning()
-              || proposedRouteAnimationTimer.isRunning() || travelAnimationTimer.isRunning()
-              || systemDiveAnimationTimer.isRunning();
-    }
-
-    private boolean isTransitionBenchmarkConfigurationCurrent(TransitionBenchmarkRun benchmarkRun) {
-        MapMode expectedMode = switch (transitionBenchmarkPhase) {
-            case WARMUP, RESTORE -> benchmarkRun.originMode();
-            case MODE_TRANSITION, CACHE_REGENERATION -> benchmarkRun.targetMode();
-        };
-        return (getWidth() == benchmarkRun.width()) && (getHeight() == benchmarkRun.height())
-              && campaign.getLocalDate().equals(benchmarkRun.date())
-              && benchmarkRun.origin().equals(
-                  new RenderBenchmarkCamera(conf.centerX, conf.centerY, conf.scale))
-              && (getSelectedMapMode() == expectedMode)
-              && (optTerritory.isSelected() == benchmarkRun.territory())
-              && (optHPGNetwork.isSelected() == benchmarkRun.hpgNetwork())
-              && (optOperations.isSelected() == benchmarkRun.operations())
-              && (optReachability.isSelected() == benchmarkRun.reachability())
-              && (optEmptySystems.isSelected() == benchmarkRun.emptySystems());
-    }
-
-    private void startMeasuredMapModeTransition(TransitionBenchmarkRun benchmarkRun, long nowNanos) {
-        transitionBenchmarkPhase = TransitionBenchmarkPhase.MODE_TRANSITION;
-        transitionBenchmarkPhaseStartedNanos = nowNanos;
-        transitionBenchmarkExactFramePainted = false;
-        renderPerformanceTracker.reset(nowNanos);
-        selectMapMode(benchmarkRun.targetMode());
-        startMapModeAnimation(benchmarkRun.targetMode());
-        LOGGER.info("Map transition benchmark measurement started: path={} phase=mode-transition from={} to={}",
-              TRANSITION_BENCHMARK_PATH_ID, benchmarkRun.originMode(), benchmarkRun.targetMode());
-    }
-
-    private void finishMapModeTransitionMeasurement(TransitionBenchmarkRun benchmarkRun, long nowNanos) {
-        logTransitionBenchmarkResult(benchmarkRun, "mode-transition", benchmarkRun.targetMode(), nowNanos);
-        finishSettledMapModeTransitionFrame();
-        transitionBenchmarkPhase = TransitionBenchmarkPhase.CACHE_REGENERATION;
-        transitionBenchmarkPhaseStartedNanos = nowNanos;
-        transitionBenchmarkExactFramePainted = false;
-        renderPerformanceTracker.reset(nowNanos);
-        clearRenderLayerCaches();
-        repaint();
-        LOGGER.info("Map transition benchmark measurement started: path={} phase=cache-regeneration mode={}",
-              TRANSITION_BENCHMARK_PATH_ID, benchmarkRun.targetMode());
-    }
-
-    private void finishCacheRegenerationMeasurement(TransitionBenchmarkRun benchmarkRun, long nowNanos) {
-        logTransitionBenchmarkResult(benchmarkRun, "cache-regeneration", benchmarkRun.targetMode(), nowNanos);
-        transitionBenchmarkPhase = TransitionBenchmarkPhase.RESTORE;
-        transitionBenchmarkPhaseStartedNanos = nowNanos;
-        transitionBenchmarkExactFramePainted = false;
-        renderPerformanceTracker.reset(nowNanos);
-        selectMapMode(benchmarkRun.originMode());
-        startMapModeAnimation(benchmarkRun.originMode());
-    }
-
-    private void finishTransitionBenchmarkRestore(TransitionBenchmarkRun benchmarkRun, long nowNanos) {
-        transitionBenchmarkTimer.stop();
-        finishSettledMapModeTransitionFrame();
-        transitionBenchmarkRun = null;
-        transitionBenchmarkPhase = null;
-        transitionBenchmarkExactFramePainted = false;
-        renderPerformanceTracker.reset(nowNanos);
-        LOGGER.info("Map transition benchmark completed: path={} restoredMode={}",
-              TRANSITION_BENCHMARK_PATH_ID, benchmarkRun.originMode());
-    }
-
-    private void logTransitionBenchmarkResult(TransitionBenchmarkRun benchmarkRun, String phase,
-          MapMode mode, long nowNanos) {
-        String report = renderPerformanceTracker.hasSamples()
-              ? renderPerformanceTracker.reportAndReset(nowNanos)
-              : "Map render: frames=0";
-        long elapsedMillis = (nowNanos - transitionBenchmarkPhaseStartedNanos) / 1_000_000L;
-        LOGGER.info("Map transition benchmark result: path={} phase={} viewport={}x{} date={} "
-                    + "from={} to={} mode={} layers[territory={} hpg={} operations={} reachability={} empty={}] "
-                    + "center=({}, {}) scale={} elapsed={}ms {}",
-              TRANSITION_BENCHMARK_PATH_ID, phase, benchmarkRun.width(), benchmarkRun.height(),
-              benchmarkRun.date(), benchmarkRun.originMode(), benchmarkRun.targetMode(), mode,
-              benchmarkRun.territory(), benchmarkRun.hpgNetwork(), benchmarkRun.operations(),
-              benchmarkRun.reachability(), benchmarkRun.emptySystems(), benchmarkRun.origin().centerX(),
-              benchmarkRun.origin().centerY(), benchmarkRun.origin().scale(), elapsedMillis, report);
-    }
-
-    private void cancelTransitionBenchmark(String reason) {
-        TransitionBenchmarkRun benchmarkRun = transitionBenchmarkRun;
-        if (benchmarkRun == null) {
-            return;
-        }
-        transitionBenchmarkTimer.stop();
-        transitionBenchmarkRun = null;
-        transitionBenchmarkPhase = null;
-        transitionBenchmarkExactFramePainted = false;
-        selectMapMode(benchmarkRun.originMode());
-        previousMapMode = benchmarkRun.originMode();
-        targetMapMode = benchmarkRun.originMode();
-        mapModeAnimationProgress = 1.0;
-        mapModeAnimating = false;
-        mapModeTransitionSettling = false;
-        mapModeTransitionCacheStage = MapModeTransitionCacheStage.INACTIVE;
-        clearMapModeTransitionRenderCaches();
-        if (!hasActiveLayerAnimation()) {
-            layerAnimationTimer.stop();
-        }
-        renderPerformanceTracker.reset(System.nanoTime());
-        repaint();
-        LOGGER.info("Map transition benchmark cancelled: path={} reason={}",
-              TRANSITION_BENCHMARK_PATH_ID, reason);
-    }
-
-    private void toggleZoomBenchmark() {
-        if (zoomBenchmarkRun != null) {
-            cancelZoomBenchmark("cancelled by user");
-            return;
-        }
-        if (renderBenchmarkTimer.isRunning()) {
-            LOGGER.info("Map zoom benchmark not started: warm-pan benchmark is running");
-            return;
-        }
-        if (transitionBenchmarkRun != null) {
-            LOGGER.info("Map zoom benchmark not started: transition benchmark is running");
-            return;
-        }
-        if (!isShowing() || (getWidth() <= 0) || (getHeight() <= 0)) {
-            LOGGER.info("Map zoom benchmark not started: map is not visible");
-            return;
-        }
-        if (hasActiveRenderAnimation()) {
-            LOGGER.info("Map zoom benchmark not started: wait for map animations to finish");
-            return;
-        }
-
-        RenderBenchmarkCamera origin = new RenderBenchmarkCamera(conf.centerX, conf.centerY, conf.scale);
-        if (!isValidZoomBenchmarkOrigin(origin)) {
-            LOGGER.info("Map zoom benchmark not started: invalid camera center=({}, {}) scale={}",
-                  origin.centerX(), origin.centerY(), origin.scale());
-            return;
-        }
-        double semanticReference = getSemanticZoomReference(conf.showPlanetNamesThreshold);
-        ZoomBenchmarkRange range = zoomBenchmarkRange(semanticReference);
-        int anchorX = getWidth() * 2 / 3;
-        int anchorY = getHeight() / 3;
-        zoomBenchmarkRun = new ZoomBenchmarkRun(origin, getWidth(), getHeight(), campaign.getLocalDate(),
-              getSelectedMapMode(), optTerritory.isSelected(), optHPGNetwork.isSelected(),
-              optOperations.isSelected(), optReachability.isSelected(), optEmptySystems.isSelected(),
-              anchorX, anchorY, semanticReference, range);
-        zoomBenchmarkPhase = ZoomBenchmarkPhase.WARMUP;
-        zoomBenchmarkPhaseStartedNanos = System.nanoTime();
-        zoomBenchmarkExpectedCamera = origin;
-        zoomBenchmarkCameraPainted = false;
-        zoomBenchmarkExactFramePainted = false;
-        zoomBenchmarkPathComplete = false;
-        renderPerformanceTracker.reset(zoomBenchmarkPhaseStartedNanos);
-        zoomBenchmarkTimer.start();
-        requestStaticCartographyPreparation();
-        repaint();
-        LOGGER.info("Map zoom benchmark warmup started: path={} atlasScale={} detailScale={} duration={}s",
-              ZOOM_BENCHMARK_PATH_ID, range.atlasScale(), range.detailScale(),
-              ZOOM_BENCHMARK_DURATION_NS / 1_000_000_000L);
-    }
-
-    private void updateZoomBenchmark() {
-        ZoomBenchmarkRun benchmarkRun = zoomBenchmarkRun;
-        if (benchmarkRun == null) {
-            zoomBenchmarkTimer.stop();
-            return;
-        }
-        if (!isZoomBenchmarkConfigurationCurrent(benchmarkRun)) {
-            cancelZoomBenchmark("map configuration changed");
-            return;
-        }
-        if (hasActiveRenderAnimation()) {
-            cancelZoomBenchmark("another map animation started");
-            return;
-        }
-
-        long nowNanos = System.nanoTime();
-        switch (zoomBenchmarkPhase) {
-            case WARMUP -> updateZoomBenchmarkWarmup(nowNanos);
-            case ACTIVE_ZOOM -> updateActiveZoomBenchmark(benchmarkRun, nowNanos);
-            case SETTLED_REGENERATION -> updateSettledZoomBenchmark(benchmarkRun, nowNanos);
-        }
-    }
-
-    private void updateZoomBenchmarkWarmup(long nowNanos) {
-        if ((nowNanos - zoomBenchmarkPhaseStartedNanos) > ZOOM_BENCHMARK_TIMEOUT_NS) {
-            cancelZoomBenchmark("warmup timed out");
-            return;
-        }
-        if (!zoomBenchmarkExactFramePainted) {
-            return;
-        }
-
-        zoomBenchmarkPhase = ZoomBenchmarkPhase.ACTIVE_ZOOM;
-        zoomBenchmarkPhaseStartedNanos = nowNanos;
-        zoomBenchmarkCameraPainted = false;
-        zoomBenchmarkExactFramePainted = false;
-        zoomBenchmarkPathComplete = false;
-        renderPerformanceTracker.reset(nowNanos);
-        LOGGER.info("Map zoom benchmark measurement started: path={} phase=active-zoom",
-              ZOOM_BENCHMARK_PATH_ID);
-    }
-
-    private void updateActiveZoomBenchmark(ZoomBenchmarkRun benchmarkRun, long nowNanos) {
-        if ((nowNanos - zoomBenchmarkPhaseStartedNanos)
-              > (ZOOM_BENCHMARK_DURATION_NS + ZOOM_BENCHMARK_TIMEOUT_NS)) {
-            cancelZoomBenchmark("active zoom timed out");
-            return;
-        }
-        if (zoomBenchmarkPathComplete) {
-            if (!zoomBenchmarkCameraPainted) {
-                return;
-            }
-            finishActiveZoomMeasurement(benchmarkRun, nowNanos);
-            return;
-        }
-
-        double progress = Math.min(1.0,
-              (double) (nowNanos - zoomBenchmarkPhaseStartedNanos) / ZOOM_BENCHMARK_DURATION_NS);
-          RenderBenchmarkCamera camera = zoomBenchmarkCameraAt(benchmarkRun.origin(), benchmarkRun.width(),
-              benchmarkRun.height(), benchmarkRun.anchorX(), benchmarkRun.anchorY(), benchmarkRun.range(),
-              progress);
-          if (!camera.equals(zoomBenchmarkExpectedCamera)) {
-            applyZoomBenchmarkCamera(camera);
-          }
-        zoomBenchmarkPathComplete = progress >= 1.0;
-    }
-
-    private void finishActiveZoomMeasurement(ZoomBenchmarkRun benchmarkRun, long nowNanos) {
-        logZoomBenchmarkResult(benchmarkRun, "active-zoom", nowNanos);
-        zoomBenchmarkPhase = ZoomBenchmarkPhase.SETTLED_REGENERATION;
-        zoomBenchmarkPhaseStartedNanos = nowNanos;
-        zoomBenchmarkExactFramePainted = false;
-        zoomBenchmarkPathComplete = false;
-        renderPerformanceTracker.reset(nowNanos);
-        clearRenderLayerCaches();
-        applyZoomBenchmarkCamera(benchmarkRun.origin());
-        requestStaticCartographyPreparation();
-        LOGGER.info("Map zoom benchmark measurement started: path={} phase=settled-regeneration",
-              ZOOM_BENCHMARK_PATH_ID);
-    }
-
-    private void updateSettledZoomBenchmark(ZoomBenchmarkRun benchmarkRun, long nowNanos) {
-        if ((nowNanos - zoomBenchmarkPhaseStartedNanos) > ZOOM_BENCHMARK_TIMEOUT_NS) {
-            cancelZoomBenchmark("settled regeneration timed out");
-            return;
-        }
-        if (!zoomBenchmarkExactFramePainted) {
-            return;
-        }
-
-        logZoomBenchmarkResult(benchmarkRun, "settled-regeneration", nowNanos);
-        zoomBenchmarkTimer.stop();
-        zoomBenchmarkRun = null;
-        zoomBenchmarkPhase = null;
-        zoomBenchmarkExpectedCamera = null;
-        zoomBenchmarkCameraPainted = false;
-        zoomBenchmarkExactFramePainted = false;
-        renderPerformanceTracker.reset(nowNanos);
-        LOGGER.info("Map zoom benchmark completed: path={} restoredScale={}",
-              ZOOM_BENCHMARK_PATH_ID, benchmarkRun.origin().scale());
-    }
-
-    private boolean isZoomBenchmarkConfigurationCurrent(ZoomBenchmarkRun benchmarkRun) {
-        return (getWidth() == benchmarkRun.width()) && (getHeight() == benchmarkRun.height())
-              && campaign.getLocalDate().equals(benchmarkRun.date())
-              && (getSelectedMapMode() == benchmarkRun.mapMode())
-              && (optTerritory.isSelected() == benchmarkRun.territory())
-              && (optHPGNetwork.isSelected() == benchmarkRun.hpgNetwork())
-              && (optOperations.isSelected() == benchmarkRun.operations())
-              && (optReachability.isSelected() == benchmarkRun.reachability())
-              && (optEmptySystems.isSelected() == benchmarkRun.emptySystems())
-              && (Double.doubleToLongBits(getSemanticZoomReference(conf.showPlanetNamesThreshold))
-                    == Double.doubleToLongBits(benchmarkRun.semanticReference()))
-              && new RenderBenchmarkCamera(conf.centerX, conf.centerY, conf.scale)
-                    .equals(zoomBenchmarkExpectedCamera);
-    }
-
-    private void applyZoomBenchmarkCamera(RenderBenchmarkCamera camera) {
-        zoomBenchmarkExpectedCamera = camera;
-        zoomBenchmarkCameraPainted = false;
-        applyRenderBenchmarkCamera(camera);
-    }
-
-    private void logZoomBenchmarkResult(ZoomBenchmarkRun benchmarkRun, String phase, long nowNanos) {
-        String report = renderPerformanceTracker.hasSamples()
-              ? renderPerformanceTracker.reportAndReset(nowNanos)
-              : "Map render: frames=0";
-        long elapsedMillis = (nowNanos - zoomBenchmarkPhaseStartedNanos) / 1_000_000L;
-        LOGGER.info("Map zoom benchmark result: path={} phase={} viewport={}x{} date={} mode={} "
-                    + "layers[territory={} hpg={} operations={} reachability={} empty={}] "
-                    + "center=({}, {}) scale={} anchor=({}, {}) range=({}, {}) elapsed={}ms {}",
-              ZOOM_BENCHMARK_PATH_ID, phase, benchmarkRun.width(), benchmarkRun.height(), benchmarkRun.date(),
-              benchmarkRun.mapMode(), benchmarkRun.territory(), benchmarkRun.hpgNetwork(),
-              benchmarkRun.operations(), benchmarkRun.reachability(), benchmarkRun.emptySystems(),
-              benchmarkRun.origin().centerX(), benchmarkRun.origin().centerY(), benchmarkRun.origin().scale(),
-              benchmarkRun.anchorX(), benchmarkRun.anchorY(), benchmarkRun.range().atlasScale(),
-              benchmarkRun.range().detailScale(), elapsedMillis, report);
-    }
-
-    private void cancelZoomBenchmark(String reason) {
-        ZoomBenchmarkRun benchmarkRun = zoomBenchmarkRun;
-        if (benchmarkRun == null) {
-            return;
-        }
-        zoomBenchmarkTimer.stop();
-        zoomBenchmarkRun = null;
-        zoomBenchmarkPhase = null;
-        zoomBenchmarkExpectedCamera = null;
-        zoomBenchmarkCameraPainted = false;
-        zoomBenchmarkExactFramePainted = false;
-        zoomBenchmarkPathComplete = false;
-        renderPerformanceTracker.reset(System.nanoTime());
-        applyRenderBenchmarkCamera(benchmarkRun.origin());
-        LOGGER.info("Map zoom benchmark cancelled: path={} reason={}", ZOOM_BENCHMARK_PATH_ID, reason);
-    }
-
     private boolean isZoomInteractionActive() {
-        return zoomInteractionActive || ((zoomBenchmarkRun != null)
-              && (zoomBenchmarkPhase == ZoomBenchmarkPhase.ACTIVE_ZOOM));
+        return zoomInteractionActive;
     }
 
     private void finishZoomInteraction() {
@@ -4316,179 +3034,10 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     static JTabbedPane createMapLegendTabbedPane() {
-        int contentWidth = UIUtil.scaleForGUI(MAP_LEGEND_CONTENT_WIDTH);
-        List<MapLegendSection> orderedSections = MAP_LEGEND_SECTIONS.stream()
-              .sorted(Comparator.comparingInt(section -> switch (section.heading()) {
-                  case "NAVIGATION" -> 0;
-                  case "ROUTES" -> 1;
-                  case "LAYERS" -> 2;
-                  case "OVERLAYS" -> 3;
-                  case "RANGE RINGS" -> 4;
-                  case "SYSTEM STATUS" -> 5;
-                  default -> Integer.MAX_VALUE;
-              }))
-              .toList();
-        List<JPanel> sections = orderedSections.stream()
-              .map(section -> createMapLegendSection(section, contentWidth))
-              .toList();
-        int viewportHeight = Math.min(sections.stream()
-              .mapToInt(section -> section.getPreferredSize().height)
-              .max()
-              .orElse(1), UIUtil.scaleForGUI(MAP_LEGEND_MAX_VIEWPORT_HEIGHT));
-
-        JTabbedPane tabbedPane = new JTabbedPane();
-        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
-        tabbedPane.setOpaque(true);
-        tabbedPane.setBackground(MAP_LEGEND_BACKGROUND);
-        tabbedPane.setForeground(LAYER_CONTROL_TEXT);
-        tabbedPane.setFocusable(true);
-        tabbedPane.getAccessibleContext().setAccessibleName("Map symbol legend");
-        tabbedPane.getAccessibleContext().setAccessibleDescription(
-              "Legend for symbols shown on the interstellar map");
-        for (int sectionIndex = 0; sectionIndex < sections.size(); sectionIndex++) {
-            MapLegendSection section = orderedSections.get(sectionIndex);
-            JScrollPane scrollPane = createMapLegendSectionScrollPane(sections.get(sectionIndex), contentWidth,
-                  viewportHeight);
-            tabbedPane.addTab(section.heading(), scrollPane);
-            tabbedPane.setBackgroundAt(sectionIndex, MAP_LEGEND_BACKGROUND);
-            tabbedPane.setForegroundAt(sectionIndex, LAYER_CONTROL_TEXT);
-        }
-        return tabbedPane;
+        return InterstellarMapLegend.createTabbedPane(InterstellarMapPanel::paintMapLegendSymbol);
     }
 
-    private static JScrollPane createMapLegendSectionScrollPane(JPanel section, int viewportWidth,
-          int viewportHeight) {
-        JScrollPane scrollPane = new JScrollPane(section, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollPane.setBorder(null);
-        scrollPane.setOpaque(true);
-        scrollPane.setBackground(MAP_LEGEND_BACKGROUND);
-        scrollPane.setFocusable(true);
-        scrollPane.getViewport().setOpaque(true);
-        scrollPane.getViewport().setBackground(MAP_LEGEND_BACKGROUND);
-        Dimension viewportSize = new Dimension(viewportWidth, viewportHeight);
-        scrollPane.getViewport().setPreferredSize(viewportSize);
-        scrollPane.setPreferredSize(viewportSize);
-          ImmersiveScrollBarStyle.apply(scrollPane.getVerticalScrollBar(), MAP_LEGEND_BACKGROUND,
-              MAP_LEGEND_DIVIDER, MAP_LEGEND_SCROLLBAR_THUMB, LAYER_CONTROL_BUTTON_ICON,
-              UIUtil.scaleForGUI(MAP_LEGEND_SCROLLBAR_WIDTH));
-        scrollPane.getAccessibleContext().setAccessibleName(section.getAccessibleContext().getAccessibleName());
-        scrollPane.getAccessibleContext().setAccessibleDescription(
-              "Map symbol legend section " + section.getAccessibleContext().getAccessibleName());
-        return scrollPane;
-    }
-
-    private static JPanel createMapLegendSection(MapLegendSection section, int sectionWidth) {
-        int horizontalPadding = UIUtil.scaleForGUI(8);
-        int rowWidth = sectionWidth - (horizontalPadding * 2);
-        JPanel sectionPanel = new JPanel();
-        sectionPanel.setLayout(new BoxLayout(sectionPanel, BoxLayout.Y_AXIS));
-        sectionPanel.setOpaque(true);
-        sectionPanel.setBackground(MAP_LEGEND_BACKGROUND);
-        sectionPanel.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(8), horizontalPadding,
-              UIUtil.scaleForGUI(8), horizontalPadding));
-        sectionPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        sectionPanel.getAccessibleContext().setAccessibleName(section.heading());
-        sectionPanel.putClientProperty("mapLegendSection", section.heading());
-        for (MapLegendEntry entry : section.entries()) {
-            sectionPanel.add(createMapLegendRow(entry, rowWidth));
-        }
-
-        Dimension preferredSize = sectionPanel.getPreferredSize();
-        sectionPanel.setPreferredSize(new Dimension(sectionWidth, preferredSize.height));
-        sectionPanel.setMaximumSize(new Dimension(sectionWidth, preferredSize.height));
-        return sectionPanel;
-    }
-
-    private static JPanel createMapLegendRow(MapLegendEntry entry, int rowWidth) {
-        int verticalPadding = UIUtil.scaleForGUI(6);
-        int swatchGap = UIUtil.scaleForGUI(10);
-        int swatchWidth = UIUtil.scaleForGUI(MAP_LEGEND_SWATCH_WIDTH);
-        int textWidth = rowWidth - swatchWidth - swatchGap;
-        MapLegendSwatch swatch = new MapLegendSwatch(entry);
-
-        JLabel title = new JLabel(entry.title());
-        title.setForeground(LAYER_CONTROL_TEXT);
-        Font baseFont = ObjectUtility.nonNull(UIManager.getFont("Label.font"), title.getFont());
-        title.setFont(baseFont.deriveFont(Font.BOLD, baseFont.getSize2D()));
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-        JTextArea meaning = new JTextArea(entry.meaning());
-        meaning.setEditable(false);
-        meaning.setFocusable(false);
-        meaning.setOpaque(false);
-        meaning.setForeground(MAP_LEGEND_MUTED_TEXT);
-        meaning.setFont(baseFont.deriveFont(Math.max(10.0f, baseFont.getSize2D() - 1.0f)));
-        meaning.setLineWrap(true);
-        meaning.setWrapStyleWord(true);
-        meaning.setBorder(null);
-        meaning.setAlignmentX(Component.LEFT_ALIGNMENT);
-        meaning.setSize(textWidth, Short.MAX_VALUE);
-        int meaningHeight = meaning.getPreferredSize().height;
-        Dimension meaningSize = new Dimension(textWidth, meaningHeight);
-        meaning.setPreferredSize(meaningSize);
-        meaning.setMinimumSize(meaningSize);
-        meaning.setMaximumSize(meaningSize);
-        meaning.putClientProperty("mapLegendTitle", entry.title());
-
-        JPanel textPanel = new JPanel();
-        textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.Y_AXIS));
-        textPanel.setOpaque(false);
-        textPanel.add(title);
-        textPanel.add(Box.createRigidArea(new Dimension(0, UIUtil.scaleForGUI(2))));
-        textPanel.add(meaning);
-        int textHeight = title.getPreferredSize().height + UIUtil.scaleForGUI(2) + meaningHeight;
-        Dimension textSize = new Dimension(textWidth, textHeight);
-        textPanel.setPreferredSize(textSize);
-                textPanel.setMinimumSize(textSize);
-        textPanel.setMaximumSize(textSize);
-                textPanel.putClientProperty("mapLegendTextCell", Boolean.TRUE);
-                textPanel.putClientProperty("mapLegendTitle", entry.title());
-
-                JPanel swatchCell = new JPanel(new GridBagLayout());
-                swatchCell.setOpaque(false);
-                swatchCell.setPreferredSize(swatch.getPreferredSize());
-                swatchCell.setMinimumSize(swatch.getPreferredSize());
-                swatchCell.add(swatch);
-                swatchCell.putClientProperty("mapLegendSwatchCell", Boolean.TRUE);
-                swatchCell.putClientProperty("mapLegendTitle", entry.title());
-
-                JPanel row = new JPanel(new GridBagLayout());
-        row.setOpaque(false);
-                GridBagConstraints swatchConstraints = new GridBagConstraints();
-                swatchConstraints.gridx = 0;
-                swatchConstraints.gridy = 0;
-                swatchConstraints.weighty = 1.0;
-                swatchConstraints.fill = GridBagConstraints.VERTICAL;
-                swatchConstraints.anchor = GridBagConstraints.CENTER;
-                swatchConstraints.insets = new Insets(0, 0, 0, swatchGap);
-                row.add(swatchCell, swatchConstraints);
-
-                GridBagConstraints textConstraints = new GridBagConstraints();
-                textConstraints.gridx = 1;
-                textConstraints.gridy = 0;
-                textConstraints.weightx = 1.0;
-                textConstraints.weighty = 1.0;
-                textConstraints.fill = GridBagConstraints.HORIZONTAL;
-                textConstraints.anchor = GridBagConstraints.CENTER;
-                row.add(textPanel, textConstraints);
-        row.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, 1, 0, MAP_LEGEND_DIVIDER),
-              BorderFactory.createEmptyBorder(verticalPadding, 0, verticalPadding, 0)));
-        int rowHeight = Math.max(swatch.getPreferredSize().height, textHeight) + (verticalPadding * 2) + 1;
-        Dimension rowSize = new Dimension(rowWidth, rowHeight);
-        row.setPreferredSize(rowSize);
-        row.setMinimumSize(rowSize);
-        row.setMaximumSize(rowSize);
-        row.setAlignmentX(Component.LEFT_ALIGNMENT);
-        row.putClientProperty("mapLegendRow", Boolean.TRUE);
-        row.putClientProperty("mapLegendTitle", entry.title());
-        row.getAccessibleContext().setAccessibleName(entry.title());
-        row.getAccessibleContext().setAccessibleDescription(entry.meaning());
-        return row;
-    }
-
-    private static void paintMapLegendSymbol(Graphics2D graphics, MapLegendSymbol symbol) {
+    private static void paintMapLegendSymbol(Graphics2D graphics, InterstellarMapLegend.Symbol symbol) {
         switch (symbol) {
             case FACTION_OWNERSHIP -> paintLegendFactionOwnership(graphics);
             case LAYER_TECHNOLOGY -> paintLegendCategoricalLayer(graphics, List.of(
@@ -4854,9 +3403,12 @@ public class InterstellarMapPanel extends JPanel {
         drawNavigationContact(graphics, new Arc2D.Double(), 52, 19, 2.5);
     }
 
-    private static String getMapResource(String key) {
-        return ResourceBundle.getBundle("mekhq.resources.CampaignGUI", MekHQ.getMHQOptions().getLocale())
-                     .getString(key);
+    private static String text(String key) {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
+    }
+
+    private static String formatText(String key, Object... arguments) {
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, arguments);
     }
 
     private static void paintLegendOperation(Graphics2D graphics) {
@@ -4996,9 +3548,9 @@ public class InterstellarMapPanel extends JPanel {
             }
         };
         Dimension buttonSize = UIUtil.scaleForGUI(MAP_LEGEND_BUTTON_SIZE, MAP_LEGEND_BUTTON_SIZE);
-        String accessibleText = "Show map symbol legend";
+          String accessibleText = text("map.legend.button.text");
         configureNavigationUtilityButton(legendButton, buttonSize, accessibleText, accessibleText,
-              "Open a legend describing symbols on the interstellar map");
+              text("map.legend.button.accessibleDescription"));
         return legendButton;
     }
 
@@ -5094,7 +3646,7 @@ public class InterstellarMapPanel extends JPanel {
         mapLegendDialog = null;
 
         Window owner = SwingUtilities.getWindowAncestor(this);
-        JDialog dialog = new JDialog(owner, "Map Symbols", Dialog.ModalityType.MODELESS);
+        JDialog dialog = new JDialog(owner, text("map.legend.dialog.title"), Dialog.ModalityType.MODELESS);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.getRootPane().putClientProperty("JRootPane.titleBarBackground", MAP_LEGEND_TITLE_BACKGROUND);
         dialog.getRootPane().putClientProperty("JRootPane.titleBarForeground", MAP_LEGEND_TITLE_FOREGROUND);
@@ -5430,12 +3982,6 @@ public class InterstellarMapPanel extends JPanel {
               || (mapModeTransitionCacheStage == MapModeTransitionCacheStage.TARGET);
     }
 
-    private boolean isTransitionBenchmarkAwaitingSettledFrame() {
-        return (transitionBenchmarkRun != null)
-              && ((transitionBenchmarkPhase == TransitionBenchmarkPhase.MODE_TRANSITION)
-                    || (transitionBenchmarkPhase == TransitionBenchmarkPhase.RESTORE));
-    }
-
     private void finishSettledMapModeTransitionFrame() {
         mapModeTransitionSettling = false;
         mapModeTransitionCacheStage = MapModeTransitionCacheStage.INACTIVE;
@@ -5518,8 +4064,8 @@ public class InterstellarMapPanel extends JPanel {
               && viewBounds.equals(view.getBounds()) && viewPosition.equals(view.getViewPosition());
     }
 
-    public void setCampaign(Campaign c) {
-        this.campaign = c;
+    public void setCampaign(Campaign campaign) {
+        this.campaign = campaign;
         refreshSystemsFromCampaign();
         settleTravelVisualState();
         refreshNavigationAnalysis();
@@ -5661,7 +4207,7 @@ public class InterstellarMapPanel extends JPanel {
         label.setOpaque(false);
         label.setForeground(PLANNED_ROUTE_COLOR);
         label.setFont(label.getFont().deriveFont(Font.BOLD, label.getFont().getSize2D() * 0.85f));
-        label.setBorder(BorderFactory.createEmptyBorder(0, 2, 3, 0));
+        label.setBorder(BorderFactory.createEmptyBorder(0, UIUtil.scaleForGUI(2), UIUtil.scaleForGUI(3), 0));
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
         return (label);
     }
@@ -5670,8 +4216,8 @@ public class InterstellarMapPanel extends JPanel {
         JPanel divider = new JPanel();
         divider.setOpaque(true);
         divider.setBackground(LAYER_CONTROL_BORDER);
-        divider.setPreferredSize(new Dimension(150, 1));
-        divider.setMaximumSize(new Dimension(Integer.MAX_VALUE, 1));
+        divider.setPreferredSize(new Dimension(UIUtil.scaleForGUI(150), UIUtil.scaleForGUI(1)));
+        divider.setMaximumSize(new Dimension(Integer.MAX_VALUE, UIUtil.scaleForGUI(1)));
         divider.setAlignmentX(Component.LEFT_ALIGNMENT);
         return divider;
     }
@@ -5679,7 +4225,7 @@ public class InterstellarMapPanel extends JPanel {
     private JCheckBox createOptionCheckBox(String text) {
         JCheckBox checkBox = new ImmersiveCheckBox(text);
         checkBox.setForeground(LAYER_CONTROL_TEXT);
-        checkBox.setPreferredSize(new Dimension(150, 20));
+        checkBox.setPreferredSize(UIUtil.scaleForGUI(150, 20));
         checkBox.setAlignmentX(Component.LEFT_ALIGNMENT);
         return checkBox;
     }
@@ -5687,7 +4233,7 @@ public class InterstellarMapPanel extends JPanel {
     private JRadioButton createOptionRadioButton(String text, MapMode mapMode) {
         JRadioButton radioButton = new ImmersiveRadioButton(text);
         radioButton.setForeground(LAYER_CONTROL_TEXT);
-        radioButton.setPreferredSize(new Dimension(150, 20));
+        radioButton.setPreferredSize(UIUtil.scaleForGUI(150, 20));
         radioButton.setAlignmentX(Component.LEFT_ALIGNMENT);
         radioButton.addActionListener(e -> {
             if (radioButton.isSelected()) {
@@ -5975,7 +4521,6 @@ public class InterstellarMapPanel extends JPanel {
             double factionLogoAlpha, double hpgNetworkAlpha, SemanticZoomProfile semanticZoom,
             Stroke thick, Stroke dashed, List<PlanetarySystem> activeRouteSystems,
             int revealedProposedRouteSystemCount, int overscan) {
-                    long phaseStartedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
                     if (cartographyLayer == null) {
                         drawRetainedCartographyLayer(graphics, atlas, factionLogoRenderKey,
                                 territoryAlpha, 0.0, overscan);
@@ -5988,33 +4533,20 @@ public class InterstellarMapPanel extends JPanel {
                           layerGraphics -> drawFactionLogoLayer(layerGraphics, atlas,
                               factionLogoRenderKey, false));
                     }
-                    long cartographyFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
           drawReachability(graphics, systemSize, semanticZoom.detailedOverlayAlpha(), systemRenderData);
           drawProposedRoute(graphics, new Arc2D.Double(), systemSize,
               revealedProposedRouteSystemCount, semanticZoom.detailedOverlayAlpha());
-                    long routeFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
           if (hpgNetworkAlpha > 0.0) {
             paintLayerWithAlpha(graphics, hpgNetworkAlpha,
                 layerGraphics -> drawHpgNetworkLayer(layerGraphics, thick, dashed,
                     hpgNetworkDetail, false));
           }
-                    long hpgFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
           if (!activeRouteSystems.isEmpty()) {
             drawActiveRoute(graphics, new Arc2D.Double(), activeRouteSystems, systemSize,
                 1.0, semanticZoom.detailedOverlayAlpha());
           }
-                    long activeRouteFinishedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
           drawRetainedSystemArt(graphics, systemRenderData, mapMode, systemSize,
               semanticZoom, overscan);
-                    if (RENDER_PROFILING_ENABLED) {
-                        long systemsFinishedNanos = System.nanoTime();
-                        renderPerformanceTracker.recordRetainedRender(
-                                cartographyFinishedNanos - phaseStartedNanos,
-                                routeFinishedNanos - cartographyFinishedNanos,
-                                hpgFinishedNanos - routeFinishedNanos,
-                                activeRouteFinishedNanos - hpgFinishedNanos,
-                                systemsFinishedNanos - activeRouteFinishedNanos);
-                    }
         }
 
         private static List<String> getSystemIds(List<PlanetarySystem> routeSystems) {
@@ -6118,12 +4650,7 @@ public class InterstellarMapPanel extends JPanel {
             retainedCartographyPreparationQueue.request(request);
             if ((previousLayer != null) && previousLayer.key().dataKey().equals(key.dataKey())) {
                 retainedCartographyProvisional = true;
-                long snapshotStartedNanos = RENDER_PROFILING_ENABLED ? System.nanoTime() : 0L;
                 drawPannableSnapshot(graphics, previousLayer, viewKey, 1.0);
-                if (RENDER_PROFILING_ENABLED) {
-                    renderPerformanceTracker.recordZoomSnapshotTransform(
-                          System.nanoTime() - snapshotStartedNanos);
-                }
             } else {
                 drawRetainedCartographyTerritory(graphics, atlas, viewKey, territoryAlpha, 0);
             }
@@ -6615,7 +5142,7 @@ public class InterstellarMapPanel extends JPanel {
             for (Faction faction : Factions.getInstance().getFactions()) {
                 String capitalSystem = faction.getStartingPlanet(date);
                 capitals.put(faction, capitalSystem);
-                if ((mercenaryFaction == null) && "MERC".equals(faction.getShortName())) {
+                if ((mercenaryFaction == null) && MERCENARY_FACTION_CODE.equals(faction.getShortName())) {
                     mercenaryFaction = faction;
                     mercenaryCapitalSystem = capitalSystem;
                 }
@@ -7571,8 +6098,8 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     private JMenuItem createRoutePlanningMenuItem(String resourceKey, boolean enabled, Runnable action) {
-        JMenuItem item = new JMenuItem(resourceMap.getString(resourceKey + ".text"));
-        item.setToolTipText(resourceMap.getString(resourceKey + ".toolTipText"));
+        JMenuItem item = new JMenuItem(text(resourceKey + ".text"));
+        item.setToolTipText(text(resourceKey + ".toolTipText"));
         item.getAccessibleContext().setAccessibleName(item.getText());
         item.getAccessibleContext().setAccessibleDescription(item.getToolTipText());
         item.setEnabled(enabled);
@@ -7971,7 +6498,7 @@ public class InterstellarMapPanel extends JPanel {
         Faction mercenaryFaction = null;
         String mercenaryCapitalSystem = null;
         for (Map.Entry<Faction, String> entry : capitals.entrySet()) {
-            if ("MERC".equals(entry.getKey().getShortName())) {
+            if (MERCENARY_FACTION_CODE.equals(entry.getKey().getShortName())) {
                 mercenaryFaction = entry.getKey();
                 mercenaryCapitalSystem = entry.getValue();
                 break;
@@ -8355,7 +6882,7 @@ public class InterstellarMapPanel extends JPanel {
             return;
         }
         PlanetarySystem anchor = cachedReachability.anchor();
-        String annotation = MessageFormat.format(resourceMap.getString("map.reachability.anchor.format"),
+          String annotation = formatText("map.reachability.anchor.format",
               anchor.getPrintableName(campaign.getLocalDate()), cachedReachability.maximumHops());
         Font oldFont = graphics.getFont();
         Paint oldPaint = graphics.getPaint();
@@ -8474,9 +7001,9 @@ public class InterstellarMapPanel extends JPanel {
         String jumps = NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getLocale())
                              .format(assessment.facts().minimumStandardJumps());
         String circuitSuffix = assessment.facts().commandCircuitAssumed()
-              ? resourceMap.getString("map.measurement.circuitSuffix.text")
+              ? text("map.measurement.circuitSuffix.text")
               : "";
-        String labelText = MessageFormat.format(resourceMap.getString("map.measurement.label.format"),
+          String labelText = formatText("map.measurement.label.format",
               distance, jumps, measurementStatusText(assessment, numberFormat), circuitSuffix);
         Font labelFont = graphics.getFont().deriveFont(Font.BOLD,
               Math.max(9.0f, Math.min(11.0f, graphics.getFont().getSize2D() * 0.82f)));
@@ -8501,15 +7028,7 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     private String measurementStatusText(LegAssessment assessment, NumberFormat numberFormat) {
-        NavigationRouteAnalysis.FindingKind primaryFinding = assessment.findings().stream()
-              .filter(finding -> finding.severity() == Severity.BLOCKED)
-              .map(NavigationRouteAnalysis.Finding::kind)
-              .findFirst()
-              .orElseGet(() -> assessment.findings().stream()
-                    .filter(finding -> finding.severity() == Severity.CAUTION)
-                    .map(NavigationRouteAnalysis.Finding::kind)
-                    .findFirst()
-                    .orElse(null));
+        NavigationRouteAnalysis.FindingKind primaryFinding = assessment.primaryFindingKind();
         if (primaryFinding != null) {
             String key = switch (primaryFinding) {
                 case OUT_OF_STANDARD_JUMP_RANGE -> "map.measurement.status.rangeBlocked.text";
@@ -8519,12 +7038,12 @@ public class InterstellarMapPanel extends JPanel {
                 case RECHARGE_IMPOSSIBLE -> "map.measurement.status.rechargeBlocked.text";
                 default -> "map.measurement.status.blocked.text";
             };
-            return resourceMap.getString(key);
+            return text(key);
         }
-        return MessageFormat.format(resourceMap.getString("map.measurement.status.clear.format"),
+        return formatText("map.measurement.status.clear.format",
               numberFormat.format(assessment.facts().rechargeHours()),
               assessment.facts().rechargeStationCount() > 0
-                    ? resourceMap.getString("map.measurement.stationSuffix.text")
+                    ? text("map.measurement.stationSuffix.text")
                     : "");
     }
 
@@ -9351,7 +7870,7 @@ public class InterstellarMapPanel extends JPanel {
         float headingFontSize = Math.max(UIUtil.scaleForGUI(9), baseFont.getSize2D() * 0.78f);
         graphics.setFont(baseFont.deriveFont(Font.BOLD, headingFontSize));
         double headingBaseline = layout.scaleBarY() - Math.max(7, UIUtil.scaleForGUI(9));
-        drawNavigationText(graphics, "DISTANCE", layout.scaleBarStartX(), headingBaseline,
+        drawNavigationText(graphics, text("map.navigation.distance.text"), layout.scaleBarStartX(), headingBaseline,
               MAP_LEGEND_MUTED_TEXT);
 
         float lineWidth = Math.max(1.0f, UIUtil.scaleForGUI(1));
@@ -9428,26 +7947,27 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         String corewardLabel() {
-            return "COREWARD";
+            return text("map.navigation.coreward.text");
         }
 
         String rimwardLabel() {
-            return "RIMWARD";
+            return text("map.navigation.rimward.text");
         }
 
         String antiSpinwardLabel() {
-            return "ANTI-SPINWARD";
+            return text("map.navigation.antiSpinward.text");
         }
 
         String spinwardLabel() {
-            return "SPINWARD";
+            return text("map.navigation.spinward.text");
         }
 
         String distanceLabel() {
             BigDecimal exactDistance = BigDecimal.valueOf(distanceLy);
             BigDecimal displayedDistance = exactDistance.round(NAVIGATION_DISTANCE_FORMAT).stripTrailingZeros();
             String approximationMarker = displayedDistance.compareTo(exactDistance) == 0 ? "" : "~";
-            return approximationMarker + displayedDistance.toPlainString() + " LY";
+            return formatText("map.navigation.distance.format", approximationMarker,
+                displayedDistance.toPlainString());
         }
 
     }
@@ -10095,22 +8615,6 @@ public class InterstellarMapPanel extends JPanel {
         }
         return MapMode.FACTION;
     }
-
-    /*
-     * TODO: re-enable later
-     * private void openPlanetEventEditor(Planet p) {
-     * NewPlanetaryEventDialog editor = new NewPlanetaryEventDialog(null, campaign,
-     * selectedSystem);
-     * editor.setVisible(true);
-     * List<Planet.PlanetaryEvent> result = editor.getChangedEvents();
-     * if ((null != result) && !result.isEmpty()) {
-     * Planets.getInstance().updatePlanetaryEvents(p.getId(), result, true);
-     * Planets.getInstance().recalcHPGNetwork();
-     * repaint();
-     * notifyListeners();
-     * }
-     * }
-     */
 
     /**
      * Opens the GM-only planetary system editor pre-selected on the given system. Refreshes and repaints the map after

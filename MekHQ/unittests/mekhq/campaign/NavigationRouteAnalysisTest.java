@@ -47,8 +47,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import mekhq.campaign.NavigationRouteAnalysis.Finding;
 import mekhq.campaign.NavigationRouteAnalysis.FindingKind;
 import mekhq.campaign.NavigationRouteAnalysis.LegAssessment;
+import mekhq.campaign.NavigationRouteAnalysis.LegFacts;
 import mekhq.campaign.NavigationRouteAnalysis.Policy;
 import mekhq.campaign.NavigationRouteAnalysis.Reachability;
 import mekhq.campaign.NavigationRouteAnalysis.Severity;
@@ -85,6 +87,24 @@ class NavigationRouteAnalysisTest {
         assertEquals(List.of(FindingKind.OUT_OF_STANDARD_JUMP_RANGE, FindingKind.ACCESS_DENIED),
               blockingKinds(assessment));
     }
+
+        @Test
+        void primaryFindingPrefersFirstBlockerThenFirstCaution() {
+          PlanetarySystem origin = system("ORIGIN");
+          PlanetarySystem destination = system("DESTINATION");
+          LegFacts facts = new LegFacts(0, 0, true, false, 0, 0, 0, false);
+          LegAssessment blocked = new LegAssessment(origin, destination, facts, List.of(
+              new Finding(FindingKind.ABANDONED_DESTINATION_ALLOWED, Severity.CAUTION),
+              new Finding(FindingKind.ACCESS_DENIED, Severity.BLOCKED),
+              new Finding(FindingKind.OUT_OF_STANDARD_JUMP_RANGE, Severity.BLOCKED)), Severity.BLOCKED);
+          LegAssessment caution = new LegAssessment(origin, destination, facts, List.of(
+              new Finding(FindingKind.RECHARGE_DURATION, Severity.INFO),
+              new Finding(FindingKind.ABANDONED_DESTINATION_ALLOWED, Severity.CAUTION),
+              new Finding(FindingKind.SOLAR_RECHARGE_IMPOSSIBLE, Severity.CAUTION)), Severity.CAUTION);
+
+          assertEquals(FindingKind.ACCESS_DENIED, blocked.primaryFindingKind());
+          assertEquals(FindingKind.ABANDONED_DESTINATION_ALLOWED, caution.primaryFindingKind());
+        }
 
     @Test
     void allowedAndAvoidedAbandonedDestinationsHaveDistinctSeverity() {

@@ -40,6 +40,7 @@ import jakarta.annotation.Nullable;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.RouteAlternativesPlanner.PlanningResult;
 import mekhq.campaign.RouteAlternativesPlanner.PlanningStatus;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 
 final class RoutePlanningIntent {
@@ -110,7 +111,15 @@ final class RoutePlanningIntent {
         if ((proposedOrigin == null) || (destination == null)) {
             return ChangeResult.NO_CHANGE;
         }
-        return replace(proposedOrigin, List.of(destination), planner);
+        return replace(proposedOrigin, List.of(destination), null, planner);
+    }
+
+    ChangeResult plotToPlanet(@Nullable PlanetarySystem proposedOrigin, @Nullable Planet destination,
+          SegmentPlanner planner) {
+        if ((proposedOrigin == null) || (destination == null) || (destination.getParentSystem() == null)) {
+            return ChangeResult.NO_CHANGE;
+        }
+        return replace(proposedOrigin, List.of(destination.getParentSystem()), destination, planner);
     }
 
     ChangeResult append(@Nullable PlanetarySystem destination, SegmentPlanner planner) {
@@ -119,7 +128,16 @@ final class RoutePlanningIntent {
         }
         List<PlanetarySystem> proposedStops = new ArrayList<>(requestedStops);
         proposedStops.add(destination);
-        return replace(origin, proposedStops, planner);
+        return replace(origin, proposedStops, null, planner);
+    }
+
+    ChangeResult appendToPlanet(@Nullable Planet destination, SegmentPlanner planner) {
+        if ((origin == null) || (destination == null) || (destination.getParentSystem() == null)) {
+            return ChangeResult.NO_CHANGE;
+        }
+        List<PlanetarySystem> proposedStops = new ArrayList<>(requestedStops);
+        proposedStops.add(destination.getParentSystem());
+        return replace(origin, proposedStops, destination, planner);
     }
 
     ChangeResult removeRequestedStop(@Nullable PlanetarySystem stop, SegmentPlanner planner) {
@@ -133,7 +151,7 @@ final class RoutePlanningIntent {
             jumpPath = new JumpPath();
             return ChangeResult.CHANGED;
         }
-        return replace(origin, proposedStops, planner);
+        return replace(origin, proposedStops, retainedTargetPlanet(proposedStops), planner);
     }
 
     ChangeResult trimAt(@Nullable PlanetarySystem destination, SegmentPlanner planner) {
@@ -156,7 +174,7 @@ final class RoutePlanningIntent {
             searchFrom = stopIndex + 1;
         }
         proposedStops.add(destination);
-        return replace(origin, proposedStops, planner);
+        return replace(origin, proposedStops, retainedTargetPlanet(proposedStops), planner);
     }
 
     boolean isRequestedStop(@Nullable PlanetarySystem system) {
@@ -173,8 +191,8 @@ final class RoutePlanningIntent {
         jumpPath = new JumpPath();
     }
 
-    private ChangeResult replace(PlanetarySystem proposedOrigin, List<PlanetarySystem> proposedStops,
-          SegmentPlanner planner) {
+        private ChangeResult replace(PlanetarySystem proposedOrigin, List<PlanetarySystem> proposedStops,
+                    @Nullable Planet targetPlanet, SegmentPlanner planner) {
         PlanningResult proposedPath = derive(proposedOrigin, proposedStops, planner);
         if (!proposedPath.routeFound()) {
             return changeResultFor(proposedPath.status());
@@ -182,6 +200,7 @@ final class RoutePlanningIntent {
         origin = proposedOrigin;
         requestedStops = List.copyOf(proposedStops);
         jumpPath = proposedPath.path();
+                jumpPath.setTargetPlanet(targetPlanet);
         return ChangeResult.CHANGED;
     }
 
@@ -205,10 +224,16 @@ final class RoutePlanningIntent {
             }
             List<PlanetarySystem> segmentSystems = segment.getSystems();
             derivedPath.addSystems(segmentSystems.subList(derivedPath.isEmpty() ? 0 : 1, segmentSystems.size()));
-            derivedPath.setTargetPlanet(segment.getTargetPlanet());
             segmentOrigin = requestedStop;
         }
         return PlanningResult.found(derivedPath);
+    }
+
+    private @Nullable Planet retainedTargetPlanet(List<PlanetarySystem> proposedStops) {
+        Planet targetPlanet = jumpPath.getTargetPlanet();
+        return (targetPlanet != null) && Objects.equals(targetPlanet.getParentSystem(), proposedStops.getLast())
+              ? targetPlanet
+              : null;
     }
 
     private static ChangeResult changeResultFor(PlanningStatus status) {

@@ -43,7 +43,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.JumpPathItinerary.CircuitMode;
@@ -68,19 +67,17 @@ import org.junit.jupiter.api.Test;
 
 class JumpPathViewPanelTest {
     private static final LocalDate START_DATE = LocalDate.of(3025, 1, 1);
-    private static final ResourceBundle RESOURCES = ResourceBundle.getBundle(
-          "mekhq.resources.JumpPathViewPanel", Locale.US);
 
     @Test
     void timelineMomentUsesLocalizedCampaignDateAndRoundedElapsedHours() {
         assertEquals("Jan 3, 3025 | D+2d 6h",
-              JumpPathViewPanel.formatTimelineMoment(START_DATE, 2.25, Locale.US, RESOURCES));
+      JumpPathViewPanel.formatTimelineMoment(START_DATE, 2.25, Locale.US));
     }
 
     @Test
     void timelineMomentCarriesNegativeOffsetsAcrossCampaignDateBoundary() {
         assertEquals("Dec 31, 3024 | D-2h",
-              JumpPathViewPanel.formatTimelineMoment(START_DATE, -2.0 / 24.0, Locale.US, RESOURCES));
+            JumpPathViewPanel.formatTimelineMoment(START_DATE, -2.0 / 24.0, Locale.US));
     }
 
         @Test
@@ -92,14 +89,14 @@ class JumpPathViewPanelTest {
         @Test
         void scheduleStatusDistinguishesFeasibleForecastAndMissedDeadline() {
         LocalDateTime earliest = START_DATE.atStartOfDay();
-        Result forecast = new Result(Mode.DEPART_AT, earliest, earliest, earliest,
+        Result forecast = new Result(Mode.DEPART_AT, null, earliest, earliest, earliest,
           earliest.plusDays(4), 0, true, List.of(), List.of());
-        Result missed = new Result(Mode.ARRIVE_BY, earliest.plusDays(4), earliest,
+        Result missed = new Result(Mode.ARRIVE_BY, null, earliest.plusDays(4), earliest,
           earliest.minusHours(5), earliest.plusDays(4), 0, false, List.of(), List.of());
 
-        assertEquals("FORECAST READY", JumpPathViewPanel.scheduleStatusText(forecast, Locale.US, RESOURCES));
+        assertEquals("FORECAST READY", JumpPathViewPanel.scheduleStatusText(forecast, Locale.US));
         assertEquals("DEADLINE MISSED BY 5h",
-          JumpPathViewPanel.scheduleStatusText(missed, Locale.US, RESOURCES));
+          JumpPathViewPanel.scheduleStatusText(missed, Locale.US));
         }
 
         @Test
@@ -152,14 +149,14 @@ class JumpPathViewPanelTest {
           DifficultyFacts difficulty = new DifficultyFacts(8, 0, 8, 15, 36);
 
           assertEquals("15/36 (41.7%)",
-              JumpPathViewPanel.format2d6Odds(difficulty, Locale.US, RESOURCES));
+              JumpPathViewPanel.format2d6Odds(difficulty, Locale.US));
         }
 
         @Test
         void adjustedArrivalChangesOnlyForOptedInPiratePointMode() {
           LocalDateTime departure = START_DATE.atStartOfDay();
           Plan itinerary = new Plan(START_DATE, 1.0, 0.0, 1.0, 4.0, 2.0, 7.0, List.of());
-          Result schedule = new Result(Mode.DEPART_AT, departure, departure, departure,
+            Result schedule = new Result(Mode.DEPART_AT, null, departure, departure, departure,
               departure.plusDays(8), 24, true, List.of(), List.of());
           DifficultyFacts difficulty = new DifficultyFacts(8, 0, 8, 15, 36);
           Facts facts = new Facts(new ApproachFacts(1000.0, 4.0, false, 0.0),
@@ -194,7 +191,7 @@ class JumpPathViewPanelTest {
 
             assertEquals("30.5 LY | 2 STD JUMPS | ACCESS BLOCKED | RECHARGE 72h | "
                   + "SOLAR 168h / 1 STATION(S) | CIRCUIT",
-              JumpPathViewPanel.formatLegFacts(assessment, Locale.US, RESOURCES));
+              JumpPathViewPanel.formatLegFacts(assessment, Locale.US));
           }
 
         private static JumpPath pathOf(PlanetarySystem... systems) {

@@ -49,6 +49,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.function.IntPredicate;
 
+import jakarta.annotation.Nullable;
 import mekhq.campaign.universe.PlanetarySystem;
 
 /** Deterministic navigation facts and route-constraint assessments. */
@@ -113,6 +114,19 @@ public final class NavigationRouteAnalysis {
             Objects.requireNonNull(facts);
             findings = List.copyOf(findings);
             Objects.requireNonNull(severity);
+        }
+
+        public @Nullable FindingKind primaryFindingKind() {
+            FindingKind firstCaution = null;
+            for (Finding finding : findings) {
+                if (finding.severity() == Severity.BLOCKED) {
+                    return finding.kind();
+                }
+                if ((firstCaution == null) && (finding.severity() == Severity.CAUTION)) {
+                    firstCaution = finding.kind();
+                }
+            }
+            return firstCaution;
         }
     }
 

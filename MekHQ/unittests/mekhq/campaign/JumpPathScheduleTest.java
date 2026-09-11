@@ -34,6 +34,7 @@ package mekhq.campaign;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -46,6 +47,7 @@ import mekhq.campaign.JumpPathItinerary.Plan;
 import mekhq.campaign.JumpPathItinerary.TimelineEntry;
 import mekhq.campaign.JumpPathSchedule.Mode;
 import mekhq.campaign.JumpPathSchedule.Result;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
 
@@ -59,16 +61,19 @@ class JumpPathScheduleTest {
         PlanetarySystem repeatedStop = system("Repeated");
         PlanetarySystem transit = system("Transit");
         PlanetarySystem destination = system("Destination");
+                        Planet destinationPlanet = new Planet("destination-planet");
+                        destinationPlanet.setParentSystem(destination);
         Plan itinerary = plan(origin, repeatedStop, transit, repeatedStop, destination);
         LocalDateTime anchor = PLAN_DATE.atTime(8, 0);
 
-        Result result = JumpPathSchedule.calculate(itinerary,
+        Result result = JumpPathSchedule.calculate(itinerary, destinationPlanet,
               List.of(repeatedStop, repeatedStop, destination), List.of(6, 3, 99),
               Mode.DEPART_AT, anchor, EARLIEST_DEPARTURE);
 
         assertEquals(anchor, result.departure());
         assertEquals(anchor.plusHours(159), result.arrival());
         assertEquals(9, result.totalDwellHours());
+                        assertSame(destinationPlanet, result.destinationPlanet());
         assertTrue(result.feasible());
         assertEquals(List.of(1, 3), result.dwells().stream().map(JumpPathSchedule.Dwell::pathIndex).toList());
         assertEquals(anchor.plusHours(48), result.dwells().get(0).start());
@@ -78,6 +83,18 @@ class JumpPathScheduleTest {
         assertEquals(0, result.entries().get(2).dwellHours());
     }
 
+      @Test
+      void destinationPlanetMustBelongToFinalSystem() {
+            PlanetarySystem origin = system("Origin");
+            PlanetarySystem destination = system("Destination");
+            Planet wrongDestination = new Planet("wrong-destination");
+            wrongDestination.setParentSystem(system("Another System"));
+
+            assertThrows(IllegalArgumentException.class,
+                    () -> JumpPathSchedule.calculate(plan(origin, destination), wrongDestination,
+                              List.of(destination), List.of(0), Mode.DEPART_AT, EARLIEST_DEPARTURE, EARLIEST_DEPARTURE));
+      }
+
     @Test
     void arriveByScheduleBackSolvesLatestDepartureAndReportsFeasibilityBoundary() {
         PlanetarySystem origin = system("Origin");
@@ -86,9 +103,9 @@ class JumpPathScheduleTest {
         Plan itinerary = plan(origin, stop, destination);
         LocalDateTime deadline = PLAN_DATE.plusDays(10).atTime(12, 0);
 
-        Result result = JumpPathSchedule.calculate(itinerary, List.of(stop, destination), List.of(5, 0),
+        Result result = JumpPathSchedule.calculate(itinerary, null, List.of(stop, destination), List.of(5, 0),
               Mode.ARRIVE_BY, deadline, EARLIEST_DEPARTURE);
-        Result impossible = JumpPathSchedule.calculate(itinerary, List.of(stop, destination), List.of(5, 0),
+        Result impossible = JumpPathSchedule.calculate(itinerary, null, List.of(stop, destination), List.of(5, 0),
               Mode.ARRIVE_BY, deadline, result.departure().plusHours(1));
 
         assertEquals(deadline, result.arrival());
@@ -106,7 +123,7 @@ class JumpPathScheduleTest {
         List<PlanetarySystem> requestedStops = new ArrayList<>(List.of(stop, destination));
         List<Integer> dwellHours = new ArrayList<>(List.of(4, 0));
 
-        Result result = JumpPathSchedule.calculate(itinerary, requestedStops, dwellHours,
+      Result result = JumpPathSchedule.calculate(itinerary, null, requestedStops, dwellHours,
               Mode.DEPART_AT, EARLIEST_DEPARTURE, EARLIEST_DEPARTURE);
         requestedStops.clear();
         dwellHours.set(0, 100);
@@ -123,7 +140,7 @@ class JumpPathScheduleTest {
             PlanetarySystem destination = system("Destination");
             LocalDateTime anchor = PLAN_DATE.atStartOfDay();
 
-            Result result = JumpPathSchedule.calculate(plan(origin, stop, destination),
+            Result result = JumpPathSchedule.calculate(plan(origin, stop, destination), null,
                     List.of(stop, stop, destination), List.of(2, 3, 0),
                     Mode.DEPART_AT, anchor, EARLIEST_DEPARTURE);
 
@@ -139,7 +156,7 @@ class JumpPathScheduleTest {
             PlanetarySystem missingStop = system("Missing");
             PlanetarySystem destination = system("Destination");
 
-            Result result = JumpPathSchedule.calculate(plan(origin, destination),
+            Result result = JumpPathSchedule.calculate(plan(origin, destination), null,
                     List.of(missingStop, destination), List.of(12, 0),
                     Mode.DEPART_AT, EARLIEST_DEPARTURE, EARLIEST_DEPARTURE);
 
@@ -155,10 +172,10 @@ class JumpPathScheduleTest {
               0.0, 0, 0.0, 1.49 / 24.0, 1.49 / 24.0);
         Plan roundedPlan = new Plan(PLAN_DATE, 1.0, 0.0, 0.0, 1.49 / 24.0,
               0.0, 1.49 / 24.0, List.of(roundedEntry));
-        Result rounded = JumpPathSchedule.calculate(roundedPlan, List.of(only), List.of(20),
+      Result rounded = JumpPathSchedule.calculate(roundedPlan, null, List.of(only), List.of(20),
               Mode.DEPART_AT, EARLIEST_DEPARTURE, EARLIEST_DEPARTURE);
         Plan emptyPlan = new Plan(PLAN_DATE, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, List.of());
-        Result empty = JumpPathSchedule.calculate(emptyPlan, List.of(), List.of(),
+      Result empty = JumpPathSchedule.calculate(emptyPlan, null, List.of(), List.of(),
               Mode.ARRIVE_BY, EARLIEST_DEPARTURE, EARLIEST_DEPARTURE);
 
         assertEquals(EARLIEST_DEPARTURE.plusHours(1), rounded.arrival());
@@ -173,7 +190,7 @@ class JumpPathScheduleTest {
         Plan emptyPlan = new Plan(PLAN_DATE, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, List.of());
 
         assertThrows(IllegalArgumentException.class,
-              () -> JumpPathSchedule.calculate(emptyPlan, List.of(), List.of(-1), Mode.DEPART_AT,
+              () -> JumpPathSchedule.calculate(emptyPlan, null, List.of(), List.of(-1), Mode.DEPART_AT,
                     EARLIEST_DEPARTURE, EARLIEST_DEPARTURE));
     }
 

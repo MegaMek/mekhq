@@ -62,7 +62,6 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.List;
 import java.util.Objects;
-import java.util.ResourceBundle;
 import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -119,6 +118,7 @@ import mekhq.gui.panels.TutorialHyperlinkPanel;
 import mekhq.gui.utilities.JSuggestField;
 import mekhq.gui.view.JumpPathViewPanel;
 import mekhq.gui.view.PlanetViewPanel;
+import mekhq.utilities.MHQInternationalization;
 
 /**
  * Displays interstellar map and contains transit controls.
@@ -126,6 +126,7 @@ import mekhq.gui.view.PlanetViewPanel;
 // FIXME: this class should not inherit from CampaignGuiTab because it is managed by NavigationTab now
 public final class MapTab extends CampaignGuiTab implements ActionListener,
     InterstellarMapPanel.RoutePlanningHandler {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
     private static final int PADDING = UIUtil.scaleForGUI(10);
     private static final Color ROUTE_STRIP_BACKGROUND = new Color(7, 16, 27);
     private static final Color ROUTE_STRIP_BORDER = new Color(35, 66, 82);
@@ -164,7 +165,6 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private JPanel contextWorkspace;
     private JPanel collapsedContextRail;
     private JSplitPane splitMap;
-    private ResourceBundle resourceMap;
     private FramedCommandButton btnCalculateJumpPath;
     private FramedCommandButton btnQuickPlotCourse;
     private FramedCommandButton btnBeginTransit;
@@ -271,8 +271,6 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     public void initTab() {
         layoutState = initializeLayoutState(layoutState);
         routePlanningIntent = initializeRoutePlanningIntent(routePlanningIntent, getCampaign().getCurrentSystem());
-        resourceMap = ResourceBundle.getBundle("mekhq.resources.CampaignGUI",
-              MekHQ.getMHQOptions().getLocale());
 
         panMapView = new JPanel(new BorderLayout());
         panMapView.add(createNavigationHud(), BorderLayout.PAGE_START);
@@ -289,7 +287,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         panMapView.add(createRouteStrip(), BorderLayout.SOUTH);
 
         mapView = new JViewport();
-        mapView.setMinimumSize(new Dimension(600, 600));
+        mapView.setMinimumSize(new Dimension(UIUtil.scaleForGUI(600), UIUtil.scaleForGUI(600)));
         mapView.setView(panMapView);
 
         contextWorkspace = createContextWorkspace();
@@ -321,10 +319,11 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         JPanel navigationHud = new JPanel(new GridBagLayout());
         navigationHud.setBackground(ROUTE_STRIP_BACKGROUND);
         navigationHud.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, 1, 0, ROUTE_STRIP_BORDER),
-              BorderFactory.createEmptyBorder(4, PADDING, 4, PADDING)));
+              BorderFactory.createMatteBorder(0, 0, UIUtil.scaleForGUI(1), 0, ROUTE_STRIP_BORDER),
+              BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(4), PADDING,
+                  UIUtil.scaleForGUI(4), PADDING)));
 
-        JLabel searchLabel = new JLabel(resourceMap.getString("mapHud.systemSearch.text"));
+        JLabel searchLabel = new JLabel(text("mapHud.systemSearch.text"));
         searchLabel.setForeground(ROUTE_MUTED_COLOR);
         searchLabel.setFont(searchLabel.getFont().deriveFont(Font.BOLD,
               searchLabel.getFont().getSize2D() * 0.8f));
@@ -336,13 +335,13 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         navigationHud.add(searchLabel, constraints);
 
         suggestPlanet = new JSuggestField(getFrame(), getCampaign().getSystemNames());
-        suggestPlanet.setToolTipText(resourceMap.getString("mapHud.systemSearch.toolTipText"));
+        suggestPlanet.setToolTipText(text("mapHud.systemSearch.toolTipText"));
         suggestPlanet.setBackground(HUD_CONTROL_BACKGROUND);
         suggestPlanet.setForeground(ROUTE_TEXT_COLOR);
         suggestPlanet.setCaretColor(PLANNED_ROUTE_COLOR);
         suggestPlanet.setSelectionColor(ROUTE_STRIP_BORDER);
         suggestPlanet.setSelectedTextColor(ROUTE_TEXT_COLOR);
-        suggestPlanet.setBorder(BorderFactory.createLineBorder(ROUTE_STRIP_BORDER));
+        suggestPlanet.setBorder(BorderFactory.createLineBorder(ROUTE_STRIP_BORDER, UIUtil.scaleForGUI(1)));
         suggestPlanet.addActionListener(ev -> {
             PlanetarySystem system = getCampaign().getSystemByName(suggestPlanet.getText());
             if (system != null) {
@@ -355,12 +354,14 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         suggestPlanet.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
-                suggestPlanet.setBorder(BorderFactory.createLineBorder(PLANNED_ROUTE_COLOR));
+                suggestPlanet.setBorder(BorderFactory.createLineBorder(PLANNED_ROUTE_COLOR,
+                      UIUtil.scaleForGUI(1)));
             }
 
             @Override
             public void focusLost(FocusEvent e) {
-                suggestPlanet.setBorder(BorderFactory.createLineBorder(ROUTE_STRIP_BORDER));
+                suggestPlanet.setBorder(BorderFactory.createLineBorder(ROUTE_STRIP_BORDER,
+                      UIUtil.scaleForGUI(1)));
             }
         });
         constraints = new GridBagConstraints();
@@ -474,8 +475,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         routeWorkspace.add(routeView, BorderLayout.CENTER);
 
         JButton collapseButton = createInspectorToggleButton(true,
-              resourceMap.getString("mapContext.collapse.toolTipText"),
-              resourceMap.getString("mapContext.collapse.accessibleName"));
+              text("mapContext.collapse.toolTipText"),
+              text("mapContext.collapse.accessibleName"));
         collapseButton.addActionListener(event -> toggleContextInspector());
 
         CardLayout contextCardLayout = new CardLayout();
@@ -483,8 +484,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         contextCards.add(systemView, "system");
         contextCards.add(routeWorkspace, "route");
 
-        JToggleButton systemTab = createContextTabButton(resourceMap.getString("mapContext.system.text"));
-        JToggleButton routeTab = createContextTabButton(resourceMap.getString("mapContext.route.text"));
+        JToggleButton systemTab = createContextTabButton(text("mapContext.system.text"));
+        JToggleButton routeTab = createContextTabButton(text("mapContext.route.text"));
         ButtonGroup contextTabGroup = new ButtonGroup();
         contextTabGroup.add(systemTab);
         contextTabGroup.add(routeTab);
@@ -505,8 +506,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         JPanel contextHeader = createContextHeader(systemTab, routeTab, collapseButton);
 
         JPanel workspace = new JPanel(new BorderLayout());
-        workspace.setMinimumSize(new Dimension(INSPECTOR_RAIL_WIDTH, 600));
-        workspace.setPreferredSize(new Dimension(INSPECTOR_PREFERRED_WIDTH, 600));
+        workspace.setMinimumSize(new Dimension(INSPECTOR_RAIL_WIDTH, UIUtil.scaleForGUI(600)));
+        workspace.setPreferredSize(new Dimension(INSPECTOR_PREFERRED_WIDTH, UIUtil.scaleForGUI(600)));
         workspace.add(contextHeader, BorderLayout.PAGE_START);
         workspace.add(contextCards, BorderLayout.CENTER);
         return workspace;
@@ -514,7 +515,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
     static JPanel createContextHeader(JToggleButton systemTab, JToggleButton routeTab, JButton collapseButton) {
         int utilityInset = UIUtil.scaleForGUI(4);
-        int headerHeight = collapseButton.getPreferredSize().height + (utilityInset * 2) + 1;
+        int headerHeight = collapseButton.getPreferredSize().height + (utilityInset * 2) + UIUtil.scaleForGUI(1);
 
         JPanel tabs = new JPanel(new GridLayout(1, 2));
         tabs.setOpaque(false);
@@ -538,7 +539,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
         JPanel header = new JPanel(new BorderLayout());
         header.setBackground(ROUTE_STRIP_BACKGROUND);
-        header.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, ROUTE_STRIP_BORDER));
+          header.setBorder(BorderFactory.createMatteBorder(0, 0, UIUtil.scaleForGUI(1), 0,
+              ROUTE_STRIP_BORDER));
         header.setPreferredSize(new Dimension(0, headerHeight));
         header.add(tabs, BorderLayout.LINE_START);
         header.add(utilityCell, BorderLayout.LINE_END);
@@ -564,14 +566,15 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private JPanel createCollapsedContextRail() {
         JPanel rail = new JPanel(new BorderLayout());
         rail.setBackground(ROUTE_STRIP_BACKGROUND);
-        rail.setBorder(BorderFactory.createMatteBorder(0, 1, 0, 0, ROUTE_STRIP_BORDER));
+          rail.setBorder(BorderFactory.createMatteBorder(0, UIUtil.scaleForGUI(1), 0, 0,
+              ROUTE_STRIP_BORDER));
         Dimension railSize = new Dimension(INSPECTOR_RAIL_WIDTH, INSPECTOR_RAIL_WIDTH);
         rail.setMinimumSize(railSize);
         rail.setPreferredSize(railSize);
         rail.setMaximumSize(new Dimension(INSPECTOR_RAIL_WIDTH, Integer.MAX_VALUE));
         JButton expandButton = createInspectorToggleButton(false,
-              resourceMap.getString("mapContext.expand.toolTipText"),
-              resourceMap.getString("mapContext.expand.accessibleName"));
+              text("mapContext.expand.toolTipText"),
+              text("mapContext.expand.accessibleName"));
         expandButton.addActionListener(event -> toggleContextInspector());
         JPanel buttonRow = new JPanel(new BorderLayout());
         buttonRow.setOpaque(false);
@@ -612,17 +615,18 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         JPanel controls = new JPanel(new GridBagLayout());
         controls.setBackground(ROUTE_STRIP_BACKGROUND);
         controls.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, 1, 0, ROUTE_STRIP_BORDER),
-              BorderFactory.createEmptyBorder(10, PADDING, 10, PADDING)));
+              BorderFactory.createMatteBorder(0, 0, UIUtil.scaleForGUI(1), 0, ROUTE_STRIP_BORDER),
+              BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(10), PADDING,
+                  UIUtil.scaleForGUI(10), PADDING)));
 
-        JLabel heading = createRouteWorkspaceHeading(resourceMap.getString("routePlanner.heading.text"));
+        JLabel heading = createRouteWorkspaceHeading(text("routePlanner.heading.text"));
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
         constraints.weightx = 1.0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(0, 0, 8, 0);
+        constraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(8), 0);
         controls.add(heading, constraints);
 
         constraints = new GridBagConstraints();
@@ -639,7 +643,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
           constraints.weightx = 1.0;
           constraints.fill = GridBagConstraints.HORIZONTAL;
           constraints.anchor = GridBagConstraints.WEST;
-          constraints.insets = new Insets(8, 0, 0, 0);
+          constraints.insets = new Insets(UIUtil.scaleForGUI(8), 0, 0, 0);
           controls.add(routeOptions, constraints);
 
         btnCalculateJumpPath = createHudButton("btnCalculateJumpPath.text", "btnCalculateJumpPath.toolTipText");
@@ -649,7 +653,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         constraints.gridy = 3;
         constraints.weightx = 1.0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.insets = new Insets(8, 0, 0, 0);
+        constraints.insets = new Insets(UIUtil.scaleForGUI(8), 0, 0, 0);
         controls.add(btnCalculateJumpPath, constraints);
 
         routeViewSelector = createRouteViewSelector();
@@ -658,7 +662,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         constraints.gridy = 4;
         constraints.weightx = 1.0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.insets = new Insets(10, 0, 0, 0);
+        constraints.insets = new Insets(UIUtil.scaleForGUI(10), 0, 0, 0);
         controls.add(routeViewSelector, constraints);
         return controls;
     }
@@ -676,9 +680,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         options.setOpaque(false);
 
           JCheckBox avoidAbandonedSystems = new ImmersiveCheckBox(
-              resourceMap.getString("chkAvoidAbandonedSystems.text"));
+              text("chkAvoidAbandonedSystems.text"));
         avoidAbandonedSystems.setToolTipText(wordWrap(
-              resourceMap.getString("chkAvoidAbandonedSystems.toolTipText")));
+              text("chkAvoidAbandonedSystems.toolTipText")));
         avoidAbandonedSystems.setSelected(getCampaign().getPlayerForce().isAvoidingEmptySystems());
         avoidAbandonedSystems.setAlignmentX(Component.LEFT_ALIGNMENT);
         avoidAbandonedSystems.addActionListener(event ->
@@ -686,8 +690,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         options.add(avoidAbandonedSystems);
 
           JCheckBox useCommandCircuits = new ImmersiveCheckBox(
-              resourceMap.getString("chkUseCommandCircuits.text"));
-        useCommandCircuits.setToolTipText(wordWrap(resourceMap.getString("chkUseCommandCircuits.toolTipText")));
+              text("chkUseCommandCircuits.text"));
+          useCommandCircuits.setToolTipText(wordWrap(text("chkUseCommandCircuits.toolTipText")));
         useCommandCircuits.setSelected(getCampaign().getPlayerForce().isOverridingCommandCircuitRequirements());
         useCommandCircuits.setAlignmentX(Component.LEFT_ALIGNMENT);
         useCommandCircuits.addActionListener(event -> {
@@ -720,7 +724,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         selector.setOpaque(true);
         selector.setBackground(ROUTE_STRIP_BACKGROUND);
           selector.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createLineBorder(ROUTE_STRIP_BORDER),
+              BorderFactory.createLineBorder(ROUTE_STRIP_BORDER, UIUtil.scaleForGUI(1)),
               BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(4), 0, UIUtil.scaleForGUI(4), 0)));
         ButtonGroup group = new ButtonGroup();
         activeRouteViewButton = createRouteViewButton("routePlanner.activeTrip.text", RouteViewMode.ACTIVE);
@@ -744,7 +748,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     }
 
     private JToggleButton createRouteViewButton(String textKey, RouteViewMode mode) {
-        JToggleButton button = new JToggleButton(resourceMap.getString(textKey));
+        JToggleButton button = new JToggleButton(text(textKey));
         button.setForeground(ROUTE_TEXT_COLOR);
         button.setFocusPainted(false);
         button.setContentAreaFilled(false);
@@ -759,7 +763,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     }
 
     private FramedCommandButton createHudButton(String textKey, String toolTipKey) {
-        return createNavigationButton(resourceMap.getString(textKey), resourceMap.getString(toolTipKey));
+        return createNavigationButton(text(textKey), text(toolTipKey));
     }
 
     static FramedCommandButton createNavigationButton(String text, String toolTipText) {
@@ -776,8 +780,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         routeStrip = new RouteStripPanel();
         routeStrip.setBackground(ROUTE_STRIP_BACKGROUND);
         routeStrip.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(1, 0, 0, 0, ROUTE_STRIP_BORDER),
-              BorderFactory.createEmptyBorder(4, PADDING, 4, PADDING)));
+              BorderFactory.createMatteBorder(UIUtil.scaleForGUI(1), 0, 0, 0, ROUTE_STRIP_BORDER),
+              BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(4), PADDING,
+                  UIUtil.scaleForGUI(4), PADDING)));
 
         lblRouteStatus = createRouteLabel(Font.BOLD);
         lblRouteDestination = createRouteLabel(Font.PLAIN);
@@ -833,7 +838,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         constraints.weightx = 1.0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(0, 0, 3, 0);
+        constraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(3), 0);
         planningPanel.add(originLabel, constraints);
 
         suggestRouteOrigin = createRouteField("routePlanner.from.text", "routePlanner.from.toolTipText");
@@ -855,7 +860,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         constraints.weightx = 1.0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(8, 0, 3, 0);
+        constraints.insets = new Insets(UIUtil.scaleForGUI(8), 0, UIUtil.scaleForGUI(3), 0);
         planningPanel.add(destinationLabel, constraints);
 
         suggestRouteDestination = createRouteField("routePlanner.to.text", "routePlanner.to.toolTipText");
@@ -874,7 +879,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     }
 
     private JLabel createRouteFieldLabel(String textKey) {
-        JLabel label = new JLabel(resourceMap.getString(textKey));
+        JLabel label = new JLabel(text(textKey));
         label.setForeground(ROUTE_MUTED_COLOR);
         label.setFont(label.getFont().deriveFont(Font.BOLD, label.getFont().getSize2D() * 0.8f));
         return label;
@@ -882,27 +887,29 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
     private JSuggestField createRouteField(String accessibleNameKey, String toolTipKey) {
         JSuggestField field = new JSuggestField(getFrame(), getCampaign().getSystemNames());
-        field.setToolTipText(resourceMap.getString(toolTipKey));
+        field.setToolTipText(text(toolTipKey));
         field.setBackground(HUD_CONTROL_BACKGROUND);
         field.setForeground(ROUTE_TEXT_COLOR);
         field.setCaretColor(PLANNED_ROUTE_COLOR);
         field.setSelectionColor(ROUTE_STRIP_BORDER);
         field.setSelectedTextColor(ROUTE_TEXT_COLOR);
-        field.setBorder(BorderFactory.createLineBorder(ROUTE_STRIP_BORDER));
+        field.setBorder(BorderFactory.createLineBorder(ROUTE_STRIP_BORDER, UIUtil.scaleForGUI(1)));
         Dimension preferredSize = field.getPreferredSize();
         field.setPreferredSize(new Dimension(UIUtil.scaleForGUI(180), preferredSize.height));
         field.setMinimumSize(new Dimension(UIUtil.scaleForGUI(96), preferredSize.height));
-        field.getAccessibleContext().setAccessibleName(resourceMap.getString(accessibleNameKey));
+        field.getAccessibleContext().setAccessibleName(text(accessibleNameKey));
         field.getAccessibleContext().setAccessibleDescription(field.getToolTipText());
         field.addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent event) {
-                field.setBorder(BorderFactory.createLineBorder(PLANNED_ROUTE_COLOR));
+                field.setBorder(BorderFactory.createLineBorder(PLANNED_ROUTE_COLOR,
+                      UIUtil.scaleForGUI(1)));
             }
 
             @Override
             public void focusLost(FocusEvent event) {
-                field.setBorder(BorderFactory.createLineBorder(ROUTE_STRIP_BORDER));
+                field.setBorder(BorderFactory.createLineBorder(ROUTE_STRIP_BORDER,
+                      UIUtil.scaleForGUI(1)));
             }
         });
         return field;
@@ -980,25 +987,25 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         boolean hasProposedPath = (proposedPath != null) && !proposedPath.isEmpty();
         boolean hasActivePath = (activePath != null) && !activePath.isEmpty();
         JumpPath displayedPath = hasProposedPath ? proposedPath : (hasActivePath ? activePath : null);
-        String unavailable = resourceMap.getString("routeStrip.unavailable.text");
+        String unavailable = text("routeStrip.unavailable.text");
         boolean isCostVisible = getCampaign().getCampaignOptions().get(CampaignOption.PAY_FOR_TRANSPORT);
         PlanetarySystem selectedSystem = panMap.getSelectedSystem();
         boolean isQuickPlotVisible = true;
         boolean isQuickPlotEnabled = canQuickPlotRoute(selectedSystem, getCampaign().getCurrentSystem());
-          String quickPlotText = resourceMap.getString(quickPlotResourceKey(hasProposedPath));
+          String quickPlotText = text(quickPlotResourceKey(hasProposedPath));
 
         if (displayedPath == null) {
             String selectedSystemName = (selectedSystem == null)
                 ? unavailable
                 : selectedSystem.getPrintableName(getCampaign().getLocalDate());
             return new RouteStripSnapshot(RouteStripState.NO_ROUTE,
-                  resourceMap.getString("routeStrip.noRoute.text"),
+                                    text("routeStrip.noRoute.text"),
                   ROUTE_MUTED_COLOR,
-                resourceMap.getString("routeStrip.target.text") + "  " + selectedSystemName,
-                  resourceMap.getString("routeStrip.jumps.text") + "  " + unavailable,
-                  resourceMap.getString("routeStrip.duration.text") + "  " + unavailable,
-                  resourceMap.getString("routeStrip.nextJump.text") + "  " + unavailable,
-                  resourceMap.getString("routeStrip.estimatedCost.text") + "  " + unavailable,
+                                text("routeStrip.target.text") + "  " + selectedSystemName,
+                                    text("routeStrip.jumps.text") + "  " + unavailable,
+                                    text("routeStrip.duration.text") + "  " + unavailable,
+                                    text("routeStrip.nextJump.text") + "  " + unavailable,
+                                    text("routeStrip.estimatedCost.text") + "  " + unavailable,
                   ROUTE_MUTED_COLOR,
                   isCostVisible,
                   quickPlotText,
@@ -1013,7 +1020,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
               && isWhatIfRoute(proposedPath, getCampaign().getCurrentSystem());
           RouteStripState routeState = whatIfRoute ? RouteStripState.WHAT_IF_ROUTE
               : (isPlannedRoute ? RouteStripState.PLANNED_ROUTE : RouteStripState.IN_TRANSIT);
-          String statusText = resourceMap.getString(switch (routeState) {
+          String statusText = text(switch (routeState) {
             case NO_ROUTE -> "routeStrip.noRoute.text";
             case PLANNED_ROUTE -> "routeStrip.plannedRoute.text";
             case WHAT_IF_ROUTE -> "routeStrip.whatIfRoute.text";
@@ -1023,8 +1030,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         String destinationName = (destination == null)
               ? unavailable
               : destination.getPrintableName(getCampaign().getLocalDate());
-        String destinationText = resourceMap.getString("routeStrip.destination.text") + "  " + destinationName;
-        String jumpsText = resourceMap.getString(isPlannedRoute
+        String destinationText = text("routeStrip.destination.text") + "  " + destinationName;
+        String jumpsText = text(isPlannedRoute
               ? "routeStrip.jumps.text"
               : "routeStrip.jumpsRemaining.text") + "  " + displayedPath.getJumps();
 
@@ -1037,15 +1044,15 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
                   : currentLocation.getTransitTime());
           int duration = (int) ceil(displayedPath.getTotalTime(getCampaign().getLocalDate(), currentTransit,
               getCampaign().isUseCommandCircuit()));
-        String durationText = resourceMap.getString("routeStrip.duration.text") + "  " + duration + ' '
-              + resourceMap.getString("routeStrip.days.text");
+          String durationText = text("routeStrip.duration.text") + "  " + duration + ' '
+              + text("routeStrip.days.text");
           String nextJumpText = createNextJumpText(displayedPath, currentLocation, unavailable, useCampaignProgress);
 
-        String costText = resourceMap.getString("routeStrip.estimatedCost.text") + "  " + unavailable;
+        String costText = text("routeStrip.estimatedCost.text") + "  " + unavailable;
         if (isCostVisible) {
             TransportCostCalculations calculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
             Money journeyCost = calculations.calculateJumpCostForEntireJourney(duration, displayedPath.getJumps());
-            costText = resourceMap.getString("routeStrip.estimatedCost.text") + "  "
+            costText = text("routeStrip.estimatedCost.text") + "  "
                 + journeyCost.toAmountAndSymbolString();
         }
 
@@ -1070,7 +1077,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
         private String createNextJumpText(JumpPath displayedPath, AbstractLocation currentLocation, String unavailable,
             boolean useCampaignProgress) {
-        String label = resourceMap.getString("routeStrip.nextJump.text") + "  ";
+        String label = text("routeStrip.nextJump.text") + "  ";
         if ((displayedPath == null) || displayedPath.isEmpty() || (displayedPath.getJumps() <= 0)
               || (displayedPath.getFirstSystem() == null)
               || (useCampaignProgress && ((currentLocation == null)
@@ -1090,7 +1097,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
                   - elapsedRecharge);
         double remainingDays = Math.max(remainingTransitDays, remainingRechargeHours / 24.0);
         if (remainingDays <= 0.0) {
-            return label + resourceMap.getString("routeStrip.nextJump.ready.text");
+            return label + text("routeStrip.nextJump.ready.text");
         }
 
         long totalHours = (long) Math.ceil(remainingDays * 24.0);
@@ -1098,12 +1105,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         long hours = totalHours % 24;
         String timeText;
         if ((days > 0) && (hours > 0)) {
-            timeText = days + resourceMap.getString("routeStrip.nextJump.daySuffix.text") + ' '
-                  + hours + resourceMap.getString("routeStrip.nextJump.hourSuffix.text");
+            timeText = days + text("routeStrip.nextJump.daySuffix.text") + ' '
+                  + hours + text("routeStrip.nextJump.hourSuffix.text");
         } else if (days > 0) {
-            timeText = days + resourceMap.getString("routeStrip.nextJump.daySuffix.text");
+            timeText = days + text("routeStrip.nextJump.daySuffix.text");
         } else {
-            timeText = hours + resourceMap.getString("routeStrip.nextJump.hourSuffix.text");
+            timeText = hours + text("routeStrip.nextJump.hourSuffix.text");
         }
         return label + timeText;
     }
@@ -1198,7 +1205,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         lblRouteStatus.setText(snapshot.statusText());
         lblRouteStatus.setForeground(snapshot.statusColor());
         String statusDescription = snapshot.state() == RouteStripState.WHAT_IF_ROUTE
-              ? resourceMap.getString("routeStrip.whatIfRoute.toolTipText")
+              ? text("routeStrip.whatIfRoute.toolTipText")
               : snapshot.statusText();
         lblRouteStatus.setToolTipText(statusDescription);
         lblRouteStatus.getAccessibleContext().setAccessibleName(snapshot.statusText());
@@ -1213,7 +1220,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         updateRouteEntryAction();
         btnQuickPlotCourse.setText(snapshot.quickPlotText());
         btnQuickPlotCourse.getAccessibleContext().setAccessibleName(snapshot.quickPlotText());
-          String quickPlotDescription = resourceMap.getString("routeStrip.plot.toolTipText");
+          String quickPlotDescription = text("routeStrip.plot.toolTipText");
           btnQuickPlotCourse.setToolTipText(quickPlotDescription);
           btnQuickPlotCourse.getAccessibleContext().setAccessibleDescription(quickPlotDescription);
         btnQuickPlotCourse.setVisible(snapshot.quickPlotVisible());
@@ -1221,8 +1228,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         btnBeginTransit.setVisible(true);
                     btnBeginTransit.setEnabled(enableActions && snapshot.beginTransitEnabled());
                         String beginTransitDescription = snapshot.state() == RouteStripState.WHAT_IF_ROUTE
-              ? resourceMap.getString("routePlanner.beginTransitWhatIf.toolTipText")
-              : resourceMap.getString("btnBeginTransit.toolTipText");
+              ? text("routePlanner.beginTransitWhatIf.toolTipText")
+              : text("btnBeginTransit.toolTipText");
           btnBeginTransit.setToolTipText(beginTransitDescription);
           btnBeginTransit.getAccessibleContext().setAccessibleDescription(beginTransitDescription);
         presentedRouteSnapshot = snapshot;
@@ -1531,7 +1538,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private JPanel createEmptyRouteView() {
         JPanel emptyView = new JPanel(new GridBagLayout());
         emptyView.setBackground(ROUTE_STRIP_BACKGROUND);
-        emptyView.setBorder(BorderFactory.createEmptyBorder(24, PADDING, 24, PADDING));
+          emptyView.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(24), PADDING,
+              UIUtil.scaleForGUI(24), PADDING));
 
         JPanel message = new JPanel(new GridBagLayout());
         message.setOpaque(false);
@@ -1540,17 +1548,17 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         constraints.gridy = 0;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-        message.add(createRouteWorkspaceHeading(resourceMap.getString("routePlanner.empty.eyebrow.text")),
+          message.add(createRouteWorkspaceHeading(text("routePlanner.empty.eyebrow.text")),
               constraints);
 
-        JLabel status = new JLabel(resourceMap.getString("routePlanner.empty.text"));
+          JLabel status = new JLabel(text("routePlanner.empty.text"));
         status.setForeground(ROUTE_TEXT_COLOR);
         status.setFont(status.getFont().deriveFont(Font.BOLD, status.getFont().getSize2D() * 1.3f));
         constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 1;
         constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(4, 0, 0, 0);
+        constraints.insets = new Insets(UIUtil.scaleForGUI(4), 0, 0, 0);
         message.add(status, constraints);
 
         constraints = new GridBagConstraints();
@@ -1562,6 +1570,10 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         constraints.fill = GridBagConstraints.HORIZONTAL;
         emptyView.add(message, constraints);
         return emptyView;
+    }
+
+    private static String text(String key) {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
     }
 
     private void showDossier(PlanetarySystem system, int planetPosition) {

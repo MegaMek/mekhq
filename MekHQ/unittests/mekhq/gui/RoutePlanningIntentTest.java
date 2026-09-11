@@ -35,6 +35,7 @@ package mekhq.gui;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -86,6 +87,26 @@ class RoutePlanningIntentTest {
         assertIterableEquals(List.of(firstStop, destination), intent.getRequestedStops());
         assertIterableEquals(List.of(origin, firstIntermediate, firstStop, secondIntermediate, destination),
               intent.getJumpPath().getSystems());
+    }
+
+    @Test
+    void planetDestinationIsExplicitAndAppendingSystemClearsIt() {
+        PlanetarySystem origin = system("Origin");
+        PlanetarySystem firstStop = system("First Stop");
+        PlanetarySystem destination = system("Destination");
+        Planet targetPlanet = new Planet("first-stop-planet");
+        targetPlanet.setParentSystem(firstStop);
+        RoutePlanningIntent intent = new RoutePlanningIntent(origin);
+        RoutePlanningIntent.SegmentPlanner planner = planner(Map.of(
+              new Leg(origin, firstStop), List.of(origin, firstStop),
+              new Leg(firstStop, destination), List.of(firstStop, destination)));
+
+        assertTrue(intent.plotToPlanet(origin, targetPlanet, planner).changed());
+        assertSame(targetPlanet, intent.getJumpPath().getTargetPlanet());
+
+        assertTrue(intent.append(destination, planner).changed());
+        assertEquals(destination, intent.getJumpPath().getLastSystem());
+        assertNull(intent.getJumpPath().getTargetPlanet());
     }
 
     @Test
@@ -189,18 +210,14 @@ class RoutePlanningIntentTest {
         PlanetarySystem requestedStop = system("Requested Stop");
         PlanetarySystem destination = system("Destination");
         PlanetarySystem alternativeIntermediate = system("Alternative Intermediate");
-        Planet targetPlanet = Mockito.mock(Planet.class);
+        Planet targetPlanet = new Planet("target-planet");
+        targetPlanet.setParentSystem(destination);
         RoutePlanningIntent intent = new RoutePlanningIntent(origin);
-        RoutePlanningIntent.SegmentPlanner initialPlanner = (segmentOrigin, segmentDestination) -> {
-            JumpPath segment = pathOf(segmentOrigin, segmentDestination);
-            if (segmentDestination == destination) {
-                segment.setTargetPlanet(targetPlanet);
-            }
-            return PlanningResult.found(segment);
-        };
+        RoutePlanningIntent.SegmentPlanner initialPlanner = (segmentOrigin, segmentDestination) ->
+              PlanningResult.found(pathOf(segmentOrigin, segmentDestination));
 
         assertTrue(intent.plot(origin, requestedStop, initialPlanner).changed());
-        assertTrue(intent.append(destination, initialPlanner).changed());
+        assertTrue(intent.appendToPlanet(targetPlanet, initialPlanner).changed());
         assertTrue(intent.adopt(pathOf(origin, alternativeIntermediate, requestedStop, destination)));
 
         assertSame(origin, intent.getOrigin());

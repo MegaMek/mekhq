@@ -41,6 +41,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -346,11 +347,11 @@ public class PlanetarySystem {
                 continue;
             }
             if ((administration != null) && !administration.equals(planetAdministration)) {
-                return List.of();
+                return Collections.emptyList();
             }
             administration = planetAdministration;
         }
-        return (administration == null) ? List.of() : List.copyOf(administration);
+        return (administration == null) ? Collections.emptyList() : List.copyOf(administration);
     }
 
     /**

@@ -46,13 +46,11 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseEvent;
-import java.text.MessageFormat;
 import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.StringJoiner;
 import javax.swing.BorderFactory;
@@ -86,6 +84,7 @@ import mekhq.campaign.universe.enums.PlanetaryType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.SourceableValueLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
+import mekhq.utilities.MHQInternationalization;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -94,13 +93,14 @@ import org.apache.commons.lang3.StringUtils;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class PlanetViewPanel extends JScrollablePanel {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.PlanetViewPanel";
     private static final Color DOSSIER_BACKGROUND = new Color(7, 16, 27);
     private static final Color DOSSIER_TEXT = new Color(218, 231, 235);
     private static final Color DOSSIER_MUTED_TEXT = new Color(132, 153, 161);
     private static final Color DOSSIER_ACCENT = new Color(65, 210, 224);
     private static final Color DOSSIER_WARNING = new Color(235, 166, 66);
     private static final Color DOSSIER_DIVIDER = new Color(35, 66, 82);
-    private static final int HORIZONTAL_PADDING = 12;
+    private static final int HORIZONTAL_PADDING = UIUtil.scaleForGUI(12);
     private static final int LABEL_COLUMN_WIDTH = UIUtil.scaleForGUI(150);
     private static final int REVEAL_FRAME_DELAY_MS = 16;
     private static final long HEADER_REVEAL_DURATION_NS = 200_000_000L;
@@ -122,9 +122,6 @@ public class PlanetViewPanel extends JScrollablePanel {
     private long revealStartTime;
     private int detailRevealIndex;
     private boolean revealComplete;
-
-    private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.PlanetViewPanel",
-          MekHQ.getMHQOptions().getLocale());
 
     public PlanetViewPanel(PlanetarySystem s, Campaign c) {
         this(s, c, 0, false);
@@ -216,27 +213,28 @@ public class PlanetViewPanel extends JScrollablePanel {
     private JPanel createHeader(Planet planet) {
         JPanel header = createRevealBand(0, HEADER_REVEAL_DURATION_NS);
         header.setLayout(new GridBagLayout());
-        header.setBorder(BorderFactory.createEmptyBorder(12, HORIZONTAL_PADDING, 10, HORIZONTAL_PADDING));
+          header.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(12), HORIZONTAL_PADDING,
+              UIUtil.scaleForGUI(10), HORIZONTAL_PADDING));
         LocalDate currentDate = campaign.getLocalDate();
         String printableSystemName = system.getPrintableName(currentDate);
 
-        JLabel eyebrow = new JLabel(resourceMap.getString("dossier.eyebrow.text"));
+        JLabel eyebrow = new JLabel(text("dossier.eyebrow.text"));
         eyebrow.setForeground(DOSSIER_ACCENT);
         eyebrow.setFont(eyebrow.getFont().deriveFont(Font.BOLD, eyebrow.getFont().getSize2D() * 0.85f));
         GridBagConstraints constraints = createFullWidthConstraints(0);
-        constraints.insets = new Insets(0, 0, 3, 0);
+        constraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(3), 0);
         header.add(eyebrow, constraints);
 
         JLabel systemName = new JLabel(printableSystemName);
         systemName.setForeground(DOSSIER_TEXT);
         systemName.setFont(systemName.getFont().deriveFont(Font.BOLD, systemName.getFont().getSize2D() * 1.35f));
         constraints = createFullWidthConstraints(1);
-        constraints.insets = new Insets(0, 0, 4, 0);
+        constraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(4), 0);
         header.add(systemName, constraints);
 
         String context;
         if (planet == null) {
-            context = resourceMap.getString("dossier.systemContext.text");
+            context = text("dossier.systemContext.text");
         } else {
             String printablePlanetName = planet.getPrintableName(currentDate);
             String factionDescription = planet.getFactionDesc(currentDate);
@@ -255,12 +253,13 @@ public class PlanetViewPanel extends JScrollablePanel {
         JPanel summary = createRevealBand(SUMMARY_REVEAL_DELAY_NS, SUMMARY_REVEAL_DURATION_NS);
         summary.setLayout(new GridBagLayout());
         summary.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(1, 0, 0, 0, DOSSIER_DIVIDER),
-              BorderFactory.createEmptyBorder(9, HORIZONTAL_PADDING, 10, HORIZONTAL_PADDING)));
+              BorderFactory.createMatteBorder(UIUtil.scaleForGUI(1), 0, 0, 0, DOSSIER_DIVIDER),
+              BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(9), HORIZONTAL_PADDING,
+                  UIUtil.scaleForGUI(10), HORIZONTAL_PADDING)));
 
         JLabel heading = createSectionHeading("section.operationalSummary.text");
         GridBagConstraints constraints = createFullWidthConstraints(0);
-        constraints.insets = new Insets(0, 0, 5, 0);
+        constraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(5), 0);
         summary.add(heading, constraints);
 
         int metricIndex = 0;
@@ -298,7 +297,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         JPanel metric = createBandPanel();
         metric.setLayout(new BoxLayout(metric, BoxLayout.Y_AXIS));
 
-        JLabel label = new JLabel(resourceMap.getString(labelKey));
+        JLabel label = new JLabel(text(labelKey));
         label.setForeground(warning ? DOSSIER_WARNING : DOSSIER_MUTED_TEXT);
         label.setFont(label.getFont().deriveFont(Font.BOLD, label.getFont().getSize2D() * 0.8f));
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -322,7 +321,8 @@ public class PlanetViewPanel extends JScrollablePanel {
         constraints.weightx = (metricIndex % 2 == 0) ? 0.0 : 1.0;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.anchor = GridBagConstraints.NORTHWEST;
-        constraints.insets = new Insets(3, 0, 4, (metricIndex % 2 == 0) ? HORIZONTAL_PADDING : 0);
+          constraints.insets = new Insets(UIUtil.scaleForGUI(3), 0, UIUtil.scaleForGUI(4),
+              (metricIndex % 2 == 0) ? HORIZONTAL_PADDING : 0);
         summary.add(metric, constraints);
     }
 
@@ -658,7 +658,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     private JLabel createSectionHeading(String headingKey) {
-        JLabel heading = new JLabel(resourceMap.getString(headingKey));
+        JLabel heading = new JLabel(text(headingKey));
         heading.setForeground(DOSSIER_ACCENT);
         heading.setFont(heading.getFont().deriveFont(Font.BOLD, heading.getFont().getSize2D() * 0.85f));
         return heading;
@@ -676,8 +676,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     private String format(String key, Object... arguments) {
-        MessageFormat formatter = new MessageFormat(resourceMap.getString(key), MekHQ.getMHQOptions().getLocale());
-        return formatter.format(arguments);
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, arguments);
     }
 
     private static class RevealBandPanel extends JPanel {
@@ -743,11 +742,12 @@ public class PlanetViewPanel extends JScrollablePanel {
                                      (detailRevealIndex++ * SECTION_REVEAL_STAGGER_NS);
             registerRevealBand(this, revealDelay, SECTION_REVEAL_DURATION_NS);
             setBorder(BorderFactory.createCompoundBorder(
-                  BorderFactory.createMatteBorder(1, 0, 0, 0, DOSSIER_DIVIDER),
-                  BorderFactory.createEmptyBorder(9, HORIZONTAL_PADDING, 10, HORIZONTAL_PADDING)));
+                BorderFactory.createMatteBorder(UIUtil.scaleForGUI(1), 0, 0, 0, DOSSIER_DIVIDER),
+                BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(9), HORIZONTAL_PADDING,
+                    UIUtil.scaleForGUI(10), HORIZONTAL_PADDING)));
 
             GridBagConstraints constraints = createFullWidthConstraints(0);
-            constraints.insets = new Insets(0, 0, 6, 0);
+            constraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(6), 0);
             add(createSectionHeading(headingKey), constraints);
         }
 
@@ -756,7 +756,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         private void addRow(String labelKey, JComponent value) {
-            JLabel label = new JLabel(labelKey == null ? "" : resourceMap.getString(labelKey));
+            JLabel label = new JLabel(labelKey == null ? "" : text(labelKey));
             label.setForeground(DOSSIER_MUTED_TEXT);
             label.setFont(label.getFont().deriveFont(Font.BOLD));
             Dimension preferredSize = label.getPreferredSize();
@@ -768,7 +768,8 @@ public class PlanetViewPanel extends JScrollablePanel {
             labelConstraints.gridx = 0;
             labelConstraints.gridy = row;
             labelConstraints.anchor = GridBagConstraints.NORTHWEST;
-            labelConstraints.insets = new Insets(2, 0, 3, 10);
+            labelConstraints.insets = new Insets(UIUtil.scaleForGUI(2), 0, UIUtil.scaleForGUI(3),
+                UIUtil.scaleForGUI(10));
             add(label, labelConstraints);
 
             value.setForeground(DOSSIER_TEXT);
@@ -781,30 +782,30 @@ public class PlanetViewPanel extends JScrollablePanel {
             valueConstraints.weightx = 1.0;
             valueConstraints.fill = GridBagConstraints.HORIZONTAL;
             valueConstraints.anchor = GridBagConstraints.NORTHWEST;
-            valueConstraints.insets = new Insets(2, 0, 3, 0);
+            valueConstraints.insets = new Insets(UIUtil.scaleForGUI(2), 0, UIUtil.scaleForGUI(3), 0);
             add(value, valueConstraints);
             row++;
         }
 
         private void addStackedRow(String labelKey, JComponent value) {
-            JLabel label = new JLabel(resourceMap.getString(labelKey));
+            JLabel label = new JLabel(text(labelKey));
             label.setForeground(DOSSIER_MUTED_TEXT);
             label.setFont(label.getFont().deriveFont(Font.BOLD));
 
             GridBagConstraints labelConstraints = createFullWidthConstraints(row++);
-            labelConstraints.insets = new Insets(5, 0, 2, 0);
+            labelConstraints.insets = new Insets(UIUtil.scaleForGUI(5), 0, UIUtil.scaleForGUI(2), 0);
             add(label, labelConstraints);
 
             value.setForeground(DOSSIER_TEXT);
             GridBagConstraints valueConstraints = createFullWidthConstraints(row++);
-            valueConstraints.insets = new Insets(0, 0, 7, 0);
+            valueConstraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(7), 0);
             add(value, valueConstraints);
         }
 
         private void addFullWidth(JComponent value) {
             value.setForeground(DOSSIER_TEXT);
             GridBagConstraints constraints = createFullWidthConstraints(row++);
-            constraints.insets = new Insets(2, 0, 3, 0);
+            constraints.insets = new Insets(UIUtil.scaleForGUI(2), 0, UIUtil.scaleForGUI(3), 0);
             add(value, constraints);
         }
     }
@@ -830,9 +831,14 @@ public class PlanetViewPanel extends JScrollablePanel {
             tooltip.setBackground(DOSSIER_BACKGROUND);
             tooltip.setForeground(DOSSIER_TEXT);
             tooltip.setBorder(BorderFactory.createCompoundBorder(
-                  BorderFactory.createLineBorder(DOSSIER_ACCENT, 1),
-                  BorderFactory.createEmptyBorder(5, 8, 5, 8)));
+                BorderFactory.createLineBorder(DOSSIER_ACCENT, UIUtil.scaleForGUI(1)),
+                BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(8),
+                    UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(8))));
             return tooltip;
         }
+    }
+
+    private static String text(String key) {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
     }
 }
