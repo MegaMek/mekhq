@@ -72,6 +72,7 @@ import megamek.common.enums.Gender;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceQuartermaster;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
@@ -83,7 +84,9 @@ import mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.Loot;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.InfantryAmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
@@ -247,18 +250,26 @@ public class PerformResupply {
             contents = resupply.getConvoyContents();
         }
 
+        ForceQuartermaster quartermaster = campaign.getQuartermaster();
         for (Part part : contents) {
-            if (part instanceof AmmoBin) {
-                campaign.getQuartermaster()
-                      .addAmmo(((AmmoBin) part).getType(), ((AmmoBin) part).getFullShots() * RESUPPLY_AMMO_TONNAGE);
-            } else if (part instanceof Armor) {
-                int quantity = (int) Math.ceil(((Armor) part).getArmorPointsPerTon() * RESUPPLY_ARMOR_TONNAGE);
-                ((Armor) part).setAmount(quantity);
-                //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
-                campaign.getPlayerForce().getWarehouse().addPart(part, true);
-            } else {
-                //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
-                campaign.getPlayerForce().getWarehouse().addPart(part, true);
+            // Ammo must be delivered through the Quartermaster
+            switch (part) {
+                case AmmoBin ammoBin ->
+                      quartermaster.addAmmo(ammoBin.getType(), ammoBin.getFullShots() * RESUPPLY_AMMO_TONNAGE);
+                case InfantryAmmoStorage infantryAmmoStorage -> quartermaster.addAmmo(infantryAmmoStorage.getType(),
+                      infantryAmmoStorage.getWeaponType(),
+                      infantryAmmoStorage.getShots() * RESUPPLY_AMMO_TONNAGE);
+                case AmmoStorage ammoStorage ->
+                      quartermaster.addAmmo(ammoStorage.getType(), ammoStorage.getShots() * RESUPPLY_AMMO_TONNAGE);
+                case Armor armor -> {
+                    int quantity = (int) Math.ceil(armor.getArmorPointsPerTon() * RESUPPLY_ARMOR_TONNAGE);
+                    armor.setAmount(quantity);
+                    //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+                    campaign.getPlayerForce().getWarehouse().addPart(part, true);
+                }
+                case null, default ->
+                    //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
+                      campaign.getPlayerForce().getWarehouse().addPart(part, true);
             }
         }
     }

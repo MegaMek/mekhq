@@ -37,7 +37,7 @@ import java.math.BigDecimal;
 import mekhq.campaign.finances.Money;
 
 public class ChaosCampaignUtilities {
-    public static int SUPPORT_POINTS_TO_MONEY_CONVERSION = 10_000; // Chaos Campaign pg 28
+    public static final int SUPPORT_POINTS_TO_MONEY_CONVERSION = 10_000; // Chaos Campaign pg 28
 
     public static Money getMoneyFromChaosSupportPoints(int supportPoints) {
         return getMoneyFromChaosSupportPoints(supportPoints, true);

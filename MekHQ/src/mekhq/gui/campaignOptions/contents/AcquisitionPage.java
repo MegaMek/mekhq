@@ -50,11 +50,11 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -133,6 +133,10 @@ class AcquisitionPage {
     private JSpinner spnAutoLogisticsGyros;
     private JLabel lblAutoLogisticsOther;
     private JSpinner spnAutoLogisticsOther;
+    private JLabel lblAutoLogisticsEquipmentKit;
+    private JSpinner spnAutoLogisticsEquipmentKit;
+    private JLabel lblAutoLogisticsBomb;
+    private JSpinner spnAutoLogisticsBomb;
 
     private JLabel lblTransitTimeUnits;
     private MMComboBox<String> choiceTransitTimeUnits;
@@ -343,6 +347,18 @@ class AcquisitionPage {
         spnAutoLogisticsOther = new CampaignOptionsSpinner("AutoLogisticsOther", 50, 0, 10000, 1);
         spnAutoLogisticsOther.addMouseListener(createTipPanelUpdater("AutoLogisticsOther"));
 
+        lblAutoLogisticsEquipmentKit = new CampaignOptionsLabel("AutoLogisticsEquipmentKit",
+              getMetadata(new Version(0, 51, 1)));
+        lblAutoLogisticsEquipmentKit.addMouseListener(createTipPanelUpdater("AutoLogisticsEquipmentKit"));
+        spnAutoLogisticsEquipmentKit = new CampaignOptionsSpinner("AutoLogisticsEquipmentKit", 0, 0, 10000, 1);
+        spnAutoLogisticsEquipmentKit.addMouseListener(createTipPanelUpdater("AutoLogisticsEquipmentKit"));
+
+        lblAutoLogisticsBomb = new CampaignOptionsLabel("AutoLogisticsBomb",
+              getMetadata(new Version(0, 51, 1)));
+        lblAutoLogisticsBomb.addMouseListener(createTipPanelUpdater("AutoLogisticsBomb"));
+        spnAutoLogisticsBomb = new CampaignOptionsSpinner("AutoLogisticsBomb", 0, 0, 10000, 1);
+        spnAutoLogisticsBomb.addMouseListener(createTipPanelUpdater("AutoLogisticsBomb"));
+
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("AutoLogisticsPanel",
               AUTO_LOGISTICS_LABEL_COLUMN_WIDTH,
@@ -360,7 +376,9 @@ class AcquisitionPage {
               lblAutoLogisticsEngines, spnAutoLogisticsEngines,
               lblAutoLogisticsGyros, spnAutoLogisticsGyros,
               lblAutoLogisticsWeapons, spnAutoLogisticsWeapons,
-              lblAutoLogisticsOther, spnAutoLogisticsOther);
+              lblAutoLogisticsOther, spnAutoLogisticsOther,
+              lblAutoLogisticsEquipmentKit, spnAutoLogisticsEquipmentKit,
+              lblAutoLogisticsBomb, spnAutoLogisticsBomb);
 
         // Compute where this grid's second label column (the "third column") begins, so
         // the single-control sections
@@ -497,6 +515,8 @@ class AcquisitionPage {
         spnAutoLogisticsHeatSink.setValue(model.autoLogisticsHeatSink);
         spnAutoLogisticsWeapons.setValue(model.autoLogisticsWeapons);
         spnAutoLogisticsOther.setValue(model.autoLogisticsOther);
+        spnAutoLogisticsEquipmentKit.setValue(model.autoLogisticsEquipmentKit);
+        spnAutoLogisticsBomb.setValue(model.autoLogisticsBomb);
         choiceTransitTimeUnits.setSelectedIndex(model.unitTransitTime);
         chkNoDeliveriesInTransit.setSelected(model.noDeliveriesInTransit);
     }
@@ -532,6 +552,8 @@ class AcquisitionPage {
         model.autoLogisticsHeatSink = (int) spnAutoLogisticsHeatSink.getValue();
         model.autoLogisticsWeapons = (int) spnAutoLogisticsWeapons.getValue();
         model.autoLogisticsOther = (int) spnAutoLogisticsOther.getValue();
+        model.autoLogisticsEquipmentKit = (int) spnAutoLogisticsEquipmentKit.getValue();
+        model.autoLogisticsBomb = (int) spnAutoLogisticsBomb.getValue();
         model.unitTransitTime = choiceTransitTimeUnits.getSelectedIndex();
         model.noDeliveriesInTransit = chkNoDeliveriesInTransit.isSelected();
     }

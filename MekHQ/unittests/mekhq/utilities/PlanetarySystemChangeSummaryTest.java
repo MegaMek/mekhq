@@ -41,7 +41,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.List;
 
-import mekhq.campaign.universe.Atmosphere;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.LifeForm;
 import mekhq.campaign.universe.Planet;
@@ -158,8 +159,8 @@ class PlanetarySystemChangeSummaryTest {
         editedPlanet.setSourcedDayLength(SourceableValue.of(26.0));
         editedPlanet.setSourcedYearLength(SourceableValue.of(1.5));
         editedPlanet.setSourcedTemperature(SourceableValue.of(32));
-        editedPlanet.setSourcedPressure(SourceableValue.of(megamek.common.planetaryConditions.Atmosphere.HIGH));
-        editedPlanet.setSourcedAtmosphere(SourceableValue.of(Atmosphere.TOXIC_POISON));
+        editedPlanet.setSourcedPressure(SourceableValue.of(Atmosphere.HIGH));
+        editedPlanet.setSourcedAtmosphere(SourceableValue.of(AtmosphericTaint.TOXIC_POISON));
         editedPlanet.setSourcedComposition(SourceableValue.of("Nitrogen-oxygen mix"));
         editedPlanet.setSourcedPercentWater(SourceableValue.of(55));
         editedPlanet.setSourcedLifeForm(SourceableValue.of(LifeForm.MAMMAL));
@@ -176,7 +177,7 @@ class PlanetarySystemChangeSummaryTest {
         assertTrue(changes.contains("Edited Prime: day length changed from 24.0 to 26.0"));
         assertTrue(changes.contains("Edited Prime: year length changed from 1.0 to 1.5"));
         assertTrue(changes.contains("Edited Prime: temperature changed from 20 to 32"));
-        assertTrue(changes.contains("Edited Prime: atmosphere changed from Breathable to Toxic (Poisonous)"));
+        assertTrue(changes.contains("Edited Prime: atmosphere changed from Breathable to Radiological/Poisonous (Toxic)"));
         assertTrue(changes.contains("Edited Prime: composition changed from none to Nitrogen-oxygen mix"));
         assertTrue(changes.contains("Edited Prime: % water changed from 70 to 55"));
         assertTrue(changes.contains("Edited Prime: life form changed from none to Mammals"));

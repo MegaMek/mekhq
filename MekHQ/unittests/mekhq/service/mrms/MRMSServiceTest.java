@@ -32,8 +32,6 @@
  */
 package mekhq.service.mrms;
 
-import static org.mockito.Mockito.lenient;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -43,6 +41,7 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -62,8 +61,8 @@ import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceQuartermaster;
 import mekhq.campaign.LocalWarehouse;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
@@ -961,6 +960,7 @@ public class MRMSServiceTest {
             // Arrange
             when(mockCampaignOptions.get(CampaignOption.MRMS_ALLOW_CARRYOVER)).thenReturn(false);
             when(mockCampaignOptions.get(CampaignOption.MRMS_OPTIMIZE_TO_COMPLETE_TODAY)).thenReturn(false);
+            when(mockCampaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(false);
 
             arrangeTestMRMSUnitsCarryover(1); // Tech has only 1 minute left (not enough for armor repairs)
 
@@ -980,6 +980,7 @@ public class MRMSServiceTest {
             // Arrange
             when(mockCampaignOptions.get(CampaignOption.MRMS_ALLOW_CARRYOVER)).thenReturn(true);
             when(mockCampaignOptions.get(CampaignOption.MRMS_OPTIMIZE_TO_COMPLETE_TODAY)).thenReturn(false);
+            when(mockCampaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(false);
 
             arrangeTestMRMSUnitsCarryover(30); // Tech has only 30 minutes left
 
@@ -998,6 +999,7 @@ public class MRMSServiceTest {
             // Arrange
             when(mockCampaignOptions.get(CampaignOption.MRMS_ALLOW_CARRYOVER)).thenReturn(true);
             when(mockCampaignOptions.get(CampaignOption.MRMS_OPTIMIZE_TO_COMPLETE_TODAY)).thenReturn(false);
+            when(mockCampaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(false);
 
             arrangeTestMRMSUnitsCarryover(480); // Tech has full day of time
 
@@ -1017,6 +1019,7 @@ public class MRMSServiceTest {
             // Arrange
             when(mockCampaignOptions.get(CampaignOption.MRMS_ALLOW_CARRYOVER)).thenReturn(true);
             when(mockCampaignOptions.get(CampaignOption.MRMS_OPTIMIZE_TO_COMPLETE_TODAY)).thenReturn(true);
+            when(mockCampaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(false);
 
             // Create two techs: one with limited time, one with full time
             Person realTech1 = createRealTech("Tech 1 (Limited)", SkillLevel.VETERAN, 30); // Insufficient time
@@ -1058,6 +1061,7 @@ public class MRMSServiceTest {
             // Arrange
             when(mockCampaignOptions.get(CampaignOption.MRMS_ALLOW_CARRYOVER)).thenReturn(false);
             when(mockCampaignOptions.get(CampaignOption.MRMS_OPTIMIZE_TO_COMPLETE_TODAY)).thenReturn(false);
+            when(mockCampaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(false);
 
             arrangeTestMRMSUnitsCarryover(15);
 
@@ -1083,6 +1087,7 @@ public class MRMSServiceTest {
             when(mockCampaignOptions.get(CampaignOption.MRMS_ALLOW_CARRYOVER)).thenReturn(false);
             when(mockCampaignOptions.get(CampaignOption.MRMS_OPTIMIZE_TO_COMPLETE_TODAY)).thenReturn(false);
             when(mockCampaignOptions.get(CampaignOption.MRMS_USE_EXTRA_TIME)).thenReturn(true); // Allow using extra time
+            when(mockCampaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(false);
 
             // Set low target number preferred so that GREEN tech will need extra time to meet it
             int targetNumberPreferred = 4; // Very low TN - will require extra time for low skill tech

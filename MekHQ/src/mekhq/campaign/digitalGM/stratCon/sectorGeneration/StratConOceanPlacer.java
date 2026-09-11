@@ -95,7 +95,7 @@ public final class StratConOceanPlacer {
         int landTarget = total - oceanTarget;
         Set<StratConCoords> ocean = switch (type) {
             case INLAND -> scatteredBlobs(track, oceanTarget, 1, 2, true);
-            case LAKELANDS -> scatteredBlobs(track, oceanTarget, 4, 8, false);
+            case LAKELANDS -> scatteredBlobs(track, oceanTarget, 4, 8, true);
             case MARSHLANDS -> scatteredBlobs(track, oceanTarget, 8, 16, false);
             case COASTAL -> singleBlob(track, oceanTarget, StratConHexGeometry.randomEdgeCoords(track));
             case INLAND_SEA -> singleBlob(track, oceanTarget, StratConHexGeometry.centerCoords(track));

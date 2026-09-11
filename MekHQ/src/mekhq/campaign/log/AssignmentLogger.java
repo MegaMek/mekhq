@@ -74,10 +74,7 @@ public class AssignmentLogger {
         if (formation != null) {
             String message = logEntriesResourceMap.getString("addToTOEForce.text");
             person.addAssignmentLogEntry(new AssignmentLogEntry(date,
-                  MessageFormat.format(message,
-                        campaign.getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME) ?
-                              formation.getFullName() :
-                              formation.getName())));
+                  MessageFormat.format(message, formatFormationForLog(campaign, formation))));
         }
     }
 
@@ -94,12 +91,8 @@ public class AssignmentLogger {
             String message = logEntriesResourceMap.getString("reassignedTOEForce.text");
             person.addAssignmentLogEntry(new AssignmentLogEntry(date,
                   MessageFormat.format(message,
-                        campaign.getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME) ?
-                              oldFormation.getFullName() :
-                              oldFormation.getName(),
-                        campaign.getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME) ?
-                              newFormation.getFullName() :
-                              newFormation.getName())));
+                        formatFormationForLog(campaign, oldFormation),
+                        formatFormationForLog(campaign, newFormation))));
         } else if (oldFormation == null) {
             addedToTOEFormation(campaign, person, date, newFormation);
         } else {
@@ -111,10 +104,20 @@ public class AssignmentLogger {
         if (formation != null) {
             String message = logEntriesResourceMap.getString("removedFromTOEForce.text");
             person.addAssignmentLogEntry(new AssignmentLogEntry(date,
-                  MessageFormat.format(message,
-                        campaign.getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME) ?
-                              formation.getFullName() :
-                              formation.getName())));
+                  MessageFormat.format(message, formatFormationForLog(campaign, formation))));
         }
+    }
+
+    /**
+     * Formats a Formation for the plain-text assignment log. Respects the campaign's
+     * {@code isUseExtendedTOEForceName} toggle: when off, only the leaf formation name is shown
+     * ("Command Lance"); when on, the leaf-first breadcrumb is shown with the campaign root
+     * dropped ("Command Lance > A Company > First Battalion"), matching what the Hangar and
+     * Personnel tabs' Formation column already displays.
+     */
+    private static String formatFormationForLog(Campaign campaign, Formation formation) {
+        return campaign.getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME)
+              ? formation.getDisplayPath(" > ", true)
+              : formation.getName();
     }
 }

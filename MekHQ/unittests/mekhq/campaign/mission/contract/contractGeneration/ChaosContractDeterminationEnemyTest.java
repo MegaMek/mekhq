@@ -34,14 +34,17 @@ package mekhq.campaign.mission.contract.contractGeneration;
 
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -49,9 +52,13 @@ import java.time.LocalDate;
 import megamek.common.compute.Compute;
 import megamek.common.icons.Camouflage;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractData.EnemyData;
+import mekhq.campaign.mission.contract.contractGeneration.targetFinder.EnemySelectionProfile;
 import mekhq.campaign.mission.utilities.RandomFactionCamouflage;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.RandomFactionGenerator;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
@@ -140,6 +147,50 @@ class ChaosContractDeterminationEnemyTest {
 
             assertEquals("DC", enemy.factionCode());
             assertNull(enemy.sponsorFactionCode());
+        }
+    }
+
+    @Test
+    void covertContractDrawsTheEnemyUnderTheCovertProfileRatherThanTheObjectiveProfile() {
+        // A profile that is deliberately NOT COVERT, so a pass-through of the objective's own profile would be visible.
+        ContractObjectiveType objectiveType = ContractObjectiveType.PIRATE_HUNTING;
+        assertNotEquals(EnemySelectionProfile.COVERT, objectiveType.getEnemySelectionProfile(),
+              "test fixture must use an objective whose own profile is not COVERT");
+
+        assertProfilePassedToRandomEnemy(objectiveType, true, EnemySelectionProfile.COVERT);
+    }
+
+    @Test
+    void nonCovertContractDrawsTheEnemyUnderTheObjectiveOwnProfile() {
+        ContractObjectiveType objectiveType = ContractObjectiveType.PIRATE_HUNTING;
+
+        assertProfilePassedToRandomEnemy(objectiveType, false, objectiveType.getEnemySelectionProfile());
+    }
+
+    /**
+     * Runs {@code generateEnemyFactionForObjective} with the given covert flag and verifies that the
+     * {@link EnemySelectionProfile} handed to {@link RandomFactionGenerator#getRandomEnemy} is the one expected. The
+     * generator singleton and camouflage lookup are stubbed so no universe fixtures are required.
+     */
+    private static void assertProfilePassedToRandomEnemy(ContractObjectiveType objectiveType, boolean isCovert,
+          EnemySelectionProfile expectedProfile) {
+        ILocation location = mock(ILocation.class);
+        Faction employer = mock(Faction.class);
+        Faction drawnEnemy = enemyFaction(false);
+
+        RandomFactionGenerator generator = mock(RandomFactionGenerator.class);
+        when(generator.getRandomEnemy(any(), any(), any(), any())).thenReturn(drawnEnemy);
+
+        try (MockedStatic<RandomFactionGenerator> factionGenerator = mockStatic(RandomFactionGenerator.class);
+              MockedStatic<RandomFactionCamouflage> camo = mockStatic(RandomFactionCamouflage.class)) {
+            factionGenerator.when(RandomFactionGenerator::getInstance).thenReturn(generator);
+            camo.when(() -> RandomFactionCamouflage.pickRandomCamouflage(anyInt(), anyString()))
+                  .thenReturn(mock(Camouflage.class));
+
+            ChaosContractDeterminationEnemy.generateEnemyFactionForObjective(campaignWithoutPersonnel(), location, DATE,
+                  employer, objectiveType, isCovert);
+
+            verify(generator).getRandomEnemy(eq(location), eq(DATE), eq(employer), eq(expectedProfile));
         }
     }
 }

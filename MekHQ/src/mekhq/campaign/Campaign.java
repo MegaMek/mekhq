@@ -54,7 +54,7 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
@@ -154,6 +154,7 @@ import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
+import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.icons.StandardFormationIcon;
@@ -166,7 +167,6 @@ import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.PartsStore;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -208,9 +208,11 @@ import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
+import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
 import mekhq.campaign.personnel.skills.Appraisal;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
@@ -310,6 +312,13 @@ public class Campaign implements ITechManager {
     private transient CampaignNewDayManager newDayManager = null;
 
     private final DailyReportLog dailyReportLog = new DailyReportLog();
+
+    // Set while a bulk operation (force generation) is adding many units/parts off the EDT. Guards
+    // event-driven GUI work from firing mid-operation and reading half-built campaign state off the
+    // EDT: addNewUnit skips its per-unit UnitNewEvent, and timer-driven tab refreshes (e.g. the
+    // Command Center cargo/summary computation, which walks the mutating location tree) skip while it
+    // is set. The operation fires one refresh event when it completes.
+    private transient boolean bulkGenerationInProgress;
 
     private Person genericAcquisitionPerson;
 
@@ -412,7 +421,6 @@ public class Campaign implements ITechManager {
               campConf.getRetDefTracker(),
               campConf.getAutosave(),
               campConf.getBehaviorSettings(),
-              campConf.getPersonnelMarket(),
               campConf.getUnitMarket(),
               campConf.getDivorce(),
               campConf.getMarriage(),
@@ -430,7 +438,6 @@ public class Campaign implements ITechManager {
           RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums, Map<UUID, LifePath> lifePaths,
           RetirementDefectionTracker retDefTracker, IAutosaveService autosave,
           BehaviorSettings behaviorSettings,
-          PersonnelMarket persMarket,
           AbstractUnitMarket unitMarket,
           AbstractDivorce divorce, AbstractMarriage marriage,
           AbstractProcreation procreation) {
@@ -474,7 +481,6 @@ public class Campaign implements ITechManager {
         // Primary init, sets state from passed values
         getPlayerForce().setFaction(faction);
         getPlayerForce().setRankSystemDirect(rankSystem);
-        getPlayerForce().getHumanResources().setPersonnelMarket(persMarket);
         setUnitMarket(unitMarket);
         getPlayerForce().getHumanResources().setDivorce(divorce);
         getPlayerForce().getHumanResources().setMarriage(marriage);
@@ -930,10 +936,28 @@ public class Campaign implements ITechManager {
      */
     public void importMission(final AbstractContract mission) {
         mission.setCampaignOptions(getCampaignOptions());
-        mission.getScenarios().forEach(this::importScenario);
+        mission.getScenarios().forEach(scenario -> importScenario(scenario, mission));
         contractHistory.contractHistory().put(mission.getId(), mission);
         MekHQ.triggerEvent(new MissionNewEvent(mission));
         StratConContractInitializer.restoreTransientStratconInformation(mission, this);
+    }
+
+    /**
+     * Imports a scenario that was loaded as part of {@code mission}, restoring its link back to that contract before
+     * registering it with the campaign.
+     *
+     * <p>{@link Scenario#getMissionId()} is a back-pointer that never reaches the save file. A contract's scenarios
+     * are nested inside the contract itself, so the link is implied by position rather than stored, and it is
+     * {@link AbstractContract#addScenario(Scenario)} that stamps it. Both load paths build the scenario list directly
+     * instead, so the id has to be restored here or every restored scenario comes back with no contract and each
+     * lookup of its contract returns {@code null}.</p>
+     *
+     * @param scenario the scenario being restored
+     * @param mission  the contract the scenario belongs to
+     */
+    private void importScenario(final Scenario scenario, final AbstractContract mission) {
+        scenario.setMissionId(mission.getId());
+        importScenario(scenario);
     }
 
     public ContractHistoryData getContractHistoryData() {
@@ -944,7 +968,13 @@ public class Campaign implements ITechManager {
         return contractHistory.contractHistory();
     }
 
-    public @jakarta.annotation.Nullable AbstractContract getContract(UUID contractId) {
+    /**
+     * @param contractId the id of the contract to look up, or {@code null} when the caller holds no id - for example a
+     *                   scenario that has yet to be attached to a contract
+     *
+     * @return the contract with that id, or {@code null} if the campaign has never held one
+     */
+    public @Nullable AbstractContract getContract(@Nullable UUID contractId) {
         return contractHistory.get(contractId);
     }
 
@@ -1058,7 +1088,7 @@ public class Campaign implements ITechManager {
      * hasActiveContract based on that check. This value should not be set elsewhere
      */
     public void setHasActiveContract() {
-        hasActiveContract = getActiveContracts().size() > 0;
+        hasActiveContract = !getActiveContracts().isEmpty();
     }
     // endregion Missions/Contracts
 
@@ -1411,9 +1441,38 @@ public class Campaign implements ITechManager {
 
         checkDuplicateNamesDuringAdd(en);
         addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
-        MekHQ.triggerEvent(new UnitNewEvent(unit));
+        if (!bulkGenerationInProgress) {
+            MekHQ.triggerEvent(new UnitNewEvent(unit));
+        }
 
         return unit;
+    }
+
+    /**
+     * Whether a bulk generation (for example the force generator) is currently adding units/parts off
+     * the Swing event dispatch thread. See {@link #setBulkGenerationInProgress(boolean)}.
+     *
+     * @return {@code true} while a bulk generation is in progress
+     */
+    public boolean isBulkGenerationInProgress() {
+        return bulkGenerationInProgress;
+    }
+
+    /**
+     * Marks that a bulk operation is adding many units/parts off the Swing event dispatch thread (for
+     * example force generation). A caller should set this to {@code true} for the operation's duration -
+     * always in a {@code try}/{@code finally} so it is cleared even on failure - so that event-driven
+     * GUI work does not fire mid-operation and read half-built campaign state off the EDT:
+     * {@link #addNewUnit(Entity, boolean, int, PartQuality)} skips its per-unit {@link UnitNewEvent},
+     * and timer-driven tab refreshes that walk the mutating campaign (such as the Command Center
+     * cargo/summary computation) skip while it is set. The operation is responsible for firing a single
+     * refresh event (such as {@link mekhq.campaign.events.OrganizationChangedEvent}) once it completes.
+     *
+     * @param bulkGenerationInProgress {@code true} while the bulk operation runs, {@code false} to restore
+     *                                 normal GUI updates
+     */
+    public void setBulkGenerationInProgress(boolean bulkGenerationInProgress) {
+        this.bulkGenerationInProgress = bulkGenerationInProgress;
     }
 
     /**
@@ -1835,7 +1894,7 @@ public class Campaign implements ITechManager {
      */
     public List<Unit> getServiceableUnits() {
         List<Unit> service = new ArrayList<>();
-        for (Unit u : getUnits()) {
+        for (Unit u : new ArrayList<>(getUnits())) {
             if (u.isAvailable() && u.isServiceable() && !StratConRulesManager.isUnitDeployedToStratCon(u)) {
                 service.add(u);
             }
@@ -2150,7 +2209,11 @@ public class Campaign implements ITechManager {
             return true;
         }
         int maxAcquisitions = getCampaignOptions().get(CampaignOption.MAX_ACQUISITIONS);
-        return maxAcquisitions <= 0 || person.getAcquisitions() < maxAcquisitions;
+        if (maxAcquisitions <= 0) {
+            return true;
+        }
+
+        return person.getAcquisitions() < ForceHumanResources.maxAcquisitionsFor(person, maxAcquisitions);
     }
 
     /***
@@ -2605,24 +2668,34 @@ public class Campaign implements ITechManager {
             } else {
                 int roll;
                 String wrongType = "";
-                if (tech.isRightTechTypeFor(theRefit)) {
-                    roll = d6(2);
-                } else {
-                    roll = Utilities.roll3d6();
-                    wrongType = " <b>Warning: wrong tech type for this refit.</b>";
+                final boolean rightTechType = tech.isRightTechTypeFor(theRefit);
+                if (!rightTechType) {
+                    wrongType = " " + getTextAt(RESOURCE_BUNDLE, "refit.wrongTechType.warning");
                 }
-                report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ": ";
-                if (getCampaignOptions().get(CampaignOption.USE_EDGE) &&
-                          (roll < target.getValue()) &&
-                          tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT) &&
-                          (tech.getCurrentEdge() > 0)) {
-                    tech.spendEdge();
-                    roll = tech.isRightTechTypeFor(theRefit) ? d6(2) : Utilities.roll3d6();
-                    // This is needed to update the edge values of individual crewmen
-                    if (tech.isEngineer()) {
-                        tech.setEdgeUsedThisRound(tech.getEdgeUsedThisRound() - 1);
+
+                final Skill refitSkill = tech.getSkillForWorkingOn(theRefit);
+                if (refitSkill == null) {
+                    roll = rightTechType ? d6(2) : Utilities.roll3d6();
+                    report = report + getFormattedTextAt(RESOURCE_BUNDLE, "refit.check.reportNoSkill",
+                          target.getValueAsString(), String.valueOf(roll)) + " ";
+                } else {
+                    final boolean canUseEdge = getCampaignOptions().get(CampaignOption.USE_EDGE) &&
+                                                     tech.getOptions()
+                                                           .booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT) &&
+                                                     (tech.getCurrentEdge() > 0);
+                    SkillCheck refitCheck = new SkillCheck(tech, refitSkill.getType(), target)
+                                                  .withoutLogging()
+                                                  .withoutSubject()
+                                                  .withEdgeRerollCondition(firstRoll -> firstRoll.result() <
+                                                                                              target.getValue());
+                    if (!rightTechType) {
+                        // Working out of type always rolls at a disadvantage, overriding any natural aptitude.
+                        refitCheck.withRollType(RollType.DISADVANTAGE);
                     }
-                    report += " <b>failed!</b> but uses Edge to reroll...getting a " + roll + ": ";
+                    ActionCheckResult refitResult = refitCheck.resolve(canUseEdge, null);
+                    roll = refitResult.getRollResult();
+                    report = report + getFormattedTextAt(RESOURCE_BUNDLE, "refit.check.report",
+                          target.getValueAsString(), refitResult.getReport(true)) + " ";
                 }
 
                 if (roll >= target.getValue()) {
@@ -2828,46 +2901,53 @@ public class Campaign implements ITechManager {
         // check for the type
         int roll;
         String wrongType = "";
-        if (tech.isRightTechTypeFor(partWork)) {
-            roll = d6(2);
-        } else {
-            roll = Utilities.roll3d6();
-            // On an automatic success the tech type is irrelevant (e.g. a self-crewed infantry unit reloading its
-            // disposables or field guns - there is no valid tech type for it), so do not show the misleading warning.
-            if (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS) {
-                wrongType = " <b>Warning: wrong tech type for this repair.</b>";
-            }
+        final boolean rightTechType = tech.isRightTechTypeFor(partWork);
+        // On an automatic success the tech type is irrelevant (e.g. a self-crewed infantry unit reloading its
+        // disposables or field guns - there is no valid tech type for it), so do not show the misleading warning.
+        if (!rightTechType && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
+            wrongType = " " + getTextAt(RESOURCE_BUNDLE, "repair.wrongTechType.warning");
         }
-        report = report + ",  needs " + target.getValueAsString() + " and rolls " + roll + ':';
         int xpGained = 0;
-        // if we fail and would break apart, here's a chance to use Edge for a
-        // re-roll...
-        if (getCampaignOptions().get(CampaignOption.USE_EDGE) &&
-                  tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART) &&
-                  (tech.getCurrentEdge() > 0) &&
-                  (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
-            if ((getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN) &&
-                       (getCampaignOptions().get(CampaignOption.DESTROY_MARGIN) <= (target.getValue() - roll))) ||
-                      (!getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)
-                             // if a legendary, primary tech and destroy by margin is NOT on
-                             &&
-                             ((tech.getExperienceLevel(getCampaignOptions(),
-                                   getPlayerForce().isClanForce(),
-                                   getLocalDate(),
-                                   false,
-                                   true) == SkillType.EXP_LEGENDARY) ||
-                                    tech.getPrimaryRole().isVesselCrew())) // For vessel crews
-                            && (roll < target.getValue())) {
-                tech.spendEdge();
-                roll = tech.isRightTechTypeFor(partWork) ? d6(2) : Utilities.roll3d6();
-                // This is needed to update the edge values of individual crewmen
-                if (tech.isEngineer()) {
-                    tech.setEdgeUsedThisRound(tech.getEdgeUsedThisRound() + 1);
-                }
-                report += " <b>failed!</b> and would destroy the part, but uses Edge to reroll...getting a " +
-                                roll +
-                                ':';
+        final Skill repairSkill = tech.getSkillForWorkingOn(partWork);
+        if (repairSkill == null) {
+            roll = rightTechType ? d6(2) : Utilities.roll3d6();
+            report = report + getFormattedTextAt(RESOURCE_BUNDLE, "repair.check.reportNoSkill",
+                  target.getValueAsString(), String.valueOf(roll));
+        } else {
+            final boolean canUseEdge = getCampaignOptions().get(CampaignOption.USE_EDGE) &&
+                                             tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART) &&
+                                             (tech.getCurrentEdge() > 0) &&
+                                             (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS);
+            SkillCheck repairCheck = new SkillCheck(tech, repairSkill.getType(), target)
+                                           .withoutLogging()
+                                           .withoutSubject()
+                                           .withEdgeRerollCondition(firstRoll -> {
+                                               int rolled = firstRoll.result();
+                                               if (getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
+                                                   // spend edge only if the margin of failure is large enough to destroy the part
+                                                   return getCampaignOptions().get(CampaignOption.DESTROY_MARGIN) <=
+                                                                (target.getValue() - rolled);
+                                               }
+                                               // destroy-by-margin off: only a legendary primary tech or a vessel crew re-rolls, and only on a
+                                               // failure (where a failure always destroys the part)
+                                               boolean legendaryOrVesselCrew = (tech.getExperienceLevel(
+                                                     getCampaignOptions(),
+                                                     getPlayerForce().isClanForce(),
+                                                     getLocalDate(),
+                                                     false,
+                                                     true) == SkillType.EXP_LEGENDARY) ||
+                                                                                     tech.getPrimaryRole()
+                                                                                           .isVesselCrew();
+                                               return legendaryOrVesselCrew && (rolled < target.getValue());
+                                           });
+            if (!rightTechType) {
+                // Working out of type always rolls at a disadvantage, overriding any natural aptitude the tech has.
+                repairCheck.withRollType(RollType.DISADVANTAGE);
             }
+            ActionCheckResult repairResult = repairCheck.resolve(canUseEdge, null);
+            roll = repairResult.getRollResult();
+            report = report + getFormattedTextAt(RESOURCE_BUNDLE, "repair.check.report",
+                  target.getValueAsString(), repairResult.getReport(true));
         }
 
         final boolean taskSucceeded = roll >= target.getValue();
@@ -2878,7 +2958,7 @@ public class Campaign implements ITechManager {
             final String repairedPartName = partWork.getPartName();
             final boolean isRepair = !partWork.isSalvaging() && !(partWork instanceof AmmoBin);
 
-            report = report + partWork.succeed();
+            report += partWork.succeed();
             // log successful repairs (fixes and missing-part replacements) against the unit; salvage and ammo
             // reloads are not repairs
             if ((repairedUnit != null) && isRepair) {
@@ -2904,12 +2984,11 @@ public class Campaign implements ITechManager {
             }
         } else {
             int modePenalty = partWork.getMode().expReduction;
-            Skill relevantSkill = tech.getSkillForWorkingOn(partWork);
             int actualSkillLevel = EXP_NONE;
 
-            if (relevantSkill != null) {
+            if (repairSkill != null) {
                 SkillModifierData skillModifierData = tech.getSkillModifierData();
-                actualSkillLevel = relevantSkill.getExperienceLevel(skillModifierData);
+                actualSkillLevel = repairSkill.getExperienceLevel(skillModifierData);
             }
             int effectiveSkillLevel = actualSkillLevel - modePenalty;
             if (getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
@@ -2922,7 +3001,7 @@ public class Campaign implements ITechManager {
                     effectiveSkillLevel = SkillType.EXP_LEGENDARY;
                 }
             }
-            report = report + partWork.fail(effectiveSkillLevel);
+            report += partWork.fail(effectiveSkillLevel);
 
             if ((roll == 2) && (target.getValue() != TargetRoll.AUTOMATIC_FAIL)) {
                 xpGained += getCampaignOptions().get(CampaignOption.MISTAKE_XP);
@@ -2941,7 +3020,7 @@ public class Campaign implements ITechManager {
                   && fabricatable.isFabricating()
                   && fabricatable.isFabricateUntilSuccess()
                   && fabricatable.canFabricate(tech).isBlank()
-                  && (tech.getSkillForWorkingOn(partWork) != null)) {
+                  && (repairSkill != null)) {
             final Money nextCost = fabricatable.getFabricationCost(tech);
             if (nextCost.isZero() || !playerForce.getFinances().getBalance().isLessThan(nextCost)) {
                 partWork.setTech(tech);
@@ -3122,8 +3201,6 @@ public class Campaign implements ITechManager {
                                                                  getLocalDate()),
                   "HELLO", chosenFaction,
                   FactionStandingJudgmentType.WELCOME, ImmersiveDialogWidth.MEDIUM, null, null);
-        } else if (chosenFaction == null) {
-            LOGGER.warn("Unable to find a suitable faction for a new mercenary organization start up");
         }
     }
 
@@ -3206,7 +3283,9 @@ public class Campaign implements ITechManager {
         }
 
         // remove from automatic mothballing
-        getPlayerForce().getAutomatedMothballUnits().remove(unit.getId());
+        for (Detachment detachment : getPlayerForce().getDetachments()) {
+            detachment.getAutomatedMothballUnits().remove(unit.getId());
+        }
 
         // finally, remove the unit
         getPlayerForce().getHangar().removeUnit(unit.getId());
@@ -3697,6 +3776,8 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "colour", getPlayerForce().getColour().name());
         getPlayerForce().getUnitIcon().writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastFormationId", playerForce.getLastFormationId());
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "supportCommandFormationId",
+              playerForce.getSupportCommandFormationId());
         contractHistory.writeToXML(writer, indent, this);
         getPlayerForce().getContractMarket().writeToXML(writer, indent, this);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastMissionId", lastMissionId);
@@ -3786,10 +3867,7 @@ public class Campaign implements ITechManager {
             storyArc.writeToXml(writer, indent);
         }
 
-        // Markets
-        if (getPlayerForce().getHumanResources().getPersonnelMarket() != null) {
-            getPlayerForce().getHumanResources().getPersonnelMarket().writeToXML(writer, indent, this);
-        }
+        // The personnel market is written inside <humanResources>; writing it here as well doubled the load time
 
         // Windchild: implicit DEPENDS-ON to the <campaignOptions> node, do not move
         // this above it
@@ -3813,7 +3891,7 @@ public class Campaign implements ITechManager {
         }
 
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "automatedMothballUnits");
-        for (UUID unitId : getPlayerForce().getAutomatedMothballUnits()) {
+        for (UUID unitId : getPlayerForce().getForceDetachment().getAutomatedMothballUnits()) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "mothballedUnit", unitId);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "automatedMothballUnits");
@@ -4317,6 +4395,9 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already being worked on by another team");
         } else if (skill == null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
+        } else if (getCampaignOptions().get(CampaignOption.TECHS_NEED_TOOL_KIT) &&
+                         !EquipmentKitCatalog.hasToolKit(tech)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no tool kit");
         } else if (!getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN) && (partWork.getSkillMin() > effectiveSkillLevel)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this tech's skill level");
         } else if (partWork.getSkillMin() > SkillType.EXP_LEGENDARY) {
@@ -4486,7 +4567,7 @@ public class Campaign implements ITechManager {
 
     private Person getGenericAcquisitionPerson() {
         if (genericAcquisitionPerson == null) {
-            genericAcquisitionPerson = createGenericAcquisitionPerson(S_NEGOTIATION, S_ADMIN, S_TECH_MECHANIC);
+            genericAcquisitionPerson = createGenericAcquisitionPerson(S_NEGOTIATION, S_ADMIN, S_TECH_VEHICLE);
         }
         return genericAcquisitionPerson;
     }
@@ -4521,6 +4602,7 @@ public class Campaign implements ITechManager {
             }
             if (getCampaignOptions().get(CampaignOption.USE_PLANETARY_CONDITIONS)) {
                 planetaryConditions.setAtmosphere(atBScenario.getAtmosphere());
+                planetaryConditions.setAtmosphericTaint(atBScenario.getAtmosphericTaint());
                 planetaryConditions.setGravity(atBScenario.getGravity());
             }
         } else {
@@ -4606,7 +4688,7 @@ public class Campaign implements ITechManager {
             case ANY_TECH -> {
                 Skill bestTechSkill = person.getBestTechSkill();
                 // since the person has no tech skills, we can create the skill check for any of them
-                yield (bestTechSkill == null) ? SkillType.getType(S_TECH_MECHANIC) : bestTechSkill.getType();
+                yield (bestTechSkill == null) ? SkillType.getType(S_TECH_VEHICLE) : bestTechSkill.getType();
             }
         };
         if ((decisiveModifier == null) && !person.hasSkill(skillType.getName())) {

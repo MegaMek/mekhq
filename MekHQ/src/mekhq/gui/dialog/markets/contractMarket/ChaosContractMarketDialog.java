@@ -59,6 +59,7 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ContractMarket;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAvailability;
@@ -304,8 +305,13 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         // The cards stay on a single row (a plain FlowLayout keeps its one-row preferred width), and the
         // FastJScrollPane scrolls horizontally when they overflow the window width rather than wrapping to a new row.
         JPanel cardRow = new JPanel(new FlowLayout(FlowLayout.LEFT, PADDING, PADDING));
+        boolean hideContractType = campaign.getCampaignOptions().get(CampaignOption.HIDE_CONTRACT_TYPE)
+                                         && campaign.getCampaignOptions().get(CampaignOption.USE_OPERATION_CODENAMES);
         for (AbstractContract contract : contracts) {
-            ContractCardPanel card = new ContractCardPanel(contract, currentDate, this::selectContract);
+            ContractCardPanel card = new ContractCardPanel(contract,
+                  currentDate,
+                  hideContractType,
+                  this::selectContract);
             cards.add(card);
             cardRow.add(card);
         }
@@ -502,9 +508,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * The search types a campaign may choose between. Mercenary and pirate bands may look for either mercenary or
-     * pirate work; government campaigns are limited to government contracts. Tournament circuits are open to every
-     * campaign.
+     * The search types a campaign may choose between. Mercenary and pirate bands may look for mercenary or pirate work,
+     * or the tournament circuit; government campaigns are limited to government orders and pirate actions.
      *
      * @author Illiani
      * @since 0.51.01
@@ -514,7 +519,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         if (faction.isMercenary() || faction.isPirate()) {
             return List.of(ContractSearchType.MERCENARY, ContractSearchType.PIRATE, ContractSearchType.TOURNAMENT);
         }
-        return List.of(ContractSearchType.GOVERNMENT, ContractSearchType.TOURNAMENT);
+        return List.of(ContractSearchType.GOVERNMENT, ContractSearchType.PIRATE);
     }
 
     /**
@@ -546,7 +551,13 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(48), PADDING, scaleForGUI(48), PADDING));
 
-        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "empty.contractMarket.title"), SwingConstants.CENTER);
+        // When the market is disabled advancing the calendar will never populate the board, so the standard
+        // "check back next month" advice would be misleading - point the player at the option instead.
+        boolean marketDisabled = campaign.getCampaignOptions().get(CampaignOption.CONTRACT_MARKET_METHOD).isNone();
+        String titleKey = marketDisabled ? "empty.contractMarket.disabled.title" : "empty.contractMarket.title";
+        String bodyKey = marketDisabled ? "empty.contractMarket.disabled.body" : "empty.contractMarket.body";
+
+        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, titleKey), SwingConstants.CENTER);
         title.setAlignmentX(JLabel.CENTER_ALIGNMENT);
         title.setFont(title.getFont().deriveFont(title.getFont().getSize2D() + 2f));
 
@@ -554,7 +565,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                                        scaleForGUI(360)
                                        +
                                        "px; text-align:center'>" +
-                                       getTextAt(RESOURCE_BUNDLE, "empty.contractMarket.body") +
+                                       getTextAt(RESOURCE_BUNDLE, bodyKey) +
                                        "</body></html>",
               SwingConstants.CENTER);
         body.setAlignmentX(JLabel.CENTER_ALIGNMENT);

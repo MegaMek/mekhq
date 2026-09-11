@@ -34,8 +34,8 @@ package mekhq.gui.campaignOptions.contents;
 
 import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
@@ -62,6 +62,8 @@ class EquipmentAndSuppliesOptionsModel {
     int autoLogisticsHeatSink;
     int autoLogisticsWeapons;
     int autoLogisticsOther;
+    int autoLogisticsEquipmentKit;
+    int autoLogisticsBomb;
     int unitTransitTime;
     boolean noDeliveriesInTransit;
     boolean usePlanetaryAcquisition;
@@ -106,6 +108,8 @@ class EquipmentAndSuppliesOptionsModel {
         autoLogisticsHeatSink = options.get(CampaignOption.AUTO_LOGISTICS_HEAT_SINK);
         autoLogisticsWeapons = options.get(CampaignOption.AUTO_LOGISTICS_WEAPONS);
         autoLogisticsOther = options.get(CampaignOption.AUTO_LOGISTICS_OTHER);
+        autoLogisticsEquipmentKit = options.get(CampaignOption.AUTO_LOGISTICS_EQUIPMENT_KIT);
+        autoLogisticsBomb = options.get(CampaignOption.AUTO_LOGISTICS_BOMB);
         unitTransitTime = options.get(CampaignOption.UNIT_TRANSIT_TIME);
         noDeliveriesInTransit = options.get(CampaignOption.NO_DELIVERIES_IN_TRANSIT);
         usePlanetaryAcquisition = options.get(CampaignOption.USE_PLANETARY_ACQUISITION);
@@ -161,6 +165,8 @@ class EquipmentAndSuppliesOptionsModel {
         options.set(CampaignOption.AUTO_LOGISTICS_HEAT_SINK, autoLogisticsHeatSink);
         options.set(CampaignOption.AUTO_LOGISTICS_WEAPONS, autoLogisticsWeapons);
         options.set(CampaignOption.AUTO_LOGISTICS_OTHER, autoLogisticsOther);
+        options.set(CampaignOption.AUTO_LOGISTICS_EQUIPMENT_KIT, autoLogisticsEquipmentKit);
+        options.set(CampaignOption.AUTO_LOGISTICS_BOMB, autoLogisticsBomb);
         options.set(CampaignOption.UNIT_TRANSIT_TIME, unitTransitTime);
         options.set(CampaignOption.NO_DELIVERIES_IN_TRANSIT, noDeliveriesInTransit);
         options.set(CampaignOption.USE_PLANETARY_ACQUISITION, usePlanetaryAcquisition);

@@ -61,6 +61,7 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.TechnicianSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 
 public class DefaultSkillGenerator extends AbstractSkillGenerator {
@@ -144,6 +145,14 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
+        // roll supplemental tech skills (skipped when the campaign uses only the global tech skills)
+        if (person.isTechExpanded() && !campaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)) {
+            List<String> supplementalSkills = TechnicianSkills.getTechSupplementalSkills(person, false);
+            for (String skillName : supplementalSkills) {
+                addSkill(person, skillName, expLvl, skillPreferences.randomizeSkill(), 0, mod);
+            }
+        }
+
         // roll Infantry Gunnery Skills
         if (!campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)) {
             if (primaryRole.isSoldier() || secondaryRole.isSoldier()) {
@@ -166,7 +175,8 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
                 // We're removing protomek from the pool as only actual protomek pilots should have access to this
                 // skill. Adding it randomly creates some lore inconsistencies. ProtoMek pilots will already have the
                 // skill at this stage
-                if (skillType.equalsIgnoreCase(SkillType.S_GUN_PROTO)) {
+                if (skillType.equalsIgnoreCase(SkillType.S_GUN_PROTO) ||
+                          skillType.equalsIgnoreCase(SkillType.S_PILOT_PROTO)) {
                     continue;
                 }
 
@@ -191,7 +201,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
 
     private static void generateCommandUtilitySkills(Person person, int expLvl,
           RandomSkillPreferences skillPreferences) {
-        for (String skillName : SkillType.getSkillsBySkillSubType(List.of(UTILITY_COMMAND))) {
+        for (String skillName : SkillType.getSkillsBySkillSubType(List.of(UTILITY_COMMAND), false)) {
             if (person.getSkills().hasSkill(skillName)) {
                 continue;
             }

@@ -112,13 +112,15 @@ class ContractXmlCodecTest {
         contract.setDescription("A punitive raid into the Periphery.");
         contract.setScale(4);
         contract.setTrackCount(2);
-        contract.setProvingGround(true);
+        contract.setNature(ContractNature.PROVING_GROUND);
         contract.setSharesPercent(45);
         contract.setStatus(MissionStatus.ACTIVE);
         contract.setSalvagedByUnitValue(Money.of(1_250_000));
         contract.setSalvagedByEmployerValue(Money.of(750_000));
-        contract.setRequiredCombatElements(12);
         contract.setRequiredVictoryPoints(9);
+        // A non-empty scenario schedule so the codec's scenarioSchedule tag is exercised by the round-trip and
+        // idempotency checks; the six per-month entries sum to the track count, matching a six-month contract.
+        contract.setScenarioSchedule(List.of(0, 1, 0, 1, 0, 0));
 
         contract.setEmployerData(new EmployerData(ChaosEmployerType.LOCAL_PLANETARY_GOVERNMENT,
               "LA",
@@ -342,6 +344,8 @@ class ContractXmlCodecTest {
         assertEquals(expected.getDescription(), actual.getDescription(), "description");
         assertEquals(expected.getScale(), actual.getScale(), "scale");
         assertEquals(expected.getTrackCount(), actual.getTrackCount(), "trackCount");
+        assertEquals(expected.getScenarioSchedule(), actual.getScenarioSchedule(), "scenarioSchedule");
+        assertEquals(expected.getNature(), actual.getNature(), "nature");
         assertTrue(actual.isProvingGround(), "provingGround");
         assertEquals(expected.getSharesPercent(), actual.getSharesPercent(), "sharesPercent");
         assertEquals(expected.getStatus(), actual.getStatus(), "missionStatus");

@@ -58,6 +58,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.GMModeEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.assets.AssetEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.missions.MissionChangedEvent;
@@ -497,6 +498,13 @@ public final class FinancesTab extends CampaignGuiTab {
 
     public void refreshFinancialReport() {
         SwingUtilities.invokeLater(() -> {
+            // While a bulk generation is adding personnel off the EDT, skip this refresh: the payroll
+            // walks the personnel roster, and copying that roster while the worker grows it threw
+            // ArrayIndexOutOfBoundsException out of ArrayList's constructor. The generation fires an
+            // event when it completes, which reschedules this against the finished campaign.
+            if (getCampaign().isBulkGenerationInProgress()) {
+                return;
+            }
             areaNetWorth.setText(getFormattedFinancialReport());
             areaNetWorth.setCaretPosition(0);
         });
@@ -705,6 +713,20 @@ public final class FinancesTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(TransactionEvent ev) {
+        financialTransactionsScheduler.schedule();
+    }
+
+    /**
+     * The starting simulation books ten years of pay and expenses while {@link Campaign#isBulkGenerationInProgress()}
+     * is true, so the {@link TransactionEvent}s it raises are all dropped by the guard in
+     * {@link #refreshFinancialReport()}. Generation signs off with this event and nothing else, so without this handler
+     * the ledger and the net worth both keep their pre-simulation figures.
+     *
+     * <p>Scheduling the transactions refresh covers both: {@link #refreshFinancialTransactions()} ends by calling
+     * {@link #refreshFinancialReport()}.</p>
+     */
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
         financialTransactionsScheduler.schedule();
     }
 

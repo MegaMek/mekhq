@@ -37,6 +37,7 @@ import static mekhq.campaign.enums.DailyReportType.*;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -57,6 +58,7 @@ import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.util.ClickableLabel;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.EnhancedTabbedPane;
@@ -72,6 +74,7 @@ import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.events.ReportEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
@@ -125,6 +128,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private JPanel panInfo;
     private ClickableLabel lblRating;
     private JLabel lblExperience;
+    private JLabel lblUnitWeight;
     private ClickableLabel lblPersonnel;
     private JLabel lblHRCapacity;
     private JLabel lblMissionSuccess;
@@ -356,6 +360,20 @@ public final class CommandCenterTab extends CampaignGuiTab {
         gridBagConstraints.fill = GridBagConstraints.HORIZONTAL;
         gridBagConstraints.weightx = 1.0;
         panInfo.add(lblExperience, gridBagConstraints);
+
+        JLabel lblUnitWeightHead = new JLabel(resourceMap.getString("lblUnitWeight.text"));
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 0;
+        gridBagConstraints.gridy = y++;
+        gridBagConstraints.fill = GridBagConstraints.NONE;
+        gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
+        gridBagConstraints.insets = new Insets(1, 5, 1, 5);
+        panInfo.add(lblUnitWeightHead, gridBagConstraints);
+        lblUnitWeight = new JLabel(getCampaign().getCampaignSummary().getUnitWeightReport());
+        lblUnitWeightHead.setLabelFor(lblUnitWeight);
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.weightx = 1.0;
+        panInfo.add(lblUnitWeight, gridBagConstraints);
 
         JLabel lblMissionSuccessHead = new JLabel(resourceMap.getString("lblMissionSuccess.text"));
         gridBagConstraints = new GridBagConstraints();
@@ -625,7 +643,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         pnlAggregateLog.setMinimumSize(size);
         pnlAggregateLog.setPreferredSize(size);
 
-        tabLogs = new EnhancedTabbedPane();
+        tabLogs = new EnhancedTabbedPane(true, true);
         tabLogs.setName("dailyReportTabs");
         addDailyReportTab(tabLogs, pnlGeneralLog, GENERAL);
         addDailyReportTab(tabLogs, pnlBattleLog, BATTLE);
@@ -639,8 +657,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
         addDailyReportTab(tabLogs, pnlAggregateLog, AGGREGATE);
 
         tabLogs.addChangeListener(evt -> {
-            int selectedIndex = tabLogs.getSelectedIndex();
-            clearDailyReportNag(selectedIndex);
+            DailyReportType selectedType = getTypeAtIndex(tabLogs.getSelectedIndex());
+            if (selectedType != null) {
+                clearDailyReportNag(selectedType);
+            }
         });
     }
 
@@ -664,12 +684,73 @@ public final class CommandCenterTab extends CampaignGuiTab {
         tabbedPane.setTabComponentAt(type.getTabIndex(), label);
     }
 
-    public void clearDailyReportNag(int selectedIndex) {
-        DailyReportType type = DailyReportType.getTypeFromIndex(selectedIndex);
-        if (type != null) {
-            tabLogs.setBackgroundAt(selectedIndex, null);
-            setLogNagActive(type, false);
+    public void clearDailyReportNag(DailyReportType type) {
+        int logIndex = getLogTabIndex(type);
+        if (logIndex >= 0) {
+            tabLogs.setBackgroundAt(logIndex, null);
         }
+        setLogNagActive(type, false);
+    }
+
+    /**
+     * Resolves the current position of a log tab by identity rather than by a fixed index, so it stays correct after
+     * the user reorders or detaches tabs.
+     *
+     * <p>The lookup keys on the tab's <em>content</em> panel (the {@link DailyReportLogPanel}), which is a stable
+     * reference that {@link EnhancedTabbedPane} preserves across reordering, detachment, and reattachment. (The tab's
+     * label component is <em>not</em> a reliable key: reattaching a detached tab does not restore its custom tab
+     * component.)</p>
+     *
+     * @param type the log type to locate
+     *
+     * @return the current tab index for the type, or {@code -1} if the tab is not present in {@link #tabLogs} (for
+     *       example because it is currently detached into its own window)
+     */
+    public int getLogTabIndex(DailyReportType type) {
+        return tabLogs.indexOfComponent(getLogPanel(type));
+    }
+
+    /**
+     * The inverse of {@link #getLogTabIndex(DailyReportType)}: resolves which {@link DailyReportType} currently sits at
+     * a live tab index, again by matching the content panel so it survives reordering and reattachment.
+     *
+     * @param tabIndex a live index into {@link #tabLogs}
+     *
+     * @return the type at that index, or {@code null} if the index is out of range or its content is not a recognized
+     *       log panel
+     */
+    private @Nullable DailyReportType getTypeAtIndex(int tabIndex) {
+        if ((tabIndex < 0) || (tabIndex >= tabLogs.getTabCount())) {
+            return null;
+        }
+
+        Component content = tabLogs.getComponentAt(tabIndex);
+        for (DailyReportType type : DailyReportType.values()) {
+            if (getLogPanel(type) == content) {
+                return type;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param type the log type
+     *
+     * @return the {@link DailyReportLogPanel} that backs the given log type's tab
+     */
+    private DailyReportLogPanel getLogPanel(DailyReportType type) {
+        return switch (type) {
+            case GENERAL -> pnlGeneralLog;
+            case BATTLE -> pnlBattleLog;
+            case POLITICS -> pnlPoliticsLog;
+            case PERSONNEL -> pnlPersonnelLog;
+            case MEDICAL -> pnlMedicalLog;
+            case FINANCES -> pnlFinancesLog;
+            case ACQUISITIONS -> pnlAcquisitionsLog;
+            case TECHNICAL -> pnlTechnicalLog;
+            case SKILL_CHECKS -> pnlSkillLog;
+            case AGGREGATE -> pnlAggregateLog;
+        };
     }
 
     public EnhancedTabbedPane getTabLogs() {
@@ -706,8 +787,9 @@ public final class CommandCenterTab extends CampaignGuiTab {
         }
     }
 
-    public void nagLogTab(int logIndex) {
-        if (logIndex >= 0 && logIndex < tabLogs.getTabCount()) {
+    public void nagLogTab(DailyReportType type) {
+        int logIndex = getLogTabIndex(type);
+        if (logIndex >= 0) {
             tabLogs.setBackgroundAt(logIndex, UIUtil.uiDarkBlue());
         }
     }
@@ -885,6 +967,16 @@ public final class CommandCenterTab extends CampaignGuiTab {
      */
     private void refreshBasicInfo() {
         final Campaign campaign = getCampaign();
+
+        // While a bulk generation is adding units/parts off the EDT, skip this refresh: the summary
+        // computation walks the campaign's hangar and location tree, which the worker is concurrently
+        // mutating - reading it here threw ConcurrentModificationException from the modal progress
+        // dialog's event pump. The generation fires an OrganizationChangedEvent when it completes,
+        // which reschedules this refresh against the finished, consistent campaign.
+        if (campaign.isBulkGenerationInProgress()) {
+            return;
+        }
+
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final CampaignSummary campaignSummary = campaign.getCampaignSummary();
 
@@ -908,6 +1000,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         } else {
             lblRating.setToolTipText(null);
         }
+
+        lblUnitWeight.setText(campaignSummary.getUnitWeightReport());
         lblPersonnel.setText(campaignSummary.getPersonnelReport());
         lblMissionSuccess.setText(campaignSummary.getMissionSuccessReport());
         lblComposition.setText(campaignSummary.getForceCompositionReport());
@@ -1038,34 +1132,34 @@ public final class CommandCenterTab extends CampaignGuiTab {
     private void initLog() {
         DailyReportLog reportLog = getCampaign().getDailyReportLog();
 
-        pnlGeneralLog.refreshLog(reportLog.getHtml(GENERAL), GENERAL);
+        pnlGeneralLog.refreshLog(reportLog.getHtml(GENERAL));
         reportLog.fetchAndClearNew(GENERAL);
 
-        pnlSkillLog.refreshLog(reportLog.getHtml(SKILL_CHECKS), SKILL_CHECKS);
+        pnlSkillLog.refreshLog(reportLog.getHtml(SKILL_CHECKS));
         reportLog.fetchAndClearNew(SKILL_CHECKS);
 
-        pnlBattleLog.refreshLog(reportLog.getHtml(BATTLE), BATTLE);
+        pnlBattleLog.refreshLog(reportLog.getHtml(BATTLE));
         reportLog.fetchAndClearNew(BATTLE);
 
-        pnlPoliticsLog.refreshLog(reportLog.getHtml(POLITICS), POLITICS);
+        pnlPoliticsLog.refreshLog(reportLog.getHtml(POLITICS));
         reportLog.fetchAndClearNew(POLITICS);
 
-        pnlPersonnelLog.refreshLog(reportLog.getHtml(PERSONNEL), PERSONNEL);
+        pnlPersonnelLog.refreshLog(reportLog.getHtml(PERSONNEL));
         reportLog.fetchAndClearNew(PERSONNEL);
 
-        pnlMedicalLog.refreshLog(reportLog.getHtml(MEDICAL), MEDICAL);
+        pnlMedicalLog.refreshLog(reportLog.getHtml(MEDICAL));
         reportLog.fetchAndClearNew(MEDICAL);
 
-        pnlFinancesLog.refreshLog(reportLog.getHtml(FINANCES), FINANCES);
+        pnlFinancesLog.refreshLog(reportLog.getHtml(FINANCES));
         reportLog.fetchAndClearNew(FINANCES);
 
-        pnlAcquisitionsLog.refreshLog(reportLog.getHtml(ACQUISITIONS), ACQUISITIONS);
+        pnlAcquisitionsLog.refreshLog(reportLog.getHtml(ACQUISITIONS));
         reportLog.fetchAndClearNew(ACQUISITIONS);
 
-        pnlTechnicalLog.refreshLog(reportLog.getHtml(TECHNICAL), TECHNICAL);
+        pnlTechnicalLog.refreshLog(reportLog.getHtml(TECHNICAL));
         reportLog.fetchAndClearNew(TECHNICAL);
 
-        pnlAggregateLog.refreshLog(reportLog.getHtml(AGGREGATE), AGGREGATE);
+        pnlAggregateLog.refreshLog(reportLog.getHtml(AGGREGATE));
         reportLog.fetchAndClearNew(AGGREGATE);
     }
 
@@ -1134,16 +1228,23 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(ReportEvent ev) {
-        refreshGeneralLog();
-        refreshSkillLog();
-        refreshBattleLog();
-        refreshPoliticsLog();
-        refreshPersonnelLog();
-        refreshMedicalLog();
-        refreshFinancesLog();
-        refreshAcquisitionsLog();
-        refreshTechnicalLog();
-        refreshAggregateLog();
+        // Dispatch onto the EDT regardless of caller thread. The Daily Report log panels are
+        // HTML-bearing JTextPanes; their appendLog path mutates the HTMLDocument and the JTextPane
+        // caret. Off-EDT writes here deadlocked with a queued DefaultCaret repaint runnable when
+        // the worker fired ReportEvent during force generation (EDT held AWTTreeLock and wanted
+        // the document read-lock; worker held the document write-lock).
+        SwingUtilities.invokeLater(() -> {
+            refreshGeneralLog();
+            refreshSkillLog();
+            refreshBattleLog();
+            refreshPoliticsLog();
+            refreshPersonnelLog();
+            refreshMedicalLog();
+            refreshFinancesLog();
+            refreshAcquisitionsLog();
+            refreshTechnicalLog();
+            refreshAggregateLog();
+        });
     }
 
     @Subscribe
@@ -1177,6 +1278,13 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
     @Subscribe
     public void handle(UnitEvent evt) {
+        basicInfoScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(OrganizationChangedEvent evt) {
+        // Fired once after a bulk force generation completes (among other org changes); reschedules the
+        // basic-info/cargo refresh that refreshBasicInfo skipped while the generation was in progress.
         basicInfoScheduler.schedule();
     }
 

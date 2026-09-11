@@ -347,7 +347,7 @@ public class StratConTab extends CampaignGuiTab {
         btnEditSupportPoints.setEnabled(isGM);
         btnEditSupportPoints.addActionListener(this::editSupportPoints);
 
-        // "Edit CVP" - set the contract's Campaign Victory Point total (GM only)
+        // "Edit CVP" - set the contract's Contract Victory Point total (GM only)
         btnEditVictoryPoints = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.editVictoryPoints.text"));
         btnEditVictoryPoints.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.editVictoryPoints.tooltip"));
         btnEditVictoryPoints.setEnabled(isGM);
@@ -389,7 +389,7 @@ public class StratConTab extends CampaignGuiTab {
     }
 
     /**
-     * GM action: prompts for and sets the current contract's Campaign Victory Point total.
+     * GM action: prompts for and sets the current contract's Contract Victory Point total.
      */
     private void editVictoryPoints(ActionEvent e) {
         if (currentContract == null) {
@@ -582,7 +582,7 @@ public class StratConTab extends CampaignGuiTab {
 
     /**
      * Refreshes the victory-point progress bar shown above the objectives list. Mirrors the Briefing Room's contract
-     * gauge: a {@link ContractMeterBar} charting current-versus-required Campaign Victory Points when a positive target
+     * gauge: a {@link ContractMeterBar} charting current-versus-required Contract Victory Points when a positive target
      * exists, falling back to a plain current/required label when it does not.
      *
      * @param campaignState the StratCon state of the currently selected contract

@@ -176,6 +176,7 @@ public class CreateCharacterStoryPoint extends StoryPoint {
                     break;
                 case PROTOMEK:
                     person.addSkill(SkillType.S_GUN_PROTO, 0, 1);
+                    person.addSkill(SkillType.S_PILOT_PROTO, 0, 1);
                     break;
                 case NAVAL:
                     person.addSkill(SkillType.S_TECH_VESSEL, 0, 1);

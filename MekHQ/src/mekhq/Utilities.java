@@ -98,6 +98,7 @@ import mekhq.campaign.mission.scenarios.IPlayerSettings;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.ITransportAssignment;
@@ -542,6 +543,9 @@ public class Utilities {
                                      gender);
                 person.addSkill(SkillType.S_GUN_PROTO,
                       SkillType.getType(SkillType.S_GUN_PROTO).getTarget() - oldCrew.getGunnery(),
+                      0);
+                person.addSkill(SkillType.S_PILOT_PROTO,
+                      SkillType.getType(SkillType.S_PILOT_PROTO).getTarget() - oldCrew.getGunnery(),
                       0);
             } else if (unit.getEntity() instanceof VTOL) {
                 final megamek.common.enums.Gender gender = oldCrew.getGender();
@@ -1022,7 +1026,9 @@ public class Utilities {
 
                 String phenotype = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_PHENOTYPE);
                 if (phenotype != null) {
-                    person.setPhenotype(Phenotype.fromString(phenotype));
+                    Phenotype resolvedPhenotype = Phenotype.fromString(phenotype);
+                    person.setPhenotype(resolvedPhenotype);
+                    applyPhenotypeSkillBonus(person, resolvedPhenotype);
                 }
 
                 String bloodname = oldCrew.getExtraDataValue(crewIndex, Crew.MAP_BLOOD_NAME);
@@ -1032,6 +1038,26 @@ public class Utilities {
             // Only created crew can be assigned a portrait, so this is safe to put in here
             if (!oldCrew.getPortrait(crewIndex).isDefault()) {
                 person.setPortrait(oldCrew.getPortrait(crewIndex).clone());
+            }
+        }
+    }
+
+    /**
+     * Applies the Clan Trueborn {@code +1} "Misc bonus" to a person's phenotype-appropriate profession skills.
+     *
+     * <p>Personnel converted from an {@link Crew} (such as captured enemy pilots) have their skills
+     * seeded directly from the crew's gunnery and piloting, so they never pass through the skill generator that would
+     * otherwise apply this bonus. Without this, Trueborn prisoners and bondsmen were missing the {@code +1} bonus that
+     * hired and Ronin Trueborn personnel receive.</p>
+     *
+     * @param person    the person whose skills should receive the bonus
+     * @param phenotype the phenotype determining which skills are bonused
+     */
+    static void applyPhenotypeSkillBonus(Person person, Phenotype phenotype) {
+        for (String skillName : phenotype.getBonusSkills()) {
+            Skill skill = person.getSkill(skillName);
+            if (skill != null) {
+                skill.setBonus(skill.getBonus() + 1);
             }
         }
     }

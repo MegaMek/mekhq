@@ -47,6 +47,8 @@ import javax.swing.UIManager;
 
 import megamek.common.Configuration;
 import megamek.common.event.Subscribe;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
@@ -59,7 +61,6 @@ import mekhq.campaign.events.TransitStatusChangedEvent;
 import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.utilities.TransportCostCalculations;
-import mekhq.campaign.universe.Atmosphere;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
@@ -285,14 +286,14 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
     public String getPlanetaryConditionsInfo() {
         Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
 
-        Atmosphere atmosphere = planet.getAtmosphere(campaign.getLocalDate());
-        megamek.common.planetaryConditions.Atmosphere pressure = planet.getPressure(campaign.getLocalDate());
+        AtmosphericTaint atmosphere = planet.getAtmosphere(campaign.getLocalDate());
+        Atmosphere pressure = planet.getPressure(campaign.getLocalDate());
 
         String atmosphereColor = getDefaultFontHexColor();
         if (atmosphere.isTainted() || atmosphere.isToxic()) {
             atmosphereColor = ReportingUtilities.getNegativeColor();
         }
-        String atmosphereLabel = atmosphere == Atmosphere.BREATHABLE ? "" : atmosphere.name;
+        String atmosphereLabel = atmosphere.isBreathable() ? "" : atmosphere.toString();
 
         String pressureColor = getDefaultFontHexColor();
         if (pressure.isTrace() || pressure.isVeryHigh()) {

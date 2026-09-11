@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -91,7 +91,7 @@ public class Attributes {
     /**
      * The default score assigned to all attributes during initialization.
      */
-    public static int DEFAULT_ATTRIBUTE_SCORE = 5;
+    public static final int DEFAULT_ATTRIBUTE_SCORE = 5;
 
     /**
      * The minimum allowable score for any attribute (other than Edge).
@@ -102,7 +102,7 @@ public class Attributes {
      * <p><b>Note:</b> ATOW allows attribute scores of 0. However, at that point the character is effectively dead
      * and outside the scope of MekHQ tracking (for now).</p>
      */
-    public static int MINIMUM_ATTRIBUTE_SCORE = 1;
+    public static final int MINIMUM_ATTRIBUTE_SCORE = 1;
 
     /**
      * The minimum allowable score for the Edge attribute.
@@ -110,7 +110,7 @@ public class Attributes {
      * <p>Edge values cannot be set below this limit, and any attempts to do so will result in clamping to this
      * value.</p>
      */
-    public static int MINIMUM_EDGE_SCORE = 0;
+    public static final int MINIMUM_EDGE_SCORE = 0;
 
     /**
      * The maximum allowable score for any attribute.
@@ -118,7 +118,7 @@ public class Attributes {
      * <p>Attribute values cannot be set above this limit, and any attempts to do so will result in clamping to this
      * value.</p>
      */
-    public static int MAXIMUM_ATTRIBUTE_SCORE = 10;
+    public static final int MAXIMUM_ATTRIBUTE_SCORE = 10;
 
     // Constructor
 

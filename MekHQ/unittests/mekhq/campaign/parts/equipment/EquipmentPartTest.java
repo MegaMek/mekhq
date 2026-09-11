@@ -68,11 +68,12 @@ import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.units.SmallCraft;
+import megamek.common.weapons.autoCannons.ACWeapon;
 import megamek.common.weapons.bayWeapons.BayWeapon;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
@@ -1788,5 +1789,207 @@ public class EquipmentPartTest {
         verify(weaponBay, times(1)).setMissing(eq(false));
         verify(weaponBay, times(1)).setDestroyed(eq(false));
         verify(unit, times(1)).repairSystem(eq(CriticalSlot.TYPE_EQUIPMENT), eq(bayEqNum));
+    }
+
+    /**
+     * #9761: under CORE rules an autocannon's first critical hit does not damage a crit slot; it only sets the
+     * autocannon-hit flag while the weapon keeps firing. That intermediate state must carry over for repair without
+     * being folded into hits (which stays crit-slot based, so it cannot be confused with a Total-Warfare destroyed
+     * AC).
+     */
+    @Test
+    public void updateConditionFromEntityAutocannonFirstHitTest() {
+        Campaign mockCampaign = mockCampaign();
+
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(unit.getEntity()).thenReturn(entity);
+
+        ACWeapon type = mock(ACWeapon.class);
+        doReturn(1.0).when(type).getTonnage(any(), anyDouble());
+
+        int equipmentNum = 42;
+        int location = Mek.LOC_RIGHT_TORSO;
+        Mounted mounted = mock(Mounted.class);
+        when(mounted.isMissing()).thenReturn(false);
+        when(mounted.getLocation()).thenReturn(location);
+        when(mounted.isAutocannonHit()).thenReturn(true);
+        doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
+        // No damaged crit slots - the first AC crit does not mark one.
+        doReturn(0).when(entity).getDamagedCriticalSlots(anyInt(), anyInt(), anyInt());
+
+        EquipmentPart equipmentPart = new EquipmentPart(75, type, equipmentNum, 1.0, false, mockCampaign);
+        equipmentPart.setUnit(unit);
+
+        equipmentPart.updateConditionFromEntity(false);
+
+        // No crit-slot hit, but the flag flags it for repair.
+        assertEquals(0, equipmentPart.getHits());
+        assertTrue(equipmentPart.autocannonHit);
+        assertTrue(equipmentPart.needsFixing());
+        assertTrue(equipmentPart.getBaseTime() > 0);
+
+        // A second AC crit damages a crit slot as normal, destroying the weapon (hits == 1).
+        doReturn(1).when(entity)
+              .getDamagedCriticalSlots(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(location));
+        equipmentPart.updateConditionFromEntity(false);
+        assertEquals(1, equipmentPart.getHits());
+        assertTrue(equipmentPart.autocannonHit);
+    }
+
+    /**
+     * #9761 ruleset guard: under Total Warfare rules a single AC crit destroys the weapon (crit slot hit, no
+     * autocannon-hit flag). That hits == 1 state must round-trip through the entity as a genuine destroyed weapon,
+     * never as the CORE damaged-but-firing state.
+     */
+    @Test
+    public void updateConditionFromPartTotalWarfareAutocannonDestroyedTest() {
+        Campaign mockCampaign = mockCampaign();
+
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(unit.getEntity()).thenReturn(entity);
+
+        ACWeapon type = mock(ACWeapon.class);
+        doReturn(1.0).when(type).getTonnage(any(), anyDouble());
+
+        int equipmentNum = 42;
+        Mounted mounted = mock(Mounted.class);
+        doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
+
+        EquipmentPart equipmentPart = new EquipmentPart(75, type, equipmentNum, 1.0, false, mockCampaign);
+        equipmentPart.setUnit(unit);
+        // A crit-slot hit with no autocannon-hit flag: the Total Warfare "AC destroyed by one crit" case.
+        equipmentPart.setHits(1);
+
+        equipmentPart.updateConditionFromPart();
+
+        verify(mounted, times(1)).setDestroyed(eq(true));
+        verify(mounted, times(1)).setHit(eq(true));
+        verify(mounted, times(1)).setAutocannonHit(eq(false));
+        verify(unit, times(1)).damageSystem(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum), eq(1));
+    }
+
+    /**
+     * #9762: a destroyed Directional Torso Mount rotation mechanism locks the weapon's arc without destroying the
+     * weapon, so it must be flagged for repair even with no crit-slot hits.
+     */
+    @Test
+    public void updateConditionFromEntityDirectionalMountLockedTest() {
+        Campaign mockCampaign = mockCampaign();
+
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(unit.getEntity()).thenReturn(entity);
+
+        WeaponType type = mock(WeaponType.class);
+        doReturn(1.0).when(type).getTonnage(any(), anyDouble());
+
+        int equipmentNum = 42;
+        Mounted mounted = mock(Mounted.class);
+        when(mounted.isMissing()).thenReturn(false);
+        when(mounted.getLocation()).thenReturn(Mek.LOC_LEFT_TORSO);
+        when(mounted.isDirectionalMountLocked()).thenReturn(true);
+        doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
+        doReturn(0).when(entity).getDamagedCriticalSlots(anyInt(), anyInt(), anyInt());
+
+        EquipmentPart equipmentPart = new EquipmentPart(75, type, equipmentNum, 1.0, false, mockCampaign);
+        equipmentPart.setUnit(unit);
+
+        equipmentPart.updateConditionFromEntity(false);
+
+        assertEquals(0, equipmentPart.getHits());
+        assertTrue(equipmentPart.isDirectionalMountLocked());
+        assertTrue(equipmentPart.needsFixing());
+        assertTrue(equipmentPart.getBaseTime() > 0);
+
+        // Once the mount is un-locked in combat terms, the part no longer needs fixing.
+        when(mounted.isDirectionalMountLocked()).thenReturn(false);
+        equipmentPart.updateConditionFromEntity(false);
+        assertFalse(equipmentPart.isDirectionalMountLocked());
+        assertFalse(equipmentPart.needsFixing());
+    }
+
+    /**
+     * A first-crit CORE autocannon (flag set, no crit-slot hit) is pushed back onto the entity as the autocannon-hit
+     * flag rather than a destroyed crit slot, so the damaged-but-firing state survives a save/load round trip (#9761).
+     */
+    @Test
+    public void updateConditionFromPartAutocannonFirstHitTest() {
+        Campaign mockCampaign = mockCampaign();
+
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(unit.getEntity()).thenReturn(entity);
+
+        ACWeapon type = mock(ACWeapon.class);
+        doReturn(1.0).when(type).getTonnage(any(), anyDouble());
+
+        int equipmentNum = 42;
+        Mounted mounted = mock(Mounted.class);
+        doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
+
+        EquipmentPart equipmentPart = new EquipmentPart(75, type, equipmentNum, 1.0, false, mockCampaign);
+        equipmentPart.setUnit(unit);
+        equipmentPart.autocannonHit = true;
+
+        equipmentPart.updateConditionFromPart();
+
+        verify(mounted, times(1)).setAutocannonHit(eq(true));
+        verify(mounted, never()).setDestroyed(eq(true));
+        verify(unit, times(1)).repairSystem(eq(CriticalSlot.TYPE_EQUIPMENT), eq(equipmentNum));
+    }
+
+    /** fix() must clear both soft-damage states MegaMek does not model as crit slots (#9761, #9762). */
+    @Test
+    public void fixClearsAutocannonHitAndDirectionalMountLockTest() {
+        Campaign mockCampaign = mockCampaign();
+
+        Unit unit = mock(Unit.class);
+        Entity entity = mock(Entity.class);
+        when(unit.getEntity()).thenReturn(entity);
+
+        EquipmentType type = mock(EquipmentType.class);
+        doReturn(1.0).when(type).getTonnage(any(), anyDouble());
+
+        int equipmentNum = 42;
+        Mounted mounted = mock(Mounted.class);
+        doReturn(mounted).when(entity).getEquipment(eq(equipmentNum));
+
+        EquipmentPart equipmentPart = new EquipmentPart(75, type, equipmentNum, 1.0, false, mockCampaign);
+        equipmentPart.setId(25);
+        equipmentPart.setUnit(unit);
+        equipmentPart.setHits(1);
+
+        equipmentPart.fix();
+
+        verify(mounted, times(1)).setAutocannonHit(eq(false));
+        verify(mounted, times(1)).setDirectionalMountLocked(eq(false));
+    }
+
+    /** The Directional Torso Mount lock survives a serialization round trip (#9762). */
+    @Test
+    public void directionalMountLockedRoundTripTest() throws ParserConfigurationException, SAXException, IOException {
+        EquipmentType type = getEquipmentType(EquipmentTypeLookup.JUMP_JET);
+        Campaign mockCampaign = mockCampaign();
+        EquipmentPart equipmentPart = new EquipmentPart(65, type, 42, 18.0, false, mockCampaign);
+        equipmentPart.setId(25);
+        equipmentPart.directionalMountLocked = true;
+
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        equipmentPart.writeToXML(pw, 0);
+
+        String xml = sw.toString();
+        assertTrue(xml.contains("directionalMountLocked"));
+
+        DocumentBuilder db = MHQXMLUtility.newSafeDocumentBuilder();
+        Document xmlDoc = db.parse(new ByteArrayInputStream(xml.getBytes()));
+        Element partElt = xmlDoc.getDocumentElement();
+
+        Part deserializedPart = Part.generateInstanceFromXML(partElt, new Version());
+        assertInstanceOf(EquipmentPart.class, deserializedPart);
+        assertTrue(((EquipmentPart) deserializedPart).isDirectionalMountLocked());
+        assertTrue(deserializedPart.needsFixing());
     }
 }

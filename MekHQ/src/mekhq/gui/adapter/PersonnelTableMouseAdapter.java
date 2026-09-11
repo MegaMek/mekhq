@@ -72,6 +72,7 @@ import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.checkFo
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -152,6 +153,8 @@ import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.DiseaseService;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -162,6 +165,7 @@ import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
+import mekhq.campaign.personnel.skills.TechnicianSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -175,6 +179,7 @@ import mekhq.gui.PersonnelTab;
 import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.quartermaster.IssueEquipmentDialog;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.menus.AssignPersonToUnitMenu;
 import mekhq.gui.menus.LocationMenu;
@@ -269,6 +274,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_LOYALTY = "LOYALTY";
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
+    private static final String CMD_ADD_MISSING_TECH_SKILLS = "ADD_MISSING_TECH_SKILLS";
     private static final String CMD_EDIT_FAMILIARITY = "EDIT_FAMILIARITY";
     private static final String CMD_GENERATE_ROLEPLAY_SKILLS = "GENERATE_ROLEPLAY_SKILLS";
     private static final String CMD_REMOVE_ROLEPLAY_SKILLS = "REMOVE_ROLEPLAY_SKILLS";
@@ -1835,6 +1841,13 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 break;
             }
+            case CMD_ADD_MISSING_TECH_SKILLS: {
+                for (Person person : people) {
+                    TechnicianSkills.addMissingSkills(person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                }
+                break;
+            }
             case CMD_EDIT_FAMILIARITY: {
                 new EditFamiliarityDialog(getFrame(), getCampaign(), selectedPerson).setVisible(true);
                 break;
@@ -2425,14 +2438,16 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         JMenu changeStatusMenu = new JMenu(resources.getString("changeStatus.text"));
 
-        if (StaticChecks.areAllEmployed(selected)) {
+        boolean areAllEmployed = StaticChecks.areAllEmployed(selected);
+        if (areAllEmployed) {
             menuItem = new JMenuItem(resources.getString("sack.text"));
             menuItem.setActionCommand(CMD_SACK);
             menuItem.addActionListener(this);
             changeStatusMenu.add(menuItem);
         }
 
-        if (!StaticChecks.areAllEmployed(selected)) {
+        boolean areAllFree = StaticChecks.areAllFreeOrBondsman(selected);
+        if (!areAllEmployed && areAllFree) {
             menuItem = new JMenuItem(resources.getString("employ.text"));
             menuItem.setActionCommand(CMD_EMPLOY);
             menuItem.addActionListener(this);
@@ -2445,7 +2460,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         changeStatusMenu.addSeparator();
 
-        boolean areAllFree = Stream.of(selected).allMatch(p -> p.getPrisonerStatus().isFreeOrBondsman());
         for (final PersonnelStatus status : PersonnelStatus.getImplementedStatuses(areAllFree, false)) {
             cbMenuItem = new JCheckBoxMenuItem(status.toString());
             cbMenuItem.setToolTipText(status.getToolTipText());
@@ -2557,7 +2571,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                               selectedPerson.getHyperlinkedFullTitle());
                         getCampaign().addReport(MEDICAL, report);
                     } else {
-                        new AdvancedReplacementLimbDialog(getCampaign(), gui.getIconPackage(), selectedPerson, false);
+                        new AdvancedSurgeriesDialog(getCampaign(), gui, selectedPerson, false);
                     }
                 }
             });
@@ -2566,6 +2580,17 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenuHelpers.addMenuIfNonEmpty(popup, healthcareMenu);
 
         JMenuHelpers.addMenuIfNonEmpty(popup, new AssignPersonToUnitMenu(getCampaign(), selected));
+
+        if (Arrays.stream(selected)
+                  .anyMatch(candidate -> ArmorKitCatalog.canBeIssuedKit(candidate)
+                                               || EquipmentKitCatalog.canBeIssuedKit(candidate))) {
+            JMenuItem issueKits = new JMenuItem(getTextAt("mekhq.resources.IssueEquipmentDialog",
+                  "menu.issueArmorKits"));
+            issueKits.addActionListener(ev -> IssueEquipmentDialog.showFor(getFrame(),
+                  getCampaign(), Arrays.asList(selected), null));
+            popup.add(issueKits);
+        }
+
         List<mekhq.campaign.personnel.Person> selectedPeople = Arrays.asList(selected);
         JMenuHelpers.addMenuIfNonEmpty(popup, new LocationMenu(getCampaign(), getFrame(), selectedPeople));
 
@@ -4036,6 +4061,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(CMD_EDIT_PORTRAIT);
             menuItem.addActionListener(this);
             changeProfileMenu.add(menuItem);
+
+            JMenuHelpers.addMenuIfNonEmpty(popup, changeProfileMenu);
         }
 
         JMenu editLogsMenu = new JMenu(resources.getString("editLogs.text"));
@@ -4441,6 +4468,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 skillsXpMenu.add(menuItem);
             }
 
+            menuItem = new JMenuItem(resources.getString("addMissingTechSkills.text"));
+            menuItem.setToolTipText(wordWrap(resources.getString("addMissingTechSkills.tooltip")));
+            menuItem.setActionCommand(CMD_ADD_MISSING_TECH_SKILLS);
+            menuItem.addActionListener(this);
+            skillsXpMenu.add(menuItem);
+
             JMenu attributesMenu = new JMenu(resources.getString("spendOnAttributes.set"));
             for (SkillAttribute attribute : SkillAttribute.values()) {
                 if (attribute.isNoAttribute()) {
@@ -4646,7 +4679,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 personalityMenu.add(menuItem);
             }
 
-            if (getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
+            if (getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES) ||
+                      getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
                 menuItem = new JMenuItem(resources.getString("regeneratePersonality.text"));
                 menuItem.setActionCommand(CMD_PERSONALITY);
                 menuItem.addActionListener(this);
@@ -4686,7 +4720,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setActionCommand(CMD_REMOVE_ROLEPLAY_SKILLS);
             menuItem.addActionListener(this);
             personalityMenu.add(menuItem);
-            
+
             if (oneSelected && getCampaignOptions().get(CampaignOption.CHASSIS_FAMILIARITY_MODE).isEnabled()) {
                 menuItem = new JMenuItem(getText("editFamiliarity.text"));
                 menuItem.setActionCommand(CMD_EDIT_FAMILIARITY);

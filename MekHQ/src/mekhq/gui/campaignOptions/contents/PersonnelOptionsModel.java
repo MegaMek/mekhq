@@ -68,6 +68,7 @@ class PersonnelOptionsModel {
     boolean usePersonnelRemoval;
     boolean useRemovalExemptCemetery;
     boolean useRemovalExemptRetirees;
+    boolean useSupportTeams;
     boolean useBlobInfantry;
     boolean useBlobBattleArmor;
     boolean useBlobVehicleCrewGround;
@@ -132,6 +133,21 @@ class PersonnelOptionsModel {
     int civilianProfessionDieSize;
     Familiarity chassisFamiliarity;
     int chassisFamiliaritySpeed;
+    String mekWarriorDefaultKit;
+    String vehicleCrewDefaultKit;
+    String aircraftDefaultKit;
+    boolean addDefaultKitToProcurement;
+    boolean npcFactionArmorKits;
+    boolean requireMekWarriorKitToDeploy;
+    String mekTechDefaultToolKit;
+    String mechanicDefaultToolKit;
+    String aeroTechDefaultToolKit;
+    String baTechDefaultToolKit;
+    String astechDefaultToolKit;
+    String doctorDefaultToolKit;
+    String medicDefaultToolKit;
+    String adminDefaultToolKit;
+    boolean techsNeedToolKit;
 
     PersonnelOptionsModel(@Nonnull CampaignOptions options) {
         useTactics = options.get(CampaignOption.USE_TACTICS);
@@ -157,6 +173,7 @@ class PersonnelOptionsModel {
         usePersonnelRemoval = options.get(CampaignOption.USE_PERSONNEL_REMOVAL);
         useRemovalExemptCemetery = options.get(CampaignOption.USE_REMOVAL_EXEMPT_CEMETERY);
         useRemovalExemptRetirees = options.get(CampaignOption.USE_REMOVAL_EXEMPT_RETIREES);
+        useSupportTeams = options.get(CampaignOption.USE_SUPPORT_TEAMS);
         useBlobInfantry = options.get(CampaignOption.USE_BLOB_INFANTRY);
         useBlobBattleArmor = options.get(CampaignOption.USE_BLOB_BATTLE_ARMOR);
         useBlobVehicleCrewGround = options.get(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND);
@@ -221,6 +238,21 @@ class PersonnelOptionsModel {
         civilianProfessionDieSize = options.get(CampaignOption.CIVILIAN_PROFESSION_DIE_SIZE);
         chassisFamiliarity = options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         chassisFamiliaritySpeed = options.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
+        mekWarriorDefaultKit = options.get(CampaignOption.MEKWARRIOR_DEFAULT_KIT);
+        vehicleCrewDefaultKit = options.get(CampaignOption.VEHICLE_CREW_DEFAULT_KIT);
+        aircraftDefaultKit = options.get(CampaignOption.AIRCRAFT_DEFAULT_KIT);
+        addDefaultKitToProcurement = options.get(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT);
+        npcFactionArmorKits = options.get(CampaignOption.NPC_FACTION_ARMOR_KITS);
+        requireMekWarriorKitToDeploy = options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY);
+        mekTechDefaultToolKit = options.get(CampaignOption.MEK_TECH_DEFAULT_TOOL_KIT);
+        mechanicDefaultToolKit = options.get(CampaignOption.MECHANIC_DEFAULT_TOOL_KIT);
+        aeroTechDefaultToolKit = options.get(CampaignOption.AERO_TECH_DEFAULT_TOOL_KIT);
+        baTechDefaultToolKit = options.get(CampaignOption.BA_TECH_DEFAULT_TOOL_KIT);
+        astechDefaultToolKit = options.get(CampaignOption.ASTECH_DEFAULT_TOOL_KIT);
+        doctorDefaultToolKit = options.get(CampaignOption.DOCTOR_DEFAULT_TOOL_KIT);
+        medicDefaultToolKit = options.get(CampaignOption.MEDIC_DEFAULT_TOOL_KIT);
+        adminDefaultToolKit = options.get(CampaignOption.ADMIN_DEFAULT_TOOL_KIT);
+        techsNeedToolKit = options.get(CampaignOption.TECHS_NEED_TOOL_KIT);
     }
 
     void applyTo(@Nonnull Campaign campaign, @Nonnull CampaignOptions options) {
@@ -247,6 +279,7 @@ class PersonnelOptionsModel {
         options.set(CampaignOption.USE_PERSONNEL_REMOVAL, usePersonnelRemoval);
         options.set(CampaignOption.USE_REMOVAL_EXEMPT_CEMETERY, useRemovalExemptCemetery);
         options.set(CampaignOption.USE_REMOVAL_EXEMPT_RETIREES, useRemovalExemptRetirees);
+        options.set(CampaignOption.USE_SUPPORT_TEAMS, useSupportTeams);
         options.set(CampaignOption.USE_BLOB_INFANTRY, useBlobInfantry);
         options.set(CampaignOption.USE_BLOB_BATTLE_ARMOR, useBlobBattleArmor);
         options.set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, useBlobVehicleCrewGround);
@@ -314,5 +347,20 @@ class PersonnelOptionsModel {
         options.set(CampaignOption.CIVILIAN_PROFESSION_DIE_SIZE, civilianProfessionDieSize);
         options.set(CampaignOption.CHASSIS_FAMILIARITY_MODE, chassisFamiliarity);
         options.set(CampaignOption.CHASSIS_FAMILIARITY_SPEED, chassisFamiliaritySpeed);
+        options.set(CampaignOption.MEKWARRIOR_DEFAULT_KIT, mekWarriorDefaultKit);
+        options.set(CampaignOption.VEHICLE_CREW_DEFAULT_KIT, vehicleCrewDefaultKit);
+        options.set(CampaignOption.AIRCRAFT_DEFAULT_KIT, aircraftDefaultKit);
+        options.set(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT, addDefaultKitToProcurement);
+        options.set(CampaignOption.NPC_FACTION_ARMOR_KITS, npcFactionArmorKits);
+        options.set(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY, requireMekWarriorKitToDeploy);
+        options.set(CampaignOption.MEK_TECH_DEFAULT_TOOL_KIT, mekTechDefaultToolKit);
+        options.set(CampaignOption.MECHANIC_DEFAULT_TOOL_KIT, mechanicDefaultToolKit);
+        options.set(CampaignOption.AERO_TECH_DEFAULT_TOOL_KIT, aeroTechDefaultToolKit);
+        options.set(CampaignOption.BA_TECH_DEFAULT_TOOL_KIT, baTechDefaultToolKit);
+        options.set(CampaignOption.ASTECH_DEFAULT_TOOL_KIT, astechDefaultToolKit);
+        options.set(CampaignOption.DOCTOR_DEFAULT_TOOL_KIT, doctorDefaultToolKit);
+        options.set(CampaignOption.MEDIC_DEFAULT_TOOL_KIT, medicDefaultToolKit);
+        options.set(CampaignOption.ADMIN_DEFAULT_TOOL_KIT, adminDefaultToolKit);
+        options.set(CampaignOption.TECHS_NEED_TOOL_KIT, techsNeedToolKit);
     }
 }

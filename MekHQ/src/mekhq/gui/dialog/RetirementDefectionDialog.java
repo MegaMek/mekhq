@@ -259,7 +259,8 @@ public class RetirementDefectionDialog extends JDialog {
             JPanel panOverview = new JPanel(new BorderLayout());
 
             cbGroupOverview = new JComboBox<>();
-            for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+            for (PersonnelFilter filter : PersonnelFilter.applicableTo(
+              MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true), hqView.getCampaign())) {
                 cbGroupOverview.addItem(filter);
             }
 
@@ -370,7 +371,8 @@ public class RetirementDefectionDialog extends JDialog {
         JPanel panRetirees = new JPanel(new BorderLayout());
 
         cbGroupResults = new JComboBox<>();
-        for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+        for (PersonnelFilter filter : PersonnelFilter.applicableTo(
+                  MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true), hqView.getCampaign())) {
             cbGroupResults.addItem(filter);
         }
         JPanel panTop = new JPanel();

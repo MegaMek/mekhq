@@ -107,7 +107,6 @@ import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
-
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
@@ -176,6 +175,8 @@ import mekhq.campaign.personnel.medical.MedicalController;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
+import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitIssuer;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.EscapeSkills;
 import mekhq.campaign.personnel.skills.QuickTrain;
@@ -329,137 +330,6 @@ public class CampaignNewDayManager {
         // clear previous retirement information
         campaign.getTurnoverRetirementInformation().clear();
 
-        // Refill Automated Pools, if the options are selected.
-        // When "no release" is also set, only hire to cover shortfalls (skip firing surplus).
-        final MHQOptions mhqOptions = MekHQ.getMHQOptions();
-        if (mhqOptions.getNewDayAsTechPoolFill()) {
-            if (mhqOptions.getNewDayAsTechPoolNoRelease()) {
-                campaign.fillAsTechPool();
-            } else {
-                campaign.resetAsTechPool();
-            }
-        }
-
-        if (mhqOptions.getNewDayMedicPoolFill()) {
-            if (mhqOptions.getNewDayMedicPoolNoRelease()) {
-                campaign.fillMedicPool();
-            } else {
-                campaign.resetMedicPool();
-            }
-        }
-
-        if (mhqOptions.getNewDaySoldierPoolFill()) {
-            if (!mhqOptions.getNewDaySoldierPoolNoRelease()) {
-                campaign.emptyTempCrewPoolForRole(PersonnelRole.SOLDIER);
-            }
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.SOLDIER);
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.SOLDIER);
-        }
-
-        if (mhqOptions.getNewDayBattleArmorPoolFill()) {
-            if (!mhqOptions.getNewDayBattleArmorPoolNoRelease()) {
-                campaign.emptyTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
-            }
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.BATTLE_ARMOUR);
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.BATTLE_ARMOUR);
-        }
-
-        if (mhqOptions.getNewDayVehicleCrewGroundPoolFill()) {
-            if (!mhqOptions.getNewDayVehicleCrewGroundPoolNoRelease()) {
-                campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
-            }
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.VEHICLE_CREW_GROUND);
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.VEHICLE_CREW_GROUND);
-        }
-
-        if (mhqOptions.getNewDayVehicleCrewVTOLPoolFill()) {
-            if (!mhqOptions.getNewDayVehicleCrewVTOLPoolNoRelease()) {
-                campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
-            }
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.VEHICLE_CREW_VTOL);
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.VEHICLE_CREW_VTOL);
-        }
-
-        if (mhqOptions.getNewDayVehicleCrewNavalPoolFill()) {
-            if (!mhqOptions.getNewDayVehicleCrewNavalPoolNoRelease()) {
-                campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
-            }
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.VEHICLE_CREW_NAVAL);
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.VEHICLE_CREW_NAVAL);
-        }
-
-        if (mhqOptions.getNewDayVesselPilotPoolFill()) {
-            if (!mhqOptions.getNewDayVesselPilotPoolNoRelease()) {
-                campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
-            }
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.VESSEL_PILOT);
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.VESSEL_PILOT);
-        }
-
-        if (mhqOptions.getNewDayVesselGunnerPoolFill()) {
-            if (!mhqOptions.getNewDayVesselGunnerPoolNoRelease()) {
-                campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
-            }
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.VESSEL_GUNNER);
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.VESSEL_GUNNER);
-        }
-
-        if (mhqOptions.getNewDayVesselCrewPoolFill()) {
-            if (!mhqOptions.getNewDayVesselCrewPoolNoRelease()) {
-                campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
-            }
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.VESSEL_CREW);
-            campaign.getPlayerForce()
-                  .getHumanResources()
-                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
-                        PersonnelRole.VESSEL_CREW);
-        }
-
         // Ensure we don't have anything that would prevent the new day
         if (MekHQ.triggerEvent(new DayEndingEvent(campaign))) {
             return false;
@@ -487,21 +357,22 @@ public class CampaignNewDayManager {
             campaign.setHasActiveContract();
         }
 
-        // Clear Reports. We also clear the daily report nags here, atomically with the report content: any report
-        // posted earlier in this newDay() (e.g. by pool refills that hire or fire) had its content wiped by the clear()
-        // below, so any nag it raised is stale. Clearing nags at the same moment leaves only genuine, post-beginReport
-        // reports able to flash a tab. (Doing this at the top of newDay() instead let those stale nags survive, so a
-        // tab would flash while showing only the date line.)
+        // Clear the previous day's reports and their tab nags together, then write today's date header. Everything that
+        // posts reports for the new day (including the pool refills below) runs after this point, so its content lands
+        // in today's freshly-started log and can raise a genuine nag; nothing posts before the clear, so no stale nag
+        // can survive to flash a tab that only shows the date line.
         campaign.getDailyReportLog().clear();
 
         CommandCenterTab commandCenter = campaign.getGUI().getCommandCenterTab();
         for (DailyReportType type : DailyReportType.values()) {
-            commandCenter.clearDailyReportNag(type.getTabIndex());
+            commandCenter.clearDailyReportNag(type);
         }
 
         campaign.beginReport("<b>" + MekHQ.getMHQOptions().getLongDisplayFormattedDate(today) + "</b>");
 
         campaign.getPlayerForce().getHumanResources().getPersonnelWhoAdvancedInXP().clear();
+
+        fillTempPools();
 
         // New Year Changes
         if (isNewYear) {
@@ -547,6 +418,11 @@ public class CampaignNewDayManager {
         processNewDayPersonnel();
 
         processAllArrivals();
+
+        // Issue any armor kits that were awaited and have now arrived in local stores.
+        ArmorKitIssuer.fulfillPendingIssues(campaign);
+        // Likewise for tool kits.
+        EquipmentKitIssuer.fulfillPendingToolKits(campaign);
 
         campaign.getCampaignLocationManager().pruneEmptyLocations();
 
@@ -700,6 +576,141 @@ public class CampaignNewDayManager {
         return startDayWithNoInterruptions;
     }
 
+    private void fillTempPools() {
+        // Refill automated personnel pools now that the new day has begun and its report header exists, so any
+        // hiring/firing these post lands in today's log under the date line (rather than being wiped by the
+        // clear above, as happened when this ran before the day was started).
+        // When "no release" is also set, only hire to cover shortfalls (skip firing surplus).
+        final MHQOptions mhqOptions = MekHQ.getMHQOptions();
+        if (mhqOptions.getNewDayAsTechPoolFill()) {
+            if (mhqOptions.getNewDayAsTechPoolNoRelease()) {
+                campaign.fillAsTechPool();
+            } else {
+                campaign.resetAsTechPool();
+            }
+        }
+
+        if (mhqOptions.getNewDayMedicPoolFill()) {
+            if (mhqOptions.getNewDayMedicPoolNoRelease()) {
+                campaign.fillMedicPool();
+            } else {
+                campaign.resetMedicPool();
+            }
+        }
+
+        if (mhqOptions.getNewDaySoldierPoolFill()) {
+            if (!mhqOptions.getNewDaySoldierPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.SOLDIER);
+            }
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.SOLDIER);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.SOLDIER);
+        }
+
+        if (mhqOptions.getNewDayBattleArmorPoolFill()) {
+            if (!mhqOptions.getNewDayBattleArmorPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.BATTLE_ARMOUR);
+            }
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.BATTLE_ARMOUR);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.BATTLE_ARMOUR);
+        }
+
+        if (mhqOptions.getNewDayVehicleCrewGroundPoolFill()) {
+            if (!mhqOptions.getNewDayVehicleCrewGroundPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+            }
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_GROUND);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+
+        if (mhqOptions.getNewDayVehicleCrewVTOLPoolFill()) {
+            if (!mhqOptions.getNewDayVehicleCrewVTOLPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_VTOL);
+            }
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_VTOL);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+
+        if (mhqOptions.getNewDayVehicleCrewNavalPoolFill()) {
+            if (!mhqOptions.getNewDayVehicleCrewNavalPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_NAVAL);
+            }
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_NAVAL);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+
+        if (mhqOptions.getNewDayVesselPilotPoolFill()) {
+            if (!mhqOptions.getNewDayVesselPilotPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_PILOT);
+            }
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VESSEL_PILOT);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VESSEL_PILOT);
+        }
+
+        if (mhqOptions.getNewDayVesselGunnerPoolFill()) {
+            if (!mhqOptions.getNewDayVesselGunnerPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_GUNNER);
+            }
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VESSEL_GUNNER);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VESSEL_GUNNER);
+        }
+
+        if (mhqOptions.getNewDayVesselCrewPoolFill()) {
+            if (!mhqOptions.getNewDayVesselCrewPoolNoRelease()) {
+                campaign.emptyTempCrewPoolForRole(PersonnelRole.VESSEL_CREW);
+            }
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VESSEL_CREW);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VESSEL_CREW);
+        }
+    }
+
     private void checkForBioweaponAttacksOrNewVaccines(String systemName, String systemId) {
         InjuryType newBioweaponAttack = getNewBioweaponAttack(systemId, today, false);
         if (newBioweaponAttack != null) {
@@ -766,6 +777,19 @@ public class CampaignNewDayManager {
     private void updateFacilities() {
         updateFieldKitchenCapacity();
         updateMASHTheatreCapacity();
+        updateFleetAltitudeCapability();
+    }
+
+    /**
+     * Refreshes the player force's cached {@link mekhq.campaign.force.FleetAltitudeCapability}.
+     *
+     * <p>This is a daily, roster-derived snapshot (mirroring {@link #updateMASHTheatreCapacity()}) so StratCon
+     * scenario generation can read the fleet's fightable altitudes in O(1) instead of rescanning every unit for each
+     * scenario it generates. It runs before scenario generation in the new-day sequence.</p>
+     */
+    private void updateFleetAltitudeCapability() {
+        campaign.getPlayerForce()
+              .setFleetAltitudeCapability(campaign.getPlayerForce().calculateFleetAltitudeCapability(campaign));
     }
 
     private void processAllArrivals() {
@@ -2221,20 +2245,6 @@ public class CampaignNewDayManager {
                       .getHangar()
                       .getUnits()
                       .forEach(unit -> unit.setSite(ContractRepairLocation.getRepairLocation(contract.getObjectiveType())));
-            }
-
-            if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
-                int deficit = ContractUtilities.getDeploymentDeficit(campaign, contract);
-                StratConCampaignState campaignState = contract.getStratConCampaignState();
-
-                if (campaignState != null && deficit > 0) {
-                    campaign.addReport(GENERAL, String.format(resources.getString("contractBreach.text"),
-                          contract.getHyperlinkedName(),
-                          spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                          CLOSING_SPAN_TAG));
-
-                    campaignState.changeVictoryPoints(-1);
-                }
             }
 
             for (final Scenario scenario : contract.getCurrentAtBScenarios()) {

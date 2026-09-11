@@ -73,6 +73,7 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -101,7 +102,6 @@ import mekhq.gui.control.EditLogControl.LogType;
 import mekhq.gui.control.EditScenarioLogControl;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.utilities.OriginFactionPickerHelper;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This dialog is used to both hire new pilots and to edit existing ones
@@ -1266,7 +1266,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             panDemographics.add(spnPersonalityQuirk, gridBagConstraints);
 
             y++;
+        }
+        // endregion random personality
 
+        // region random talent
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
             JLabel labelReasoning = new JLabel();
             labelReasoning.setText("Talent:");
             labelReasoning.setName("labelReasoning");
@@ -1289,6 +1293,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
             y++;
         }
+        // endregion random talent
 
         if (person.hasDarkSecret()) {
             chkDarkSecretRevealed = new JCheckBox("Dark Secret Revealed");
@@ -1533,7 +1538,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         List<PlanetarySystem> orderedSystems = campaign.getSystems()
                                                      .stream()
                                                      .filter(a -> !a.isConnector())
-                                                     .filter(a -> isInhabitedAt(cachedOwnersAt(a)))
+                                                     // A world counts as a valid birth world if it either has a real
+                                                     // owner faction at the birthdate OR still had a recorded
+                                                     // population then.
+                                                       .filter(a -> hadPopulationAt(a) ||
+                                                                            isInhabitedAt(cachedOwnersAt(a)))
                                                      .sorted(Comparator.comparing(a -> a.getName(birthDate)))
                                                      .toList();
         for (PlanetarySystem system : orderedSystems) {
@@ -1862,6 +1871,17 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         return true;
     }
 
+    /**
+     * @return {@code true} if {@code system} had a recorded population greater than zero on the dialog's current
+     *       {@code birthdate}. Used as a fallback to {@link #isInhabitedAt(Set)} so an abandoned world (owner set is
+     *       {@code ABN}-only, which {@code isInhabitedAt} rejects) is still offered as a birthworld when people were
+     *       actually living there. Returns {@code false} when {@code birthdate} is unset, since population is
+     *       date-scoped.
+     */
+    private boolean hadPopulationAt(PlanetarySystem system) {
+        return birthdate != null && system.getPopulation(birthdate) > 0;
+    }
+
     private void filterPlanetarySystemsForOurFaction(boolean onlyOurFaction) {
         PlanetarySystem selectedSystem = (PlanetarySystem) choiceSystem.getSelectedItem();
         Planet selectedPlanet = (Planet) choicePlanet.getSelectedItem();
@@ -1999,10 +2019,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             person.setPersonalityQuirk(comboPersonalityQuirk.getSelectedItem());
             person.setPersonalityQuirkDescriptionIndex((int) spnPersonalityQuirk.getValue());
 
-            person.setReasoning(comboReasoning.getSelectedItem());
-
             writePersonalityDescription(person);
             writeInterviewersNotes(person);
+        }
+
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
+            person.setReasoning(comboReasoning.getSelectedItem());
         }
 
         if (person.hasDarkSecret()) {
@@ -2413,72 +2435,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         final Phenotype newPhenotype = (Phenotype) choicePhenotype.getSelectedItem();
         if ((chkClan.isSelected()) || (Objects.requireNonNull(newPhenotype).isNone())) {
             if ((newPhenotype != null) && (newPhenotype != selectedPhenotype)) {
-                switch (selectedPhenotype) {
-                    case MEKWARRIOR:
-                        decreasePhenotypeBonus(SkillType.S_GUN_MEK);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_MEK);
-                        break;
-                    case ELEMENTAL:
-                        decreasePhenotypeBonus(SkillType.S_GUN_BA);
-                        decreasePhenotypeBonus(SkillType.S_ANTI_MEK);
-                        break;
-                    case AEROSPACE:
-                        decreasePhenotypeBonus(SkillType.S_GUN_AERO);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_AERO);
-                        decreasePhenotypeBonus(SkillType.S_GUN_JET);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_JET);
-                        break;
-                    case VEHICLE:
-                        decreasePhenotypeBonus(SkillType.S_GUN_VEE);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_GVEE);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_NVEE);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_VTOL);
-                        break;
-                    case PROTOMEK:
-                        decreasePhenotypeBonus(SkillType.S_GUN_PROTO);
-                        break;
-                    case NAVAL:
-                        decreasePhenotypeBonus(SkillType.S_TECH_VESSEL);
-                        decreasePhenotypeBonus(SkillType.S_GUN_SPACE);
-                        decreasePhenotypeBonus(SkillType.S_PILOT_SPACE);
-                        decreasePhenotypeBonus(SkillType.S_NAVIGATION);
-                        break;
-                    default:
-                        break;
+                for (String skillType : selectedPhenotype.getBonusSkills()) {
+                    decreasePhenotypeBonus(skillType);
                 }
 
-                switch (newPhenotype) {
-                    case MEKWARRIOR:
-                        increasePhenotypeBonus(SkillType.S_GUN_MEK);
-                        increasePhenotypeBonus(SkillType.S_PILOT_MEK);
-                        break;
-                    case ELEMENTAL:
-                        increasePhenotypeBonus(SkillType.S_GUN_BA);
-                        increasePhenotypeBonus(SkillType.S_ANTI_MEK);
-                        break;
-                    case AEROSPACE:
-                        increasePhenotypeBonus(SkillType.S_GUN_AERO);
-                        increasePhenotypeBonus(SkillType.S_PILOT_AERO);
-                        increasePhenotypeBonus(SkillType.S_GUN_JET);
-                        increasePhenotypeBonus(SkillType.S_PILOT_JET);
-                        break;
-                    case VEHICLE:
-                        increasePhenotypeBonus(SkillType.S_GUN_VEE);
-                        increasePhenotypeBonus(SkillType.S_PILOT_GVEE);
-                        increasePhenotypeBonus(SkillType.S_PILOT_NVEE);
-                        increasePhenotypeBonus(SkillType.S_PILOT_VTOL);
-                        break;
-                    case PROTOMEK:
-                        increasePhenotypeBonus(SkillType.S_GUN_PROTO);
-                        break;
-                    case NAVAL:
-                        increasePhenotypeBonus(SkillType.S_TECH_VESSEL);
-                        increasePhenotypeBonus(SkillType.S_GUN_SPACE);
-                        increasePhenotypeBonus(SkillType.S_PILOT_SPACE);
-                        increasePhenotypeBonus(SkillType.S_NAVIGATION);
-                        break;
-                    default:
-                        break;
+                for (String skillType : newPhenotype.getBonusSkills()) {
+                    increasePhenotypeBonus(skillType);
                 }
 
                 selectedPhenotype = newPhenotype;

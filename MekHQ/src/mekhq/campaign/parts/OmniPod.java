@@ -89,6 +89,11 @@ public class OmniPod extends Part {
      * @return The tech base of the part the OmniPod is meant to contain.
      */
     @Override
+    public boolean isRightTechType(String skillType) {
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
+    }
+
+    @Override
     public TechBase getTechBase() {
         if (null != partType) {
             return partType.getTechBase();

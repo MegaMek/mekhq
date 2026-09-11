@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.force.Formation;
@@ -60,8 +61,28 @@ public class PregnantCombatantNagLogic {
      * @return {@code true} if there are pregnant personnel assigned to a combat force; {@code false} otherwise.
      */
     public static boolean hasActivePregnantCombatant(boolean hasActiveContract, List<Person> activePersonnel) {
+        return !getPregnantCombatants(hasActiveContract, activePersonnel).isEmpty();
+    }
+
+    /**
+     * Collects all personnel who are pregnant and actively assigned to a combat force.
+     *
+     * <p>The conditions mirror those used by {@link #hasActivePregnantCombatant(boolean, List)}: the campaign must
+     * have
+     * an active contract, and each returned person must be pregnant and assigned to a unit that belongs to a combat
+     * force (i.e., a force with an ID other than {@link Formation#FORMATION_NONE}).</p>
+     *
+     * @param hasActiveContract A flag indicating whether the campaign currently has an active contract.
+     * @param activePersonnel   A list of {@link Person} objects representing the active personnel in the campaign.
+     *
+     * @return a list of pregnant personnel assigned to a combat force; an empty list if there are none or if there is
+     *       no active contract.
+     */
+    public static List<Person> getPregnantCombatants(boolean hasActiveContract, List<Person> activePersonnel) {
+        List<Person> pregnantCombatants = new ArrayList<>();
+
         if (!hasActiveContract) {
-            return false;
+            return pregnantCombatants;
         }
 
         // There is no reason to use a stream here, as there won't be enough iterations to warrant it.
@@ -71,12 +92,12 @@ public class PregnantCombatantNagLogic {
 
                 if (unit != null) {
                     if (unit.getFormationId() != Formation.FORMATION_NONE) {
-                        return true;
+                        pregnantCombatants.add(person);
                     }
                 }
             }
         }
 
-        return false;
+        return pregnantCombatants;
     }
 }

@@ -36,7 +36,7 @@ import static java.lang.Math.round;
 import static megamek.client.ratgenerator.ModelRecord.NETWORK_NONE;
 import static megamek.client.ratgenerator.UnitTable.findTable;
 import static megamek.common.enums.SkillLevel.ELITE;
-import static megamek.common.enums.SkillLevel.parseFromInteger;
+import static megamek.common.enums.SkillLevel.changeByDelta;
 import static megamek.common.units.UnitType.MEK;
 
 import java.time.LocalDate;
@@ -137,7 +137,9 @@ public class ChaosContractDeterminationDifficulty {
         }
 
         if (Factions.getInstance().getFaction(factionCode).isClan()) {
-            return parseFromInteger(skillLevel.ordinal() + 1);
+            // Clan forces fight one skill level above their nominal rating, clamped so an already-top-tier faction
+            // (LEGENDARY) does not overflow the enum.
+            return changeByDelta(skillLevel, 1);
         }
 
         return skillLevel;

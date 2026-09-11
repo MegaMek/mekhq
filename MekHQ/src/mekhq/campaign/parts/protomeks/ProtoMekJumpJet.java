@@ -279,7 +279,7 @@ public class ProtoMekJumpJet extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MEK);
+        return skillType.equals(SkillType.S_TECH_JETS);
     }
 
     @Override

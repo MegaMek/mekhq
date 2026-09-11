@@ -38,6 +38,7 @@ import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
@@ -48,7 +49,6 @@ import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A table model for displaying work items
@@ -58,7 +58,7 @@ public class TechTableModel extends DataTableModel<Person> {
     /** Contains the skill levels to be displayed in a tech's description */
     private static final String[] DISPLAYED_SKILL_LEVELS = new String[] {
           SkillType.S_TECH_MEK,
-          SkillType.S_TECH_MECHANIC,
+          SkillType.S_TECH_VEHICLE,
           SkillType.S_TECH_BA,
           SkillType.S_TECH_AERO,
           SkillType.S_TECH_VESSEL,

@@ -32,6 +32,7 @@
  */
 package mekhq.gui;
 
+import static mekhq.gui.enums.PersonnelTableModelColumn.CALLSIGN;
 import static mekhq.gui.enums.PersonnelTableModelColumn.SURNAME;
 import static mekhq.gui.enums.PersonnelTableModelColumn.SURNAME_GROUPED_BY_UNIT;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -364,7 +365,8 @@ public final class PersonnelTab extends CampaignGuiTab {
 
     private DefaultComboBoxModel<PersonnelFilter> createPersonGroupModel() {
         final DefaultComboBoxModel<PersonnelFilter> personGroupModel = new DefaultComboBoxModel<>();
-        for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(false)) {
+        for (PersonnelFilter filter : PersonnelFilter.applicableTo(
+              MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(false), getCampaign())) {
             personGroupModel.addElement(filter);
         }
         return personGroupModel;
@@ -451,13 +453,23 @@ public final class PersonnelTab extends CampaignGuiTab {
                 TableColumnModel columnModel = personnelTable.getColumnModel();
                 int visibleColumnCount = columnModel.getColumnCount();
 
+                boolean callsignSearched = false;
                 for (int i = 0; i < visibleColumnCount; i++) {
                     int modelIndex = columnModel.getColumn(i).getModelIndex();
                     PersonnelTableModelColumn column = getPersonnelTableModel().getAllColumns().get(modelIndex);
+                    if (column == CALLSIGN) {
+                        callsignSearched = true;
+                    }
                     String cellText = column.getText(column.getCellValue(getCampaign(), person));
                     if (cellText != null && cellText.toLowerCase(Locale.ROOT).contains(searchAsLowerCase)) {
                         return true;
                     }
+                }
+
+                // Callsign should always be searchable, even when its column is hidden.
+                if (!callsignSearched) {
+                    String callsignText = CALLSIGN.getText(CALLSIGN.getCellValue(getCampaign(), person));
+                    return callsignText != null && callsignText.toLowerCase(Locale.ROOT).contains(searchAsLowerCase);
                 }
                 return false;
             }
@@ -531,25 +543,33 @@ public final class PersonnelTab extends CampaignGuiTab {
     public void refreshPersonnelList() {
         UUID selectedUUID = null;
         int selectedRow = personnelTable.getSelectedRow();
-        if (selectedRow != -1) {
+        if (selectedRow >= 0 && selectedRow < personnelTable.getRowCount()) {
             Person person = getPersonnelTableModel().getRow(personnelTable.convertRowIndexToModel(selectedRow));
             if (null != person) {
                 selectedUUID = person.getId();
             }
         }
 
+        personnelTable.clearSelection();
+
         LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
 
         List<Person> people = locationFilter.selectPersonnel(getCampaign());
         getPersonnelTableModel().setData(people);
 
+        boolean reselected = false;
         for (int row = 0; row < personnelTable.getRowCount(); row++) {
             Person person = getPersonnelTableModel().getRow(personnelTable.convertRowIndexToModel(row));
             if (person != null && person.getId().equals(selectedUUID)) {
                 personnelTable.setRowSelectionInterval(row, row);
                 refreshPersonnelView();
+                reselected = true;
                 break;
             }
+        }
+
+        if (!reselected) {
+            refreshPersonnelView();
         }
         filterPersonnel();
     }

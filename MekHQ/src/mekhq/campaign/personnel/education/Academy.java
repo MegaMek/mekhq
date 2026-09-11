@@ -52,6 +52,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.education.AcademyType;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
@@ -64,7 +65,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.factionHints.FactionHints;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * The Academy class represents an academy with various properties and methods.
@@ -1232,13 +1232,25 @@ public class Academy implements Comparable<Academy> {
             case "artillery" -> SkillType.S_ARTILLERY;
             case "gunnery/battlearmor" -> SkillType.S_GUN_BA;
             case "gunnery/protomek" -> SkillType.S_GUN_PROTO;
+            case "piloting/protomek" -> SkillType.S_PILOT_PROTO;
             case "small arms" -> SkillType.S_SMALL_ARMS;
             case "anti-mek", "climbing" -> SkillType.S_ANTI_MEK;
             case "tech/mek" -> SkillType.S_TECH_MEK;
-            case "tech/mechanic" -> SkillType.S_TECH_MECHANIC;
-            case "tech/aero" -> SkillType.S_TECH_AERO;
+            // "tech/mechanic" and "tech/aero" are retained as pre-0.51 aliases for the renamed skills.
+            case "tech/vehicle", "tech/mechanic" -> SkillType.S_TECH_VEHICLE;
+            case "tech/aerospace", "tech/aero" -> SkillType.S_TECH_AERO;
             case "tech/battlearmor" -> SkillType.S_TECH_BA;
             case "tech/vessel" -> SkillType.S_TECH_VESSEL;
+            case "tech/military" -> SkillType.S_TECH_MILITARY;
+            case "tech/civilian" -> SkillType.S_TECH_CIVILIAN;
+            case "tech/electronic" -> SkillType.S_TECH_ELECTRONIC;
+            case "tech/nuclear" -> SkillType.S_TECH_NUCLEAR;
+            case "tech/aeronautics" -> SkillType.S_TECH_AERONAUTICS;
+            case "tech/mechanical" -> SkillType.S_TECH_MECHANICAL;
+            case "tech/myomer" -> SkillType.S_TECH_MYOMER;
+            case "tech/jets" -> SkillType.S_TECH_JETS;
+            case "tech/weapons" -> SkillType.S_TECH_WEAPONS;
+            case "tech/cybernetics" -> SkillType.S_TECH_CYBERNETICS;
             case "astech" -> SkillType.S_ASTECH;
             case "doctor", "surgery/any" -> SkillType.S_SURGERY;
             case "medtech" -> SkillType.S_MEDTECH;

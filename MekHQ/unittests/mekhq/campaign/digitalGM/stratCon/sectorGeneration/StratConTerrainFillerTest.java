@@ -38,12 +38,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
-import mekhq.campaign.universe.Atmosphere;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -69,7 +69,7 @@ class StratConTerrainFillerTest {
         return biome;
     }
 
-    private static PlanetProfile planet(int water, boolean airless, Atmosphere atmosphere) {
+    private static PlanetProfile planet(int water, boolean airless, AtmosphericTaint atmosphere) {
         return new PlanetProfile(20, PlanetProfile.TERRA_DIAMETER_KM, water, airless, atmosphere, "", 1, 1.0, null,
               mekhq.campaign.universe.enums.HPGRating.X);
     }
@@ -112,7 +112,7 @@ class StratConTerrainFillerTest {
     void candidates_taintedWorld_dropVegetation() {
         List<String> candidates = StratConTerrainFiller.candidateTerrains(
               biome("Forest", "Jungle", "Badlands", "Steppe"),
-              planet(50, false, Atmosphere.TAINTED_POISON));
+              planet(50, false, AtmosphericTaint.TAINTED_POISON));
 
         assertFalse(candidates.contains("Forest"));
         assertFalse(candidates.contains("Jungle"));
@@ -171,7 +171,7 @@ class StratConTerrainFillerTest {
         StratConBiome biome = biome("Forest", "Jungle", "Badlands", "Steppe");
         StratConTerrainFields fields = StratConTerrainFields.compute(track, LatitudeBand.EQUATORIAL, 0);
 
-        StratConTerrainFiller.fill(track, biome, planet(50, false, Atmosphere.TOXIC_POISON), fields);
+        StratConTerrainFiller.fill(track, biome, planet(50, false, AtmosphericTaint.TOXIC_POISON), fields);
 
         assertTrue(countVegetation(track, 0, SIZE) == 0, "a toxic world must have no vegetation");
     }
@@ -199,7 +199,7 @@ class StratConTerrainFillerTest {
     @Test
     void coastalMoisture_vegetationClustersNearWater() {
         StratConBiome biome = biome("Forest", "Plains", "Badlands", "Steppe");
-        PlanetProfile breathable = planet(50, false, Atmosphere.BREATHABLE);
+        PlanetProfile breathable = planet(50, false, AtmosphericTaint.BREATHABLE);
 
         long nearWater = 0;
         long inland = 0;
@@ -222,7 +222,7 @@ class StratConTerrainFillerTest {
     @Test
     void piedmont_concentratesHillsAroundMountains() {
         StratConBiome biome = biome("Hills", "Forest", "Plains", "Badlands");
-        PlanetProfile breathable = planet(50, false, Atmosphere.BREATHABLE);
+        PlanetProfile breathable = planet(50, false, AtmosphericTaint.BREATHABLE);
         StratConCoords mountain = new StratConCoords(15, 15);
 
         long adjacentHills = 0;
@@ -252,7 +252,7 @@ class StratConTerrainFillerTest {
     @Test
     void riparian_makesWaterAdjacentHexesMostlyVegetation() {
         StratConBiome biome = biome("Forest", "Plains", "Badlands", "Steppe");
-        PlanetProfile breathable = planet(50, false, Atmosphere.BREATHABLE);
+        PlanetProfile breathable = planet(50, false, AtmosphericTaint.BREATHABLE);
 
         long bankVegetation = 0;
         long bankTotal = 0;

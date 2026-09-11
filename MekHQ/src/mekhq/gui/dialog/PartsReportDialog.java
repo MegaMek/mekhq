@@ -55,36 +55,25 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 
 import megamek.client.ui.util.UIUtil;
-import megamek.common.equipment.MiscType;
-import megamek.common.equipment.WeaponType;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.market.PartsInUseManager;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
-import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.enums.PartQuality;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.meks.MekActuator;
-import mekhq.campaign.parts.meks.MekGyro;
-import mekhq.campaign.parts.meks.MekLifeSupport;
-import mekhq.campaign.parts.meks.MekLocation;
-import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.model.LocationFilterItem;
+import mekhq.gui.model.PartsFilterGroup;
 import mekhq.gui.model.PartsInUseTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.TwoNumbersSorter;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A dialog to show parts in use, ordered, in transit with actionable buttons for buying or adding more taken from the
@@ -107,18 +96,6 @@ public class PartsReportDialog extends JDialog {
     /** The location whose parts are currently shown in the table and whose stock edits are being saved. */
     private IPlace activePlace;
     private final CampaignGUI gui;
-
-    private static final int SG_ALL = 0;
-    private static final int SG_ARMOR = 1;
-    private static final int SG_SYSTEM = 2;
-    private static final int SG_EQUIP = 3;
-    private static final int SG_LOC = 4;
-    private static final int SG_WEAPON = 5;
-    private static final int SG_AMMO = 6;
-    private static final int SG_MISC = 7;
-    private static final int SG_ENGINE = 8;
-    private static final int SG_GYRO = 9;
-    private static final int SG_ACT = 10;
 
     @Deprecated(since = "0.51.0")
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
@@ -335,19 +312,13 @@ public class PartsReportDialog extends JDialog {
 
         JLabel lblGroup = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.text"));
 
-        String[] groupNames = {
-              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.all"),
-              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.armor"),
-              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.system"),
-              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.equipment"),
-              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.locations"),
-              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.weapons"),
-              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.ammunition"),
-              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.misc"),
-              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.engine"),
-              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.gyro"),
-              getTextAt(RESOURCE_BUNDLE, "lblPartsGroup.actuator")
-        };
+        // The group filters are shared with the Warehouse tab and Parts Store dialog via PartsFilterGroup, so this
+        // dialog offers the same groups (including Armor Kits) and classifies parts identically.
+        PartsFilterGroup[] partsFilterGroups = PartsFilterGroup.values();
+        String[] groupNames = new String[partsFilterGroups.length];
+        for (int i = 0; i < partsFilterGroups.length; i++) {
+            groupNames[i] = partsFilterGroups[i].getGroupName();
+        }
         partsGroupFilterCB = new JComboBox<>(groupNames);
         partsGroupFilterCB.setMaximumSize(partsGroupFilterCB.getPreferredSize());
         partsGroupFilterCB.addActionListener(evt -> applyFilter());
@@ -516,25 +487,7 @@ public class PartsReportDialog extends JDialog {
                 Part part = (Part) partInUse.getPartToBuy().getNewEquipment();
 
                 // Group filter
-                boolean inGroup = switch (group) {
-                    case SG_ARMOR -> part instanceof Armor;
-                    case SG_SYSTEM -> part instanceof MekGyro ||
-                                            part instanceof EnginePart ||
-                                            part instanceof MekActuator ||
-                                            part instanceof MekLifeSupport ||
-                                            part instanceof MekSensor;
-                    case SG_EQUIP -> part instanceof EquipmentPart;
-                    case SG_LOC -> part instanceof MekLocation || part instanceof TankLocation;
-                    case SG_WEAPON ->
-                          part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof WeaponType;
-                    case SG_AMMO -> part instanceof AmmoStorage;
-                    case SG_MISC ->
-                          part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof MiscType;
-                    case SG_ENGINE -> part instanceof EnginePart;
-                    case SG_GYRO -> part instanceof MekGyro;
-                    case SG_ACT -> part instanceof MekActuator;
-                    default -> true; // SG_ALL
-                };
+                boolean inGroup = PartsFilterGroup.matches(group, part);
 
                 // Search filter
                 boolean inSearch = searchText.isEmpty() ||

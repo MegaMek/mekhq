@@ -60,14 +60,14 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
      *
      * <p>This constructor initializes the dialog with preconfigured parameters, such as the
      * {@code NAG_INSUFFICIENT_AS_TECHS} constant, to manage dialog suppression and the
-     * {@code "InsufficientAsTechsNagDialog"} message key for retrieving localized dialog content. No specialized
+     * {@code "InsufficientAstechsNagDialog"} message key for retrieving localized dialog content. No specialized
      * speaker is provided, triggering the fallback logic to determine the appropriate speaker for the dialog.</p>
      *
      * @param campaign The {@link Campaign} instance associated with this dialog. Provides access to campaign data and
      *                 settings required for constructing the dialog.
      */
     public InsufficientAsTechsNagDialog(final Campaign campaign) {
-        super(campaign, NAG_INSUFFICIENT_AS_TECHS, "InsufficientAsTechsNagDialog");
+        super(campaign, NAG_INSUFFICIENT_AS_TECHS, "InsufficientAstechsNagDialog");
     }
 
     /**

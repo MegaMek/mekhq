@@ -41,6 +41,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ import javax.swing.tree.TreeSelectionModel;
 
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -69,12 +71,14 @@ import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.gui.adapter.TOEMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.MaplessStratConForcePicker;
 import mekhq.gui.dialog.MaplessStratConScenarioPicker;
+import mekhq.gui.dialog.SupportCarrierDeploymentDialogs;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.handler.TOETransferHandler;
 import mekhq.gui.model.CrewListModel;
@@ -88,6 +92,8 @@ import mekhq.gui.view.UnitViewPanel;
  * Display organization tree (TO&amp;E) and force/unit summary
  */
 public final class TOETab extends CampaignGuiTab {
+    private static final MMLogger LOGGER = MMLogger.create(TOETab.class);
+
     private static final int UNIT_CREW_TAB_INDEX = 0;
     private static final int UNIT_STATS_TAB_INDEX_WITH_CREW = 1;
 
@@ -178,6 +184,14 @@ public final class TOETab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private void deploymentButton() {
+        // The button acts on the whole TOE, not the highlighted node, but a player who has a support carrier or a
+        // support company highlighted reads it as "deploy this". Say up front that it will not, rather than running
+        // the whole flow in silence.
+        if (isHighlightedSupportOnly()) {
+            SupportCarrierDeploymentDialogs.showNothingToDeploy(getCampaign(), highlightedName());
+            return;
+        }
+
         // Build scenario list with mission mapping
         Map<Scenario, AbstractContract> scenarioMissionMap = new HashMap<>();
         for (AbstractContract mission : getCampaign().getActiveContracts()) {
@@ -210,6 +224,32 @@ public final class TOETab extends CampaignGuiTab {
         } else {
             deployToRegularScenario(selectedScenario);
         }
+    }
+
+    /**
+     * @return {@code true} if the highlighted node is a support carrier, or a formation holding only support carriers
+     */
+    private boolean isHighlightedSupportOnly() {
+        Object node = orgTree.getLastSelectedPathComponent();
+        if (node instanceof Unit unit) {
+            return SupportCarrierDeployment.staysHome(unit, null);
+        }
+        if (node instanceof Formation formation) {
+            return SupportCarrierDeployment.deploysNothing(getCampaign(), formation, null);
+        }
+        return false;
+    }
+
+    /** @return the display name of the highlighted node, for the dialog */
+    private String highlightedName() {
+        Object node = orgTree.getLastSelectedPathComponent();
+        if (node instanceof Unit unit) {
+            return unit.getName();
+        }
+        if (node instanceof Formation formation) {
+            return formation.getName();
+        }
+        return "";
     }
 
     /**
@@ -254,6 +294,8 @@ public final class TOETab extends CampaignGuiTab {
                                                      return campaign1.getPlayerForce().getFormation(id);
                                                  })
                                                  .filter(force -> force != null && !force.isDeployed())
+                                                 .filter(force -> !SupportCarrierDeployment.deploysNothing(campaign,
+                                                       force, selectedScenario))
                                                  .sorted(Comparator.comparing(Formation::getFullName))
                                                  .toList();
 
@@ -265,6 +307,13 @@ public final class TOETab extends CampaignGuiTab {
 
         Formation selectedFormation = formationOptions.get(forcePicker.getComboBoxChoiceIndex());
 
+        if (selectedScenario == null) {
+            getCampaignGui().undeployForce(selectedFormation);
+            selectedFormation.clearScenarioIds(getCampaign(), true);
+            LOGGER.warn("TOETab: Null selectedScenario in deployToRegularScenario()");
+            return;
+        }
+
         // Deploy force to scenario
         if (selectedScenario instanceof AtBDynamicScenario dynamicScenario) {
             new ForceTemplateAssignmentDialog(getCampaignGui(),
@@ -274,11 +323,11 @@ public final class TOETab extends CampaignGuiTab {
         } else {
             getCampaignGui().undeployForce(selectedFormation);
             selectedFormation.clearScenarioIds(getCampaign(), true);
-            if (selectedScenario != null) {
-                selectedScenario.addForces(selectedFormation.getId());
-                selectedFormation.setScenarioId(selectedScenario.getId(), getCampaign());
-            }
+            selectedScenario.addForces(selectedFormation.getId());
+            selectedFormation.setScenarioId(selectedScenario.getId(), getCampaign());
             MekHQ.triggerEvent(new DeploymentChangedEvent(selectedFormation, selectedScenario));
+
+            SupportCarrierDeploymentDialogs.showStayingHome(campaign, List.of(selectedFormation), selectedScenario);
         }
     }
 
@@ -288,8 +337,33 @@ public final class TOETab extends CampaignGuiTab {
     }
 
     public void refreshOrganization() {
+        LOGGER.info("TOE-DEBUG: TOETab.refreshOrganization RUNNING (updateUI + refreshForceView)");
         SwingUtilities.invokeLater(() -> {
+            // Preserve the tree's expansion and selection across the refresh so adding units (for
+            // example committing a generated command) updates the tree in place rather than
+            // collapsing it back to the root. orgTree.updateUI() re-reads the model but resets the
+            // expansion state, so capture the expanded paths first (materialized into a list, since
+            // the live enumeration would be emptied by the reset) and restore them afterward.
+            List<TreePath> expandedPaths = new ArrayList<>();
+            Object root = orgTree.getModel().getRoot();
+            if (root != null) {
+                Enumeration<TreePath> expanded = orgTree.getExpandedDescendants(new TreePath(root));
+                if (expanded != null) {
+                    while (expanded.hasMoreElements()) {
+                        expandedPaths.add(expanded.nextElement());
+                    }
+                }
+            }
+            TreePath selectionPath = orgTree.getSelectionPath();
+
             orgTree.updateUI();
+
+            for (TreePath path : expandedPaths) {
+                orgTree.expandPath(path);
+            }
+            if (selectionPath != null) {
+                orgTree.setSelectionPath(selectionPath);
+            }
             refreshForceView();
         });
     }
@@ -442,6 +516,7 @@ public final class TOETab extends CampaignGuiTab {
 
     @Subscribe
     public void organizationChanged(OrganizationChangedEvent ev) {
+        LOGGER.info("TOE-DEBUG: TOETab.organizationChanged RECEIVED event; scheduling refresh");
         orgRefreshScheduler.schedule();
     }
 

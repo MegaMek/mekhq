@@ -33,7 +33,9 @@
 package mekhq.gui.enums;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -44,6 +46,7 @@ import megamek.client.ui.util.UIUtil;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.Mek;
@@ -56,9 +59,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -69,6 +73,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
@@ -91,60 +96,58 @@ import org.jspecify.annotations.NonNull;
 
 public enum PersonnelTableModelColumn implements MHQTableColumn {
 
-    PERSON_GRAPHICAL("Column.PERSON.title", Comparators.STRING_COMPARATOR,
+    PERSON_GRAPHICAL("Column.PERSON.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           (person, campaign) -> "<html>" + person.getFullDesc(campaign) + "</html>"),
     RANK("Column.RANK.title", PersonRankSorter.INSTANCE,
           person -> person, Person::getRankName),
-    FIRST_NAME("Column.FIRST_NAME.title", Comparators.STRING_COMPARATOR,
+    FIRST_NAME("Column.FIRST_NAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getFirstName),
-    LAST_NAME("Column.LAST_NAME.title", Comparators.STRING_COMPARATOR,
+    LAST_NAME("Column.LAST_NAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getLastName),
-    PRE_NOMINAL("Column.PRE_NOMINAL.title", Comparators.STRING_COMPARATOR,
+    PRE_NOMINAL("Column.PRE_NOMINAL.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getPreNominal),
-    GIVEN_NAME("Column.GIVEN_NAME.title", Comparators.STRING_COMPARATOR,
+    GIVEN_NAME("Column.GIVEN_NAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getGivenName),
-    SURNAME("Column.SURNAME.title", Comparators.STRING_COMPARATOR,
+    SURNAME("Column.SURNAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           person -> StringUtility.isNullOrBlank(person.getSurname()) ? "" : person.getSurname()),
-    SURNAME_GROUPED_BY_UNIT("Column.SURNAME.title", Comparators.STRING_COMPARATOR,
+    SURNAME_GROUPED_BY_UNIT("Column.SURNAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getSurnameGroupedByUnit),
-    BLOODNAME("Column.BLOODNAME.title", Comparators.STRING_COMPARATOR,
+    BLOODNAME("Column.BLOODNAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getBloodname),
-    POST_NOMINAL("Column.POST_NOMINAL.title", Comparators.STRING_COMPARATOR,
+    POST_NOMINAL("Column.POST_NOMINAL.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getPostNominal),
-    CALLSIGN("Column.CALLSIGN.title", Comparators.STRING_COMPARATOR,
+    CALLSIGN("Column.CALLSIGN.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           Person::getCallsign),
     AGE("Column.AGE.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> person.getAge(campaign.getLocalDate()), Object::toString),
     PERSONNEL_STATUS("Column.PERSONNEL_STATUS.title", fieldBasedSorter(PersonnelStatus::getLabel),
           Person::getStatus, PersonnelStatus::getLabel),
-    GENDER("Column.GENDER.title", Comparators.STRING_COMPARATOR,
+    GENDER("Column.GENDER.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           person -> GenderDescriptors.MALE_FEMALE_OTHER.getDescriptorCapitalized(person.getGender())),
     SKILL_LEVEL("Column.SKILL_LEVEL.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> person.getExperienceLevel(campaign.getCampaignOptions(),
                 campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), false, true),
           level -> "<html>" + SkillType.getColoredExperienceLevelName(level) + "</html>"),
-    PERSONNEL_ROLE("Column.PERSONNEL_ROLE.title", Comparators.STRING_COMPARATOR,
+    PERSONNEL_ROLE("Column.PERSONNEL_ROLE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           (person, campaign) -> person.getFormatedRoleDescriptions(campaign.getLocalDate())),
-    UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
+    UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getUnitAssignment),
-    UNIT_ASSIGNMENT_GRAPHICAL("Column.UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
+    UNIT_ASSIGNMENT_GRAPHICAL("Column.UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getUnitAssignmentGraphical),
-    TECH_UNIT_ASSIGNMENT("Column.TECH_UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
+    TECH_UNIT_ASSIGNMENT("Column.TECH_UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getTechUnitAssignment),
-    MARKET_UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.STRING_COMPARATOR,
-          (person, campaign) -> {
-              PersonnelMarket market = campaign.getPlayerForce().getHumanResources().getPersonnelMarket();
-              Entity entity = (market == null) ? null : market.getAttachedEntity(person);
-              return (entity == null) ? "-" : entity.getDisplayName();
-          }),
-    FORCE("Column.FORCE.title", Comparators.STRING_COMPARATOR,
+    FORCE("Column.FORCE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           (person, campaign) -> {
               Formation formation = campaign.getPlayerForce().getFormationFor(person);
-              return (formation == null) ? "-" : formation.getName();
+              // Show the full TOE breadcrumb, honoring the same isUseExtendedTOEForceName toggle the
+              // cell renderer reads, rather than just the leaf formation name.
+              return (formation == null)
+                           ? "-"
+                           : formation.getDisplayPath(" / ", campaign.getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME));
           }),
-    FORCE_GRAPHICAL("Column.FORCE.title", Comparators.STRING_COMPARATOR,
+    FORCE_GRAPHICAL("Column.FORCE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getForceTextGraphical),
-    DEPLOYED("Column.DEPLOYED.title", Comparators.STRING_COMPARATOR,
+    DEPLOYED("Column.DEPLOYED.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getDeployedScenarioName),
     MEK("Column.MEK.title", SkillPair.COMPARATOR,
           skillPairModelExtractor(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK), SkillPair::toString),
@@ -160,8 +163,8 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           skillPairModelExtractor(SkillType.S_GUN_JET, SkillType.S_PILOT_JET), SkillPair::toString),
     VESSEL("Column.VESSEL.title", SkillPair.COMPARATOR,
           skillPairModelExtractor(SkillType.S_GUN_SPACE, SkillType.S_PILOT_SPACE), SkillPair::toString),
-    PROTOMEK("Column.PROTOMEK.title", Comparators.SKILL_COMPARATOR,
-          skillModelExtractor(SkillType.S_GUN_PROTO), PersonnelTableModelColumn::skillToText),
+    PROTOMEK("Column.PROTOMEK.title", SkillPair.COMPARATOR,
+          skillPairModelExtractor(SkillType.S_GUN_PROTO, SkillType.S_PILOT_PROTO), SkillPair::toString),
     BATTLE_ARMOUR("Column.BATTLE_ARMOUR.title", Comparators.SKILL_COMPARATOR,
           skillModelExtractor(SkillType.S_GUN_BA), PersonnelTableModelColumn::skillToText),
     AGGREGATE_COMBAT("Column.AGGREGATE_COMBAT.title", NaturalOrderComparator.INSTANCE,
@@ -194,7 +197,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     TECH_AERO("Column.TECH_AERO.title", Comparators.SKILL_COMPARATOR,
           skillModelExtractor(SkillType.S_TECH_AERO), PersonnelTableModelColumn::skillToText),
     TECH_MECHANIC("Column.TECH_MECHANIC.title", Comparators.SKILL_COMPARATOR,
-          skillModelExtractor(SkillType.S_TECH_MECHANIC), PersonnelTableModelColumn::skillToText),
+          skillModelExtractor(SkillType.S_TECH_VEHICLE), PersonnelTableModelColumn::skillToText),
     TECH_BA("Column.TECH_BA.title", Comparators.SKILL_COMPARATOR,
           skillModelExtractor(SkillType.S_TECH_BA), PersonnelTableModelColumn::skillToText),
     TECH_VESSEL("Column.TECH_VESSEL.title", Comparators.SKILL_COMPARATOR,
@@ -240,7 +243,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           Person::getSalary, Money::toAmountAndSymbolString),
     XP("Column.XP.title", Comparators.INT_COMPARATOR,
           Person::getXP, Object::toString),
-    ORIGIN("Column.ORIGIN.title", Comparators.STRING_COMPARATOR,
+    ORIGIN("Column.ORIGIN.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getOrigin),
     RECRUITMENT_DATE("Column.RECRUITMENT_DATE.title", Comparators.DATE_COMPARATOR,
           Person::getRecruitment, date -> MekHQ.getMHQOptions().getDisplayFormattedDate(date)),
@@ -321,8 +324,10 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           Fatigue::getEffectiveFatigue, Object::toString),
     SPA_COUNT("Column.SPA_COUNT.title", Comparators.INT_COMPARATOR,
           person -> person.countOptions(PersonnelOptions.LVL3_ADVANTAGES), Object::toString),
+    // Counts every implant, not only the Manei Domini group: enhanced imaging is held in a group of
+    // its own and would otherwise be missing from both the count and the list behind it.
     IMPLANT_COUNT("Column.IMPLANT_COUNT.title", Comparators.INT_COMPARATOR,
-          person -> person.countOptions(PersonnelOptions.MD_ADVANTAGES), Object::toString),
+          Person::countImplants, Object::toString),
     MANAGEMENT_MODIFIER("Column.MANAGEMENT_MODIFIER.title", Comparators.INT_COMPARATOR,
           (person, campaign) -> campaign.getPlayerForce()
                                       .getHumanResources()
@@ -348,13 +353,13 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
               return (academy == null) ? null : EducationLevel.fromLevel(academy.getEducationLevel(person));
           },
           level -> (level == null) ? "" : level.toString()),
-    ACADEMY("Column.ACADEMY.title", Comparators.STRING_COMPARATOR,
+    ACADEMY("Column.ACADEMY.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           person -> {
               Academy currentAcademy = EducationController.getAcademy(person.getEduAcademySet(),
                     person.getEduAcademyNameInSet());
               return currentAcademy == null ? "" : currentAcademy.getName();
           }),
-    COURSE("Column.COURSE.title", Comparators.STRING_COMPARATOR,
+    COURSE("Column.COURSE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           person -> {
               Academy currentAcademy = EducationController.getAcademy(person.getEduAcademySet(),
                     person.getEduAcademyNameInSet());
@@ -392,27 +397,28 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
           attributeExtractor(SkillAttribute.CHARISMA), Object::toString),
     EDGE("Column.EDGE.title", SkillAttributeCell.COMPARATOR,
           attributeExtractor(SkillAttribute.EDGE), Object::toString),
-    SHIP_TRANSPORT("Column.SHIP_TRANSPORT.title", Comparators.STRING_COMPARATOR,
+    SHIP_TRANSPORT("Column.SHIP_TRANSPORT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           person -> {
               if (person.getUnit() == null || person.getUnit().getTransportShipAssignment() == null) {
                   return "-";
               }
               return person.getUnit().getTransportShipAssignment().getTransportShip().getName();
           }),
-    TACTICAL_TRANSPORT("Column.TACTICAL_TRANSPORT.title", Comparators.STRING_COMPARATOR,
+    TACTICAL_TRANSPORT("Column.TACTICAL_TRANSPORT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           person -> {
               if (person.getUnit() == null || person.getUnit().getTacticalTransportAssignment() == null) {
                   return "-";
               }
               return person.getUnit().getTacticalTransportAssignment().getTransport().getName();
           }),
-    LOCATION_SYSTEM_AND_PLANET("Column.LOCATION_SYSTEM_AND_PLANET.title", Comparators.STRING_COMPARATOR,
+    LOCATION_SYSTEM_AND_PLANET("Column.LOCATION_SYSTEM_AND_PLANET.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getLocationSystemAndPlanet),
-    LOCATION_NAME("Column.LOCATION_NAME.title", Comparators.STRING_COMPARATOR,
+    LOCATION_NAME("Column.LOCATION_NAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           (person, campaign) -> LocationDisplay.getLocationName(person, campaign, campaign.getLocalDate())),
-    DESTINATION_SYSTEM_AND_PLANET("Column.DESTINATION_SYSTEM_AND_PLANET.title", Comparators.STRING_COMPARATOR,
+    DESTINATION_SYSTEM_AND_PLANET("Column.DESTINATION_SYSTEM_AND_PLANET.title",
+          Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getDestinationSystemAndPlanet),
-    DESTINATION_NAME("Column.DESTINATION_NAME.title", Comparators.STRING_COMPARATOR,
+    DESTINATION_NAME("Column.DESTINATION_NAME.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           (person, campaign) -> LocationDisplay.getDestinationName(person, campaign, campaign.getLocalDate())),
     IS_MARRIED("Column.IS_MARRIED.title", Comparators.YES_NO_NA_COMPARATOR,
           person -> person.getGenealogy().hasSpouse(), PersonnelTableModelColumn::convertBooleanToYesNoNA),
@@ -423,7 +429,15 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     EXTENDED_FAMILY("Column.EXTENDED_FAMILY.title", Comparators.INT_COMPARATOR,
           person -> person.getGenealogy().getChildren().size(), Object::toString),
     TOTAL_RELATIVES("Column.TOTAL_RELATIVES.title", Comparators.INT_COMPARATOR,
-          person -> getImmediateFamilySize(person) + getExtendedFamilySize(person), Object::toString);
+          person -> getImmediateFamilySize(person) + getExtendedFamilySize(person), Object::toString),
+    ARMOR_KIT("Column.ARMOR_KIT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
+          PersonnelTableModelColumn::getArmorKit),
+    ARMOR_KIT_INTENDED("Column.ARMOR_KIT_INTENDED.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
+          PersonnelTableModelColumn::getIntendedArmorKit),
+    EQUIPMENT("Column.EQUIPMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
+          PersonnelTableModelColumn::getEquipment),
+    COMBAT_ROLE("Column.COMBAT_ROLE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
+          PersonnelTableModelColumn::getCombatRole);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelTable";
 
@@ -690,7 +704,8 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
                       campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY));
                 yield skillValue.apply(gunnerySkill) + '/' + skillValue.apply(SkillType.S_ANTI_MEK);
             }
-            case PersonnelRole.PROTOMEK_PILOT -> skillValue.apply(SkillType.S_GUN_PROTO);
+            case PersonnelRole.PROTOMEK_PILOT ->
+                  skillValue.apply(SkillType.S_GUN_PROTO) + '/' + skillValue.apply(SkillType.S_PILOT_PROTO);
             default -> "-/-";
         };
     }
@@ -706,7 +721,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             case PersonnelRole.BA_TECH -> new SkillPair(skillValue.apply(SkillType.S_TECH_BA), SkillType.S_TECH_BA,
                   skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
             case PersonnelRole.MECHANIC ->
-                  new SkillPair(skillValue.apply(SkillType.S_TECH_MECHANIC), SkillType.S_TECH_MECHANIC,
+                  new SkillPair(skillValue.apply(SkillType.S_TECH_VEHICLE), SkillType.S_TECH_VEHICLE,
                         skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
             case PersonnelRole.AERO_TEK -> new SkillPair(skillValue.apply(SkillType.S_TECH_AERO), SkillType.S_TECH_AERO,
                   skillValue.apply(SkillType.S_ZERO_G_OPERATIONS), SkillType.S_ZERO_G_OPERATIONS);
@@ -847,6 +862,92 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     }
 
     /**
+     * The personal armor kit a person is wearing. Kit-ineligible personnel (foot infantry, battle armor, support, and
+     * civilians) show "N/A" rather than a value they can never carry; eligible crew show their current kit, with the
+     * default coveralls displayed as "None".
+     */
+    private static String getArmorKit(Person person) {
+        if (!ArmorKitCatalog.canBeIssuedKit(person)) {
+            return MHQInternationalization.getText("NA.text");
+        }
+        return armorKitDisplayName(person.getArmorKitName());
+    }
+
+    /**
+     * The armor kit a person is awaiting from a pending order, if any. Displays "-" when nothing is on order.
+     */
+    private static String getIntendedArmorKit(Person person) {
+        return armorKitDisplayName(person.getIntendedArmorKitName());
+    }
+
+    /**
+     * Renders an armor kit internal name for display: coveralls (the no-protection default) reads as "None", an absent
+     * kit as "-", and every other kit by its own name.
+     */
+    private static String armorKitDisplayName(@Nullable String internalName) {
+        if (internalName == null) {
+            return "-";
+        }
+        if (ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(internalName)) {
+            return getTextAt("Cell.ARMOR_KIT.none");
+        }
+        return kitDisplayName(internalName);
+    }
+
+    /**
+     * Every equipment kit a person is carrying, listed by display name: the personal armor kit (unless it is the
+     * default coveralls) followed by any tool, medical, computer, or other equipment kits, separated by commas.
+     * Displays "-" when the person carries nothing.
+     */
+    private static String getEquipment(Person person) {
+        List<String> kits = new ArrayList<>();
+
+        String armorKit = person.getArmorKitName();
+        if ((armorKit != null) && !ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(armorKit)) {
+            kits.add(kitDisplayName(armorKit));
+        }
+
+        String toolKit = person.getRepairKitName();
+        if (toolKit != null) {
+            kits.add(kitDisplayName(toolKit));
+        }
+
+        if (kits.isEmpty()) {
+            return "-";
+        }
+        kits.sort(Comparator.naturalOrder());
+        return String.join(", ", kits);
+    }
+
+    /**
+     * Resolves an equipment internal name to its display name, falling back to the raw internal name when the equipment
+     * cannot be looked up.
+     */
+    private static String kitDisplayName(String internalName) {
+        EquipmentType type = EquipmentType.get(internalName);
+        return (type != null) ? type.getName() : internalName;
+    }
+
+    /**
+     * The combat role a person is assigned to: the {@link CombatRole} of the combat team their unit (or, for a tech,
+     * their maintained formation) belongs to. Walks up the TOE from the person's formation to the nearest ancestor that
+     * is a combat team and reports its role. People not in any active combat team show "-".
+     */
+    private static String getCombatRole(Person person, Campaign campaign) {
+        Formation formation = campaign.getPlayerForce().getFormationFor(person);
+        Hashtable<Integer, CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsMap();
+        while (formation != null) {
+            if (formation.isCombatTeam()) {
+                CombatTeam combatTeam = combatTeams.get(formation.getId());
+                CombatRole role = (combatTeam != null) ? combatTeam.getRole() : formation.getCombatRoleInMemory();
+                return role.toString();
+            }
+            formation = formation.getParentFormation();
+        }
+        return "-";
+    }
+
+    /**
      * Returns the tooltip text for this column, optionally including color reason explanations.
      *
      * @param person             the person for this row
@@ -899,7 +1000,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             case SPA_COUNT:
                 return person.getAbilityListAsString(PersonnelOptions.LVL3_ADVANTAGES);
             case IMPLANT_COUNT:
-                return person.getAbilityListAsString(PersonnelOptions.MD_ADVANTAGES);
+                return person.getImplantListAsString();
             case MODIFICATION_COUNT:
                 StringBuilder modificationCount = new StringBuilder("<html>");
                 for (Injury injury : person.getProstheticInjuries()) {
@@ -943,8 +1044,10 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             case SKILL_LEVEL -> 45;
             case PERSONNEL_ROLE -> 120;
             case UNIT_ASSIGNMENT -> 140;
-            case ORIGIN -> 160;
+            case ORIGIN, ARMOR_KIT, ARMOR_KIT_INTENDED -> 160;
+            case EQUIPMENT -> 280;
             case TECH_UNIT_ASSIGNMENT -> 280;
+            case COMBAT_ROLE -> 100;
             default -> null;
         };
         return (preferredWidth == null) ? null : UIUtil.scaleForGUI(preferredWidth);
@@ -956,7 +1059,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             case RANK, SKILL_LEVEL -> SwingConstants.LEFT;
             case SALARY, MAX_TECH_MINUTES -> SwingConstants.RIGHT;
             default -> {
-                if (modelComparator.equals(Comparators.STRING_COMPARATOR)) {
+                if (modelComparator.equals(Comparators.NATURAL_ORDER_STRING_COMPARATOR)) {
                     yield SwingConstants.LEFT;
                 }
                 yield SwingConstants.CENTER;
@@ -981,7 +1084,8 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     private static class Comparators {
         private static final Comparator<Integer> SKILL_COMPARATOR = Comparator.reverseOrder();
         private static final Comparator<Integer> INT_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
-        private static final Comparator<String> STRING_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
+        private static final Comparator<String> NATURAL_ORDER_STRING_COMPARATOR =
+              Comparator.nullsLast(NaturalOrderComparator.INSTANCE);
         private static final Comparator<LocalDate> DATE_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
         private static final Comparator<Boolean> YES_NO_NA_COMPARATOR = Comparator.nullsLast(Comparator.naturalOrder());
         private static final Comparator<Person> WANTS_CHILDREN_COMPARATOR =

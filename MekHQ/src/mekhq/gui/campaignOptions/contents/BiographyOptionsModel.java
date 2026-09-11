@@ -42,8 +42,8 @@ import jakarta.annotation.Nullable;
 import megamek.client.generator.RandomGenderGenerator;
 import megamek.client.generator.RandomNameGenerator;
 import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.campaign.universe.Planet;
@@ -68,6 +68,7 @@ class BiographyOptionsModel {
     boolean rewardComingOfAgeAbilities;
     boolean rewardComingOfAgeRPSkills;
     boolean useRandomPersonalities;
+    boolean useRandomTalent;
     boolean usePersonalityLabelsOnly;
     boolean useRandomPersonalityReputation;
     boolean useReasoningXpMultiplier;
@@ -127,6 +128,7 @@ class BiographyOptionsModel {
         rewardComingOfAgeAbilities = options.get(CampaignOption.REWARD_COMING_OF_AGE_ABILITIES);
         rewardComingOfAgeRPSkills = options.get(CampaignOption.REWARD_COMING_OF_AGE_RP_SKILLS);
         useRandomPersonalities = options.get(CampaignOption.USE_RANDOM_PERSONALITIES);
+        useRandomTalent = options.get(CampaignOption.USE_RANDOM_TALENT);
         usePersonalityLabelsOnly = options.get(CampaignOption.USE_PERSONALITY_LABELS_ONLY);
         useRandomPersonalityReputation = options.get(CampaignOption.USE_RANDOM_PERSONALITY_REPUTATION);
         useReasoningXpMultiplier = options.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
@@ -187,6 +189,7 @@ class BiographyOptionsModel {
         options.set(CampaignOption.REWARD_COMING_OF_AGE_ABILITIES, rewardComingOfAgeAbilities);
         options.set(CampaignOption.REWARD_COMING_OF_AGE_RP_SKILLS, rewardComingOfAgeRPSkills);
         options.set(CampaignOption.USE_RANDOM_PERSONALITIES, useRandomPersonalities);
+        options.set(CampaignOption.USE_RANDOM_TALENT, useRandomTalent);
         options.set(CampaignOption.USE_PERSONALITY_LABELS_ONLY, usePersonalityLabelsOnly);
         options.set(CampaignOption.USE_RANDOM_PERSONALITY_REPUTATION, useRandomPersonalityReputation);
         options.set(CampaignOption.USE_REASONING_XP_MULTIPLIER, useReasoningXpMultiplier);

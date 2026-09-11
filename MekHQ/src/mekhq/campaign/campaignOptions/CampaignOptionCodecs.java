@@ -160,7 +160,7 @@ final class CampaignOptionCodecs {
         register(CampaignOption.FINANCIAL_YEAR_DURATION, enumCodec(FinancialYearDuration::parseFromString));
         register(CampaignOption.PERSONNEL_MARKET_STYLE, enumCodec(PersonnelMarketStyle::fromString));
         register(CampaignOption.UNIT_MARKET_METHOD, enumCodec(UnitMarketMethod::valueOf));
-        register(CampaignOption.CONTRACT_MARKET_METHOD, enumCodec(ContractMarketMethod::valueOf));
+        register(CampaignOption.CONTRACT_MARKET_METHOD, enumCodec(ContractMarketMethod::fromString));
         register(CampaignOption.SKILL_LEVEL, enumCodec(SkillLevel::parseFromString));
         register(CampaignOption.MINIMUM_CALLSIGN_SKILL_LEVEL, enumCodec(SkillLevel::parseFromString));
         register(CampaignOption.AUTO_RESOLVE_METHOD, enumCodec(AutoResolveMethod::valueOf));

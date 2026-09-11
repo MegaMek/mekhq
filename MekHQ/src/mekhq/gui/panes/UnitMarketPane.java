@@ -63,6 +63,7 @@ import megamek.common.units.UnitType;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.market.enums.UnitMarketType;
@@ -73,7 +74,6 @@ import mekhq.gui.model.UnitMarketTableModel;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class UnitMarketPane extends AbstractMHQSplitPane {
     private static final MMLogger LOGGER = MMLogger.create(UnitMarketPane.class);
@@ -541,10 +541,19 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
      */
     private void finalizeEntityAcquisition(final List<UnitMarketOffer> offers, final boolean instantDelivery) {
         for (final UnitMarketOffer offer : offers) {
+            final Entity entity = offer.getEntity();
+            if (entity == null) {
+                // The unit failed to load. It cannot be acquired, so drop it instead of passing a null entity into
+                // addNewUnit.
+                LOGGER.error("Cannot acquire a null entity; removing the offer from the market.");
+                getCampaign().getUnitMarket().getOffers().remove(offer);
+                continue;
+            }
+
             boolean isEmployerMarket = offer.getMarketType().isEmployer();
             int transitDuration = instantDelivery || isEmployerMarket ? 0 : offer.getTransitDuration();
 
-            getCampaign().addNewUnit(offer.getEntity(),
+            getCampaign().addNewUnit(entity,
                   false,
                   transitDuration,
                   UnitMarketType.getQuality(campaign, offer.getMarketType()),

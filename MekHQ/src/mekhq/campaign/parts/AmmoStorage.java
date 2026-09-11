@@ -44,6 +44,7 @@ import megamek.common.equipment.AmmoType;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
@@ -53,7 +54,6 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This will be a special type of part that will only exist as spares It will determine the amount of ammo of a
@@ -89,10 +89,22 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public double getTonnage() {
-        if (getType().getKgPerShot() > 0) {
-            return getType().getKgPerShot() * (shots / 1000.0);
+        AmmoType type = getType();
+        // Prefer the per-shot weight when a real one is available. getKgPerShot() falls back to
+        // 1000.0 / getShots() when no explicit weight is set, so for ammo with no per-ton shot capacity
+        // (notably infantry ammo, getShots() == 0) it returns Infinity - guard against that non-finite
+        // value here rather than letting it propagate.
+        double kgPerShot = type.getKgPerShot();
+        if (Double.isFinite(kgPerShot) && kgPerShot > 0) {
+            return kgPerShot * (shots / 1000.0);
         }
-        return ((double) shots / getType().getShots());
+        // Fall back to shots-per-ton, but only when there is a per-ton capacity to divide by. Otherwise a
+        // non-finite tonnage would poison cargo/warehouse totals and crash the Command Center when handed to
+        // BigDecimal (see MekHQ issue #9616). Treat such ammo as weightless.
+        if (type.getShots() > 0) {
+            return (double) shots / type.getShots();
+        }
+        return 0.0;
     }
 
     @Override

@@ -67,6 +67,8 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
@@ -110,7 +112,6 @@ import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.service.PartsAcquisitionService;
 import mekhq.service.enums.MRMSMode;
 import mekhq.service.mrms.MRMSService;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Shows damaged units and controls for repair.
@@ -123,6 +124,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private JTable techTable;
     private RoundedJButton btnDoTask;
     private RoundedMMToggleButton btnShowAllTechs;
+    private RoundedMMToggleButton btnShowOnlyUnitTechs;
     private JLabel lblTargetNum;
     private JTextPane txtServicedUnitView;
     private JTextArea textTarget;
@@ -445,12 +447,24 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnShowAllTechs = new RoundedMMToggleButton(resourceMap.getString("btnShowAllTechs.text"));
         btnShowAllTechs.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText"));
         btnShowAllTechs.setName("btnShowAllTechs");
+        btnShowAllTechs.setSelected(true);
         btnShowAllTechs.addActionListener(ev -> filterTechs());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
         gridBagConstraints.gridy = 0;
         gridBagConstraints.anchor = GridBagConstraints.WEST;
         panTechs.add(btnShowAllTechs, gridBagConstraints);
+
+        btnShowOnlyUnitTechs = new RoundedMMToggleButton(resourceMap.getString("btnShowOnlyUnitTechs.text"));
+        btnShowOnlyUnitTechs.setToolTipText(resourceMap.getString("btnShowOnlyUnitTechs.toolTipText"));
+        btnShowOnlyUnitTechs.setName("btnShowOnlyUnitTechs");
+        btnShowOnlyUnitTechs.setSelected(false);
+        btnShowOnlyUnitTechs.addActionListener(ev -> filterTechs());
+        gridBagConstraints = new GridBagConstraints();
+        gridBagConstraints.gridx = 1;
+        gridBagConstraints.gridy = 0;
+        gridBagConstraints.anchor = GridBagConstraints.WEST;
+        panTechs.add(btnShowOnlyUnitTechs, gridBagConstraints);
 
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -808,6 +822,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
                     return false;
                 }
+                if (btnShowOnlyUnitTechs.isSelected() && (unit != null) && !tech.isRightTechProfessionFor(unit)) {
+                    return false;
+                }
                 if ((unit != null) && unit.isSelfCrewed()) {
                     if (!tech.getPrimaryRole().isVesselCrew()) {
                         return false;
@@ -975,11 +992,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
      */
     private void refreshTechsList() {
         int selected = techTable.getSelectedRow();
-        // Get all techs who have more than 0 minutes free, and sort by skill descending (elites at bottom)
-        mekhq.campaign.Campaign campaign = getCampaign();
+        // Offer anyone with a technician repair skill, regardless of their profession, who has more than 0 minutes
+        // free; sorted by skill descending (elites at bottom). The task's required-skill filtering is applied in
+        // filterTechs().
+        Campaign campaign = getCampaign();
         List<Person> techs = campaign.getPlayerForce()
                                    .getHumanResources()
-                                   .getTechs(campaign.getPlayerForce().getHangar().getUnits(),
+                                   .getSkilledTechs(campaign.getPlayerForce().getHangar().getUnits(),
                                          campaign.getCampaignOptions(),
                                          campaign.getPlayerForce().isClanForce(),
                                          campaign.getLocalDate(),

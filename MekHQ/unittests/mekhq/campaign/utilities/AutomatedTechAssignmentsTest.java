@@ -34,6 +34,7 @@ package mekhq.campaign.utilities;
 
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,6 +46,7 @@ import static org.mockito.Mockito.when;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import megamek.common.units.Entity;
@@ -487,5 +489,71 @@ class AutomatedTechAssignmentsTest {
 
         // 2 successful assignments + 1 unable-to-assign report => 3 reports total for this run
         assertEquals(initialReportCount + 3, techAssignments.getReports().size());
+    }
+
+    // --- Caller-supplied unit ordering (the seam the Company Generator's sort grid uses) ---
+
+    @Test
+    void constructor_withNoOrderSupplied_offersUnitsByBattleValueHighestFirst() {
+        Unit lowest = unitWithUnitTypeAndBV(UnitType.MEK, 10);
+        Unit middle = unitWithUnitTypeAndBV(UnitType.MEK, 20);
+        Unit highest = unitWithUnitTypeAndBV(UnitType.MEK, 30);
+        wireSetTechToUpdateTechUnits(lowest);
+        wireSetTechToUpdateTechUnits(middle);
+        wireSetTechToUpdateTechUnits(highest);
+
+        // One tech takes at most two units, so the two offered first are the two that get one.
+        new AutomatedTechAssignments(new ArrayList<>(List.of(mekTech())),
+              new ArrayList<>(List.of(lowest, middle, highest)));
+
+        assertNotNull(highest.getTech(), "Highest battle value should be offered a tech first");
+        assertNotNull(middle.getTech());
+        assertNull(lowest.getTech(), "Lowest battle value should be the one left over");
+    }
+
+    @Test
+    void constructor_withOrderSupplied_offersUnitsInThatOrderInstead() {
+        Unit lowest = unitWithUnitTypeAndBV(UnitType.MEK, 10);
+        Unit middle = unitWithUnitTypeAndBV(UnitType.MEK, 20);
+        Unit highest = unitWithUnitTypeAndBV(UnitType.MEK, 30);
+        wireSetTechToUpdateTechUnits(lowest);
+        wireSetTechToUpdateTechUnits(middle);
+        wireSetTechToUpdateTechUnits(highest);
+
+        Comparator<Unit> lowestBattleValueFirst =
+              Comparator.comparingInt(unit -> unit.getEntity().calculateBattleValue());
+
+        new AutomatedTechAssignments(new ArrayList<>(List.of(mekTech())),
+              new ArrayList<>(List.of(lowest, middle, highest)), lowestBattleValueFirst);
+
+        assertNotNull(lowest.getTech(), "Caller order puts the lowest battle value first");
+        assertNotNull(middle.getTech());
+        assertNull(highest.getTech(), "Highest battle value is the one left over under the caller's order");
+    }
+
+    @Test
+    void constructor_withNullOrder_behavesLikeTheTwoArgumentConstructor() {
+        Unit lowest = unitWithUnitTypeAndBV(UnitType.MEK, 10);
+        Unit middle = unitWithUnitTypeAndBV(UnitType.MEK, 20);
+        Unit highest = unitWithUnitTypeAndBV(UnitType.MEK, 30);
+        wireSetTechToUpdateTechUnits(lowest);
+        wireSetTechToUpdateTechUnits(middle);
+        wireSetTechToUpdateTechUnits(highest);
+
+        new AutomatedTechAssignments(new ArrayList<>(List.of(mekTech())),
+              new ArrayList<>(List.of(lowest, middle, highest)), null);
+
+        assertNotNull(highest.getTech());
+        assertNotNull(middle.getTech());
+        assertNull(lowest.getTech());
+    }
+
+    /** A Mek tech with an empty workload, eligible for the Mek bucket. */
+    private static Person mekTech() {
+        Person tech = mock(Person.class);
+        when(tech.getTechUnits()).thenReturn(new ArrayList<>());
+        when(tech.isTechMek()).thenReturn(true);
+        stubTechLevel(tech, 5);
+        return tech;
     }
 }

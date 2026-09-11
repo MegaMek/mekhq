@@ -58,7 +58,10 @@ import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.TestSystems;
@@ -220,6 +223,76 @@ class LegacyContractConverterTest {
 
     // endregion close-out rule
 
+    // region prisoner resolution
+
+    /**
+     * Closing out a running contract on load ransoms every enemy prisoner the player is holding: the player is credited
+     * their combined ransom value and the prisoners are released.
+     */
+    @Test
+    void closingOutAnActiveContractRansomsEnemyPrisonersHeld() throws Exception {
+        Person prisoner = addEnemyPrisoner();
+        Money expectedRansom = prisoner.getRansomValue(campaign);
+        assertTrue(expectedRansom.isPositive(), "the prisoner must be worth something for the credit to be meaningful");
+
+        importActiveLegacyContractWithNoPayout();
+        Money before = campaign.getPlayerForce().getFinances().getBalance();
+
+        LegacyContractConverter.settlePendingLegacyContracts(campaign);
+
+        // Checked against the live roster rather than getCurrentPrisoners(): the active-personnel cache is invalidated
+        // in production by the event bus reacting to the removal, but that subscriber isn't wired up in this harness.
+        assertFalse(campaign.getPlayerForce().getHumanResources().getPersonnel().contains(prisoner),
+              "a closed-out contract releases the enemy prisoners the player held");
+        assertEquals(before.plus(expectedRansom), campaign.getPlayerForce().getFinances().getBalance(),
+              "the player is credited the ransom of every enemy prisoner released");
+    }
+
+    /**
+     * The player's own captured personnel are freed and restored to active duty when the contract closes out, and at no
+     * cost - only the enemy prisoners the player held are paid for.
+     */
+    @Test
+    void closingOutAnActiveContractFreesFriendlyPoWsAtNoCost() throws Exception {
+        Person captured = addFriendlyPoW();
+
+        importActiveLegacyContractWithNoPayout();
+        Money before = campaign.getPlayerForce().getFinances().getBalance();
+
+        LegacyContractConverter.settlePendingLegacyContracts(campaign);
+
+        assertEquals(PersonnelStatus.ACTIVE, captured.getStatus(),
+              "a closed-out contract returns the player's own captured personnel to active duty");
+        assertEquals(before, campaign.getPlayerForce().getFinances().getBalance(),
+              "freeing the player's own captured personnel costs nothing");
+    }
+
+    /**
+     * A save whose contracts had all already concluded closed out nothing, so its prisoners are left exactly as they
+     * were - no ransom, no release, no status change.
+     */
+    @Test
+    void prisonersAreLeftAloneWhenNoActiveContractWasClosedOut() throws Exception {
+        Person enemyPrisoner = addEnemyPrisoner();
+        Person captured = addFriendlyPoW();
+
+        // A concluded contract has nothing to close out, so it neither settles pay nor triggers prisoner resolution.
+        campaign.importMission(convert(legacyMission("<status>FAILED</status>")));
+        Money before = campaign.getPlayerForce().getFinances().getBalance();
+
+        LegacyContractConverter.settlePendingLegacyContracts(campaign);
+
+        assertTrue(campaign.getPlayerForce().getHumanResources().getCurrentPrisoners().contains(enemyPrisoner),
+              "with no active contract closed out, the enemy prisoners the player held are untouched");
+        assertEquals(PersonnelStatus.POW, captured.getStatus(),
+              "with no active contract closed out, the player's own captured personnel stay captured");
+        assertEquals(before,
+              campaign.getPlayerForce().getFinances().getBalance(),
+              "nothing is ransomed, so nothing is paid");
+    }
+
+    // endregion prisoner resolution
+
     // region placeholders and defaults
 
     @Test
@@ -367,6 +440,31 @@ class LegacyContractConverterTest {
     /** Wraps {@code body} in a legacy {@code <mission>} element of the retired {@code AtBContract} type. */
     private static String legacyMission(String body) {
         return "<mission id=\"1\" type=\"mekhq.campaign.mission.AtBContract\">" + body + "</mission>";
+    }
+
+    /**
+     * Converts and imports a still-running legacy contract whose payout reconstructs to nothing (a zero payment
+     * multiplier), so its close-out settles no pay and any balance change comes purely from prisoner ransoming.
+     */
+    private void importActiveLegacyContractWithNoPayout() throws Exception {
+        campaign.importMission(convert(legacyMission("<status>ACTIVE</status>"
+                                                           + "<paymentMultiplier>0</paymentMultiplier>")));
+    }
+
+    /** Registers an enemy combatant the player is holding as a prisoner. */
+    private Person addEnemyPrisoner() {
+        Person prisoner = new Person(campaign);
+        campaign.importPerson(prisoner);
+        prisoner.setPrisonerStatus(campaign, PrisonerStatus.PRISONER, false);
+        return prisoner;
+    }
+
+    /** Registers one of the player's own personnel as a captured prisoner of war. */
+    private Person addFriendlyPoW() {
+        Person captured = new Person(campaign);
+        campaign.importPerson(captured);
+        captured.setStatus(PersonnelStatus.POW);
+        return captured;
     }
 
     private AbstractContract convert(String missionXml) throws Exception {

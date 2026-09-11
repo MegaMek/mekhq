@@ -34,10 +34,12 @@ package mekhq.campaign.mission.contract;
 
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MINIMUM_MORALE_LEVEL;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -104,55 +106,23 @@ public abstract class AbstractContract {
     private SystemsTargetData systemsTargetData;
 
     private RentedFacilitiesData rentedFacilitiesData;
-    /**
-     * Seeded with neutral morale so a freshly-constructed contract is always well-formed: generation performs its first
-     * morale check (which reads the current level as its baseline) before any morale data is assigned.
-     */
+    private NonNegotiableTermsData nonNegotiableTermsData;
+    private ActiveNegotiationData activeNegotiationData;
+
     private @Nonnull MoraleData moraleData = new MoraleData(ContractMoraleLevel.STALEMATE);
     private NegotiationData negotiationData;
     private Person playerNegotiator;
-    /**
-     * The id of {@link #playerNegotiator} as read from a save, held until it can be resolved.
-     *
-     * <p>Contracts are written inside {@code <info>}, which the loader parses before the personnel roster exists, so
-     * the negotiator cannot be looked up while the contract itself is being read. The codec stashes the raw id here and
-     * the loader resolves it in a post-load pass once the whole save has been read. Never serialized - the negotiator
-     * is written from {@link #playerNegotiator}.</p>
-     */
-    private transient UUID pendingPlayerNegotiatorId;
 
-    /**
-     * The payment multiplier of a converted-active legacy contract awaiting settlement of its remaining balance, or
-     * {@code null} when nothing is pending. Transient; set during legacy conversion and cleared by the post-load
-     * settlement pass. See {@link #getPendingLegacySettlementMultiplier()}.
-     */
-    private transient Double pendingLegacySettlementMultiplier;
-
-    /**
-     * The active campaign options, injected so the term getters can apply the campaign's configured per-term
-     * multipliers (base pay, straight support, battlefield loss, transport, salvage). Transient and never serialized;
-     * set at generation, on load ({@link Campaign#importMission}), and on registration ({@link Campaign#addMission}).
-     * When absent the term multipliers fall back to no adjustment (x1.0).
-     */
-    private transient CampaignOptions campaignOptions;
-
-    /** Percentage of each monthly payment distributed to shareholding personnel. */
     private int sharesPercent = DEFAULT_SHARES_PERCENT;
-
-    /**
-     * The intel fields hidden from the player while this contract is an unaccepted market offer. Empty by default;
-     * populated automatically at generation (when the campaign opts in) or by the GM contract editor. Only consulted in
-     * the contract-market dossier - it has no effect once the contract is accepted.
-     */
     private final EnumSet<ObfuscatableIntel> obfuscatedIntel = EnumSet.noneOf(ObfuscatableIntel.class);
+    private final EnumSet<ContractCharacteristic> characteristics = EnumSet.noneOf(ContractCharacteristic.class);
 
     private StratConCampaignState stratConCampaignState;
-    private int scale;
-    private int requiredCombatElements;
-    private int requiredVictoryPoints;
-    private int trackCount; // TODO future proofing
-    /** A "pity" contract: an easy top-up offer, surfaced in the market as a Proving Ground. */
-    private boolean provingGround;
+    // Scale, required combat elements, required victory points, track count, and the scenario schedule - the contract's
+    // scenario-generation parameters, bundled together. Immutable like the other data records, so the scalar setters
+    // below replace it with a one-field-changed copy.
+    private ContractIntensityData intensityData = new ContractIntensityData();
+    private ContractNature nature = ContractNature.NORMAL;
 
     private final List<Scenario> scenarios = new ArrayList<>();
 
@@ -163,6 +133,26 @@ public abstract class AbstractContract {
      */
     private transient JumpPath cachedJumpPath;
     private transient int cachedContractDifficulty;
+
+    /**
+     * Marks a legacy contract that was still active when converted on load, and therefore force-closed by the legacy
+     * handler. Transient; set during legacy conversion and consumed by the post-load pass, which uses it to
+     * auto-resolve any prisoners still held once the closed-out contracts are settled. See
+     * {@link #wasClosedOutActiveOnLoad()}.
+     */
+    private transient boolean closedOutActiveOnLoad;
+
+    /**
+     * The id of {@link #playerNegotiator} as read from a save, held until it can be resolved.
+     *
+     * <p>Contracts are written inside {@code <info>}, which the loader parses before the personnel roster exists, so
+     * the negotiator cannot be looked up while the contract itself is being read. The codec stashes the raw id here and
+     * the loader resolves it in a post-load pass once the whole save has been read. Never serialized - the negotiator
+     * is written from {@link #playerNegotiator}.</p>
+     */
+    private transient UUID pendingPlayerNegotiatorId;
+    private transient Double pendingLegacySettlementMultiplier;
+    private transient CampaignOptions campaignOptions;
 
     public @Nonnull List<Scenario> getScenarios() {
         return scenarios;
@@ -303,6 +293,39 @@ public abstract class AbstractContract {
         this.contractTerms = contractTerms;
     }
 
+    /**
+     * @return the random flavor characteristics this contract carries (an at-most-one-per-category set). The returned
+     *       set is the contract's own, live {@link EnumSet}; callers must not mutate it - use
+     *       {@link #setCharacteristics(Collection)}.
+     */
+    public EnumSet<ContractCharacteristic> getCharacteristics() {
+        return characteristics;
+    }
+
+    /** Replaces this contract's characteristics with the supplied collection. */
+    public void setCharacteristics(Collection<ContractCharacteristic> newCharacteristics) {
+        characteristics.clear();
+        characteristics.addAll(newCharacteristics);
+    }
+
+    /** @return {@code true} if this contract carries the given characteristic */
+    public boolean hasCharacteristic(ContractCharacteristic characteristic) {
+        return characteristics.contains(characteristic);
+    }
+
+    /**
+     * @return the single characteristic this contract carries from the given category, or {@code null} if none. At most
+     *       one characteristic per category is ever present, so the first match is the only match.
+     */
+    public @Nullable ContractCharacteristic getCharacteristic(ContractCharacteristic.Category category) {
+        for (ContractCharacteristic characteristic : characteristics) {
+            if (characteristic.getCategory() == category) {
+                return characteristic;
+            }
+        }
+        return null;
+    }
+
     public ContractObjectiveData getObjectiveData() {
         return objectiveData;
     }
@@ -380,6 +403,22 @@ public abstract class AbstractContract {
 
     public void setRentedFacilitiesData(RentedFacilitiesData rentedFacilitiesData) {
         this.rentedFacilitiesData = rentedFacilitiesData;
+    }
+
+    public @Nullable NonNegotiableTermsData getNonNegotiableTermsData() {
+        return nonNegotiableTermsData;
+    }
+
+    public void setNonNegotiableTermsData(NonNegotiableTermsData nonNegotiableTermsData) {
+        this.nonNegotiableTermsData = nonNegotiableTermsData;
+    }
+
+    public @Nullable ActiveNegotiationData getActiveNegotiationData() {
+        return activeNegotiationData;
+    }
+
+    public void setActiveNegotiationData(ActiveNegotiationData activeNegotiationData) {
+        this.activeNegotiationData = activeNegotiationData;
     }
 
     public @Nonnull MoraleData getMoraleData() {
@@ -511,6 +550,24 @@ public abstract class AbstractContract {
     }
 
     /**
+     * @return {@code true} if this contract was still active when converted on load and was therefore force-closed by
+     *       the legacy handler. Used by the post-load pass to decide whether held prisoners should be auto-resolved.
+     */
+    public boolean wasClosedOutActiveOnLoad() {
+        return closedOutActiveOnLoad;
+    }
+
+    /**
+     * Marks whether this legacy contract was force-closed while active on load. Set during legacy conversion and read
+     * by the post-load pass; not for general use.
+     *
+     * @param closedOutActiveOnLoad {@code true} if the contract was still active when converted and was force-closed
+     */
+    public void setClosedOutActiveOnLoad(final boolean closedOutActiveOnLoad) {
+        this.closedOutActiveOnLoad = closedOutActiveOnLoad;
+    }
+
+    /**
      * @return an unmodifiable view of the intel fields hidden from the player while this contract is a market offer
      */
     public Set<ObfuscatableIntel> getObfuscatedIntel() {
@@ -561,45 +618,82 @@ public abstract class AbstractContract {
         this.stratConCampaignState = stratConCampaignState;
     }
 
+    /** @return the contract's scenario-generation parameters (scale, required forces, track count, and schedule) */
+    public ContractIntensityData getIntensityData() {
+        return intensityData;
+    }
+
     public int getScale() {
-        return scale;
+        return intensityData.scale();
     }
 
     public void setScale(int scale) {
-        this.scale = scale;
-    }
-
-    public int getRequiredCombatElements() {
-        return requiredCombatElements;
-    }
-
-    public void setRequiredCombatElements(int requiredCombatElements) {
-        this.requiredCombatElements = requiredCombatElements;
+        intensityData = intensityData.withScale(scale);
     }
 
     public int getTrackCount() {
-        return trackCount;
+        return intensityData.trackCount();
     }
 
     public void setTrackCount(int trackCount) {
-        this.trackCount = trackCount;
+        intensityData = intensityData.withTrackCount(trackCount);
+    }
+
+    /**
+     * @return how this contract's tracks are spread across the months it runs, rolled from the Track Intensity Tables,
+     *       as per-month track counts. Never {@code null}; empty until a schedule has been generated. Nothing consumes
+     *       it yet.
+     */
+    public List<Integer> getScenarioSchedule() {
+        return intensityData.monthlyTrackCounts();
+    }
+
+    public void setScenarioSchedule(List<Integer> scenarioSchedule) {
+        intensityData = intensityData.withMonthlyTrackCounts(scenarioSchedule);
+    }
+
+    /** @return this contract's special designation ({@link ContractNature#NORMAL} if it has none) */
+    public ContractNature getNature() {
+        return nature;
+    }
+
+    public void setNature(ContractNature nature) {
+        this.nature = (nature == null) ? ContractNature.NORMAL : nature;
     }
 
     /** @return {@code true} if this is a pity ("Proving Ground") contract - an easy top-up offer for a struggling force */
     public boolean isProvingGround() {
-        return provingGround;
+        return nature.isProvingGround();
     }
 
-    public void setProvingGround(boolean provingGround) {
-        this.provingGround = provingGround;
+    /**
+     * @return {@code true} if this is specifically a plain covert operation (not a false flag), where the employer is
+     *       concealed from the market outright
+     */
+    public boolean isCovert() {
+        return nature.isCovert();
+    }
+
+    /** @return {@code true} if this is a false flag operation, presenting a front faction as its cover-story employer */
+    public boolean isFalseFlag() {
+        return nature.isFalseFlag();
+    }
+
+    /**
+     * @return {@code true} if this is any kind of covert operation ({@link ContractNature#COVERT} or
+     *       {@link ContractNature#FALSE_FLAG}), which share covert enemy selection and conceal the true employer from
+     *       the market
+     */
+    public boolean isCovertOperation() {
+        return nature.isCovertOperation();
     }
 
     public int getRequiredVictoryPoints() {
-        return requiredVictoryPoints;
+        return intensityData.requiredVictoryPoints();
     }
 
     public void setRequiredVictoryPoints(int requiredVictoryPoints) {
-        this.requiredVictoryPoints = requiredVictoryPoints;
+        intensityData = intensityData.withRequiredVictoryPoints(requiredVictoryPoints);
     }
 
     /**
@@ -646,9 +740,19 @@ public abstract class AbstractContract {
      * <p>Employer types that keep their faction's own name (system owners, planetary governments, nobles) have no tag,
      * so this returns the plain display name unchanged.</p>
      *
-     * @return the display name, with a {@code " (Tag)"} suffix when the employer type carries a market tag
+     * <p>A plain covert operation conceals its employing faction from the player, returning an "Undisclosed Employer"
+     * placeholder; only the market display is affected, as {@link #getEmployerDisplayName()} still returns the true
+     * employer everywhere else. A false flag operation needs no special handling here: its visible employer is already
+     * the cover-story front (the real employer is preserved as the covert sponsor), so it displays like any normal
+     * contract.</p>
+     *
+     * @return the display name, with a {@code " (Tag)"} suffix when the employer type carries a market tag, or an
+     *       "Undisclosed Employer" placeholder for a plain covert operation
      */
     public String getEmployerMarketDisplayName() {
+        if (isCovert()) {
+            return getTextAt("mekhq.resources.ChaosContractMarketDialog", "value.contractMarket.employer.hidden");
+        }
         String tag = employerData.type().getMarketDisplayTag();
         String displayName = employerData.displayName();
         return (tag == null) ? displayName : displayName + " (" + tag + ')';
@@ -997,6 +1101,6 @@ public abstract class AbstractContract {
      * @return the maximum support points the contract can hold in reserve
      */
     public int getMaximumSupportPoints() {
-        return scale * INITIAL_SUPPORT_POINTS_PER_COMBAT_TEAM;
+        return getScale() * INITIAL_SUPPORT_POINTS_PER_COMBAT_TEAM;
     }
 }

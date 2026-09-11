@@ -42,12 +42,18 @@ import java.nio.charset.StandardCharsets;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import megamek.logging.MMLogger;
 
 /**
  * Shared YAML gateway for planetary system files.
@@ -57,6 +63,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
  * same YAML representation inside the campaign XML.
  */
 public final class PlanetarySystemYamlIO {
+
+    private static final MMLogger LOGGER = MMLogger.create(PlanetarySystemYamlIO.class);
 
     private static final ObjectMapper MAPPER = buildMapper();
 
@@ -86,6 +94,23 @@ public final class PlanetarySystemYamlIO {
         module.addSerializer(StarType.class, ToStringSerializer.instance);
         mapper.registerModule(module);
         mapper.registerModule(new JavaTimeModule());
+
+        // Degrade gracefully when the data is ahead of the code (a newer field the running build does not yet know)
+        // or a property name is misspelled: log the property and skip it, rather than throwing and letting the caller
+        // drop the entire star system. This keeps a data/code skew from silently removing hundreds of systems.
+        mapper.addHandler(new DeserializationProblemHandler() {
+            @Override
+            public boolean handleUnknownProperty(DeserializationContext context, JsonParser parser,
+                  JsonDeserializer<?> deserializer, Object beanOrClass, String propertyName) throws IOException {
+                String targetType = (beanOrClass instanceof Class<?> beanClass)
+                      ? beanClass.getSimpleName()
+                      : beanOrClass.getClass().getSimpleName();
+                LOGGER.warn("Ignoring unrecognized property '{}' on {} while parsing planetary system data; the data " +
+                      "may be ahead of the code, or the property name may be misspelled.", propertyName, targetType);
+                parser.skipChildren();
+                return true;
+            }
+        });
 
         return mapper;
     }

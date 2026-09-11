@@ -445,7 +445,7 @@ public class ScenarioObjectiveProcessor {
                     int scoreEffect = effect.howMuch * effectMultiplier;
 
                     if (dryRun) {
-                        return String.format("%d Contract Score/Campaign Victory Points", scoreEffect);
+                        return String.format("%d Contract Score/Contract Victory Points", scoreEffect);
                     } else {
                         tracker.getMission().getStratConCampaignState().changeVictoryPoints(scoreEffect);
                     }

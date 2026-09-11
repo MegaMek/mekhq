@@ -94,6 +94,7 @@ public class SkillType {
     public static final String S_PILOT_VTOL = "Piloting/VTOL";
     public static final String S_PILOT_NVEE = "Piloting/Naval";
     public static final String S_PILOT_SPACE = "Piloting/Spacecraft";
+    public static final String S_PILOT_PROTO = "Piloting/ProtoMek";
     public static final String S_GUN_MEK = "Gunnery/Mek";
     public static final String S_GUN_AERO = "Gunnery/Aerospace";
     public static final String S_GUN_JET = "Gunnery/Aircraft";
@@ -113,10 +114,20 @@ public class SkillType {
 
     // support skills
     public static final String S_TECH_MEK = "Tech/Mek";
-    public static final String S_TECH_MECHANIC = "Tech/Mechanic";
-    public static final String S_TECH_AERO = "Tech/Aero";
+    public static final String S_TECH_VEHICLE = "Tech/Vehicle";
+    public static final String S_TECH_AERO = "Tech/Aerospace";
     public static final String S_TECH_BA = "Tech/BattleArmor";
     public static final String S_TECH_VESSEL = "Tech/Vessel";
+    public static final String S_TECH_MILITARY = "Tech/Military";
+    public static final String S_TECH_CIVILIAN = "Tech/Civilian";
+    public static final String S_TECH_ELECTRONIC = "Tech/Electronic";
+    public static final String S_TECH_NUCLEAR = "Tech/Nuclear";
+    public static final String S_TECH_AERONAUTICS = "Tech/Aeronautics";
+    public static final String S_TECH_MECHANICAL = "Tech/Mechanical";
+    public static final String S_TECH_MYOMER = "Tech/Myomer";
+    public static final String S_TECH_JETS = "Tech/Jets";
+    public static final String S_TECH_WEAPONS = "Tech/Weapons";
+    public static final String S_TECH_CYBERNETICS = "Tech/Cybernetics";
     public static final String S_ASTECH = "Astech";
     public static final String S_SURGERY = "Surgery/Any";
     public static final String S_MEDTECH = "MedTech/Any";
@@ -207,14 +218,17 @@ public class SkillType {
     public static final String[] skillList = { S_PILOT_MEK, S_GUN_MEK, S_PILOT_AERO, S_GUN_AERO, S_PILOT_GVEE,
                                                S_PILOT_VTOL, S_PILOT_NVEE, S_GUN_VEE, S_PILOT_JET, S_GUN_JET,
                                                S_PILOT_SPACE, S_GUN_SPACE, S_ARTILLERY, S_GUN_BA, S_GUN_PROTO,
-                                               S_SMALL_ARMS, S_ANTI_MEK, S_TECH_MEK, S_TECH_MECHANIC, S_TECH_AERO,
-                                               S_TECH_BA, S_TECH_VESSEL, S_ASTECH, S_SURGERY, S_MEDTECH, S_NAVIGATION,
-                                               S_ADMIN, S_TACTICS, S_STRATEGY, S_NEGOTIATION, S_LEADER, S_ACROBATICS,
-                                               S_ACTING, S_ANIMAL_HANDLING, S_APPRAISAL, S_ARCHERY, S_ART_COOKING,
-                                               S_ART_DANCING, S_ART_DRAWING, S_ART_PAINTING, S_ART_POETRY,
-                                               S_ART_SCULPTURE, S_ART_INSTRUMENT, S_ART_SINGING, S_ART_WRITING,
-                                               S_ART_OTHER, S_COMMUNICATIONS, S_COMPUTERS, S_CRYPTOGRAPHY,
-                                               S_DEMOLITIONS, S_DISGUISE, S_ESCAPE_ARTIST, S_FORGERY,
+                                               S_PILOT_PROTO, S_SMALL_ARMS, S_ANTI_MEK, S_TECH_MEK, S_TECH_VEHICLE,
+                                               S_TECH_AERO, S_TECH_BA, S_TECH_VESSEL, S_TECH_MILITARY, S_TECH_CIVILIAN,
+                                               S_TECH_ELECTRONIC, S_TECH_NUCLEAR, S_TECH_AERONAUTICS, S_TECH_MECHANICAL,
+                                               S_TECH_MYOMER, S_TECH_JETS, S_TECH_WEAPONS, S_TECH_CYBERNETICS,
+                                               S_ASTECH, S_SURGERY, S_MEDTECH,
+                                               S_NAVIGATION, S_ADMIN, S_TACTICS, S_STRATEGY, S_NEGOTIATION, S_LEADER,
+                                               S_ACROBATICS, S_ACTING, S_ANIMAL_HANDLING, S_APPRAISAL, S_ARCHERY,
+                                               S_ART_COOKING, S_ART_DANCING, S_ART_DRAWING, S_ART_PAINTING,
+                                               S_ART_POETRY, S_ART_SCULPTURE, S_ART_INSTRUMENT, S_ART_SINGING,
+                                               S_ART_WRITING, S_ART_OTHER, S_COMMUNICATIONS, S_COMPUTERS,
+                                               S_CRYPTOGRAPHY, S_DEMOLITIONS, S_DISGUISE, S_ESCAPE_ARTIST, S_FORGERY,
                                                S_INTEREST_HISTORY, S_INTEREST_LITERATURE, S_INTEREST_HOLO_GAMES,
                                                S_INTEREST_SPORTS, S_INTEREST_FASHION, S_INTEREST_MUSIC,
                                                S_INTEREST_MILITARY, S_INTEREST_ANTIQUES, S_INTEREST_THEOLOGY,
@@ -233,6 +247,25 @@ public class SkillType {
                                                S_CAREER_ANY, S_SWIMMING, S_ZERO_G_OPERATIONS, S_RUNNING, S_TRAINING,
                                                S_MELEE_WEAPONS, S_THROWN_WEAPONS, S_SUPPORT_WEAPONS };
 
+    /**
+     * The technician skills usable for repairing, maintaining, and replacing unit parts, ordered from the legacy
+     * "global" skills (used only when no more specific skill applies to a part) to the granular specialist skills. This
+     * deliberately excludes {@link #S_ASTECH} (an assistant-only skill) and {@link #S_TECH_MILITARY}/
+     * {@link #S_TECH_CIVILIAN} (broad groupings that do not correspond to any component subskill), none of which are
+     * ever returned by a part's {@link mekhq.campaign.parts.Part#isRightTechType(String)}.
+     */
+    public static final String[] techSkillList = { S_TECH_MEK, S_TECH_VEHICLE, S_TECH_AERO, S_TECH_BA, S_TECH_VESSEL,
+                                                   S_TECH_ELECTRONIC, S_TECH_NUCLEAR, S_TECH_AERONAUTICS,
+                                                   S_TECH_MECHANICAL, S_TECH_MYOMER, S_TECH_JETS, S_TECH_WEAPONS,
+                                                   S_TECH_CYBERNETICS };
+
+    /**
+     * @return the technician skills used for repairing, maintaining, and replacing unit parts. See
+     *       {@link #techSkillList} for what is included and excluded.
+     */
+    public static String[] getTechSkills() {
+        return techSkillList;
+    }
 
     public static Map<String, SkillType> lookupHash;
 
@@ -371,17 +404,28 @@ public class SkillType {
      * resulting list, even if multiple {@code SkillType}s with the same name are found.</p>
      *
      * @param skillSubTypes List of {@link SkillSubType}s for which to find matching skill names.
+     * @param treatAllTechSkillsAsTech Whether to treat all tech skills as tech skills, instead of their individual
+     *                                 classifications
      *
      * @return A list of unique skill names that belong to one of the specified skill subtypes.
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public static List<String> getSkillsBySkillSubType(List<SkillSubType> skillSubTypes) {
+    public static List<String> getSkillsBySkillSubType(List<SkillSubType> skillSubTypes,
+          boolean treatAllTechSkillsAsTech) {
+        // Certain tech skills are marked as utility or roleplay so would not normally be included. However, they are
+        // still tech skills.
+        boolean isTechSubType = treatAllTechSkillsAsTech && skillSubTypes.contains(SUPPORT_TECHNICIAN);
+        List<String> specialTechSkills = List.of(S_TECH_MILITARY, S_TECH_CIVILIAN, S_TECH_ELECTRONIC, S_TECH_NUCLEAR,
+              S_TECH_AERONAUTICS, S_TECH_MECHANICAL, S_TECH_MYOMER, S_TECH_JETS, S_TECH_WEAPONS, S_TECH_CYBERNETICS);
+
         List<String> relevantSkills = new ArrayList<>();
         for (SkillType skillType : lookupHash.values()) {
+            boolean isSpecialTech = isTechSubType && specialTechSkills.contains(skillType.getName());
+
             SkillSubType subType = skillType.getSubType();
-            if (skillSubTypes.contains(subType)) {
+            if (isSpecialTech || skillSubTypes.contains(subType)) {
                 if (!relevantSkills.contains(skillType.name)) {
                     relevantSkills.add(skillType.name);
                 }
@@ -699,9 +743,19 @@ public class SkillType {
     public boolean isAffectedByGremlinsOrTechEmpathy() {
         return Objects.equals(this.name, S_TECH_BA) ||
                      Objects.equals(this.name, S_TECH_AERO) ||
-                     Objects.equals(this.name, S_TECH_MECHANIC) ||
+                     Objects.equals(this.name, S_TECH_VEHICLE) ||
                      Objects.equals(this.name, S_TECH_MEK) ||
                      Objects.equals(this.name, S_TECH_VESSEL) ||
+                     Objects.equals(this.name, S_TECH_MILITARY) ||
+                     Objects.equals(this.name, S_TECH_CIVILIAN) ||
+                     Objects.equals(this.name, S_TECH_ELECTRONIC) ||
+                     Objects.equals(this.name, S_TECH_NUCLEAR) ||
+                     Objects.equals(this.name, S_TECH_AERONAUTICS) ||
+                     Objects.equals(this.name, S_TECH_MECHANICAL) ||
+                     Objects.equals(this.name, S_TECH_MYOMER) ||
+                     Objects.equals(this.name, S_TECH_JETS) ||
+                     Objects.equals(this.name, S_TECH_WEAPONS) ||
+                     Objects.equals(this.name, S_TECH_CYBERNETICS) ||
                      Objects.equals(this.name, S_COMPUTERS) ||
                      Objects.equals(this.name, S_COMMUNICATIONS) ||
                      Objects.equals(this.name, S_SECURITY_SYSTEMS_ELECTRONIC);
@@ -972,13 +1026,24 @@ public class SkillType {
         lookupHash.put(S_ARTILLERY, createArtillery());
         lookupHash.put(S_GUN_BA, createGunneryBA());
         lookupHash.put(S_GUN_PROTO, createGunneryProto());
+        lookupHash.put(S_PILOT_PROTO, createPilotingProto());
         lookupHash.put(S_SMALL_ARMS, createSmallArms());
         lookupHash.put(S_ANTI_MEK, createAntiMek());
         lookupHash.put(S_TECH_MEK, createTechMek());
-        lookupHash.put(S_TECH_MECHANIC, createTechMechanic());
+        lookupHash.put(S_TECH_VEHICLE, createTechVehicle());
         lookupHash.put(S_TECH_AERO, createTechAero());
         lookupHash.put(S_TECH_BA, createTechBA());
         lookupHash.put(S_TECH_VESSEL, createTechVessel());
+        lookupHash.put(S_TECH_MILITARY, createTechMilitary());
+        lookupHash.put(S_TECH_CIVILIAN, createTechCivilian());
+        lookupHash.put(S_TECH_ELECTRONIC, createTechElectronic());
+        lookupHash.put(S_TECH_NUCLEAR, createTechNuclear());
+        lookupHash.put(S_TECH_AERONAUTICS, createTechAeronautics());
+        lookupHash.put(S_TECH_MECHANICAL, createTechMechanical());
+        lookupHash.put(S_TECH_MYOMER, createTechMyomer());
+        lookupHash.put(S_TECH_JETS, createTechJets());
+        lookupHash.put(S_TECH_WEAPONS, createTechWeapons());
+        lookupHash.put(S_TECH_CYBERNETICS, createTechCybernetics());
         lookupHash.put(S_ASTECH, createAstech());
         lookupHash.put(S_SURGERY, createSurgery());
         lookupHash.put(S_MEDTECH, createMedTech());
@@ -1165,6 +1230,12 @@ public class SkillType {
             case "Career/Any" + RP_ONLY_TAG -> "Career/Any";
             case "Running" + RP_ONLY_TAG -> "Running";
             case "Swimming" + RP_ONLY_TAG -> "Swimming";
+            // Anti-Mek gained its ATOW "(Climbing)" alias in its canonical name; map the legacy
+            // bare name (from older saves and infantry crew-skill data) to the current one.
+            case "Anti-Mek" -> S_ANTI_MEK;
+            // <50.01 compatibility handler
+            case "Tech/Mechanic" -> S_TECH_VEHICLE;
+            case "Tech/Aero" -> S_TECH_AERO;
             default -> skillName;
         };
         return skillName;
@@ -1186,7 +1257,7 @@ public class SkillType {
         } else if (en instanceof Infantry) {
             return S_ANTI_MEK;
         } else if (en instanceof ProtoMek) {
-            return S_GUN_PROTO;
+            return S_PILOT_PROTO;
         } else {
             return S_PILOT_MEK;
         }
@@ -1605,6 +1676,23 @@ public class SkillType {
         );
     }
 
+    public static SkillType createPilotingProto() {
+        return new SkillType(S_PILOT_PROTO,
+              7, // Not a typo
+              false,
+              COMBAT_PILOTING,
+              REFLEXES,
+              DEXTERITY,
+              2,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+        );
+    }
+
     public static SkillType createGunneryVehicle() {
         return new SkillType(S_GUN_VEE,
               7,
@@ -1731,9 +1819,9 @@ public class SkillType {
         );
     }
 
-    public static SkillType createTechMechanic() {
+    public static SkillType createTechVehicle() {
         // This skill corresponds to the ATOW skill 'Technician'
-        return new SkillType(S_TECH_MECHANIC,
+        return new SkillType(S_TECH_VEHICLE,
               10,
               false,
               SUPPORT_TECHNICIAN,
@@ -1794,6 +1882,196 @@ public class SkillType {
               10,
               false,
               SUPPORT_TECHNICIAN,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+        );
+    }
+
+    public static SkillType createTechMilitary() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_MILITARY,
+              10,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+        );
+    }
+
+    public static SkillType createTechCivilian() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_CIVILIAN,
+              10,
+              false,
+              ROLEPLAY_GENERAL,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+        );
+    }
+
+    public static SkillType createTechElectronic() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_ELECTRONIC,
+              10,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+        );
+    }
+
+    public static SkillType createTechNuclear() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_NUCLEAR,
+              10,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+        );
+    }
+
+    public static SkillType createTechAeronautics() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_AERONAUTICS,
+              10,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+        );
+    }
+
+    public static SkillType createTechMechanical() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_MECHANICAL,
+              10,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+        );
+    }
+
+    public static SkillType createTechMyomer() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_MYOMER,
+              10,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+        );
+    }
+
+    public static SkillType createTechJets() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_JETS,
+              10,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+        );
+    }
+
+    public static SkillType createTechWeapons() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_WEAPONS,
+              10,
+              false,
+              UTILITY,
+              DEXTERITY,
+              INTELLIGENCE,
+              null,
+              null,
+              null,
+              null,
+              null,
+              null,
+              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
+                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+        );
+    }
+
+    public static SkillType createTechCybernetics() {
+        // This skill corresponds to the ATOW skill 'Technician'
+        return new SkillType(S_TECH_CYBERNETICS,
+              10,
+              false,
+              ROLEPLAY_GENERAL,
               DEXTERITY,
               INTELLIGENCE,
               null,

@@ -41,6 +41,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.*;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -187,6 +188,9 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
         boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
         boolean isStartOfMonth = today.getDayOfMonth() == 1;
         boolean singleDrop = isSingleDropMode();
+        // "Essential Scenarios Only" suppresses the ambient, over-time scenario stream, leaving just the contract's
+        // strategic-objective (Essential) scenarios, which are spawned separately below.
+        boolean essentialScenariosOnly = campaign.getCampaignOptions().get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
 
         // run scenario generation routine for every track attached to an active contract
         for (AbstractContract contract : campaign.getActiveContracts()) {
@@ -195,6 +199,10 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             if (campaignState == null) {
                 continue;
             }
+
+            // Strategic-objective scenarios trickle in over the contract's months, paced by its scenario schedule,
+            // rather than all being placed at contract start.
+            processScheduledStrategicScenarios(campaign, contract, campaignState, today);
 
             boolean hasAssignedSingleDropScenario = false;
             for (StratConTrackState track : campaignState.getTracks()) {
@@ -219,8 +227,8 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                     }
                 }
 
-                // on monday, generate new scenario dates
-                if (isMonday && !hasAssignedSingleDropScenario) {
+                // on monday, generate new scenario dates - unless Essential-only play suppresses ambient scenarios
+                if (!essentialScenariosOnly && isMonday && !hasAssignedSingleDropScenario) {
                     getScenarioGenerationStrategy().generateWeeklyScenarioDates(campaign,
                           campaignState,
                           contract,
@@ -236,7 +244,7 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
 
             List<LocalDate> weeklyScenarioDates = campaignState.getWeeklyScenarios();
 
-            if (weeklyScenarioDates.contains(today)) {
+            if (!essentialScenariosOnly && weeklyScenarioDates.contains(today)) {
                 int scenarioCount = 0;
                 for (LocalDate date : weeklyScenarioDates) {
                     if (date.equals(today)) {
@@ -254,6 +262,34 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                           scenarioCount);
                 }
             }
+        }
+    }
+
+    /**
+     * Spawns the strategic-objective scenarios whose pre-rolled spawn day has arrived.
+     *
+     * <p>At contract start each strategic scenario is assigned a random day within its scheduled month (see
+     * {@code StratConContractInitializer#scheduleStrategicScenarioSpawnDates()}); those days are drained from
+     * {@link StratConCampaignState#getStrategicScenarioSpawnDates()} here. Every date on or before today is spawned and
+     * removed, so a skipped day or a save loaded past a date still catches up. Each due date is one scenario, placed
+     * across the tracks via {@link StratConContractInitializer#spawnScheduledStrategicScenarios}.</p>
+     */
+    private static void processScheduledStrategicScenarios(Campaign campaign, AbstractContract contract,
+          StratConCampaignState campaignState, LocalDate today) {
+        List<LocalDate> spawnDates = campaignState.getStrategicScenarioSpawnDates();
+        if (spawnDates.isEmpty()) {
+            return;
+        }
+
+        int before = spawnDates.size();
+        spawnDates.removeIf(spawnDate -> !spawnDate.isAfter(today));
+        int dueCount = before - spawnDates.size();
+
+        // The due dates are consumed above whatever happens. If the OpFor is routed, those scenarios are simply
+        // skipped rather than spawned - clearly the enemy is in no state to contest the objective - matching how the
+        // ambient weekly scenarios are discarded while routed.
+        if ((dueCount > 0) && !contract.getMoraleLevel().isRouted()) {
+            StratConContractInitializer.spawnScheduledStrategicScenarios(campaign, contract, dueCount);
         }
     }
 

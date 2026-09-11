@@ -421,6 +421,50 @@ class ContractHistoryDataTest {
     }
 
     /**
+     * The regression behind issue #9815. A scenario's contract id is a back-pointer that is never written to the save -
+     * scenarios are nested inside their contract instead - and both load paths add scenarios straight to the
+     * contract's list rather than through {@code AbstractContract.addScenario}, which is what stamps it. Without the
+     * restore in {@code Campaign.importMission} every reloaded scenario comes back with no contract, which crashed the
+     * Briefing Room the moment one was selected.
+     */
+    @Test
+    void aRestoredScenarioStillKnowsWhichContractItBelongsTo() throws Exception {
+        AbstractContract accepted = acceptInto(campaign, "Reach Garrison");
+        Scenario scenario = new Scenario("Ambush at Rasalhague");
+        scenario.setId(4242);
+        accepted.addScenario(scenario);
+
+        Campaign reloaded = MHQTestUtilities.getTestCampaign();
+        load(reloaded, write(campaign));
+
+        Scenario restoredScenario = reloaded.getScenario(4242);
+        assertNotNull(restoredScenario, "a restored contract's scenarios must be reachable through the campaign");
+        assertEquals(accepted.getId(), restoredScenario.getMissionId(),
+              "a restored scenario must point back at its own contract, not null");
+    }
+
+    /**
+     * The lookup the Briefing Room, scenario resolution and the game launcher all make. Asserting the id alone would
+     * pass on an id that resolves to nothing, so this follows it all the way back to the contract object.
+     */
+    @Test
+    void aRestoredScenariosContractResolvesThroughTheCampaign() throws Exception {
+        AbstractContract accepted = acceptInto(campaign, "Reach Garrison");
+        Scenario scenario = new Scenario("Ambush at Rasalhague");
+        scenario.setId(4242);
+        accepted.addScenario(scenario);
+
+        Campaign reloaded = MHQTestUtilities.getTestCampaign();
+        load(reloaded, write(campaign));
+
+        Scenario restoredScenario = reloaded.getScenario(4242);
+        assertNotNull(restoredScenario);
+        AbstractContract restoredContract = reloaded.getContract(restoredScenario.getMissionId());
+        assertNotNull(restoredContract, "looking a restored scenario's contract up by id must not come back null");
+        assertEquals("Reach Garrison", restoredContract.getName());
+    }
+
+    /**
      * A contract in the history was accepted, so it has a status. Saves written before acceptance set one carry none;
      * those load as active rather than dropping out of every status filter.
      */

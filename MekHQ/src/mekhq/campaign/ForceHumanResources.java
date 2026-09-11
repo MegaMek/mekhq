@@ -37,7 +37,6 @@ import static java.lang.Math.floor;
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
 import static mekhq.campaign.personnel.PersonUtility.setVeterancyAwardEligibility;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_ILL_DO_IT_MYSELF;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
@@ -52,6 +51,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import megamek.Version;
@@ -82,13 +82,13 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.MedicalLogger;
-import mekhq.campaign.market.PersonnelMarket;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
+import mekhq.campaign.personnel.enums.GeneticLegacyRole;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -100,6 +100,8 @@ import mekhq.campaign.personnel.generator.RandomPortraitGenerator;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryTypes;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitIssuer;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -155,9 +157,6 @@ public class ForceHumanResources {
     private RetirementDefectionTracker retirementDefectionTracker;
 
     private NewPersonnelMarket newPersonnelMarket;
-
-    @Deprecated(since = "0.50.06")
-    private PersonnelMarket personnelMarket;
 
     private transient AbstractDivorce divorce;
     private transient AbstractMarriage marriage;
@@ -225,7 +224,13 @@ public class ForceHumanResources {
 
         List<Person> activePersonnel = new ArrayList<>();
 
-        for (Person person : getPersonnel()) {
+        // Snapshot the personnel collection before iterating: the Force Generator's SwingWorker
+        // mutates the personnel map (recruitPerson during support-personnel generation) while the EDT
+        // calls this method (e.g. through PartsAcquisitionService.generateSummaryCounts ->
+        // Campaign.getLogisticsPerson, triggered by Swing Timers in RepairTab.refreshPartsAcquisition).
+        // Without the snapshot the EDT trips ConcurrentModificationException on the iterator backing
+        // getPersonnel(). Matches the snapshot pattern applied to getServiceableUnits.
+        for (Person person : new ArrayList<>(getPersonnel())) {
             PersonnelStatus status = person.getStatus();
             PrisonerStatus prisonerStatus = person.getPrisonerStatus();
             boolean isActive = status.isActiveFlexible();
@@ -888,16 +893,23 @@ public class ForceHumanResources {
      * @return available slots (negative = surplus temp crew)
      */
     private int getRoleSpecificNeeds(Unit unit, PersonnelRole role) {
+        // Large vessels require at least one real crew member in a role before temp crew may fill the rest.
         return switch (role) {
-            case VESSEL_PILOT -> unit.getTotalDriverNeeds()
-                                       - unit.getDrivers().size()
-                                       - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
-            case VESSEL_GUNNER -> unit.getTotalGunnerNeeds()
-                                        - unit.getGunners().size()
-                                        - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER);
-            case VESSEL_CREW -> unit.getTotalCrewNeeds()
-                                      - unit.getVesselCrew().size()
-                                      - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW);
+            case VESSEL_PILOT -> unit.hasRealCrewInVesselRole(PersonnelRole.VESSEL_PILOT) ?
+                                       unit.getTotalDriverNeeds()
+                                             - unit.getDrivers().size()
+                                             - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT) :
+                                       -unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
+            case VESSEL_GUNNER -> unit.hasRealCrewInVesselRole(PersonnelRole.VESSEL_GUNNER) ?
+                                        unit.getTotalGunnerNeeds()
+                                              - unit.getGunners().size()
+                                              - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER) :
+                                        -unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_GUNNER);
+            case VESSEL_CREW -> unit.hasRealCrewInVesselRole(PersonnelRole.VESSEL_CREW) ?
+                                      unit.getTotalCrewNeeds()
+                                            - unit.getVesselCrew().size()
+                                            - unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW) :
+                                      -unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW);
             default -> unit.getFullCrewSize()
                              - unit.getActiveCrew().size()
                              - unit.getTempCrewByPersonnelRole(role);
@@ -1000,34 +1012,12 @@ public class ForceHumanResources {
         emptyTempCrewPoolForRole(campaign, role);
     }
 
-
-    @Deprecated(since = "0.50.06")
-    public PersonnelMarket getPersonnelMarket() {
-        return personnelMarket;
-    }
-
-    @Deprecated(since = "0.50.06")
-    public void setPersonnelMarket(final PersonnelMarket personnelMarket) {
-        this.personnelMarket = personnelMarket;
-    }
-
     public NewPersonnelMarket getNewPersonnelMarket() {
         return newPersonnelMarket;
     }
 
     public void setNewPersonnelMarket(final NewPersonnelMarket newPersonnelMarket) {
         this.newPersonnelMarket = newPersonnelMarket;
-    }
-
-    /**
-     * Returns {@code true} when campaign options select the legacy (deprecated) personnel market.
-     *
-     * <p>The market style named {@code PERSONNEL_MARKET_DISABLED} disables the <em>new</em> market
-     * and causes the legacy market to run instead — the name is counterintuitive, so this predicate makes the intent
-     * explicit at every call site.</p>
-     */
-    public static boolean isUsingLegacyPersonnelMarket(CampaignOptions options) {
-        return options.get(CampaignOption.PERSONNEL_MARKET_STYLE) == PERSONNEL_MARKET_DISABLED;
     }
 
     /**
@@ -1038,17 +1028,10 @@ public class ForceHumanResources {
      *                               campaign start
      */
     public void refreshApplicants(Campaign campaign, boolean bypassDateRestrictions) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         LocalDate currentDay = campaign.getLocalDate();
 
-        if (isUsingLegacyPersonnelMarket(campaignOptions)) {
-            if (personnelMarket != null) {
-                personnelMarket.generatePersonnelForDay(campaign);
-            }
-        } else {
-            if (currentDay.getDayOfMonth() == 1 || bypassDateRestrictions) {
+        if (currentDay.getDayOfMonth() == 1 || bypassDateRestrictions) {
                 newPersonnelMarket.gatherApplications();
-            }
         }
     }
 
@@ -1450,8 +1433,35 @@ public class ForceHumanResources {
     public static List<Person> getTechsExpanded(Collection<Person> people, Collection<Unit> units,
           CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today,
           boolean noZeroMinute, boolean eliteFirst, boolean expanded) {
+        return getTechs(people, units, campaignOptions, isClanCampaign, today, noZeroMinute, eliteFirst,
+              expanded ? Person::isTechExpanded : Person::isTech);
+    }
+
+    /**
+     * Retrieves a list of active technicians eligible under a supplied eligibility predicate, applying the same minute
+     * filtering, self-crewed engineer inclusion, and sorting as the role-based variants.
+     *
+     * <p>This lets callers decide eligibility by whatever rule fits their context - for example a role-based test
+     * ({@link Person#isTech()}) for maintenance capacity, or a purely skill-based test ({@link Person#hasTechSkill()})
+     * for the repair tab, where any person who has the right skill should be offered regardless of their
+     * profession.</p>
+     *
+     * @param people          the collection of people to search
+     * @param units           the collection of units (for self-crewed engineers)
+     * @param campaignOptions the campaign options
+     * @param isClanCampaign  whether this is a Clan campaign
+     * @param today           the current in-game date
+     * @param noZeroMinute    if {@code true}, excludes technicians with no remaining available minutes
+     * @param eliteFirst      if {@code true}, sorts the list to place the most skilled technicians at the top
+     * @param isEligibleTech  the predicate deciding whether a person qualifies as a technician
+     *
+     * @return a list of active technicians sorted appropriately
+     */
+    public static List<Person> getTechs(Collection<Person> people, Collection<Unit> units,
+          CampaignOptions campaignOptions, boolean isClanCampaign, LocalDate today,
+          boolean noZeroMinute, boolean eliteFirst, Predicate<Person> isEligibleTech) {
         final List<Person> techs = people.stream()
-                                         .filter(person -> (expanded ? person.isTechExpanded() : person.isTech()) &&
+                                         .filter(person -> isEligibleTech.test(person) &&
                                                                  (!noZeroMinute || (person.getMinutesLeft() > 0)))
                                          .collect(Collectors.toList());
 
@@ -1496,6 +1506,28 @@ public class ForceHumanResources {
     }
 
     /**
+     * Retrieves active personnel eligible to work on a part by <em>skill</em> rather than profession: anyone who has a
+     * technician repair skill ({@link Person#hasTechSkill()}) is included, regardless of their assigned role. Self-
+     * crewed unit engineers are added and the list is sorted as with the role-based variants.
+     *
+     * <p>Used by the repair tab so a specialist (e.g. a pilot who happens to have Technician/Weapons) can be offered
+     * for a job even though they hold no tech profession.</p>
+     *
+     * @param units           the collection of units (for self-crewed engineers)
+     * @param campaignOptions the campaign options
+     * @param isClanCampaign  whether this is a Clan campaign
+     * @param today           the current in-game date
+     * @param noZeroMinute    if {@code true}, excludes technicians with no remaining available minutes
+     *
+     * @return a list of skill-eligible technicians sorted appropriately
+     */
+    public List<Person> getSkilledTechs(Collection<Unit> units, CampaignOptions campaignOptions,
+          boolean isClanCampaign, LocalDate today, boolean noZeroMinute) {
+        return getTechs(getActivePersonnel(false, false), units, campaignOptions, isClanCampaign, today,
+              noZeroMinute, false, Person::hasTechSkill);
+    }
+
+    /**
      * Parses a {@code <humanResources>} node and returns a populated {@link ForceHumanResources} instance.
      *
      * @param wn       the {@code <humanResources>} node
@@ -1536,8 +1568,6 @@ public class ForceHumanResources {
                 } else if (nodeName.equalsIgnoreCase("personnel")) {
                     InjuryTypes.registerAll();
                     LocalPersonnel.loadFromXML(childNode, campaign, version);
-                } else if (nodeName.equalsIgnoreCase("personnelMarket")) {
-                    hr.personnelMarket = PersonnelMarket.generateInstanceFromXML(childNode, campaign, version);
                 } else if (nodeName.equalsIgnoreCase("retirementDefectionTracker")) {
                     hr.retirementDefectionTracker = RetirementDefectionTracker.generateInstanceFromXML(childNode,
                           campaign);
@@ -1589,7 +1619,8 @@ public class ForceHumanResources {
                 continue;
             }
 
-            if (defaultMaxAcquisitions > 0 && (person.getAcquisitions() >= defaultMaxAcquisitions)) {
+            if (defaultMaxAcquisitions > 0 &&
+                      (person.getAcquisitions() >= maxAcquisitionsFor(person, defaultMaxAcquisitions))) {
                 continue;
             }
 
@@ -1621,6 +1652,34 @@ public class ForceHumanResources {
             return Integer.MIN_VALUE;
         }
         return skill.getTotalSkillLevel(person.getSkillModifierData(isUseAgingEffects, isClanCampaign, today));
+    }
+
+    /**
+     * Returns the maximum number of acquisition attempts {@code person} is allowed in a period.
+     *
+     * <p>This is the campaign's base {@link CampaignOption#MAX_ACQUISITIONS} limit, plus one for personnel with the
+     * {@link PersonnelOptions#ADMIN_SCROUNGE} special ability. A {@code baseMaxAcquisitions} of zero or less means the
+     * limit is disabled (unlimited attempts) and is returned unchanged so callers can keep their existing "no limit"
+     * checks.</p>
+     *
+     * <p>This must be the single source of truth for the per-person cap: both the procurement personnel filters
+     * ({@link #getLogisticsPerson} and {@link #getLogisticsPersonnel}) and {@code Campaign.canAcquireParts} rely on it
+     * agreeing, otherwise a Scrounge admin at the base cap can be filtered out before their bonus attempt is ever
+     * considered.</p>
+     *
+     * @param person              the person whose cap is being computed
+     * @param baseMaxAcquisitions the campaign's base acquisition limit
+     *
+     * @return the effective maximum acquisition attempts for {@code person}
+     */
+    public static int maxAcquisitionsFor(Person person, int baseMaxAcquisitions) {
+        if (baseMaxAcquisitions <= 0) {
+            return baseMaxAcquisitions;
+        }
+        if (person.getOptions().booleanOption(PersonnelOptions.ADMIN_SCROUNGE)) {
+            return baseMaxAcquisitions + 1;
+        }
+        return baseMaxAcquisitions;
     }
 
     /**
@@ -1658,7 +1717,8 @@ public class ForceHumanResources {
                 continue;
             }
 
-            if ((maxAcquisitions > 0) && (person.getAcquisitions() >= maxAcquisitions)) {
+            if ((maxAcquisitions > 0) &&
+                      (person.getAcquisitions() >= maxAcquisitionsFor(person, maxAcquisitions))) {
                 continue;
             }
             if (isAnyTech) {
@@ -1894,7 +1954,44 @@ public class ForceHumanResources {
      * @param person     the bloodname candidate
      * @param ignoreDice if true, skips the random roll and assigns a bloodname automatically
      */
+    /**
+     * The hardest a Bloodname roll can get. 2d6 reaches 12, so a target above this could never be met
+     * and a warrior on it still has one chance in thirty-six.
+     */
+    static final int MAXIMUM_BLOODNAME_TARGET = 12;
+
+    /**
+     * One Bloodnamed warrior in this many has their genetic legacy in active use in the breeding
+     * program.
+     *
+     * <p>Winning a Bloodname makes a legacy eligible, not used. A House holds twenty-five Bloodrights
+     * and a Clan runs far fewer sibkos than it has Bloodnamed warriors, so most carry no role. The
+     * exact share is not given in any source; this is a judgement that keeps genefathers and
+     * genemothers uncommon enough to be worth remarking on.</p>
+     */
+    private static final int LEGACY_IN_USE_DENOMINATOR = 4;
+
     public void checkBloodnameAdd(Campaign campaign, Person person, boolean ignoreDice) {
+        checkBloodnameAdd(campaign, person, ignoreDice, 0);
+    }
+
+    /**
+     * As {@link #checkBloodnameAdd(Campaign, Person, boolean)}, with an adjustment to the target
+     * number the roll has to beat.
+     *
+     * <p>The roll is made on 2d6 against a target built from the warrior's skills, the unit's rating,
+     * the era and their rank, so a lower target means a better chance. A caller that knows something
+     * about the warrior's standing which those inputs do not capture can shift it here - the Force
+     * Generator uses this to reflect the calibre of the force as a whole, a veteran or front-line
+     * Cluster carrying more Bloodnamed warriors than a garrison unit of the same individual skills.
+     *
+     * @param campaign       the campaign the person belongs to
+     * @param person         the person who may earn a Bloodname
+     * @param ignoreDice     {@code true} to award one outright, bypassing the roll entirely
+     * @param targetModifier added to the target number; negative values make a Bloodname likelier
+     */
+    public void checkBloodnameAdd(Campaign campaign, Person person, boolean ignoreDice,
+          int targetModifier) {
         if (!person.isClanPersonnel() || person.getPhenotype().isNone()) {
             return;
         }
@@ -2041,21 +2138,94 @@ public class ForceHumanResources {
 
             bloodnameTarget += Math.min(0,
                   campaign.getPlayerForce().getRankSystem().getOfficerCut() - person.getRankNumeric());
+            // 2d6 cannot beat 12, so a higher target is not "hard", it is impossible - and the target
+            // starts at 6 plus two skill values, which puts every tier below Elite out of reach on
+            // skill alone. Winning a Trial of Bloodright is meant to be a long shot for an ordinary
+            // warrior, not something the dice forbid outright.
+            bloodnameTarget = Math.min(bloodnameTarget, MAXIMUM_BLOODNAME_TARGET);
+
+            // The caller's adjustment lands on the capped target rather than being absorbed by it, so
+            // a better force is genuinely better off instead of being levelled with a green one.
+            bloodnameTarget = Math.min(bloodnameTarget + targetModifier, MAXIMUM_BLOODNAME_TARGET);
         }
+
+        // Every trueborn descends from a House whether or not they ever win its name, so the descent is
+        // settled first and the roll only decides whether they may carry it.
+        assignBloodhouse(campaign, person);
 
         if (ignoreDice || (d6(2) >= bloodnameTarget)) {
-            final Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
-
-            final Bloodname bloodname = Bloodname.randomBloodname((campaign.getPlayerForce().getFaction().isClan() ?
-                                                                         campaign.getPlayerForce().getFaction() :
-                                                                         person.getOriginFaction()).getShortName(),
-                  phenotype,
-                  campaign.getGameYear());
-            if (bloodname != null) {
-                person.setBloodname(bloodname.getName());
-                personUpdated(campaign, person);
+            if (!person.hasBloodhouse()) {
+                LOGGER.debug("[Bloodname] {} won a Bloodright but has no House to take a name from",
+                      person.getFullName());
+                return;
             }
+            // A warrior competes for a Bloodright within their own House, so the name they win is that
+            // House's - not an unrelated legacy drawn afresh.
+            person.setBloodname(person.getBloodhouse());
+            assignGeneticLegacyRole(person);
+            personUpdated(campaign, person);
         }
+    }
+
+    /**
+     * Decides whether a newly Bloodnamed warrior's genetic legacy has been taken into their Clan's
+     * breeding program, and in which role.
+     *
+     * <p>Winning a Bloodname makes a warrior's legacy eligible; it does not put it to use. Only a
+     * minority are drawn on at any one time, so most Bloodnamed warriors carry no role.</p>
+     *
+     * <p>Neither role follows from the warrior's own sex. Clan scientists implant the DNA of either
+     * sex into either cell, so a woman may be a genefather and a man a genemother.</p>
+     *
+     * @param person the warrior who has just won their Bloodname
+     */
+    private static void assignGeneticLegacyRole(Person person) {
+        if (randomInt(LEGACY_IN_USE_DENOMINATOR) != 0) {
+            return;
+        }
+
+        GeneticLegacyRole role = (randomInt(2) == 0)
+              ? GeneticLegacyRole.GENEFATHER
+              : GeneticLegacyRole.GENEMOTHER;
+        person.setGeneticLegacyRole(role);
+        LOGGER.debug("[Bloodname] {}'s legacy taken into the breeding program as {}",
+              person.getFullName(), role);
+    }
+
+    /**
+     * Records which Bloodname House a trueborn warrior was bred from, if it is not already known.
+     *
+     * <p>Every trueborn comes out of a House's genetic legacy; only a minority ever win the right to
+     * carry its name. This is the first of those two facts, and it holds for a warrior who never wins a
+     * Trial of Bloodright at all.</p>
+     *
+     * <p>The House is drawn with the same weighting that decides which name a warrior could win, so a
+     * warrior descends from a legacy their Clan actually holds, of a phenotype it breeds for.</p>
+     *
+     * @param campaign the campaign the warrior belongs to, supplying the Clan and the year
+     * @param person   the warrior whose descent is being settled
+     */
+    public void assignBloodhouse(Campaign campaign, Person person) {
+        if (!person.isClanPersonnel() || !person.getPhenotype().isTrueborn()) {
+            return;
+        }
+        if (person.hasBloodhouse()) {
+            return;
+        }
+
+        Phenotype phenotype = person.getPhenotype().isNone() ? Phenotype.GENERAL : person.getPhenotype();
+        Faction bloodhouseFaction = campaign.getPlayerForce().getFaction().isClan()
+              ? campaign.getPlayerForce().getFaction()
+              : person.getOriginFaction();
+        Bloodname house = Bloodname.randomBloodname(bloodhouseFaction.getShortName(), phenotype,
+              campaign.getGameYear());
+        if (house == null) {
+            LOGGER.debug("[Bloodname] no House available for {} of {} in {}", person.getFullName(),
+                  bloodhouseFaction.getShortName(), campaign.getGameYear());
+            return;
+        }
+        person.setBloodhouse(house.getName());
+        personUpdated(campaign, person);
     }
 
     /**
@@ -2386,6 +2556,11 @@ public class ForceHumanResources {
             }
         }
 
+        if (employ && prisonerStatus.isFreeOrBondsman()) {
+            ArmorKitIssuer.equipDefaultKitOnRecruitment(person, campaign, gmAdd);
+            EquipmentKitIssuer.equipDefaultToolKitOnRecruitment(person, campaign, gmAdd);
+        }
+
         MekHQ.triggerEvent(new PersonNewEvent(person));
         return true;
     }
@@ -2589,11 +2764,6 @@ public class ForceHumanResources {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "personWhoAdvancedInXP", person.getId());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "personnelWhoAdvancedInXP");
-
-        // Personnel market (deprecated)
-        if (personnelMarket != null) {
-            personnelMarket.writeToXML(writer, indent, campaign);
-        }
 
         // New recruitment is managed at campaign level (newPersonnelMarket) — not written here
         // as it writes at campaign info level

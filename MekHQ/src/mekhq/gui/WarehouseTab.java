@@ -56,16 +56,16 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.equipment.MiscType;
-import megamek.common.equipment.WeaponType;
 import megamek.common.event.Subscribe;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
+import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
@@ -79,18 +79,8 @@ import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.PartsInUseManager;
-import mekhq.campaign.parts.AmmoStorage;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
-import mekhq.campaign.parts.TankLocation;
-import mekhq.campaign.parts.equipment.EquipmentPart;
-import mekhq.campaign.parts.meks.MekActuator;
-import mekhq.campaign.parts.meks.MekGyro;
-import mekhq.campaign.parts.meks.MekLifeSupport;
-import mekhq.campaign.parts.meks.MekLocation;
-import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -104,6 +94,7 @@ import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.PartsReportDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.LocationFilterItem;
+import mekhq.gui.model.PartsFilterGroup;
 import mekhq.gui.model.PartsTableModel;
 import mekhq.gui.model.TechTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
@@ -112,7 +103,6 @@ import mekhq.gui.sorter.PartsDetailSorter;
 import mekhq.gui.sorter.TechSorter;
 import mekhq.gui.sorter.WarehouseStatusSorter;
 import mekhq.service.enums.MRMSMode;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Displays all spare parts in stock, parts on order, and permits repair of damaged parts.
@@ -121,28 +111,15 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private static final MMLogger LOGGER = MMLogger.create(WarehouseTab.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
-    // parts filter groups
-    private static final int SG_ALL = 0;
-    private static final int SG_ARMOR = 1;
-    private static final int SG_SYSTEM = 2;
-    private static final int SG_EQUIP = 3;
-    private static final int SG_LOC = 4;
-    private static final int SG_WEAPON = 5;
-    private static final int SG_AMMO = 6;
-    private static final int SG_MISC = 7;
-    private static final int SG_ENGINE = 8;
-    private static final int SG_GYRO = 9;
-    private static final int SG_ACT = 10;
-    private static final int SG_NUM = 11;
-
     // parts views
     private static final int SV_ALL = 0;
-    private static final int SV_IN_TRANSIT = 1;
-    private static final int SV_RESERVED = 2;
-    private static final int SV_SPARE = 3;
-    private static final int SV_UNDAMAGED = 4;
-    private static final int SV_DAMAGED = 5;
-    private static final int SV_NUM = 6;
+    private static final int SV_PRESENT = 1;
+    private static final int SV_SPARE = 2;
+    private static final int SV_IN_TRANSIT = 3;
+    private static final int SV_RESERVED = 4;
+    private static final int SV_UNDAMAGED = 5;
+    private static final int SV_DAMAGED = 6;
+    private static final int SV_NUM = 7;
 
     private JTable partsTable;
     private JTable techTable;
@@ -210,8 +187,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         panSupplies.add(new JLabel(resourceMap.getString("lblPartsChoice.text")), gridBagConstraints);
 
         DefaultComboBoxModel<String> partsGroupModel = new DefaultComboBoxModel<>();
-        for (int i = 0; i < SG_NUM; i++) {
-            partsGroupModel.addElement(getPartsGroupName(i));
+        for (PartsFilterGroup group : PartsFilterGroup.values()) {
+            partsGroupModel.addElement(group.getGroupName());
         }
         choiceParts = new JComboBox<>(partsGroupModel);
         choiceParts.setSelectedIndex(0);
@@ -534,6 +511,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void filterParts() {
+        if (getCampaign().isBulkGenerationInProgress()) {
+            LOGGER.debug("[CompanyGen] warehouse filter skipped. Bulk generation in progress");
+            return;
+        }
+
         final int nGroup = choiceParts.getSelectedIndex();
         final int nGroupView = choicePartsView.getSelectedIndex();
         RowFilter<PartsTableModel, Integer> partsTypeFilter = new RowFilter<>() {
@@ -541,37 +523,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
             public boolean include(Entry<? extends PartsTableModel, ? extends Integer> entry) {
                 PartsTableModel partsModel = entry.getModel();
                 Part part = partsModel.getPartAt(entry.getIdentifier());
-                boolean inGroup = false;
                 boolean inView = false;
 
                 // Check grouping
-                if (nGroup == SG_ALL) {
-                    inGroup = true;
-                } else if (nGroup == SG_ARMOR) {
-                    inGroup = (part instanceof Armor); // ProtoMekArmor and BAArmor are derived from Armor
-                } else if (nGroup == SG_SYSTEM) {
-                    inGroup = part instanceof MekGyro ||
-                                    part instanceof EnginePart ||
-                                    part instanceof MekActuator ||
-                                    part instanceof MekLifeSupport ||
-                                    part instanceof MekSensor;
-                } else if (nGroup == SG_EQUIP) {
-                    inGroup = part instanceof EquipmentPart;
-                } else if (nGroup == SG_LOC) {
-                    inGroup = part instanceof MekLocation || part instanceof TankLocation;
-                } else if (nGroup == SG_WEAPON) {
-                    inGroup = part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof WeaponType;
-                } else if (nGroup == SG_AMMO) {
-                    inGroup = part instanceof AmmoStorage;
-                } else if (nGroup == SG_MISC) {
-                    inGroup = part instanceof EquipmentPart && ((EquipmentPart) part).getType() instanceof MiscType;
-                } else if (nGroup == SG_ENGINE) {
-                    inGroup = part instanceof EnginePart;
-                } else if (nGroup == SG_GYRO) {
-                    inGroup = part instanceof MekGyro;
-                } else if (nGroup == SG_ACT) {
-                    inGroup = part instanceof MekActuator;
-                }
+                boolean inGroup = PartsFilterGroup.matches(nGroup, part);
 
                 // Check view
                 if (nGroupView == SV_ALL) {
@@ -586,6 +541,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                     inView = !part.needsFixing();
                 } else if (nGroupView == SV_DAMAGED) {
                     inView = part.needsFixing();
+                } else if (nGroupView == SV_PRESENT) {
+                    inView = part.isSpare() && part.isPresent();
                 }
 
                 String searchText = txtPartsSearch.getText().trim();
@@ -601,31 +558,15 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         partsSorter.setRowFilter(partsTypeFilter);
     }
 
-    public static String getPartsGroupName(int group) {
-        return switch (group) {
-            case SG_ALL -> "All Parts";
-            case SG_ARMOR -> "Armor";
-            case SG_SYSTEM -> "System Components";
-            case SG_EQUIP -> "Equipment";
-            case SG_LOC -> "Locations";
-            case SG_WEAPON -> "Weapons";
-            case SG_AMMO -> "Ammunition";
-            case SG_MISC -> "Miscellaneous Equipment";
-            case SG_ENGINE -> "Engines";
-            case SG_GYRO -> "Gyros";
-            case SG_ACT -> "Actuators";
-            default -> "?";
-        };
-    }
-
     public static String getPartsGroupViewName(int view) {
         return switch (view) {
-            case SV_ALL -> "All";
-            case SV_IN_TRANSIT -> "In Transit";
-            case SV_RESERVED -> "Reserved for Refit/Repair";
-            case SV_SPARE -> "Spares";
-            case SV_UNDAMAGED -> "Undamaged";
-            case SV_DAMAGED -> "Damaged";
+            case SV_ALL -> getTextAt(RESOURCE_BUNDLE, "partsView.All.text");
+            case SV_IN_TRANSIT -> getTextAt(RESOURCE_BUNDLE, "partsView.InTransit.text");
+            case SV_RESERVED -> getTextAt(RESOURCE_BUNDLE, "partsView.Reserved.text");
+            case SV_SPARE -> getTextAt(RESOURCE_BUNDLE, "partsView.Spares.text");
+            case SV_UNDAMAGED -> getTextAt(RESOURCE_BUNDLE, "partsView.Undamaged.text");
+            case SV_DAMAGED -> getTextAt(RESOURCE_BUNDLE, "partsView.Damaged.text");
+            case SV_PRESENT -> getTextAt(RESOURCE_BUNDLE, "partsView.Present.text");
             default -> "?";
         };
     }
@@ -764,8 +705,26 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     public void refreshPartsList() {
-        LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
+        // While a bulk generation is adding units/parts off the EDT, skip this refresh: the In Use
+        // computation walks every part in the warehouse and asks each one what it would cost to
+        // replace, which reads the part's owning unit. The worker is concurrently detaching parts
+        // from units, so a part could pass its own "do I have a unit" check here and have lost it a
+        // moment later, throwing NullPointerException out of the modal progress dialog's event pump.
+        // The generation fires an OrganizationChangedEvent when it completes, which reschedules this
+        // refresh against the finished, consistent campaign.
+        if (getCampaign().isBulkGenerationInProgress()) {
+            LOGGER.debug("[CompanyGen] warehouse refresh skipped - bulk generation in progress");
+            return;
+        }
 
+        // Recompute the In Use snapshot on every refresh. PartsTableModel renders the In Use column
+        // from a one-shot map; without this call it stays at whatever it was at construction time,
+        // so a campaign that adds units after the WarehouseTab exists (force-generated or imported)
+        // reads 0 across the board even when units clearly carry the parts.
+        PartsInUseManager partsInUseManager = new PartsInUseManager(getCampaign());
+        partsModel.setPartsInUse(partsInUseManager.getPartsInUse(true, false, QUALITY_A));
+
+        LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
         List<Part> parts = locationFilter.selectSpareParts(getCampaign());
         partsModel.setData(parts);
         getCampaign().getPlayerForce().getShoppingList().removeZeroQuantityFromList(); // To
@@ -874,7 +833,24 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     @Subscribe
     public void handle(PartChangedEvent ev) {
-        filterParts();
+        // Dispatch onto the EDT regardless of caller thread. filterParts() rebuilds a RowFilter
+        // and applies it to the TableRowSorter; both are Swing operations and must run on the
+        // EDT. Off-EDT calls are possible whenever a worker thread (e.g. the ratgen pipeline's
+        // Stage 8 spare-parts stock-up) triggers a PartChangedEvent through Quartermaster.addPart,
+        // which would race the EDT for the underlying Document/table locks the same way the
+        // ReportEvent deadlock did.
+        SwingUtilities.invokeLater(this::filterParts);
+    }
+
+    /**
+     * A force generation adds its parts while {@link Campaign#isBulkGenerationInProgress()} is true, so every
+     * {@link PartNewEvent} it raises is dropped by the guard at the top of {@link #refreshPartsList()}. Generation ends
+     * by firing this event and nothing else, so without this handler no refresh ever runs against the finished
+     * campaign: the warehouse is full and the table still shows what it held before the build.
+     */
+    @Subscribe
+    public void handle(OrganizationChangedEvent ev) {
+        partsScheduler.schedule();
     }
 
     @Subscribe

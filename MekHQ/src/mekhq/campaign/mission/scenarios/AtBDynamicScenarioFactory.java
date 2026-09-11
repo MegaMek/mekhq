@@ -102,6 +102,7 @@ import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.planetaryConditions.Wind;
 import megamek.common.units.*;
 import megamek.common.universe.FactionTag;
@@ -140,6 +141,7 @@ import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -360,7 +362,15 @@ public class AtBDynamicScenarioFactory {
                 LOGGER.info("++ Generating a force for the {} template ++",
                       forceTemplate.getForceName().toUpperCase());
 
-                if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedMUL.ordinal()) {
+                if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.None.ordinal()) {
+                    if (scenario.getStratConScenarioType().isMoleHunt() &&
+                              forceTemplate.getForceName().contains("Mole")) {
+                        generatedLanceCount += generateMole(scenario, contract, campaign, forceTemplate);
+                    } else if (scenario.getStratConScenarioType().isPrisonerLiberation() &&
+                                     forceTemplate.getForceName().contains("Prisoners")) {
+                        generatedLanceCount += generateEscapees(scenario, contract, campaign, forceTemplate);
+                    }
+                } else if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.FixedMUL.ordinal()) {
                     generatedLanceCount += generateFixedForce(scenario, contract, campaign, forceTemplate);
                 } else {
                     int weightClass = randomForceWeight();
@@ -377,6 +387,94 @@ public class AtBDynamicScenarioFactory {
         }
 
         return generatedLanceCount;
+    }
+
+    public static int generateEscapees(AtBDynamicScenario scenario, AbstractContract contract, Campaign campaign,
+          ScenarioForceTemplate forceTemplate) {
+        ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
+
+        String factionCode = contract.getEnemyFactionCode();
+        if (factionCode.isBlank()) {
+            LOGGER.error("Enemy faction code is blank; using fallback faction code. This is indicative of a deeper problem and should be reported.");
+            factionCode = "IS";
+        }
+
+        Faction faction = Factions.getInstance().getFaction(factionCode);
+        if (faction == null) {
+            LOGGER.error("Enemy faction {} does not exist; aborting escapee generation.", factionCode);
+            return 0;
+        }
+
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek("Mob (Small)");
+        if (mekSummary == null) {
+            LOGGER.error("Cannot find entry for Mob (Small)");
+            return 0;
+        }
+
+        Vector<Entity> generatedEntities = new Vector<>();
+        int mobCount = forceTemplate.getFixedUnitCount();
+        for (int i = 0; i < mobCount; i++) {
+            Entity escapee = createEntityWithCrew(faction, SkillLevel.ULTRA_GREEN, campaign, mekSummary, false);
+            if (escapee == null) {
+                LOGGER.error("Cannot create entity for Mob (Small)");
+                continue;
+            }
+
+            if (campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
+                updateArmorKits(scenario, escapee);
+            }
+
+            generatedEntities.add(escapee);
+        }
+
+        BotForce generatedForce = new BotForce();
+        generatedForce.setFixedEntityList(generatedEntities);
+        setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
+        scenario.addBotForce(generatedForce, forceTemplate, campaign);
+
+        return (int) floor(generatedEntities.size() / 4.0);
+    }
+
+    public static int generateMole(AtBDynamicScenario scenario, AbstractContract contract, Campaign campaign,
+          ScenarioForceTemplate forceTemplate) {
+        ForceAlignment forceAlignment = ForceAlignment.getForceAlignment(forceTemplate.getForceAlignment());
+
+        String factionCode = contract.getEnemyFactionCode();
+        Faction faction = Factions.getInstance().getFaction(factionCode);
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek("VIP");
+        if (mekSummary == null) {
+            LOGGER.error("Cannot find entry for VIP");
+            return 0;
+        }
+
+        Entity vip = createEntityWithCrew(faction, SkillLevel.ULTRA_GREEN, campaign, mekSummary, false);
+        if (vip == null) {
+            LOGGER.error("Cannot create entity for VIP");
+            return 0;
+        }
+
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_PLANETARY_MODIFIERS)) {
+            updateArmorKits(scenario, vip);
+        }
+
+        Vector<Entity> generatedEntities = new Vector<>();
+        generatedEntities.add(vip);
+
+        BotForce generatedForce = new BotForce();
+        generatedForce.setFixedEntityList(generatedEntities);
+        setBotForceParameters(generatedForce, forceTemplate, forceAlignment, contract);
+        scenario.addBotForce(generatedForce, forceTemplate, campaign);
+
+        return (int) floor(generatedEntities.size() / 4.0);
+    }
+
+    private static void updateArmorKits(AtBDynamicScenario scenario, Entity entity) {
+        if (entity instanceof ConvInfantry infantry) {
+            boolean isLowPressure = scenario.getAtmosphere().isLighterThan(THIN);
+            boolean isPoisonous = !scenario.getAtmosphericTaint().isBreathable();
+            int temperature = scenario.getTemperature();
+            changeInfantryKit(infantry, isLowPressure, isPoisonous, temperature);
+        }
     }
 
     /**
@@ -612,17 +710,16 @@ public class AtBDynamicScenarioFactory {
                 isLowPressure = true;
                 allowsTanks = false;
             } else {
-                mekhq.campaign.universe.Atmosphere specific_atmosphere = contract.getTargetPlanet()
-                                                                               .getAtmosphere(currentDate);
+                AtmosphericTaint specificAtmosphere = contract.getTargetPlanet().getAtmosphere(currentDate);
 
-                switch (specific_atmosphere) {
-                    case TOXIC_POISON, TOXICPOISON, TOXIC_CAUSTIC, TOXICCAUSTIC -> {
-                        LOGGER.info("Atmosphere is {}, disallowing Tanks and Infantry", specific_atmosphere);
+                switch (specificAtmosphere) {
+                    case TOXIC_POISON, TOXIC_CAUSTIC -> {
+                        LOGGER.info("Atmosphere is {}, disallowing Tanks and Infantry", specificAtmosphere);
                         allowsConvInfantry = false;
                         allowsTanks = false;
                     }
-                    case TAINTED_POISON, TAINTEDPOISON, TAINTED_CAUSTIC, TAINTEDCAUSTIC -> {
-                        LOGGER.info("Atmosphere is {}, setting tainted flag", specific_atmosphere);
+                    case TAINTED_POISON, TAINTED_CAUSTIC -> {
+                        LOGGER.info("Atmosphere is {}, setting tainted flag", specificAtmosphere);
                         isTainted = true;
                     }
                     default -> {
@@ -1116,6 +1213,15 @@ public class AtBDynamicScenarioFactory {
                 if (faction.isClan() && !entity.isInfantry() && !entity.isProtoMek()) {
                     if (SpecialAbility.getSpecialAbilities().containsKey("clan_pilot_training")) {
                         entity.getCrew().getOptions().getOption("clan_pilot_training").setValue(true);
+                    }
+                }
+            }
+
+            if (campaign.getCampaignOptions().get(CampaignOption.NPC_FACTION_ARMOR_KITS)) {
+                String npcKit = ArmorKitCatalog.npcKitFor(entity, faction.isClan(), currentDate.getYear());
+                if (npcKit != null) {
+                    for (int slot = 0; slot < entity.getCrew().getSlotCount(); slot++) {
+                        entity.getCrew().setArmorKitName(npcKit, slot);
                     }
                 }
             }
@@ -1927,11 +2033,13 @@ public class AtBDynamicScenarioFactory {
             if (null != planet) {
                 Atmosphere atmosphere = ObjectUtility.nonNull(planet.getPressure(campaign.getLocalDate()),
                       scenario.getAtmosphere());
+                AtmosphericTaint atmosphericTaint = planet.getAtmosphere(campaign.getLocalDate());
                 float gravity = ObjectUtility.nonNull(planet.getGravity(), scenario.getGravity()).floatValue();
                 int temperature = ObjectUtility.nonNull(planet.getTemperature(campaign.getLocalDate()),
                       scenario.getTemperature());
 
                 scenario.setAtmosphere(atmosphere);
+                scenario.setAtmosphericTaint(atmosphericTaint);
                 scenario.setGravity(gravity);
                 scenario.setTemperature(temperature);
             }
@@ -2689,28 +2797,26 @@ public class AtBDynamicScenarioFactory {
         }
 
         UnitGeneratorParameters newParams = params.clone();
-        if (newParams != null) {
-            newParams.setUnitType(BATTLE_ARMOR);
-            newParams.getMovementModes().addAll(IUnitGenerator.ALL_BATTLE_ARMOR_MODES);
+        newParams.setUnitType(BATTLE_ARMOR);
+        newParams.getMovementModes().addAll(IUnitGenerator.ALL_BATTLE_ARMOR_MODES);
 
-            // Set the parameters to filter out types that are too heavy for the provided
-            // bay space, or those that cannot use mechanized BA travel
-            if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT) {
-                if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
-                    params.setFilter(mekSummary -> !mekSummary.isClan() && mekSummary.getTons() <= bayCapacity);
-                } else {
-                    params.setFilter(mekSummary -> mekSummary.getTons() <= bayCapacity);
-                }
+        // Set the parameters to filter out types that are too heavy for the provided
+        // bay space, or those that cannot use mechanized BA travel
+        if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT) {
+            if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
+                params.setFilter(mekSummary -> !mekSummary.isClan() && mekSummary.getTons() <= bayCapacity);
             } else {
-                newParams.addMissionRole(MECHANIZED_BA);
+                params.setFilter(mekSummary -> mekSummary.getTons() <= bayCapacity);
             }
+        } else {
+            newParams.addMissionRole(MECHANIZED_BA);
         }
 
         MekSummary unitData = campaign.getUnitGenerator().generate(newParams);
 
         // If generating for an internal bay fails, try again as mechanized if the flag is set
         if (unitData == null) {
-            if (newParams != null && bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT && retryAsMechanized) {
+            if (bayCapacity != IUnitGenerator.NO_WEIGHT_LIMIT && retryAsMechanized) {
                 if (filterOutClanTech(campaign, isFactionClan(params.getFaction()))) {
                     params.setFilter(mekSummary -> !mekSummary.isClan());
                 } else {
@@ -2727,11 +2833,7 @@ public class AtBDynamicScenarioFactory {
         }
 
         // Add an appropriate crew
-        if (newParams != null) {
-            return createEntityWithCrew(newParams.getFaction(), skill, campaign, unitData);
-        } else {
-            return null;
-        }
+        return createEntityWithCrew(newParams.getFaction(), skill, campaign, unitData);
     }
 
     /**

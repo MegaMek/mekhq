@@ -61,6 +61,8 @@ public class PersonnelOptions extends PilotOptions {
     public static final String EDGE_ADVANCED_SURGERY = "edge_when_advanced_surgery_fail";
     public static final String EDGE_REPAIR_BREAK_PART = "edge_when_repair_break_part";
     public static final String EDGE_REPAIR_FAILED_REFIT = "edge_when_fail_refit_check";
+    /** The single admin acquisition trigger older saves carry; it maps onto the three triggers below on load. */
+    public static final String EDGE_ADMIN_ACQUIRE_FAIL_LEGACY = "edge_when_admin_acquire_fail";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL_EIGHT = "edge_when_admin_acquire_fail_greater_than_eight";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL_OTHER = "edge_when_admin_acquire_fail_other";
     public static final String EDGE_ADMIN_ACQUIRE_FAIL_ELEVEN = "edge_when_admin_acquire_fail_greater_than_eleven";
@@ -75,6 +77,14 @@ public class PersonnelOptions extends PilotOptions {
     public static final String TECH_WEAPON_SPECIALIST = "tech_weapon_specialist";
     public static final String TECH_ARMOR_SPECIALIST = "tech_armor_specialist";
     public static final String TECH_INTERNAL_SPECIALIST = "tech_internal_specialist";
+    public static final String TECH_SPECIALIST_ELECTRONIC = "tech_specialist_electronic";
+    public static final String TECH_SPECIALIST_NUCLEAR = "tech_specialist_nuclear";
+    public static final String TECH_SPECIALIST_AERONAUTICS = "tech_specialist_aeronautics";
+    public static final String TECH_SPECIALIST_MECHANICAL = "tech_specialist_mechanical";
+    public static final String TECH_SPECIALIST_MYOMER = "tech_specialist_myomer";
+    public static final String TECH_SPECIALIST_JETS = "tech_specialist_jets";
+    public static final String TECH_SPECIALIST_WEAPONS = "tech_specialist_weapons";
+    public static final String TECH_SPECIALIST_CYBERNETICS = "tech_specialist_cybernetics";
     public static final String TECH_ENGINEER = "tech_engineer";
     public static final String TECH_FIXER = "tech_fixer";
     public static final String UNOFFICIAL_SPICE_IS_RIGHT = "unofficial_spice_is_right";
@@ -113,6 +123,17 @@ public class PersonnelOptions extends PilotOptions {
     public static final String DISAPPOINTING_LEADER = "disappointing_leader";
     public static final String GOOD_REPUTATION = "good_reputation";
     public static final String BAD_REPUTATION = "bad_reputation";
+    // Chaos contract negotiation SPAs and Flaws
+    public static final String RELENTLESS_BARGAINER = "relentless_bargainer";
+    public static final String ABRASIVE = "abrasive";
+    public static final String LOOPHOLE_FINDER = "loophole_finder";
+    public static final String FINE_PRINT_READER = "fine_print_reader";
+    public static final String BLACKLISTED = "blacklisted";
+    public static final String EASILY_FOOLED = "easily_fooled";
+    public static final String HARD_BARGAINER = "hard_bargainer";
+    public static final String PUSHOVER = "pushover";
+    public static final String SHREWD_TRADER = "shrewd_trader";
+    public static final String INFLEXIBLE = "inflexible";
     public static final String FLAW_ANIMAL_ANTIPATHY = "flaw_animal_antipathy";
     public static final String ATOW_ANIMAL_EMPATHY = "atow_animal_empathy";
     public static final String ATOW_AMBIDEXTROUS = "atow_ambidextrous";
@@ -291,6 +312,14 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, TECH_WEAPON_SPECIALIST, false);
         addOption(l3a, TECH_ARMOR_SPECIALIST, false);
         addOption(l3a, TECH_INTERNAL_SPECIALIST, false);
+        addOption(l3a, TECH_SPECIALIST_ELECTRONIC, false);
+        addOption(l3a, TECH_SPECIALIST_NUCLEAR, false);
+        addOption(l3a, TECH_SPECIALIST_AERONAUTICS, false);
+        addOption(l3a, TECH_SPECIALIST_MECHANICAL, false);
+        addOption(l3a, TECH_SPECIALIST_MYOMER, false);
+        addOption(l3a, TECH_SPECIALIST_JETS, false);
+        addOption(l3a, TECH_SPECIALIST_WEAPONS, false);
+        addOption(l3a, TECH_SPECIALIST_CYBERNETICS, false);
         addOption(l3a, TECH_ENGINEER, false);
         addOption(l3a, TECH_FIXER, false);
         addOption(l3a, UNOFFICIAL_SPICE_IS_RIGHT, false);
@@ -329,6 +358,16 @@ public class PersonnelOptions extends PilotOptions {
         addOption(l3a, DISAPPOINTING_LEADER, false);
         addOption(l3a, GOOD_REPUTATION, false);
         addOption(l3a, BAD_REPUTATION, false);
+        addOption(l3a, RELENTLESS_BARGAINER, false);
+        addOption(l3a, ABRASIVE, false);
+        addOption(l3a, LOOPHOLE_FINDER, false);
+        addOption(l3a, FINE_PRINT_READER, false);
+        addOption(l3a, BLACKLISTED, false);
+        addOption(l3a, EASILY_FOOLED, false);
+        addOption(l3a, HARD_BARGAINER, false);
+        addOption(l3a, PUSHOVER, false);
+        addOption(l3a, SHREWD_TRADER, false);
+        addOption(l3a, INFLEXIBLE, false);
         addOption(l3a, FLAW_ANIMAL_ANTIPATHY, false);
         addOption(l3a, ATOW_ANIMAL_EMPATHY, false);
         addOption(l3a, ATOW_AMBIDEXTROUS, false);

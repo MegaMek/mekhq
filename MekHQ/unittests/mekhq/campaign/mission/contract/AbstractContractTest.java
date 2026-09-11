@@ -235,10 +235,10 @@ class AbstractContractTest {
     @Test
     void salvageIsAvailableWhenTheNegotiatedStepGrantsAShare() {
         AbstractContract contract = contract();
-        contract.setContractTerms(termsWithSalvage(ChaosContractStepsTable.STEP_TWO));
+        contract.setContractTerms(termsWithSalvage(ChaosContractStepsTable.STEP_THREE));
 
-        assertTrue(contract.canSalvage(), "STEP_TWO grants a positive salvage share");
-        assertTrue(contract.isSalvageExchange(), "STEP_TWO grants that share as an exchange");
+        assertTrue(contract.canSalvage(), "STEP_THREE grants a positive salvage share");
+        assertTrue(contract.isSalvageExchange(), "STEP_THREE grants that share as an exchange");
     }
 
     @Test

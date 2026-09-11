@@ -45,6 +45,7 @@ import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartNewEvent;
 import mekhq.campaign.events.parts.PartRemovedEvent;
 import mekhq.campaign.events.persons.PersonStatusChangedEvent;
+import mekhq.campaign.events.units.UnitNewEvent;
 
 /**
  * Provides a list of events captured during its lifetime. Use this as part of a try-with-resources block.
@@ -134,6 +135,11 @@ public class EventSpy implements AutoCloseable {
 
     @Subscribe
     public void handle(PersonStatusChangedEvent e) {
+        record(e);
+    }
+
+    @Subscribe
+    public void handle(UnitNewEvent e) {
         record(e);
     }
 }

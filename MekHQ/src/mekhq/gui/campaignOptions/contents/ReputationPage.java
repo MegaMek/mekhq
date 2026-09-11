@@ -87,6 +87,7 @@ class ReputationPage {
     private JSpinner chaosReputationCap;
     private JCheckBox chkChaosDebtPenaltiesStack;
     private JCheckBox chkChaosNoPartialSuccessReputation;
+    private JCheckBox chkUseFailedContractReputationLoss;
     private JCheckBox chkChaosPersonalityAffectsReputation;
     private JCheckBox chkChaosNewRecruitsHaveReputation;
     private JCheckBox chkRequireSupportForceTransportation;
@@ -183,6 +184,11 @@ class ReputationPage {
               getMetadata(new Version(0, 51, 1)));
         chkChaosNoPartialSuccessReputation.addMouseListener(createTipPanelUpdater("ChaosNoPartialSuccessReputation"));
 
+        chkUseFailedContractReputationLoss = new CampaignOptionsCheckBox("UseFailedContractReputationLoss",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseFailedContractReputationLoss.addMouseListener(
+              createTipPanelUpdater("UseFailedContractReputationLoss"));
+
         chkChaosPersonalityAffectsReputation = new CampaignOptionsCheckBox("ChaosPersonalityAffectsReputation",
               getMetadata(new Version(0, 51, 1)));
         chkChaosPersonalityAffectsReputation.addMouseListener(createTipPanelUpdater("ChaosPersonalityAffectsReputation"));
@@ -206,6 +212,7 @@ class ReputationPage {
               chkCampaignLevelChaosReputation,
               chkChaosDebtPenaltiesStack,
               chkChaosNoPartialSuccessReputation,
+              chkUseFailedContractReputationLoss,
               chkChaosPersonalityAffectsReputation,
               chkChaosNewRecruitsHaveReputation);
 
@@ -314,6 +321,7 @@ class ReputationPage {
         chkCampaignLevelChaosReputation.setSelected(model.campaignLevelChaosReputation);
         chkChaosDebtPenaltiesStack.setSelected(model.chaosDebtPenaltiesStack);
         chkChaosNoPartialSuccessReputation.setSelected(model.chaosNoPartialSuccessReputation);
+        chkUseFailedContractReputationLoss.setSelected(model.useFailedContractReputationLoss);
         chkChaosPersonalityAffectsReputation.setSelected(model.chaosPersonalityAffectsReputation);
         chkChaosNewRecruitsHaveReputation.setSelected(model.chaosNewRecruitsHaveReputation);
         chaosReputationCap.setValue(model.chaosReputationCap);
@@ -339,6 +347,7 @@ class ReputationPage {
         model.campaignLevelChaosReputation = chkCampaignLevelChaosReputation.isSelected();
         model.chaosDebtPenaltiesStack = chkChaosDebtPenaltiesStack.isSelected();
         model.chaosNoPartialSuccessReputation = chkChaosNoPartialSuccessReputation.isSelected();
+        model.useFailedContractReputationLoss = chkUseFailedContractReputationLoss.isSelected();
         model.chaosPersonalityAffectsReputation = chkChaosPersonalityAffectsReputation.isSelected();
         model.chaosNewRecruitsHaveReputation = chkChaosNewRecruitsHaveReputation.isSelected();
         model.chaosReputationCap = (int) chaosReputationCap.getValue();

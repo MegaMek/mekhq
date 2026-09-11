@@ -78,18 +78,6 @@ class EnemySelectionProfileTest {
     }
 
     @Test
-    void covertTypesMapToCovert() {
-        assertEquals(EnemySelectionProfile.COVERT,
-              ContractObjectiveType.ESPIONAGE.getEnemySelectionProfile());
-        assertEquals(EnemySelectionProfile.COVERT,
-              ContractObjectiveType.SABOTAGE.getEnemySelectionProfile());
-        assertEquals(EnemySelectionProfile.COVERT,
-              ContractObjectiveType.TERRORISM.getEnemySelectionProfile());
-        assertEquals(EnemySelectionProfile.COVERT,
-              ContractObjectiveType.ASSASSINATION.getEnemySelectionProfile());
-    }
-
-    @Test
     void remainingTypesMapToDefault() {
         assertEquals(EnemySelectionProfile.DEFAULT,
               ContractObjectiveType.GARRISON_DUTY.getEnemySelectionProfile());

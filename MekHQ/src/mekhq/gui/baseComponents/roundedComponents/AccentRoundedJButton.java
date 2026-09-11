@@ -45,36 +45,57 @@ import javax.swing.border.Border;
  * <p>The {@link Accent#HAZARD} scheme is the MekHQ counterpart of MegaMek's {@code HazardButton}. MegaMek tints its
  * skinned button images; MekHQ buttons are drawn from plain colours, so this class sets the accent colours directly
  * and keeps the same rounded shape as every other {@link RoundedJButton}. Hover and pressed shades come from the
- * parent's painting, which brightens or darkens the face colour.</p>
+ * parent's painting, which brightens or darkens the face colour. The hazard face is the mid tone of MegaMek's
+ * tint ramp, so those shades land on MegaMek's own bevel highlight and shadow.</p>
  *
  * @author Illiani
  * @since 0.50.12
  */
 public class AccentRoundedJButton extends RoundedJButton {
 
+    /** How wide a taped frame is, before GUI scaling. Wide enough for the diagonal bars to read as tape. */
+    private static final int TAPE_THICKNESS = 6;
+
     /**
      * The colour schemes an {@link AccentRoundedJButton} can wear.
      */
     public enum Accent {
-        /** Emergency-stop red and yellow, the same values as MegaMek's hazard widgets. Used for Report a Bug. */
-        HAZARD(new Color(204, 34, 34), new Color(255, 204, 0),
-              new Color(255, 221, 0), new Color(255, 245, 150), new Color(160, 110, 40)),
-        /** Calm green, for reference material such as the Glossary. */
-        REFERENCE(new Color(34, 120, 60), new Color(150, 220, 120),
-              new Color(225, 255, 215), new Color(255, 255, 255), new Color(120, 160, 120));
+        /**
+         * Emergency-stop red and yellow. The face is the red that MegaMek's {@code HazardButton} paints its brushed
+         * face in, and the frame is the yellow of its hazard stripes. Used for Report a Bug and for saving a campaign
+         * for a bug report.
+         */
+        HAZARD(new Color(117, 17, 8), new Color(255, 204, 0),
+              new Color(255, 221, 0), new Color(255, 245, 150), new Color(160, 110, 40), false),
+        /**
+         * Deep green for reference material such as the Glossary: the hazard red's opposite on the painter's colour
+         * wheel, at the same saturation and depth, so the two buttons read as a matched pair.
+         */
+        REFERENCE(new Color(8, 117, 44), new Color(150, 220, 120),
+              new Color(225, 255, 215), new Color(255, 255, 255), new Color(120, 160, 120), false),
+        /**
+         * Hazard-stripe yellow and black, the colours a warning sign is painted in. Where {@link #HAZARD} marks
+         * something that has gone wrong, this marks a step the player has to take and might otherwise walk past.
+         * The face is the same yellow as the hazard frame, so the two read as the same warning palette.
+         */
+        CAUTION(new Color(255, 204, 0), new Color(26, 26, 26),
+              new Color(26, 26, 26), new Color(0, 0, 0), new Color(130, 105, 30), true);
 
         private final Color face;
         private final Color frame;
         private final Color label;
         private final Color labelHover;
         private final Color labelDisabled;
+        private final boolean stripedFrame;
 
-        Accent(Color face, Color frame, Color label, Color labelHover, Color labelDisabled) {
+        Accent(Color face, Color frame, Color label, Color labelHover, Color labelDisabled,
+              boolean stripedFrame) {
             this.face = face;
             this.frame = frame;
             this.label = label;
             this.labelHover = labelHover;
             this.labelDisabled = labelDisabled;
+            this.stripedFrame = stripedFrame;
         }
 
         /** @return the colour the face is filled with when the button is idle */
@@ -101,6 +122,15 @@ public class AccentRoundedJButton extends RoundedJButton {
         public Color getLabelDisabled() {
             return labelDisabled;
         }
+
+        /**
+         * Whether this scheme frames the button in hazard tape rather than a plain line.
+         *
+         * @return {@code true} for a taped frame, {@code false} for a line in {@link #getFrame()}
+         */
+        public boolean isStripedFrame() {
+            return stripedFrame;
+        }
     }
 
     private final Accent accent;
@@ -117,7 +147,10 @@ public class AccentRoundedJButton extends RoundedJButton {
         setFont(getFont().deriveFont(Font.BOLD));
         setBackground(accent.getFace());
 
-        Border frame = new RoundedLineBorder(accent.getFrame(), THICKNESS, ARC);
+        // A taped frame needs the room to show a diagonal; two pixels of it would just read as a dark edge.
+        Border frame = accent.isStripedFrame()
+                             ? new HazardTapeBorder(accent.getFace(), accent.getFrame(), TAPE_THICKNESS, ARC)
+                             : new RoundedLineBorder(accent.getFrame(), THICKNESS, ARC);
         Border padding = BorderFactory.createEmptyBorder(VERTICAL_PADDING, HORIZONTAL_PADDING, VERTICAL_PADDING,
               HORIZONTAL_PADDING);
         setBorder(BorderFactory.createCompoundBorder(frame, padding));

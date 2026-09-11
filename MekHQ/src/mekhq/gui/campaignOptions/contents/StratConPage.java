@@ -55,6 +55,8 @@ import megamek.Version;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.models.FileNameComboBoxModel;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.BoardScalingType;
@@ -63,12 +65,11 @@ import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMet
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
+import mekhq.gui.utilities.SkillLevelPickerUtility;
 
 /**
  * The {@code StratConPage} class builds and manages the StratCon leaf page of the Campaign Options dialog. It owns the
@@ -112,6 +113,8 @@ class StratConPage {
     private MMComboBox<SkillLevel> comboMinimumCallsignSkillLevel;
 
     private JCheckBox chkUseDropShips;
+
+    private JCheckBox chkRestrictScenariosToFleetCapability;
 
     private JCheckBox chkRegionalMekVariations;
 
@@ -167,6 +170,7 @@ class StratConPage {
     private JLabel lblStratConPlayType;
     private MMComboBox<StratConPlayType> comboStratConPlayType;
     private JCheckBox chkUseAdvancedScouting;
+    private JCheckBox chkEssentialScenariosOnly;
     private JCheckBox chkNoSeedForces;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
@@ -189,7 +193,8 @@ class StratConPage {
     @Nonnull
     JPanel createPanel(@Nullable RulesetsOptionsModel model) {
         // Combos (previously built during initialization)
-        comboSkillLevel = new MMComboBox<>("comboSkillLevel", getSkillLevelOptions());
+        comboSkillLevel = new MMComboBox<>("comboSkillLevel", SkillLevelPickerUtility.PICKER_LEVELS);
+        SkillLevelPickerUtility.applyRandomRenderer(comboSkillLevel);
         comboBoardScalingType = new MMComboBox<>("comboBoardScalingType", BoardScalingType.values());
         final DefaultComboBoxModel<AutoResolveMethod> autoResolveTypeModel = new DefaultComboBoxModel<>(
               AutoResolveMethod.values());
@@ -314,6 +319,9 @@ class StratConPage {
         chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting",
               getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater("UseAdvancedScouting"));
+        chkEssentialScenariosOnly = new CampaignOptionsCheckBox("EssentialScenariosOnly",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkEssentialScenariosOnly.addMouseListener(createTipPanelUpdater("EssentialScenariosOnly"));
         chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces",
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkNoSeedForces.addMouseListener(createTipPanelUpdater("NoSeedForces"));
@@ -402,6 +410,10 @@ class StratConPage {
         spnOpForLanceTypeVehicles = new CampaignOptionsSpinner("OpForLanceTypeVehicle", 0, 0, 10, 1);
 
         chkUseDropShips = new CampaignOptionsCheckBox("UseDropShips");
+        chkRestrictScenariosToFleetCapability = new CampaignOptionsCheckBox("RestrictScenariosToFleetCapability",
+              getMetadata(new Version(0, 51, 1)));
+        chkRestrictScenariosToFleetCapability.addMouseListener(
+              createTipPanelUpdater("RestrictScenariosToFleetCapability"));
         chkRegionalMekVariations = new CampaignOptionsCheckBox("RegionalMekVariations");
         chkAttachedPlayerCamouflage = new CampaignOptionsCheckBox("AttachedPlayerCamouflage");
         chkPlayerControlsAttachedUnits = new CampaignOptionsCheckBox("PlayerControlsAttachedUnits");
@@ -507,6 +519,7 @@ class StratConPage {
         panel.addRow(lblBoardScalingType, comboBoardScalingType);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
               chkUseAdvancedScouting,
+              chkEssentialScenariosOnly,
               chkNoSeedForces,
               chkUseGenericBattleValue,
               chkUseVerboseBidding,
@@ -526,6 +539,7 @@ class StratConPage {
         panel.addRow(lblOpForLanceTypeVehicle, spnOpForLanceTypeVehicles);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
               chkUseDropShips,
+              chkRestrictScenariosToFleetCapability,
               chkRegionalMekVariations,
               chkAttachedPlayerCamouflage,
               chkPlayerControlsAttachedUnits,
@@ -622,6 +636,7 @@ class StratConPage {
         chkAutoGenerateOpForCallSigns.setSelected(model.autoGenerateOpForCallSigns);
         comboMinimumCallsignSkillLevel.setSelectedItem(model.minimumCallsignSkillLevel);
         chkUseDropShips.setSelected(model.useDropShips);
+        chkRestrictScenariosToFleetCapability.setSelected(model.restrictScenariosToFleetCapability);
         chkRegionalMekVariations.setSelected(model.regionalMekVariations);
         chkAttachedPlayerCamouflage.setSelected(model.attachedPlayerCamouflage);
         chkPlayerControlsAttachedUnits.setSelected(model.playerControlsAttachedUnits);
@@ -652,6 +667,7 @@ class StratConPage {
         spnAutoResolveNumberOfScenarios.setValue(model.autoResolveNumberOfScenarios);
         comboStratConPlayType.setSelectedItem(model.stratConPlayType);
         chkUseAdvancedScouting.setSelected(model.useAdvancedScouting);
+        chkEssentialScenariosOnly.setSelected(model.essentialScenariosOnly);
         chkNoSeedForces.setSelected(model.noSeedForces);
         chkUseGenericBattleValue.setSelected(model.useGenericBattleValue);
         chkUseVerboseBidding.setSelected(model.useVerboseBidding);
@@ -671,7 +687,7 @@ class StratConPage {
             return;
         }
 
-        model.skillLevel = comboSkillLevel.getSelectedItem();
+        model.skillLevel = SkillLevelPickerUtility.resolve(comboSkillLevel.getSelectedItem());
         model.boardScalingType = comboBoardScalingType.getSelectedItem();
         model.opForLanceTypeMeks = (int) spnOpForLanceTypeMeks.getValue();
         model.opForLanceTypeMixed = (int) spnOpForLanceTypeMixed.getValue();
@@ -679,6 +695,7 @@ class StratConPage {
         model.autoGenerateOpForCallSigns = chkAutoGenerateOpForCallSigns.isSelected();
         model.minimumCallsignSkillLevel = comboMinimumCallsignSkillLevel.getSelectedItem();
         model.useDropShips = chkUseDropShips.isSelected();
+        model.restrictScenariosToFleetCapability = chkRestrictScenariosToFleetCapability.isSelected();
         model.regionalMekVariations = chkRegionalMekVariations.isSelected();
         model.attachedPlayerCamouflage = chkAttachedPlayerCamouflage.isSelected();
         model.playerControlsAttachedUnits = chkPlayerControlsAttachedUnits.isSelected();
@@ -709,6 +726,7 @@ class StratConPage {
         model.autoResolveNumberOfScenarios = (int) spnAutoResolveNumberOfScenarios.getValue();
         model.stratConPlayType = comboStratConPlayType.getSelectedItem();
         model.useAdvancedScouting = chkUseAdvancedScouting.isSelected();
+        model.essentialScenariosOnly = chkEssentialScenariosOnly.isSelected();
         model.noSeedForces = chkNoSeedForces.isSelected();
         model.useGenericBattleValue = chkUseGenericBattleValue.isSelected();
         model.useVerboseBidding = chkUseVerboseBidding.isSelected();

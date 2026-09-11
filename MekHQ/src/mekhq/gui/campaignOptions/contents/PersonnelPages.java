@@ -57,6 +57,7 @@ public class PersonnelPages {
     private final MedicalPage medicalPage = new MedicalPage();
     private final PrisonersAndDependentsPage prisonersAndDependentsPage = new PrisonersAndDependentsPage();
     private final PersonnelGeneralPage personnelGeneralPage = new PersonnelGeneralPage();
+    private final PersonnelEquipmentPage personnelEquipmentPage = new PersonnelEquipmentPage();
     private final PersonnelInformationPage personnelInformationPage = new PersonnelInformationPage();
 
     /**
@@ -81,6 +82,16 @@ public class PersonnelPages {
      */
     public @Nonnull JPanel createGeneralPage() {
         return personnelGeneralPage.createPanel(model);
+    }
+
+    /**
+     * Creates the components and layout for the Equipment Page: the quartermaster's default armor-kit and tool-kit
+     * settings.
+     *
+     * @return a {@link JPanel} representing the Equipment Page.
+     */
+    public @Nonnull JPanel createEquipmentPage() {
+        return personnelEquipmentPage.createPanel(model);
     }
 
     /**
@@ -182,6 +193,7 @@ public class PersonnelPages {
 
     private void updateCreatedControlsFromModel() {
         personnelGeneralPage.readFromModel(model);
+        personnelEquipmentPage.readFromModel(model);
         awardsPage.readFromModel(model);
         medicalPage.readFromModel(model);
         personnelInformationPage.readFromModel(model);
@@ -190,6 +202,7 @@ public class PersonnelPages {
 
     private void updateModelFromCreatedControls() {
         personnelGeneralPage.writeToModel(model);
+        personnelEquipmentPage.writeToModel(model);
         awardsPage.writeToModel(model);
         medicalPage.writeToModel(model);
         personnelInformationPage.writeToModel(model);

@@ -55,16 +55,8 @@ import java.io.PrintWriter;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.UUID;
 import java.util.stream.IntStream;
 import java.util.zip.GZIPOutputStream;
 import javax.swing.*;
@@ -126,8 +118,16 @@ import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton.Accent;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.baseComponents.roundedComponents.RoundedMMToggleButton;
-import mekhq.gui.dialog.*;
-import mekhq.gui.dialog.CompanyGenerationDialog;
+import mekhq.gui.commandGeneration.CommandGenerationDialog;
+import mekhq.gui.dialog.AdvanceDaysDialog;
+import mekhq.gui.dialog.EasyBugReportDialog;
+import mekhq.gui.dialog.HireBulkPersonnelDialog;
+import mekhq.gui.dialog.MekHQUnitSelectorDialog;
+import mekhq.gui.dialog.NewsDialog;
+import mekhq.gui.dialog.PartsStoreDialog;
+import mekhq.gui.dialog.RefitNameDialog;
+import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
 import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
 import mekhq.gui.dialog.CampaignExportWizard.CampaignExportWizardState;
@@ -154,9 +154,9 @@ public class CampaignGUI extends JPanel {
     private static final int MIN_WINDOW_WIDTH = 1024;
     private static final int MIN_WINDOW_HEIGHT = 768;
     private static final int TOP_PANEL_HEIGHT = 90;
-    public static int THIN_GAP = 2;
-    public static int SMALL_GAP = 4;
-    public static int MEDIUM_GAP = 8;
+    public static final int THIN_GAP = 2;
+    public static final int SMALL_GAP = 4;
+    public static final int MEDIUM_GAP = 8;
 
     // the max quantity when mass purchasing parts, hiring, etc. using the JSpinner
     public static final int MAX_QUANTITY_SPINNER = 10000;
@@ -206,7 +206,7 @@ public class CampaignGUI extends JPanel {
 
     /* Top Panel */
     private JPanel pnlTop;
-    private RoundedJButton btnCompanyGenerator;
+    private AccentRoundedJButton btnCommandGenerator;
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
@@ -492,7 +492,7 @@ public class CampaignGUI extends JPanel {
         pnlTop.add(Box.createHorizontalGlue());
         AdvanceTimePanel advanceTimePanel = new AdvanceTimePanel(170, 240, getCampaign().getLocalDate(),
               getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
-        pnlTop.add(createCompanyGeneratorButton());
+        pnlTop.add(createCommandGeneratorButton());
         pnlTop.add(Box.createHorizontalStrut(SMALL_GAP));
         pnlTop.add(advanceTimePanel);
         pnlTop.add(createCampaignControlPanel(140, 170));
@@ -500,27 +500,30 @@ public class CampaignGUI extends JPanel {
         // The box layout stretches every child to the panel's height, so the button is squared to that height,
         // measured once all the other children are in place.
         int side = pnlTop.getPreferredSize().height;
-        btnCompanyGenerator.setMinimumSize(new Dimension(side, side));
-        btnCompanyGenerator.setPreferredSize(new Dimension(side, side));
-        btnCompanyGenerator.setMaximumSize(new Dimension(side, side));
+        btnCommandGenerator.setMinimumSize(new Dimension(side, side));
+        btnCommandGenerator.setPreferredSize(new Dimension(side, side));
+        btnCommandGenerator.setMaximumSize(new Dimension(side, side));
     }
 
     /**
-     * Creates the Company Generator button that sits to the left of the Advance Day panel. It is squared to the
+     * Creates the Command Generator button that sits to the left of the Advance Day panel. It is squared to the
      * top panel's height by {@link #initTopPanel()}, and is only shown while the campaign has no units and no
      * personnel - the one time a player needs it. See {@link #refreshCampaignControlButtons()}.
      *
      * @return the button
      */
-    private RoundedJButton createCompanyGeneratorButton() {
-        btnCompanyGenerator = new RoundedJButton(resourceMap.getString("btnCompanyGenerator.text"));
-        btnCompanyGenerator.setToolTipText(resourceMap.getString("btnCompanyGenerator.toolTipText"));
-        btnCompanyGenerator.setHorizontalAlignment(SwingConstants.CENTER);
-        btnCompanyGenerator.addActionListener(event -> {
-            new CompanyGenerationDialog(getFrame(), getCampaign()).setVisible(true);
+    private AccentRoundedJButton createCommandGeneratorButton() {
+        // Painted in hazard yellow and black: it is only on screen while the campaign is empty, and players
+        // regularly miss that they have to press something to get a starting force at all.
+        btnCommandGenerator = new AccentRoundedJButton(resourceMap.getString("btnCommandGenerator.text"),
+              Accent.CAUTION);
+        btnCommandGenerator.setToolTipText(resourceMap.getString("btnCommandGenerator.toolTipText"));
+        btnCommandGenerator.setHorizontalAlignment(SwingConstants.CENTER);
+        btnCommandGenerator.addActionListener(event -> {
+            new CommandGenerationDialog(getFrame(), getCampaign()).setVisible(true);
             refreshCampaignControlButtons();
         });
-        return btnCompanyGenerator;
+        return btnCommandGenerator;
     }
 
     private JPanel createMarketsPanel(int minWidth, int maxWidth) {
@@ -855,8 +858,7 @@ public class CampaignGUI extends JPanel {
     /**
      * Opens the recruitment dialog to hire a person, using the appropriate market style based on campaign options.
      *
-     * <p>If the style recruitment is disabled in the campaign options, a deprecated {@link PersonnelMarketDialog} is
-     * displayed. Otherwise, the new recruitment dialog is shown according to the campaign's current market style.</p>
+     * <p>The new recruitment dialog is shown according to the campaign's current market style.</p>
      *
      * <p>If all recruitment options are disabled, display the bulk recruitment dialog (GM), instead.</p>
      */
@@ -864,17 +866,8 @@ public class CampaignGUI extends JPanel {
         CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
         PersonnelMarketStyle marketStyle = campaignOptions.get(CampaignOption.PERSONNEL_MARKET_STYLE);
 
-        if (marketStyle != PERSONNEL_MARKET_DISABLED || !getCampaign().getPlayerForce()
-                                                               .getHumanResources()
-                                                               .getPersonnelMarket()
-                                                               .isNone()) {
-            if (marketStyle == PERSONNEL_MARKET_DISABLED) {
-                PersonnelMarketDialog personnelMarketDialog =
-                      new PersonnelMarketDialog(getFrame(), this, getCampaign());
-                personnelMarketDialog.setVisible(true);
-            } else {
-                getCampaign().getPlayerForce().getHumanResources().getNewPersonnelMarket().showPersonnelMarketDialog();
-            }
+        if (marketStyle != PERSONNEL_MARKET_DISABLED) {
+            getCampaign().getPlayerForce().getHumanResources().getNewPersonnelMarket().showPersonnelMarketDialog();
         } else {
             openBulkRecruitmentDialog();
         }
@@ -1398,7 +1391,8 @@ public class CampaignGUI extends JPanel {
 
         // If we're already nagging, no need to nag again
         boolean subTabNagActive = commandCenterTab.isLogNagActive(logType);
-        int relevantIndex = logType.getTabIndex();
+        // Resolve the log tab's live position by identity, so it stays correct after the user reorders or detaches tabs.
+        int relevantIndex = commandCenterTab.getLogTabIndex(logType);
 
         // We're already nagging
         if (logNagActive && subTabNagActive) {
@@ -1412,8 +1406,9 @@ public class CampaignGUI extends JPanel {
         EnhancedTabbedPane tabLogs = commandCenterTab.getTabLogs();
         int logsSelected = tabLogs.getSelectedIndex();
 
-        // If the player is already viewing the correct log tab, no nag needed.
-        if (commandCenterTab.isShowing() && (logsSelected == relevantIndex)) {
+        // If the player is already viewing the correct log tab, no nag needed. A negative relevantIndex means the tab is
+        // detached (not in the pane), so it can never be the selected tab.
+        if (commandCenterTab.isShowing() && (relevantIndex >= 0) && (logsSelected == relevantIndex)) {
             return;
         }
 
@@ -1439,7 +1434,7 @@ public class CampaignGUI extends JPanel {
             };
 
             if (!DailyReportLogPanel.isDateOnly(List.of(reportTab.getLogText()))) {
-                commandCenterTab.nagLogTab(relevantIndex);
+                commandCenterTab.nagLogTab(logType);
                 commandCenterTab.setLogNagActive(logType, true);
             }
         }
@@ -1695,11 +1690,11 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * Shows the Company Generator button only while the campaign is empty: no units anywhere, including base
+     * Shows the Command Generator button only while the campaign is empty: no units anywhere, including base
      * hangars, and no personnel.
      */
     private void refreshCampaignControlButtons() {
-        btnCompanyGenerator.setVisible(isHangarEmpty() && getPlayerPersonnel().isEmpty());
+        btnCommandGenerator.setVisible(isHangarEmpty() && getPlayerPersonnel().isEmpty());
     }
 
     private boolean isHangarEmpty() {
@@ -2018,6 +2013,20 @@ public class CampaignGUI extends JPanel {
     @Subscribe
     public void handleOrganizationChanged(OrganizationChangedEvent organizationChangedEvent) {
         refreshCampaignControlButtons();
+    }
+
+    /**
+     * Rebuilds the Active Location dropdown when the set of player bases changes, so a newly added (or removed) base
+     * appears in the location filter picker without waiting for the next new day.
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param locationEvent the event signalling that a tracked location (player base) was added or removed
+     */
+    @Subscribe
+    public void handleLocationSetChanged(LocationEvent locationEvent) {
+        refreshActiveLocation();
     }
 
     /**

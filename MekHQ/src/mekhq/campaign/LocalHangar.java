@@ -34,7 +34,9 @@ package mekhq.campaign;
 
 import java.io.PrintWriter;
 import java.util.Collection;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -84,7 +86,11 @@ public class LocalHangar implements ILocation {
             unit.setId(UUID.randomUUID());
         }
 
-        units.put(unit.getId(), unit);
+        // Synchronized with forEachUnit's snapshot: force generation adds units from a background
+        // thread while GUI tabs may iterate the hangar on the EDT.
+        synchronized (units) {
+            units.put(unit.getId(), unit);
+        }
         unit.setParent(this);
     }
 
@@ -146,7 +152,14 @@ public class LocalHangar implements ILocation {
      * @param consumer A function to apply to each unit.
      */
     public void forEachUnit(Consumer<Unit> consumer) {
-        units.forEach((id, unit) -> consumer.accept(unit));
+        // Snapshot under the lock, then run the consumer outside it: force generation adds units from
+        // a background thread while callers (e.g. the financial report) iterate the hangar on the EDT.
+        // Iterating the live map directly throws ConcurrentModificationException.
+        final List<Unit> snapshot;
+        synchronized (units) {
+            snapshot = new ArrayList<>(units.values());
+        }
+        snapshot.forEach(consumer);
     }
 
     /**
@@ -155,7 +168,11 @@ public class LocalHangar implements ILocation {
      * @param consumer A function to apply to each ID-unit pair.
      */
     public void forEachUnit(BiConsumer<UUID, Unit> consumer) {
-        units.forEach(consumer);
+        final Map<UUID, Unit> snapshot;
+        synchronized (units) {
+            snapshot = new LinkedHashMap<>(units);
+        }
+        snapshot.forEach(consumer);
     }
 
     /**
@@ -186,7 +203,10 @@ public class LocalHangar implements ILocation {
      * @return true if the unit was removed, otherwise false.
      */
     public boolean removeUnit(UUID id) {
-        Unit unit = units.remove(id);
+        final Unit unit;
+        synchronized (units) {
+            unit = units.remove(id);
+        }
         if (unit != null) {
             unit.setParent(null);
         }

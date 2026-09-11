@@ -49,6 +49,8 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechRating;
+import megamek.common.planetaryConditions.Atmosphere;
+import megamek.common.planetaryConditions.AtmosphericTaint;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.universe.FactionTag;
 import megamek.logging.MMLogger;
@@ -56,6 +58,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
+import mekhq.campaign.universe.enums.CapitalType;
 import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.enums.PlanetaryType;
@@ -126,9 +129,9 @@ public class Planet {
     // Atmospheric description
     /** Pressure classification - we use the MegaMek enum here directly */
     @JsonProperty("pressure")
-    private SourceableValue<megamek.common.planetaryConditions.Atmosphere> pressure;
+    private SourceableValue<Atmosphere> pressure;
     @JsonProperty("atmosphere")
-    private SourceableValue<Atmosphere> atmosphere;
+    private SourceableValue<AtmosphericTaint> atmosphere;
     @JsonProperty("composition")
     private SourceableValue<String> composition;
     @JsonProperty("temperature")
@@ -339,11 +342,11 @@ public class Planet {
         this.temperature = temperature;
     }
 
-    public void setSourcedPressure(SourceableValue<megamek.common.planetaryConditions.Atmosphere> pressure) {
+    public void setSourcedPressure(SourceableValue<Atmosphere> pressure) {
         this.pressure = pressure;
     }
 
-    public void setSourcedAtmosphere(SourceableValue<Atmosphere> atmosphere) {
+    public void setSourcedAtmosphere(SourceableValue<AtmosphericTaint> atmosphere) {
         this.atmosphere = atmosphere;
     }
 
@@ -576,6 +579,20 @@ public class Planet {
         return getEventData(when, null, e -> e.socioIndustrial);
     }
 
+    /**
+     * @param when the date to check
+     *
+     * @return this planet's administrative capital status on the given date, or {@link CapitalType#NONE} if it is not a
+     *       capital (never {@code null})
+     */
+    public CapitalType getCapitalType(LocalDate when) {
+        return (null == getSourcedCapitalType(when)) ? CapitalType.NONE : getSourcedCapitalType(when).getValue();
+    }
+
+    public SourceableValue<CapitalType> getSourcedCapitalType(LocalDate when) {
+        return getEventData(when, null, planetaryEvent -> planetaryEvent.capitalType);
+    }
+
     public @Nonnull HPGRating getHPG(LocalDate when) {
         return (null == getSourcedHPG(when)) ? HPGRating.X : getSourcedHPG(when).getValue();
     }
@@ -631,27 +648,37 @@ public class Planet {
     }
 
     /**
-     * @return the planet's atmospheric pressure for the given date, or
-     *       {@link megamek.common.planetaryConditions.Atmosphere#STANDARD} when no data is recorded for that date.
-     *       Never {@code null}, mirroring the fallback returned by {@link #getAtmosphere(LocalDate)}. Use
-     *       {@link #getSourcedPressure(LocalDate)} to distinguish "no recorded data" from an actual reading.
+     * @return the planet's atmospheric pressure for the given date, or {@link Atmosphere#STANDARD} when no data is
+     *       recorded for that date. Never {@code null}, mirroring the fallback returned by
+     *       {@link #getAtmosphere(LocalDate)}. Use {@link #getSourcedPressure(LocalDate)} to distinguish "no recorded
+     *       data" from an actual reading.
      */
-    public @Nonnull megamek.common.planetaryConditions.Atmosphere getPressure(LocalDate when) {
-        SourceableValue<megamek.common.planetaryConditions.Atmosphere> sourced = getSourcedPressure(when);
-        return (sourced == null || sourced.getValue() == null) ?
-                     megamek.common.planetaryConditions.Atmosphere.STANDARD :
-                     sourced.getValue();
+    public @Nonnull Atmosphere getPressure(LocalDate when) {
+        SourceableValue<Atmosphere> sourced = getSourcedPressure(when);
+        return ((sourced == null) || (sourced.getValue() == null)) ? Atmosphere.STANDARD : sourced.getValue();
     }
 
-    public @Nullable SourceableValue<megamek.common.planetaryConditions.Atmosphere> getSourcedPressure(LocalDate when) {
+    public @Nullable SourceableValue<Atmosphere> getSourcedPressure(LocalDate when) {
         return getEventData(when, pressure, e -> e.pressure);
     }
 
-    public @Nonnull Atmosphere getAtmosphere(LocalDate when) {
-        return (null == getSourcedAtmosphere(when)) ? Atmosphere.NONE : getSourcedAtmosphere(when).getValue();
+    /**
+     * @return how safe the planet's air is to breathe on the given date, or {@link AtmosphericTaint#BREATHABLE} when
+     *       no data is recorded for that date. Never {@code null}. Use {@link #getSourcedAtmosphere(LocalDate)} to
+     *       distinguish "no recorded data" from an actual reading.
+     *       <p>
+     *       A world with no atmosphere at all reports {@link AtmosphericTaint#BREATHABLE} too, because an absent
+     *       atmosphere is not a taint: airlessness is recorded on the pressure reading, which says
+     *       {@link Atmosphere#VACUUM} for every such world. Ask {@link #getPressure(LocalDate)} whether a world can
+     *       be breathed at all, and this method only what is wrong with the air where there is some.
+     */
+    public @Nonnull AtmosphericTaint getAtmosphere(LocalDate when) {
+        SourceableValue<AtmosphericTaint> sourced = getSourcedAtmosphere(when);
+        return ((sourced == null) || (sourced.getValue() == null)) ? AtmosphericTaint.BREATHABLE :
+                     sourced.getValue();
     }
 
-    public @Nullable SourceableValue<Atmosphere> getSourcedAtmosphere(LocalDate when) {
+    public @Nullable SourceableValue<AtmosphericTaint> getSourcedAtmosphere(LocalDate when) {
         return getEventData(when, atmosphere, e -> e.atmosphere);
     }
 
@@ -963,14 +990,16 @@ public class Planet {
         @JsonProperty("temperature")
         public SourceableValue<Integer> temperature;
         public SourceableValue<SocioIndustrialData> socioIndustrial;
+        @JsonProperty("capitalType")
+        public SourceableValue<CapitalType> capitalType;
         @JsonProperty("hpg")
         public SourceableValue<HPGRating> hpg;
         @JsonProperty("pressure")
-        private SourceableValue<megamek.common.planetaryConditions.Atmosphere> pressure;
+        private SourceableValue<Atmosphere> pressure;
         @JsonProperty("hiringHall")
         private SourceableValue<HiringHallLevel> hiringHall;
         @JsonProperty("atmosphere")
-        private SourceableValue<Atmosphere> atmosphere;
+        private SourceableValue<AtmosphericTaint> atmosphere;
         @JsonProperty("composition")
         public SourceableValue<String> composition;
         @JsonProperty("population")
@@ -994,6 +1023,7 @@ public class Planet {
             percentWater = ObjectUtility.nonNull(other.percentWater, percentWater);
             shortName = ObjectUtility.nonNull(other.shortName, shortName);
             socioIndustrial = ObjectUtility.nonNull(other.socioIndustrial, socioIndustrial);
+            capitalType = ObjectUtility.nonNull(other.capitalType, capitalType);
             hiringHall = ObjectUtility.nonNull(other.hiringHall, hiringHall);
             temperature = ObjectUtility.nonNull(other.temperature, temperature);
             pressure = ObjectUtility.nonNull(other.pressure, pressure);
@@ -1024,6 +1054,7 @@ public class Planet {
                          (null == name) &&
                          (null == shortName) &&
                          (null == socioIndustrial) &&
+                         (null == capitalType) &&
                          (null == temperature) &&
                          (null == pressure) &&
                          (null == atmosphere) &&

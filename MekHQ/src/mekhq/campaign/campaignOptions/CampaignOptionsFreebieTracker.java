@@ -62,6 +62,11 @@ package mekhq.campaign.campaignOptions;
  * @param useDiseases                   whether random diseases are enabled (and applicable)
  * @param useNormalizedContractPayModel whether contract pay is using the alternate method
  * @param useDiminishingContractPay     whether diminishing returns are applied to contract pay
+ * @param requireMekWarriorKitToDeploy  whether a Mek requires its crew to wear a MekWarrior kit to deploy
+ * @param specialistTechSkillsEnabled   whether the granular specialist tech skills are in use (the inverse of the
+ *                                      "use global tech skills only" option), so enabling them reads as a
+ *                                      {@code false -> true} transition like every other tracked freebie
+ * @param techsNeedToolKit              whether technicians require a tool kit to make repairs
  *
  * @author Illiani
  * @since 0.50.11
@@ -70,7 +75,8 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
       boolean trackPrisoners, boolean useMASHTheatres, boolean useFatigue, boolean useAdvancedSalvage,
       boolean useStratCon, boolean useMapless, boolean useAdvancedScouting, boolean useAltAdvancedMedical,
       boolean useDiseases, boolean useNormalizedContractPayModel, boolean useDiminishingContractPay,
-      boolean useChaosReputation, boolean useLegacyContractOptions) {
+      boolean useChaosReputation, boolean useLegacyContractOptions, boolean requireMekWarriorKitToDeploy,
+      boolean useSupportTeams, boolean specialistTechSkillsEnabled, boolean techsNeedToolKit) {
     /**
      * Creates a tracker snapshot from the provided {@link CampaignOptions}.
      *
@@ -103,7 +109,11 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
               options.get(CampaignOption.USE_ALTERNATE_PAYMENT_MODE),
               options.get(CampaignOption.USE_DIMINISHING_CONTRACT_PAY) && isDiminishingContractPayRelevant(options),
               options.get(CampaignOption.USE_CHAOS_REPUTATION),
-              options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY)
+              options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY),
+              options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY),
+              options.get(CampaignOption.USE_SUPPORT_TEAMS),
+              !options.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY),
+              options.get(CampaignOption.TECHS_NEED_TOOL_KIT)
         );
     }
 

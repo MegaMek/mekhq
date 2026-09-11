@@ -41,7 +41,6 @@ import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -74,6 +73,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.displayWrappers.FactionDisplay;
+import mekhq.gui.utilities.SkillLevelPickerUtility;
 
 public class CustomizeBotForceDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(CustomizeBotForceDialog.class);
@@ -438,9 +438,8 @@ public class CustomizeBotForceDialog extends JDialog {
         gbc.weightx = 1.0;
         panRandomUnits.add(choiceUnitType, gbc);
 
-        // leave out none as a skill option
-        choiceSkillLevel = new MMComboBox<>("choiceSkillLevel",
-              Arrays.stream(SkillLevel.values()).filter(skill -> !skill.isNone()).toList());
+        choiceSkillLevel = new MMComboBox<>("choiceSkillLevel", SkillLevelPickerUtility.PICKER_LEVELS);
+        SkillLevelPickerUtility.applyRandomRenderer(choiceSkillLevel);
         choiceSkillLevel.setSelectedItem(randomizer.getSkill());
         choiceSkillLevel.setEnabled(useRandomUnits);
         gbc.gridx = 0;

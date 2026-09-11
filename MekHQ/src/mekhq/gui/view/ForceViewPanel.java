@@ -55,6 +55,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
@@ -66,7 +67,6 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A custom panel that gets filled in with goodies from a Force record
@@ -225,8 +225,8 @@ public class ForceViewPanel extends JScrollablePanel {
         for (UUID uid : formation.getAllUnits(false)) {
             Unit unit = campaign.getUnit(uid);
             if (null != unit) {
-                // Never factor in C3 in this check. It will cause the TO&E to lock up for large campaigns.
-                bv += unit.getEntity().calculateBattleValue(true, !unit.hasPilot());
+                // Never factor in C3 or the TAG force bonus in this check. It will cause the TO&E to lock up for large campaigns.
+                bv += unit.getEntity().calculateBattleValue(true, !unit.hasPilot(), true);
                 cost = cost.plus(unit.getEntity().getCost(true));
                 ton += unit.getEntity().getWeight();
                 String unitTypeName = UnitType.getTypeDisplayableName(unit.getEntity().getUnitType());
@@ -627,9 +627,9 @@ public class ForceViewPanel extends JScrollablePanel {
     public String getForceSummary(Unit unit) {
         String toReturn = "<html><font size='4'><b>" + unit.getName() + "</b></font><br/>";
 
-        // Never factor in C3 in this check. It will cause the TO&E to lock up for large campaigns.
+        // Never factor in C3 or the TAG force bonus in this check. It will cause the TO&E to lock up for large campaigns.
         toReturn += "<font><b>BV:</b> " +
-                          unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew()) +
+                          unit.getEntity().calculateBattleValue(true, null == unit.getEntity().getCrew(), true) +
                           "<br/>";
         toReturn += unit.getStatus();
         Entity entity = unit.getEntity();
@@ -726,7 +726,7 @@ public class ForceViewPanel extends JScrollablePanel {
             Unit unit = campaign.getUnit(uid);
             if (null != unit) {
                 boolean crewExists = unit.getCommander() != null;
-                battleValue += unit.getEntity().calculateBattleValue(true, !crewExists);
+                battleValue += unit.getEntity().calculateBattleValue(true, !crewExists, true);
                 cost = cost.plus(unit.getEntity().getCost(true));
                 tonnage += unit.getEntity().getWeight();
                 number++;

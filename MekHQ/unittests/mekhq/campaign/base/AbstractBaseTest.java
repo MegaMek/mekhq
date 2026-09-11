@@ -33,21 +33,29 @@
 package mekhq.campaign.base;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.UUID;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.FixedLocation;
+import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.meks.MekSensor;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -195,6 +203,68 @@ public class AbstractBaseTest {
             Armor armorTemplate = new Armor();
             PartInventory inv = base.getPartInventory(armorTemplate);
             assertEquals(" points", inv.getCountModifier());
+        }
+    }
+
+    @Nested
+    class IsEmpty {
+        Campaign campaign;
+        CampaignLocationManager locationManager;
+
+        @BeforeEach
+        void setUpCampaign() {
+            locationManager = mock(CampaignLocationManager.class);
+            campaign = mock(Campaign.class);
+            when(campaign.getCampaignLocationManager()).thenReturn(locationManager);
+            // holdsPendingTravelDestination defaults to false on the mock unless a test overrides it.
+        }
+
+        @Test
+        void freshBase_isEmpty() {
+            assertTrue(base.isEmpty(campaign));
+        }
+
+        @Test
+        void withPersonnelPresent_isNotEmpty() {
+            base.getBasePersonnel().put(UUID.randomUUID(), mock(Person.class));
+            assertFalse(base.isEmpty(campaign));
+        }
+
+        @Test
+        void withHangarUnit_isNotEmpty() {
+            Unit unit = mock(Unit.class);
+            when(unit.getId()).thenReturn(UUID.randomUUID());
+            base.getBaseHangar().addUnit(unit);
+            assertFalse(base.isEmpty(campaign));
+        }
+
+        @Test
+        void withWarehousePart_isNotEmpty() {
+            base.getBaseWarehouse().addPart(new MekSensor());
+            assertFalse(base.isEmpty(campaign));
+        }
+
+        @Test
+        void withInTransitTravelerOnTravelNode_isNotEmpty() {
+            GroundTransitLocation travel = new GroundTransitLocation(mock(PlanetarySystem.class), 2d);
+            assertTrue(travel.setParent(base), "travel node should attach under the base");
+            Person traveler = new Person("First", "Last", null, "MERC");
+            assertTrue(traveler.setParent(travel), "traveler should attach under the travel node");
+
+            assertFalse(base.isEmpty(campaign));
+        }
+
+        @Test
+        void withPendingTravelDestination_isNotEmpty() {
+            when(locationManager.holdsPendingTravelDestination(base)).thenReturn(true);
+            assertFalse(base.isEmpty(campaign));
+        }
+
+        @Test
+        void freshBase_consultsPendingTravelQueue() {
+            // An otherwise-empty base must still fall through to the pending-travel check before reporting empty.
+            assertTrue(base.isEmpty(campaign));
+            verify(locationManager).holdsPendingTravelDestination(base);
         }
     }
 

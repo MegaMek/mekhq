@@ -287,7 +287,7 @@ public class SpacecraftCoolingSystem extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_VESSEL);
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

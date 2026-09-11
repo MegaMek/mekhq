@@ -44,6 +44,7 @@ class SystemsOptionsModel {
     int chaosReputationCap;
     boolean chaosDebtPenaltiesStack;
     boolean chaosNoPartialSuccessReputation;
+    boolean useFailedContractReputationLoss;
     boolean chaosPersonalityAffectsReputation;
     boolean chaosNewRecruitsHaveReputation;
     boolean requireSupportForceTransportation;
@@ -72,6 +73,7 @@ class SystemsOptionsModel {
         chaosReputationCap = options.get(CampaignOption.CHAOS_REPUTATION_CAP);
         chaosDebtPenaltiesStack = options.get(CampaignOption.CHAOS_DEBT_PENALTIES_STACK);
         chaosNoPartialSuccessReputation = options.get(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION);
+        useFailedContractReputationLoss = options.get(CampaignOption.USE_FAILED_CONTRACT_REPUTATION_LOSS);
         chaosPersonalityAffectsReputation = options.get(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION);
         chaosNewRecruitsHaveReputation = options.get(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION);
         requireSupportForceTransportation = options.get(CampaignOption.REQUIRE_SUPPORT_FORCE_TRANSPORTATION);
@@ -100,6 +102,7 @@ class SystemsOptionsModel {
         options.set(CampaignOption.CHAOS_REPUTATION_CAP, chaosReputationCap);
         options.set(CampaignOption.CHAOS_DEBT_PENALTIES_STACK, chaosDebtPenaltiesStack);
         options.set(CampaignOption.CHAOS_NO_PARTIAL_SUCCESS_REPUTATION, chaosNoPartialSuccessReputation);
+        options.set(CampaignOption.USE_FAILED_CONTRACT_REPUTATION_LOSS, useFailedContractReputationLoss);
         options.set(CampaignOption.CHAOS_PERSONALITY_AFFECTS_REPUTATION, chaosPersonalityAffectsReputation);
         options.set(CampaignOption.CHAOS_NEW_RECRUITS_HAVE_REPUTATION, chaosNewRecruitsHaveReputation);
         options.set(CampaignOption.REQUIRE_SUPPORT_FORCE_TRANSPORTATION, requireSupportForceTransportation);

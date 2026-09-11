@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.mission.scenarios;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -62,6 +64,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -153,7 +156,8 @@ public class BotForceRandomizer {
     // region Constructors
     public BotForceRandomizer() {
         factionCode = "MERC";
-        skill = SkillLevel.REGULAR;
+        // NONE is the "Random" sentinel: each generated unit rolls its own level (see generateEntity).
+        skill = SkillLevel.NONE;
         unitType = UnitType.MEK;
         quality = DragoonRating.DRAGOON_C.getRating();
         forceMultiplier = 1.0;
@@ -479,14 +483,17 @@ public class BotForceRandomizer {
         innerMap.put(Crew.MAP_GIVEN_NAME, crewNameArray[0]);
         innerMap.put(Crew.MAP_SURNAME, crewNameArray[1]);
 
+        // Resolve the "Random" sentinel per unit, so a Random selection rolls a fresh level for each entity
+        // (a fixed selection uses that level for every entity).
+        final SkillLevel entitySkill = Skills.resolveRandomSkillLevel(skill);
         final AbstractSkillGenerator skillGenerator = new ModifiedConstantSkillGenerator();
-        skillGenerator.setLevel(skill);
+        skillGenerator.setLevel(entitySkill);
         if (faction.isClan()) {
             skillGenerator.setType(SkillGeneratorType.CLAN);
         }
         int[] skills = skillGenerator.generateRandomSkills(en);
 
-        if (faction.isClan() && (Compute.d6(2) > (6 - skill.ordinal() + skills[0] + skills[1]))) {
+        if (faction.isClan() && (Compute.d6(2) > (6 - entitySkill.ordinal() + skills[0] + skills[1]))) {
             Phenotype phenotype = Phenotype.NONE;
             switch (en.getUnitType()) {
                 case UnitType.MEK:
@@ -678,7 +685,10 @@ public class BotForceRandomizer {
         StringBuilder sb = new StringBuilder();
         sb.append(Factions.getInstance().getFaction(factionCode).getFullName(campaign.getGameYear()));
         sb.append(' ');
-        sb.append(skill.toString());
+        // NONE (or null) is the "Random" sentinel - show the shared "Random" label rather than "None".
+        sb.append((skill == null || skill == SkillLevel.NONE)
+                        ? getTextAt("mekhq.resources.SkillLevelPickerUtil", "random.text")
+                        : skill.toString());
         sb.append(' ');
         String typeDesc = UnitType.getTypeDisplayableName(unitType);
         if (percentConventional > 0) {

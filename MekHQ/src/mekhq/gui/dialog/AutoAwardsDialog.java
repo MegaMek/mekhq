@@ -145,7 +145,8 @@ public class AutoAwardsDialog extends JDialog {
         cboPersonnelFilter = new JComboBox<>();
         cboPersonnelFilter.setMaximumSize(new Dimension(200, 20));
 
-        for (PersonnelFilter filter : MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true)) {
+        for (PersonnelFilter filter : PersonnelFilter.applicableTo(
+              MekHQ.getMHQOptions().getPersonnelFilterStyle().getFilters(true), campaign)) {
             cboPersonnelFilter.addItem(filter);
         }
 

@@ -42,7 +42,6 @@ import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
-import megamek.common.units.Mek;
 import megamek.common.units.Tank;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -189,11 +188,22 @@ public class PodSpace implements IPartWork {
                 return unit.getEntity().getLocationName(location) + " is destroyed.";
             }
             if (repairInPlace) {
+                boolean hasMissingPart = false;
                 for (int id : childPartIds) {
                     final Part p = unit.getCampaign().getPlayerForce().getWarehouse().getPart(id);
-                    if (p instanceof MissingPart) {
-                        return null;
+                    if (p instanceof MissingPart missing) {
+                        hasMissingPart = true;
+                        // Only fixable if a replacement is actually in stock. This check prevents an infinite loop
+                        // in MRMS
+                        if (missing.isReplacementAvailable()) {
+                            return null;
+                        }
                     }
+                }
+                if (hasMissingPart) {
+                    return "There are no replacement parts available for " +
+                                 unit.getEntity().getLocationName(location) +
+                                 '.';
                 }
                 return unit.getEntity().getLocationName(location) + " is not missing any pod-mounted equipment.";
             } else {
@@ -374,14 +384,7 @@ public class PodSpace implements IPartWork {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        if (unit.getEntity() instanceof Mek) {
-            return skillType.equals(SkillType.S_TECH_MEK);
-        } else if (unit.getEntity() instanceof Aero) {
-            return skillType.equals(SkillType.S_TECH_AERO);
-        } else if (unit.getEntity() instanceof Tank) {
-            return skillType.equals(SkillType.S_TECH_MECHANIC);
-        }
-        return false;
+        return skillType.equals(SkillType.S_TECH_MECHANICAL);
     }
 
     @Override

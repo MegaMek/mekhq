@@ -40,6 +40,7 @@ import static megamek.common.board.Coords.ALL_DIRECTIONS;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.REGULAR;
+import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
 import static megamek.common.units.UnitType.CONV_FIGHTER;
 import static megamek.common.units.UnitType.DROPSHIP;
 import static megamek.common.units.UnitType.JUMPSHIP;
@@ -67,6 +68,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.utilities.EntityUtilities.hasActiveProbe;
 import static mekhq.utilities.EntityUtilities.hasImprovedSensors;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -101,10 +103,13 @@ import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConOceanPlacer;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConRoadPlacer;
 import mekhq.campaign.events.StratConDeploymentEvent;
 import mekhq.campaign.events.scenarios.ScenarioChangedEvent;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractCommandRights;
+import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
@@ -130,6 +135,7 @@ import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.campaign.universe.Planet;
 import mekhq.gui.dialog.StratConAmbushedDialog;
 import mekhq.gui.dialog.nagDialogs.CombatChallengeNagDialog;
@@ -1075,7 +1081,7 @@ public class StratConRulesManager {
         // but they can operate on airless worlds (vacuum)
         if (isAtmospheric && entity.hasQuirk(OptionsConstants.QUIRK_NEG_UNSTREAMLINED)) {
             Planet planet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
-            if (planet == null || !planet.getAtmosphere(campaign.getLocalDate()).isNone()) {
+            if (planet == null || !planet.getPressure(campaign.getLocalDate()).isVacuum()) {
                 return false;
             }
         }
@@ -1257,7 +1263,10 @@ public class StratConRulesManager {
         boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != Allied);
 
         int targetNum = calculateScenarioOdds(track, contract, true);
-        boolean spawnScenario = (facility == null) && (randomInt(100) <= targetNum);
+        // Under "Essential Scenarios Only", deploying into an empty hex never rolls a random encounter - only the
+        // contract's Essential objective scenarios appear. Facility scenarios (below) are objective-tied and unaffected.
+        boolean essentialScenariosOnly = campaignOptions.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
+        boolean spawnScenario = !essentialScenariosOnly && (facility == null) && (randomInt(100) <= targetNum);
 
         if (isNonAlliedFacility || spawnScenario) {
             StratConScenario scenario;
@@ -1308,7 +1317,14 @@ public class StratConRulesManager {
                 // If the player doesn't have any available forces, we grab a force at random to
                 // seed the scenario
                 if (availableForceIDs.isEmpty()) {
-                    List<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
+                    List<CombatTeam> combatTeams = new ArrayList<>();
+                    for (CombatTeam candidate : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
+                        Formation candidateFormation = candidate.getFormation(campaign);
+                        if ((candidateFormation != null)
+                                  && !SupportCarrierDeployment.deploysNothing(campaign, candidateFormation, null)) {
+                            combatTeams.add(candidate);
+                        }
+                    }
                     if (!combatTeams.isEmpty()) {
                         combatTeam = getRandomItem(combatTeams);
 
@@ -2521,6 +2537,70 @@ public class StratConRulesManager {
     }
 
     /**
+     * Determines the set of {@link MapLocation map locations} that StratCon is allowed to generate scenarios in, given
+     * the composition of the campaign's fleet.
+     *
+     * <p>This implements the {@link CampaignOption#RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY} option: an aerospace
+     * outfit should not be handed ground battles it has no units to fight. The rules are:</p>
+     *
+     * <ul>
+     *   <li>If the option is disabled, the campaign has no units, or it fields any ground-capable unit (a 'Mek,
+     *       vehicle, infantry, and so on), no restriction is applied and {@code null} is returned - the full range of
+     *       ground, low-atmosphere, and space scenarios remains available.</li>
+     *   <li>If every unit is airborne and at least one is space-capable (an aerospace fighter, small craft, DropShip,
+     *       and so on), scenarios are restricted to space and low atmosphere.</li>
+     *   <li>If every unit is airborne but none is space-capable (only conventional fighters), scenarios are restricted
+     *       to low atmosphere.</li>
+     * </ul>
+     *
+     * <p>This reads the player force's {@link mekhq.campaign.force.FleetAltitudeCapability}, a cached summary
+     * refreshed once per day in {@code CampaignNewDayManager} (before scenario generation), so this method is O(1) and
+     * safe to call for every scenario generated in a batch rather than rescanning the roster each time.</p>
+     *
+     * @param campaign the current {@link Campaign}
+     *
+     * @return a fresh {@link Set} of the allowed {@link MapLocation}s, or {@code null} if scenario generation should
+     *       not be restricted
+     */
+    public static @Nullable Set<MapLocation> getFleetRestrictedMapLocations(Campaign campaign) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY)) {
+            return null;
+        }
+
+        return switch (campaign.getPlayerForce().getFleetAltitudeCapability()) {
+            case UNRESTRICTED -> null;
+            case ATMOSPHERE_ONLY -> EnumSet.of(LowAtmosphere);
+            case SPACE_AND_ATMOSPHERE -> EnumSet.of(Space, LowAtmosphere);
+        };
+    }
+
+    /**
+     * Selects a random, non-ambush scenario template for the given unit type, honoring the campaign's
+     * {@link CampaignOption#RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY fleet-capability restriction}.
+     *
+     * <p>When the campaign is restricted to aerospace altitudes but the resolved {@code unitType} would only pull
+     * ground templates - most commonly because no deploying force was supplied, so it defaulted to
+     * {@link megamek.common.units.UnitType#MEK} - a representative aerospace unit type is substituted so a suitable
+     * scenario is still found instead of coming up empty.</p>
+     *
+     * @param campaign the current {@link Campaign}
+     * @param unitType the primary unit type of the deploying force, or {@code MEK} if none is available
+     *
+     * @return a suitable {@link ScenarioTemplate}, or {@code null} if none could be selected
+     */
+    private static @Nullable ScenarioTemplate getFleetAppropriateRandomScenario(Campaign campaign, int unitType) {
+        Set<MapLocation> allowedLocations = getFleetRestrictedMapLocations(campaign);
+
+        if ((allowedLocations != null) &&
+                  (convertSpecificUnitTypeToGeneral(unitType) !=
+                         ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX)) {
+            unitType = allowedLocations.contains(Space) ? AEROSPACE_FIGHTER : CONV_FIGHTER;
+        }
+
+        return StratConScenarioFactory.getRandomScenario(unitType, false, false, allowedLocations);
+    }
+
+    /**
      * Generates a StratCon scenario at the specified coordinates for the given force on the specified track. The
      * scenario is determined based on a random template suitable for the unit type of the specified force, and it is
      * optionally configured with a deployment delay.
@@ -2555,7 +2635,7 @@ public class StratConRulesManager {
         // produces an ambush. Ambushes (a scenario spawning on top of an already-deployed force) are handled up
         // front by generateScenarioForExistingForces in deployForceToCoords and generateDailyScenariosForTrack,
         // which pass an explicit ambush template instead of the random one selected here.
-        ScenarioTemplate template = StratConScenarioFactory.getRandomScenario(unitType, false, false);
+        ScenarioTemplate template = getFleetAppropriateRandomScenario(campaign, unitType);
         // useful for debugging specific scenario types
         // template = StratConScenarioFactory.getSpecificScenario("Defend Grounded
         // Dropship.xml");
@@ -2612,7 +2692,7 @@ public class StratConRulesManager {
                 // This just means the player has no units
             }
 
-            template = StratConScenarioFactory.getRandomScenario(unitType, false, false);
+            template = getFleetAppropriateRandomScenario(campaign, unitType);
         }
 
         if (template == null) {
@@ -2625,6 +2705,14 @@ public class StratConRulesManager {
               campaign);
         scenario.setBackingScenario(backingScenario);
         scenario.setCoords(coords);
+
+        // A scenario sitting on a strategic-objective facility - one the player must retain, capture, or destroy - is
+        // itself Essential: its outcome decides that facility's fate. Flag it so it is treated like any other
+        // strategic-objective scenario (Essential marker, combat bonus on victory, barred from being a Turning Point).
+        StratConFacility facilityAtCoords = (coords == null) ? null : track.getFacility(coords);
+        if ((facilityAtCoords != null) && facilityAtCoords.isStrategicObjective()) {
+            scenario.setStrategicObjective(true);
+        }
 
         // by default, certain conditions may make this bigger
         scenario.setRequiredPlayerLances(1);
@@ -3096,6 +3184,12 @@ public class StratConRulesManager {
                 continue;
             }
 
+            // A support company holds only carriers, which never deploy, so StratCon must not generate a scenario
+            // for it. It can sit in the combat-team list between a load and the next recalculation.
+            if (SupportCarrierDeployment.deploysNothing(campaign, formation, null)) {
+                continue;
+            }
+
             // So long as the combat team isn't In Reserve or Auxiliary, they are eligible to be deployed
             CombatRole combatRole = combatTeam.getRole();
             if (bypassRoleRestrictions) {
@@ -3184,6 +3278,13 @@ public class StratConRulesManager {
             }
 
             if (force.isDeployed()) {
+                continue;
+            }
+
+            // A support company holds only carriers, which stay home; offering it would assign a formation that
+            // sends nothing.
+            if (SupportCarrierDeployment.deploysNothing(campaign, force,
+                  (currentScenario == null) ? null : currentScenario.getBackingScenario())) {
                 continue;
             }
 
@@ -3278,6 +3379,10 @@ public class StratConRulesManager {
 
             // Validate the unit
             if (!isUnitValidForFrontlineDeployment(unit)) {
+                continue;
+            }
+
+            if (SupportCarrierDeployment.staysHome(unit, currentScenario.getBackingScenario())) {
                 continue;
             }
 
@@ -3417,6 +3522,10 @@ public class StratConRulesManager {
 
             // Validate the unit
             if (!isUnitValidForLeadershipDeployment(unit, generalUnitType, totalBudget)) {
+                continue;
+            }
+
+            if (SupportCarrierDeployment.staysHome(unit, currentScenario.getBackingScenario())) {
                 continue;
             }
 
@@ -3754,6 +3863,13 @@ public class StratConRulesManager {
                 // in case any objectives are linked to the scenario's coordinates
                 updateStrategicObjectives(victory, scenario, track);
 
+                // Winning an Essential (strategic-objective) scenario pays the contract's combat bonus. Combat pay is a
+                // per-battle figure set at negotiation (and divided by scale when track intensity is multiplied by
+                // scale), so the player earns it each time they secure one of these objectives.
+                if (victory && scenario.isStrategicObjective()) {
+                    awardCombatBonus(campaign, mission);
+                }
+
                 if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
                     switchFacilityOwner(facility);
                 }
@@ -3816,6 +3932,30 @@ public class StratConRulesManager {
         }
     }
 
+
+    /**
+     * Credits the contract's combat bonus to the player for winning an Essential (strategic-objective) scenario.
+     *
+     * <p>Combat pay is the per-battle bonus agreed during contract negotiation; it is paid out here, once per secured
+     * Essential objective, rather than as a lump sum. Does nothing when the contract carries no positive combat
+     * pay.</p>
+     *
+     * @param campaign the campaign whose finances receive the bonus
+     * @param contract the contract supplying the combat-pay figure
+     */
+    private static void awardCombatBonus(Campaign campaign, AbstractContract contract) {
+        ContractFinanceData financeData = contract.getContractFinanceData();
+        Money combatPay = (financeData == null) ? null : financeData.combatPay();
+        if ((combatPay == null) || !combatPay.isPositive()) {
+            return;
+        }
+
+        campaign.getPlayerForce().getFinances().credit(TransactionType.CONTRACT_PAYMENT, campaign.getLocalDate(),
+              combatPay,
+              getFormattedTextAt(RESOURCE_BUNDLE, "StratConRulesManager.combatBonus.reason", contract.getName()));
+        campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE, "StratConRulesManager.combatBonus.report",
+              combatPay.toAmountAndSymbolString()));
+    }
 
     /**
      * Worker function that updates strategic objectives relevant to the passed in scenario, track and campaign state.

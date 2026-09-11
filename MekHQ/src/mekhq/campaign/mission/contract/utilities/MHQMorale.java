@@ -739,7 +739,8 @@ public class MHQMorale {
               campaign.getPlayerForce().getForceDetachment().getCurrentLocation(),
               campaign.getLocalDate(),
               contract.getEmployerFaction(),
-              contract.getObjectiveType()
+              contract.getObjectiveType(),
+              false // Always treat this as a non-covert contract to avoid weirdness
         );
 
         // The Batchall, standing update, and salvage clause below all concern the newly generated enemy, so read its
@@ -786,8 +787,11 @@ public class MHQMorale {
             // Whenever we dynamically change the enemy faction, we update standing accordingly. A covert sponsor, if
             // any, takes the standing change in the visible enemy's place.
             Faction standingEnemyFaction = contract.getStandingEnemyFaction();
+            // The enemy-disposition characteristic (Professional Courtesy / Blood Feud) scales the standing loss.
+            double enemyRegardMultiplier = regardMultiplier
+                                                 * ContractCharacteristics.getEnemyRegardMultiplier(contract);
             String report = factionStandings.processContractAccept(campaignFactionCode, standingEnemyFaction, today,
-                  regardMultiplier, contract.getLengthInMonths());
+                  enemyRegardMultiplier, contract.getLengthInMonths());
             if (report != null) {
                 campaign.addReport(POLITICS, report);
             }

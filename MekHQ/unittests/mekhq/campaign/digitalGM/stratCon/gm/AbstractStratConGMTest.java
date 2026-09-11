@@ -49,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.IFacilityStrategy;
 import mekhq.campaign.digitalGM.IScenarioGenerationStrategy;
@@ -153,9 +154,17 @@ class AbstractStratConGMTest {
     }
 
     private static NewDayEvent newDay(LocalDate today, AbstractContract contract) {
+        return newDay(today, contract, false);
+    }
+
+    private static NewDayEvent newDay(LocalDate today, AbstractContract contract, boolean essentialScenariosOnly) {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getLocalDate()).thenReturn(today);
         when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY)).thenReturn(essentialScenariosOnly);
+        when(campaign.getCampaignOptions()).thenReturn(options);
 
         NewDayEvent event = mock(NewDayEvent.class);
         when(event.getCampaign()).thenReturn(campaign);
@@ -268,6 +277,25 @@ class AbstractStratConGMTest {
 
         gm.handleNewDay(newDay(TUESDAY, contract));
 
+        verify(gm.generation, never()).generateDailyScenarios(any(),
+              any(),
+              any(),
+              org.mockito.ArgumentMatchers.anyInt());
+    }
+
+    @Test
+    void essentialScenariosOnlySuppressesAmbientScenarioGeneration() {
+        StratConTrackState track = trackWith();
+        // A weekly date is due today and it is Monday, so both the weekly roll and the daily generation would fire
+        // were ambient scenarios not suppressed.
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>(List.of(MONDAY)));
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        TestGM gm = new TestGM(false);
+
+        gm.handleNewDay(newDay(MONDAY, contract, true));
+
+        verify(gm.generation, never()).generateWeeklyScenarioDates(any(), any(), any(), any(),
+              org.mockito.ArgumentMatchers.anyBoolean());
         verify(gm.generation, never()).generateDailyScenarios(any(),
               any(),
               any(),

@@ -33,7 +33,6 @@
 package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
-import static mekhq.campaign.ForceHumanResources.isUsingLegacyPersonnelMarket;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
@@ -79,6 +78,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityListFile;
+import megamek.common.units.UnitType;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
@@ -109,6 +109,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.ContractEmergencyExtension;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
@@ -131,6 +132,7 @@ import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -268,7 +270,7 @@ public final class BriefingTab extends CampaignGuiTab {
                 if (value instanceof AbstractContract contract) {
                     MissionStatus status = contract.getStatus();
                     if (status != null) {
-                        setText(getText() + " [" + status + "]");
+                        setText("[" + status + "] " + getText());
                     }
                 }
                 return this;
@@ -431,7 +433,6 @@ public final class BriefingTab extends CampaignGuiTab {
         scrollScenarioView.setViewportView(null);
         scrollScenarioView.setMinimumSize(new Dimension(350, 220));
         panLanceAssignment = new LanceAssignmentView(getCampaign());
-        panLanceAssignment.setAssignmentChangeListener(this::updateMissionDeploymentCoverage);
 
         scenarioWorkTabs = new JTabbedPane();
         styleBriefingTabs(scenarioWorkTabs);
@@ -769,8 +770,21 @@ public final class BriefingTab extends CampaignGuiTab {
         refreshScenarioActionButtonEmphasis();
     }
 
+    /**
+     * @param scenario the scenario to test
+     *
+     * @return {@code true} if the scenario belongs to a contract that is running a StratCon campaign, otherwise
+     *       {@code false} - including when the scenario has no contract to ask
+     */
     private boolean isStratConScenario(Scenario scenario) {
         AbstractContract mission = getCampaign().getContract(scenario.getMissionId());
+        if (mission == null) {
+            logger.warn("[Briefing] Scenario {} ({}) is not linked to any contract; treating it as non-StratCon.",
+                  scenario.getId(),
+                  scenario.getName());
+            return false;
+        }
+
         return mission.getStratConCampaignState() != null;
     }
 
@@ -838,11 +852,15 @@ public final class BriefingTab extends CampaignGuiTab {
         getCampaign().completeMission(mission, status);
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
 
+        // Pay the completion bonus, if the contract earned one (Completion Bonus characteristic, success only).
+        ContractCharacteristics.payCompletionBonus(getCampaign(), mission, status);
+
         if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)) {
             List<Person> personnel = getCampaign().getPlayerForce()
                                            .getHumanResources()
                                            .getPersonnelFilteringOutDepartedAndAbsent();
-            ChaosReputation.processContractCompletion(getCampaign(), status, personnel);
+            ChaosReputation.processContractCompletion(getCampaign(), status, personnel,
+                  ContractCharacteristics.getUnitReputationMultiplier(mission, status));
 
             if (mission.getEmployerFactionCode() == PIRATE_FACTION_CODE) {
                 ChaosReputation.resolveActOfPiracy(getCampaign(),
@@ -957,7 +975,9 @@ public final class BriefingTab extends CampaignGuiTab {
             FactionStandings factionStandings = getCampaign().getPlayerForce().getFactionStandings();
             List<String> reports = new ArrayList<>();
 
-            double regardMultiplier = campaignOptions.get(CampaignOption.REGARD_MULTIPLIER);
+            // The employer's disposition characteristic (Employer's Favorite / On Probation) scales the standing change.
+            double regardMultiplier = campaignOptions.get(CampaignOption.REGARD_MULTIPLIER)
+                                            * ContractCharacteristics.getEmployerRegardMultiplier(mission);
 
             // A covert sponsor, if any, takes the standing change in the visible employer's place.
             Faction employer = mission.getStandingEmployerFaction();
@@ -968,7 +988,7 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         // Refresh personnel market if it was previously disabled
-        if (!isUsingLegacyPersonnelMarket(campaignOptions) && marketPreviouslyDisabled) {
+        if (marketPreviouslyDisabled) {
             Campaign campaign = getCampaign();
             campaign.getPlayerForce().getHumanResources().refreshApplicants(campaign, true);
             CampaignNewDayManager.showRarePersonnelDialog(getCampaign(), false);
@@ -1817,6 +1837,11 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void promptAutoResolve(Scenario scenario) {
+        if (!MekHQ.getMHQOptions().getEnableAbstractCombatAutoResolve()) {
+            runPrincessAutoResolve();
+            return;
+        }
+
         // the options for the auto resolve method follow a predefined order, which is the same as the order in the enum,
         // and it uses that to preselect the option that is currently set in the campaign options
         Object[] options = new Object[] { getText("AutoResolveMethod.PRINCESS.text"),
@@ -1877,6 +1902,30 @@ public final class BriefingTab extends CampaignGuiTab {
         return scenarioModel.getScenario(scenarioTable.convertRowIndexToModel(row));
     }
 
+    /**
+     * Determines whether a unit is a space-only craft being sent to a board it cannot operate on.
+     *
+     * <p>WarShips, JumpShips and space stations can only fight on a space map; on a ground or atmospheric map they
+     * have no legal deployment. Aerospace fighters, DropShips and small craft are not blocked here - they follow the
+     * scenario's own rules. The check uses the entity's unit type rather than matching on chassis names. See issue
+     * #9960 (#9952).</p>
+     *
+     * @param entity    the player entity being considered
+     * @param boardType the scenario board type ({@link Scenario#T_GROUND}, {@link Scenario#T_ATMOSPHERE} or
+     *                  {@link Scenario#T_SPACE})
+     *
+     * @return {@code true} if the entity is space-only and the board is not a space map
+     */
+    static boolean isSpaceOnlyUnitOnNonSpaceBoard(Entity entity, int boardType) {
+        if (boardType == Scenario.T_SPACE) {
+            return false;
+        }
+        int unitType = entity.getUnitType();
+        return (unitType == UnitType.WARSHIP)
+                     || (unitType == UnitType.JUMPSHIP)
+                     || (unitType == UnitType.SPACE_STATION);
+    }
+
     private void startScenario(Scenario scenario, BehaviorSettings autoResolveBehaviorSettings) {
         Vector<UUID> uids = scenario.getForces(getCampaign()).getAllUnits(false);
         if (uids.isEmpty()) {
@@ -1896,10 +1945,29 @@ public final class BriefingTab extends CampaignGuiTab {
                 continue;
             }
 
+            // A support carrier that stayed home is not a unit that failed to deploy; it is skipped rather than
+            // listed in the warning below.
+            if (unit.isCarrier() && !SupportCarrierDeployment.isAllowed(scenario)) {
+                continue;
+            }
+
             Entity entity = unit.getEntity();
 
             if (entity == null) {
                 logger.error("Skipping unit {} because it's entity is null", uid);
+                continue;
+            }
+
+            // A space-only unit (WarShip, JumpShip, space station) cannot fight on a ground or atmospheric map. In
+            // Commander mode there is no lobby to catch this, so it is refused here for both launch modes rather than
+            // deployed onto a map it cannot operate on. See issue #9960 (#9952).
+            if (isSpaceOnlyUnitOnNonSpaceBoard(entity, scenario.getBoardType())) {
+                unDeployed.append('\n')
+                      .append(unit.getName())
+                      .append(" (a space-only unit cannot deploy on a ")
+                      .append(Scenario.getBoardTypeName(scenario.getBoardType()).toLowerCase(Locale.ROOT))
+                      .append(" map)");
+                unDeployedUnits.add(unit);
                 continue;
             }
 
@@ -2309,6 +2377,14 @@ public final class BriefingTab extends CampaignGuiTab {
 
         for (UUID uid : uids) {
             Unit u = getCampaign().getUnit(uid);
+            if (u == null) {
+                continue;
+            }
+            // A support carrier that stayed home is not a unit that failed to deploy; it is skipped rather than
+            // listed in the warning below.
+            if (u.isCarrier() && !SupportCarrierDeployment.isAllowed(scenario)) {
+                continue;
+            }
             if (null != u.getEntity()) {
                 if (null == u.checkDeployment()) {
                     // Make sure the unit's entity and pilot are fully up to date!
@@ -2589,13 +2665,6 @@ public final class BriefingTab extends CampaignGuiTab {
         panLanceAssignment.refresh();
         refreshSelectedScenarioActions(getSelectedScenario());
         refreshAssignmentsTabAvailability();
-        updateMissionDeploymentCoverage();
-    }
-
-    private void updateMissionDeploymentCoverage() {
-        if (missionViewPanel != null) {
-            missionViewPanel.updateDeploymentCoverage();
-        }
     }
 
     /*

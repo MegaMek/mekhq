@@ -87,10 +87,16 @@ public record CargoStatistics(Campaign campaign) {
                      .sum();
     }
 
-    // Liquid not included
+    /**
+     * Returns the total cargo capacity across every bay type that can hold general cargo, plus livestock. Liquid cargo
+     * capacity is deliberately excluded.
+     *
+     * <p>Note that {@link #getTotalCargoCapacity()} already folds in refrigerated and insulated bay capacity - the
+     * convoy calculation treats both as usable general cargo space - so they must not be added again here. Only
+     * livestock capacity is added on top; adding refrigerated and insulated would double-count them.</p>
+     */
     public double getTotalCombinedCargoCapacity() {
-        return getTotalCargoCapacity() + getTotalLivestockCargoCapacity()
-                     + getTotalInsulatedCargoCapacity() + getTotalRefrigeratedCargoCapacity();
+        return getTotalCargoCapacity() + getTotalLivestockCargoCapacity();
     }
 
     public double getCargoTonnage(boolean inTransit) {
@@ -114,9 +120,12 @@ public record CargoStatistics(Campaign campaign) {
 
         // if we're in transit or the part is present and has a meaningful tonnage, accumulate it
         // not sure what the "in transit" flag is for, but I'm leaving it to retain current behavior
+        // Double.isFinite also rejects Infinity (not just NaN); a single part reporting a non-finite
+        // tonnage must not be allowed to poison the whole cargo total (see MekHQ issue #9616).
         for (Part part : spareParts) {
-            if ((inTransit || part.isPresent()) && !Double.isNaN(part.getTonnage())) {
-                cargoTonnage += part.getQuantity() * part.getTonnage();
+            double partTonnage = part.getTonnage();
+            if ((inTransit || part.isPresent()) && Double.isFinite(partTonnage)) {
+                cargoTonnage += part.getQuantity() * partTonnage;
             }
         }
 

@@ -426,6 +426,8 @@ public class FactionStandingUtilities {
      * <p>The rules for entry are as follows:</p>
      * <ol>
      *   <li>If the target system is empty (population zero), entry is always permitted.</li>
+     *   <li>If the target system has no controlling faction (uncolonized or abandoned), entry is always permitted, even
+     *   if it retains a residual population. There is no government present to bar entry.</li>
      *   <li>If the target system is owned by any faction that is either an employer or a contract target, entry is
      *   allowed.</li>
      *   <li>If the player is outlawed in their current system, they may always exit to another system (unless {@code
@@ -458,6 +460,12 @@ public class FactionStandingUtilities {
         }
 
         Set<Faction> systemFactions = targetSystem.getFactionSet(when);
+
+        // Always allowed in systems with no controlling faction.
+        if (systemFactions.isEmpty()) {
+            LOGGER.debug("Target system has no controlling faction, access granted");
+            return true;
+        }
 
         Set<Faction> contractEmployers = new HashSet<>();
         Set<Faction> contractTargets = new HashSet<>();
@@ -521,8 +529,15 @@ public class FactionStandingUtilities {
      */
     private static boolean isOutlawedInSystem(FactionStandings factionStandings, PlanetarySystem targetSystem,
           LocalDate when) {
+        Set<Faction> systemFactions = targetSystem.getFactionSet(when);
+
+        // A system with no controlling faction cannot outlaw anyone.
+        if (systemFactions.isEmpty()) {
+            return false;
+        }
+
         double highestRegard = FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard();
-        for (Faction faction : targetSystem.getFactionSet(when)) {
+        for (Faction faction : systemFactions) {
             double currentRegard = factionStandings.getRegardForFaction(faction.getShortName(), true);
             if (currentRegard > highestRegard) {
                 highestRegard = currentRegard;

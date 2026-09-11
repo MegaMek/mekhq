@@ -66,8 +66,8 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.OptimizeInfirmaryAssignments;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.MedicPoolChangedEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
@@ -76,7 +76,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.AdvancedReplacementLimbDialog;
+import mekhq.gui.dialog.AdvancedSurgeriesDialog;
 import mekhq.gui.dialog.MedicalViewDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.DocTableModel;
@@ -172,7 +172,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
                           person.getHyperlinkedFullTitle());
                     getCampaign().addReport(MEDICAL, report);
                 } else {
-                    new AdvancedReplacementLimbDialog(getCampaign(), getCampaignGui().getIconPackage(), person, false);
+                    new AdvancedSurgeriesDialog(getCampaign(), getCampaignGui(), person, false);
                 }
             }
         });

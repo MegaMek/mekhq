@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -35,6 +35,7 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
@@ -151,6 +152,13 @@ public class MissingBattleArmorEquipmentPart extends MissingEquipmentPart {
 
     @Override
     public void fix() {
+        // Never install a replacement for a Missing part that has lost a valid trooper assignment. Copying this onto
+        // the replacement below would attach an out-of-range part to the unit, which then crashes the next campaign
+        // load. We have other protections that should prevent this from being any issue, but I added this guard just
+        // in case. Illiani - Aug/31/26
+        if ((unit == null) || (trooper < BattleArmor.LOC_TROOPER_1)) {
+            return;
+        }
         Part replacement = findReplacement(false);
         if (null != replacement) {
             Part actualReplacement = replacement.clone();

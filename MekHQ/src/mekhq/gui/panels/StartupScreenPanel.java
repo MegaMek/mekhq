@@ -86,7 +86,7 @@ public class StartupScreenPanel extends AbstractMHQPanel {
     private BufferedImage backgroundIcon;
 
     // Save file filtering needs to avoid loading some special files
-    public static FilenameFilter saveFilter = (dir, name) -> {
+    public static final FilenameFilter saveFilter = (dir, name) -> {
         // Allow any .xml, .cpnx, and .cpnx.gz file that is not in the list of excluded
         // files
         List<String> toReject = List.of(PreferenceManager.DEFAULT_CFG_FILE_NAME.toLowerCase());

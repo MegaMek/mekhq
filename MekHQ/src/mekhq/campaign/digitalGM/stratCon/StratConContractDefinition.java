@@ -87,8 +87,15 @@ public class StratConContractDefinition {
      */
     public static StratConContractDefinition getContractDefinition(final ContractObjectiveType contractObjectiveType) {
         if (!loadedDefinitions.containsKey(contractObjectiveType)) {
-            String filePath = Paths.get(MHQConstants.STRAT_CON_CONTRACT_PATH,
-                  getContractDefinitionManifest().definitionFileNames.get(contractObjectiveType)).toString();
+            String fileName = getContractDefinitionManifest().definitionFileNames.get(contractObjectiveType);
+            if (fileName == null) {
+                // No manifest entry (e.g. the UNDEFINED sentinel). Guard against a null path segment, which would
+                // otherwise crash Paths.get. Callers treat a null definition as "skip StratCon seeding".
+                LOGGER.error("No contract definition is mapped for objective type {}", contractObjectiveType);
+                return null;
+            }
+
+            String filePath = Paths.get(MHQConstants.STRAT_CON_CONTRACT_PATH, fileName).toString();
             StratConContractDefinition def = Deserialize(new File(filePath));
 
             if (def == null) {

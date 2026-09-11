@@ -73,8 +73,7 @@ class MHQDisplayPage extends MHQOptionsPage {
     private SettingsCheckBox chkHideUnitFluff;
     private SettingsCheckBox chkUseAlternateStratConFogOfWar;
     private SettingsCheckBox chkHistoricalDailyLog;
-    private SettingsCheckBox chkCompanyGeneratorStartup;
-    private SettingsCheckBox chkShowCompanyGenerator;
+    private SettingsCheckBox chkShowCommandGenerator;
     private SettingsCheckBox chkShowUnitPicturesOnTOE;
     private SettingsCheckBox chkShowWarriorsAlmanac;
 
@@ -182,9 +181,7 @@ class MHQDisplayPage extends MHQOptionsPage {
         chkUseAlternateStratConFogOfWar = checkBox("optionUseAlternateStratConFogOfWar",
               model.useAlternateStratConFogOfWarDisplay, getMetadata(new Version(0, 51, 1)));
         chkHistoricalDailyLog = checkBox("optionHistoricalDailyLog", model.historicalDailyLog);
-        chkCompanyGeneratorStartup = checkBox("chkCompanyGeneratorStartup", model.companyGeneratorStartup,
-              getMetadata(null, CampaignOptionFlag.UNIMPLEMENTED));
-        chkShowCompanyGenerator = checkBox("chkShowCompanyGenerator", model.showCompanyGenerator);
+        chkShowCommandGenerator = checkBox("chkShowCommandGenerator", model.showCommandGenerator);
         chkShowUnitPicturesOnTOE = checkBox("chkShowUnitPicturesOnTOE", model.showUnitPicturesOnTOE);
         chkShowWarriorsAlmanac = checkBox("chkShowWarriorsAlmanac", model.showWarriorsAlmanac,
               getMetadata(new Version(0, 51, 1)));
@@ -192,8 +189,7 @@ class MHQDisplayPage extends MHQOptionsPage {
               chkHideUnitFluff,
               chkUseAlternateStratConFogOfWar,
               chkHistoricalDailyLog,
-              chkCompanyGeneratorStartup,
-              chkShowCompanyGenerator,
+              chkShowCommandGenerator,
               chkShowUnitPicturesOnTOE,
               chkShowWarriorsAlmanac);
 
@@ -423,8 +419,7 @@ class MHQDisplayPage extends MHQOptionsPage {
         model.hideUnitFluff = chkHideUnitFluff.isSelected();
         model.useAlternateStratConFogOfWarDisplay = chkUseAlternateStratConFogOfWar.isSelected();
         model.historicalDailyLog = chkHistoricalDailyLog.isSelected();
-        model.companyGeneratorStartup = chkCompanyGeneratorStartup.isSelected();
-        model.showCompanyGenerator = chkShowCompanyGenerator.isSelected();
+        model.showCommandGenerator = chkShowCommandGenerator.isSelected();
         model.showUnitPicturesOnTOE = chkShowUnitPicturesOnTOE.isSelected();
         model.showWarriorsAlmanac = chkShowWarriorsAlmanac.isSelected();
 

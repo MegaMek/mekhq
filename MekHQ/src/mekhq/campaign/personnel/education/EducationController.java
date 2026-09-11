@@ -188,7 +188,7 @@ public class EducationController {
 
         // Calculate the roll based on Reasoning if necessary
         int roll = d6(2);
-        if (campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
+        if (campaignOptions.get(CampaignOption.USE_RANDOM_TALENT)) {
             roll += (person.getReasoning().getReasoningScore() / 4);
         }
         // Calculate the target number based on base target number and faculty skill
@@ -672,7 +672,6 @@ public class EducationController {
      *
      * @param campaign  The campaign the person is part of.
      * @param person    The person for whom the journey is being processed.
-     * @param resources The resource bundle containing localized strings.
      */
     private static void journeyToAcademy(Campaign campaign, Person person) {
         PlanetarySystem targetSystem = campaign.getSystemById(person.getEduAcademySystem());
@@ -1409,7 +1408,7 @@ public class EducationController {
             }
         }
 
-        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
             graduationRoll += person.getReasoning().getReasoningScore();
         }
 
@@ -1705,7 +1704,7 @@ public class EducationController {
             }
         }
 
-        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES)) {
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
             graduationRoll += person.getReasoning().ordinal() - 12;
         }
 
@@ -2325,8 +2324,8 @@ public class EducationController {
      *   <li>If the person's education reaches the doctorate level, they are granted the pre-nominal "Dr".</li>
      * </ul>
      *
-     * <p>The pass rate is influenced by the campaign's settings. When using random personalities, the person's
-     * reasoning modifies the base pass rate (defaulting to average reasoning if personalities are disabled).</p>
+     * <p>The pass rate is influenced by the campaign's settings. When using random talent, the person's
+     * reasoning modifies the base pass rate (defaulting to average reasoning if talent is disabled).</p>
      *
      * @param campaign the campaign context, used to retrieve the current date, options, and calculate the person's
      *                 experience.
@@ -2354,7 +2353,7 @@ public class EducationController {
 
         // We base passRate on US averages
         int passRate = 60 - (Reasoning.values().length / 2);
-        final int reasoningModifier = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PERSONALITIES) ?
+        final int reasoningModifier = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT) ?
                                             person.getReasoning().getReasoningScore() :
                                             Reasoning.values().length / 2;
         passRate += reasoningModifier;

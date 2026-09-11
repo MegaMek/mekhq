@@ -53,6 +53,8 @@ public class CampaignOptionsUnmarshaller {
         CampaignOptions campaignOptions = new CampaignOptions();
         NodeList childNodes = parentNod.getChildNodes();
 
+        boolean sawRandomTalent = false;
+
         for (int i = 0; i < childNodes.getLength(); i++) {
             Node childNode = childNodes.item(i);
 
@@ -68,11 +70,22 @@ public class CampaignOptionsUnmarshaller {
                 LOGGER.debug("{}\n\t{}", nodeName, nodeContents);
             }
 
+            if (CampaignOption.USE_RANDOM_TALENT.xmlTag().equals(nodeName)) {
+                sawRandomTalent = true;
+            }
+
             try {
                 parseNodeName(version, nodeName, campaignOptions, nodeContents, childNode);
             } catch (Exception ex) {
                 LOGGER.error(ex, "Exception parsing campaign option node: {}", nodeName);
             }
+        }
+
+        // Talent (Reasoning) was coupled to random personalities before it gained its own toggle. Saves written before
+        // that split carry no useRandomTalent tag, so inherit the personality setting to preserve their behavior.
+        if (!sawRandomTalent) {
+            campaignOptions.set(CampaignOption.USE_RANDOM_TALENT,
+                  campaignOptions.get(CampaignOption.USE_RANDOM_PERSONALITIES));
         }
 
         LOGGER.debug("Load Campaign Options Complete!");

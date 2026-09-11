@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.parts;
 
-import static org.mockito.Mockito.lenient;
-
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static mekhq.campaign.parts.AmmoUtilities.getBombType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -60,8 +59,8 @@ import megamek.Version;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.enums.BombType;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.meks.MekSensor;
@@ -423,6 +422,24 @@ public class AmmoStorageTest {
         int shots = 50;
         AmmoStorage ammoStorage = new AmmoStorage(0, mockAmmoType, shots, mockCampaign);
         assertEquals((shots * kgPerShot) / 1000.0, ammoStorage.getTonnage(), 0.001);
+    }
+
+    @Test
+    public void getTonnageNoShotCapacityTest() {
+        // Infantry ammo has no per-ton shot capacity (getShots() == 0). getKgPerShot() then falls back to
+        // 1000.0 / getShots() == Infinity, so both weight paths would otherwise produce a non-finite
+        // tonnage that poisons cargo totals and crashes the Command Center (see MekHQ issue #9616).
+        // getTonnage() must treat such ammo as weightless.
+        AmmoType mockAmmoType = mock(AmmoType.class);
+        when(mockAmmoType.getKgPerShot()).thenReturn(Double.POSITIVE_INFINITY);
+        when(mockAmmoType.getShots()).thenReturn(0);
+        Campaign mockCampaign = mockCampaign();
+
+        AmmoStorage ammoStorage = new AmmoStorage(0, mockAmmoType, 50, mockCampaign);
+
+        double tonnage = ammoStorage.getTonnage();
+        assertEquals(0.0, tonnage, 0.001);
+        assertTrue(Double.isFinite(tonnage));
     }
 
     @Test

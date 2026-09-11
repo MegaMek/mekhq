@@ -53,13 +53,13 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -89,6 +89,7 @@ class BackgroundsPage {
     private CampaignOptionsHeaderPanel backgroundHeader;
     private JPanel pnlRandomBackgrounds;
     private JCheckBox chkUseRandomPersonalities;
+    private JCheckBox chkUseRandomTalent;
     private JCheckBox chkUsePersonalityTagsOnly;
     private JCheckBox chkUseRandomPersonalityReputation;
     private JCheckBox chkUseReasoningXpMultiplier;
@@ -171,6 +172,9 @@ class BackgroundsPage {
         chkUseRandomPersonalities = new CampaignOptionsCheckBox("UseRandomPersonalities",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
         chkUseRandomPersonalities.addMouseListener(createTipPanelUpdater("UseRandomPersonalities"));
+        chkUseRandomTalent = new CampaignOptionsCheckBox("UseRandomTalent",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.DOCUMENTED));
+        chkUseRandomTalent.addMouseListener(createTipPanelUpdater("UseRandomTalent"));
         chkUsePersonalityTagsOnly = new CampaignOptionsCheckBox("UsePersonalityTagsOnly",
                 getMetadata(new Version(0, 51, 1), CampaignOptionFlag.IMPORTANT));
         chkUsePersonalityTagsOnly.addMouseListener(createTipPanelUpdater("UsePersonalityTagsOnly"));
@@ -188,6 +192,7 @@ class BackgroundsPage {
             CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
                 chkUseRandomPersonalities,
+              chkUseRandomTalent,
                 chkUsePersonalityTagsOnly,
                 chkUseRandomPersonalityReputation,
                 chkUseReasoningXpMultiplier,
@@ -453,6 +458,7 @@ class BackgroundsPage {
         }
 
         chkUseRandomPersonalities.setSelected(model.useRandomPersonalities);
+        chkUseRandomTalent.setSelected(model.useRandomTalent);
         chkUsePersonalityTagsOnly.setSelected(model.usePersonalityLabelsOnly);
         chkUseRandomPersonalityReputation.setSelected(model.useRandomPersonalityReputation);
         chkUseReasoningXpMultiplier.setSelected(model.useReasoningXpMultiplier);
@@ -482,6 +488,7 @@ class BackgroundsPage {
         }
 
         model.useRandomPersonalities = chkUseRandomPersonalities.isSelected();
+        model.useRandomTalent = chkUseRandomTalent.isSelected();
         model.usePersonalityLabelsOnly = chkUsePersonalityTagsOnly.isSelected();
         model.useRandomPersonalityReputation = chkUseRandomPersonalityReputation.isSelected();
         model.useReasoningXpMultiplier = chkUseReasoningXpMultiplier.isSelected();

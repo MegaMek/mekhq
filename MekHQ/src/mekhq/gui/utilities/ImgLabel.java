@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2019-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -48,10 +48,52 @@ import javax.swing.JLabel;
  */
 public class ImgLabel extends JLabel {
     Image image;
+    private final int maxWidth;
+    private final int maxHeight;
 
-    public ImgLabel(Image i) {
+    /**
+     * Creates a label that paints the given image without an upper bound on its preferred size, so it reports the
+     * image's natural dimensions and grows to whatever space a stretching layout gives it.
+     *
+     * @param image the image to paint
+     */
+    public ImgLabel(Image image) {
+        this(image, Integer.MAX_VALUE, Integer.MAX_VALUE);
+    }
+
+    /**
+     * Creates a label that paints the given image, reporting a preferred size that fits the image (aspect ratio
+     * preserved) within the given bounds. The bounds matter for layouts that size a component to its preferred size
+     * (e.g. {@code GridBagConstraints.fill == NONE}); without a non-zero preferred size such layouts collapse the label
+     * to nothing and the image is never seen.
+     *
+     * @param i         the image to paint
+     * @param maxWidth  the maximum preferred width, in pixels
+     * @param maxHeight the maximum preferred height, in pixels
+     */
+    public ImgLabel(Image i, int maxWidth, int maxHeight) {
         super();
         this.image = i;
+        this.maxWidth = maxWidth;
+        this.maxHeight = maxHeight;
+    }
+
+    /**
+     * Reports the image's dimensions scaled to fit within the configured maximum bounds, preserving aspect ratio. This
+     * gives the label a non-zero footprint so that layouts which honor the preferred size still show the image.
+     *
+     * @return the preferred size for this label
+     */
+    @Override
+    public Dimension getPreferredSize() {
+        int imageWidth = image.getWidth(this);
+        int imageHeight = image.getHeight(this);
+        // If the image's dimensions are not yet known, defer to the default preferred size.
+        if ((imageWidth <= 0) || (imageHeight <= 0)) {
+            return super.getPreferredSize();
+        }
+        double scale = Math.min(1.0, Math.min((double) maxWidth / imageWidth, (double) maxHeight / imageHeight));
+        return new Dimension((int) Math.round(imageWidth * scale), (int) Math.round(imageHeight * scale));
     }
 
     /**

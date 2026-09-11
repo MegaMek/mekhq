@@ -53,6 +53,7 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.SpaceStation;
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -60,7 +61,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
 import mekhq.utilities.ReportingUtilities;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A table Model for displaying information about units
@@ -246,8 +246,9 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 // Allocate temp crew to driver slots first
                 tempDrivers = Math.min(totalTempCrew, driverShortfall);
             } else if (driverRole != null) {
-                // Driver has its own unique role
-                tempDrivers = unit.getTempCrewByPersonnelRole(driverRole);
+                // Driver has its own unique role. On large vessels temp crew only counts once a real driver is
+                // present, so use the effective count.
+                tempDrivers = unit.getEffectiveTempCrewByPersonnelRole(driverRole);
             }
 
             appendReport(reports,
@@ -272,8 +273,9 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 // Remaining temp crew goes to gunner slots
                 tempGunners = Math.min(tempCrewAfterDrivers, gunnerShortfall);
             } else if (gunnerRole != null) {
-                // Gunner has its own unique role
-                tempGunners = unit.getTempCrewByPersonnelRole(gunnerRole);
+                // Gunner has its own unique role. On large vessels temp crew only counts once a real gunner is
+                // present, so use the effective count.
+                tempGunners = unit.getEffectiveTempCrewByPersonnelRole(gunnerRole);
             }
 
             appendReport(reports,
@@ -295,13 +297,14 @@ public class UnitTableModel extends DataTableModel<Unit> {
 
             // If it isn't a large craft, we can use getDriverRole() to get the right crew type for the unit. If
             // vehicle ground crew differentiation returns, this'll need updated.
-            int tempCrew = isLargeCraft ? unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW) :
+            int tempCrew = isLargeCraft ? unit.getEffectiveTempCrewByPersonnelRole(PersonnelRole.VESSEL_CREW) :
                                  unit.getTempCrewByPersonnelRole(unit.getDriverRole()) - tempDrivers - tempGunners;
             appendReport(reports, getTextAt(RESOURCE_BUNDLE, key), crewAssigned, tempCrew, crewNeeded);
         }
 
         if (navigatorsNeeded > 0) {
-            int tempNavigators = unit.getTempCrewByPersonnelRole(PersonnelRole.VESSEL_PILOT);
+            // Navigators are never filled by temp/blob crew, so there is no temp count.
+            int tempNavigators = 0;
             appendReport(reports, getTextAt(RESOURCE_BUNDLE, "UnitTableModel.crewNeeds.navigator"), navigatorsAssigned,
                   tempNavigators, navigatorsNeeded);
         }
@@ -398,7 +401,7 @@ public class UnitTableModel extends DataTableModel<Unit> {
                 int cycleLength = campaign.getCampaignOptions().get(CampaignOption.MAINTENANCE_CYCLE_DAYS);
                 yield (unit.getMaintenanceCycleDuration(cycleLength) - daysSinceLastMaintenance) + " days";
             }
-            case COL_BV -> entity.calculateBattleValue(true, unit.getEntity().getCrew() == null);
+            case COL_BV -> entity.calculateBattleValue(true, true, true);
             case COL_REPAIR -> unit.getPartsNeedingFixing().size();
             case COL_PARTS -> unit.getPartsNeeded().size();
             case COL_SITE -> Unit.getSiteName(unit.getSite());
@@ -523,14 +526,11 @@ public class UnitTableModel extends DataTableModel<Unit> {
                     Campaign campaign1 = getCampaign();
                     Formation formation = campaign1.getPlayerForce().getFormationFor(u);
                     if (formation != null) {
-                        StringBuilder desc = new StringBuilder("<html><b>").append(formation.getName()).append("</b>");
-                        Formation parent = formation.getParentFormation();
-                        // cut off after three lines and don't include the top level
-                        int lines = 1;
-                        while ((parent != null) && (parent.getParentFormation() != null) && (lines < 4)) {
-                            desc.append("<br>").append(parent.getName());
-                            lines++;
-                            parent = parent.getParentFormation();
+                        boolean includeTopLevel = getCampaign().getCampaignOptions().get(CampaignOption.USE_EXTENDED_TOE_FORCE_NAME);
+                        List<String> path = formation.getDisplayPath(includeTopLevel);
+                        StringBuilder desc = new StringBuilder("<html><b>").append(path.get(0)).append("</b>");
+                        for (int i = 1; i < path.size(); i++) {
+                            desc.append("<br>").append(path.get(i));
                         }
                         desc.append("</html>");
                         setHtmlText(desc.toString());
