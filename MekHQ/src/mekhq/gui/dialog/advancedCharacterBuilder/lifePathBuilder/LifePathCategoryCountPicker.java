@@ -34,7 +34,6 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.codeUtilities.MathUtility.clamp;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -274,7 +273,7 @@ class LifePathCategoryCountPicker extends JDialog {
 
             if (selectedCategoryCounts.containsKey(category)) {
                 int currentValue = selectedCategoryCounts.get(category);
-                currentValue = clamp(currentValue, minimumSkillLevel, maximumSkillLevel);
+                currentValue = Math.clamp(currentValue, minimumSkillLevel, maximumSkillLevel);
                 spnCategoryCount.setValue(currentValue);
             }
 
