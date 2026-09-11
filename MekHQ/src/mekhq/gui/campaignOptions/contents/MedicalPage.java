@@ -46,9 +46,9 @@ import javax.swing.JSpinner;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -145,7 +145,7 @@ class MedicalPage {
 
         chkUseAlternativeAdvancedMedicalFewerPermanentInjuries = new CampaignOptionsCheckBox(
               "UseAlternativeAdvancedMedicalFewerPermanentInjuries",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM,
                     CampaignOptionFlag.IMPORTANT));
         chkUseAlternativeAdvancedMedicalFewerPermanentInjuries.addMouseListener(createTipPanelUpdater(
               "UseAlternativeAdvancedMedicalFewerPermanentInjuries"));
