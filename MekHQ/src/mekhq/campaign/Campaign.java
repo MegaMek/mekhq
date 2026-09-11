@@ -199,7 +199,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
-import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -509,15 +508,6 @@ public class Campaign implements ITechManager {
         getPlayerForce().getHumanResources().getNewPersonnelMarket().setCampaign(this);
         this.randomDeath.setCampaign(this);
         this.campaignSummary.setCampaign(this);
-
-        // TODO remove Immersive Dialog's reliance on Campaign so this can be enabled and the duplicate code in
-        //  CampaignFactory can be removed.
-        //        try {
-        //            lifePathLibrary = LifePathIO.loadAllLifePaths(this);
-        //        } catch (Exception ex) {
-        //            LOGGER.error("Unable to initialize Life Path Library. If this wasn't during automated testing this must " +
-        //                               "be investigated.", ex);
-        //        }
     }
 
     public IAutosaveService getAutosaveService() {

@@ -54,6 +54,9 @@ public enum LifePathEntryDataTraitLookup {
     EQUIPPED("EQUIPPED"),
     EXTRA_INCOME("EXTRA_INCOME"),
     LOST_LIMB("LOST_LIMB"), // character creation only
+    ORIGIN_MISSING_LIMB("ORIGIN_MISSING_LIMB"), // character creation only
+    ORIGIN_PROSTHETIC("ORIGIN_PROSTHETIC"), // character creation only
+    ORIGIN_RANK("ORIGIN_RANK"), // character creation only
     OWNED_VEHICLE("OWNED_VEHICLE"), // character creation only
     PROPERTY("PROPERTY"),
     REPUTATION("REPUTATION"),

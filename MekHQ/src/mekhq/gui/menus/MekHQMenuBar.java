@@ -640,6 +640,10 @@ public class MekHQMenuBar extends JMenuBar {
               event -> new StratConFacilityEditorDialog(getFrame()).setVisible(true));
         menuDeveloperTools.add(miFacilityEditor);
 
+        JMenuItem miLifePathBuilder = createMenuItem("miLifePathBuilder.text", KeyEvent.VK_F,
+              event -> new LifePathBuilderDialog(getCampaign(), getFrame()));
+        menuDeveloperTools.add(miLifePathBuilder);
+
         return menuDeveloperTools;
     }
 

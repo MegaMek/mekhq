@@ -214,6 +214,10 @@ public class Person implements ILocatable {
     public static final int MINIMUM_FAME = -5;
     public static final int MAXIMUM_FAME = 5;
 
+    public static final String ORIGIN_RANK = "ORIGIN_RANK";
+    public static final int MINIMUM_ORIGIN_RANK = 0;
+    public static final int MAXIMUM_ORIGIN_RANK = 15;
+
     public static final String TITLE_LABEL = "TITLE";
     public static final int MINIMUM_TITLE = 0;
     public static final int MAXIMUM_TITLE = 10;
@@ -229,6 +233,14 @@ public class Person implements ILocatable {
     public static final String BLOODMARK_LABEL = "BLOODMARK";
     public static final int MINIMUM_BLOODMARK = 0;
     public static final int MAXIMUM_BLOODMARK = 5;
+
+    public static final String ORIGIN_PROSTHETIC = "ORIGIN_PROSTHETIC";
+    public static final int MINIMUM_ORIGIN_PROSTHETIC = 0;
+    public static final int MAXIMUM_ORIGIN_PROSTHETIC = 6;
+
+    public static final String ORIGIN_MISSING_LIMB = "ORIGIN_MISSING_LIMB";
+    public static final int MINIMUM_ORIGIN_MISSING_LIMB = 0;
+    public static final int MAXIMUM_ORIGIN_MISSING_LIMB = 6;
 
     public static final String EXTRA_INCOME_LABEL = "EXTRA_INCOME";
     public static final int MINIMUM_EXTRA_INCOME = ExtraIncome.NEGATIVE_TEN.getTraitLevel();

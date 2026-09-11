@@ -244,6 +244,10 @@ class LifePathTraitPicker extends JDialog {
                             traitMinimumValue = MINIMUM_TITLE;
                             traitMaximumValue = MAXIMUM_TITLE;
                         }
+                        case ORIGIN_RANK -> {
+                            traitMinimumValue = MINIMUM_ORIGIN_RANK;
+                            traitMaximumValue = MAXIMUM_ORIGIN_RANK;
+                        }
                         case UNLUCKY -> {
                             traitMinimumValue = MINIMUM_UNLUCKY;
                             traitMaximumValue = MAXIMUM_UNLUCKY;
@@ -251,6 +255,14 @@ class LifePathTraitPicker extends JDialog {
                         case WEALTH -> {
                             traitMinimumValue = MINIMUM_WEALTH;
                             traitMaximumValue = MAXIMUM_WEALTH;
+                        }
+                        case ORIGIN_PROSTHETIC -> {
+                            traitMinimumValue = MINIMUM_ORIGIN_PROSTHETIC;
+                            traitMaximumValue = MAXIMUM_ORIGIN_PROSTHETIC;
+                        }
+                        case ORIGIN_MISSING_LIMB -> {
+                            traitMinimumValue = MINIMUM_ORIGIN_MISSING_LIMB;
+                            traitMaximumValue = MAXIMUM_ORIGIN_MISSING_LIMB;
                         }
                         default -> {}
                     }

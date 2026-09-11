@@ -332,8 +332,6 @@ public class CampaignFactory {
             LOGGER.error("Unable to create campaign.", e);
         }
 
-        // TODO this is currently bolted in here, but really we need to remove Immersive Dialog's reliance on
-        //  Campaign. Once that has been handled this can get shifted to CampaignConfiguration
         if (campaign != null) {
             try {
                 Map<UUID, LifePath> lifePathLibrary = LifePathIO.loadAllLifePaths(campaign);
