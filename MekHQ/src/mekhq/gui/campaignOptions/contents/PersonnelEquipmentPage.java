@@ -314,8 +314,8 @@ class PersonnelEquipmentPage {
         if (kitName == null) {
             return null;
         }
-        String text = getTextAt(getCampaignOptionsResourceBundle(),
-              "kitTooltip." + kitName.replaceAll("[^A-Za-z0-9]", ""));
+        String text = getTextAt("mekhq.resources.IssueEquipmentDialog",
+              "tools.effect." + kitName.replaceAll("[^A-Za-z0-9]", ""));
         return isResourceKeyValid(text) ? text : null;
     }
 
