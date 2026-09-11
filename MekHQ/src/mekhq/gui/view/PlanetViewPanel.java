@@ -680,7 +680,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         return formatter.format(arguments);
     }
 
-    private class RevealBandPanel extends JPanel {
+    private static class RevealBandPanel extends JPanel {
         private long revealDelay;
         private long revealDuration;
         private float revealAlpha = 1.0f;

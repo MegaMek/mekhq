@@ -1366,7 +1366,10 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         AbstractLocation currentLocation = getCampaign().getPlayerForce()
                                                    .getForceDetachment()
                                                    .getCurrentLocation();
-        JumpPath activePath = (currentLocation == null) ? null : currentLocation.getJumpPath();
+        if (currentLocation == null) {
+            return;
+        }
+        JumpPath activePath = currentLocation.getJumpPath();
         PathAssessment routeAssessment = assessPlannedRoute(jumpPath);
         if (!canBeginTransit(jumpPath, getCampaign().getCurrentSystem(), activePath, routeAssessment)) {
             return;
@@ -1390,7 +1393,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         // Everything else
         boolean isUseCommandCircuits = getCampaign().isUseCommandCircuit();
         int duration = (int) ceil(jumpPath.getTotalTime(getCampaign().getLocalDate(),
-              getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation().getTransitTime(),
+              currentLocation.getTransitTime(),
               isUseCommandCircuits));
 
         TransportCostCalculations transportCostCalculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
