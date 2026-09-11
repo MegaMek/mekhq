@@ -68,12 +68,12 @@ import javax.swing.SpinnerNumberModel;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.ATOWTraits;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.campaign.universe.Faction;
@@ -114,7 +114,7 @@ public class LifePathTab {
     private Map<Integer, Map<SkillAttribute, Integer>> storedAttributes = new HashMap<>();
     private Map<Integer, Integer> storedEdge = new HashMap<>();
     private Map<Integer, Integer> storedFlexibleAttributes = new HashMap<>();
-    private Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> storedTraits = new HashMap<>();
+    private Map<Integer, Map<ATOWTraits, Integer>> storedTraits = new HashMap<>();
     private Map<Integer, Map<String, Integer>> storedSkills = new HashMap<>();
     private Map<Integer, Map<SkillSubType, Integer>> storedMetaSkills = new HashMap<>();
     private Map<Integer, Map<String, Integer>> storedNaturalAptitudes = new HashMap<>();
@@ -187,11 +187,11 @@ public class LifePathTab {
         this.storedFlexibleAttributes = storedFlexibleAttribute;
     }
 
-    public Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> getTraits() {
+    public Map<Integer, Map<ATOWTraits, Integer>> getTraits() {
         return storedTraits;
     }
 
-    public void setTraits(Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> storedTraits) {
+    public void setTraits(Map<Integer, Map<ATOWTraits, Integer>> storedTraits) {
         this.storedTraits = storedTraits;
     }
 
@@ -464,8 +464,8 @@ public class LifePathTab {
         storedFlexibleAttributes.putAll(tempFlexibleAttributes);
 
         storedTraits.remove(selectedIndex);
-        Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> tempTraits = new HashMap<>();
-        for (Map.Entry<Integer, Map<LifePathEntryDataTraitLookup, Integer>> entry : storedTraits.entrySet()) {
+        Map<Integer, Map<ATOWTraits, Integer>> tempTraits = new HashMap<>();
+        for (Map.Entry<Integer, Map<ATOWTraits, Integer>> entry : storedTraits.entrySet()) {
             if (entry.getKey() < selectedIndex) {
                 tempTraits.put(entry.getKey(), entry.getValue());
             } else if (entry.getKey() > selectedIndex) {
@@ -573,7 +573,7 @@ public class LifePathTab {
         Integer currentFlexibleAttributes = storedFlexibleAttributes.get(selectedIndex);
         storedFlexibleAttributes.put(newIndex, currentFlexibleAttributes);
 
-        Map<LifePathEntryDataTraitLookup, Integer> currentTraits = new HashMap<>(storedTraits.get(selectedIndex));
+        Map<ATOWTraits, Integer> currentTraits = new HashMap<>(storedTraits.get(selectedIndex));
         storedTraits.put(newIndex, currentTraits);
 
         Map<String, Integer> currentSkills = new HashMap<>(storedSkills.get(selectedIndex));
@@ -1090,13 +1090,13 @@ public class LifePathTab {
         }
 
         // Traits
-        Map<LifePathEntryDataTraitLookup, Integer> workingTraits = storedTraits.get(index);
+        Map<ATOWTraits, Integer> workingTraits = storedTraits.get(index);
         if (workingTraits != null && !workingTraits.isEmpty()) {
             appendBreaker(individualProgressText);
 
             int counter = 0;
             int length = workingTraits.size();
-            for (Map.Entry<LifePathEntryDataTraitLookup, Integer> entry : workingTraits.entrySet()) {
+            for (Map.Entry<ATOWTraits, Integer> entry : workingTraits.entrySet()) {
                 int value = entry.getValue();
 
                 individualProgressText.append(entry.getKey().getDisplayName());

@@ -34,7 +34,7 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.campaign.personnel.Person.*;
+import static mekhq.campaign.personnel.ATOWTraits.*;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -62,8 +62,8 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.personnel.ATOWTraits;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
-import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathEntryDataTraitLookup;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
 
@@ -82,14 +82,14 @@ class LifePathTraitPicker extends JDialog {
     private static final int PADDING = scaleForGUI(10);
 
     private JLabel lblTooltipDisplay;
-    private final Map<LifePathEntryDataTraitLookup, Integer> storedTraitScores;
-    private Map<LifePathEntryDataTraitLookup, Integer> selectedTraitScores;
+    private final Map<ATOWTraits, Integer> storedTraitScores;
+    private Map<ATOWTraits, Integer> selectedTraitScores;
 
-    Map<LifePathEntryDataTraitLookup, Integer> getSelectedTraitScores() {
+    Map<ATOWTraits, Integer> getSelectedTraitScores() {
         return selectedTraitScores;
     }
 
-    LifePathTraitPicker(Map<LifePathEntryDataTraitLookup, Integer> selectedTraitScores,
+    LifePathTraitPicker(Map<ATOWTraits, Integer> selectedTraitScores,
           LifePathBuilderTabType tabType) {
         super();
 
@@ -178,7 +178,7 @@ class LifePathTraitPicker extends JDialog {
         String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathTraitPicker.options.label");
         pnlOptions.setBorder(createRoundedLineBorder(titleOptions));
 
-        for (LifePathEntryDataTraitLookup trait : LifePathEntryDataTraitLookup.values()) {
+        for (ATOWTraits trait : ATOWTraits.values()) {
             String label = trait.getDisplayName();
             String tooltip = trait.getDescription();
 
@@ -193,64 +193,64 @@ class LifePathTraitPicker extends JDialog {
                 case REQUIREMENTS, EXCLUSIONS -> {
                     switch (trait) {
                         case BLOODMARK -> {
-                            traitMinimumValue = MINIMUM_BLOODMARK;
-                            traitMaximumValue = MAXIMUM_BLOODMARK;
+                            traitMinimumValue = BLOODMARK.getMinimum();
+                            traitMaximumValue = BLOODMARK.getMaximum();
                         }
                         case CONNECTIONS -> {
-                            traitMinimumValue = MINIMUM_CONNECTIONS;
-                            traitMaximumValue = MAXIMUM_CONNECTIONS;
+                            traitMinimumValue = CONNECTIONS.getMinimum();
+                            traitMaximumValue = CONNECTIONS.getMaximum();
                         }
                         case ORIGIN_DEPENDENTS -> {
-                            traitMinimumValue = MINIMUM_ORIGIN_DEPENDENTS;
-                            traitMaximumValue = MAXIMUM_ORIGIN_DEPENDENTS;
+                            traitMinimumValue = ORIGIN_DEPENDENTS.getMinimum();
+                            traitMaximumValue = ORIGIN_DEPENDENTS.getMaximum();
                         }
                         case ENEMY -> {
-                            traitMinimumValue = MINIMUM_ENEMY;
-                            traitMaximumValue = MAXIMUM_ENEMY;
+                            traitMinimumValue = ENEMY.getMinimum();
+                            traitMaximumValue = ENEMY.getMaximum();
                         }
                         case ORIGIN_EQUIPPED -> {
-                            traitMinimumValue = MINIMUM_ORIGIN_EQUIPPED;
-                            traitMaximumValue = MAXIMUM_ORIGIN_EQUIPPED;
+                            traitMinimumValue = ORIGIN_EQUIPPED.getMinimum();
+                            traitMaximumValue = ORIGIN_EQUIPPED.getMaximum();
                         }
                         case EXTRA_INCOME -> {
-                            traitMinimumValue = MINIMUM_EXTRA_INCOME;
-                            traitMaximumValue = MAXIMUM_EXTRA_INCOME;
+                            traitMinimumValue = EXTRA_INCOME.getMinimum();
+                            traitMaximumValue = EXTRA_INCOME.getMaximum();
                         }
                         case ORIGIN_MISSING_LIMB -> {
-                            traitMinimumValue = MINIMUM_ORIGIN_MISSING_LIMB;
-                            traitMaximumValue = MAXIMUM_ORIGIN_MISSING_LIMB;
+                            traitMinimumValue = ORIGIN_MISSING_LIMB.getMinimum();
+                            traitMaximumValue = ORIGIN_MISSING_LIMB.getMaximum();
                         }
                         case ORIGIN_OWNED_VEHICLE -> {
-                            traitMinimumValue = MINIMUM_ORIGIN_OWNED_VEHICLE;
-                            traitMaximumValue = MAXIMUM_ORIGIN_OWNED_VEHICLE;
+                            traitMinimumValue = ORIGIN_OWNED_VEHICLE.getMinimum();
+                            traitMaximumValue = ORIGIN_OWNED_VEHICLE.getMaximum();
                         }
                         case PROPERTY -> {
-                            traitMinimumValue = MINIMUM_PROPERTY;
-                            traitMaximumValue = MAXIMUM_PROPERTY;
+                            traitMinimumValue = PROPERTY.getMinimum();
+                            traitMaximumValue = PROPERTY.getMaximum();
                         }
                         case FAME -> {
-                            traitMinimumValue = MINIMUM_FAME;
-                            traitMaximumValue = MAXIMUM_FAME;
+                            traitMinimumValue = FAME.getMinimum();
+                            traitMaximumValue = FAME.getMaximum();
                         }
                         case TITLE -> {
-                            traitMinimumValue = MINIMUM_TITLE;
-                            traitMaximumValue = MAXIMUM_TITLE;
+                            traitMinimumValue = TITLE.getMinimum();
+                            traitMaximumValue = TITLE.getMaximum();
                         }
                         case ORIGIN_RANK -> {
-                            traitMinimumValue = MINIMUM_ORIGIN_RANK;
-                            traitMaximumValue = MAXIMUM_ORIGIN_RANK;
+                            traitMinimumValue = ORIGIN_RANK.getMinimum();
+                            traitMaximumValue = ORIGIN_RANK.getMaximum();
                         }
                         case UNLUCKY -> {
-                            traitMinimumValue = MINIMUM_UNLUCKY;
-                            traitMaximumValue = MAXIMUM_UNLUCKY;
+                            traitMinimumValue = UNLUCKY.getMinimum();
+                            traitMaximumValue = UNLUCKY.getMaximum();
                         }
                         case WEALTH -> {
-                            traitMinimumValue = MINIMUM_WEALTH;
-                            traitMaximumValue = MAXIMUM_WEALTH;
+                            traitMinimumValue = WEALTH.getMinimum();
+                            traitMaximumValue = WEALTH.getMaximum();
                         }
                         case ORIGIN_PROSTHETIC -> {
-                            traitMinimumValue = MINIMUM_ORIGIN_PROSTHETIC;
-                            traitMaximumValue = MAXIMUM_ORIGIN_PROSTHETIC;
+                            traitMinimumValue = ORIGIN_PROSTHETIC.getMinimum();
+                            traitMaximumValue = ORIGIN_PROSTHETIC.getMaximum();
                         }
                         default -> {}
                     }

@@ -34,7 +34,12 @@ package mekhq.gui.dialog;
 
 import static java.lang.Math.min;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
-import static mekhq.campaign.personnel.Person.*;
+import static mekhq.campaign.personnel.ATOWTraits.BLOODMARK;
+import static mekhq.campaign.personnel.ATOWTraits.CONNECTIONS;
+import static mekhq.campaign.personnel.ATOWTraits.EXTRA_INCOME;
+import static mekhq.campaign.personnel.ATOWTraits.FAME;
+import static mekhq.campaign.personnel.ATOWTraits.UNLUCKY;
+import static mekhq.campaign.personnel.ATOWTraits.WEALTH;
 import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
@@ -1957,27 +1962,27 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
         int currentValue = person.getConnections();
         int newValue = MathUtility.parseInt(textConnections.getText(), currentValue);
-        person.setConnections(Math.clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
+        person.setConnections(Math.clamp(newValue, CONNECTIONS.getMinimum(), CONNECTIONS.getMaximum()));
 
         currentValue = person.getWealth();
         newValue = MathUtility.parseInt(textWealth.getText(), currentValue);
-        person.setWealth(Math.clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH));
+        person.setWealth(Math.clamp(newValue, WEALTH.getMinimum(), WEALTH.getMaximum()));
 
         currentValue = person.getFame();
         newValue = MathUtility.parseInt(textReputation.getText(), currentValue);
-        person.setFame(Math.clamp(newValue, MINIMUM_FAME, MAXIMUM_FAME));
+        person.setFame(Math.clamp(newValue, FAME.getMinimum(), FAME.getMaximum()));
 
         currentValue = person.getUnlucky();
         newValue = MathUtility.parseInt(textUnlucky.getText(), currentValue);
-        person.setUnlucky(Math.clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
+        person.setUnlucky(Math.clamp(newValue, UNLUCKY.getMinimum(), UNLUCKY.getMaximum()));
 
         currentValue = person.getBloodmark();
         newValue = MathUtility.parseInt(textBloodmark.getText(), currentValue);
-        person.setBloodmark(Math.clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+        person.setBloodmark(Math.clamp(newValue, BLOODMARK.getMinimum(), BLOODMARK.getMaximum()));
 
         currentValue = person.getExtraIncomeTraitLevel();
         newValue = MathUtility.parseInt(textExtraIncome.getText(), currentValue);
-        person.setExtraIncomeFromTraitLevel(Math.clamp(newValue, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
+        person.setExtraIncomeFromTraitLevel(Math.clamp(newValue, EXTRA_INCOME.getMinimum(), EXTRA_INCOME.getMaximum()));
 
         if (campaign.getCampaignOptions().get(CampaignOption.USE_EDUCATION_MODULE)) {
             person.setEduHighestEducation((EducationLevel) textEducationLevel.getSelectedItem());

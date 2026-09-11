@@ -38,7 +38,7 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
-import static mekhq.campaign.personnel.Person.CONNECTIONS_TARGET_NUMBER;
+import static mekhq.campaign.personnel.ATOWTraits.CONNECTIONS_TARGET_NUMBER;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
@@ -71,6 +71,7 @@ import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.MarketNewPersonnelEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
@@ -84,7 +85,6 @@ import mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketDialog;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Represents the Personnel Market system for managing the recruitment, listing, and data persistence of potential

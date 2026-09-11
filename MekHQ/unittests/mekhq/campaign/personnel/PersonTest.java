@@ -32,10 +32,7 @@
  */
 package mekhq.campaign.personnel;
 
-import static org.mockito.Mockito.lenient;
-
-import static mekhq.campaign.personnel.Person.MAXIMUM_WEALTH;
-import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
+import static mekhq.campaign.personnel.ATOWTraits.WEALTH;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -48,6 +45,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -598,7 +596,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person gambler = new Person(mockCampaign);
-        gambler.setWealth(MAXIMUM_WEALTH);
+        gambler.setWealth(WEALTH.getMaximum());
         gambler.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, PersonnelOptions.COMPULSION_GAMBLING,
               true);
 
@@ -607,7 +605,7 @@ public class PersonTest {
             gambler.gambleWealth();
         }
 
-        int expected = MAXIMUM_WEALTH;
+        int expected = WEALTH.getMaximum();
         int actual = gambler.getWealth();
         assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
     }
@@ -620,7 +618,7 @@ public class PersonTest {
         when(mockFaction.getShortName()).thenReturn("MERC");
 
         Person gambler = new Person(mockCampaign);
-        gambler.setWealth(MINIMUM_WEALTH);
+        gambler.setWealth(WEALTH.getMinimum());
         gambler.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, PersonnelOptions.COMPULSION_GAMBLING,
               true);
 
@@ -629,7 +627,7 @@ public class PersonTest {
             gambler.gambleWealth();
         }
 
-        int expected = MINIMUM_WEALTH;
+        int expected = WEALTH.getMinimum();
         int actual = gambler.getWealth();
         assertEquals(expected, actual, "Expected wealth to be " + expected + " but was " + actual);
     }

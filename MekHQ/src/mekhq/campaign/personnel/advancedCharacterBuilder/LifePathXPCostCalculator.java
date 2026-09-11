@@ -36,6 +36,7 @@ import static java.lang.Math.max;
 
 import java.util.Map;
 
+import mekhq.campaign.personnel.ATOWTraits;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 
@@ -44,7 +45,7 @@ public class LifePathXPCostCalculator {
           Map<Integer, Map<SkillAttribute, Integer>> fixedAttributes,
           Map<Integer, Integer> fixedFlexibleAttribute,
           Map<Integer, Integer> fixedXPEdge,
-          Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> fixedTraits,
+            Map<Integer, Map<ATOWTraits, Integer>> fixedTraits,
           Map<Integer, Map<String, Integer>> fixedSkills,
           Map<Integer, Map<SkillSubType, Integer>> fixedMetaSkills,
           Map<Integer, Map<String, Integer>> fixedNaturalAptitudes,
@@ -55,7 +56,7 @@ public class LifePathXPCostCalculator {
           Map<Integer, Map<SkillAttribute, Integer>> flexibleAttributes,
           Map<Integer, Integer> flexibleXPEdge,
           Map<Integer, Integer> flexibleFlexibleAttribute,
-          Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> flexibleTraits,
+            Map<Integer, Map<ATOWTraits, Integer>> flexibleTraits,
           Map<Integer, Map<String, Integer>> flexibleSkills,
           Map<Integer, Map<SkillSubType, Integer>> flexibleMetaSkills,
           Map<Integer, Map<String, Integer>> flexibleNaturalAptitudes,
@@ -96,11 +97,11 @@ public class LifePathXPCostCalculator {
     }
 
     private static int getCost(Map<Integer, Map<SkillAttribute, Integer>> attributes,
-          Map<Integer, Integer> flexibleAttribute, Map<Integer, Integer> edge,
-          Map<Integer, Map<LifePathEntryDataTraitLookup, Integer>> traits, Map<Integer, Map<String, Integer>> skills,
-          Map<Integer, Map<SkillSubType, Integer>> metaSkills, Map<Integer, Map<String, Integer>> naturalAptitudes,
-          Map<Integer, Map<SkillSubType, Integer>> naturalAptitudesMetaSkills,
-          Map<Integer, Map<String, Integer>> abilities) {
+            Map<Integer, Integer> flexibleAttribute, Map<Integer, Integer> edge,
+            Map<Integer, Map<ATOWTraits, Integer>> traits, Map<Integer, Map<String, Integer>> skills,
+            Map<Integer, Map<SkillSubType, Integer>> metaSkills, Map<Integer, Map<String, Integer>> naturalAptitudes,
+            Map<Integer, Map<SkillSubType, Integer>> naturalAptitudesMetaSkills,
+            Map<Integer, Map<String, Integer>> abilities) {
         int cost = 0;
 
         for (Map.Entry<Integer, Map<SkillAttribute, Integer>> entry : attributes.entrySet()) {
@@ -124,9 +125,9 @@ public class LifePathXPCostCalculator {
             }
         }
 
-        for (Map.Entry<Integer, Map<LifePathEntryDataTraitLookup, Integer>> entry : traits.entrySet()) {
-            Map<LifePathEntryDataTraitLookup, Integer> storage = entry.getValue();
-            for (Map.Entry<LifePathEntryDataTraitLookup, Integer> traitEntry : storage.entrySet()) {
+        for (Map.Entry<Integer, Map<ATOWTraits, Integer>> entry : traits.entrySet()) {
+            Map<ATOWTraits, Integer> storage = entry.getValue();
+            for (Map.Entry<ATOWTraits, Integer> traitEntry : storage.entrySet()) {
                 cost += traitEntry.getValue();
             }
         }

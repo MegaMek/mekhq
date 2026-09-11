@@ -30,12 +30,14 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.personnel.advancedCharacterBuilder;
+package mekhq.campaign.personnel;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
+import mekhq.campaign.personnel.enums.ExtraIncome;
 
 /**
  * Enumerates the supported trait types for {@link LifePath} objects, providing lookup functionality by name for use in
@@ -46,39 +48,45 @@ import megamek.logging.MMLogger;
  * @author Illiani
  * @since 0.50.07
  */
-public enum LifePathEntryDataTraitLookup {
-    BLOODMARK("BLOODMARK"),
-    CONNECTIONS("CONNECTIONS"),
-    ENEMY("ENEMY"),
-    EXTRA_INCOME("EXTRA_INCOME"),
-    ORIGIN_DEPENDENTS("ORIGIN_DEPENDENTS"), // character creation only
-    ORIGIN_EQUIPPED("ORIGIN_EQUIPPED"),
-    ORIGIN_MISSING_LIMB("ORIGIN_MISSING_LIMB"), // character creation only
-    ORIGIN_OWNED_VEHICLE("ORIGIN_OWNED_VEHICLE"), // character creation only
-    ORIGIN_PROSTHETIC("ORIGIN_PROSTHETIC"), // character creation only
-    ORIGIN_RANK("ORIGIN_RANK"), // character creation only
-    PROPERTY("PROPERTY"),
-    FAME("FAME"),
-    TITLE("TITLE"),
-    UNLUCKY("UNLUCKY"),
-    WEALTH("WEALTH");
+public enum ATOWTraits {
+    BLOODMARK("BLOODMARK", 0, 5),
+    CONNECTIONS("CONNECTIONS", 0, 10),
+    ENEMY("ENEMY", -10, 0),
+    EXTRA_INCOME("EXTRA_INCOME", ExtraIncome.NEGATIVE_TEN.getTraitLevel(), ExtraIncome.POSITIVE_TEN.getTraitLevel()),
+    ORIGIN_DEPENDENTS("ORIGIN_DEPENDENTS", -10, 0), // character creation only
+    ORIGIN_EQUIPPED("ORIGIN_EQUIPPED", -1, 8),
+    ORIGIN_MISSING_LIMB("ORIGIN_MISSING_LIMB", -5, 0), // character creation only
+    ORIGIN_OWNED_VEHICLE("ORIGIN_OWNED_VEHICLE", 0, 12), // character creation only
+    ORIGIN_PROSTHETIC("ORIGIN_PROSTHETIC", -6, 0), // character creation only
+    ORIGIN_RANK("ORIGIN_RANK", 0, 15), // character creation only
+    PROPERTY("PROPERTY", 0, 10),
+    FAME("FAME", -5, 5),
+    TITLE("TITLE", 0, 10),
+    UNLUCKY("UNLUCKY", 0, 5),
+    WEALTH("WEALTH", -1, 10);
 
     private final static String RESOURCE_BUNDLE = "mekhq.resources.LifePathEntryDataTraitLookup";
-    private static final MMLogger LOGGER = MMLogger.create(LifePathEntryDataTraitLookup.class);
+    private static final MMLogger LOGGER = MMLogger.create(ATOWTraits.class);
 
+    public static final int TRAIT_MODIFICATION_COST = 100;
+    public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 
     private final String lookupName;
+    private final int minumum;
+    private final int maximum;
 
     /**
-     * Constructs a {@link LifePathEntryDataTraitLookup} enumerated value with the provided name.
+     * Constructs a {@link ATOWTraits} enumerated value with the provided name.
      *
      * @param lookupName the unique string identifier for this trait
      *
      * @author Illiani
      * @since 0.50.07
      */
-    LifePathEntryDataTraitLookup(String lookupName) {
+    ATOWTraits(String lookupName, final int minumum, final int maximum) {
         this.lookupName = lookupName;
+        this.minumum = minumum;
+        this.maximum = maximum;
     }
 
     /**
@@ -91,6 +99,14 @@ public enum LifePathEntryDataTraitLookup {
      */
     public String getLookupName() {
         return lookupName;
+    }
+
+    public int getMinimum() {
+        return minumum;
+    }
+
+    public int getMaximum() {
+        return maximum;
     }
 
     /**
@@ -120,23 +136,23 @@ public enum LifePathEntryDataTraitLookup {
     }
 
     /**
-     * Resolves a {@link LifePathEntryDataTraitLookup} from a lookup string, performing a case-insensitive match.
+     * Resolves a {@link ATOWTraits} from a lookup string, performing a case-insensitive match.
      *
      * @param lookup the string lookup key (case-insensitive)
      *
-     * @return the matching {@link LifePathEntryDataTraitLookup}, or {@code null} if not found or if input is
+     * @return the matching {@link ATOWTraits}, or {@code null} if not found or if input is
      *       {@code null}
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static @Nullable LifePathEntryDataTraitLookup fromLookupName(String lookup) {
+    public static @Nullable ATOWTraits fromLookupName(String lookup) {
         if (lookup == null) {
             LOGGER.warn("Null lookup passed to LifePathEntryDataTraitLookup#fromLookupName");
             return null;
         }
 
-        for (LifePathEntryDataTraitLookup type : values()) {
+        for (ATOWTraits type : values()) {
             if (type.lookupName.equalsIgnoreCase(lookup)) {
                 return type;
             }

@@ -36,49 +36,50 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import mekhq.campaign.personnel.ATOWTraits;
 import mekhq.utilities.MHQInternationalization;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
-class LifePathEntryDataTraitLookupTest {
+class ATOWTraitsTest {
     @ParameterizedTest
-    @EnumSource(LifePathEntryDataTraitLookup.class)
-    public void testFromLookupName_ValidName(LifePathEntryDataTraitLookup lifePathEntryDataTraitLookup) {
-        LifePathEntryDataTraitLookup result = LifePathEntryDataTraitLookup.fromLookupName(lifePathEntryDataTraitLookup.getLookupName());
+    @EnumSource(ATOWTraits.class)
+    public void testFromLookupName_ValidName(ATOWTraits atowTraits) {
+        ATOWTraits result = ATOWTraits.fromLookupName(atowTraits.getLookupName());
         assertEquals(result,
-              lifePathEntryDataTraitLookup,
-              "Failed to retrieve " + lifePathEntryDataTraitLookup.getLookupName() + " from lookup name.");
+              atowTraits,
+              "Failed to retrieve " + atowTraits.getLookupName() + " from lookup name.");
     }
 
     @Test
     public void testFromLookupName_InvalidLookupName() {
-        LifePathEntryDataTraitLookup result = LifePathEntryDataTraitLookup.fromLookupName("SOME_NONSENSE");
+        ATOWTraits result = ATOWTraits.fromLookupName("SOME_NONSENSE");
         assertNull(result, "Invalid lookup should return null.");
     }
 
     @Test
     public void testFromLookupName_NullLookupName() {
-        LifePathEntryDataTraitLookup result = LifePathEntryDataTraitLookup.fromLookupName(null);
+        ATOWTraits result = ATOWTraits.fromLookupName(null);
         assertNull(result, "Null lookup should return null.");
     }
 
     @Test
     public void testFromLookupName_EmptyLookupName() {
-        LifePathEntryDataTraitLookup result = LifePathEntryDataTraitLookup.fromLookupName("");
+        ATOWTraits result = ATOWTraits.fromLookupName("");
         assertNull(result, "Empty lookup should return null.");
     }
 
     @ParameterizedTest
-    @EnumSource(LifePathEntryDataTraitLookup.class)
-    void testGetDisplayName_isValidKey(LifePathEntryDataTraitLookup trait) {
+    @EnumSource(ATOWTraits.class)
+    void testGetDisplayName_isValidKey(ATOWTraits trait) {
         assertTrue(MHQInternationalization.isResourceKeyValid(trait.getDisplayName()),
               "Invalid key for " + trait.name());
     }
 
     @ParameterizedTest
-    @EnumSource(LifePathEntryDataTraitLookup.class)
-    void testGetDescription_isValidKey(LifePathEntryDataTraitLookup trait) {
+    @EnumSource(ATOWTraits.class)
+    void testGetDescription_isValidKey(ATOWTraits trait) {
         assertTrue(MHQInternationalization.isResourceKeyValid(trait.getDescription()),
               "Invalid key for " + trait.name());
     }
