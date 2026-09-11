@@ -43,6 +43,7 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.TechBase;
 import megamek.common.units.ProtoMek;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -50,7 +51,6 @@ import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.parts.missing.MissingProtoMekSensor;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.w3c.dom.Node;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author Jay Lawson (jaylawson39 at yahoo.com)
@@ -242,7 +242,7 @@ public class ProtoMekSensor extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MEK);
+        return skillType.equals(SkillType.S_TECH_ELECTRONIC);
     }
 
     @Override

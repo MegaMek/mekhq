@@ -70,8 +70,8 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
-import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -304,16 +304,19 @@ public class Maintenance {
         int roll;
         if (maintenanceSkill == null) {
             roll = d6(2);
+            // getValueAsString() renders an IMPOSSIBLE target as a word rather than its Integer.MAX_VALUE sentinel.
             partReport += getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.check.reportNoSkill",
-                  String.valueOf(target.getValue()), target.getDesc(), String.valueOf(roll));
+                  target.getValueAsString(), target.getDesc(), String.valueOf(roll));
         } else {
+            // withoutSubject: this report already names the tech; getReport(false): the numeric margin is appended
+            // once, below, so the utility's own margin label is suppressed to avoid printing the margin twice.
             ActionCheckResult result = new SkillCheck(maintenanceTech, maintenanceSkill.getType(), target)
-                                             .withRollType(RollType.NORMAL)
                                              .withoutLogging()
+                                             .withoutSubject()
                                              .resolve(false, null);
             roll = result.getRollResult();
             partReport += getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.check.report",
-                  result.getReport(true), target.getDesc());
+                  result.getReport(false), target.getDesc());
         }
         int margin = roll - target.getValue();
         partReport += getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.check.margin", String.valueOf(margin));
@@ -438,7 +441,7 @@ public class Maintenance {
         String skillLevel = "Unmaintained";
         SkillModifierData skillModifierData = null;
         if (null != tech) {
-            Skill skill = tech.getSkillForWorkingOn(partWork);
+            Skill skill = tech.getMaintenanceOrRefitSkill(partWork.getUnit());
             skillModifierData = tech.getSkillModifierData();
             if (null != skill) {
                 value = skill.getFinalSkillValue(skillModifierData);
@@ -452,6 +455,12 @@ public class Maintenance {
         }
 
         target.append(partWork.getAllModsForMaintenance());
+
+        // A technician with a Descartes diagnostic scanner (or a Deluxe Toolkit) gets a bonus to the maintenance check.
+        int maintenanceKitBonus = EquipmentKitCatalog.maintenanceBonus(tech);
+        if (maintenanceKitBonus != 0) {
+            target.addModifier(-maintenanceKitBonus, "technician kit");
+        }
 
         Familiarity familiarity = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         Unit partUnit = partWork.getUnit();

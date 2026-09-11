@@ -1236,10 +1236,21 @@ public class Academy implements Comparable<Academy> {
             case "small arms" -> SkillType.S_SMALL_ARMS;
             case "anti-mek", "climbing" -> SkillType.S_ANTI_MEK;
             case "tech/mek" -> SkillType.S_TECH_MEK;
-            case "tech/mechanic" -> SkillType.S_TECH_MECHANIC;
-            case "tech/aero" -> SkillType.S_TECH_AERO;
+            // "tech/mechanic" and "tech/aero" are retained as pre-0.51 aliases for the renamed skills.
+            case "tech/vehicle", "tech/mechanic" -> SkillType.S_TECH_VEHICLE;
+            case "tech/aerospace", "tech/aero" -> SkillType.S_TECH_AERO;
             case "tech/battlearmor" -> SkillType.S_TECH_BA;
             case "tech/vessel" -> SkillType.S_TECH_VESSEL;
+            case "tech/military" -> SkillType.S_TECH_MILITARY;
+            case "tech/civilian" -> SkillType.S_TECH_CIVILIAN;
+            case "tech/electronic" -> SkillType.S_TECH_ELECTRONIC;
+            case "tech/nuclear" -> SkillType.S_TECH_NUCLEAR;
+            case "tech/aeronautics" -> SkillType.S_TECH_AERONAUTICS;
+            case "tech/mechanical" -> SkillType.S_TECH_MECHANICAL;
+            case "tech/myomer" -> SkillType.S_TECH_MYOMER;
+            case "tech/jets" -> SkillType.S_TECH_JETS;
+            case "tech/weapons" -> SkillType.S_TECH_WEAPONS;
+            case "tech/cybernetics" -> SkillType.S_TECH_CYBERNETICS;
             case "astech" -> SkillType.S_ASTECH;
             case "doctor", "surgery/any" -> SkillType.S_SURGERY;
             case "medtech" -> SkillType.S_MEDTECH;

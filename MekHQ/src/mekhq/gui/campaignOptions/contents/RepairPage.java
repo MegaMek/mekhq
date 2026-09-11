@@ -71,6 +71,7 @@ class RepairPage {
     private static final int CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
 
     private JCheckBox chkTechsUseAdministration;
+    private JCheckBox chkUseGlobalTechSkillsOnly;
     private JCheckBox chkUsefulAsTechs;
     private JCheckBox useEraModsCheckBox;
     private JCheckBox assignedTechFirstCheckBox;
@@ -109,6 +110,10 @@ class RepairPage {
         chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkTechsUseAdministration.addMouseListener(createTipPanelUpdater("TechsUseAdministration"));
+
+        chkUseGlobalTechSkillsOnly = new CampaignOptionsCheckBox("UseGlobalTechSkillsOnly",
+              getMetadata(new Version(0, 51, 1)));
+        chkUseGlobalTechSkillsOnly.addMouseListener(createTipPanelUpdater("UseGlobalTechSkillsOnly"));
 
         chkUsefulAsTechs = new CampaignOptionsCheckBox("UsefulAsTechs",
               getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
@@ -188,6 +193,7 @@ class RepairPage {
               CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(2,
               chkTechsUseAdministration,
+              chkUseGlobalTechSkillsOnly,
               chkUsefulAsTechs,
               useEraModsCheckBox,
               assignedTechFirstCheckBox,
@@ -226,6 +232,7 @@ class RepairPage {
         }
 
         chkTechsUseAdministration.setSelected(model.techsUseAdministration);
+        chkUseGlobalTechSkillsOnly.setSelected(model.useGlobalTechSkillsOnly);
         chkUsefulAsTechs.setSelected(model.useUsefulAsTechs);
         useEraModsCheckBox.setSelected(model.useEraMods);
         assignedTechFirstCheckBox.setSelected(model.assignedTechFirst);
@@ -253,6 +260,7 @@ class RepairPage {
         }
 
         model.techsUseAdministration = chkTechsUseAdministration.isSelected();
+        model.useGlobalTechSkillsOnly = chkUseGlobalTechSkillsOnly.isSelected();
         model.useUsefulAsTechs = chkUsefulAsTechs.isSelected();
         model.useEraMods = useEraModsCheckBox.isSelected();
         model.assignedTechFirst = assignedTechFirstCheckBox.isSelected();

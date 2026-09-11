@@ -437,11 +437,27 @@ public class EnginePart extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        if (getEngine().hasFlag(Engine.TANK_ENGINE)) {
-            return skillType.equals(SkillType.S_TECH_MECHANIC);
-        } else {
-            return skillType.equals(SkillType.S_TECH_MEK) || skillType.equals(SkillType.S_TECH_AERO);
-        }
+        return skillType.equals(isNuclearEngineType(getEngine().getEngineType()) ?
+                                      SkillType.S_TECH_NUCLEAR :
+                                      SkillType.S_TECH_MECHANICAL);
+    }
+
+    /**
+     * Classifies an {@link Engine} type constant as a nuclear (fusion or fission) power plant, as opposed to a
+     * non-nuclear engine such as an internal-combustion engine, fuel cell, battery, or solar plant.
+     *
+     * @param engineType an {@link Engine} type constant (e.g. {@link Engine#NORMAL_ENGINE})
+     *
+     * @return {@code true} if the engine is a fusion or fission plant; {@code false} otherwise
+     *
+     * @since 0.51.01
+     */
+    public static boolean isNuclearEngineType(int engineType) {
+        return switch (engineType) {
+            case Engine.NORMAL_ENGINE, Engine.XL_ENGINE, Engine.XXL_ENGINE, Engine.LIGHT_ENGINE, Engine.COMPACT_ENGINE,
+                 Engine.FISSION -> true;
+            default -> false;
+        };
     }
 
     @Override

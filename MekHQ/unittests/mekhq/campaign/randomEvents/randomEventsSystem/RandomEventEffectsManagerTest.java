@@ -107,6 +107,10 @@ class RandomEventEffectsManagerTest {
         lenient().when(mockCampaignOptions.get(CampaignOption.ADMIN_EXPERIENCE_LEVEL_INCLUDE_NEGOTIATION)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)).thenReturn(false);
+
         when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
     }
 

@@ -54,7 +54,7 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
-import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MECHANIC;
+import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
 import static mekhq.campaign.personnel.skills.SkillType.getType;
 import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
 import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
@@ -206,6 +206,7 @@ import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.marriage.AbstractMarriage;
 import mekhq.campaign.personnel.procreation.AbstractProcreation;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
@@ -2668,22 +2669,16 @@ public class Campaign implements ITechManager {
                                                      tech.getOptions()
                                                            .booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT) &&
                                                      (tech.getCurrentEdge() > 0);
-                    final TargetRoll refitTarget = target;
-                    ActionCheckResult refitResult = new SkillCheck(tech, refitSkill.getType(), refitTarget)
-                                                          .withRollType(rightTechType ?
-                                                                              RollType.NORMAL :
-                                                                              RollType.DISADVANTAGE)
-                                                          .withoutLogging()
-                                                          .withEdgeRerollCondition(firstRoll -> firstRoll.result() <
-                                                                                                      refitTarget.getValue())
-                                                          .withOnEdgeSpent(() -> {
-                                                              // This is needed to update the edge values of individual crewmen
-                                                              if (tech.isEngineer()) {
-                                                                  tech.setEdgeUsedThisRound(tech.getEdgeUsedThisRound() -
-                                                                                                  1);
-                                                              }
-                                                          })
-                                                          .resolve(canUseEdge, null);
+                    SkillCheck refitCheck = new SkillCheck(tech, refitSkill.getType(), target)
+                                                  .withoutLogging()
+                                                  .withoutSubject()
+                                                  .withEdgeRerollCondition(firstRoll -> firstRoll.result() <
+                                                                                              target.getValue());
+                    if (!rightTechType) {
+                        // Working out of type always rolls at a disadvantage, overriding any natural aptitude.
+                        refitCheck.withRollType(RollType.DISADVANTAGE);
+                    }
+                    ActionCheckResult refitResult = refitCheck.resolve(canUseEdge, null);
                     roll = refitResult.getRollResult();
                     report = report + getFormattedTextAt(RESOURCE_BUNDLE, "refit.check.report",
                           target.getValueAsString(), refitResult.getReport(true)) + " ";
@@ -2909,37 +2904,33 @@ public class Campaign implements ITechManager {
                                              tech.getOptions().booleanOption(PersonnelOptions.EDGE_REPAIR_BREAK_PART) &&
                                              (tech.getCurrentEdge() > 0) &&
                                              (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS);
-            ActionCheckResult repairResult = new SkillCheck(tech, repairSkill.getType(), target)
-                                                   .withRollType(rightTechType ?
-                                                                       RollType.NORMAL :
-                                                                       RollType.DISADVANTAGE)
-                                                   .withoutLogging()
-                                                   .withEdgeRerollCondition(firstRoll -> {
-                                                       int rolled = firstRoll.result();
-                                                       if (getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
-                                                           // spend edge only if the margin of failure is large enough to destroy the part
-                                                           return getCampaignOptions().get(CampaignOption.DESTROY_MARGIN) <=
-                                                                        (target.getValue() - rolled);
-                                                       }
-                                                       // destroy-by-margin off: only a legendary primary tech or a vessel crew re-rolls, and only on a
-                                                       // failure (where a failure always destroys the part)
-                                                       boolean legendaryOrVesselCrew = (tech.getExperienceLevel(
-                                                             getCampaignOptions(),
-                                                             getPlayerForce().isClanForce(),
-                                                             getLocalDate(),
-                                                             false,
-                                                             true) == SkillType.EXP_LEGENDARY) ||
-                                                                                             tech.getPrimaryRole()
-                                                                                                   .isVesselCrew();
-                                                       return legendaryOrVesselCrew && (rolled < target.getValue());
-                                                   })
-                                                   .withOnEdgeSpent(() -> {
-                                                       // This is needed to update the edge values of individual crewmen
-                                                       if (tech.isEngineer()) {
-                                                           tech.setEdgeUsedThisRound(tech.getEdgeUsedThisRound() + 1);
-                                                       }
-                                                   })
-                                                   .resolve(canUseEdge, null);
+            SkillCheck repairCheck = new SkillCheck(tech, repairSkill.getType(), target)
+                                           .withoutLogging()
+                                           .withoutSubject()
+                                           .withEdgeRerollCondition(firstRoll -> {
+                                               int rolled = firstRoll.result();
+                                               if (getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
+                                                   // spend edge only if the margin of failure is large enough to destroy the part
+                                                   return getCampaignOptions().get(CampaignOption.DESTROY_MARGIN) <=
+                                                                (target.getValue() - rolled);
+                                               }
+                                               // destroy-by-margin off: only a legendary primary tech or a vessel crew re-rolls, and only on a
+                                               // failure (where a failure always destroys the part)
+                                               boolean legendaryOrVesselCrew = (tech.getExperienceLevel(
+                                                     getCampaignOptions(),
+                                                     getPlayerForce().isClanForce(),
+                                                     getLocalDate(),
+                                                     false,
+                                                     true) == SkillType.EXP_LEGENDARY) ||
+                                                                                     tech.getPrimaryRole()
+                                                                                           .isVesselCrew();
+                                               return legendaryOrVesselCrew && (rolled < target.getValue());
+                                           });
+            if (!rightTechType) {
+                // Working out of type always rolls at a disadvantage, overriding any natural aptitude the tech has.
+                repairCheck.withRollType(RollType.DISADVANTAGE);
+            }
+            ActionCheckResult repairResult = repairCheck.resolve(canUseEdge, null);
             roll = repairResult.getRollResult();
             report = report + getFormattedTextAt(RESOURCE_BUNDLE, "repair.check.report",
                   target.getValueAsString(), repairResult.getReport(true));
@@ -2953,7 +2944,7 @@ public class Campaign implements ITechManager {
             final String repairedPartName = partWork.getPartName();
             final boolean isRepair = !partWork.isSalvaging() && !(partWork instanceof AmmoBin);
 
-            partWork.succeed();
+            report += partWork.succeed();
             // log successful repairs (fixes and missing-part replacements) against the unit; salvage and ammo
             // reloads are not repairs
             if ((repairedUnit != null) && isRepair) {
@@ -2979,12 +2970,11 @@ public class Campaign implements ITechManager {
             }
         } else {
             int modePenalty = partWork.getMode().expReduction;
-            Skill relevantSkill = tech.getSkillForWorkingOn(partWork);
             int actualSkillLevel = EXP_NONE;
 
-            if (relevantSkill != null) {
+            if (repairSkill != null) {
                 SkillModifierData skillModifierData = tech.getSkillModifierData();
-                actualSkillLevel = relevantSkill.getExperienceLevel(skillModifierData);
+                actualSkillLevel = repairSkill.getExperienceLevel(skillModifierData);
             }
             int effectiveSkillLevel = actualSkillLevel - modePenalty;
             if (getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN)) {
@@ -2997,7 +2987,7 @@ public class Campaign implements ITechManager {
                     effectiveSkillLevel = SkillType.EXP_LEGENDARY;
                 }
             }
-            partWork.fail(effectiveSkillLevel);
+            report += partWork.fail(effectiveSkillLevel);
 
             if ((roll == 2) && (target.getValue() != TargetRoll.AUTOMATIC_FAIL)) {
                 xpGained += getCampaignOptions().get(CampaignOption.MISTAKE_XP);
@@ -3016,7 +3006,7 @@ public class Campaign implements ITechManager {
                   && fabricatable.isFabricating()
                   && fabricatable.isFabricateUntilSuccess()
                   && fabricatable.canFabricate(tech).isBlank()
-                  && (tech.getSkillForWorkingOn(partWork) != null)) {
+                  && (repairSkill != null)) {
             final Money nextCost = fabricatable.getFabricationCost(tech);
             if (nextCost.isZero() || !playerForce.getFinances().getBalance().isLessThan(nextCost)) {
                 partWork.setTech(tech);
@@ -4379,6 +4369,9 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already being worked on by another team");
         } else if (skill == null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
+        } else if (getCampaignOptions().get(CampaignOption.TECHS_NEED_TOOL_KIT) &&
+                         !EquipmentKitCatalog.hasToolKit(tech)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no tool kit");
         } else if (!getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN) && (partWork.getSkillMin() > effectiveSkillLevel)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Task is beyond this tech's skill level");
         } else if (partWork.getSkillMin() > SkillType.EXP_LEGENDARY) {
@@ -4548,7 +4541,7 @@ public class Campaign implements ITechManager {
 
     private Person getGenericAcquisitionPerson() {
         if (genericAcquisitionPerson == null) {
-            genericAcquisitionPerson = createGenericAcquisitionPerson(S_NEGOTIATION, S_ADMIN, S_TECH_MECHANIC);
+            genericAcquisitionPerson = createGenericAcquisitionPerson(S_NEGOTIATION, S_ADMIN, S_TECH_VEHICLE);
         }
         return genericAcquisitionPerson;
     }
@@ -4669,7 +4662,7 @@ public class Campaign implements ITechManager {
             case ANY_TECH -> {
                 Skill bestTechSkill = person.getBestTechSkill();
                 // since the person has no tech skills, we can create the skill check for any of them
-                yield (bestTechSkill == null) ? SkillType.getType(S_TECH_MECHANIC) : bestTechSkill.getType();
+                yield (bestTechSkill == null) ? SkillType.getType(S_TECH_VEHICLE) : bestTechSkill.getType();
             }
         };
         if ((decisiveModifier == null) && !person.hasSkill(skillType.getName())) {

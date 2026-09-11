@@ -111,7 +111,7 @@ class SparesCategoryTest {
         for (SparesCategory category : SparesCategory.values()) {
             keys.add(category.getResourceKey());
         }
-        assertTrue(keys.contains("SparesArmorKit"), "Armor Kit was the first of the two missing categories");
+        assertTrue(keys.contains("SparesEquipmentKit"), "Equipment Kit was the first of the two missing categories");
         assertTrue(keys.contains("SparesBomb"), "Bomb was the second");
     }
 

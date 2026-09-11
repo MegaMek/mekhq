@@ -149,6 +149,7 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.TechnicianSkills;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.LegacyRelinkResult;
@@ -395,6 +396,16 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based)
         for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             performEdgeConversion(campaign, person);
+        }
+
+        // <51.01 compatibility handler: technicians from before the granular Tech/... skills existed carry only their
+        // global tech skill, so give them the supplementary specialist skills their profession now expects. Skipped when
+        // the campaign uses only the global tech skills, where the granular skills would go unused.
+        if (version.isLowerThan(new Version("0.51.01"))
+                  && !campaign.getCampaignOptions().get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)) {
+            for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+                TechnicianSkills.addMissingSkills(person);
+            }
         }
 
         // this block verifies all in-use academies are valid

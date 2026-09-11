@@ -32,7 +32,6 @@
  */
 package mekhq.gui.dialog.quartermaster;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -40,20 +39,9 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.EnumMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 
@@ -75,6 +63,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.Category;
 import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -88,12 +77,14 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * @author Illiani
  * @since 0.51.01
  */
-public class IssueArmorKitsDialog extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(IssueArmorKitsDialog.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.IssueArmorKitsDialog";
+public class IssueEquipmentDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(IssueEquipmentDialog.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.IssueEquipmentDialog";
 
     private final transient Campaign campaign;
     private final transient List<Person> personnel;
+    private final transient List<Person> toolTechnicians;
+    private final transient List<KitIssueSection> sections = new ArrayList<>();
     private final transient Map<Category, List<Person>> byCategory = new EnumMap<>(Category.class);
 
     /** The kit chosen for a group, or absent if the group is left unchanged. */
@@ -104,6 +95,9 @@ public class IssueArmorKitsDialog extends JDialog {
     private final transient Set<Category> restoreDesigned = new HashSet<>();
     /** The cards drawn for each group, so a click can re-mark the selected one. */
     private final transient Map<Category, List<KitCard>> cardsByCategory = new EnumMap<>(Category.class);
+    /** Per-kit unit price and acquisition-difficulty text, cached so building many cards prices each kit once. */
+    private final transient Map<EquipmentType, Money> priceCache = new HashMap<>();
+    private final transient Map<EquipmentType, String> acquireTextCache = new HashMap<>();
 
     private transient RosterModel rosterModel;
     private transient JLabel tallyLabel;
@@ -124,26 +118,58 @@ public class IssueArmorKitsDialog extends JDialog {
      * @since 0.51.01
      */
     public static void showFor(JFrame parent, Campaign campaign, Collection<Person> people, Collection<Unit> units) {
-        List<Person> gathered = new ArrayList<>(ArmorKitIssuer.gatherPersonnel(people, units));
-        if (gathered.isEmpty()) {
+        List<Person> armorPersonnel = new ArrayList<>(ArmorKitIssuer.gatherPersonnel(people, units));
+        List<Person> toolTechnicians = gatherTechnicians(people, units);
+        if (armorPersonnel.isEmpty() && toolTechnicians.isEmpty()) {
             JOptionPane.showMessageDialog(parent,
                   getTextAt(RESOURCE_BUNDLE, "empty.message"),
                   getTextAt(RESOURCE_BUNDLE, "empty.title"),
                   JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        IssueArmorKitsDialog dialog = new IssueArmorKitsDialog(parent, campaign, gathered);
+        IssueEquipmentDialog dialog = new IssueEquipmentDialog(parent, campaign, armorPersonnel, toolTechnicians);
         dialog.setPreferences(dialog); // Must be before setVisible
         dialog.setVisible(true);
     }
 
-    private IssueArmorKitsDialog(JFrame parent, Campaign campaign, List<Person> gathered) {
+    /** Every selected person (and selected units' crew) who can be issued technician tool kits, without duplicates. */
+    private static List<Person> gatherTechnicians(Collection<Person> people, Collection<Unit> units) {
+        LinkedHashSet<Person> gathered = new LinkedHashSet<>();
+        if (people != null) {
+            for (Person person : people) {
+                if (EquipmentKitCatalog.canBeIssuedKit(person)) {
+                    gathered.add(person);
+                }
+            }
+        }
+        if (units != null) {
+            for (Unit unit : units) {
+                for (Person crew : unit.getCrew()) {
+                    if (EquipmentKitCatalog.canBeIssuedKit(crew)) {
+                        gathered.add(crew);
+                    }
+                }
+            }
+        }
+        return new ArrayList<>(gathered);
+    }
+
+    private IssueEquipmentDialog(JFrame parent, Campaign campaign, List<Person> armorPersonnel,
+          List<Person> toolTechnicians) {
         super(parent, getTextAt(RESOURCE_BUNDLE, "title"), true);
         this.campaign = campaign;
-        this.personnel = gathered;
+        this.personnel = armorPersonnel;
+        this.toolTechnicians = toolTechnicians;
 
-        for (Person person : gathered) {
+        for (Person person : armorPersonnel) {
             byCategory.computeIfAbsent(ArmorKitCatalog.categoryFor(person), key -> new ArrayList<>()).add(person);
+        }
+
+        if (!armorPersonnel.isEmpty()) {
+            sections.add(armorSection());
+        }
+        if (!toolTechnicians.isEmpty()) {
+            sections.add(new ToolKitSection(campaign, toolTechnicians, this::recalculate));
         }
 
         buildUI();
@@ -161,8 +187,13 @@ public class IssueArmorKitsDialog extends JDialog {
         content.setBorder(BorderFactory.createEmptyBorder(pad, pad, pad, pad));
 
         content.add(buildHeader(), BorderLayout.NORTH);
-        content.add(buildSections(), BorderLayout.CENTER);
-        content.add(buildBottom(), BorderLayout.SOUTH);
+
+        JTabbedPane tabs = new JTabbedPane();
+        for (KitIssueSection section : sections) {
+            tabs.addTab(section.getTitle(), section.getComponent());
+        }
+        content.add(tabs, BorderLayout.CENTER);
+        content.add(buildFooter(), BorderLayout.SOUTH);
 
         setContentPane(content);
     }
@@ -180,7 +211,9 @@ public class IssueArmorKitsDialog extends JDialog {
         JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "title"));
         title.setFont(title.getFont().deriveFont(Font.BOLD, title.getFont().getSize2D() + 5f));
         title.setAlignmentX(Component.LEFT_ALIGNMENT);
-        JLabel subtitle = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "header.subtitle", personnel.size()));
+        Set<Person> everyone = new HashSet<>(personnel);
+        everyone.addAll(toolTechnicians);
+        JLabel subtitle = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "header.subtitle", everyone.size()));
         subtitle.setForeground(mutedColor());
         subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
         left.add(title);
@@ -244,56 +277,29 @@ public class IssueArmorKitsDialog extends JDialog {
         tab.add(hint, BorderLayout.NORTH);
 
         List<EquipmentType> kits = new ArrayList<>(ArmorKitCatalog.availableKits(category));
-        kits.sort(Comparator.comparing(candidate -> ArmorKitIssuer.unitPrice(candidate, campaign)));
+        kits.sort(Comparator.comparing(this::price));
+
+        // Tally this group's warehouse stock once, rather than rescanning per kit inside each card.
+        Map<EquipmentType, Integer> stock = ArmorKitIssuer.localStock(people);
 
         List<KitCard> cards = new ArrayList<>();
         for (EquipmentType kit : kits) {
-            cards.add(new KitCard(category, kit, false, people));
+            cards.add(buildArmorCard(category, kit, false, people, stock));
         }
         // Every group can strip to coveralls; soldiers can also return to the platoon's designed armor.
-        cards.add(new KitCard(category, null, false, people));
+        cards.add(buildArmorCard(category, null, false, people, stock));
         if (category == Category.SOLDIER) {
-            cards.add(new KitCard(category, null, true, people));
+            cards.add(buildArmorCard(category, null, true, people, stock));
         }
         cardsByCategory.put(category, cards);
 
-        FastJScrollPane scroll = new FastJScrollPane(buildTwoRowGrid(cards),
+        FastJScrollPane scroll = new FastJScrollPane(KitCard.grid(cards),
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.setBorder(null);
-        scroll.getHorizontalScrollBar().setUnitIncrement(scaleForGUI(16));
+        scroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
         tab.add(scroll, BorderLayout.CENTER);
         return tab;
-    }
-
-    /** Lays the cards out on two rows to use the space, splitting them as evenly as possible. */
-    private JPanel buildTwoRowGrid(List<KitCard> cards) {
-        int perRow = (cards.size() + 1) / 2;
-        JPanel grid = new JPanel();
-        grid.setLayout(new BoxLayout(grid, BoxLayout.Y_AXIS));
-        grid.add(buildCardRow(cards.subList(0, Math.min(perRow, cards.size()))));
-        if (perRow < cards.size()) {
-            grid.add(Box.createVerticalStrut(scaleForGUI(10)));
-            grid.add(buildCardRow(cards.subList(perRow, cards.size())));
-        }
-        grid.add(Box.createVerticalGlue());
-        return grid;
-    }
-
-    private JPanel buildCardRow(List<KitCard> cards) {
-        JPanel row = new JPanel();
-        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
-        row.setAlignmentX(Component.LEFT_ALIGNMENT);
-        boolean first = true;
-        for (KitCard card : cards) {
-            if (!first) {
-                row.add(Box.createHorizontalStrut(scaleForGUI(10)));
-            }
-            first = false;
-            row.add(card);
-        }
-        row.add(Box.createHorizontalGlue());
-        return row;
     }
 
     private void select(Category category, EquipmentType kit, boolean designed) {
@@ -325,9 +331,41 @@ public class IssueArmorKitsDialog extends JDialog {
     // endregion Sections
 
     // region Bottom (roster + footer)
-    private JPanel buildBottom() {
-        JPanel bottom = new JPanel(new BorderLayout(0, scaleForGUI(6)));
 
+    /** The armor kit family as a section: the category cards plus the "what everyone wears" roster. */
+    private KitIssueSection armorSection() {
+        return new KitIssueSection() {
+            @Override
+            public String getTitle() {
+                return getTextAt(RESOURCE_BUNDLE, "tab.armor");
+            }
+
+            @Override
+            public JComponent getComponent() {
+                JPanel panel = new JPanel(new BorderLayout(0, scaleForGUI(6)));
+                panel.add(buildSections(), BorderLayout.CENTER);
+                panel.add(buildArmorRoster(), BorderLayout.SOUTH);
+                return panel;
+            }
+
+            @Override
+            public boolean hasPendingChanges() {
+                return !chosenKit.isEmpty() || !stripped.isEmpty() || !restoreDesigned.isEmpty();
+            }
+
+            @Override
+            public Tally computeTally() {
+                return armorComputeTally();
+            }
+
+            @Override
+            public void commit(CommitTotals totals) {
+                armorCommit(totals);
+            }
+        };
+    }
+
+    private JComponent buildArmorRoster() {
         rosterModel = new RosterModel();
         JTable table = new JTable(rosterModel);
         table.setRowHeight(scaleForGUI(22));
@@ -338,10 +376,7 @@ public class IssueArmorKitsDialog extends JDialog {
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         rosterScroll.setBorder(RoundedLineBorder.createSubtleRoundedLineBorder());
         rosterScroll.setPreferredSize(scaleForGUI(760, 150));
-        bottom.add(rosterScroll, BorderLayout.CENTER);
-
-        bottom.add(buildFooter(), BorderLayout.SOUTH);
-        return bottom;
+        return rosterScroll;
     }
 
     private JPanel buildFooter() {
@@ -369,6 +404,29 @@ public class IssueArmorKitsDialog extends JDialog {
 
     // region Actions & totals
     private void recalculate() {
+        KitIssueSection.Tally tally = KitIssueSection.Tally.empty();
+        boolean anyChoice = false;
+        for (KitIssueSection section : sections) {
+            tally = tally.plus(section.computeTally());
+            anyChoice |= section.hasPendingChanges();
+        }
+
+        tallyLabel.setText(tally.cost().toAmountString());
+        if (anyChoice) {
+            summaryLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "footer.summary",
+                  tally.fromStores(), tally.toProcure(), tally.cost().toAmountString()));
+        } else {
+            summaryLabel.setText(getTextAt(RESOURCE_BUNDLE, "footer.summary.none"));
+        }
+        issueButton.setEnabled(anyChoice);
+
+        if (rosterModel != null) {
+            rosterModel.fireTableDataChanged();
+        }
+    }
+
+    /** The armor section's footer tally: how many kits come from stores, how many are ordered, and the cost. */
+    private KitIssueSection.Tally armorComputeTally() {
         int fromStores = 0;
         int toProcure = 0;
         Money total = Money.zero();
@@ -388,31 +446,48 @@ public class IssueArmorKitsDialog extends JDialog {
             int ordered = quantity - drawn;
             fromStores += drawn;
             toProcure += ordered;
-            total = total.plus(ArmorKitIssuer.unitPrice(kit, campaign).multipliedBy(ordered));
+            total = total.plus(price(kit).multipliedBy(ordered));
         }
 
-        tallyLabel.setText(total.toAmountString());
-        boolean anyChoice = !chosenKit.isEmpty() || !stripped.isEmpty() || !restoreDesigned.isEmpty();
-        if (anyChoice) {
-            summaryLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "footer.summary",
-                  fromStores, toProcure, total.toAmountString()));
-        } else {
-            summaryLabel.setText(getTextAt(RESOURCE_BUNDLE, "footer.summary.none"));
-        }
-        issueButton.setEnabled(anyChoice);
-
-        if (rosterModel != null) {
-            rosterModel.fireTableDataChanged();
-        }
+        return new KitIssueSection.Tally(fromStores, toProcure, total);
     }
 
     private void onIssue() {
-        Set<Person> changed = new HashSet<>();
-        int drawn = 0;
-        int ordered = 0;
-        int returned = 0;
-        int platoons = 0;
+        KitIssueSection.CommitTotals totals = new KitIssueSection.CommitTotals();
+        for (KitIssueSection section : sections) {
+            section.commit(totals);
+        }
 
+        Set<Unit> units = new HashSet<>();
+        for (Person person : totals.changed) {
+            MekHQ.triggerEvent(new PersonChangedEvent(person));
+            if (person.getUnit() != null) {
+                units.add(person.getUnit());
+            }
+        }
+        for (Unit unit : units) {
+            unit.resetPilotAndEntity();
+        }
+
+        if ((totals.issued > 0) || (totals.ordered > 0)) {
+            campaign.addReport(DailyReportType.PERSONNEL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "report.issued",
+                        totals.issued + totals.ordered, totals.issued, totals.ordered));
+        }
+        if (totals.removed > 0) {
+            campaign.addReport(DailyReportType.PERSONNEL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "report.stripped", totals.removed));
+        }
+        if (totals.platoons > 0) {
+            campaign.addReport(DailyReportType.PERSONNEL,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "report.platoons", totals.platoons));
+        }
+
+        dispose();
+    }
+
+    /** Applies the armor kit selections, accumulating counts into the shared commit totals. */
+    private void armorCommit(KitIssueSection.CommitTotals totals) {
         for (Map.Entry<Category, List<Person>> entry : byCategory.entrySet()) {
             Category category = entry.getKey();
             List<Person> people = entry.getValue();
@@ -438,7 +513,7 @@ public class IssueArmorKitsDialog extends JDialog {
                     } else {
                         ArmorKitIssuer.issuePlatoonKit(unit, kit, campaign);
                     }
-                    platoons++;
+                    totals.platoons++;
                 }
                 continue;
             }
@@ -448,8 +523,8 @@ public class IssueArmorKitsDialog extends JDialog {
                     person.setIntendedArmorKitName(null);
                     if (!ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(person.getArmorKitName())) {
                         ArmorKitIssuer.strip(person, campaign);
-                        changed.add(person);
-                        returned++;
+                        totals.changed.add(person);
+                        totals.removed++;
                     }
                 }
                 continue;
@@ -463,8 +538,8 @@ public class IssueArmorKitsDialog extends JDialog {
             for (Person person : people) {
                 if (ArmorKitIssuer.issueFromStock(person, kit, campaign)) {
                     person.setIntendedArmorKitName(null);
-                    changed.add(person);
-                    drawn++;
+                    totals.changed.add(person);
+                    totals.issued++;
                 } else {
                     // out of stock now — remember what they are meant to wear so it is issued when a kit arrives
                     person.setIntendedArmorKitName(kit.getInternalName());
@@ -473,35 +548,9 @@ public class IssueArmorKitsDialog extends JDialog {
             }
             if (shortfall > 0) {
                 ArmorKitIssuer.order(kit, shortfall, campaign);
-                ordered += shortfall;
+                totals.ordered += shortfall;
             }
         }
-
-        Set<Unit> units = new HashSet<>();
-        for (Person person : changed) {
-            MekHQ.triggerEvent(new PersonChangedEvent(person));
-            if (person.getUnit() != null) {
-                units.add(person.getUnit());
-            }
-        }
-        for (Unit unit : units) {
-            unit.resetPilotAndEntity();
-        }
-
-        if ((drawn > 0) || (ordered > 0)) {
-            campaign.addReport(DailyReportType.PERSONNEL,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "report.issued", drawn + ordered, drawn, ordered));
-        }
-        if (returned > 0) {
-            campaign.addReport(DailyReportType.PERSONNEL,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "report.stripped", returned));
-        }
-        if (platoons > 0) {
-            campaign.addReport(DailyReportType.PERSONNEL,
-                  getFormattedTextAt(RESOURCE_BUNDLE, "report.platoons", platoons));
-        }
-
-        dispose();
     }
 
     /** Kits stock is per location, so sum across each distinct local warehouse the group draws from. */
@@ -531,8 +580,17 @@ public class IssueArmorKitsDialog extends JDialog {
         return EquipmentType.get(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME);
     }
 
-    /** How hard a Regular acquirer would find this kit, rendered for the card. */
+    /** The unit price of a kit, cached so repeated card/sort lookups price each kit only once. */
+    private Money price(EquipmentType kit) {
+        return priceCache.computeIfAbsent(kit, candidate -> ArmorKitIssuer.unitPrice(candidate, campaign));
+    }
+
+    /** How hard a Regular acquirer would find this kit, rendered for the card. Cached per kit (see {@link #price}). */
     private String acquisitionText(EquipmentType kit) {
+        return acquireTextCache.computeIfAbsent(kit, this::computeAcquisitionText);
+    }
+
+    private String computeAcquisitionText(EquipmentType kit) {
         TargetRoll target = ArmorKitIssuer.acquisitionTarget(kit, campaign);
         if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
             return getTextAt(RESOURCE_BUNDLE, "card.acquire.automatic");
@@ -574,195 +632,48 @@ public class IssueArmorKitsDialog extends JDialog {
     }
 
     private static Color mutedColor() {
-        Color base = new JLabel().getForeground();
-        Color bg = new JPanel().getBackground();
-        return blend(base, bg, 0.45f);
+        return KitCard.mutedColor();
     }
 
-    private static Color blend(Color a, Color b, float t) {
-        return new Color(
-              Math.round(a.getRed() + (b.getRed() - a.getRed()) * t),
-              Math.round(a.getGreen() + (b.getGreen() - a.getGreen()) * t),
-              Math.round(a.getBlue() + (b.getBlue() - a.getBlue()) * t));
-    }
-
-    // endregion Kit display helpers
-
-    // region Kit card
-
-    /** One selectable kit tile — a real kit, or (when {@code kit} is null) the "strip to coveralls" tile. */
-    private final class KitCard extends JPanel {
-        private final Category category;
-        private final transient EquipmentType kit;
-        /**
-         * A real kit has a non-null kit; kit==null and !designed is "strip to coveralls"; designed is "return to
-         * designed armor".
-         */
-        private final boolean designed;
-        private final Color accent;
-        private final Color baseBackground;
-        private final Color defaultForeground;
-        private final JPanel band;
-        private final JPanel body;
-        private final JLabel nameLabel;
-
-        private KitCard(Category category, EquipmentType kit, boolean designed, List<Person> people) {
-            super(new BorderLayout());
-            this.category = category;
-            this.kit = kit;
-            this.designed = designed;
-            this.accent = accentFor(category);
-            this.baseBackground = getBackground();
-
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            Dimension size = scaleForGUI(250, 168);
-            setPreferredSize(size);
-            setMinimumSize(size);
-            setMaximumSize(size);
-            setAlignmentY(TOP_ALIGNMENT);
-
-            band = new JPanel();
-            band.setPreferredSize(scaleForGUI(1, 6));
-            add(band, BorderLayout.NORTH);
-
-            String specialName = designed
-                                       ? getTextAt(RESOURCE_BUNDLE, "card.designed.name")
-                                       : getTextAt(RESOURCE_BUNDLE, "card.strip.name");
-            // Word-wrap the title so long kit names wrap within the card instead of running off the edge.
-            nameLabel = new JLabel(wordWrap((kit == null) ? specialName : kit.getName(), 26));
-            nameLabel.setFont(nameLabel.getFont().deriveFont(Font.BOLD));
-            nameLabel.setAlignmentX(LEFT_ALIGNMENT);
-            this.defaultForeground = nameLabel.getForeground();
-
-            body = (kit == null) ? buildSpecialBody(designed) : buildKitBody(people);
-            add(body, BorderLayout.CENTER);
-
-            refreshSelected();
-            addMouseListener(new MouseAdapter() {
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    select(category, KitCard.this.kit, KitCard.this.designed);
-                }
-            });
+    /**
+     * Builds one shared {@link KitCard} for the armor family: a real kit (divisor/encumbrance, acquisition, survival
+     * badges, stock and price), or - when {@code kit} is null - the "strip to coveralls" or "return to designed" action
+     * tile. Selection and click are wired back to this section's per-category state.
+     */
+    private KitCard buildArmorCard(Category category, EquipmentType kit, boolean designed, List<Person> people,
+          Map<EquipmentType, Integer> stockByKit) {
+        Color accent = accentFor(category);
+        if (kit == null) {
+            String title = getTextAt(RESOURCE_BUNDLE, designed ? "card.designed.name" : "card.strip.name");
+            String desc = getTextAt(RESOURCE_BUNDLE, designed ? "card.designed.desc" : "card.strip.desc");
+            return new KitCard(accent, title, true, List.of(desc), List.of(), null, false, null,
+                  () -> isSelected(category, null, designed),
+                  () -> select(category, null, designed));
         }
 
-        private JPanel buildKitBody(List<Person> people) {
-            JPanel content = new JPanel();
-            content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-            content.setOpaque(false);
-            content.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8),
-                  scaleForGUI(10),
-                  scaleForGUI(8),
-                  scaleForGUI(10)));
-            content.add(nameLabel);
-
-            content.add(Box.createVerticalStrut(scaleForGUI(3)));
-            double divisor = (kit instanceof MiscType misc) ? misc.getDamageDivisor() : 1.0;
-            String statsText = getFormattedTextAt(RESOURCE_BUNDLE, "card.divisor", formatDivisor(divisor));
-            if (kit.hasFlag(MiscTypeFlag.S_ENCUMBERING)) {
-                statsText += "  ·  " + getTextAt(RESOURCE_BUNDLE, "card.encumbering");
+        double divisor = (kit instanceof MiscType misc) ? misc.getDamageDivisor() : 1.0;
+        String stats = getFormattedTextAt(RESOURCE_BUNDLE, "card.divisor", KitCard.formatDivisor(divisor));
+        if (kit.hasFlag(MiscTypeFlag.S_ENCUMBERING)) {
+            stats += "  ·  " + getTextAt(RESOURCE_BUNDLE, "card.encumbering");
+        }
+        List<KitCard.Badge> badges = new ArrayList<>();
+        List<String> flags = survivalBadges(kit);
+        if (flags.isEmpty()) {
+            badges.add(new KitCard.Badge(getTextAt(RESOURCE_BUNDLE, "card.noProtection"), false));
+        } else {
+            for (String flag : flags) {
+                badges.add(new KitCard.Badge(flag, true));
             }
-            JLabel stats = new JLabel(statsText);
-            stats.setForeground(mutedColor());
-            stats.setFont(stats.getFont().deriveFont(stats.getFont().getSize2D() - 1f));
-            stats.setAlignmentX(LEFT_ALIGNMENT);
-            content.add(stats);
-
-            content.add(Box.createVerticalStrut(scaleForGUI(2)));
-            JLabel acquire = new JLabel(acquisitionText(kit));
-            acquire.setForeground(mutedColor());
-            acquire.setFont(acquire.getFont().deriveFont(acquire.getFont().getSize2D() - 1f));
-            acquire.setAlignmentX(LEFT_ALIGNMENT);
-            content.add(acquire);
-
-            content.add(Box.createVerticalStrut(scaleForGUI(5)));
-            JPanel badges = new JPanel(new FlowLayout(FlowLayout.LEFT, scaleForGUI(4), 0));
-            badges.setOpaque(false);
-            badges.setAlignmentX(LEFT_ALIGNMENT);
-            List<String> flags = survivalBadges(kit);
-            if (flags.isEmpty()) {
-                badges.add(badge(getTextAt(RESOURCE_BUNDLE, "card.noProtection"), mutedColor()));
-            } else {
-                for (String flag : flags) {
-                    badges.add(badge(flag, accent));
-                }
-            }
-            content.add(badges);
-
-            content.add(Box.createVerticalGlue());
-            JPanel foot = new JPanel(new BorderLayout());
-            foot.setOpaque(false);
-            foot.setAlignmentX(LEFT_ALIGNMENT);
-            int stock = stockFor(people, kit);
-            JLabel stockLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "card.stock", stock));
-            if (stock < people.size()) {
-                stockLabel.setForeground(new Color(0xC0, 0x70, 0x1F));
-            }
-            JLabel price = new JLabel(ArmorKitIssuer.unitPrice(kit, campaign).toAmountString()
-                                            + " " + getTextAt(RESOURCE_BUNDLE, "card.each"));
-            price.setFont(price.getFont().deriveFont(Font.BOLD));
-            foot.add(stockLabel, BorderLayout.WEST);
-            foot.add(price, BorderLayout.EAST);
-            content.add(foot);
-            return content;
         }
-
-        private JPanel buildSpecialBody(boolean designed) {
-            JPanel content = new JPanel();
-            content.setLayout(new BoxLayout(content, BoxLayout.Y_AXIS));
-            content.setOpaque(false);
-            content.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8),
-                  scaleForGUI(10),
-                  scaleForGUI(8),
-                  scaleForGUI(10)));
-            String descKey = designed ? "card.designed.desc" : "card.strip.desc";
-            JLabel desc = new JLabel(wordWrap(getTextAt(RESOURCE_BUNDLE, descKey), 30));
-            desc.setForeground(mutedColor());
-            desc.setFont(desc.getFont().deriveFont(desc.getFont().getSize2D() - 1f));
-            desc.setAlignmentX(LEFT_ALIGNMENT);
-            content.add(nameLabel);
-            content.add(Box.createVerticalStrut(scaleForGUI(3)));
-            content.add(desc);
-            return content;
-        }
-
-        private void refreshSelected() {
-            boolean selected = isSelected(category, kit, designed);
-            if (selected) {
-                Color tint = blend(accent, baseBackground, 0.72f);
-                setBackground(tint);
-                body.setOpaque(true);
-                body.setBackground(tint);
-                band.setBackground(accent);
-                nameLabel.setForeground(accent);
-                setBorder(new RoundedLineBorder(accent, scaleForGUI(3), scaleForGUI(16)));
-            } else {
-                setBackground(baseBackground);
-                body.setOpaque(false);
-                band.setBackground(kit == null ? mutedColor() : accent);
-                nameLabel.setForeground(defaultForeground);
-                setBorder(RoundedLineBorder.createSubtleRoundedLineBorder());
-            }
-            repaint();
-        }
+        int stock = stockByKit.getOrDefault(kit, 0);
+        String priceText = price(kit).toAmountString() + " " + getTextAt(RESOURCE_BUNDLE, "card.each");
+        return new KitCard(accent, kit.getName(), false,
+              List.of(stats, acquisitionText(kit)), badges,
+              getFormattedTextAt(RESOURCE_BUNDLE, "card.stock", stock), stock < people.size(), priceText,
+              () -> isSelected(category, kit, false),
+              () -> select(category, kit, false));
     }
 
-    private static JLabel badge(String text, Color accent) {
-        JLabel badge = new JLabel(text);
-        badge.setFont(badge.getFont().deriveFont(badge.getFont().getSize2D() - 2f));
-        badge.setForeground(accent);
-        badge.setBorder(BorderFactory.createCompoundBorder(
-              new RoundedLineBorder(accent, 1, scaleForGUI(8)),
-              BorderFactory.createEmptyBorder(scaleForGUI(1), scaleForGUI(5), scaleForGUI(1), scaleForGUI(5))));
-        return badge;
-    }
-
-    private static String formatDivisor(double divisor) {
-        if (divisor == Math.rint(divisor)) {
-            return String.valueOf((int) divisor);
-        }
-        return String.valueOf(divisor);
-    }
     // endregion Kit card
 
     // region Roster model
@@ -833,8 +744,8 @@ public class IssueArmorKitsDialog extends JDialog {
      */
     private void setPreferences(JDialog dialog) {
         try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(IssueArmorKitsDialog.class);
-            dialog.setName("IssueArmorKitsDialog");
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(IssueEquipmentDialog.class);
+            dialog.setName("IssueEquipmentDialog");
             preferences.manage(new JWindowPreference(dialog));
         } catch (Exception ex) {
             LOGGER.error("Failed to set user preferences", ex);

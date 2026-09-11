@@ -57,7 +57,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
  * @author Illiani
  * @since 0.51.01
  */
-public final class ArmorKitCatalog {
+public final class ArmorKitCatalog extends AbstractKitCatalog {
     /**
      * The internal name of the kit a person wears when they have been issued nothing: civilian clothing that provides
      * no protection. This is the default every person starts in, what stripping a kit returns them to, and the one kit
@@ -164,12 +164,9 @@ public final class ArmorKitCatalog {
      * @since 0.51.01
      */
     public static List<String> optionKitNames(Category category) {
-        List<String> names = new ArrayList<>();
-        names.add(DEFAULT_ARMOR_KIT_NAME);
         List<String> categoryKits = new ArrayList<>(kitsFor(category));
         categoryKits.sort(String::compareTo);
-        names.addAll(categoryKits);
-        return names;
+        return optionKitNames(DEFAULT_ARMOR_KIT_NAME, categoryKits);
     }
 
     /**

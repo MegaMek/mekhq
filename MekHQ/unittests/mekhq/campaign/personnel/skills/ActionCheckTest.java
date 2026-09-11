@@ -301,10 +301,8 @@ class ActionCheckTest {
         Person person = new Person("F", "L", null, "Faction");
         person.setCurrentEdge(1);
         TargetRoll target = new TargetRoll(7, "Base");
-        AtomicInteger edgeSpentCallbacks = new AtomicInteger(0);
         ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action")
-                                          .withEdgeRerollCondition(firstRoll -> false)
-                                          .withOnEdgeSpent(edgeSpentCallbacks::incrementAndGet);
+                                          .withEdgeRerollCondition(firstRoll -> false);
 
         // First roll fails (4 vs 7); the default gate would re-roll, but the custom condition forbids it.
         ActionCheckResult result = resolveWithFixedRoll(check, true, 1, 3);
@@ -313,18 +311,15 @@ class ActionCheckTest {
         assertFalse(result.hasUsedEdge());
         assertEquals(4, result.getRollResult());
         assertEquals(1, person.getCurrentEdge(), "edge must not be spent when the condition is false");
-        assertEquals(0, edgeSpentCallbacks.get());
     }
 
     @Test
-    void testWithEdgeRerollCondition_TrueSpendsEdgeAndFiresCallback() {
+    void testWithEdgeRerollCondition_TrueSpendsEdge() {
         Person person = new Person("F", "L", null, "Faction");
         person.setCurrentEdge(1);
         TargetRoll target = new TargetRoll(7, "Base");
-        AtomicInteger edgeSpentCallbacks = new AtomicInteger(0);
         ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action")
-                                          .withEdgeRerollCondition(firstRoll -> firstRoll.result() < target.getValue())
-                                          .withOnEdgeSpent(edgeSpentCallbacks::incrementAndGet);
+                                          .withEdgeRerollCondition(firstRoll -> firstRoll.result() < target.getValue());
 
         // First roll 1+3=4 fails, condition true -> reroll 6+6=12 succeeds.
         ActionCheckResult result = resolveWithFixedRoll(check, true, 1, 3, 6, 6);
@@ -333,7 +328,55 @@ class ActionCheckTest {
         assertTrue(result.hasUsedEdge());
         assertEquals(12, result.getRollResult());
         assertEquals(0, person.getCurrentEdge(), "edge must be spent");
-        assertEquals(1, edgeSpentCallbacks.get(), "onEdgeSpent must fire exactly once");
+    }
+
+    @Test
+    void testEdgeIsNeverSpentOnACheckThatCannotSucceed() {
+        // Even a caller-supplied condition that always says "re-roll" must not burn edge on an unbeatable target: the
+        // canSucceed guard narrows every edge gate.
+        Person person = new Person("F", "L", null, "Faction");
+        person.setCurrentEdge(1);
+        TargetRoll target = new TargetRoll(TargetRoll.AUTOMATIC_FAIL, "cannot succeed");
+        ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action")
+                                          .withEdgeRerollCondition(firstRoll -> true);
+
+        ActionCheckResult result = resolveWithFixedRoll(check, true, 1, 3);
+
+        assertFalse(result.hasUsedEdge(), "edge must not be spent when the target cannot be beaten");
+        assertEquals(1, person.getCurrentEdge());
+    }
+
+    @Test
+    void testAutomaticSuccessTargetIsRenderedAsWordsNotASentinel() {
+        // An AUTOMATIC_SUCCESS target's raw value is Integer.MIN_VALUE; the results line must show the word form.
+        Person person = new Person("F", "L", null, "Faction");
+        TargetRoll target = new TargetRoll(TargetRoll.AUTOMATIC_SUCCESS, "auto");
+        ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action");
+
+        ActionCheckResult result = resolveWithFixedRoll(check, false, 4, 4);
+        String report = result.getReport(false);
+
+        assertTrue(result.isSuccess());
+        assertTrue(report.contains(target.getValueAsString()), "the target should read as words: " + report);
+        assertFalse(report.contains(String.valueOf(Integer.MIN_VALUE)), "no raw sentinel should leak into the report");
+    }
+
+    @Test
+    void testWithoutSubjectOmitsThePersonName() {
+        Person person = mock(Person.class);
+        when(person.getHyperlinkedFullTitle()).thenReturn("SUBJECT_NAME");
+        when(person.getGender()).thenReturn(Gender.MALE);
+        when(person.getCurrentEdge()).thenReturn(0);
+        TargetRoll target = new TargetRoll(7, "Base");
+
+        String withSubject = resolveWithFixedRoll(
+              new ConcreteActionCheck(person, target, false, false, "Action"), false, 5, 5).getReport(false);
+        String withoutSubject = resolveWithFixedRoll(
+              new ConcreteActionCheck(person, target, false, false, "Action").withoutSubject(), false, 5, 5)
+                                       .getReport(false);
+
+        assertTrue(withSubject.contains("SUBJECT_NAME"), "the default line names the person");
+        assertFalse(withoutSubject.contains("SUBJECT_NAME"), "withoutSubject must drop the person's name");
     }
 
     @Test
