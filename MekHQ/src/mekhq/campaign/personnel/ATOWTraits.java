@@ -65,14 +65,14 @@ public enum ATOWTraits {
     UNLUCKY("UNLUCKY", 0, 5),
     WEALTH("WEALTH", -1, 10);
 
-    private final static String RESOURCE_BUNDLE = "mekhq.resources.LifePathEntryDataTraitLookup";
+    private final static String RESOURCE_BUNDLE = "mekhq.resources.ATOWTraits";
     private static final MMLogger LOGGER = MMLogger.create(ATOWTraits.class);
 
     public static final int TRAIT_MODIFICATION_COST = 100;
     public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 
     private final String lookupName;
-    private final int minumum;
+    private final int minimum;
     private final int maximum;
 
     /**
@@ -83,9 +83,9 @@ public enum ATOWTraits {
      * @author Illiani
      * @since 0.50.07
      */
-    ATOWTraits(String lookupName, final int minumum, final int maximum) {
+    ATOWTraits(String lookupName, final int minimum, final int maximum) {
         this.lookupName = lookupName;
-        this.minumum = minumum;
+        this.minimum = minimum;
         this.maximum = maximum;
     }
 
@@ -102,7 +102,7 @@ public enum ATOWTraits {
     }
 
     public int getMinimum() {
-        return minumum;
+        return minimum;
     }
 
     public int getMaximum() {
@@ -148,7 +148,7 @@ public enum ATOWTraits {
      */
     public static @Nullable ATOWTraits fromLookupName(String lookup) {
         if (lookup == null) {
-            LOGGER.warn("Null lookup passed to LifePathEntryDataTraitLookup#fromLookupName");
+            LOGGER.warn("Null lookup passed to ATOWTraits#fromLookupName");
             return null;
         }
 

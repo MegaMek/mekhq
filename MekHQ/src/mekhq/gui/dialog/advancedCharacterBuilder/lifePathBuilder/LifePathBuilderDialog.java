@@ -372,7 +372,7 @@ public class LifePathBuilderDialog extends JDialog {
         txtTooltipArea.setContentType("text/html");
         txtTooltipArea.setEditable(false);
         txtTooltipArea.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
-        setTxtTooltipArea(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.panel.tootltip.default"));
+        setTxtTooltipArea(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.panel.tooltip.default"));
 
         FastJScrollPane scrollTooltipArea = new FastJScrollPane(txtTooltipArea);
         scrollTooltipArea.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
@@ -395,11 +395,11 @@ public class LifePathBuilderDialog extends JDialog {
         pnlButtons.add(btnToggleInstructions);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
 
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.cancel");
-        RoundedJButton btnCancel = new RoundedJButton(titleCancel);
-        btnCancel.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
-        btnCancel.addActionListener(e -> performDialogCloseAction());
-        pnlButtons.add(btnCancel);
+        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.close");
+        RoundedJButton btnClose = new RoundedJButton(titleCancel);
+        btnClose.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
+        btnClose.addActionListener(e -> performDialogCloseAction());
+        pnlButtons.add(btnClose);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
 
         String titleNew = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.new");
@@ -430,9 +430,9 @@ public class LifePathBuilderDialog extends JDialog {
         RoundedJButton btnLoad = new RoundedJButton(titleLoad);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
         btnLoad.addActionListener(e -> {
-            LifePathIO.loadFromJSONWithDialog().ifPresent(LifePath -> {
+            LifePathIO.loadFromJSONWithDialog().ifPresent(lifePath -> {
                 resetNonBasicTabs();
-                updateBuilderFromExistingLifePathRecord(LifePath);
+                updateBuilderFromExistingLifePathRecord(lifePath);
             });
             SwingUtilities.invokeLater(() -> {
                 scrollProgress.getVerticalScrollBar().setValue(0);

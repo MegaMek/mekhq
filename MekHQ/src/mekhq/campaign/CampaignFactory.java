@@ -38,6 +38,7 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
@@ -188,7 +189,7 @@ public class CampaignFactory {
         Finances finances = new Finances();
         RandomEventLibraries randomEvents = null;
         FactionStandingUltimatumsLibrary ultimatums = null;
-        Map<UUID, LifePath> lifePaths = null;
+        Map<UUID, LifePath> lifePaths = new HashMap<>();
 
         RetirementDefectionTracker retirementDefectionTracker = new RetirementDefectionTracker();
         AutosaveService autosave = new AutosaveService();

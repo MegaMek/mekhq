@@ -382,7 +382,7 @@ public class LifePathTabBasicInformation {
               "LifePathBuilderDialog.basic.titleLegalStatement.tooltip");
         JLabel lblLegalStatement = new JLabel(titleLegalStatement);
         chkLegalStatement = new JCheckBox();
-        chkLegalStatement.setSelected(true); // TODO set to false once bulk of official Life Paths are made
+        chkLegalStatement.setSelected(true);
         lblLegalStatement.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipLegalStatement)
         );

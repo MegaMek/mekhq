@@ -163,18 +163,16 @@ public class LifePathIO {
                                 // second boolean bypasses the 'check for legal statement' conditional and causes all
                                 // Life Paths in the data directory to be resaved with a legal statement. Note that
                                 // both booleans need to be true for this statement inclusion to occur.
-                                boolean overrideUpgradeRequirements = true;
-                                boolean overrideLegalStatementRequirements = overrideUpgradeRequirements && true;
+                                boolean overrideUpgradeRequirements = false;
+                                boolean overrideLegalStatementRequirements = overrideUpgradeRequirements && false;
 
                                 if (record.version().isLowerThan(MHQConstants.VERSION) || overrideUpgradeRequirements) {
                                     outOfDateLifePaths.put(id, file.getParent());
                                     LOGGER.info("LifePath [{}] is out of date.", record.name());
 
-                                    if (fileHasLegalStatement(file) || overrideLegalStatementRequirements) {
+                                    if (!fileHasLegalStatement(file) || overrideLegalStatementRequirements) {
                                         outOfDateLifePathsWithLegalStatements.put(id, file.getPath());
                                     }
-
-                                    outOfDateLifePathsWithLegalStatements.put(id, file.getPath());
                                 }
 
                                 LOGGER.debug("Loaded LifePath [{}] from {}", record.name(), file.getPath());
@@ -219,7 +217,7 @@ public class LifePathIO {
                 }
             }
         } catch (Exception e) {
-            // Optionally log error
+            LOGGER.error("Error reading file: {}", file.getName(), e);
         }
         return false;
     }

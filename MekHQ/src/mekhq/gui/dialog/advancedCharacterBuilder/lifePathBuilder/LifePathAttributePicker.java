@@ -276,8 +276,6 @@ class LifePathAttributePicker extends JDialog {
         int edgeKeyValue = getDefaultAttributeValue(tabType, true);
         int edgeDefaultValue = selectedEdge == null ? edgeKeyValue : selectedEdge;
 
-        LOGGER.info("selectedEdge: {}", selectedEdge);
-
         JPanel edgeRow = buildAttributeRow(edgeLabel, edgeTooltip, edgeMinimumValue, categoryMaximumValue,
               edgeDefaultValue, value -> selectedEdge = value
         );

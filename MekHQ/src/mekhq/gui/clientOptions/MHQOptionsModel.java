@@ -93,6 +93,9 @@ class MHQOptionsModel {
           MHQConstants.CONFIRMATION_RESOLVE_SCENARIO,
           MHQConstants.CONFIRMATION_ABANDON_UNITS,
           MHQConstants.CONFIRMATION_ASSIGN_TECHS,
+          MHQConstants.CONFIRMATION_NEW_LIFE_PATH,
+          MHQConstants.CONFIRMATION_REGEN_PATH_ID,
+          MHQConstants.CONFIRMATION_UPGRADE_LIFE_PATHS,
     };
 
     // region Fonts

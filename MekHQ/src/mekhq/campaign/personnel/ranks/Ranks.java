@@ -131,7 +131,7 @@ public class Ranks {
             writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
             String year = String.valueOf(LocalDate.now().getYear()).replace(",", "");
-            String legalStatement = getFormattedTextAt(RESOURCE_BUNDLE, "Ranks.legalStatement", year);
+            String legalStatement = getFormattedTextAt(RESOURCE_BUNDLE, "Legal.legalStatement", year);
             writer.println(legalStatement.trim());
 
             MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "rankSystems", "version", MHQConstants.VERSION);

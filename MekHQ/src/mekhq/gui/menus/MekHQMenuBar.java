@@ -599,20 +599,7 @@ public class MekHQMenuBar extends JMenuBar {
 
         menuManage.add(miAutoResolveBehaviorEditor);
 
-        initMenuRoleplay(menuManage);
-
         return menuManage;
-    }
-
-    private void initMenuRoleplay(JMenu menuManage) {
-        JMenu menuRoleplay = new JMenu(getTextAt("menuRoleplay.text"));
-        menuRoleplay.setMnemonic(KeyEvent.VK_R);
-        menuManage.setName("menuRoleplay");
-
-        JMenuItem miLifePathBuilder = createMenuItem("miLifePathBuilder.text", KeyEvent.VK_L,
-              evt -> new LifePathBuilderDialog(getCampaign(), getFrame()));
-        menuRoleplay.add(miLifePathBuilder);
-        menuManage.add(menuRoleplay);
     }
 
     /**
@@ -640,7 +627,7 @@ public class MekHQMenuBar extends JMenuBar {
               event -> new StratConFacilityEditorDialog(getFrame()).setVisible(true));
         menuDeveloperTools.add(miFacilityEditor);
 
-        JMenuItem miLifePathBuilder = createMenuItem("miLifePathBuilder.text", KeyEvent.VK_F,
+        JMenuItem miLifePathBuilder = createMenuItem("miLifePathBuilder.text", KeyEvent.VK_L,
               event -> new LifePathBuilderDialog(getCampaign(), getFrame()));
         menuDeveloperTools.add(miLifePathBuilder);
 

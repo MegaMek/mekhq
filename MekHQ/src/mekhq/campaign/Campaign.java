@@ -364,7 +364,7 @@ public class Campaign implements ITechManager {
     // bugs being permanently locked into the campaign file.
     private RandomEventLibraries randomEventLibraries;
     private FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
-    private Map<UUID, LifePath> lifePathLibrary;
+    private Map<UUID, LifePath> lifePathLibrary = new HashMap<>();
 
     private Map<Integer, List<WarriorsAlmanacEntry>> partsAlmanac;
     private Map<Integer, List<WarriorsAlmanacEntry>> unitsAlmanac;
