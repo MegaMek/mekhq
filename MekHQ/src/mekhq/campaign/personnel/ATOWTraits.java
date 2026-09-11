@@ -46,7 +46,7 @@ import mekhq.campaign.personnel.enums.ExtraIncome;
  * <p>Each trait is identified by a unique string, which is used for matching and data serialization.</p>
  *
  * @author Illiani
- * @since 0.50.07
+ * @since 0.50.11
  */
 public enum ATOWTraits {
     BLOODMARK("BLOODMARK", 0, 5),
@@ -68,20 +68,39 @@ public enum ATOWTraits {
     private final static String RESOURCE_BUNDLE = "mekhq.resources.ATOWTraits";
     private static final MMLogger LOGGER = MMLogger.create(ATOWTraits.class);
 
+    /**
+     * The XP it costs to move a trait by one level, in either direction.
+     *
+     * <p>Trait levels are bought and sold in whole steps, so this is also the step a trait spinner moves by on the XP
+     * tabs of the Life Path wizard.</p>
+     */
     public static final int TRAIT_MODIFICATION_COST = 100;
-    public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
+
+    /**
+     * The target number a Connections roll has to beat.
+     *
+     * <p>Not drawn from a rulebook. It was picked to make Connections useful without making it reliable, and it can
+     * be retuned without consequence elsewhere.</p>
+     */
+    public static final int CONNECTIONS_TARGET_NUMBER = 4;
 
     private final String lookupName;
     private final int minimum;
     private final int maximum;
 
     /**
-     * Constructs a {@link ATOWTraits} enumerated value with the provided name.
+     * Constructs a {@link ATOWTraits} enumerated value with the provided name and bounds.
+     *
+     * <p>The bounds are trait <em>levels</em>, not XP. Several traits are negative-only, because they exist to
+     * describe a drawback: Enemy runs from -10 to 0, and Origin Prosthetic from -6 to 0. Others span both sides of
+     * zero, such as Fame at -5 to 5.</p>
      *
      * @param lookupName the unique string identifier for this trait
+     * @param minimum    the lowest level this trait can be set to
+     * @param maximum    the highest level this trait can be set to
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.11
      */
     ATOWTraits(String lookupName, final int minimum, final int maximum) {
         this.lookupName = lookupName;
@@ -95,7 +114,7 @@ public enum ATOWTraits {
      * @return the lookup name
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.11
      */
     public String getLookupName() {
         return lookupName;
@@ -116,7 +135,7 @@ public enum ATOWTraits {
      * @return the localized display name for this object
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.11
      */
     public String getDisplayName() {
         return getTextAt(RESOURCE_BUNDLE, lookupName + ".label");
@@ -129,7 +148,7 @@ public enum ATOWTraits {
      * @return the localized description for this object
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.11
      */
     public String getDescription() {
         return getTextAt(RESOURCE_BUNDLE, lookupName + ".description");
@@ -144,7 +163,7 @@ public enum ATOWTraits {
      *       {@code null}
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.11
      */
     public static @Nullable ATOWTraits fromLookupName(String lookup) {
         if (lookup == null) {

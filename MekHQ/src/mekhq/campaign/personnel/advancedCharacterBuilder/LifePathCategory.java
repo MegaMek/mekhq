@@ -150,7 +150,7 @@ public enum LifePathCategory {
      * @return the localized display name for this object
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.11
      */
     public String getDisplayName() {
         return getTextAt(RESOURCE_BUNDLE, lookupName + ".label");
@@ -163,7 +163,7 @@ public enum LifePathCategory {
      * @return the localized description for this object
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.11
      */
     public String getDescription() {
         return getTextAt(RESOURCE_BUNDLE, lookupName + ".description");

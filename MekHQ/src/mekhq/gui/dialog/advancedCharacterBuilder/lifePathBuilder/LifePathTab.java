@@ -34,6 +34,7 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.min;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
+import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_EDGE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_EDGE_SCORE;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog.getLifePathBuilderPadding;
@@ -54,8 +55,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.swing.BoxLayout;
 import javax.swing.JEditorPane;
@@ -83,7 +87,7 @@ import mekhq.campaign.universe.Systems;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
-import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
+import mekhq.gui.utilities.TooltipMouseListenerUtil;
 
 public class LifePathTab {
     private final static MMLogger LOGGER = MMLogger.create(LifePathTab.class);
@@ -107,133 +111,191 @@ public class LifePathTab {
     private final String tabName;
     private final Map<UUID, LifePath> lifePathLibrary;
 
-    private Map<Integer, Set<String>> storedFactions = new HashMap<>();
-    private Map<Integer, Set<String>> storedSystems = new HashMap<>();
-    private Map<Integer, Set<UUID>> storedLifePaths = new HashMap<>();
-    private Map<Integer, Map<LifePathCategory, Integer>> storedCategories = new HashMap<>();
-    private Map<Integer, Map<SkillAttribute, Integer>> storedAttributes = new HashMap<>();
-    private Map<Integer, Integer> storedEdge = new HashMap<>();
-    private Map<Integer, Integer> storedFlexibleAttributes = new HashMap<>();
-    private Map<Integer, Map<ATOWTraits, Integer>> storedTraits = new HashMap<>();
-    private Map<Integer, Map<String, Integer>> storedSkills = new HashMap<>();
-    private Map<Integer, Map<SkillSubType, Integer>> storedMetaSkills = new HashMap<>();
-    private Map<Integer, Map<String, Integer>> storedNaturalAptitudes = new HashMap<>();
-    private Map<Integer, Map<SkillSubType, Integer>> storedNaturalAptitudesMetaSkills = new HashMap<>();
-    private Map<Integer, Map<String, Integer>> storedAbilities = new HashMap<>();
+    /**
+     * What every group in this section holds, keyed by group index.
+     *
+     * <p>One map of {@link LifePathGroup} rather than thirteen parallel maps keyed by the same index. Adding,
+     * removing, duplicating and resetting a group each used to be written out thirteen times.</p>
+     *
+     * <p>A {@link TreeMap} so the groups iterate in index order. The old maps were {@link HashMap}s, and the progress
+     * text relied on small {@link Integer} keys happening to come back in order.</p>
+     */
+    private final Map<Integer, LifePathGroup> groups = new TreeMap<>();
 
     private final JLabel lblFlexibleXPPicks = new JLabel();
     private final JSpinner spnFlexibleXPPicks = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
 
-    public Map<Integer, Set<String>> getFactions() {
-        return storedFactions;
-    }
-
-    public void setFactions(Map<Integer, Set<String>> storedFactions) {
-        this.storedFactions = storedFactions;
-    }
-
-    public Map<Integer, Set<String>> getSystems() {
-        return storedSystems;
-    }
-
-    public void setSystems(Map<Integer, Set<String>> storedSystems) {
-        this.storedSystems = storedSystems;
-    }
-
-    public Map<Integer, Set<UUID>> getLifePaths() {
-        return storedLifePaths;
-    }
-
-    public void setLifePaths(Map<Integer, Set<UUID>> storedLifePaths) {
-        this.storedLifePaths = storedLifePaths;
-    }
-
-    public Map<Integer, Map<LifePathCategory, Integer>> getCategories() {
-        return storedCategories;
-    }
-
-    public void setCategories(Map<Integer, Map<LifePathCategory, Integer>> storedCategories) {
-        this.storedCategories = storedCategories;
-    }
-
-    public Map<Integer, Map<SkillAttribute, Integer>> getAttributes() {
-        return storedAttributes;
-    }
-
-    public void setAttributes(Map<Integer, Map<SkillAttribute, Integer>> storedAttributes) {
-        this.storedAttributes = storedAttributes;
-    }
-
-    public Map<Integer, Integer> getEdge() {
-        return storedEdge;
-    }
-
-    public void setEdge(Map<Integer, Integer> storedEdge) {
-        this.storedEdge = storedEdge;
+    /**
+     * Returns the group at the given index, creating it if this section does not have one yet.
+     *
+     * @param groupIndex the group's index
+     *
+     * @return the group
+     *
+     * @since 0.50.11
+     */
+    private LifePathGroup groupFor(int groupIndex) {
+        return groups.computeIfAbsent(groupIndex, index -> new LifePathGroup());
     }
 
     /**
-     * Retrieves the mapping of stored flexible attributes.
+     * Returns one kind of entry from every group, keyed by group index.
      *
-     * <p><b>Warning:</b> the returned {@link Integer} can be {@code null}.</p>
+     * <p>This is how the section presents itself to the rest of the wizard, which still thinks in terms of
+     * "the skills of every group" rather than "every group's skills".</p>
      *
-     * @return a map where the key represents an identifier and the value represents its associated attribute.
+     * @param accessor which part of a group to read
+     * @param <T>      the type that part holds
+     *
+     * @return that part of every group, in index order
+     *
+     * @since 0.50.11
      */
-    public Map<Integer, Integer> getFlexibleAttribute() {
-        return storedFlexibleAttributes;
+    private <T> Map<Integer, T> collectFromGroups(Function<LifePathGroup, T> accessor) {
+        Map<Integer, T> collected = new TreeMap<>();
+
+        for (Map.Entry<Integer, LifePathGroup> entry : groups.entrySet()) {
+            collected.put(entry.getKey(), accessor.apply(entry.getValue()));
+        }
+
+        return collected;
     }
 
-    public void setFlexibleAttribute(Map<Integer, Integer> storedFlexibleAttribute) {
-        this.storedFlexibleAttributes = storedFlexibleAttribute;
+    /**
+     * Writes one kind of entry into the groups it belongs to, creating groups as needed.
+     *
+     * @param source   the entries to write, keyed by group index
+     * @param mutator  which part of a group to write
+     * @param <T>      the type that part holds
+     *
+     * @since 0.50.11
+     */
+    private <T> void applyToGroups(Map<Integer, T> source, BiConsumer<LifePathGroup, T> mutator) {
+        if (source == null) {
+            return;
+        }
+
+        for (Map.Entry<Integer, T> entry : source.entrySet()) {
+            mutator.accept(groupFor(entry.getKey()), entry.getValue());
+        }
+    }
+
+    public Map<Integer, Set<String>> getFactions() {
+        return collectFromGroups(LifePathGroup::getFactions);
+    }
+
+    public void setFactions(Map<Integer, Set<String>> factions) {
+        applyToGroups(factions, LifePathGroup::setFactions);
+    }
+
+    public Map<Integer, Set<String>> getSystems() {
+        return collectFromGroups(LifePathGroup::getSystems);
+    }
+
+    public void setSystems(Map<Integer, Set<String>> systems) {
+        applyToGroups(systems, LifePathGroup::setSystems);
+    }
+
+    public Map<Integer, Set<UUID>> getLifePaths() {
+        return collectFromGroups(LifePathGroup::getLifePaths);
+    }
+
+    public void setLifePaths(Map<Integer, Set<UUID>> lifePaths) {
+        applyToGroups(lifePaths, LifePathGroup::setLifePaths);
+    }
+
+    public Map<Integer, Map<LifePathCategory, Integer>> getCategories() {
+        return collectFromGroups(LifePathGroup::getCategories);
+    }
+
+    public void setCategories(Map<Integer, Map<LifePathCategory, Integer>> categories) {
+        applyToGroups(categories, LifePathGroup::setCategories);
+    }
+
+    public Map<Integer, Map<SkillAttribute, Integer>> getAttributes() {
+        return collectFromGroups(LifePathGroup::getAttributes);
+    }
+
+    public void setAttributes(Map<Integer, Map<SkillAttribute, Integer>> attributes) {
+        applyToGroups(attributes, LifePathGroup::setAttributes);
+    }
+
+    /**
+     * Retrieves each group's Edge value.
+     *
+     * <p><b>Warning:</b> a value can be {@code null}, which means the author set no Edge rule for that group.</p>
+     *
+     * @return each group's Edge value, keyed by group index
+     */
+    public Map<Integer, Integer> getEdge() {
+        return collectFromGroups(LifePathGroup::getEdge);
+    }
+
+    public void setEdge(Map<Integer, Integer> edge) {
+        applyToGroups(edge, LifePathGroup::setEdge);
+    }
+
+    /**
+     * Retrieves each group's "any attribute" value.
+     *
+     * <p><b>Warning:</b> a value can be {@code null}, which means the author set no rule for that group.</p>
+     *
+     * @return each group's "any attribute" value, keyed by group index
+     */
+    public Map<Integer, Integer> getFlexibleAttribute() {
+        return collectFromGroups(LifePathGroup::getFlexibleAttribute);
+    }
+
+    public void setFlexibleAttribute(Map<Integer, Integer> flexibleAttribute) {
+        applyToGroups(flexibleAttribute, LifePathGroup::setFlexibleAttribute);
     }
 
     public Map<Integer, Map<ATOWTraits, Integer>> getTraits() {
-        return storedTraits;
+        return collectFromGroups(LifePathGroup::getTraits);
     }
 
-    public void setTraits(Map<Integer, Map<ATOWTraits, Integer>> storedTraits) {
-        this.storedTraits = storedTraits;
+    public void setTraits(Map<Integer, Map<ATOWTraits, Integer>> traits) {
+        applyToGroups(traits, LifePathGroup::setTraits);
     }
 
     public Map<Integer, Map<String, Integer>> getSkills() {
-        return storedSkills;
+        return collectFromGroups(LifePathGroup::getSkills);
     }
 
-    public void setSkills(Map<Integer, Map<String, Integer>> storedSkills) {
-        this.storedSkills = storedSkills;
+    public void setSkills(Map<Integer, Map<String, Integer>> skills) {
+        applyToGroups(skills, LifePathGroup::setSkills);
     }
 
     public Map<Integer, Map<String, Integer>> getNaturalAptitudes() {
-        return storedNaturalAptitudes;
+        return collectFromGroups(LifePathGroup::getNaturalAptitudes);
     }
 
-    public void setNaturalAptitudes(Map<Integer, Map<String, Integer>> storedNaturalAptitudes) {
-        this.storedNaturalAptitudes = storedNaturalAptitudes;
+    public void setNaturalAptitudes(Map<Integer, Map<String, Integer>> naturalAptitudes) {
+        applyToGroups(naturalAptitudes, LifePathGroup::setNaturalAptitudes);
     }
 
     public Map<Integer, Map<SkillSubType, Integer>> getNaturalAptitudesMetaSkills() {
-        return storedNaturalAptitudesMetaSkills;
+        return collectFromGroups(LifePathGroup::getNaturalAptitudesMetaSkills);
     }
 
-    public void setNaturalAptitudesMetaSkills(
-          Map<Integer, Map<SkillSubType, Integer>> storedNaturalAptitudesMetaSkills) {
-        this.storedNaturalAptitudesMetaSkills = storedNaturalAptitudesMetaSkills;
+    public void setNaturalAptitudesMetaSkills(Map<Integer, Map<SkillSubType, Integer>> naturalAptitudesMetaSkills) {
+        applyToGroups(naturalAptitudesMetaSkills, LifePathGroup::setNaturalAptitudesMetaSkills);
     }
 
     public Map<Integer, Map<SkillSubType, Integer>> getMetaSkills() {
-        return storedMetaSkills;
+        return collectFromGroups(LifePathGroup::getMetaSkills);
     }
 
-    public void setMetaSkills(Map<Integer, Map<SkillSubType, Integer>> storedMetaSkills) {
-        this.storedMetaSkills = storedMetaSkills;
+    public void setMetaSkills(Map<Integer, Map<SkillSubType, Integer>> metaSkills) {
+        applyToGroups(metaSkills, LifePathGroup::setMetaSkills);
     }
 
     public Map<Integer, Map<String, Integer>> getAbilities() {
-        return storedAbilities;
+        return collectFromGroups(LifePathGroup::getAbilities);
     }
 
-    public void setAbilities(Map<Integer, Map<String, Integer>> storedAbilities) {
-        this.storedAbilities = storedAbilities;
+    public void setAbilities(Map<Integer, Map<String, Integer>> abilities) {
+        applyToGroups(abilities, LifePathGroup::setAbilities);
     }
 
     public int getPickCount() {
@@ -281,18 +343,18 @@ public class LifePathTab {
         JPanel panelButtonsRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         RoundedJButton btnAddGroup = getAddGroup(panelButtonsRow);
         btnAddGroup.setVisible(enableGroupControls);
-        btnAddGroup.addActionListener(e -> {
+        btnAddGroup.addActionListener(actionEvent -> {
             addTab();
             tabLocal.setSelectedIndex(getTabCount() - 1);
         });
 
         RoundedJButton btnRemoveGroup = getRemoveGroup(panelButtonsRow);
         btnRemoveGroup.setVisible(enableGroupControls);
-        btnRemoveGroup.addActionListener(e -> removeGroup());
+        btnRemoveGroup.addActionListener(actionEvent -> removeGroup());
 
         RoundedJButton btnDuplicateGroup = getDuplicateGroup(panelButtonsRow);
         btnDuplicateGroup.setVisible(enableGroupControls);
-        btnDuplicateGroup.addActionListener(e -> duplicateGroup());
+        btnDuplicateGroup.addActionListener(actionEvent -> duplicateGroup());
 
         JPanel panelPicksRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
         buildFlexiblePicksPanel(panelPicksRow);
@@ -316,16 +378,13 @@ public class LifePathTab {
         String tooltipPicks = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.flexible_xp.button.pickCount.tooltip");
         lblFlexibleXPPicks.setText(titlePicks);
-        lblFlexibleXPPicks.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                parent.setTxtTooltipArea(tooltipPicks);
-            }
-        });
+        lblFlexibleXPPicks.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipPicks)
+        );
         spnFlexibleXPPicks.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipPicks)
         );
-        spnFlexibleXPPicks.addChangeListener(e -> parent.updateTxtProgress());
+        spnFlexibleXPPicks.addChangeListener(changeEvent -> parent.updateTxtProgress());
         panelPicksRow.add(lblFlexibleXPPicks);
         panelPicksRow.add(spnFlexibleXPPicks);
     }
@@ -370,6 +429,15 @@ public class LifePathTab {
         return btnAddGroup;
     }
 
+    /**
+     * Removes the selected group and closes the gap its index leaves behind.
+     *
+     * <p>Every group above the removed one shifts down by one, because the indexes are the keys the saved file uses
+     * and they have to stay consecutive. This was 170 lines of thirteen identical shift blocks before the groups
+     * became one object.</p>
+     *
+     * @since 0.50.11
+     */
     private void removeGroup() {
         if (tabLocal.getTabCount() == 0) {
             return;
@@ -377,169 +445,81 @@ public class LifePathTab {
 
         int selectedIndex = tabLocal.getSelectedIndex();
 
-        // We need to remove the tab's storage data from the storge map and then re-add the tabs in the
-        // correct order (since we're removing a tab, the indexes will shift)
-        storedFactions.remove(selectedIndex);
-        Map<Integer, Set<String>> tempFactions = new HashMap<>();
-        for (Map.Entry<Integer, Set<String>> entry : storedFactions.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempFactions.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempFactions.put(entry.getKey() - 1, entry.getValue());
-            }
-        }
-        storedFactions.clear();
-        storedFactions.putAll(tempFactions);
+        Map<Integer, LifePathGroup> shifted = new TreeMap<>();
+        for (Map.Entry<Integer, LifePathGroup> entry : groups.entrySet()) {
+            int groupIndex = entry.getKey();
 
-        storedSystems.remove(selectedIndex);
-        Map<Integer, Set<String>> tempSystems = new HashMap<>();
-        for (Map.Entry<Integer, Set<String>> entry : storedSystems.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempSystems.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempSystems.put(entry.getKey() - 1, entry.getValue());
+            if (groupIndex < selectedIndex) {
+                shifted.put(groupIndex, entry.getValue());
+            } else if (groupIndex > selectedIndex) {
+                shifted.put(groupIndex - 1, entry.getValue());
             }
         }
-        storedSystems.clear();
-        storedSystems.putAll(tempSystems);
 
-        storedLifePaths.remove(selectedIndex);
-        Map<Integer, Set<UUID>> tempLifePaths = new HashMap<>();
-        for (Map.Entry<Integer, Set<UUID>> entry : storedLifePaths.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempLifePaths.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempLifePaths.put(entry.getKey() - 1, entry.getValue());
-            }
-        }
-        storedLifePaths.clear();
-        storedLifePaths.putAll(tempLifePaths);
-
-        storedCategories.remove(selectedIndex);
-        Map<Integer, Map<LifePathCategory, Integer>> tempCategories = new HashMap<>();
-        for (Map.Entry<Integer, Map<LifePathCategory, Integer>> entry : storedCategories.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempCategories.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempCategories.put(entry.getKey() - 1, entry.getValue());
-            }
-        }
-        storedCategories.clear();
-        storedCategories.putAll(tempCategories);
-
-        storedAttributes.remove(selectedIndex);
-        Map<Integer, Map<SkillAttribute, Integer>> tempAttributes = new HashMap<>();
-        for (Map.Entry<Integer, Map<SkillAttribute, Integer>> entry : storedAttributes.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempAttributes.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempAttributes.put(entry.getKey() - 1, entry.getValue());
-            }
-        }
-        storedAttributes.clear();
-        storedAttributes.putAll(tempAttributes);
-
-        storedEdge.remove(selectedIndex);
-        Map<Integer, Integer> tempEdge = new HashMap<>();
-        for (Map.Entry<Integer, Integer> entry : storedEdge.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempEdge.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempEdge.put(entry.getKey() - 1, entry.getValue());
-            }
-        }
-        storedEdge.clear();
-        storedEdge.putAll(tempEdge);
-
-        storedFlexibleAttributes.remove(selectedIndex);
-        Map<Integer, Integer> tempFlexibleAttributes = new HashMap<>();
-        for (Map.Entry<Integer, Integer> entry : storedFlexibleAttributes.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempFlexibleAttributes.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempFlexibleAttributes.put(entry.getKey() - 1, entry.getValue());
-            }
-        }
-        storedFlexibleAttributes.clear();
-        storedFlexibleAttributes.putAll(tempFlexibleAttributes);
-
-        storedTraits.remove(selectedIndex);
-        Map<Integer, Map<ATOWTraits, Integer>> tempTraits = new HashMap<>();
-        for (Map.Entry<Integer, Map<ATOWTraits, Integer>> entry : storedTraits.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempTraits.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempTraits.put(entry.getKey() - 1, entry.getValue());
-            }
-        }
-        storedTraits.clear();
-        storedTraits.putAll(tempTraits);
-
-        storedSkills.remove(selectedIndex);
-        Map<Integer, Map<String, Integer>> tempSkills = new HashMap<>();
-        for (Map.Entry<Integer, Map<String, Integer>> entry : storedSkills.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempSkills.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempSkills.put(entry.getKey() - 1, entry.getValue());
-            }
-        }
-        storedSkills.clear();
-        storedSkills.putAll(tempSkills);
-
-        storedMetaSkills.remove(selectedIndex);
-        Map<Integer, Map<SkillSubType, Integer>> tempMetaSkills = new HashMap<>();
-        for (Map.Entry<Integer, Map<SkillSubType, Integer>> entry : storedMetaSkills.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempMetaSkills.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempMetaSkills.put(entry.getKey() - 1, entry.getValue());
-            }
-        }
-        storedMetaSkills.clear();
-        storedMetaSkills.putAll(tempMetaSkills);
-
-        storedNaturalAptitudes.remove(selectedIndex);
-        Map<Integer, Map<String, Integer>> tempNaturalAptitudes = new HashMap<>();
-        for (Map.Entry<Integer, Map<String, Integer>> entry : storedNaturalAptitudes.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempNaturalAptitudes.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempNaturalAptitudes.put(entry.getKey() - 1, entry.getValue());
-            }
-        }
-        storedNaturalAptitudes.clear();
-        storedNaturalAptitudes.putAll(tempNaturalAptitudes);
-
-        storedNaturalAptitudesMetaSkills.remove(selectedIndex);
-        Map<Integer, Map<SkillSubType, Integer>> tempNaturalAptitudeMetaSkills = new HashMap<>();
-        for (Map.Entry<Integer, Map<SkillSubType, Integer>> entry : storedNaturalAptitudesMetaSkills.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempNaturalAptitudeMetaSkills.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempNaturalAptitudeMetaSkills.put(entry.getKey() - 1, entry.getValue());
-            }
-        }
-        storedNaturalAptitudesMetaSkills.clear();
-        storedNaturalAptitudesMetaSkills.putAll(tempNaturalAptitudeMetaSkills);
-
-        storedAbilities.remove(selectedIndex);
-        Map<Integer, Map<String, Integer>> tempAbilities = new HashMap<>();
-        for (Map.Entry<Integer, Map<String, Integer>> entry : storedAbilities.entrySet()) {
-            if (entry.getKey() < selectedIndex) {
-                tempAbilities.put(entry.getKey(), entry.getValue());
-            } else if (entry.getKey() > selectedIndex) {
-                tempAbilities.put(entry.getKey() - 1, entry.getValue());
-            }
-        }
-        storedAbilities.clear();
-        storedAbilities.putAll(tempAbilities);
+        groups.clear();
+        groups.putAll(shifted);
 
         // Remove the desired tab
         tabLocal.remove(selectedIndex);
 
+        // The titles are the group indexes, and every index above the removed one has just shifted down, so the
+        // labels have to be rewritten. Without this, removing group 1 of three leaves tabs titled 0 and 2.
+        renumberGroupTabs();
+        updateFlexiblePicksMaximum();
+
         // Update the progress panel
         parent.updateTxtProgress();
+    }
+
+    /**
+     * Rewrites every group tab's title so the numbers run consecutively from zero again.
+     *
+     * <p>The numbers are the group indexes used as keys in the saved file, so they are not cosmetic.</p>
+     *
+     * @since 0.50.11
+     */
+    private void renumberGroupTabs() {
+        for (int groupIndex = 0; groupIndex < getTabCount(); groupIndex++) {
+            tabLocal.setTitleAt(groupIndex, buildGroupTabTitle(groupIndex));
+        }
+    }
+
+    /**
+     * Returns the title shown on a group tab.
+     *
+     * <p>Fixed XP and Exclusions have exactly one group, so they show no number.</p>
+     *
+     * @param groupIndex the group's index
+     *
+     * @return the tab title, which may be empty
+     *
+     * @since 0.50.11
+     */
+    private String buildGroupTabTitle(int groupIndex) {
+        return switch (tabType) {
+            case FIXED_XP, EXCLUSIONS -> "";
+            case FLEXIBLE_XP, REQUIREMENTS -> "<html><b>" + groupIndex + "</b></html>";
+        };
+    }
+
+    /**
+     * Caps the "how many groups may the player pick?" spinner at the number of groups that exist.
+     *
+     * <p>The spinner used to accept up to 100 regardless, and {@link #getPickCount()} then quietly reduced the
+     * number on save. That made the saved value disagree with the number on screen, and made
+     * {@code TOO_MANY_FLEXIBLE_PICKS} impossible to produce from the wizard.</p>
+     *
+     * @since 0.50.11
+     */
+    private void updateFlexiblePicksMaximum() {
+        SpinnerNumberModel model = (SpinnerNumberModel) spnFlexibleXPPicks.getModel();
+        int groupCount = getTabCount();
+
+        model.setMaximum(groupCount);
+
+        if ((int) spnFlexibleXPPicks.getValue() > groupCount) {
+            spnFlexibleXPPicks.setValue(groupCount);
+        }
     }
 
     private void duplicateGroup() {
@@ -552,45 +532,9 @@ public class LifePathTab {
 
         int newIndex = getTabCount() - 1;
 
-        Set<String> currentFactions = new HashSet<>(storedFactions.get(selectedIndex));
-        storedFactions.put(newIndex, currentFactions);
-
-        Set<String> currentSystems = new HashSet<>(storedSystems.get(selectedIndex));
-        storedSystems.put(newIndex, currentSystems);
-
-        Set<UUID> currentLifePaths = new HashSet<>(storedLifePaths.get(selectedIndex));
-        storedLifePaths.put(newIndex, currentLifePaths);
-
-        Map<LifePathCategory, Integer> currentCategories = new HashMap<>(storedCategories.get(selectedIndex));
-        storedCategories.put(newIndex, currentCategories);
-
-        Map<SkillAttribute, Integer> currentAttributes = new HashMap<>(storedAttributes.get(selectedIndex));
-        storedAttributes.put(newIndex, currentAttributes);
-
-        Integer currentEdge = storedEdge.get(selectedIndex);
-        storedEdge.put(newIndex, currentEdge);
-
-        Integer currentFlexibleAttributes = storedFlexibleAttributes.get(selectedIndex);
-        storedFlexibleAttributes.put(newIndex, currentFlexibleAttributes);
-
-        Map<ATOWTraits, Integer> currentTraits = new HashMap<>(storedTraits.get(selectedIndex));
-        storedTraits.put(newIndex, currentTraits);
-
-        Map<String, Integer> currentSkills = new HashMap<>(storedSkills.get(selectedIndex));
-        storedSkills.put(newIndex, currentSkills);
-
-        Map<SkillSubType, Integer> currentMetaSkills = new HashMap<>(storedMetaSkills.get(selectedIndex));
-        storedMetaSkills.put(newIndex, currentMetaSkills);
-
-        Map<String, Integer> currentNaturalAptitudes = new HashMap<>(storedNaturalAptitudes.get(selectedIndex));
-        storedNaturalAptitudes.put(newIndex, currentNaturalAptitudes);
-
-        Map<SkillSubType, Integer> currentNaturalAptitudeMetaSkills = new HashMap<>(storedNaturalAptitudesMetaSkills.get(
-              selectedIndex));
-        storedNaturalAptitudesMetaSkills.put(newIndex, currentNaturalAptitudeMetaSkills);
-
-        Map<String, Integer> currentAbilities = new HashMap<>(storedAbilities.get(selectedIndex));
-        storedAbilities.put(newIndex, currentAbilities);
+        // groupFor rather than a bare get: a group loaded from a hand-edited file need not be present, and copy()
+        // deep-copies the collections so editing the duplicate cannot reach back into the original.
+        groups.put(newIndex, groupFor(selectedIndex).copy());
 
         JPanel pnlNewTab = (JPanel) tabLocal.getComponentAt(newIndex);
         JPanel pnlMain = (JPanel) pnlNewTab.getComponent(1);
@@ -633,12 +577,13 @@ public class LifePathTab {
         // Panel for the 8 buttons (using GridLayout: 2 rows, 4 columns)
         JPanel buttonsPanel = new JPanel(new GridLayout(2, 4, PADDING, PADDING));
 
-        // Attributes
-        storedAttributes.put(index, new HashMap<>());
-        storedFlexibleAttributes.put(index, null);
+        // One object per group, created empty. Every kind of entry a group can hold starts empty inside it, and Edge
+        // and the "any attribute" value start unset rather than at their sentinel, so a group nobody touches writes
+        // nothing to the saved file.
+        groupFor(index);
 
-        int defaultEdgeValue = getDefaultAttributeValue(tabType, true);
-        storedEdge.put(index, defaultEdgeValue);
+        // Attributes
+
 
         String titleAddAttribute = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addAttribute.label");
@@ -651,7 +596,6 @@ public class LifePathTab {
         buttonsPanel.add(btnAddAttribute);
 
         // Traits
-        storedTraits.put(index, new HashMap<>());
 
         String titleAddTrait = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addTrait.label");
@@ -663,8 +607,6 @@ public class LifePathTab {
         );
         buttonsPanel.add(btnAddTrait);
 
-        storedNaturalAptitudes.put(index, new HashMap<>());
-        storedNaturalAptitudesMetaSkills.put(index, new HashMap<>());
         String titleAddNaturalAptitude = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addNaturalAptitude.label");
         String tooltipAddNaturalAptitude = getTextAt(RESOURCE_BUNDLE,
@@ -675,8 +617,6 @@ public class LifePathTab {
         );
 
         // Skills
-        storedSkills.put(index, new HashMap<>());
-        storedMetaSkills.put(index, new HashMap<>());
 
         String titleAddSkill = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addSkill.label");
@@ -693,7 +633,6 @@ public class LifePathTab {
         }
 
         // SPAs
-        storedAbilities.put(index, new HashMap<>());
 
         String titleAddSPA = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addSPA.label");
@@ -706,7 +645,6 @@ public class LifePathTab {
         buttonsPanel.add(btnAddSPA);
 
         // Factions
-        storedFactions.put(index, new HashSet<>());
 
         String titleAddFaction = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addFaction.label");
@@ -720,7 +658,6 @@ public class LifePathTab {
         buttonsPanel.add(btnAddFaction);
 
         // Systems
-        storedSystems.put(index, new HashSet<>());
 
         String titleAddSystem = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addSystem.label");
@@ -734,7 +671,6 @@ public class LifePathTab {
         buttonsPanel.add(btnAddSystem);
 
         // Life Paths
-        storedLifePaths.put(index, new HashSet<>());
 
         String titleAddLifePath = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addLifePath.label");
@@ -748,7 +684,6 @@ public class LifePathTab {
         buttonsPanel.add(btnAddLifePath);
 
         // Categories
-        storedCategories.put(index, new HashMap<>());
 
         String titleAddCategory = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addCategory.label");
@@ -786,146 +721,160 @@ public class LifePathTab {
         groupPanel.add(buttonsPanel, BorderLayout.NORTH);
         groupPanel.add(pnlDisplay, BorderLayout.CENTER);
 
-        String title = switch (tabType) {
-            case FIXED_XP, EXCLUSIONS -> "";
-            case FLEXIBLE_XP, REQUIREMENTS -> "<html><b>" + index + "</b></html>";
-        };
-        tabLocal.addTab(title, groupPanel);
+        tabLocal.addTab(buildGroupTabTitle(index), groupPanel);
+        updateFlexiblePicksMaximum();
 
         // Action Listeners
-        btnAddAttribute.addActionListener(e -> {
-            parent.setVisible(false);
-
+        // No hide and show around any of these: the pickers are owned by the wizard, so they cannot end up behind
+        // it, and nesting a modal event loop inside the wizard's own was the usual cause of that report.
+        btnAddAttribute.addActionListener(actionEvent -> {
             int currentIndex = tabLocal.getSelectedIndex();
+            LifePathGroup group = groupFor(currentIndex);
 
-            LifePathAttributePicker picker = new LifePathAttributePicker(storedAttributes.get(currentIndex),
-                  storedFlexibleAttributes.get(currentIndex), storedEdge.get(currentIndex), tabType);
-            storedAttributes.put(currentIndex, picker.getSelectedAttributeScores());
-            storedEdge.put(currentIndex, picker.getEdge());
-            storedFlexibleAttributes.put(currentIndex, picker.getFlexibleAttribute());
+            LifePathAttributePicker picker = new LifePathAttributePicker(parent,
+                  group.getAttributes(),
+                  group.getFlexibleAttribute(),
+                  group.getEdge(),
+                  tabType,
+                  currentIndex);
+            group.setAttributes(picker.getSelectedAttributeScores());
+            group.setEdge(picker.getEdge());
+            group.setFlexibleAttribute(picker.getFlexibleAttribute());
+            standardizedActions(currentIndex, editorProgress);
+        });
+        btnAddTrait.addActionListener(actionEvent -> {
+            int currentIndex = tabLocal.getSelectedIndex();
+            LifePathGroup group = groupFor(currentIndex);
+
+            LifePathTraitPicker picker = new LifePathTraitPicker(parent,
+                  group.getTraits(), tabType, currentIndex);
+            group.setTraits(picker.getSelectedTraitScores());
+            standardizedActions(currentIndex, editorProgress);
+        });
+        btnAddSkill.addActionListener(actionEvent -> {
+            int currentIndex = tabLocal.getSelectedIndex();
+            LifePathGroup group = groupFor(currentIndex);
+
+            LifePathSkillPicker picker = new LifePathSkillPicker(parent,
+                  group.getSkills(), group.getMetaSkills(), tabType, currentIndex);
+            group.setSkills(picker.getSelectedSkillLevels());
+            group.setMetaSkills(picker.getSelectedMetaSkillLevels());
+            standardizedActions(currentIndex, editorProgress);
+        });
+        btnAddNaturalAptitude.addActionListener(actionEvent -> {
+            int currentIndex = tabLocal.getSelectedIndex();
+            LifePathGroup group = groupFor(currentIndex);
+
+            LifePathSkillPicker picker = new LifePathSkillPicker(parent,
+                  group.getNaturalAptitudes(),
+                  group.getNaturalAptitudesMetaSkills(),
+                  tabType,
+                  currentIndex);
+            group.setNaturalAptitudes(picker.getSelectedSkillLevels());
+            group.setNaturalAptitudesMetaSkills(picker.getSelectedMetaSkillLevels());
+            standardizedActions(currentIndex, editorProgress);
+        });
+        btnAddSPA.addActionListener(actionEvent -> {
+            int currentIndex = tabLocal.getSelectedIndex();
+            LifePathGroup group = groupFor(currentIndex);
+
+            LifePathSPAPicker picker = new LifePathSPAPicker(parent,
+                  group.getAbilities(), allAbilityInfo, tabType, currentIndex);
+            group.setAbilities(picker.getSelectedAbilities());
             standardizedActions(currentIndex, editorProgress);
 
             parent.setVisible(true);
         });
-        btnAddTrait.addActionListener(e -> {
-            parent.setVisible(false);
-
+        btnAddFaction.addActionListener(actionEvent -> {
             int currentIndex = tabLocal.getSelectedIndex();
+            LifePathGroup group = groupFor(currentIndex);
 
-            LifePathTraitPicker picker = new LifePathTraitPicker(storedTraits.get(currentIndex), tabType);
-            storedTraits.put(currentIndex, picker.getSelectedTraitScores());
+            LifePathFactionPicker picker = new LifePathFactionPicker(parent,
+                  group.getFactions(), gameYear, tabType, currentIndex);
+            group.setFactions(picker.getSelectedFactions());
             standardizedActions(currentIndex, editorProgress);
-
-            parent.setVisible(true);
         });
-        btnAddSkill.addActionListener(e -> {
-            parent.setVisible(false);
-
+        btnAddSystem.addActionListener(actionEvent -> {
             int currentIndex = tabLocal.getSelectedIndex();
+            LifePathGroup group = groupFor(currentIndex);
 
-            LifePathSkillPicker picker = new LifePathSkillPicker(storedSkills.get(currentIndex),
-                  storedMetaSkills.get(currentIndex), tabType);
-            storedSkills.put(currentIndex, picker.getSelectedSkillLevels());
-            storedMetaSkills.put(currentIndex, picker.getSelectedMetaSkillLevels());
+            LifePathSystemPicker picker = new LifePathSystemPicker(parent,
+                  group.getSystems(), today, tabType, currentIndex);
+            group.setSystems(picker.getSelectedSystems());
             standardizedActions(currentIndex, editorProgress);
-
-            parent.setVisible(true);
         });
-        btnAddNaturalAptitude.addActionListener(e -> {
-            parent.setVisible(false);
-
+        btnAddLifePath.addActionListener(actionEvent -> {
             int currentIndex = tabLocal.getSelectedIndex();
+            LifePathGroup group = groupFor(currentIndex);
 
-            LifePathSkillPicker picker = new LifePathSkillPicker(storedNaturalAptitudes.get(currentIndex),
-                  storedNaturalAptitudesMetaSkills.get(currentIndex), tabType);
-            storedNaturalAptitudes.put(currentIndex, picker.getSelectedSkillLevels());
-            storedNaturalAptitudesMetaSkills.put(currentIndex, picker.getSelectedMetaSkillLevels());
+            LifePathLifePathPicker picker = new LifePathLifePathPicker(parent,
+                  group.getLifePaths(),
+                  lifePathLibrary,
+                  parent.getLifePathId(),
+                  tabType,
+                  currentIndex);
+            group.setLifePaths(picker.getSelectedLifePaths());
             standardizedActions(currentIndex, editorProgress);
-
-            parent.setVisible(true);
         });
-        btnAddSPA.addActionListener(e -> {
-            parent.setVisible(false);
-
+        btnAddCategory.addActionListener(actionEvent -> {
             int currentIndex = tabLocal.getSelectedIndex();
+            LifePathGroup group = groupFor(currentIndex);
 
-            LifePathSPAPicker picker = new LifePathSPAPicker(storedAbilities.get(currentIndex), allAbilityInfo,
-                  tabType);
-            storedAbilities.put(currentIndex, picker.getSelectedAbilities());
+            LifePathCategoryCountPicker picker = new LifePathCategoryCountPicker(parent,
+                  group.getCategories(), tabType, currentIndex);
+            group.setCategories(picker.getSelectedCategoryCounts());
             standardizedActions(currentIndex, editorProgress);
-
-            parent.setVisible(true);
-        });
-        btnAddFaction.addActionListener(e -> {
-            parent.setVisible(false);
-
-            int currentIndex = tabLocal.getSelectedIndex();
-
-            LifePathFactionPicker picker = new LifePathFactionPicker(storedFactions.get(currentIndex),
-                  gameYear,
-                  tabType);
-            storedFactions.put(currentIndex, picker.getSelectedFactions());
-            standardizedActions(currentIndex, editorProgress);
-
-            parent.setVisible(true);
-        });
-        btnAddSystem.addActionListener(e -> {
-            parent.setVisible(false);
-
-            int currentIndex = tabLocal.getSelectedIndex();
-
-            // TODO replace with System Picker
-            LifePathFactionPicker picker = new LifePathFactionPicker(storedSystems.get(currentIndex), gameYear,
-                  tabType);
-            storedSystems.put(currentIndex, picker.getSelectedFactions());
-            standardizedActions(currentIndex, editorProgress);
-
-            parent.setVisible(true);
-        });
-        btnAddLifePath.addActionListener(e -> {
-            parent.setVisible(false);
-
-            int currentIndex = tabLocal.getSelectedIndex();
-
-            LifePathLifePathPicker picker = new LifePathLifePathPicker(storedLifePaths.get(currentIndex),
-                  lifePathLibrary, tabType);
-            storedLifePaths.put(currentIndex, picker.getSelectedLifePaths());
-            standardizedActions(currentIndex, editorProgress);
-
-            parent.setVisible(true);
-        });
-        btnAddCategory.addActionListener(e -> {
-            parent.setVisible(false);
-
-            int currentIndex = tabLocal.getSelectedIndex();
-
-            LifePathCategoryCountPicker picker = new LifePathCategoryCountPicker(storedCategories.get(currentIndex),
-                  tabType);
-            storedCategories.put(currentIndex, picker.getSelectedCategoryCounts());
-            standardizedActions(currentIndex, editorProgress);
-
-            parent.setVisible(true);
         });
     }
 
+    /**
+     * Returns the value that means "nothing selected" for an attribute row on the given tab.
+     *
+     * <p>A requirement of the lowest possible score asks for nothing, and an exclusion at the highest possible score
+     * bans nothing, so each tab treats a different end of the range as empty. The XP tabs treat zero as empty.</p>
+     *
+     * @param tabType the tab the row belongs to
+     * @param isEdge  {@code true} for the Edge row, which has its own bounds
+     *
+     * @return the value that represents an unset row
+     *
+     * @since 0.50.11
+     */
     static int getDefaultAttributeValue(LifePathBuilderTabType tabType, boolean isEdge) {
-        int categoryMinimumValue = getAttributeMinimumValue(tabType, isEdge);
-        int categoryMaximumValue = getAttributeMaximumValue(tabType);
-
         return switch (tabType) {
-            case REQUIREMENTS -> categoryMinimumValue;
-            case EXCLUSIONS -> categoryMaximumValue;
+            case REQUIREMENTS -> getAttributeMinimumValue(tabType, isEdge);
+            case EXCLUSIONS -> getAttributeMaximumValue(tabType, isEdge);
             case FIXED_XP, FLEXIBLE_XP -> 0;
         };
     }
 
-    static int getAttributeMaximumValue(LifePathBuilderTabType tabType) {
+    /**
+     * Returns the highest value an attribute row will offer on the given tab.
+     *
+     * @param tabType the tab the row belongs to
+     * @param isEdge  {@code true} for the Edge row, which has its own ceiling
+     *
+     * @return the highest selectable value
+     *
+     * @since 0.50.11
+     */
+    static int getAttributeMaximumValue(LifePathBuilderTabType tabType, boolean isEdge) {
         return switch (tabType) {
             case FIXED_XP, FLEXIBLE_XP -> ATTRIBUTE_SPINNER_HIGHEST_VALUE;
-            case REQUIREMENTS, EXCLUSIONS -> MAXIMUM_ATTRIBUTE_SCORE;
+            case REQUIREMENTS, EXCLUSIONS -> isEdge ? MAXIMUM_EDGE_SCORE : MAXIMUM_ATTRIBUTE_SCORE;
         };
     }
 
+    /**
+     * Returns the lowest value an attribute row will offer on the given tab.
+     *
+     * @param tabType the tab the row belongs to
+     * @param isEdge  {@code true} for the Edge row, which can legitimately sit at zero
+     *
+     * @return the lowest selectable value
+     *
+     * @since 0.50.11
+     */
     static int getAttributeMinimumValue(LifePathBuilderTabType tabType, boolean isEdge) {
         return switch (tabType) {
             case FIXED_XP, FLEXIBLE_XP -> ATTRIBUTE_SPINNER_LOWEST_VALUE;
@@ -942,9 +891,10 @@ public class LifePathTab {
     public List<String> buildProgressText() {
         List<String> progressText = new ArrayList<>();
 
-        for (int index : storedAbilities.keySet()) {
-            StringBuilder individualProgressText = buildIndividualProgressText(index);
-            progressText.add(individualProgressText.toString());
+        // Indexed from zero rather than over a map's key set: callers index this list by group index, and a
+        // HashMap only happens to hand back small Integer keys in order.
+        for (int groupIndex = 0; groupIndex < getTabCount(); groupIndex++) {
+            progressText.add(buildIndividualProgressText(groupIndex).toString());
         }
 
         return progressText;
@@ -953,13 +903,20 @@ public class LifePathTab {
     StringBuilder buildIndividualProgressText(int index) {
         StringBuilder individualProgressText = new StringBuilder();
 
+        // Read without creating: building the progress text must not bring a group into existence, and an index with
+        // no group simply has nothing to describe.
+        LifePathGroup group = groups.getOrDefault(index, new LifePathGroup());
+
         boolean isXP = tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP;
         final String TEXT_LEAD_POSITIVE = isXP ? " +" : " ";
         final String TEXT_LEAD_NEGATIVE = " ";
-        final String TEXT_TRAIL = isXP ? " XP" : "+";
+        // "XP" and "+" are words a translator needs; the surrounding spacing is not, so it stays here.
+        final String TEXT_TRAIL = isXP
+              ? ' ' + getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.progress.trail.xp")
+              : getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.progress.trail.level");
 
         // Factions
-        Set<String> workingFactions = storedFactions.get(index);
+        Set<String> workingFactions = group.getFactions();
         if (workingFactions != null && !workingFactions.isEmpty()) {
             int workingIndex = 0;
             int total = workingFactions.size();
@@ -978,8 +935,11 @@ public class LifePathTab {
         }
 
         // Systems
-        Set<String> workingSystems = storedSystems.get(index);
+        Set<String> workingSystems = group.getSystems();
         if (workingSystems != null && !workingSystems.isEmpty()) {
+            // Without this, a group holding both factions and systems reads "Federated SunsTerra".
+            appendBreaker(individualProgressText);
+
             int workingIndex = 0;
             int total = workingSystems.size();
             for (String systemCode : workingSystems) {
@@ -997,7 +957,7 @@ public class LifePathTab {
         }
 
         // Life Paths
-        Set<UUID> workingLifePaths = storedLifePaths.get(index);
+        Set<UUID> workingLifePaths = group.getLifePaths();
         if (workingLifePaths != null && !workingLifePaths.isEmpty()) {
             appendBreaker(individualProgressText);
 
@@ -1023,7 +983,7 @@ public class LifePathTab {
         }
 
         // Categories
-        Map<LifePathCategory, Integer> workingCategories = storedCategories.get(index);
+        Map<LifePathCategory, Integer> workingCategories = group.getCategories();
         if (workingCategories != null && !workingCategories.isEmpty()) {
             appendBreaker(individualProgressText);
 
@@ -1044,7 +1004,7 @@ public class LifePathTab {
         }
 
         // Attributes
-        Map<SkillAttribute, Integer> workingAttributes = storedAttributes.get(index);
+        Map<SkillAttribute, Integer> workingAttributes = group.getAttributes();
         if (workingAttributes != null && !workingAttributes.isEmpty()) {
             appendBreaker(individualProgressText);
 
@@ -1064,7 +1024,7 @@ public class LifePathTab {
             }
         }
 
-        Integer workingEdge = storedEdge.get(index);
+        Integer workingEdge = group.getEdge();
         int edgeDefaultValue = getDefaultAttributeValue(tabType, true);
 
         if (workingEdge != null && workingEdge != edgeDefaultValue) {
@@ -1076,11 +1036,12 @@ public class LifePathTab {
             individualProgressText.append(TEXT_TRAIL);
         }
 
-        Integer workingFlexibleAttributes = storedFlexibleAttributes.get(index);
-        int flexibleDefaultValue = getDefaultAttributeValue(tabType, true);
-        if (workingFlexibleAttributes != null &&
-                  !storedFlexibleAttributes.isEmpty() &&
-                  workingFlexibleAttributes != flexibleDefaultValue) {
+        Integer workingFlexibleAttributes = group.getFlexibleAttribute();
+        // Not the Edge bounds: the flexible attribute row is an ordinary attribute, and LifePathAttributePicker
+        // decides "unset" against the attribute default. The two have to agree or the progress text disagrees with
+        // what the picker stored.
+        int flexibleDefaultValue = getDefaultAttributeValue(tabType, false);
+        if (workingFlexibleAttributes != null && workingFlexibleAttributes != flexibleDefaultValue) {
             appendBreaker(individualProgressText);
 
             individualProgressText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexibleAttribute.label"));
@@ -1090,7 +1051,7 @@ public class LifePathTab {
         }
 
         // Traits
-        Map<ATOWTraits, Integer> workingTraits = storedTraits.get(index);
+        Map<ATOWTraits, Integer> workingTraits = group.getTraits();
         if (workingTraits != null && !workingTraits.isEmpty()) {
             appendBreaker(individualProgressText);
 
@@ -1110,7 +1071,7 @@ public class LifePathTab {
             }
         }
 
-        Map<String, Integer> workingNaturalAptitudes = storedNaturalAptitudes.get(index);
+        Map<String, Integer> workingNaturalAptitudes = group.getNaturalAptitudes();
         if (workingNaturalAptitudes != null && !workingNaturalAptitudes.isEmpty()) {
             appendBreaker(individualProgressText);
 
@@ -1132,7 +1093,7 @@ public class LifePathTab {
             }
         }
 
-        Map<SkillSubType, Integer> workingNaturalAptitudesMetaSkills = storedNaturalAptitudesMetaSkills.get(index);
+        Map<SkillSubType, Integer> workingNaturalAptitudesMetaSkills = group.getNaturalAptitudesMetaSkills();
         if (workingNaturalAptitudesMetaSkills != null && !workingNaturalAptitudesMetaSkills.isEmpty()) {
             appendBreaker(individualProgressText);
 
@@ -1155,7 +1116,7 @@ public class LifePathTab {
         }
 
         // Skills
-        Map<String, Integer> workingSkills = storedSkills.get(index);
+        Map<String, Integer> workingSkills = group.getSkills();
         if (workingSkills != null && !workingSkills.isEmpty()) {
             appendBreaker(individualProgressText);
 
@@ -1176,7 +1137,7 @@ public class LifePathTab {
             }
         }
 
-        Map<SkillSubType, Integer> workingMetaSkills = storedMetaSkills.get(index);
+        Map<SkillSubType, Integer> workingMetaSkills = group.getMetaSkills();
         if (workingMetaSkills != null && !workingMetaSkills.isEmpty()) {
             appendBreaker(individualProgressText);
 
@@ -1198,7 +1159,7 @@ public class LifePathTab {
         }
 
         // SPAs
-        Map<String, Integer> workingAbilities = storedAbilities.get(index);
+        Map<String, Integer> workingAbilities = group.getAbilities();
         if (workingAbilities != null && !workingAbilities.isEmpty()) {
             appendBreaker(individualProgressText);
 
@@ -1257,19 +1218,7 @@ public class LifePathTab {
     public void resetTab() {
         tabLocal.removeAll();
 
-        storedFactions.clear();
-        storedSystems.clear();
-        storedLifePaths.clear();
-        storedCategories.clear();
-        storedAttributes.clear();
-        storedEdge.clear();
-        storedFlexibleAttributes.clear();
-        storedTraits.clear();
-        storedSkills.clear();
-        storedMetaSkills.clear();
-        storedNaturalAptitudes.clear();
-        storedNaturalAptitudesMetaSkills.clear();
-        storedAbilities.clear();
+        groups.clear();
         spnFlexibleXPPicks.setValue(0);
 
         parent.updateTxtProgress();

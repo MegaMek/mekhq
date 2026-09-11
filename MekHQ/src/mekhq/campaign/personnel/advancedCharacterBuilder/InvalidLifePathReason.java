@@ -34,6 +34,14 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+/**
+ * Why a Life Path cannot be used.
+ *
+ * <p>Each value names a mistake an author can make that the record's own constructor does not reject, and carries
+ * the display name and description shown to the author. {@link LifePathValidator} produces them.</p>
+ *
+ * @since 0.50.11
+ */
 public enum InvalidLifePathReason {
     MIN_YEAR_ABOVE_MAX_YEAR("MIN_YEAR_ABOVE_MAX_YEAR"),
     MISSING_CATEGORIES("MISSING_CATEGORIES"),
@@ -44,6 +52,8 @@ public enum InvalidLifePathReason {
     NO_FLEXIBLE_PICKS("NO_FLEXIBLE_PICKS"),
     MATCHING_UUID_REQUIREMENT("MATCHING_UUID_REQUIREMENT"),
     MATCHING_UUID_EXCLUSION("MATCHING_UUID_EXCLUSION"),
+    CATEGORY_NONE_NOT_ALONE("CATEGORY_NONE_NOT_ALONE"),
+    CONTRADICTORY_REQUIREMENT_EXCLUSION("CONTRADICTORY_REQUIREMENT_EXCLUSION"),
     TOO_MANY_FLEXIBLE_PICKS("TOO_MANY_FLEXIBLE_PICKS");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.InvalidLifePathReason";
@@ -54,14 +64,35 @@ public enum InvalidLifePathReason {
         this.lookupName = lookupName;
     }
 
+    /**
+     * Returns the identifier used to look this reason's strings up.
+     *
+     * @return the lookup name
+     *
+     * @since 0.50.11
+     */
     public String getLookupName() {
         return lookupName;
     }
 
+    /**
+     * Returns the short name shown to the author.
+     *
+     * @return the display name
+     *
+     * @since 0.50.11
+     */
     public String getDisplayName() {
         return getTextAt(RESOURCE_BUNDLE, "InvalidLifePathReason." + lookupName + ".displayName");
     }
 
+    /**
+     * Returns the sentence explaining what the author needs to change.
+     *
+     * @return the description
+     *
+     * @since 0.50.11
+     */
     public String getDescription() {
         return getTextAt(RESOURCE_BUNDLE, "InvalidLifePathReason." + lookupName + ".description");
     }

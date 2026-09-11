@@ -44,39 +44,95 @@ import java.util.UUID;
 
 import megamek.codeUtilities.StringUtility;
 
+/**
+ * Checks a Life Path for the mistakes an author can make that the record's own constructor does not catch.
+ *
+ * <p>The record constructor rejects values that make a Life Path unloadable, such as a null map or a negative XP
+ * cost. This class covers the next layer up: a path that loads perfectly well but cannot work, such as an
+ * affiliation stage with no faction attached, or more flexible picks than there are groups to pick from.</p>
+ *
+ * <p>There are two entry points because validation happens at two moments. {@link #validate(LifePath)} checks a
+ * finished record and is used when files are read from disk. {@link #validate(LifePathBuilder)} checks the wizard's
+ * working state, which has to be validated <em>before</em> a record is built, because the record's constructor would
+ * throw first and the author would see a stack trace instead of a list of problems.</p>
+ *
+ * @since 0.50.11
+ */
 public class LifePathValidator {
-    private final int flexiblePicks;
-    private final int maximumGroupSize;
-    private final Set<ATOWLifeStage> lifeStages;
-    private final Map<Integer, Set<String>> requirementsFactions;
-    private final String source;
-    private final String name;
-    private final Set<LifePathCategory> categories;
-
+    private final LifePathBuilder lifePath;
     private final Set<InvalidLifePathReason> invalidReasons = new HashSet<>();
-    private final UUID id;
-    private final Set<UUID> requirementIDs;
-    private final Set<UUID> exclusionIDs;
 
+    /**
+     * Returns every problem found with the Life Path that was validated.
+     *
+     * @return the reasons this Life Path is invalid, empty when it is valid
+     *
+     * @since 0.50.11
+     */
     public Set<InvalidLifePathReason> getInvalidReasons() {
         return invalidReasons;
     }
 
-    public LifePathValidator(int flexiblePicks, int maximumGroupSize, Set<ATOWLifeStage> lifeStages,
-          Map<Integer, Set<String>> requirementsFactions, String source, String name,
-          Set<LifePathCategory> categories, UUID id, Set<UUID> requirementIDs, Set<UUID> exclusionIDs) {
-        this.flexiblePicks = flexiblePicks;
-        this.maximumGroupSize = maximumGroupSize;
-        this.lifeStages = lifeStages;
-        this.requirementsFactions = requirementsFactions;
-        this.source = source;
-        this.name = name;
-        this.categories = categories;
-        this.id = id;
-        this.requirementIDs = requirementIDs;
-        this.exclusionIDs = exclusionIDs;
+    /**
+     * Validates a finished {@link LifePath}.
+     *
+     * <p>Use this for records that already exist, such as the files read at campaign load. A record that reaches
+     * this method has already satisfied its own constructor, so anything reported here is an authoring mistake
+     * rather than a corrupt file.</p>
+     *
+     * @param lifePath the Life Path to check
+     *
+     * @return the reasons it is invalid, empty when it is valid
+     *
+     * @since 0.50.11
+     */
+    public static Set<InvalidLifePathReason> validate(LifePath lifePath) {
+        return validate(LifePathBuilder.from(lifePath));
+    }
+
+    /**
+     * Validates a Life Path that is still being assembled.
+     *
+     * <p>This is what the wizard uses. It cannot hand over a {@link LifePath}, because the record's constructor
+     * throws on the very values this check exists to report, and the author would see a stack trace instead of a
+     * list of things to fix.</p>
+     *
+     * @param lifePath the Life Path under construction
+     *
+     * @return the reasons it is invalid, empty when it is valid
+     *
+     * @since 0.50.11
+     */
+    public static Set<InvalidLifePathReason> validate(LifePathBuilder lifePath) {
+        return new LifePathValidator(lifePath).getInvalidReasons();
+    }
+
+    /**
+     * Collapses a group-keyed map of Life Path id sets into one set of ids.
+     *
+     * @param groupedIds Life Path ids keyed by group index
+     *
+     * @return every id in every group
+     *
+     * @since 0.50.11
+     */
+    private static Set<UUID> flattenIds(Map<Integer, Set<UUID>> groupedIds) {
+        Set<UUID> allIds = new HashSet<>();
+
+        for (Set<UUID> group : groupedIds.values()) {
+            if (group != null) {
+                allIds.addAll(group);
+            }
+        }
+
+        return allIds;
+    }
+
+    private LifePathValidator(LifePathBuilder lifePath) {
+        this.lifePath = lifePath;
 
         // Tests
+        checkYears();
         checkFlexiblePicks();
         checkAffiliationFactionRequirement();
         checkSource();
@@ -85,42 +141,66 @@ public class LifePathValidator {
         checkCategories();
         checkLifePathRequirements();
         checkLifePathExclusions();
+        checkContradictions();
     }
 
-    public static int getMaximumGroupSize(int flexibleXPAttributesCount, int flexibleXPEdgeCount,
-          int flexibleXPFlexibleAttributesCount, int flexibleXPTraitsCount, int flexibleXPSkillsCount,
-          int flexibleXPMetaSkillsCount, int flexibleXPAbilitiesCount) {
-        return java.util.stream.Stream.of(
-              flexibleXPAttributesCount,
-              flexibleXPEdgeCount,
-              flexibleXPFlexibleAttributesCount,
-              flexibleXPTraitsCount,
-              flexibleXPSkillsCount,
-              flexibleXPMetaSkillsCount,
-              flexibleXPAbilitiesCount
-        ).mapToInt(Integer::intValue).max().orElse(0);
-    }
-
-    private void checkFlexiblePicks() {
-        // Find the largest group size among all flexible XP award groups
-        // If groups are present, but no picks are selected, then the Life Path is invalid
-        if (flexiblePicks <= 0) {
-            if (maximumGroupSize > 0) {
-                invalidReasons.add(NO_FLEXIBLE_PICKS);
-            }
-        } else {
-            // If there are flexible picks, but the number of picks exceeds the maximum group size, then the Life
-            // Path is invalid
-            if (flexiblePicks > maximumGroupSize) {
-                invalidReasons.add(TOO_MANY_FLEXIBLE_PICKS);
-            }
+    /**
+     * Flags a Life Path whose earliest year is later than its latest year.
+     *
+     * <p>Equal years are allowed: a Life Path available in exactly one year is legitimate.</p>
+     *
+     * @since 0.50.11
+     */
+    private void checkYears() {
+        if (lifePath.minimumYear() > lifePath.maximumYear()) {
+            invalidReasons.add(InvalidLifePathReason.MIN_YEAR_ABOVE_MAX_YEAR);
         }
     }
 
+    /**
+     * Flags a mismatch between the flexible XP groups an author created and the number the player may pick.
+     *
+     * <p>Groups with no picks are unreachable, and more picks than groups is impossible.</p>
+     *
+     * @since 0.50.11
+     */
+    private void checkFlexiblePicks() {
+        int flexiblePicks = lifePath.flexibleXPPickCount() == null ? 0 : lifePath.flexibleXPPickCount();
+        int groupCount = LifePath.countFlexibleXPGroups(lifePath.flexibleXPAttributes(),
+              lifePath.flexibleXPEdge(),
+              lifePath.flexibleXPFlexibleAttribute(),
+              lifePath.flexibleXPTraits(),
+              lifePath.flexibleXPSkills(),
+              lifePath.flexibleXPMetaSkills(),
+              lifePath.flexibleXPNaturalAptitudes(),
+              lifePath.flexibleXPNaturalAptitudesMetaSkills(),
+              lifePath.flexibleXPAbilities());
+
+        if (flexiblePicks <= 0) {
+            if (groupCount > 0) {
+                invalidReasons.add(NO_FLEXIBLE_PICKS);
+            }
+        } else if (flexiblePicks > groupCount) {
+            invalidReasons.add(TOO_MANY_FLEXIBLE_PICKS);
+        }
+    }
+
+    /**
+     * Flags a Life Path that places a character in a faction without saying which faction.
+     *
+     * <p>Clan caste is included alongside the two affiliation stages: a caste only exists inside a Clan, so a caste
+     * path with no faction requirement cannot be qualified for.</p>
+     *
+     * @since 0.50.11
+     */
     private void checkAffiliationFactionRequirement() {
         // If the Life Path has an affiliation stage, but no factions are selected, then the Life Path is invalid
-        if (lifeStages.contains(ATOWLifeStage.AFFILIATION) || lifeStages.contains(ATOWLifeStage.SUB_AFFILIATION)) {
-            Collection<Set<String>> requirements = requirementsFactions.values();
+        Set<ATOWLifeStage> lifeStages = lifePath.lifeStages();
+
+        if (lifeStages.contains(ATOWLifeStage.AFFILIATION) ||
+                  lifeStages.contains(ATOWLifeStage.SUB_AFFILIATION) ||
+                  lifeStages.contains(ATOWLifeStage.CLAN_CASTE)) {
+            Collection<Set<String>> requirements = lifePath.requirementsFactions().values();
             if (requirements.isEmpty()) {
                 invalidReasons.add(MISSING_FACTION);
                 return;
@@ -135,39 +215,184 @@ public class LifePathValidator {
         }
     }
 
+    /**
+     * Flags a Life Path with no source recorded.
+     *
+     * @since 0.50.11
+     */
     private void checkSource() {
-        if (StringUtility.isNullOrBlank(source)) {
+        if (StringUtility.isNullOrBlank(lifePath.source())) {
             invalidReasons.add(InvalidLifePathReason.MISSING_SOURCE);
         }
     }
 
+    /**
+     * Flags a Life Path with no name.
+     *
+     * @since 0.50.11
+     */
     private void checkName() {
-        if (StringUtility.isNullOrBlank(name)) {
+        if (StringUtility.isNullOrBlank(lifePath.name())) {
             invalidReasons.add(InvalidLifePathReason.MISSING_NAME);
         }
     }
 
+    /**
+     * Flags a Life Path belonging to no life stage, which nothing would ever offer.
+     *
+     * @since 0.50.11
+     */
     private void checkLifeStages() {
-        if (lifeStages.isEmpty()) {
+        if (lifePath.lifeStages().isEmpty()) {
             invalidReasons.add(InvalidLifePathReason.MISSING_LIFE_STAGE);
         }
     }
 
+    /**
+     * Flags a Life Path with no categories, or one that combines {@link LifePathCategory#NONE} with a real category.
+     *
+     * <p>{@code NONE} means "belongs to no category". Pairing it with a real one says both at once, so one of the
+     * two is always wrong.</p>
+     *
+     * @since 0.50.11
+     */
     private void checkCategories() {
+        Set<LifePathCategory> categories = lifePath.categories();
+
         if (categories.isEmpty()) {
             invalidReasons.add(InvalidLifePathReason.MISSING_CATEGORIES);
+            return;
+        }
+
+        if (categories.contains(LifePathCategory.NONE) && categories.size() > 1) {
+            invalidReasons.add(InvalidLifePathReason.CATEGORY_NONE_NOT_ALONE);
         }
     }
 
+    /**
+     * Flags a Life Path that requires itself, which nothing can ever satisfy.
+     *
+     * @since 0.50.11
+     */
     private void checkLifePathRequirements() {
-        if (requirementIDs.contains(id)) {
+        if (flattenIds(lifePath.requirementsLifePath()).contains(lifePath.id())) {
             invalidReasons.add(InvalidLifePathReason.MATCHING_UUID_REQUIREMENT);
         }
     }
 
+    /**
+     * Flags a Life Path that excludes itself.
+     *
+     * @since 0.50.11
+     */
     private void checkLifePathExclusions() {
-        if (exclusionIDs.contains(id)) {
+        if (flattenIds(lifePath.exclusionsLifePath()).contains(lifePath.id())) {
             invalidReasons.add(InvalidLifePathReason.MATCHING_UUID_EXCLUSION);
         }
+    }
+
+    /**
+     * Flags a Life Path that both requires and excludes the same thing.
+     *
+     * <p>Anything named on both sides makes the path impossible to qualify for: the character would have to have it
+     * and not have it at once. Checked for factions, planetary systems, other Life Paths, categories and traits.</p>
+     *
+     * @since 0.50.11
+     */
+    private void checkContradictions() {
+        boolean hasContradiction =
+              sharesAnyEntry(lifePath.requirementsFactions(), lifePath.exclusionsFactions()) ||
+                    sharesAnyEntry(lifePath.requirementsSystems(), lifePath.exclusionsSystems()) ||
+                    sharesAnyEntry(lifePath.requirementsLifePath(), lifePath.exclusionsLifePath()) ||
+                    sharesAnyKey(lifePath.requirementsCategories(), lifePath.exclusionsCategories()) ||
+                    sharesAnyKey(lifePath.requirementsTraits(), lifePath.exclusionsTraits());
+
+        if (hasContradiction) {
+            invalidReasons.add(InvalidLifePathReason.CONTRADICTORY_REQUIREMENT_EXCLUSION);
+        }
+    }
+
+    /**
+     * Reports whether any single entry appears in both sets of groups.
+     *
+     * <p>Group indexes are ignored: requiring a faction in group 0 and excluding it in group 1 is still a
+     * contradiction.</p>
+     *
+     * @param requirementGroups entries required, keyed by group index
+     * @param exclusionGroups   entries excluded, keyed by group index
+     * @param <T>               the entry type
+     *
+     * @return {@code true} when at least one entry appears on both sides
+     *
+     * @since 0.50.11
+     */
+    private static <T> boolean sharesAnyEntry(Map<Integer, Set<T>> requirementGroups,
+          Map<Integer, Set<T>> exclusionGroups) {
+        Set<T> required = new HashSet<>();
+        for (Set<T> group : requirementGroups.values()) {
+            if (group != null) {
+                required.addAll(group);
+            }
+        }
+
+        if (required.isEmpty()) {
+            return false;
+        }
+
+        for (Set<T> group : exclusionGroups.values()) {
+            if (group == null) {
+                continue;
+            }
+
+            for (T entry : group) {
+                if (required.contains(entry)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Reports whether any key appears in both sets of scored groups.
+     *
+     * <p>Only the key matters. A requirement and an exclusion on the same trait contradict each other whatever
+     * levels they name, because one demands at least a level and the other forbids it.</p>
+     *
+     * @param requirementGroups scored entries required, keyed by group index
+     * @param exclusionGroups   scored entries excluded, keyed by group index
+     * @param <K>               the scored key type
+     *
+     * @return {@code true} when at least one key appears on both sides
+     *
+     * @since 0.50.11
+     */
+    private static <K> boolean sharesAnyKey(Map<Integer, Map<K, Integer>> requirementGroups,
+          Map<Integer, Map<K, Integer>> exclusionGroups) {
+        Set<K> required = new HashSet<>();
+        for (Map<K, Integer> group : requirementGroups.values()) {
+            if (group != null) {
+                required.addAll(group.keySet());
+            }
+        }
+
+        if (required.isEmpty()) {
+            return false;
+        }
+
+        for (Map<K, Integer> group : exclusionGroups.values()) {
+            if (group == null) {
+                continue;
+            }
+
+            for (K key : group.keySet()) {
+                if (required.contains(key)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }

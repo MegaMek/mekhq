@@ -32,213 +32,111 @@
  */
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
-import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.Window;
 import java.util.HashSet;
 import java.util.Set;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.EmptyBorder;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.ui.FastJScrollPane;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
+import mekhq.gui.utilities.TooltipMouseListenerUtil;
 
-class LifePathStagePicker extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(LifePathStagePicker.class);
+/**
+ * Lets an author choose which life stages a Life Path belongs to.
+ *
+ * <p>A Life Path with no life stage is never offered to a player and cannot be listed by the Life Path picker, so
+ * Confirm stays disabled until at least one stage is ticked.</p>
+ *
+ * @since 0.50.11
+ */
+class LifePathStagePicker extends AbstractLifePathPicker {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathStagePicker";
 
-    private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(200);
     private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(375);
 
-    private static final int TOOLTIP_PANEL_WIDTH = (int) round(MINIMUM_MAIN_WIDTH * 0.75);
-    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.75);
-    private static final String PANEL_HTML_FORMAT = "<html><div style='width:%dpx;'>%s</div></html>";
-
-    private static final int PADDING = scaleForGUI(10);
-
-    private JLabel lblTooltipDisplay;
     private final Set<ATOWLifeStage> storedLifeStages;
     private Set<ATOWLifeStage> selectedLifeStages;
 
+    /**
+     * Returns the life stages the author settled on.
+     *
+     * @return the selected life stages
+     *
+     * @since 0.50.11
+     */
     Set<ATOWLifeStage> getSelectedLifeStages() {
         return selectedLifeStages;
     }
 
-    LifePathStagePicker(Set<ATOWLifeStage> selectedLifeStages) {
-        super();
+    /**
+     * Opens the picker.
+     *
+     * @param owner             the wizard this picker belongs to
+     * @param selectedLifeStages the life stages already chosen
+     *
+     * @since 0.50.11
+     */
+    LifePathStagePicker(@Nullable Window owner, Set<ATOWLifeStage> selectedLifeStages) {
+        super(owner, RESOURCE_BUNDLE, "LifePathStagePicker", null, null, MINIMUM_MAIN_WIDTH,
+              MINIMUM_COMPONENT_HEIGHT);
 
         // Defensive copies to avoid external modification
         this.selectedLifeStages = new HashSet<>(selectedLifeStages);
-        storedLifeStages = new HashSet<>(selectedLifeStages);
+        this.storedLifeStages = new HashSet<>(selectedLifeStages);
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.title"));
-
-        JPanel pnlInstructions = initializeInstructionsPanel();
-        JPanel pnlOptions = buildOptionsPanel();
-        JPanel pnlControls = buildControlPanel();
-
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1.0;
-        gbc.gridy = 0;
-
-        gbc.gridx = 0;
-        gbc.weightx = 1.0;
-        gbc.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
-        mainPanel.add(pnlInstructions, gbc);
-
-        JPanel pnlMain = new JPanel();
-        pnlMain.setLayout(new BorderLayout());
-
-        pnlMain.add(pnlOptions, BorderLayout.NORTH);
-        pnlMain.add(pnlControls, BorderLayout.SOUTH);
-
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        mainPanel.add(pnlMain, gbc);
-
-        setContentPane(mainPanel);
-        setMinimumSize(new Dimension((int) round((MINIMUM_INSTRUCTIONS_WIDTH + MINIMUM_MAIN_WIDTH) * 1.25),
-              MINIMUM_COMPONENT_HEIGHT));
-        setLocationRelativeTo(null);
-        setModal(true);
-        setPreferences(); // Must be before setVisible
-        setVisible(true);
+        buildAndShow();
     }
 
-    private JPanel buildControlPanel() {
-        JPanel pnlControls = new JPanel();
-        pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
-        pnlControls.setBorder(RoundedLineBorder.createRoundedLineBorder());
-
-        lblTooltipDisplay = new JLabel();
-        lblTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
-        lblTooltipDisplay.setAlignmentX(Component.CENTER_ALIGNMENT);
-        setLblTooltipDisplay("");
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.button.cancel");
-        RoundedJButton btnCancel = new RoundedJButton(titleCancel);
-        btnCancel.addActionListener(e -> {
-            selectedLifeStages = storedLifeStages;
-            dispose();
-        });
-
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.button.confirm");
-        RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
-        btnConfirm.addActionListener(e -> dispose());
-
-        buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(btnCancel);
-        buttonPanel.add(Box.createHorizontalStrut(PADDING));
-        buttonPanel.add(btnConfirm);
-        buttonPanel.add(Box.createHorizontalGlue());
-
-        pnlControls.add(lblTooltipDisplay);
-        pnlControls.add(Box.createVerticalStrut(PADDING));
-        pnlControls.add(buttonPanel);
-
-        return pnlControls;
-    }
-
-    private JPanel buildOptionsPanel() {
+    @Override
+    protected JPanel buildOptionsPanel() {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
+        pnlOptions.setBorder(RoundedLineBorder.createRoundedLineBorder(getPickerText("options.label")));
 
-        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.options.label");
-        pnlOptions.setBorder(RoundedLineBorder.createRoundedLineBorder(titleOptions));
+        // Ordered rather than declaration order: ATOWLifeStage carries an explicit order, which is the sequence a
+        // character actually passes through.
+        for (ATOWLifeStage lifeStage : ATOWLifeStage.getOrderedLifeStages()) {
+            JCheckBox chkLifeStage = new JCheckBox(lifeStage.getDisplayName());
+            chkLifeStage.setSelected(selectedLifeStages.contains(lifeStage));
 
-        for (ATOWLifeStage lifeStage : ATOWLifeStage.values()) {
-            String label = lifeStage.getDisplayName();
-            String tooltip = lifeStage.getDescription();
-            JCheckBox chkLifeStage = new JCheckBox(label);
-
-            if (selectedLifeStages.contains(lifeStage)) {
-                chkLifeStage.setSelected(true);
-            }
-
-            chkLifeStage.addActionListener(evt -> {
+            chkLifeStage.addActionListener(actionEvent -> {
                 if (chkLifeStage.isSelected()) {
                     selectedLifeStages.add(lifeStage);
                 } else {
                     selectedLifeStages.remove(lifeStage);
                 }
+
+                refreshConfirmEnabled();
             });
             chkLifeStage.addMouseListener(
-                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltip)
+                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, lifeStage.getDescription())
             );
 
             pnlOptions.add(chkLifeStage);
         }
+
         return pnlOptions;
     }
 
-    private void setLblTooltipDisplay(String newText) {
-        String newTooltipText = String.format(PANEL_HTML_FORMAT, TOOLTIP_PANEL_WIDTH, newText);
-        lblTooltipDisplay.setText(newTooltipText);
+    @Override
+    protected void restoreStoredSelection() {
+        selectedLifeStages = new HashSet<>(storedLifeStages);
     }
 
-    private JPanel initializeInstructionsPanel() {
-        JPanel pnlInstructions = new JPanel();
-
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.instructions.label");
-        pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
-
-        JEditorPane txtInstructions = new JEditorPane();
-        txtInstructions.setContentType("text/html");
-        txtInstructions.setEditable(false);
-        String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathStagePicker.instructions.text"));
-        txtInstructions.setText(instructions);
-
-        FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);
-        scrollInstructions.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setBorder(null);
-
-        pnlInstructions.add(scrollInstructions);
-        pnlInstructions.setMinimumSize(new Dimension(MINIMUM_INSTRUCTIONS_WIDTH, MINIMUM_COMPONENT_HEIGHT));
-
-        return pnlInstructions;
+    @Override
+    protected void clearSelection() {
+        selectedLifeStages.clear();
+        rebuildOptions();
     }
 
-    /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
-     */
-    private void setPreferences() {
-        try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathStagePicker.class);
-            this.setName("LifePathStagePicker");
-            preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to set user preferences", ex);
-        }
+    @Override
+    protected boolean isConfirmEnabled() {
+        return !selectedLifeStages.isEmpty();
     }
 }

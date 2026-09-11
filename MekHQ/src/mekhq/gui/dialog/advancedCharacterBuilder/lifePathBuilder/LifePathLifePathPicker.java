@@ -40,6 +40,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Window;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -70,6 +71,7 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
@@ -77,139 +79,100 @@ import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
-public class LifePathLifePathPicker extends JDialog {
+/**
+ * Lets an author say which other Life Paths a Life Path requires or excludes.
+ *
+ * <p>The library is shown one tab per life stage, in the order a character passes through them. A Life Path that
+ * belongs to several stages appears on each of their tabs, and ticking it on one tab ticks it on the others.</p>
+ *
+ * <p>The Life Path being edited is never offered, because a path cannot require or exclude itself.</p>
+ *
+ * @since 0.50.11
+ */
+class LifePathLifePathPicker extends AbstractLifePathPicker {
     private static final MMLogger LOGGER = MMLogger.create(LifePathLifePathPicker.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathLifePathPicker";
 
-    private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(575);
     private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(575);
 
-    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.70);
-    private static final String PANEL_HTML_FORMAT = "<html><div style='width:%dpx;'>%s</div></html>";
-
-    private static final int PADDING = scaleForGUI(10);
-
-    private JEditorPane txtTooltipDisplay;
     private final Set<UUID> storedLifePaths;
     private Set<UUID> selectedLifePaths;
     private final Map<ATOWLifeStage, Set<LifePath>> sortedLifePaths = new HashMap<>();
-    private final Map<LifePath, List<JCheckBox>> lifePathOptionDictionary = new HashMap<>();
+    /**
+     * Every checkbox that represents a given Life Path, so the duplicates across life stage tabs can be kept in
+     * step.
+     *
+     * <p>Keyed by id, not by the record. {@link LifePath} is a record, so its {@code hashCode} walks more than
+     * fifty maps on every lookup.</p>
+     */
+    private final Map<UUID, List<JCheckBox>> lifePathOptionDictionary = new HashMap<>();
 
     Set<UUID> getSelectedLifePaths() {
         return selectedLifePaths;
     }
 
-    private void setTxtTooltipDisplay(String newText) {
-        txtTooltipDisplay.setText("<div style='text-align:center;'>" + newText + "</div>");
-    }
-
-    LifePathLifePathPicker(Set<UUID> selectedLifePaths, Map<UUID, LifePath> lifePathLibrary,
-          LifePathBuilderTabType tabType) {
-        super();
+    /**
+     * Opens the picker.
+     *
+     * @param owner             the wizard this picker belongs to
+     * @param selectedLifePaths the Life Path identifiers already on this group
+     * @param lifePathLibrary   every Life Path the campaign knows about
+     * @param currentLifePathId the identifier of the Life Path being edited, which is never offered; may be
+     *                          {@code null} for a path that has never been saved
+     * @param tabType           the section being edited
+     * @param groupIndex        the group being edited, shown in the title
+     *
+     * @since 0.50.11
+     */
+    LifePathLifePathPicker(@Nullable Window owner, Set<UUID> selectedLifePaths,
+          Map<UUID, LifePath> lifePathLibrary, @Nullable UUID currentLifePathId, LifePathBuilderTabType tabType,
+          int groupIndex) {
+        super(owner, RESOURCE_BUNDLE, "LifePathLifePathPicker", tabType, groupIndex, MINIMUM_MAIN_WIDTH,
+              MINIMUM_COMPONENT_HEIGHT);
 
         // Defensive copies to avoid external modification
         this.selectedLifePaths = new HashSet<>(selectedLifePaths);
-        storedLifePaths = new HashSet<>(selectedLifePaths);
+        this.storedLifePaths = new HashSet<>(selectedLifePaths);
 
-        populateDictionaries(lifePathLibrary.values());
+        populateDictionaries(lifePathLibrary.values(), currentLifePathId);
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathLifePathPicker.title"));
-
-        JPanel pnlInstructions = initializeInstructionsPanel(tabType);
-        JPanel pnlOptions = buildLifeStagePanel();
-        JPanel pnlControls = buildControlPanel();
-
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1.0;
-        gbc.gridy = 0;
-
-        gbc.gridx = 0;
-        gbc.weightx = 0.2;
-        gbc.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
-        mainPanel.add(pnlInstructions, gbc);
-
-        JPanel pnlMain = new JPanel();
-        pnlMain.setLayout(new BorderLayout());
-
-        pnlMain.add(pnlOptions, BorderLayout.CENTER);
-        pnlMain.add(pnlControls, BorderLayout.SOUTH);
-
-        gbc.gridx = 1;
-        gbc.weightx = 8;
-        mainPanel.add(pnlMain, gbc);
-
-        setContentPane(mainPanel);
-        setMinimumSize(new Dimension((int) round((MINIMUM_INSTRUCTIONS_WIDTH + MINIMUM_MAIN_WIDTH) * 1.25),
-              MINIMUM_COMPONENT_HEIGHT));
-        setLocationRelativeTo(null);
-        setModal(true);
-        setPreferences(); // Must be before setVisible
-        setVisible(true);
+        buildAndShow();
     }
 
-    private JPanel buildControlPanel() {
-        JPanel pnlControls = new JPanel();
-        pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
-        pnlControls.setBorder(createRoundedLineBorder());
-        pnlControls.setPreferredSize(scaleForGUI(0, 150));
-
-        txtTooltipDisplay = new JEditorPane();
-        txtTooltipDisplay.setContentType("text/html");
-        txtTooltipDisplay.setEditable(false);
-        txtTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
-        setTxtTooltipDisplay("");
-
-        FastJScrollPane scrollTooltipArea = new FastJScrollPane(txtTooltipDisplay);
-        scrollTooltipArea.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollTooltipArea.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollTooltipArea.setBorder(null);
-        scrollTooltipArea.setMinimumSize(scaleForGUI(250, 50));
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathLifePathPicker.button.cancel");
-        RoundedJButton btnCancel = new RoundedJButton(titleCancel);
-        btnCancel.addActionListener(e -> {
-            selectedLifePaths = storedLifePaths;
-            dispose();
-        });
-
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathLifePathPicker.button.confirm");
-        RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
-        btnConfirm.addActionListener(e -> dispose());
-
-        buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(btnCancel);
-        buttonPanel.add(Box.createHorizontalStrut(PADDING));
-        buttonPanel.add(btnConfirm);
-        buttonPanel.add(Box.createHorizontalGlue());
-
-        pnlControls.add(scrollTooltipArea);
-        pnlControls.add(Box.createVerticalStrut(PADDING));
-        pnlControls.add(buttonPanel);
-
-        return pnlControls;
-    }
-
-    private void populateDictionaries(Collection<LifePath> allLifePaths) {
+    /**
+     * Sorts the library into life stages and prepares the checkbox lookup.
+     *
+     * @param allLifePaths      every Life Path in the library
+     * @param currentLifePathId the Life Path being edited, which is left out
+     *
+     * @since 0.50.11
+     */
+    private void populateDictionaries(Collection<LifePath> allLifePaths, @Nullable UUID currentLifePathId) {
         for (LifePath lifePath : allLifePaths) {
-            for (ATOWLifeStage lifeStage : lifePath.lifeStages()) {
-                if (!sortedLifePaths.containsKey(lifeStage)) {
-                    sortedLifePaths.put(lifeStage, new HashSet<>());
-                }
-                sortedLifePaths.get(lifeStage).add(lifePath);
+            // A Life Path cannot require or exclude itself, so offering it only lets the author make a path the
+            // validator then rejects.
+            if (currentLifePathId != null && currentLifePathId.equals(lifePath.id())) {
+                continue;
             }
 
-            lifePathOptionDictionary.put(lifePath, new ArrayList<>());
+            if (lifePath.lifeStages().isEmpty()) {
+                // Every tab is a life stage, so a path belonging to none has nowhere to appear.
+                LOGGER.warn("LifePath [{}] ({}) belongs to no life stage, so it cannot be offered here.",
+                      lifePath.name(), lifePath.id());
+                continue;
+            }
+
+            for (ATOWLifeStage lifeStage : lifePath.lifeStages()) {
+                sortedLifePaths.computeIfAbsent(lifeStage, stage -> new HashSet<>()).add(lifePath);
+            }
+
+            lifePathOptionDictionary.put(lifePath.id(), new ArrayList<>());
         }
     }
 
-    private JPanel buildLifeStagePanel() {
+    @Override
+    protected JPanel buildOptionsPanel() {
         JPanel pnlLifeStages = new JPanel();
         pnlLifeStages.setLayout(new BoxLayout(pnlLifeStages, BoxLayout.Y_AXIS));
 
@@ -223,14 +186,14 @@ public class LifePathLifePathPicker extends JDialog {
                 continue;
             }
 
-            optionPane.addTab(lifeStage.getDisplayName(), buildOptionsPanel(lifePaths));
+            optionPane.addTab(lifeStage.getDisplayName(), buildLifeStageTabs(lifePaths));
         }
 
         pnlLifeStages.add(optionPane, BorderLayout.NORTH);
         return pnlLifeStages;
     }
 
-    private EnhancedTabbedPane buildOptionsPanel(Set<LifePath> lifePaths) {
+    private EnhancedTabbedPane buildLifeStageTabs(Set<LifePath> lifePaths) {
         List<LifePath> lifePaths1 = new ArrayList<>();
         List<LifePath> lifePaths2 = new ArrayList<>();
         List<LifePath> lifePaths3 = new ArrayList<>();
@@ -316,8 +279,8 @@ public class LifePathLifePathPicker extends JDialog {
                     tooltipUpdater(lifePath);
                 }
             });
-            JCheckBox chkLifePath = GetLifePathCheckbox(isEnabled, id, lifePath);
-            lifePathOptionDictionary.get(lifePath).add(chkLifePath);
+            JCheckBox chkLifePath = createLifePathCheckbox(isEnabled, id, lifePath);
+            lifePathOptionDictionary.get(lifePath.id()).add(chkLifePath);
 
             gbc.gridx = i % columns;
             gbc.gridy = i / columns;
@@ -340,20 +303,31 @@ public class LifePathLifePathPicker extends JDialog {
         return scrollLifePaths;
     }
 
-    private JCheckBox GetLifePathCheckbox(boolean isEnabled, UUID id, LifePath lifePath) {
+    /**
+     * Builds one Life Path checkbox, wired so that toggling it updates every copy of itself on the other tabs.
+     *
+     * @param isEnabled  whether the option can be changed
+     * @param id         the Life Path's id
+     * @param lifePath   the Life Path the checkbox represents
+     *
+     * @return the checkbox
+     *
+     * @since 0.50.11
+     */
+    private JCheckBox createLifePathCheckbox(boolean isEnabled, UUID id, LifePath lifePath) {
         JCheckBox chkLifePath = new JCheckBox();
         chkLifePath.setSelected(isEnabled);
-        chkLifePath.addActionListener(evt -> {
+        chkLifePath.addActionListener(actionEvent -> {
             if (chkLifePath.isSelected()) {
                 selectedLifePaths.add(id);
 
-                for (JCheckBox option : lifePathOptionDictionary.get(lifePath)) {
+                for (JCheckBox option : lifePathOptionDictionary.get(lifePath.id())) {
                     option.setSelected(true);
                 }
             } else {
                 selectedLifePaths.remove(id);
 
-                for (JCheckBox option : lifePathOptionDictionary.get(lifePath)) {
+                for (JCheckBox option : lifePathOptionDictionary.get(lifePath.id())) {
                     option.setSelected(false);
                 }
             }
@@ -373,43 +347,17 @@ public class LifePathLifePathPicker extends JDialog {
                                   .map(ATOWLifeStage::getDisplayName)
                                   .collect(Collectors.joining(","));
         String display = String.format(format, lifeStages, lifePath.flavorText());
-        setTxtTooltipDisplay(display);
+        setLblTooltipDisplay(display);
     }
 
-    private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
-        JPanel pnlInstructions = new JPanel();
-
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathLifePathPicker.instructions.label");
-        pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
-
-        JEditorPane txtInstructions = new JEditorPane();
-        txtInstructions.setContentType("text/html");
-        txtInstructions.setEditable(false);
-        String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathLifePathPicker.instructions.text." + tabType.getLookupName()));
-        txtInstructions.setText(instructions);
-
-        FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);
-        scrollInstructions.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setBorder(null);
-
-        pnlInstructions.add(scrollInstructions);
-        pnlInstructions.setMinimumSize(new Dimension(MINIMUM_INSTRUCTIONS_WIDTH, MINIMUM_COMPONENT_HEIGHT));
-
-        return pnlInstructions;
+    @Override
+    protected void restoreStoredSelection() {
+        selectedLifePaths = new HashSet<>(storedLifePaths);
     }
 
-    /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
-     */
-    private void setPreferences() {
-        try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathLifePathPicker.class);
-            this.setName("LifePathLifePathPicker");
-            preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to set user preferences", ex);
-        }
+    @Override
+    protected void clearSelection() {
+        selectedLifePaths.clear();
+        rebuildOptions();
     }
 }

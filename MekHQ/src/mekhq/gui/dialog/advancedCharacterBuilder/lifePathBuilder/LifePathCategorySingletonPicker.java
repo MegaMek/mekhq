@@ -32,245 +32,144 @@
  */
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
-import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.Window;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.border.EmptyBorder;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.ui.FastJScrollPane;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
+import mekhq.gui.utilities.TooltipMouseListenerUtil;
 
-class LifePathCategorySingletonPicker extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(LifePathCategorySingletonPicker.class);
+/**
+ * Lets an author choose which categories a Life Path belongs to.
+ *
+ * <p>{@link LifePathCategory#NONE} is not offered. It means "belongs to no category", which is what leaving every box
+ * unticked already says, and ticking it alongside a real category says both things at once.</p>
+ *
+ * @since 0.50.11
+ */
+class LifePathCategorySingletonPicker extends AbstractLifePathPicker {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathCategorySingletonPicker";
 
-    private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(500);
     private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(625);
 
-    private static final int TOOLTIP_PANEL_WIDTH = (int) round(MINIMUM_MAIN_WIDTH * 0.9);
-    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.75);
-    private static final String PANEL_HTML_FORMAT = "<html><div style='width:%dpx;'>%s</div></html>";
+    /** How many columns the category checkboxes are laid out in. */
+    private static final int COLUMN_COUNT = 3;
 
-    private static final int PADDING = scaleForGUI(10);
-
-    private JLabel lblTooltipDisplay;
     private final Set<LifePathCategory> storedCategories;
     private Set<LifePathCategory> selectedCategories;
 
+    /**
+     * Returns the categories the author settled on.
+     *
+     * @return the selected categories
+     *
+     * @since 0.50.11
+     */
     Set<LifePathCategory> getSelectedCategories() {
         return selectedCategories;
     }
 
-    LifePathCategorySingletonPicker(Set<LifePathCategory> selectedCategories) {
-        super();
+    /**
+     * Opens the picker.
+     *
+     * @param owner              the wizard this picker belongs to
+     * @param selectedCategories the categories already chosen
+     *
+     * @since 0.50.11
+     */
+    LifePathCategorySingletonPicker(@Nullable Window owner, Set<LifePathCategory> selectedCategories) {
+        super(owner, RESOURCE_BUNDLE, "LifePathCategorySingletonPicker", null, null, MINIMUM_MAIN_WIDTH,
+              MINIMUM_COMPONENT_HEIGHT);
 
         // Defensive copies to avoid external modification
         this.selectedCategories = new HashSet<>(selectedCategories);
-        storedCategories = new HashSet<>(selectedCategories);
+        this.storedCategories = new HashSet<>(selectedCategories);
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.title"));
-
-        JPanel pnlInstructions = initializeInstructionsPanel();
-        JPanel pnlOptions = buildOptionsPanel();
-        JPanel pnlControls = buildControlPanel();
-
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1.0;
-        gbc.gridy = 0;
-
-        gbc.gridx = 0;
-        gbc.weightx = 1.0;
-        gbc.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
-        mainPanel.add(pnlInstructions, gbc);
-
-        JPanel pnlMain = new JPanel();
-        pnlMain.setLayout(new BorderLayout());
-
-        pnlMain.add(pnlOptions, BorderLayout.NORTH);
-        pnlMain.add(pnlControls, BorderLayout.SOUTH);
-
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        mainPanel.add(pnlMain, gbc);
-
-        setContentPane(mainPanel);
-        setMinimumSize(new Dimension((int) round((MINIMUM_INSTRUCTIONS_WIDTH + MINIMUM_MAIN_WIDTH) * 1.25),
-              MINIMUM_COMPONENT_HEIGHT));
-        setLocationRelativeTo(null);
-        setModal(true);
-        setPreferences(); // Must be before setVisible
-        setVisible(true);
+        buildAndShow();
     }
 
-    private JPanel buildControlPanel() {
-        JPanel pnlControls = new JPanel();
-        pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
-        pnlControls.setBorder(RoundedLineBorder.createRoundedLineBorder());
-
-        lblTooltipDisplay = new JLabel();
-        lblTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
-        lblTooltipDisplay.setAlignmentX(Component.CENTER_ALIGNMENT);
-        setLblTooltipDisplay("");
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.button.cancel");
-        RoundedJButton btnCancel = new RoundedJButton(titleCancel);
-        btnCancel.addActionListener(e -> {
-            selectedCategories = storedCategories;
-            dispose();
-        });
-
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.button.confirm");
-        RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
-        btnConfirm.addActionListener(e -> dispose());
-
-        buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(btnCancel);
-        buttonPanel.add(Box.createHorizontalStrut(PADDING));
-        buttonPanel.add(btnConfirm);
-        buttonPanel.add(Box.createHorizontalGlue());
-
-        pnlControls.add(lblTooltipDisplay);
-        pnlControls.add(Box.createVerticalStrut(PADDING));
-        pnlControls.add(buttonPanel);
-
-        return pnlControls;
-    }
-
-    private JPanel buildOptionsPanel() {
+    @Override
+    protected JPanel buildOptionsPanel() {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
+        pnlOptions.setBorder(RoundedLineBorder.createRoundedLineBorder(getPickerText("options.label")));
 
-        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.options.label");
-        pnlOptions.setBorder(RoundedLineBorder.createRoundedLineBorder(titleOptions));
-
-        java.util.List<LifePathCategory> categories = new java.util.ArrayList<>(java.util.List.of(LifePathCategory.values()));
-        categories.sort(java.util.Comparator.comparing(LifePathCategory::getDisplayName));
-
-        int numColumns = 3;
+        List<LifePathCategory> categories = new ArrayList<>();
+        for (LifePathCategory category : LifePathCategory.values()) {
+            // NONE says "no category", which an empty selection already says.
+            if (category != LifePathCategory.NONE) {
+                categories.add(category);
+            }
+        }
+        categories.sort(Comparator.comparing(LifePathCategory::getDisplayName));
 
         JPanel columnsPanel = new JPanel(new GridBagLayout());
 
-        // Prepare columns with row-major arrangement
-        java.util.List<java.util.List<LifePathCategory>> columns = new java.util.ArrayList<>();
-        for (int col = 0; col < numColumns; col++) {
-            columns.add(new java.util.ArrayList<>());
-        }
+        // Split into contiguous blocks so each column reads alphabetically top to bottom. Taking every third entry
+        // instead runs the alphabet across the rows while the columns look shuffled.
+        int categoriesPerColumn = (int) Math.ceil(categories.size() / (double) COLUMN_COUNT);
 
-        for (int i = 0; i < categories.size(); i++) {
-            int col = i % numColumns;
-            columns.get(col).add(categories.get(i));
-        }
+        for (int columnIndex = 0; columnIndex < COLUMN_COUNT; columnIndex++) {
+            int firstEntry = Math.min(columnIndex * categoriesPerColumn, categories.size());
+            int lastEntry = Math.min(firstEntry + categoriesPerColumn, categories.size());
 
-        for (int col = 0; col < numColumns; col++) {
-            JPanel colPanel = new JPanel();
-            colPanel.setLayout(new BoxLayout(colPanel, BoxLayout.Y_AXIS));
-            for (LifePathCategory category : columns.get(col)) {
-                String label = category.getDisplayName();
-                String tooltip = category.getDescription();
-                JCheckBox chkLifeStage = new JCheckBox(label);
+            JPanel columnPanel = new JPanel();
+            columnPanel.setLayout(new BoxLayout(columnPanel, BoxLayout.Y_AXIS));
 
-                if (selectedCategories.contains(category)) {
-                    chkLifeStage.setSelected(true);
-                }
+            for (LifePathCategory category : categories.subList(firstEntry, lastEntry)) {
+                JCheckBox chkCategory = new JCheckBox(category.getDisplayName());
+                chkCategory.setSelected(selectedCategories.contains(category));
 
-                chkLifeStage.addActionListener(evt -> {
-                    if (chkLifeStage.isSelected()) {
+                chkCategory.addActionListener(actionEvent -> {
+                    if (chkCategory.isSelected()) {
                         selectedCategories.add(category);
                     } else {
                         selectedCategories.remove(category);
                     }
                 });
-                chkLifeStage.addMouseListener(
-                      TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltip)
+                chkCategory.addMouseListener(
+                      TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, category.getDescription())
                 );
 
-                colPanel.add(chkLifeStage);
+                columnPanel.add(chkCategory);
             }
-            GridBagConstraints gbc = new GridBagConstraints();
-            gbc.gridx = col;
-            gbc.gridy = 0;
-            gbc.anchor = GridBagConstraints.NORTH;
-            gbc.fill = GridBagConstraints.VERTICAL;
-            gbc.weightx = 1.0;
-            gbc.weighty = 1.0;
-            columnsPanel.add(colPanel, gbc);
+
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.gridx = columnIndex;
+            constraints.gridy = 0;
+            constraints.anchor = GridBagConstraints.NORTH;
+            constraints.fill = GridBagConstraints.VERTICAL;
+            constraints.weightx = 1.0;
+            constraints.weighty = 1.0;
+            columnsPanel.add(columnPanel, constraints);
         }
 
         pnlOptions.add(columnsPanel);
+
         return pnlOptions;
     }
 
-    private void setLblTooltipDisplay(String newText) {
-        String newTooltipText = String.format(PANEL_HTML_FORMAT, TOOLTIP_PANEL_WIDTH, newText);
-        lblTooltipDisplay.setText(newTooltipText);
+    @Override
+    protected void restoreStoredSelection() {
+        selectedCategories = new HashSet<>(storedCategories);
     }
 
-    private JPanel initializeInstructionsPanel() {
-        JPanel pnlInstructions = new JPanel();
-
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.instructions.label");
-        pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
-
-        JEditorPane txtInstructions = new JEditorPane();
-        txtInstructions.setContentType("text/html");
-        txtInstructions.setEditable(false);
-        String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathCategorySingletonPicker.instructions.text"));
-        txtInstructions.setText(instructions);
-
-        FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);
-        scrollInstructions.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setBorder(null);
-
-        pnlInstructions.add(scrollInstructions);
-        pnlInstructions.setMinimumSize(new Dimension(MINIMUM_INSTRUCTIONS_WIDTH, MINIMUM_COMPONENT_HEIGHT));
-
-        return pnlInstructions;
-    }
-
-    /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
-     */
-    private void setPreferences() {
-        try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathCategorySingletonPicker.class);
-            this.setName("LifePathCategorySingletonPicker");
-            preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to set user preferences", ex);
-        }
+    @Override
+    protected void clearSelection() {
+        selectedCategories.clear();
+        rebuildOptions();
     }
 }

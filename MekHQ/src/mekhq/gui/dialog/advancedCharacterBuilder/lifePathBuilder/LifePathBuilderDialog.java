@@ -52,6 +52,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -60,6 +61,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import javax.swing.Box;
@@ -89,6 +91,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilder;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathIO;
@@ -123,6 +126,29 @@ public class LifePathBuilderDialog extends JDialog {
     private JPanel pnlProgress;
 
     private UUID lifePathId = UUID.randomUUID();
+
+    /**
+     * Whether the path currently in the wizard was read from a file.
+     *
+     * <p>Only such a path has an id worth keeping or replacing, so this gates the "regenerate unique id?" question
+     * on save.</p>
+     */
+    private boolean loadedFromFile = false;
+
+    /**
+     * Whether anything has been edited since the Life Path was last saved, loaded or started fresh.
+     *
+     * <p>Gates the prompt on close. Closing used to discard an afternoon's work without a word.</p>
+     */
+    private boolean hasUnsavedChanges = false;
+
+    /**
+     * Suppresses dirty tracking while the wizard is populating itself.
+     *
+     * <p>Loading a file fires the same change listeners an author's typing does, so without this a freshly loaded
+     * Life Path would immediately count as edited.</p>
+     */
+    private boolean isPopulating = false;
     private LifePathTabBasicInformation basicInfoTab;
     private LifePathTab requirementsTab;
     private LifePathTab exclusionsTab;
@@ -165,6 +191,9 @@ public class LifePathBuilderDialog extends JDialog {
         setPreferredSize(PREFERRED_SIZE);
         setSize(PREFERRED_SIZE);
         setLocationRelativeTo(owner);
+        basicInfoTab.setLifePathId(lifePathId);
+        hasUnsavedChanges = false;
+
         setPreferences(); // Must be before setVisible
         setVisible(true);
     }
@@ -178,9 +207,71 @@ public class LifePathBuilderDialog extends JDialog {
         txtTooltipArea.setText("<div style='text-align:center;'>" + newText + "</div>");
     }
 
+    /**
+     * Rebuilds the progress panel, and notes that the Life Path now differs from what is on disk.
+     *
+     * <p>Every control in the wizard routes its changes through here, which makes it the one place that knows an
+     * edit happened.</p>
+     *
+     * @since 0.50.11
+     */
+    /**
+     * Returns the identifier of the Life Path currently in the wizard.
+     *
+     * <p>Needed by the Life Path picker, which must not offer the path being edited as something that path requires
+     * or excludes.</p>
+     *
+     * @return the current Life Path's identifier
+     *
+     * @since 0.50.11
+     */
+    UUID getLifePathId() {
+        return lifePathId;
+    }
+
     void updateTxtProgress() {
-        txtProgress.setText(LifePathProgressTextBuilder.getProgressText(basicInfoTab, requirementsTab,
-              exclusionsTab, fixedXPTab, flexibleXPTab));
+        if (!isPopulating) {
+            hasUnsavedChanges = true;
+        }
+
+        txtProgress.setText(buildValidationSummary() +
+                                  LifePathProgressTextBuilder.getProgressText(basicInfoTab,
+                                        requirementsTab,
+                                        exclusionsTab,
+                                        fixedXPTab,
+                                        flexibleXPTab));
+    }
+
+    /**
+     * Returns the list of current problems, ready to sit above the progress text.
+     *
+     * <p>Shown while editing rather than only on save, so an author finds out about a missing faction or an
+     * impossible pick count when they cause it.</p>
+     *
+     * @return the problems as HTML, or an empty string when there are none
+     *
+     * @since 0.50.11
+     */
+    private String buildValidationSummary() {
+        Set<InvalidLifePathReason> invalidReasons = LifePathValidator.validate(readWizardIntoBuilder());
+
+        if (invalidReasons.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder summary = new StringBuilder(getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.invalid.label"));
+
+        for (InvalidLifePathReason invalidReason : invalidReasons) {
+            summary.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "LifePathBuilderDialog.invalid.format",
+                  spanOpeningWithCustomColor(getWarningColor()),
+                  invalidReason.getDisplayName(),
+                  CLOSING_SPAN_TAG,
+                  invalidReason.getDescription()));
+        }
+
+        return summary.toString();
     }
 
     private JPanel initialize(LocalDate today) {
@@ -329,7 +420,7 @@ public class LifePathBuilderDialog extends JDialog {
         exclusionsTab.buildTab();
 
         // Add a listener to handle tab selection changes
-        tabMain.addChangeListener(e -> {
+        tabMain.addChangeListener(changeEvent -> {
             int selectedIndex = tabMain.getSelectedIndex();
             Component selectedTab = tabMain.getComponentAt(selectedIndex);
             String tabName = selectedTab.getName();
@@ -391,61 +482,42 @@ public class LifePathBuilderDialog extends JDialog {
         String titleToggleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.toggleInstructions");
         RoundedJButton btnToggleInstructions = new RoundedJButton(titleToggleInstructions);
         btnToggleInstructions.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
-        btnToggleInstructions.addActionListener(e -> pnlInstructions.setVisible(!pnlInstructions.isVisible()));
+        btnToggleInstructions.addActionListener(actionEvent -> pnlInstructions.setVisible(!pnlInstructions.isVisible()));
         pnlButtons.add(btnToggleInstructions);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
 
         String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.close");
         RoundedJButton btnClose = new RoundedJButton(titleCancel);
         btnClose.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
-        btnClose.addActionListener(e -> performDialogCloseAction());
+        btnClose.addActionListener(actionEvent -> performDialogCloseAction());
         pnlButtons.add(btnClose);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
 
         String titleNew = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.new");
         RoundedJButton btnNew = new RoundedJButton(titleNew);
         btnNew.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
-        btnNew.addActionListener(e -> newLifePathAction());
+        btnNew.addActionListener(actionEvent -> newLifePathAction());
         pnlButtons.add(btnNew);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
 
         String titleSave = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.save");
         RoundedJButton btnSave = new RoundedJButton(titleSave);
         btnSave.setMargin(new Insets(PADDING, 0, PADDING, 0));
-        btnSave.addActionListener(e -> {
-            // This has to be before we build the Life Path as records cannot be edited post-substantialization
-            displayIDRegenerationDialogs();
-
-            // The record builder performs validation checks and will return null if validation fails
-            LifePath record = buildLifePathFromBuilderWizard();
-
-            if (record != null) {
-                LifePathIO.writeToJSONWithDialog(record, basicInfoTab.isIncludeLegalStatement());
-            }
-        });
+        btnSave.addActionListener(event -> saveLifePathAction());
         pnlButtons.add(btnSave);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
 
         String titleLoad = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.load");
         RoundedJButton btnLoad = new RoundedJButton(titleLoad);
         btnLoad.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
-        btnLoad.addActionListener(e -> {
-            LifePathIO.loadFromJSONWithDialog().ifPresent(lifePath -> {
-                resetNonBasicTabs();
-                updateBuilderFromExistingLifePathRecord(lifePath);
-            });
-            SwingUtilities.invokeLater(() -> {
-                scrollProgress.getVerticalScrollBar().setValue(0);
-                scrollProgress.getHorizontalScrollBar().setValue(0);
-            });
-        });
+        btnLoad.addActionListener(event -> loadLifePathAction());
         pnlButtons.add(btnLoad);
         pnlButtons.add(Box.createHorizontalStrut(PADDING));
 
         String titleToggleProgress = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.button.toggleProgress");
         RoundedJButton btnToggleProgress = new RoundedJButton(titleToggleProgress);
         btnToggleProgress.setMargin(new Insets(PADDING, PADDING, PADDING, PADDING));
-        btnToggleProgress.addActionListener(e -> pnlProgress.setVisible(!pnlProgress.isVisible()));
+        btnToggleProgress.addActionListener(actionEvent -> pnlProgress.setVisible(!pnlProgress.isVisible()));
         pnlButtons.add(btnToggleProgress);
 
         pnlButtons.add(Box.createHorizontalGlue());
@@ -453,6 +525,73 @@ public class LifePathBuilderDialog extends JDialog {
         pnlControls.add(pnlButtons, BorderLayout.SOUTH);
 
         return pnlControls;
+    }
+
+    /**
+     * Validates the wizard's contents, asks about the unique id where that question makes sense, then writes the
+     * Life Path to a file the author chooses.
+     *
+     * <p>The order matters. Validation runs first, so an author with an invalid path is not made to answer the id
+     * question, read "Save Failed", and answer it again on the retry. The id is only committed once the file has
+     * actually been written, so cancelling the save dialog leaves the id on screen unchanged.</p>
+     *
+     * @since 0.50.11
+     */
+    private void saveLifePathAction() {
+        // Returns null and shows the reasons when the path is not valid.
+        LifePath record = buildLifePathFromBuilderWizard();
+
+        if (record == null) {
+            return;
+        }
+
+        Optional<File> writtenFile = LifePathIO.writeToJSONWithDialog(record,
+              basicInfoTab.isIncludeLegalStatement());
+
+        if (writtenFile.isPresent()) {
+            lifePathId = record.id();
+            loadedFromFile = true;
+            hasUnsavedChanges = false;
+            basicInfoTab.setLifePathId(lifePathId);
+        }
+    }
+
+    /**
+     * Asks the author for a Life Path file and loads it into the wizard.
+     *
+     * <p>A file that cannot be read now says so. Previously the failure was swallowed, so picking a bad file did
+     * nothing at all and looked like the button was broken.</p>
+     *
+     * @since 0.50.11
+     */
+    private void loadLifePathAction() {
+        LifePathIO.LifePathLoadResult result = LifePathIO.loadFromJSONWithDialog();
+
+        if (result.isFailed()) {
+            new ImmersiveDialogNotification(campaign, result.errorMessage(), true);
+            return;
+        }
+
+        if (!result.isLoaded()) {
+            return;
+        }
+
+        isPopulating = true;
+        try {
+            resetNonBasicTabs();
+            updateBuilderFromExistingLifePathRecord(result.lifePath());
+        } finally {
+            isPopulating = false;
+        }
+
+        loadedFromFile = true;
+        hasUnsavedChanges = false;
+        basicInfoTab.setIncludeLegalStatement(result.fileHasLegalStatement());
+
+        SwingUtilities.invokeLater(() -> {
+            scrollProgress.getVerticalScrollBar().setValue(0);
+            scrollProgress.getHorizontalScrollBar().setValue(0);
+        });
     }
 
     private void newLifePathAction() {
@@ -465,11 +604,22 @@ public class LifePathBuilderDialog extends JDialog {
         }
 
         lifePathId = UUID.randomUUID();
-        resetBasicTab();
-        resetNonBasicTabs();
+        // A brand new path has never been written anywhere, so there is no id to keep or replace on the next save.
+        loadedFromFile = false;
 
-        fixedXPTab.addTab();
-        exclusionsTab.addTab();
+        isPopulating = true;
+        try {
+            resetBasicTab();
+            resetNonBasicTabs();
+
+            fixedXPTab.addTab();
+            exclusionsTab.addTab();
+            basicInfoTab.setLifePathId(lifePathId);
+        } finally {
+            isPopulating = false;
+        }
+
+        hasUnsavedChanges = false;
     }
 
     private void resetBasicTab() {
@@ -483,13 +633,59 @@ public class LifePathBuilderDialog extends JDialog {
         exclusionsTab.resetTab();
     }
 
+    /**
+     * Closes the wizard, asking first when there is unsaved work.
+     *
+     * <p>The Life Path library is reloaded on the way out so anything saved during this session is visible to the
+     * campaign straight away.</p>
+     *
+     * @since 0.50.11
+     */
     private void performDialogCloseAction() {
+        if (hasUnsavedChanges && !confirmDiscardUnsavedChanges()) {
+            return;
+        }
+
         Map<UUID, LifePath> lifePaths = LifePathIO.loadAllLifePaths(campaign);
         campaign.setLifePathLibrary(lifePaths);
         dispose();
     }
 
-    private void displayIDRegenerationDialogs() {
+    /**
+     * Asks whether unsaved edits should be thrown away.
+     *
+     * @return {@code true} when the author chose to close anyway
+     *
+     * @since 0.50.11
+     */
+    private boolean confirmDiscardUnsavedChanges() {
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
+              null,
+              null,
+              getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.unsaved.label.inCharacter"),
+              List.of(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.unsaved.button.stay"),
+                    getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.unsaved.button.discard")),
+              getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.unsaved.label.outOfCharacter"),
+              null,
+              false);
+
+        final int DISCARD = 1;
+        return dialog.getDialogChoice() == DISCARD;
+    }
+
+    /**
+     * Asks the author whether this save should become a new Life Path rather than replace the one it was loaded
+     * from.
+     *
+     * <p>The caller decides what to do with the answer. This method no longer replaces the id itself, because the
+     * save dialog that follows can still be cancelled, and an id replaced before that point would leave the wizard
+     * showing one id while the next save wrote another.</p>
+     *
+     * @return {@code true} when the author asked for a new unique id
+     *
+     * @since 0.50.11
+     */
+    private boolean displayIDRegenerationDialogs() {
         final int REGENERATE_ID = 1;
 
         ImmersiveDialogSimple dialog = null;
@@ -514,16 +710,27 @@ public class LifePathBuilderDialog extends JDialog {
             }
         }
 
-        if (dialog.getDialogChoice() == REGENERATE_ID) {
-            lifePathId = UUID.randomUUID();
-
-            new ImmersiveDialogNotification(campaign,
-                  getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.confirmation.label"), true);
+        if (dialog.getDialogChoice() != REGENERATE_ID) {
+            return false;
         }
+
+        new ImmersiveDialogNotification(campaign,
+              getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.confirmation.label"), true);
+
+        return true;
     }
 
+    /**
+     * Fills the wizard in from an existing Life Path.
+     *
+     * <p>Each section's groups have to exist before its values are written, and its progress text has to be built
+     * after, which is why the three steps are ordered the way they are.</p>
+     *
+     * @param record the Life Path to load
+     *
+     * @since 0.50.11
+     */
     private void updateBuilderFromExistingLifePathRecord(LifePath record) {
-        // Dynamic
         lifePathId = record.id();
 
         // Basic Info
@@ -538,137 +745,57 @@ public class LifePathBuilderDialog extends JDialog {
         basicInfoTab.setMaximumYear(record.maximumYear());
         basicInfoTab.setPlayerRestricted(record.isPlayerRestricted());
         basicInfoTab.setRandomWeight(record.randomWeight());
+        basicInfoTab.setLifePathId(record.id());
 
-        // Requirements
-        int requirementsMaxKey = -1;
-
-        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsFactions()));
-        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsSystems()));
-        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsLifePath()));
-        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsCategories()));
-        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsAttributes()));
-        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsEdge()));
-        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsFlexibleAttribute()));
-        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsTraits()));
-        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsSkills()));
-        requirementsMaxKey = Math.max(requirementsMaxKey, getMaxKey(record.requirementsAbilities()));
-
-        // This must be before we set the values below, otherwise the values will be overwritten
-        addAdditionalTabsAsNecessary(requirementsMaxKey, requirementsTab);
-
-        if (requirementsMaxKey > -1) {
-            requirementsTab.setFactions(record.requirementsFactions());
-            requirementsTab.setSystems(record.requirementsSystems());
-            requirementsTab.setLifePaths(record.requirementsLifePath());
-            requirementsTab.setCategories(record.requirementsCategories());
-            requirementsTab.setAttributes(record.requirementsAttributes());
-            requirementsTab.setEdge(record.requirementsEdge());
-            requirementsTab.setFlexibleAttribute(record.requirementsFlexibleAttribute());
-            requirementsTab.setTraits(record.requirementsTraits());
-            requirementsTab.setSkills(record.requirementsSkills());
-            requirementsTab.setMetaSkills(record.requirementsMetaSkills());
-            requirementsTab.setAbilities(record.requirementsAbilities());
-        }
-
-        // Conversely, this must be after we set the values above, so the text can be current
-        updateProgressTextPerTab(requirementsMaxKey, requirementsTab);
-
-        // Exclusions
-        int exclusionsMaxKey = -1;
-
-        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsFactions()));
-        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsLifePath()));
-        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsCategories()));
-        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsAttributes()));
-        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsEdge()));
-        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsFlexibleAttribute()));
-        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsTraits()));
-        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsSkills()));
-        exclusionsMaxKey = Math.max(exclusionsMaxKey, getMaxKey(record.exclusionsAbilities()));
-
-        // This must be before we set the values below, otherwise the values will be overwritten
-        addAdditionalTabsAsNecessary(exclusionsMaxKey, exclusionsTab);
-
-        if (exclusionsMaxKey > -1) {
-            exclusionsTab.setFactions(record.exclusionsFactions());
-            exclusionsTab.setLifePaths(record.exclusionsLifePath());
-            exclusionsTab.setCategories(record.exclusionsCategories());
-            exclusionsTab.setAttributes(record.exclusionsAttributes());
-            exclusionsTab.setEdge(record.exclusionsEdge());
-            exclusionsTab.setFlexibleAttribute(record.exclusionsFlexibleAttribute());
-            exclusionsTab.setTraits(record.exclusionsTraits());
-            exclusionsTab.setSkills(record.exclusionsSkills());
-            exclusionsTab.setMetaSkills(record.exclusionsMetaSkills());
-            exclusionsTab.setAbilities(record.exclusionsAbilities());
-        }
-
-        // Conversely, this must be after we set the values above, so the text can be current
-        updateProgressTextPerTab(exclusionsMaxKey, exclusionsTab);
-
-        // Fixed XP
-        int fixedXPMaxKey = -1;
-
-        fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPAttributes()));
-        fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPEdge()));
-        fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPFlexibleAttribute()));
-        fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPTraits()));
-        fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPSkills()));
-        fixedXPMaxKey = Math.max(fixedXPMaxKey, getMaxKey(record.fixedXPAbilities()));
-
-        // This must be before we set the values below, otherwise the values will be overwritten
-        addAdditionalTabsAsNecessary(fixedXPMaxKey, fixedXPTab);
-
-        if (fixedXPMaxKey > -1) {
-            fixedXPTab.setAttributes(record.fixedXPAttributes());
-            fixedXPTab.setEdge(record.fixedXPEdge());
-            fixedXPTab.setFlexibleAttribute(record.fixedXPFlexibleAttribute());
-            fixedXPTab.setTraits(record.fixedXPTraits());
-            fixedXPTab.setSkills(record.fixedXPSkills());
-            fixedXPTab.setMetaSkills(record.fixedXPMetaSkills());
-            fixedXPTab.setNaturalAptitudes(record.fixedXPNaturalAptitudes());
-            fixedXPTab.setNaturalAptitudesMetaSkills(record.fixedXPNaturalAptitudesMetaSkills());
-            fixedXPTab.setAbilities(record.fixedXPAbilities());
-        }
-
-        // Conversely, this must be after we set the values above, so the text can be current
-        updateProgressTextPerTab(fixedXPMaxKey, fixedXPTab);
-
-        // Flexible XP
-        int flexibleXPMaxKey = -1;
-
-        flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPAttributes()));
-        flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPEdge()));
-        flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPFlexibleAttribute()));
-        flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPTraits()));
-        flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPSkills()));
-        flexibleXPMaxKey = Math.max(flexibleXPMaxKey, getMaxKey(record.flexibleXPAbilities()));
-
-        // This must be before we set the values below, otherwise the values will be overwritten
-        addAdditionalTabsAsNecessary(flexibleXPMaxKey, flexibleXPTab);
-
-        if (flexibleXPMaxKey > -1) {
-            flexibleXPTab.setAttributes(record.flexibleXPAttributes());
-            flexibleXPTab.setEdge(record.flexibleXPEdge());
-            flexibleXPTab.setFlexibleAttribute(record.flexibleXPFlexibleAttribute());
-            flexibleXPTab.setTraits(record.flexibleXPTraits());
-            flexibleXPTab.setSkills(record.flexibleXPSkills());
-            flexibleXPTab.setMetaSkills(record.flexibleXPMetaSkills());
-            flexibleXPTab.setNaturalAptitudes(record.flexibleXPNaturalAptitudes());
-            flexibleXPTab.setNaturalAptitudesMetaSkills(record.flexibleXPNaturalAptitudesMetaSkills());
-            flexibleXPTab.setAbilities(record.flexibleXPAbilities());
-        }
-
-        flexibleXPTab.setPickCount(record.flexibleXPPickCount());
-
-        // Conversely, this must be after we set the values above, so the text can be current
-        updateProgressTextPerTab(flexibleXPMaxKey, flexibleXPTab);
+        loadSection(LifePathBuilderTabType.REQUIREMENTS, record, requirementsTab);
+        loadSection(LifePathBuilderTabType.EXCLUSIONS, record, exclusionsTab);
+        loadSection(LifePathBuilderTabType.FIXED_XP, record, fixedXPTab);
+        loadSection(LifePathBuilderTabType.FLEXIBLE_XP, record, flexibleXPTab);
 
         updateTxtProgress();
     }
 
-    private void addAdditionalTabsAsNecessary(int requirementsMaxKey, LifePathTab requirementsTab) {
-        for (int i = -1; i < requirementsMaxKey; i++) {
-            requirementsTab.addTab();
+    /**
+     * Loads one section of a Life Path onto its tab, creating the groups it needs first.
+     *
+     * @param tabType the section to load
+     * @param record  the Life Path being loaded
+     * @param tab     the tab for that section
+     *
+     * @since 0.50.11
+     */
+    private void loadSection(LifePathBuilderTabType tabType, LifePath record, LifePathTab tab) {
+        int maximumGroupIndex = LifePathSection.getMaximumGroupIndex(tabType, record);
+
+        // Before the values, or creating the groups would overwrite them.
+        addAdditionalTabsAsNecessary(maximumGroupIndex, tab);
+
+        if (maximumGroupIndex > -1) {
+            LifePathSection.writeToTab(tabType, record, tab);
+        }
+
+        // After the values, so the text describes what was just loaded.
+        updateProgressTextPerTab(maximumGroupIndex, tab);
+    }
+
+    /**
+     * Creates the group tabs a loaded Life Path needs.
+     *
+     * <p>One group is always created, even for a section the file left empty. Fixed XP and Exclusions hide their Add
+     * Group button, so a section left with no groups at all could not be given one.</p>
+     *
+     * @param maximumGroupIndex the highest group index the file uses, or {@code -1} when it uses none
+     * @param lifePathTab       the section to add groups to
+     *
+     * @since 0.50.11
+     */
+    private void addAdditionalTabsAsNecessary(int maximumGroupIndex, LifePathTab lifePathTab) {
+        for (int groupIndex = -1; groupIndex < maximumGroupIndex; groupIndex++) {
+            lifePathTab.addTab();
+        }
+
+        if (lifePathTab.getTabCount() == 0) {
+            lifePathTab.addTab();
         }
     }
 
@@ -686,12 +813,31 @@ public class LifePathBuilderDialog extends JDialog {
         }
     }
 
-    private static int getMaxKey(Map<Integer, ?> map) {
-        if (map == null || map.isEmpty()) {
-            return Integer.MIN_VALUE;
+    /**
+     * Returns the highest group index present across the supplied group maps.
+     *
+     * <p>Every map is keyed by group index, so the highest key across all of a section's maps is the index of the
+     * last group that section needs. Empty and {@code null} maps contribute nothing.</p>
+     *
+     * @param maps the group maps belonging to a single section
+     *
+     * @return the highest group index found, or {@code -1} when every map is empty
+     *
+     * @since 0.50.11
+     */
+    @SafeVarargs
+    private static int getMaxKey(Map<Integer, ?>... maps) {
+        int maxKey = -1;
+
+        for (Map<Integer, ?> map : maps) {
+            if (map == null || map.isEmpty()) {
+                continue;
+            }
+
+            maxKey = Math.max(maxKey, Collections.max(map.keySet()));
         }
 
-        return Collections.max(map.keySet());
+        return maxKey;
     }
 
     /**
@@ -702,185 +848,94 @@ public class LifePathBuilderDialog extends JDialog {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathBuilderDialog.class);
             this.setName("LifePathBuilderDialog");
             preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to set user preferences", ex);
+        } catch (Exception exception) {
+            LOGGER.error("Failed to set user preferences", exception);
         }
     }
 
+    /**
+     * Reads the whole wizard into a Life Path, or reports why it cannot be one.
+     *
+     * <p>Assembled through {@link LifePathBuilder} rather than by calling the record's 55-argument constructor
+     * directly, so adding or moving a component cannot silently shift the arguments after it.</p>
+     *
+     * @return the finished Life Path, or {@code null} when the author was shown a list of problems instead
+     *
+     * @since 0.50.11
+     */
     private @Nullable LifePath buildLifePathFromBuilderWizard() {
-        // Basic Info
-        String source = basicInfoTab.getSource();
-        String name = basicInfoTab.getName();
-        String flavorText = basicInfoTab.getFlavorText();
-        int age = basicInfoTab.getAge();
-        int xpDiscount = basicInfoTab.getDiscount();
-        int minimumYear = basicInfoTab.getMinimumYear();
-        int maximumYear = basicInfoTab.getMaximumYear();
-        double randomWeight = basicInfoTab.getRandomWeight();
-        Set<ATOWLifeStage> lifeStages = basicInfoTab.getLifeStages();
-        Set<LifePathCategory> categories = basicInfoTab.getCategories();
-        boolean isPlayerRestricted = basicInfoTab.isPlayerRestricted();
+        LifePathBuilder builder = readWizardIntoBuilder();
 
-        // Requirements
-        Map<Integer, Set<String>> requirementsFactions = requirementsTab.getFactions();
-        Map<Integer, Set<String>> requirementsSystems = requirementsTab.getSystems();
-        Map<Integer, Set<UUID>> requirementsLifePath = requirementsTab.getLifePaths();
-        Map<Integer, Map<LifePathCategory, Integer>> requirementsCategories = requirementsTab.getCategories();
-        Map<Integer, Map<SkillAttribute, Integer>> requirementsAttributes = requirementsTab.getAttributes();
-        Map<Integer, Integer> requirementsEdge = requirementsTab.getEdge();
-        Map<Integer, Integer> requirementsFlexibleAttributes = requirementsTab.getFlexibleAttribute();
-        Map<Integer, Map<ATOWTraits, Integer>> requirementsTraits = requirementsTab.getTraits();
-        Map<Integer, Map<String, Integer>> requirementsSkills = requirementsTab.getSkills();
-        Map<Integer, Map<SkillSubType, Integer>> requirementsMetaSkills = requirementsTab.getMetaSkills();
-        Map<Integer, Map<String, Integer>> requirementsAbilities = requirementsTab.getAbilities();
+        Set<InvalidLifePathReason> invalidReasons = LifePathValidator.validate(builder);
+        showInvalidReasonsDialog(invalidReasons);
 
-        // Exclusions
-        Map<Integer, Set<String>> exclusionsFactions = exclusionsTab.getFactions();
-        Map<Integer, Set<String>> exclusionsSystems = exclusionsTab.getSystems();
-        Map<Integer, Set<UUID>> exclusionsLifePath = exclusionsTab.getLifePaths();
-        Map<Integer, Map<LifePathCategory, Integer>> exclusionsCategories = exclusionsTab.getCategories();
-        Map<Integer, Map<SkillAttribute, Integer>> exclusionsAttributes = exclusionsTab.getAttributes();
-        Map<Integer, Integer> exclusionsEdge = exclusionsTab.getEdge();
-        Map<Integer, Integer> exclusionsFlexibleAttributes = exclusionsTab.getFlexibleAttribute();
-        Map<Integer, Map<ATOWTraits, Integer>> exclusionsTraits = exclusionsTab.getTraits();
-        Map<Integer, Map<String, Integer>> exclusionsSkills = exclusionsTab.getSkills();
-        Map<Integer, Map<SkillSubType, Integer>> exclusionsMetaSkills = exclusionsTab.getMetaSkills();
-        Map<Integer, Map<String, Integer>> exclusionsAbilities = exclusionsTab.getAbilities();
-
-        // Fixed XP
-        Map<Integer, Map<SkillAttribute, Integer>> fixedXPAttributes = fixedXPTab.getAttributes();
-        Map<Integer, Integer> fixedXPEdge = fixedXPTab.getEdge();
-        Map<Integer, Integer> fixedXPFlexibleAttributes = fixedXPTab.getFlexibleAttribute();
-        Map<Integer, Map<ATOWTraits, Integer>> fixedXPTraits = fixedXPTab.getTraits();
-        Map<Integer, Map<String, Integer>> fixedXPSkills = fixedXPTab.getSkills();
-        Map<Integer, Map<SkillSubType, Integer>> fixedXPMetaSkills = fixedXPTab.getMetaSkills();
-        Map<Integer, Map<String, Integer>> fixedXPNaturalAptitudes = fixedXPTab.getNaturalAptitudes();
-        Map<Integer, Map<SkillSubType, Integer>> fixedXPNaturalAptitudesMetaSkills = fixedXPTab.getNaturalAptitudesMetaSkills();
-        Map<Integer, Map<String, Integer>> fixedXPAbilities = fixedXPTab.getAbilities();
-
-        // Flexible XP
-        Map<Integer, Map<SkillAttribute, Integer>> flexibleXPAttributes = flexibleXPTab.getAttributes();
-        Map<Integer, Integer> flexibleXPEdge = flexibleXPTab.getEdge();
-        Map<Integer, Integer> flexibleXPFlexibleAttributes = flexibleXPTab.getFlexibleAttribute();
-        Map<Integer, Map<ATOWTraits, Integer>> flexibleXPTraits = flexibleXPTab.getTraits();
-        Map<Integer, Map<String, Integer>> flexibleXPSkills = flexibleXPTab.getSkills();
-        Map<Integer, Map<SkillSubType, Integer>> flexibleXPMetaSkills = flexibleXPTab.getMetaSkills();
-        Map<Integer, Map<String, Integer>> flexibleXPNaturalAptitudes = flexibleXPTab.getNaturalAptitudes();
-        Map<Integer, Map<SkillSubType, Integer>> flexibleXPNaturalAptitudesMetaSkills = flexibleXPTab.getNaturalAptitudesMetaSkills();
-        Map<Integer, Map<String, Integer>> flexibleXPAbilities = flexibleXPTab.getAbilities();
-        int flexibleXPPickCount = flexibleXPTab.getPickCount();
-
-        // Dynamic
-        UUID id = lifePathId;
-        Version version = MHQConstants.VERSION;
-        int xpCost = LifePathXPCostCalculator.calculateXPCost(xpDiscount,
-              fixedXPAttributes,
-              fixedXPFlexibleAttributes,
-              fixedXPEdge,
-              fixedXPTraits,
-              fixedXPSkills,
-              fixedXPMetaSkills,
-              fixedXPNaturalAptitudes,
-              fixedXPNaturalAptitudesMetaSkills,
-              fixedXPAbilities,
-              flexibleXPTab.getTabCount(),
-              flexibleXPPickCount,
-              flexibleXPAttributes,
-              flexibleXPFlexibleAttributes,
-              flexibleXPEdge,
-              flexibleXPTraits,
-              flexibleXPSkills,
-              flexibleXPMetaSkills,
-              flexibleXPNaturalAptitudes,
-              flexibleXPNaturalAptitudesMetaSkills,
-              flexibleXPAbilities);
-
-        // Validation
-        int maximumGroupSize = LifePathValidator.getMaximumGroupSize(flexibleXPAttributes.size(),
-              flexibleXPEdge.size(),
-              flexibleXPFlexibleAttributes.size(),
-              flexibleXPTraits.size(),
-              flexibleXPSkills.size(),
-              flexibleXPMetaSkills.size(),
-              flexibleXPAbilities.size());
-
-        Set<UUID> requirementIDs = new HashSet<>();
-        for (Set<UUID> ids : requirementsLifePath.values()) {
-            requirementIDs.addAll(ids);
-        }
-
-        Set<UUID> exclusionIDs = new HashSet<>();
-        for (Set<UUID> ids : exclusionsLifePath.values()) {
-            exclusionIDs.addAll(ids);
-        }
-
-        LifePathValidator validator = new LifePathValidator(flexibleXPPickCount, maximumGroupSize, lifeStages,
-              requirementsFactions, source, name, categories, id, requirementIDs, exclusionIDs);
-        Set<InvalidLifePathReason> invalidReasons = validator.getInvalidReasons();
-        validateLifePath(invalidReasons);
         if (!invalidReasons.isEmpty()) {
             return null;
         }
 
-        // Build and return the Record
-        return new LifePath(id,
-              version,
-              xpCost,
-              source,
-              name,
-              flavorText,
-              age,
-              xpDiscount,
-              minimumYear,
-              maximumYear,
-              randomWeight,
-              lifeStages,
-              categories,
-              isPlayerRestricted,
-              requirementsFactions,
-              requirementsSystems,
-              requirementsLifePath,
-              requirementsCategories,
-              requirementsAttributes,
-              requirementsEdge,
-              requirementsFlexibleAttributes,
-              requirementsTraits,
-              requirementsSkills,
-              requirementsMetaSkills,
-              requirementsAbilities,
-              exclusionsFactions,
-              exclusionsSystems,
-              exclusionsLifePath,
-              exclusionsCategories,
-              exclusionsAttributes,
-              exclusionsEdge,
-              exclusionsFlexibleAttributes,
-              exclusionsTraits,
-              exclusionsSkills,
-              exclusionsMetaSkills,
-              exclusionsAbilities,
-              fixedXPAttributes,
-              fixedXPEdge,
-              fixedXPFlexibleAttributes,
-              fixedXPTraits,
-              fixedXPSkills,
-              fixedXPMetaSkills,
-              fixedXPNaturalAptitudes,
-              fixedXPNaturalAptitudesMetaSkills,
-              fixedXPAbilities,
-              flexibleXPAttributes,
-              flexibleXPEdge,
-              flexibleXPFlexibleAttributes,
-              flexibleXPTraits,
-              flexibleXPSkills,
-              flexibleXPMetaSkills,
-              flexibleXPNaturalAptitudes,
-              flexibleXPNaturalAptitudesMetaSkills,
-              flexibleXPAbilities,
-              flexibleXPPickCount);
+        // Asked only now that the path is known to be valid, and only for a path that came from a file: a brand new
+        // path has no previous id, so "keep or replace it?" has no meaning. The answer goes onto the record but not
+        // onto the wizard, because the save dialog can still be cancelled.
+        if (loadedFromFile && displayIDRegenerationDialogs()) {
+            builder.id(UUID.randomUUID());
+        }
+
+        return builder.build();
     }
 
-    private void validateLifePath(Set<InvalidLifePathReason> invalidReasons) {
+    /**
+     * Collects everything currently in the wizard into a builder, without validating it.
+     *
+     * @return the Life Path as the wizard currently describes it
+     *
+     * @since 0.50.11
+     */
+    private LifePathBuilder readWizardIntoBuilder() {
+        LifePathBuilder builder = new LifePathBuilder().id(lifePathId)
+                                        .version(MHQConstants.VERSION)
+                                        .source(basicInfoTab.getSource())
+                                        .name(basicInfoTab.getName())
+                                        .flavorText(basicInfoTab.getFlavorText())
+                                        .age(basicInfoTab.getAge())
+                                        .xpDiscount(basicInfoTab.getDiscount())
+                                        .minimumYear(basicInfoTab.getMinimumYear())
+                                        .maximumYear(basicInfoTab.getMaximumYear())
+                                        .randomWeight(basicInfoTab.getRandomWeight())
+                                        .lifeStages(basicInfoTab.getLifeStages())
+                                        .categories(basicInfoTab.getCategories())
+                                        .isPlayerRestricted(basicInfoTab.isPlayerRestricted());
+
+        LifePathSection.readFromTab(LifePathBuilderTabType.REQUIREMENTS, requirementsTab, builder);
+        LifePathSection.readFromTab(LifePathBuilderTabType.EXCLUSIONS, exclusionsTab, builder);
+        LifePathSection.readFromTab(LifePathBuilderTabType.FIXED_XP, fixedXPTab, builder);
+        LifePathSection.readFromTab(LifePathBuilderTabType.FLEXIBLE_XP, flexibleXPTab, builder);
+
+        builder.xpCost(calculateXPCost(builder));
+
+        return builder;
+    }
+
+    /**
+     * Returns what the Life Path under construction would cost.
+     *
+     * @param builder the Life Path being assembled
+     *
+     * @return the XP cost
+     *
+     * @since 0.50.11
+     */
+    private int calculateXPCost(LifePathBuilder builder) {
+        return LifePathXPCostCalculator.calculateXPCost(builder);
+    }
+
+    /**
+     * Shows the author every reason the Life Path cannot be saved, and does nothing when there are none.
+     *
+     * @param invalidReasons the reasons reported by {@link LifePathValidator}
+     *
+     * @since 0.50.11
+     */
+    private void showInvalidReasonsDialog(Set<InvalidLifePathReason> invalidReasons) {
         if (invalidReasons.isEmpty()) {
             return;
         }

@@ -34,18 +34,21 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathPickerUtilities.clampSpinnerValue;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Window;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -71,18 +74,28 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 
-class LifePathSkillPicker extends JDialog {
+/**
+ * Lets an author set skill levels a Life Path requires or excludes, or skill XP it awards.
+ *
+ * <p>Two kinds of row appear: one per named skill, and one per meta skill, which stands for a whole family of skills
+ * at once. They are split across tabs because there are over a hundred skills.</p>
+ *
+ * <p>This picker also serves the Natural Aptitudes buttons, which award XP towards raising a skill's aptitude rather
+ * than the skill itself.</p>
+ *
+ * @since 0.50.11
+ */
+class LifePathSkillPicker extends AbstractLifePathPicker {
     private static final MMLogger LOGGER = MMLogger.create(LifePathSkillPicker.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathSkillPicker";
 
-    private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(575);
     private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(525);
 
-    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.75);
-    private static final String PANEL_HTML_FORMAT = "<html><div style='width:%dpx;'>%s</div></html>";
+    /** Highest level a meta skill row offers on the Requirements and Exclusions tabs. */
+    private static final int MAXIMUM_META_SKILL_LEVEL = 10;
 
-    private static final int PADDING = scaleForGUI(10);
+    private final LifePathBuilderTabType tabType;
 
     private final Map<String, Integer> storedSkillLevels;
     private Map<String, Integer> selectedSkillLevels;
@@ -98,9 +111,24 @@ class LifePathSkillPicker extends JDialog {
         return selectedMetaSkillLevels;
     }
 
-    LifePathSkillPicker(@Nullable Map<String, Integer> selectedSkillLevels,
-          @Nullable Map<SkillSubType, Integer> selectedMetaSkillLevels, LifePathBuilderTabType tabType) {
-        super();
+    /**
+     * Opens the picker.
+     *
+     * @param owner                   the wizard this picker belongs to
+     * @param selectedSkillLevels     the per-skill values already on this group, which may be {@code null}
+     * @param selectedMetaSkillLevels the per-meta-skill values already on this group, which may be {@code null}
+     * @param tabType                 the section being edited
+     * @param groupIndex              the group being edited, shown in the title
+     *
+     * @since 0.50.11
+     */
+    LifePathSkillPicker(@Nullable Window owner, @Nullable Map<String, Integer> selectedSkillLevels,
+          @Nullable Map<SkillSubType, Integer> selectedMetaSkillLevels, LifePathBuilderTabType tabType,
+          int groupIndex) {
+        super(owner, RESOURCE_BUNDLE, "LifePathSkillPicker", tabType, groupIndex, MINIMUM_MAIN_WIDTH,
+              MINIMUM_COMPONENT_HEIGHT);
+
+        this.tabType = tabType;
 
         // Defensive copies to avoid external modification
         this.selectedSkillLevels = selectedSkillLevels == null ?
@@ -113,76 +141,11 @@ class LifePathSkillPicker extends JDialog {
                                              new HashMap<>(selectedMetaSkillLevels);
         storedMetaSkillLevels = new HashMap<>(this.selectedMetaSkillLevels);
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.title"));
-
-        JPanel pnlInstructions = initializeInstructionsPanel(tabType);
-        JPanel pnlOptions = buildOptionsPanel(tabType);
-        JPanel pnlControls = buildControlPanel();
-
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1.0;
-        gbc.gridy = 0;
-
-        gbc.gridx = 0;
-        gbc.weightx = 0.2;
-        gbc.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
-        mainPanel.add(pnlInstructions, gbc);
-
-        JPanel pnlMain = new JPanel();
-        pnlMain.setLayout(new BorderLayout());
-
-        pnlMain.add(pnlOptions, BorderLayout.CENTER);
-        pnlMain.add(pnlControls, BorderLayout.SOUTH);
-
-        gbc.gridx = 1;
-        gbc.weightx = 8;
-        mainPanel.add(pnlMain, gbc);
-
-        setContentPane(mainPanel);
-        setMinimumSize(new Dimension((int) round((MINIMUM_INSTRUCTIONS_WIDTH + MINIMUM_MAIN_WIDTH) * 1.25),
-              MINIMUM_COMPONENT_HEIGHT));
-        setLocationRelativeTo(null);
-        setModal(true);
-        setPreferences(); // Must be before setVisible
-        setVisible(true);
+        buildAndShow();
     }
 
-    private JPanel buildControlPanel() {
-        JPanel pnlControls = new JPanel();
-        pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
-        pnlControls.setBorder(createRoundedLineBorder());
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.button.cancel");
-        RoundedJButton btnCancel = new RoundedJButton(titleCancel);
-        btnCancel.addActionListener(e -> {
-            selectedSkillLevels = storedSkillLevels;
-            selectedMetaSkillLevels = storedMetaSkillLevels;
-            dispose();
-        });
-
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.button.confirm");
-        RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
-        btnConfirm.addActionListener(e -> dispose());
-
-        buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(btnCancel);
-        buttonPanel.add(Box.createHorizontalStrut(PADDING));
-        buttonPanel.add(btnConfirm);
-        buttonPanel.add(Box.createHorizontalGlue());
-
-        pnlControls.add(Box.createVerticalStrut(PADDING));
-        pnlControls.add(buttonPanel);
-
-        return pnlControls;
-    }
-
-    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
+    @Override
+    protected JPanel buildOptionsPanel() {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
@@ -202,11 +165,21 @@ class LifePathSkillPicker extends JDialog {
 
         List<SkillSubType> metaSkills = new ArrayList<>(List.of(SkillSubType.values()));
         metaSkills.remove(SkillSubType.NONE);
-        Collections.sort(metaSkills);
+        // By display name, not by ordinal: Collections.sort on an enum list orders by declaration, which is not the
+        // order the author reads on screen.
+        metaSkills.sort(Comparator.comparing(SkillSubType::getDisplayName));
 
         // Normal Skills
         for (String skillName : new ArrayList<>(allSkills)) {
             SkillType type = SkillType.getType(skillName);
+
+            // SkillType.getType is @Nullable and logs its own error when a name does not resolve. Dereferencing it
+            // straight away took the whole picker down over one bad name.
+            if (type == null) {
+                allSkills.remove(skillName);
+                continue;
+            }
+
             if (type.isCombatSkill()) {
                 combatSkills.add(type);
                 allSkills.remove(skillName);
@@ -278,7 +251,7 @@ class LifePathSkillPicker extends JDialog {
         // Meta Skills
         if (tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP) {
             FastJScrollPane pnlMetaSkills = getMetaSkillOptions(metaSkills, tabType);
-            optionPane.addTab(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.meta.label"),
+            optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.meta.label"),
                   pnlMetaSkills);
         }
 
@@ -326,20 +299,23 @@ class LifePathSkillPicker extends JDialog {
                 case FIXED_XP, FLEXIBLE_XP -> 0;
             };
 
-            int defaultValue = selectedSkillLevels.getOrDefault(type.getName(), keyValue);
+            // Clamped first: a stored value from a hand-edited file can sit outside these bounds, and
+            // SpinnerNumberModel throws when its initial value is out of range.
+            int storedValue = selectedSkillLevels.getOrDefault(type.getName(), keyValue);
+            int defaultValue = clampSpinnerValue(storedValue, minimumSkillLevel, maximumSkillLevel, label);
 
             JLabel lblSkill = new JLabel(label);
             JSpinner spnSkillLevel = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
                   maximumSkillLevel, 1));
 
-            spnSkillLevel.addChangeListener(evt -> {
+            spnSkillLevel.addChangeListener(changeEvent -> {
                 int value = (int) spnSkillLevel.getValue();
-                if (value != defaultValue) {
-                    if (value == keyValue) {
-                        selectedSkillLevels.remove(type.getName());
-                    } else {
-                        selectedSkillLevels.put(type.getName(), value);
-                    }
+                // Deliberately not compared against the value the spinner started at. Changing a spinner and
+                // then changing it back must write the original number, otherwise the map keeps the stale one.
+                if (value == keyValue) {
+                    selectedSkillLevels.remove(type.getName());
+                } else {
+                    selectedSkillLevels.put(type.getName(), value);
                 }
             });
 
@@ -382,7 +358,7 @@ class LifePathSkillPicker extends JDialog {
                 case FIXED_XP, FLEXIBLE_XP -> -1000;
             };
             int maximumSkillLevel = switch (tabType) {
-                case REQUIREMENTS, EXCLUSIONS -> 10; // Max level is always assumed 10 for meta-skills
+                case REQUIREMENTS, EXCLUSIONS -> MAXIMUM_META_SKILL_LEVEL;
                 case FIXED_XP, FLEXIBLE_XP -> 1000;
             };
 
@@ -392,20 +368,23 @@ class LifePathSkillPicker extends JDialog {
                 case FIXED_XP, FLEXIBLE_XP -> 0;
             };
 
-            int defaultValue = selectedMetaSkillLevels.getOrDefault(metaSkill, keyValue);
+            // Clamped first: a stored value from a hand-edited file can sit outside these bounds, and
+            // SpinnerNumberModel throws when its initial value is out of range.
+            int storedValue = selectedMetaSkillLevels.getOrDefault(metaSkill, keyValue);
+            int defaultValue = clampSpinnerValue(storedValue, minimumSkillLevel, maximumSkillLevel, label);
 
             JLabel lblMetaSkill = new JLabel(label);
             JSpinner spnSkillLevel = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
                   maximumSkillLevel, 1));
 
-            spnSkillLevel.addChangeListener(evt -> {
+            spnSkillLevel.addChangeListener(changeEvent -> {
                 int value = (int) spnSkillLevel.getValue();
-                if (value != defaultValue) {
-                    if (value == keyValue) {
-                        selectedMetaSkillLevels.remove(metaSkill);
-                    } else {
-                        selectedMetaSkillLevels.put(metaSkill, value);
-                    }
+                // Deliberately not compared against the value the spinner started at. Changing a spinner and
+                // then changing it back must write the original number, otherwise the map keeps the stale one.
+                if (value == keyValue) {
+                    selectedMetaSkillLevels.remove(metaSkill);
+                } else {
+                    selectedMetaSkillLevels.put(metaSkill, value);
                 }
             });
 
@@ -430,40 +409,16 @@ class LifePathSkillPicker extends JDialog {
         return scrollSkills;
     }
 
-    private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
-        JPanel pnlInstructions = new JPanel();
-
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.instructions.label");
-        pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
-
-        JEditorPane txtInstructions = new JEditorPane();
-        txtInstructions.setContentType("text/html");
-        txtInstructions.setEditable(false);
-        String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.instructions.text." + tabType.getLookupName()));
-        txtInstructions.setText(instructions);
-
-        FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);
-        scrollInstructions.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setBorder(null);
-
-        pnlInstructions.add(scrollInstructions);
-        pnlInstructions.setMinimumSize(new Dimension(MINIMUM_INSTRUCTIONS_WIDTH, MINIMUM_COMPONENT_HEIGHT));
-
-        return pnlInstructions;
+    @Override
+    protected void restoreStoredSelection() {
+        selectedSkillLevels = new HashMap<>(storedSkillLevels);
+        selectedMetaSkillLevels = new HashMap<>(storedMetaSkillLevels);
     }
 
-    /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
-     */
-    private void setPreferences() {
-        try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathSkillPicker.class);
-            this.setName("LifePathSkillPicker");
-            preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to set user preferences", ex);
-        }
+    @Override
+    protected void clearSelection() {
+        selectedSkillLevels.clear();
+        selectedMetaSkillLevels.clear();
+        rebuildOptions();
     }
 }

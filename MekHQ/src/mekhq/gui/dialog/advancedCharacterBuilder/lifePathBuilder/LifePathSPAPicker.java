@@ -34,11 +34,14 @@ package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
 import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathPickerUtilities.clampSpinnerValue;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
+import java.awt.Window;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -55,28 +58,44 @@ import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.campaignOptions.CampaignOptionsAbilityInfo;
-import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
+import mekhq.gui.utilities.TooltipMouseListenerUtil;
 
-class LifePathSPAPicker extends JDialog {
+/**
+ * Lets an author set the special pilot abilities a Life Path requires, excludes or awards.
+ *
+ * <p>Requirements and exclusions are a yes or no: the character either has the ability or does not, so those tabs show
+ * checkboxes. The two XP tabs show spinners instead, because there the ability is being bought with XP.</p>
+ *
+ * <p>The abilities are split across tabs by category: combat, maneuvering, utility, flaws and character creation.</p>
+ *
+ * @since 0.50.11
+ */
+class LifePathSPAPicker extends AbstractLifePathPicker {
     private static final MMLogger LOGGER = MMLogger.create(LifePathSPAPicker.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathSPAPicker";
 
-    private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(575);
     private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(575);
 
-    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.70);
-    private static final String PANEL_HTML_FORMAT = "<html><div style='width:%dpx;'>%s</div></html>";
+    /**
+     * The value stored for an ability that is simply required or excluded.
+     *
+     * <p>Requirements and exclusions are a yes or no, so the map's value carries no information; the ability's presence
+     * as a key is the whole rule.</p>
+     */
+    private static final int PRESENCE_ONLY_VALUE = 0;
 
-    private static final int PADDING = scaleForGUI(10);
+    /** Largest XP amount one ability row can award or charge on the Fixed XP and Flexible XP tabs. */
+    private static final int MAXIMUM_ABILITY_XP = 1000;
 
-    private JEditorPane txtTooltipDisplay;
+    private final LifePathBuilderTabType tabType;
     private final Map<String, CampaignOptionsAbilityInfo> allAbilityInfo;
     private final Map<String, Integer> storedAbilities;
     private Map<String, Integer> selectedAbilities;
@@ -85,99 +104,34 @@ class LifePathSPAPicker extends JDialog {
         return selectedAbilities;
     }
 
-    LifePathSPAPicker(Map<String, Integer> selectedAbilities, Map<String, CampaignOptionsAbilityInfo> allAbilityInfo,
-          LifePathBuilderTabType tabType) {
-        super();
+    /**
+     * Opens the picker.
+     *
+     * @param owner             the wizard this picker belongs to
+     * @param selectedAbilities the abilities already on this group
+     * @param allAbilityInfo    every ability the campaign knows about, keyed by name
+     * @param tabType           the section being edited
+     * @param groupIndex        the group being edited, shown in the title
+     *
+     * @since 0.50.11
+     */
+    LifePathSPAPicker(@Nullable Window owner, Map<String, Integer> selectedAbilities,
+          Map<String, CampaignOptionsAbilityInfo> allAbilityInfo, LifePathBuilderTabType tabType, int groupIndex) {
+        super(owner, RESOURCE_BUNDLE, "LifePathSPAPicker", tabType, groupIndex, MINIMUM_MAIN_WIDTH,
+              MINIMUM_COMPONENT_HEIGHT);
 
+        this.tabType = tabType;
         this.allAbilityInfo = allAbilityInfo;
 
         // Defensive copies to avoid external modification
         this.selectedAbilities = new HashMap<>(selectedAbilities);
         storedAbilities = new HashMap<>(selectedAbilities);
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.title"));
-
-        JPanel pnlInstructions = initializeInstructionsPanel(tabType);
-        JPanel pnlOptions = buildOptionsPanel(tabType);
-        JPanel pnlControls = buildControlPanel();
-
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1.0;
-        gbc.gridy = 0;
-
-        gbc.gridx = 0;
-        gbc.weightx = 0.2;
-        gbc.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
-        mainPanel.add(pnlInstructions, gbc);
-
-        JPanel pnlMain = new JPanel();
-        pnlMain.setLayout(new BorderLayout());
-
-        pnlMain.add(pnlOptions, BorderLayout.CENTER);
-        pnlMain.add(pnlControls, BorderLayout.SOUTH);
-
-        gbc.gridx = 1;
-        gbc.weightx = 8;
-        mainPanel.add(pnlMain, gbc);
-
-        setContentPane(mainPanel);
-        setMinimumSize(new Dimension((int) round((MINIMUM_INSTRUCTIONS_WIDTH + MINIMUM_MAIN_WIDTH) * 1.25),
-              MINIMUM_COMPONENT_HEIGHT));
-        setLocationRelativeTo(null);
-        setModal(true);
-        setPreferences(); // Must be before setVisible
-        setVisible(true);
+        buildAndShow();
     }
 
-    private JPanel buildControlPanel() {
-        JPanel pnlControls = new JPanel();
-        pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
-        pnlControls.setBorder(createRoundedLineBorder());
-        pnlControls.setPreferredSize(scaleForGUI(0, 150));
-
-        txtTooltipDisplay = new JEditorPane();
-        txtTooltipDisplay.setContentType("text/html");
-        txtTooltipDisplay.setEditable(false);
-        txtTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
-        setTxtTooltipDisplay("");
-
-        FastJScrollPane scrollTooltipArea = new FastJScrollPane(txtTooltipDisplay);
-        scrollTooltipArea.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scrollTooltipArea.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollTooltipArea.setBorder(null);
-        scrollTooltipArea.setMinimumSize(scaleForGUI(250, 50));
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.button.cancel");
-        RoundedJButton btnCancel = new RoundedJButton(titleCancel);
-        btnCancel.addActionListener(e -> {
-            selectedAbilities = storedAbilities;
-            dispose();
-        });
-
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.button.confirm");
-        RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
-        btnConfirm.addActionListener(e -> dispose());
-
-        buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(btnCancel);
-        buttonPanel.add(Box.createHorizontalStrut(PADDING));
-        buttonPanel.add(btnConfirm);
-        buttonPanel.add(Box.createHorizontalGlue());
-
-        pnlControls.add(scrollTooltipArea);
-        pnlControls.add(Box.createVerticalStrut(PADDING));
-        pnlControls.add(buttonPanel);
-
-        return pnlControls;
-    }
-
-    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
+    @Override
+    protected JPanel buildOptionsPanel() {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
 
@@ -215,27 +169,27 @@ class LifePathSPAPicker extends JDialog {
                                          tabType == LifePathBuilderTabType.EXCLUSIONS;
 
         FastJScrollPane pnlCombatSkills = useBinaryOptions ? getAbilityOptionsBinary(combatAbilities) :
-                                                getAbilityOptionsVariable(combatAbilities, tabType);
+                                                getAbilityOptionsVariable(combatAbilities);
         optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.options.combat.label"),
               pnlCombatSkills);
 
         FastJScrollPane pnlManeuveringAbilities = useBinaryOptions ? getAbilityOptionsBinary(maneuveringAbilities) :
-                                                        getAbilityOptionsVariable(maneuveringAbilities, tabType);
+                                                        getAbilityOptionsVariable(maneuveringAbilities);
         optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.options.maneuvering.label"),
               pnlManeuveringAbilities);
 
         FastJScrollPane pnlUtilityAbilities = useBinaryOptions ? getAbilityOptionsBinary(utilityAbilities) :
-                                                    getAbilityOptionsVariable(utilityAbilities, tabType);
+                                                    getAbilityOptionsVariable(utilityAbilities);
         optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.options.utility.label"),
               pnlUtilityAbilities);
 
         FastJScrollPane pnlFlawsAbilities = useBinaryOptions ? getAbilityOptionsBinary(flawsAbilities) :
-                                                  getAbilityOptionsVariable(flawsAbilities, tabType);
+                                                  getAbilityOptionsVariable(flawsAbilities);
         optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.options.flaws.label"),
               pnlFlawsAbilities);
 
         FastJScrollPane pnlOriginsAbilities = useBinaryOptions ? getAbilityOptionsBinary(originsAbilities) :
-                                                    getAbilityOptionsVariable(originsAbilities, tabType);
+                                                    getAbilityOptionsVariable(originsAbilities);
         optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.options.origins.label"),
               pnlOriginsAbilities);
 
@@ -256,13 +210,15 @@ class LifePathSPAPicker extends JDialog {
             CampaignOptionsAbilityInfo info = abilityInfo.get(i);
 
             SpecialAbility ability = info.getAbility();
-            String label = ability.getDisplayName().replaceAll("\\s*\\(.*$", "");
-            String description = ability.getDescription() + " (" + ability.getCost() + " XP)";
+            String label = ability.getDisplayName();
+            String description = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "LifePathSPAPicker.options.ability.description", ability.getDescription(),
+                  ability.getCost());
             String abilityName = ability.getName();
 
             JCheckBox chkAbilityOption = new JCheckBox(label);
             chkAbilityOption.setSelected(selectedAbilities.containsKey(abilityName));
-            chkAbilityOption.addActionListener(evt -> {
+            chkAbilityOption.addActionListener(actionEvent -> {
                 if (chkAbilityOption.isSelected()) {
                     selectedAbilities.put(abilityName, 0);
                 } else {
@@ -270,7 +226,7 @@ class LifePathSPAPicker extends JDialog {
                 }
             });
             chkAbilityOption.addMouseListener(
-                  TooltipMouseListenerUtil.forTooltip(this::setTxtTooltipDisplay, description)
+                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
             );
 
             gbc.gridx = i % columns;
@@ -292,8 +248,19 @@ class LifePathSPAPicker extends JDialog {
         return scrollSkills;
     }
 
-    private FastJScrollPane getAbilityOptionsVariable(List<CampaignOptionsAbilityInfo> allAbilityInfo,
-          LifePathBuilderTabType tabType) {
+    /**
+     * Builds spinner rows for the two XP tabs, where an ability is bought with XP rather than simply held.
+     *
+     * <p>Only ever called for Fixed XP and Flexible XP. Requirements and Exclusions use
+     * {@link #getAbilityOptionsBinary(List)} instead, because there an ability is a yes or no.</p>
+     *
+     * @param abilities the abilities to build rows for
+     *
+     * @return the scrollable panel of rows
+     *
+     * @since 0.50.11
+     */
+    private FastJScrollPane getAbilityOptionsVariable(List<CampaignOptionsAbilityInfo> abilities) {
         JPanel pnlAbilityOptions = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -302,57 +269,44 @@ class LifePathSPAPicker extends JDialog {
         gbc.weightx = 1.0;
 
         int columns = 3;
-        for (int i = 0; i < allAbilityInfo.size(); i++) {
-            CampaignOptionsAbilityInfo abilityInfo = allAbilityInfo.get(i);
+        for (int i = 0; i < abilities.size(); i++) {
+            CampaignOptionsAbilityInfo abilityInfo = abilities.get(i);
             SpecialAbility ability = abilityInfo.getAbility();
-            String label = ability.getDisplayName().replaceAll("\\s*\\(.*$", "");
-            String description = ability.getDescription() + " (" + ability.getCost() + " XP)";
+            String label = ability.getDisplayName();
+            String description = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "LifePathSPAPicker.options.ability.description", ability.getDescription(),
+                  ability.getCost());
 
-            int minimumValue = 0;
-            int maximumValue = ability.getCost();
-            if (maximumValue == 0) {
-                minimumValue = -1;
-            }
+            // This panel only serves the XP tabs, so the range is the flat plus or minus an XP award can take.
+            // The per-ability bounds that Requirements and Exclusions need are applied in getAbilityOptionsBinary,
+            // and the branch that set them here could never be reached.
+            int minimumValue = -MAXIMUM_ABILITY_XP;
+            int maximumValue = MAXIMUM_ABILITY_XP;
+            int keyValue = 0;
 
-            switch (tabType) {
-                case FIXED_XP, FLEXIBLE_XP -> {
-                    minimumValue = -1000;
-                    maximumValue = 1000;
-                }
-                case REQUIREMENTS, EXCLUSIONS -> {
-                    maximumValue = ability.getCost();
-                    if (maximumValue == 0) {
-                        minimumValue = -1;
-                    }
-                }
-            }
-
-            int keyValue = switch (tabType) {
-                case REQUIREMENTS -> minimumValue;
-                case EXCLUSIONS -> maximumValue;
-                case FIXED_XP, FLEXIBLE_XP -> 0;
-            };
-
-            int defaultValue = selectedAbilities.getOrDefault(ability.getName(), keyValue);
+            // Clamped first: a stored value from a hand-edited file can sit outside these bounds, and
+            // SpinnerNumberModel throws when its initial value is out of range.
+            int storedValue = selectedAbilities.getOrDefault(ability.getName(), keyValue);
+            int defaultValue = clampSpinnerValue(storedValue, minimumValue, maximumValue, label);
 
             JLabel lblAbility = new JLabel(label);
             JSpinner spnAbilityValue = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue,
                   maximumValue, 1));
             lblAbility.addMouseListener(
-                  TooltipMouseListenerUtil.forTooltip(this::setTxtTooltipDisplay, description)
+                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
             );
             spnAbilityValue.addMouseListener(
-                  TooltipMouseListenerUtil.forTooltip(this::setTxtTooltipDisplay, description)
+                  TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
             );
 
-            spnAbilityValue.addChangeListener(evt -> {
+            spnAbilityValue.addChangeListener(changeEvent -> {
                 int value = (int) spnAbilityValue.getValue();
-                if (value != defaultValue) {
-                    if (value == keyValue) {
-                        selectedAbilities.remove(ability.getName());
-                    } else {
-                        selectedAbilities.put(ability.getName(), value);
-                    }
+                // Deliberately not compared against the value the spinner started at. Changing a spinner and
+                // then changing it back must write the original number, otherwise the map keeps the stale one.
+                if (value == keyValue) {
+                    selectedAbilities.remove(ability.getName());
+                } else {
+                    selectedAbilities.put(ability.getName(), value);
                 }
             });
 
@@ -377,44 +331,14 @@ class LifePathSPAPicker extends JDialog {
         return scrollAbilityOptions;
     }
 
-    private void setTxtTooltipDisplay(String newText) {
-        txtTooltipDisplay.setText("<div style='text-align:center;'>" + newText + "</div>");
+    @Override
+    protected void restoreStoredSelection() {
+        selectedAbilities = new HashMap<>(storedAbilities);
     }
 
-    private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
-        JPanel pnlInstructions = new JPanel();
-
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.instructions.label");
-        pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
-
-        JEditorPane txtInstructions = new JEditorPane();
-        txtInstructions.setContentType("text/html");
-        txtInstructions.setEditable(false);
-        String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathSPAPicker.instructions.text." + tabType.getLookupName()));
-        txtInstructions.setText(instructions);
-
-        FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);
-        scrollInstructions.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setBorder(null);
-
-        pnlInstructions.add(scrollInstructions);
-        pnlInstructions.setMinimumSize(new Dimension(MINIMUM_INSTRUCTIONS_WIDTH, MINIMUM_COMPONENT_HEIGHT));
-
-        return pnlInstructions;
-    }
-
-    /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
-     */
-    private void setPreferences() {
-        try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathSPAPicker.class);
-            this.setName("LifePathSPAPicker");
-            preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to set user preferences", ex);
-        }
+    @Override
+    protected void clearSelection() {
+        selectedAbilities.clear();
+        rebuildOptions();
     }
 }

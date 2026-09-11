@@ -42,12 +42,14 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
 import java.util.HashSet;
+import java.util.UUID;
 import java.util.Set;
 import javax.swing.GroupLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
+import javax.swing.JTextField;
 import javax.swing.JTextArea;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
@@ -58,8 +60,8 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.personnel.advancedCharacterBuilder.ATOWLifeStage;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.dialog.advancedCharacterBuilder.DocumentChangeListenerUtil;
-import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
+import mekhq.gui.utilities.DocumentChangeListenerUtil;
+import mekhq.gui.utilities.TooltipMouseListenerUtil;
 
 public class LifePathTabBasicInformation {
     private final static String RESOURCE_BUNDLE = getLifePathBuilderResourceBundle();
@@ -77,6 +79,7 @@ public class LifePathTabBasicInformation {
     private final JSpinner spnRandomWeight;
     private final JCheckBox chkPlayerRestricted;
     private final JCheckBox chkLegalStatement;
+    private final JTextField txtLifePathId;
     private Set<ATOWLifeStage> lifeStages = new HashSet<>();
     private Set<LifePathCategory> categories = new HashSet<>();
 
@@ -120,21 +123,33 @@ public class LifePathTabBasicInformation {
         spnDiscount.setValue(discount);
     }
 
+    /**
+     * Returns the earliest year this Life Path is available in, exactly as the author set it.
+     *
+     * <p>Deliberately not corrected against the maximum year. This used to return {@code maximum - 1} whenever the
+     * minimum was not below the maximum, which made a single-year path impossible to write and turned a mistaken
+     * 3050 and 3000 pair into a silent 2999 and 3000. The mismatch is reported by the Life Path validator instead,
+     * where the author can see it.</p>
+     *
+     * @return the minimum year
+     *
+     * @since 0.50.11
+     */
     public int getMinimumYear() {
-        int value = (int) spnMinimumYear.getValue();
-        int maximumYear = (int) spnMaximumYear.getValue();
-
-        if (value >= maximumYear) {
-            value = max(0, maximumYear - 1);
-        }
-
-        return max(0, value);
+        return max(0, (int) spnMinimumYear.getValue());
     }
 
     public void setMinimumYear(int minimumYear) {
         spnMinimumYear.setValue(minimumYear);
     }
 
+    /**
+     * Returns the latest year this Life Path is available in.
+     *
+     * @return the maximum year
+     *
+     * @since 0.50.11
+     */
     public int getMaximumYear() {
         return max(1, (int) spnMaximumYear.getValue());
     }
@@ -151,20 +166,53 @@ public class LifePathTabBasicInformation {
         spnRandomWeight.setValue(randomWeight);
     }
 
+    /**
+     * Returns the life stages this Life Path belongs to.
+     *
+     * @return a copy of the selected life stages
+     *
+     * @since 0.50.11
+     */
     public Set<ATOWLifeStage> getLifeStages() {
-        return lifeStages;
+        return new HashSet<>(lifeStages);
     }
 
+    /**
+     * Sets the life stages this Life Path belongs to.
+     *
+     * <p>Copied rather than stored by reference: the stage picker is handed this set to edit, and sharing it with
+     * the caller would let the picker mutate the caller's collection.</p>
+     *
+     * @param lifeStages the life stages to select
+     *
+     * @since 0.50.11
+     */
     public void setLifeStages(Set<ATOWLifeStage> lifeStages) {
-        this.lifeStages = lifeStages;
+        this.lifeStages = new HashSet<>(lifeStages);
     }
 
+    /**
+     * Returns the categories this Life Path belongs to.
+     *
+     * @return a copy of the selected categories
+     *
+     * @since 0.50.11
+     */
     public Set<LifePathCategory> getCategories() {
-        return categories;
+        return new HashSet<>(categories);
     }
 
+    /**
+     * Sets the categories this Life Path belongs to.
+     *
+     * <p>Copied for the same reason as {@link #setLifeStages(Set)}.</p>
+     *
+     * @param categories the categories to select
+     *
+     * @since 0.50.11
+     */
     public void setCategories(Set<LifePathCategory> categories) {
-        this.categories = categories;
+        this.categories = new HashSet<>(categories);
     }
 
     public boolean isPlayerRestricted() {
@@ -173,6 +221,21 @@ public class LifePathTabBasicInformation {
 
     public void setPlayerRestricted(boolean isPlayerRestricted) {
         chkPlayerRestricted.setSelected(isPlayerRestricted);
+    }
+
+    /**
+     * Shows the Life Path's unique id.
+     *
+     * <p>Read-only but selectable. The id is the key other Life Paths use to require or exclude this one, so an
+     * author writing those links needs to be able to read and copy it; until now it was never displayed at all.</p>
+     *
+     * @param lifePathId the id to display
+     *
+     * @since 0.50.11
+     */
+    public void setLifePathId(UUID lifePathId) {
+        txtLifePathId.setText(lifePathId == null ? "" : lifePathId.toString());
+        txtLifePathId.setCaretPosition(0);
     }
 
     public boolean isIncludeLegalStatement() {
@@ -193,6 +256,21 @@ public class LifePathTabBasicInformation {
 
         final int DERIVED_WIDTH = (int) round(MINIMUM_COMPONENT_WIDTH * 2 * 0.9);
 
+        // Unique ID
+        final String titleLifePathId = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.basic.lifePathId.label");
+        final String tooltipLifePathId = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.basic.lifePathId.tooltip");
+        JLabel lblLifePathId = new JLabel(titleLifePathId);
+        txtLifePathId = new JTextField();
+        txtLifePathId.setEditable(false);
+        txtLifePathId.setPreferredSize(new Dimension(DERIVED_WIDTH, scaleForGUI(24)));
+        txtLifePathId.setMaximumSize(new Dimension(DERIVED_WIDTH, scaleForGUI(24)));
+        lblLifePathId.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipLifePathId)
+        );
+        txtLifePathId.addMouseListener(
+              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipLifePathId)
+        );
+
         // Name
         final String titleName = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.basic.name.label");
@@ -204,7 +282,9 @@ public class LifePathTabBasicInformation {
         nameScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         nameScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         int rowHeight = txtName.getFontMetrics(txtName.getFont()).getHeight();
-        Dimension nameSize = new Dimension(DERIVED_WIDTH - lblName.getWidth(),
+        // DERIVED_WIDTH alone: getWidth() is zero until the component has been laid out, so every one of
+        // these subtractions was a no-op.
+        Dimension nameSize = new Dimension(DERIVED_WIDTH,
               scaleForGUI(rowHeight + 12));
         nameScroll.setPreferredSize(nameSize);
         nameScroll.setMaximumSize(nameSize);
@@ -253,7 +333,7 @@ public class LifePathTabBasicInformation {
         flavorScroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         flavorScroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
         rowHeight = txtFlavorText.getFontMetrics(txtFlavorText.getFont()).getHeight();
-        Dimension flavorSize = new Dimension(DERIVED_WIDTH - lblFlavorText.getWidth(),
+        Dimension flavorSize = new Dimension(DERIVED_WIDTH,
               scaleForGUI(rowHeight * 10 + 12));
         flavorScroll.setPreferredSize(flavorSize);
         flavorScroll.setMaximumSize(flavorSize);
@@ -275,7 +355,7 @@ public class LifePathTabBasicInformation {
               "LifePathBuilderDialog.basic.age.tooltip");
         JLabel lblAge = new JLabel(titleAge);
         spnAge = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
-        Dimension ageSize = new Dimension(DERIVED_WIDTH - lblAge.getWidth(),
+        Dimension ageSize = new Dimension(DERIVED_WIDTH,
               spnAge.getPreferredSize().height);
         spnAge.setPreferredSize(ageSize);
         spnAge.setMaximumSize(ageSize);
@@ -285,7 +365,7 @@ public class LifePathTabBasicInformation {
         spnAge.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAge)
         );
-        spnAge.addChangeListener(e -> parent.updateTxtProgress());
+        spnAge.addChangeListener(changeEvent -> parent.updateTxtProgress());
 
         // XP Discount
         final String titleDiscount = getTextAt(RESOURCE_BUNDLE,
@@ -294,7 +374,7 @@ public class LifePathTabBasicInformation {
               "LifePathBuilderDialog.basic.discount.tooltip");
         JLabel lblDiscount = new JLabel(titleDiscount);
         spnDiscount = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
-        Dimension discountSize = new Dimension(DERIVED_WIDTH - lblDiscount.getWidth(),
+        Dimension discountSize = new Dimension(DERIVED_WIDTH,
               spnAge.getPreferredSize().height);
         spnDiscount.setPreferredSize(discountSize);
         spnDiscount.setMaximumSize(discountSize);
@@ -304,7 +384,7 @@ public class LifePathTabBasicInformation {
         spnDiscount.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipDiscount)
         );
-        spnDiscount.addChangeListener(e -> parent.updateTxtProgress());
+        spnDiscount.addChangeListener(changeEvent -> parent.updateTxtProgress());
 
         // Minimum Year
         final String titleMinimumYear = getTextAt(RESOURCE_BUNDLE,
@@ -313,7 +393,7 @@ public class LifePathTabBasicInformation {
               "LifePathBuilderDialog.basic.minimumYear.tooltip");
         JLabel lblMinimumYear = new JLabel(titleMinimumYear);
         spnMinimumYear = new JSpinner(new SpinnerNumberModel(0, 0, 9999, 1));
-        Dimension minimumYearSize = new Dimension(DERIVED_WIDTH - lblMinimumYear.getWidth(),
+        Dimension minimumYearSize = new Dimension(DERIVED_WIDTH,
               spnAge.getPreferredSize().height);
         spnMinimumYear.setPreferredSize(minimumYearSize);
         spnMinimumYear.setMaximumSize(minimumYearSize);
@@ -323,7 +403,7 @@ public class LifePathTabBasicInformation {
         spnMinimumYear.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipMinimumYear)
         );
-        spnMinimumYear.addChangeListener(e -> parent.updateTxtProgress());
+        spnMinimumYear.addChangeListener(changeEvent -> parent.updateTxtProgress());
 
         // Maximum Year
         final String titleMaximumYear = getTextAt(RESOURCE_BUNDLE,
@@ -332,7 +412,7 @@ public class LifePathTabBasicInformation {
               "LifePathBuilderDialog.basic.maximumYear.tooltip");
         JLabel lblMaximumYear = new JLabel(titleMaximumYear);
         spnMaximumYear = new JSpinner(new SpinnerNumberModel(9999, 1, 9999, 1));
-        Dimension maximumYearSize = new Dimension(DERIVED_WIDTH - lblMaximumYear.getWidth(),
+        Dimension maximumYearSize = new Dimension(DERIVED_WIDTH,
               spnAge.getPreferredSize().height);
         spnMaximumYear.setPreferredSize(maximumYearSize);
         spnMaximumYear.setMaximumSize(maximumYearSize);
@@ -342,7 +422,7 @@ public class LifePathTabBasicInformation {
         spnMaximumYear.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipMaximumYear)
         );
-        spnMaximumYear.addChangeListener(e -> parent.updateTxtProgress());
+        spnMaximumYear.addChangeListener(changeEvent -> parent.updateTxtProgress());
 
         // Random Weight
         final String titleRandomWeight = getTextAt(RESOURCE_BUNDLE,
@@ -351,6 +431,8 @@ public class LifePathTabBasicInformation {
               "LifePathBuilderDialog.basic.randomWeight.tooltip");
         JLabel lblRandomWeight = new JLabel(titleRandomWeight);
         spnRandomWeight = new JSpinner(new SpinnerNumberModel(1.0, 0.001, 10.0, 0.001));
+        // The default editor rounds the display, so a step of 0.001 looked like it did nothing.
+        spnRandomWeight.setEditor(new JSpinner.NumberEditor(spnRandomWeight, "0.000"));
         spnRandomWeight.setPreferredSize(maximumYearSize);
         spnRandomWeight.setMaximumSize(maximumYearSize);
         lblRandomWeight.addMouseListener(
@@ -359,7 +441,7 @@ public class LifePathTabBasicInformation {
         spnRandomWeight.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipRandomWeight)
         );
-        spnRandomWeight.addChangeListener(e -> parent.updateTxtProgress());
+        spnRandomWeight.addChangeListener(changeEvent -> parent.updateTxtProgress());
 
         // Player Restricted
         final String titlePlayerRestricted = getTextAt(RESOURCE_BUNDLE,
@@ -397,13 +479,12 @@ public class LifePathTabBasicInformation {
               "LifePathBuilderDialog.basic.manageLifeStages.tooltip");
         RoundedJButton btnManageLifeStages = createButton(parent, titleManageLifeStages,
               tooltipManageLifeStages);
-        btnManageLifeStages.addActionListener(e -> {
-            parent.setVisible(false);
-            LifePathStagePicker picker = new LifePathStagePicker(
-                  lifeStages);
+        btnManageLifeStages.addActionListener(actionEvent -> {
+            // No hide and show around this any more: the picker is owned by the wizard, so it cannot end up behind
+            // it, and nesting a modal event loop inside the wizard's own was the usual cause of that report.
+            LifePathStagePicker picker = new LifePathStagePicker(parent, lifeStages);
             lifeStages = picker.getSelectedLifeStages();
             parent.updateTxtProgress();
-            parent.setVisible(true);
         });
 
         // Manage Categories
@@ -413,13 +494,10 @@ public class LifePathTabBasicInformation {
               "LifePathBuilderDialog.basic.manageCategories.tooltip");
         RoundedJButton btnManageCategories = createButton(parent, titleManageCategories,
               tooltipManageCategories);
-        btnManageCategories.addActionListener(e -> {
-            parent.setVisible(false);
-            LifePathCategorySingletonPicker picker = new LifePathCategorySingletonPicker(
-                  categories);
+        btnManageCategories.addActionListener(actionEvent -> {
+            LifePathCategorySingletonPicker picker = new LifePathCategorySingletonPicker(parent, categories);
             categories = picker.getSelectedCategories();
             parent.updateTxtProgress();
-            parent.setVisible(true);
         });
 
         // Layout
@@ -431,6 +509,7 @@ public class LifePathTabBasicInformation {
         layout.setHorizontalGroup(
               layout.createSequentialGroup()
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                    .addComponent(lblLifePathId)
                                     .addComponent(lblName)
                                     .addComponent(lblFlavorText)
                                     .addComponent(lblSource)
@@ -443,6 +522,7 @@ public class LifePathTabBasicInformation {
                                     .addComponent(lblLegalStatement)
                     )
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtLifePathId)
                                     .addComponent(nameScroll)
                                     .addComponent(flavorScroll)
                                     .addComponent(sourceScroll)
@@ -477,6 +557,10 @@ public class LifePathTabBasicInformation {
 
         layout.setVerticalGroup(
               layout.createSequentialGroup()
+                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
+                                    .addComponent(lblLifePathId)
+                                    .addComponent(txtLifePathId)
+                    )
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                                     .addComponent(lblName)
                                     .addComponent(nameScroll)

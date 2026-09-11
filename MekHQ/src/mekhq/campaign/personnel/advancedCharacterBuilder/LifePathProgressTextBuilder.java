@@ -38,6 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.util.List;
 import java.util.Set;
 
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathSection;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTabBasicInformation;
 
@@ -48,27 +49,12 @@ public class LifePathProgressTextBuilder {
           LifePathTab exclusionsTab, LifePathTab fixedXPTab, LifePathTab flexibleXPTab) {
         StringBuilder newProgressText = new StringBuilder();
 
-        int calculatedCost = LifePathXPCostCalculator.calculateXPCost(basicInfoTab.getDiscount(),
-              fixedXPTab.getAttributes(),
-              fixedXPTab.getFlexibleAttribute(),
-              fixedXPTab.getEdge(),
-              fixedXPTab.getTraits(),
-              fixedXPTab.getSkills(),
-              fixedXPTab.getMetaSkills(),
-              fixedXPTab.getNaturalAptitudes(),
-              fixedXPTab.getNaturalAptitudesMetaSkills(),
-              fixedXPTab.getAbilities(),
-              flexibleXPTab.getTabCount(),
-              flexibleXPTab.getPickCount(),
-              flexibleXPTab.getAttributes(),
-              flexibleXPTab.getFlexibleAttribute(),
-              flexibleXPTab.getEdge(),
-              flexibleXPTab.getTraits(),
-              flexibleXPTab.getSkills(),
-              flexibleXPTab.getMetaSkills(),
-              flexibleXPTab.getNaturalAptitudes(),
-              flexibleXPTab.getNaturalAptitudesMetaSkills(),
-              flexibleXPTab.getAbilities());
+        LifePathBuilder costBasis = new LifePathBuilder().xpDiscount(basicInfoTab.getDiscount())
+                                          .flexibleXPPickCount(flexibleXPTab.getPickCount());
+        LifePathSection.readFromTab(LifePathBuilderTabType.FIXED_XP, fixedXPTab, costBasis);
+        LifePathSection.readFromTab(LifePathBuilderTabType.FLEXIBLE_XP, flexibleXPTab, costBasis);
+
+        int calculatedCost = LifePathXPCostCalculator.calculateXPCost(costBasis);
 
         String newBasicText = getNewBasicText(basicInfoTab, calculatedCost);
         newProgressText.append(newBasicText);

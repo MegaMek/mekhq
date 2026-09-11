@@ -147,10 +147,12 @@ class ATOWLifeStageTest {
 
     @ParameterizedTest
     @EnumSource(ATOWLifeStage.class)
-    void testFromString_ValidOrder(ATOWLifeStage lifeStage) {
-        assertNotNull(lifeStage, "Life stage was null.");
-        assertEquals(lifeStage, ATOWLifeStage.fromString(String.valueOf(lifeStage.getOrder())),
-              "Failed to retrieve " + lifeStage.getOrder() + " from string.");
+    void testFromString_OrderIsNotAccepted(ATOWLifeStage lifeStage) {
+        // order describes the sequence a character passes through the stages and is renumbered whenever a stage is
+        // added or moved, so it must never resolve a stored value. Reading it as one would have quietly remapped
+        // every persisted stage when this branch renumbered them.
+        assertNull(ATOWLifeStage.fromString(String.valueOf(lifeStage.getOrder())),
+              "An order should not resolve a life stage; only the lookup name identifies one.");
     }
 
     @Test

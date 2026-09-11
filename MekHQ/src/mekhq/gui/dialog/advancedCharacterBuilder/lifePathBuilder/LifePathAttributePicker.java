@@ -32,61 +32,50 @@
  */
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
-import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
+import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathPickerUtilities.clampSpinnerValue;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab.getAttributeMaximumValue;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab.getAttributeMinimumValue;
 import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathTab.getDefaultAttributeValue;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.Window;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.EmptyBorder;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
-import megamek.common.ui.FastJScrollPane;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
+import mekhq.gui.utilities.TooltipMouseListenerUtil;
 
-class LifePathAttributePicker extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(LifePathAttributePicker.class);
+/**
+ * Lets an author set attribute scores a Life Path requires or excludes, or attribute XP it awards.
+ *
+ * <p>Three kinds of row appear. One per named attribute; one for Edge, which has its own bounds because a character
+ * can legitimately have none; and one "any attribute" row, which lets the player choose which attribute the value
+ * applies to.</p>
+ *
+ * <p>Edge and the "any attribute" row both store {@code null} when they sit at their unset value, rather than storing
+ * that value. Storing it left every group carrying a rule the author never wrote, which in exclusion groups read as
+ * "Edge 10 is banned".</p>
+ *
+ * @since 0.50.11
+ */
+class LifePathAttributePicker extends AbstractLifePathPicker {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathAttributePicker";
 
-    private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(200);
     private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(400);
 
-    private static final int TOOLTIP_PANEL_WIDTH = (int) round(MINIMUM_MAIN_WIDTH * 0.75);
-    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.75);
-    private static final String PANEL_HTML_FORMAT = "<html><div style='width:%dpx;'>%s</div></html>";
-
-    private static final int PADDING = scaleForGUI(10);
-
-    private JLabel lblTooltipDisplay;
+    private final LifePathBuilderTabType tabType;
 
     private final Map<SkillAttribute, Integer> storedAttributeScores;
     private Map<SkillAttribute, Integer> selectedAttributeScores;
@@ -97,133 +86,158 @@ class LifePathAttributePicker extends JDialog {
     private final Integer storedFlexibleAttribute;
     private Integer selectedFlexibleAttribute;
 
+    /**
+     * Returns the per-attribute values the author settled on.
+     *
+     * @return the selected attributes and their values
+     *
+     * @since 0.50.11
+     */
     Map<SkillAttribute, Integer> getSelectedAttributeScores() {
         return selectedAttributeScores;
     }
 
+    /**
+     * Returns the Edge value, or {@code null} when the author set none.
+     *
+     * @return the Edge value or {@code null}
+     *
+     * @since 0.50.11
+     */
     @Nullable
     Integer getEdge() {
         return selectedEdge;
     }
 
+    /**
+     * Returns the "any attribute" value, or {@code null} when the author set none.
+     *
+     * @return the value or {@code null}
+     *
+     * @since 0.50.11
+     */
     @Nullable
     Integer getFlexibleAttribute() {
         return selectedFlexibleAttribute;
     }
 
-    LifePathAttributePicker(Map<SkillAttribute, Integer> selectedAttributeScores,
-          @Nullable Integer selectedFlexibleAttribute, Integer selectedEdge, LifePathBuilderTabType tabType) {
-        super();
+    /**
+     * Opens the picker.
+     *
+     * @param owner                    the wizard this picker belongs to
+     * @param selectedAttributeScores  the per-attribute values already on this group
+     * @param selectedFlexibleAttribute the "any attribute" value already on this group, or {@code null}
+     * @param selectedEdge             the Edge value already on this group, or {@code null}
+     * @param tabType                  the section being edited
+     * @param groupIndex               the group being edited, shown in the title
+     *
+     * @since 0.50.11
+     */
+    LifePathAttributePicker(@Nullable Window owner, Map<SkillAttribute, Integer> selectedAttributeScores,
+          @Nullable Integer selectedFlexibleAttribute, @Nullable Integer selectedEdge,
+          LifePathBuilderTabType tabType, int groupIndex) {
+        super(owner, RESOURCE_BUNDLE, "LifePathAttributePicker", tabType, groupIndex, MINIMUM_MAIN_WIDTH,
+              MINIMUM_COMPONENT_HEIGHT);
+
+        this.tabType = tabType;
 
         // Defensive copies to avoid external modification
         this.selectedAttributeScores = new HashMap<>(selectedAttributeScores);
-        storedAttributeScores = new HashMap<>(selectedAttributeScores);
+        this.storedAttributeScores = new HashMap<>(selectedAttributeScores);
 
         this.selectedEdge = selectedEdge;
-        storedEdge = selectedEdge;
+        this.storedEdge = selectedEdge;
 
         this.selectedFlexibleAttribute = selectedFlexibleAttribute;
-        storedFlexibleAttribute = selectedFlexibleAttribute;
+        this.storedFlexibleAttribute = selectedFlexibleAttribute;
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.title"));
-
-        JPanel pnlInstructions = initializeInstructionsPanel(tabType);
-        JPanel pnlOptions = buildOptionsPanel(tabType);
-        JPanel pnlControls = buildControlPanel();
-
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1.0;
-        gbc.gridy = 0;
-
-        gbc.gridx = 0;
-        gbc.weightx = 1.0;
-        gbc.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
-        mainPanel.add(pnlInstructions, gbc);
-
-        JPanel pnlMain = new JPanel();
-        pnlMain.setLayout(new BorderLayout());
-
-        pnlMain.add(pnlOptions, BorderLayout.NORTH);
-        pnlMain.add(pnlControls, BorderLayout.SOUTH);
-
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        mainPanel.add(pnlMain, gbc);
-
-        setContentPane(mainPanel);
-        setMinimumSize(new Dimension((int) round((MINIMUM_INSTRUCTIONS_WIDTH + MINIMUM_MAIN_WIDTH) * 1.25),
-              MINIMUM_COMPONENT_HEIGHT));
-        setLocationRelativeTo(null);
-        setModal(true);
-        setPreferences(); // Must be before setVisible
-        setVisible(true);
+        buildAndShow();
     }
 
-    private JPanel buildControlPanel() {
-        JPanel pnlControls = new JPanel();
-        pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
-        pnlControls.setBorder(RoundedLineBorder.createRoundedLineBorder());
+    @Override
+    protected JPanel buildOptionsPanel() {
+        JPanel pnlOptions = new JPanel();
+        pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
+        pnlOptions.setBorder(RoundedLineBorder.createRoundedLineBorder(getPickerText("options.label")));
 
-        lblTooltipDisplay = new JLabel();
-        lblTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
-        lblTooltipDisplay.setAlignmentX(Component.CENTER_ALIGNMENT);
-        setLblTooltipDisplay("");
+        int attributeMinimumValue = getAttributeMinimumValue(tabType, false);
+        int attributeMaximumValue = getAttributeMaximumValue(tabType, false);
+        int attributeKeyValue = getDefaultAttributeValue(tabType, false);
 
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        for (SkillAttribute attribute : SkillAttribute.values()) {
+            if (attribute == SkillAttribute.NO_ATTRIBUTE) {
+                continue;
+            }
 
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.button.cancel");
-        RoundedJButton btnCancel = new RoundedJButton(titleCancel);
-        btnCancel.addActionListener(e -> {
-            selectedAttributeScores = storedAttributeScores;
-            selectedEdge = storedEdge;
-            selectedFlexibleAttribute = storedFlexibleAttribute;
-            dispose();
-        });
+            int storedValue = selectedAttributeScores.getOrDefault(attribute, attributeKeyValue);
 
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.button.confirm");
-        RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
-        btnConfirm.addActionListener(e -> dispose());
+            pnlOptions.add(buildAttributeRow(attribute.getLabel(),
+                  attribute.getDescription(),
+                  attributeMinimumValue,
+                  attributeMaximumValue,
+                  storedValue,
+                  value -> {
+                      if (value == attributeKeyValue) {
+                          selectedAttributeScores.remove(attribute);
+                      } else {
+                          selectedAttributeScores.put(attribute, value);
+                      }
+                  }));
+        }
 
-        buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(btnCancel);
-        buttonPanel.add(Box.createHorizontalStrut(PADDING));
-        buttonPanel.add(btnConfirm);
-        buttonPanel.add(Box.createHorizontalGlue());
+        // Edge has its own bounds: unlike the other attributes it can legitimately be zero.
+        int edgeMinimumValue = getAttributeMinimumValue(tabType, true);
+        int edgeMaximumValue = getAttributeMaximumValue(tabType, true);
+        int edgeKeyValue = getDefaultAttributeValue(tabType, true);
 
-        pnlControls.add(lblTooltipDisplay);
-        pnlControls.add(Box.createVerticalStrut(PADDING));
-        pnlControls.add(buttonPanel);
+        pnlOptions.add(buildAttributeRow(getPickerText("edge.label"),
+              getPickerText("edge.tooltip"),
+              edgeMinimumValue,
+              edgeMaximumValue,
+              selectedEdge == null ? edgeKeyValue : selectedEdge,
+              // Stored as null at the key value, the same way the "any attribute" row below behaves. Storing the key
+              // value itself left every group carrying an Edge rule the author never set.
+              value -> selectedEdge = (value == edgeKeyValue) ? null : value));
 
-        return pnlControls;
+        pnlOptions.add(buildAttributeRow(getPickerText("flexible.label"),
+              getPickerText("flexible.tooltip"),
+              attributeMinimumValue,
+              attributeMaximumValue,
+              selectedFlexibleAttribute == null ? attributeKeyValue : selectedFlexibleAttribute,
+              value -> selectedFlexibleAttribute = (value == attributeKeyValue) ? null : value));
+
+        return pnlOptions;
     }
 
-    private JPanel buildAttributeRow(String label, String tooltip, int minValue, int maxValue,
-          int defaultValue,
-          Consumer<Integer> onChanged) {
-
+    /**
+     * Builds one labelled spinner row.
+     *
+     * @param label        the row's label
+     * @param tooltip      the help text shown on hover
+     * @param minimumValue the lowest selectable value
+     * @param maximumValue the highest selectable value
+     * @param storedValue  the value to start at, as read from the Life Path
+     * @param onChanged    what to do when the author moves the spinner
+     *
+     * @return the row
+     *
+     * @since 0.50.11
+     */
+    private JPanel buildAttributeRow(String label, String tooltip, int minimumValue, int maximumValue,
+          int storedValue, Consumer<Integer> onChanged) {
         JLabel lblAttribute = new JLabel(label);
         lblAttribute.setToolTipText(tooltip);
 
-        // During development, we ran into a scenario where under certain circumstances, the default value could be
-        // invalid. While that bug was fixed, we added this catch to ensure future failures of that kind are caught
-        // elegantly. - Illiani, Oct 02 2025
-        JSpinner spnAttributeScore;
-        try {
-            spnAttributeScore = new JSpinner(new SpinnerNumberModel(defaultValue, minValue, maxValue, 1));
-        } catch (IllegalArgumentException ex) {
-            LOGGER.error(ex, "Invalid default value for attribute {}: {} vs {}-{}", label, defaultValue, minValue,
-                  maxValue);
-            return new JPanel();
-        }
+        // A stored value can sit outside these bounds when a file was hand-edited or predates a change to the range.
+        // Clamping keeps the row on screen; this used to return an empty panel instead, which hid the attribute
+        // entirely so the author could neither see nor correct the bad value.
+        int startingValue = clampSpinnerValue(storedValue, minimumValue, maximumValue, label);
+        JSpinner spnAttributeScore = new JSpinner(new SpinnerNumberModel(startingValue, minimumValue, maximumValue,
+              1));
 
-        spnAttributeScore.addChangeListener(evt -> onChanged.accept((Integer) spnAttributeScore.getValue()));
-        spnAttributeScore.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltip)
-        );
+        spnAttributeScore.addChangeListener(changeEvent -> onChanged.accept((Integer) spnAttributeScore.getValue()));
+        lblAttribute.addMouseListener(TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltip));
+        spnAttributeScore.addMouseListener(TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, tooltip));
 
         JPanel pnlRows = new JPanel();
         pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
@@ -235,110 +249,18 @@ class LifePathAttributePicker extends JDialog {
         return pnlRows;
     }
 
-    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
-        JPanel pnlOptions = new JPanel();
-        pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
-
-        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.options.label");
-        pnlOptions.setBorder(RoundedLineBorder.createRoundedLineBorder(titleOptions));
-
-        int categoryMinimumValue = getAttributeMinimumValue(tabType, false);
-        int categoryMaximumValue = getAttributeMaximumValue(tabType);
-        int keyValue = getDefaultAttributeValue(tabType, false);
-
-        for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute == SkillAttribute.NO_ATTRIBUTE) {
-                continue;
-            }
-
-            String label = attribute.getLabel();
-            String tooltip = attribute.getDescription();
-
-            int defaultValue = selectedAttributeScores.getOrDefault(attribute, keyValue);
-
-            JPanel row = buildAttributeRow(label, tooltip, categoryMinimumValue, categoryMaximumValue,
-                  defaultValue, value -> {
-                      if (value == keyValue) {
-                          selectedAttributeScores.remove(attribute);
-                      } else {
-                          selectedAttributeScores.put(attribute, value);
-                      }
-                  }
-            );
-            pnlOptions.add(row);
-        }
-
-        // Edge attribute row
-        String edgeLabel = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.edge.label");
-        String edgeTooltip = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.edge.tooltip");
-
-        int edgeMinimumValue = getAttributeMinimumValue(tabType, true);
-        int edgeKeyValue = getDefaultAttributeValue(tabType, true);
-        int edgeDefaultValue = selectedEdge == null ? edgeKeyValue : selectedEdge;
-
-        JPanel edgeRow = buildAttributeRow(edgeLabel, edgeTooltip, edgeMinimumValue, categoryMaximumValue,
-              edgeDefaultValue, value -> selectedEdge = value
-        );
-        pnlOptions.add(edgeRow);
-
-        // Flexible attribute row
-        String label = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.flexible.label");
-        String tooltip = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.flexible.tooltip");
-        int flexibleDefaultValue = selectedFlexibleAttribute == null ? keyValue : selectedFlexibleAttribute;
-
-        JPanel flexibleRow = buildAttributeRow(label, tooltip, categoryMinimumValue, categoryMaximumValue,
-              flexibleDefaultValue, value -> {
-                  if (value == keyValue) {
-                      selectedFlexibleAttribute = null;
-                  } else {
-                      selectedFlexibleAttribute = value;
-                  }
-              }
-        );
-        pnlOptions.add(flexibleRow);
-
-        return pnlOptions;
+    @Override
+    protected void restoreStoredSelection() {
+        selectedAttributeScores = new HashMap<>(storedAttributeScores);
+        selectedEdge = storedEdge;
+        selectedFlexibleAttribute = storedFlexibleAttribute;
     }
 
-    private void setLblTooltipDisplay(String newText) {
-        String newTooltipText = String.format(PANEL_HTML_FORMAT, TOOLTIP_PANEL_WIDTH, newText);
-        lblTooltipDisplay.setText(newTooltipText);
-    }
-
-    private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
-        JPanel pnlInstructions = new JPanel();
-
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.instructions.label");
-        pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
-
-        JEditorPane txtInstructions = new JEditorPane();
-        txtInstructions.setContentType("text/html");
-        txtInstructions.setEditable(false);
-        String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathAttributePicker.instructions.text." + tabType.getLookupName()));
-        txtInstructions.setText(instructions);
-
-        FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);
-        scrollInstructions.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setBorder(null);
-
-        pnlInstructions.add(scrollInstructions);
-        pnlInstructions.setMinimumSize(new Dimension(MINIMUM_INSTRUCTIONS_WIDTH, MINIMUM_COMPONENT_HEIGHT));
-
-        return pnlInstructions;
-    }
-
-    /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
-     */
-    private void setPreferences() {
-        try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathAttributePicker.class);
-            this.setName("LifePathAttributePicker");
-            preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to set user preferences", ex);
-        }
+    @Override
+    protected void clearSelection() {
+        selectedAttributeScores.clear();
+        selectedEdge = null;
+        selectedFlexibleAttribute = null;
+        rebuildOptions();
     }
 }

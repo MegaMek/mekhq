@@ -32,18 +32,15 @@
  */
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
-import static java.lang.Math.round;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder.createRoundedLineBorder;
+import static mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathPickerUtilities.clampSpinnerValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.Window;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -51,240 +48,200 @@ import java.util.List;
 import java.util.Map;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JDialog;
-import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
-import javax.swing.border.EmptyBorder;
 
-import megamek.client.ui.preferences.JWindowPreference;
-import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.annotations.Nullable;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
-import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathCategory;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.dialog.advancedCharacterBuilder.TooltipMouseListenerUtil;
+import mekhq.gui.utilities.TooltipMouseListenerUtil;
 
-class LifePathCategoryCountPicker extends JDialog {
-    private static final MMLogger LOGGER = MMLogger.create(LifePathCategoryCountPicker.class);
+/**
+ * Lets an author say how many Life Paths of a given category a character must, or must not, already have.
+ *
+ * <p>There are enough categories that they are split alphabetically across tabs. {@link LifePathCategory#NONE} is not
+ * offered: it means "belongs to no category", so counting it says nothing a player could satisfy.</p>
+ *
+ * @since 0.50.11
+ */
+class LifePathCategoryCountPicker extends AbstractLifePathPicker {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathCategoryCountPicker";
 
-    private static final int MINIMUM_INSTRUCTIONS_WIDTH = scaleForGUI(250);
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(600);
     private static final int MINIMUM_COMPONENT_HEIGHT = scaleForGUI(450);
 
-    private static final int TOOLTIP_PANEL_WIDTH = (int) round(MINIMUM_MAIN_WIDTH * 0.95);
-    private static final int TEXT_PANEL_WIDTH = (int) round(MINIMUM_INSTRUCTIONS_WIDTH * 0.7);
-    private static final String PANEL_HTML_FORMAT = "<html><div style='width:%dpx;'>%s</div></html>";
+    /** Fewest Life Paths of a category a group can call for. This is also the "no requirement" value. */
+    private static final int MINIMUM_CATEGORY_COUNT = 0;
 
-    private static final int PADDING = scaleForGUI(10);
+    /** Most Life Paths of a category a group can call for. */
+    private static final int MAXIMUM_CATEGORY_COUNT = 10;
 
-    private JLabel lblTooltipDisplay;
+    /** How many alphabetical tabs the categories are spread across. */
+    private static final int TAB_COUNT = 3;
+
+    /** How many columns of rows each tab holds. */
+    private static final int COLUMN_COUNT = 3;
+
+    private final LifePathBuilderTabType tabType;
     private final Map<LifePathCategory, Integer> storedCategoryCounts;
     private Map<LifePathCategory, Integer> selectedCategoryCounts;
 
+    /**
+     * Returns the category counts the author settled on.
+     *
+     * @return the selected categories and their counts
+     *
+     * @since 0.50.11
+     */
     Map<LifePathCategory, Integer> getSelectedCategoryCounts() {
         return selectedCategoryCounts;
     }
 
-    LifePathCategoryCountPicker(Map<LifePathCategory, Integer> selectedCategoryCounts,
-          LifePathBuilderTabType tabType) {
-        super();
+    /**
+     * Opens the picker.
+     *
+     * @param owner                  the wizard this picker belongs to
+     * @param selectedCategoryCounts the counts already set on this group
+     * @param tabType                the section being edited
+     * @param groupIndex             the group being edited, shown in the title
+     *
+     * @since 0.50.11
+     */
+    LifePathCategoryCountPicker(@Nullable Window owner, Map<LifePathCategory, Integer> selectedCategoryCounts,
+          LifePathBuilderTabType tabType, int groupIndex) {
+        super(owner, RESOURCE_BUNDLE, "LifePathCategoryCountPicker", tabType, groupIndex, MINIMUM_MAIN_WIDTH,
+              MINIMUM_COMPONENT_HEIGHT);
+
+        this.tabType = tabType;
 
         // Defensive copies to avoid external modification
         this.selectedCategoryCounts = new HashMap<>(selectedCategoryCounts);
-        storedCategoryCounts = new HashMap<>(selectedCategoryCounts);
+        this.storedCategoryCounts = new HashMap<>(selectedCategoryCounts);
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.title"));
-
-        JPanel pnlInstructions = initializeInstructionsPanel(tabType);
-        JPanel pnlOptions = buildOptionsPanel(tabType);
-        JPanel pnlControls = buildControlPanel();
-
-        JPanel mainPanel = new JPanel(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weighty = 1.0;
-        gbc.gridy = 0;
-
-        gbc.gridx = 0;
-        gbc.weightx = 0.2;
-        gbc.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
-        mainPanel.add(pnlInstructions, gbc);
-
-        JPanel pnlMain = new JPanel();
-        pnlMain.setLayout(new BorderLayout());
-
-        pnlMain.add(pnlOptions, BorderLayout.CENTER);
-        pnlMain.add(pnlControls, BorderLayout.SOUTH);
-
-        gbc.gridx = 1;
-        gbc.weightx = 8;
-        mainPanel.add(pnlMain, gbc);
-
-        setContentPane(mainPanel);
-        setMinimumSize(new Dimension((int) round((MINIMUM_INSTRUCTIONS_WIDTH + MINIMUM_MAIN_WIDTH) * 1.25),
-              MINIMUM_COMPONENT_HEIGHT));
-        setLocationRelativeTo(null);
-        setModal(true);
-        setPreferences(); // Must be before setVisible
-        setVisible(true);
+        buildAndShow();
     }
 
-    private JPanel buildControlPanel() {
-        JPanel pnlControls = new JPanel();
-        pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
-        pnlControls.setBorder(createRoundedLineBorder());
-        pnlControls.setPreferredSize(scaleForGUI(0, 75));
-
-        lblTooltipDisplay = new JLabel();
-        lblTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
-        lblTooltipDisplay.setAlignmentX(Component.CENTER_ALIGNMENT);
-        setLblTooltipDisplay("");
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
-        buttonPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        String titleCancel = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.button.cancel");
-        RoundedJButton btnCancel = new RoundedJButton(titleCancel);
-        btnCancel.addActionListener(e -> {
-            selectedCategoryCounts = storedCategoryCounts;
-            dispose();
-        });
-
-        String titleConfirm = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.button.confirm");
-        RoundedJButton btnConfirm = new RoundedJButton(titleConfirm);
-        btnConfirm.addActionListener(e -> dispose());
-
-        buttonPanel.add(Box.createHorizontalGlue());
-        buttonPanel.add(btnCancel);
-        buttonPanel.add(Box.createHorizontalStrut(PADDING));
-        buttonPanel.add(btnConfirm);
-        buttonPanel.add(Box.createHorizontalGlue());
-
-        pnlControls.add(lblTooltipDisplay);
-        pnlControls.add(Box.createVerticalStrut(PADDING));
-        pnlControls.add(buttonPanel);
-
-        return pnlControls;
-    }
-
-    private JPanel buildOptionsPanel(LifePathBuilderTabType tabType) {
+    @Override
+    protected JPanel buildOptionsPanel() {
         JPanel pnlOptions = new JPanel();
         pnlOptions.setLayout(new BoxLayout(pnlOptions, BoxLayout.Y_AXIS));
+        pnlOptions.setBorder(createRoundedLineBorder(getPickerText("options.label")));
 
-        String titleOptions = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.options.label");
-        pnlOptions.setBorder(createRoundedLineBorder(titleOptions));
-
-        List<LifePathCategory> categories0 = new ArrayList<>();
-        List<LifePathCategory> categories1 = new ArrayList<>();
-        List<LifePathCategory> categories2 = new ArrayList<>();
-        List<LifePathCategory> categories3 = new ArrayList<>();
-        List<LifePathCategory> categories4 = new ArrayList<>();
-
-        List<LifePathCategory> allCategories = new ArrayList<>(List.of(LifePathCategory.values()));
-        allCategories.sort(Comparator.comparing(LifePathCategory::getDisplayName));
-
-        // Roleplay Skills
-        int groups = 3;
-        int n = allCategories.size();
-        for (int i = 0; i < n; i++) {
-            LifePathCategory category = allCategories.get(i);
-            int groupIdx = (int) Math.floor(i * groups / (double) n);
-            switch (groupIdx) {
-                case 0 -> categories0.add(category);
-                case 1 -> categories1.add(category);
-                case 2 -> categories2.add(category);
-                case 3 -> categories3.add(category);
-                default -> categories4.add(category);
+        List<LifePathCategory> allCategories = new ArrayList<>();
+        for (LifePathCategory category : LifePathCategory.values()) {
+            // NONE means "no category", so there is nothing to count.
+            if (category != LifePathCategory.NONE) {
+                allCategories.add(category);
             }
         }
+        allCategories.sort(Comparator.comparing(LifePathCategory::getDisplayName));
 
         EnhancedTabbedPane optionPane = new EnhancedTabbedPane();
 
-        if (!categories0.isEmpty()) {
-            buildTab(categories0, optionPane, getCategoryOptions(categories0, tabType));
-        }
-
-        if (!categories1.isEmpty()) {
-            buildTab(categories1, optionPane, getCategoryOptions(categories1, tabType));
-        }
-
-        if (!categories2.isEmpty()) {
-            buildTab(categories2, optionPane, getCategoryOptions(categories2, tabType));
-        }
-
-        if (!categories3.isEmpty()) {
-            buildTab(categories3, optionPane, getCategoryOptions(categories3, tabType));
-        }
-
-        if (!categories4.isEmpty()) {
-            buildTab(categories4, optionPane, getCategoryOptions(categories4, tabType));
+        // One list per tab, sized by TAB_COUNT. This used to be five separately named lists for three tabs, two of
+        // which could never be filled.
+        for (List<LifePathCategory> tabCategories : splitIntoTabs(allCategories)) {
+            if (!tabCategories.isEmpty()) {
+                buildTab(tabCategories, optionPane);
+            }
         }
 
         pnlOptions.add(optionPane);
+
         return pnlOptions;
     }
 
-    private static void buildTab(List<LifePathCategory> categories, EnhancedTabbedPane optionPane,
-          FastJScrollPane pnlOptions) {
-        String firstName = categories.get(0).getDisplayName();
-        String lastName = categories.get(categories.size() - 1).getDisplayName();
+    /**
+     * Splits the categories into one contiguous alphabetical block per tab.
+     *
+     * @param allCategories every category, already sorted by display name
+     *
+     * @return one list per tab
+     *
+     * @since 0.50.11
+     */
+    private static List<List<LifePathCategory>> splitIntoTabs(List<LifePathCategory> allCategories) {
+        List<List<LifePathCategory>> tabs = new ArrayList<>();
+        int perTab = (int) Math.ceil(allCategories.size() / (double) TAB_COUNT);
+
+        for (int tabIndex = 0; tabIndex < TAB_COUNT; tabIndex++) {
+            int firstEntry = Math.min(tabIndex * perTab, allCategories.size());
+            int lastEntry = Math.min(firstEntry + perTab, allCategories.size());
+            tabs.add(new ArrayList<>(allCategories.subList(firstEntry, lastEntry)));
+        }
+
+        return tabs;
+    }
+
+    /**
+     * Adds one alphabetical tab, titled with the range of initials it covers.
+     *
+     * @param categories the categories on this tab
+     * @param optionPane the tabbed pane to add to
+     *
+     * @since 0.50.11
+     */
+    private void buildTab(List<LifePathCategory> categories, EnhancedTabbedPane optionPane) {
+        String firstName = categories.getFirst().getDisplayName();
+        String lastName = categories.getLast().getDisplayName();
 
         char firstLetter = firstName.isEmpty() ? '\0' : firstName.charAt(0);
         char lastLetter = lastName.isEmpty() ? '\0' : lastName.charAt(0);
 
         optionPane.addTab(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.options.tab", firstLetter,
-              lastLetter), pnlOptions);
+              lastLetter), getCategoryOptions(categories));
     }
 
+    /**
+     * Builds the rows for one tab's categories.
+     *
+     * @param categories the categories to build rows for
+     *
+     * @return the scrollable panel of rows
+     *
+     * @since 0.50.11
+     */
+    private FastJScrollPane getCategoryOptions(List<LifePathCategory> categories) {
+        JPanel pnlCategories = new JPanel(new GridBagLayout());
 
-    private FastJScrollPane getCategoryOptions(List<LifePathCategory> categories, LifePathBuilderTabType tabType) {
-        JPanel pnlSkills = new JPanel(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.anchor = GridBagConstraints.NORTHWEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
+        // An exclusion is "must not already have this many", so its empty value is the top of the range; a
+        // requirement is "must already have at least this many", so its empty value is the bottom.
+        int keyValue = (tabType == LifePathBuilderTabType.EXCLUSIONS)
+              ? MAXIMUM_CATEGORY_COUNT
+              : MINIMUM_CATEGORY_COUNT;
 
-        int columns = 3;
-        for (int i = 0; i < categories.size(); i++) {
-            LifePathCategory category = categories.get(i);
+        for (int categoryIndex = 0; categoryIndex < categories.size(); categoryIndex++) {
+            LifePathCategory category = categories.get(categoryIndex);
             String label = category.getDisplayName();
             String description = category.getDescription();
 
-            int minimumSkillLevel = 0;
-            int maximumSkillLevel = 10;
-
-            boolean isDefaultMaximum = tabType == LifePathBuilderTabType.EXCLUSIONS;
-            int keyValue = isDefaultMaximum ? maximumSkillLevel : minimumSkillLevel;
-            int defaultValue = selectedCategoryCounts.getOrDefault(category, keyValue);
+            // Clamped first: a stored value from a hand-edited file can sit outside these bounds, and
+            // SpinnerNumberModel throws when its initial value is out of range.
+            int storedValue = selectedCategoryCounts.getOrDefault(category, keyValue);
+            int startingValue = clampSpinnerValue(storedValue, MINIMUM_CATEGORY_COUNT, MAXIMUM_CATEGORY_COUNT, label);
 
             JLabel lblCategory = new JLabel(label);
-            JSpinner spnCategoryCount = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
-                  maximumSkillLevel, 1));
+            JSpinner spnCategoryCount = new JSpinner(new SpinnerNumberModel(startingValue, MINIMUM_CATEGORY_COUNT,
+                  MAXIMUM_CATEGORY_COUNT, 1));
 
-            if (selectedCategoryCounts.containsKey(category)) {
-                int currentValue = selectedCategoryCounts.get(category);
-                currentValue = Math.clamp(currentValue, minimumSkillLevel, maximumSkillLevel);
-                spnCategoryCount.setValue(currentValue);
-            }
-
-            spnCategoryCount.addChangeListener(evt -> {
+            spnCategoryCount.addChangeListener(changeEvent -> {
                 int value = (int) spnCategoryCount.getValue();
-                if (value != defaultValue) {
-                    if (value == keyValue) {
-                        selectedCategoryCounts.remove(category);
-                    } else {
-                        selectedCategoryCounts.put(category, value);
-                    }
+                // Deliberately not compared against the value the spinner started at. Changing a spinner and then
+                // changing it back must write the original number, otherwise the map keeps the stale one.
+                if (value == keyValue) {
+                    selectedCategoryCounts.remove(category);
+                } else {
+                    selectedCategoryCounts.put(category, value);
                 }
             });
 
@@ -295,8 +252,8 @@ class LifePathCategoryCountPicker extends JDialog {
                   TooltipMouseListenerUtil.forTooltip(this::setLblTooltipDisplay, description)
             );
 
-            gbc.gridx = i % columns;
-            gbc.gridy = i / columns;
+            constraints.gridx = categoryIndex % COLUMN_COUNT;
+            constraints.gridy = categoryIndex / COLUMN_COUNT;
 
             JPanel pnlRows = new JPanel();
             pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
@@ -305,56 +262,25 @@ class LifePathCategoryCountPicker extends JDialog {
             pnlRows.add(spnCategoryCount);
             pnlRows.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-            pnlSkills.add(pnlRows, gbc);
+            pnlCategories.add(pnlRows, constraints);
         }
 
-        FastJScrollPane scrollSkills = new FastJScrollPane(pnlSkills);
-        scrollSkills.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollSkills.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollSkills.setBorder(null);
+        FastJScrollPane scrollCategories = new FastJScrollPane(pnlCategories);
+        scrollCategories.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollCategories.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollCategories.setBorder(null);
 
-        return scrollSkills;
+        return scrollCategories;
     }
 
-    private void setLblTooltipDisplay(String newText) {
-        String newTooltipText = String.format(PANEL_HTML_FORMAT, TOOLTIP_PANEL_WIDTH, newText);
-        lblTooltipDisplay.setText(newTooltipText);
+    @Override
+    protected void restoreStoredSelection() {
+        selectedCategoryCounts = new HashMap<>(storedCategoryCounts);
     }
 
-    private JPanel initializeInstructionsPanel(LifePathBuilderTabType tabType) {
-        JPanel pnlInstructions = new JPanel();
-
-        String titleInstructions = getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.instructions.label");
-        pnlInstructions.setBorder(createRoundedLineBorder(titleInstructions));
-
-        JEditorPane txtInstructions = new JEditorPane();
-        txtInstructions.setContentType("text/html");
-        txtInstructions.setEditable(false);
-        String instructions = String.format(PANEL_HTML_FORMAT, TEXT_PANEL_WIDTH,
-              getTextAt(RESOURCE_BUNDLE, "LifePathCategoryCountPicker.instructions.text." + tabType.getLookupName()));
-        txtInstructions.setText(instructions);
-
-        FastJScrollPane scrollInstructions = new FastJScrollPane(txtInstructions);
-        scrollInstructions.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollInstructions.setBorder(null);
-
-        pnlInstructions.add(scrollInstructions);
-        pnlInstructions.setMinimumSize(new Dimension(MINIMUM_INSTRUCTIONS_WIDTH, MINIMUM_COMPONENT_HEIGHT));
-
-        return pnlInstructions;
-    }
-
-    /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
-     */
-    private void setPreferences() {
-        try {
-            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(LifePathCategoryCountPicker.class);
-            this.setName("LifePathCategoryCountPicker");
-            preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to set user preferences", ex);
-        }
+    @Override
+    protected void clearSelection() {
+        selectedCategoryCounts.clear();
+        rebuildOptions();
     }
 }

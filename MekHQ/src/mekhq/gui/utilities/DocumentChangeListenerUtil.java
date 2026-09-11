@@ -30,27 +30,48 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog.advancedCharacterBuilder;
+package mekhq.gui.utilities;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
 
+/**
+ * Attaches a single callback to every kind of change a text component's document can report.
+ *
+ * <p>{@link DocumentListener} has three methods, and a caller that simply wants to know "the text changed" has to
+ * implement all three identically. MekHQ has a number of hand-rolled listeners that do exactly that; this replaces
+ * them with one call.</p>
+ *
+ * @since 0.50.11
+ */
 public class DocumentChangeListenerUtil {
+    private DocumentChangeListenerUtil() {
+        // Utility class: not instantiable.
+    }
+
+    /**
+     * Runs the given action whenever the document's text changes, however it changed.
+     *
+     * @param document the document to watch
+     * @param onChange what to run on any insert, removal or attribute change
+     *
+     * @since 0.50.11
+     */
     public static void addChangeListener(Document document, Runnable onChange) {
         document.addDocumentListener(new DocumentListener() {
             @Override
-            public void insertUpdate(DocumentEvent e) {
+            public void insertUpdate(DocumentEvent event) {
                 onChange.run();
             }
 
             @Override
-            public void removeUpdate(DocumentEvent e) {
+            public void removeUpdate(DocumentEvent event) {
                 onChange.run();
             }
 
             @Override
-            public void changedUpdate(DocumentEvent e) {
+            public void changedUpdate(DocumentEvent event) {
                 onChange.run();
             }
         });

@@ -35,8 +35,9 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.UUID;
-import java.util.stream.Stream;
 
 import megamek.Version;
 import megamek.logging.MMLogger;
@@ -354,19 +355,67 @@ public record LifePath(
             throw new IllegalArgumentException("flexibleXPPickCount must be a non-negative integer");
         }
 
-        int groupCount = Stream.of(
-              flexibleXPAttributes.size(),
-              flexibleXPEdge.size(),
-              flexibleXPFlexibleAttribute.size(),
-              flexibleXPTraits.size(),
-              flexibleXPSkills.size(),
-              flexibleXPAbilities.size()
-        ).mapToInt(Integer::intValue).max().orElse(0);
+        int groupCount = countFlexibleXPGroups(flexibleXPAttributes,
+              flexibleXPEdge,
+              flexibleXPFlexibleAttribute,
+              flexibleXPTraits,
+              flexibleXPSkills,
+              flexibleXPMetaSkills,
+              flexibleXPNaturalAptitudes,
+              flexibleXPNaturalAptitudesMetaSkills,
+              flexibleXPAbilities);
 
         if (flexibleXPPickCount > groupCount) {
             throw new IllegalArgumentException(
                   "flexibleXPPickCount must be less than or equal to the total number of flexible XP award groups");
         }
+    }
+
+    /**
+     * Counts how many distinct flexible XP award groups the supplied maps describe.
+     *
+     * <p>Each of the nine flexible XP maps is keyed by group index, and a group exists as soon as any one of them
+     * holds that index. The count is therefore the size of the union of all their keys, not the size of the largest
+     * map. Counting the largest map instead would miss a group that only appears in, say, the meta skills map.</p>
+     *
+     * <p>This is the single source of truth for the group count. The compact constructor uses it to bound
+     * {@code flexibleXPPickCount}, and {@link LifePathValidator} uses it so the wizard cannot save a path the
+     * constructor would then refuse to load.</p>
+     *
+     * @param flexibleGroupMaps the flexible XP group maps; {@code null} entries are ignored
+     *
+     * @return the number of distinct flexible XP award groups
+     *
+     * @since 0.50.11
+     */
+    @SafeVarargs
+    public static int countFlexibleXPGroups(Map<Integer, ?>... flexibleGroupMaps) {
+        return flexibleXPGroupKeys(flexibleGroupMaps).size();
+    }
+
+    /**
+     * Returns the index of every flexible XP award group the supplied maps describe.
+     *
+     * <p>A group exists as soon as any one of the nine flexible maps holds its index, so this is the union of their
+     * key sets. Indexes can be sparse, because empty groups are dropped when a Life Path is saved.</p>
+     *
+     * @param flexibleGroupMaps the flexible XP group maps; {@code null} entries are ignored
+     *
+     * @return the group indexes in ascending order
+     *
+     * @since 0.50.11
+     */
+    @SafeVarargs
+    public static SortedSet<Integer> flexibleXPGroupKeys(Map<Integer, ?>... flexibleGroupMaps) {
+        SortedSet<Integer> groupKeys = new TreeSet<>();
+
+        for (Map<Integer, ?> groupMap : flexibleGroupMaps) {
+            if (groupMap != null) {
+                groupKeys.addAll(groupMap.keySet());
+            }
+        }
+
+        return groupKeys;
     }
 
     /**
@@ -382,62 +431,6 @@ public record LifePath(
      * @since 0.50.11
      */
     public LifePath resaveWithUpdatedVersion() {
-        return new LifePath(
-              id,
-              MHQConstants.VERSION,
-              xpCost,
-              source,
-              name,
-              flavorText,
-              age,
-              xpDiscount,
-              minimumYear,
-              maximumYear,
-              randomWeight,
-              lifeStages,
-              categories,
-              isPlayerRestricted,
-              requirementsFactions,
-              requirementsSystems,
-              requirementsLifePath,
-              requirementsCategories,
-              requirementsAttributes,
-              requirementsEdge,
-              requirementsFlexibleAttribute,
-              requirementsTraits,
-              requirementsSkills,
-              requirementsMetaSkills,
-              requirementsAbilities,
-              exclusionsFactions,
-              exclusionsSystems,
-              exclusionsLifePath,
-              exclusionsCategories,
-              exclusionsAttributes,
-              exclusionsEdge,
-              exclusionsFlexibleAttribute,
-              exclusionsTraits,
-              exclusionsSkills,
-              exclusionsMetaSkills,
-              exclusionsAbilities,
-              fixedXPAttributes,
-              fixedXPEdge,
-              fixedXPFlexibleAttribute,
-              fixedXPTraits,
-              fixedXPSkills,
-              fixedXPMetaSkills,
-              fixedXPNaturalAptitudes,
-              fixedXPNaturalAptitudesMetaSkills,
-              fixedXPAbilities,
-              flexibleXPAttributes,
-              flexibleXPEdge,
-              flexibleXPFlexibleAttribute,
-              flexibleXPTraits,
-              flexibleXPSkills,
-              flexibleXPMetaSkills,
-              flexibleXPNaturalAptitudes,
-              flexibleXPNaturalAptitudesMetaSkills,
-              flexibleXPAbilities,
-              flexibleXPPickCount
-        );
+        return LifePathBuilder.from(this).version(MHQConstants.VERSION).build();
     }
 }

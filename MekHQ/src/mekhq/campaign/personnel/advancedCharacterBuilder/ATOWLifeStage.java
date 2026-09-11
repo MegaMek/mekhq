@@ -116,7 +116,7 @@ public enum ATOWLifeStage {
      * @return the localized display name for this object
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.11
      */
     public String getDisplayName() {
         return getTextAt(RESOURCE_BUNDLE, lookupName + ".label");
@@ -129,7 +129,7 @@ public enum ATOWLifeStage {
      * @return the localized description for this object
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.11
      */
     public String getDescription() {
         return getTextAt(RESOURCE_BUNDLE, lookupName + ".description");
@@ -141,7 +141,7 @@ public enum ATOWLifeStage {
      * @return a sorted list of {@link ATOWLifeStage} values by order
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.50.11
      */
     public static List<ATOWLifeStage> getOrderedLifeStages() {
         List<ATOWLifeStage> stages = Arrays.asList(values());
@@ -198,10 +198,15 @@ public enum ATOWLifeStage {
     }
 
     /**
-     * Attempts to look up a life stage from text input, first matching by lookup name, then (if not found) by parsing
-     * the provided text as an integer order.
+     * Attempts to look up a life stage from its lookup name.
      *
-     * @param text the input text, which may be a lookup name or an integer order
+     * <p>The lookup name is the only thing that identifies a stage in stored data. This method used to fall back to
+     * reading the text as an integer {@link #getOrder() order}, which was a trap: {@code order} describes the sequence
+     * a character passes through the stages, and it is renumbered whenever a stage is added or moved. This branch
+     * renumbered every one of them. Anything that had persisted an order would silently resolve to a different stage
+     * afterwards.</p>
+     *
+     * @param text the lookup name to search for
      *
      * @return the matching {@link ATOWLifeStage}, or {@code null} if no match is found
      *
@@ -215,11 +220,6 @@ public enum ATOWLifeStage {
         }
 
         ATOWLifeStage stage = fromLookupName(text);
-        if (stage != null) {
-            return stage;
-        }
-
-        stage = fromOrder(MathUtility.parseInt(text, -1));
         if (stage != null) {
             return stage;
         }
