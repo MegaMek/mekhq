@@ -46,6 +46,7 @@ import java.util.List;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonUtility;
@@ -90,8 +91,6 @@ public class EmployerNegotiator {
 
     private EmployerNegotiator() {}
 
-    // TODO have a way for the player to get intel on the opposing negotiator
-
     /**
      * Generates the employer's negotiator, choosing an appropriate role and raising the person to the CamOps negotiator
      * baseline.
@@ -104,14 +103,14 @@ public class EmployerNegotiator {
      * @return the generated negotiator
      */
     public static Person generateNegotiator(Campaign campaign, ContractSearchType searchType,
-          Faction employerFaction, HiringHallLevel hiringHallLevel) {
+          Faction employerFaction, HiringHallLevel hiringHallLevel, ChaosEmployerType chaosEmployerType) {
         PersonnelRole role = getNegotiatorRole(hiringHallLevel, searchType, employerFaction);
 
         Person negotiator = campaign.getPlayerForce()
                                   .getHumanResources()
                                   .newPerson(campaign, role, employerFaction.getShortName(), Gender.RANDOMIZE);
 
-        adjustExperienceLevel(campaign, negotiator, role, employerFaction.isClan());
+        adjustExperienceLevel(campaign, negotiator, role, employerFaction, chaosEmployerType);
         adjustCharisma(negotiator);
         adjustNegotiation(negotiator);
         giveSPA(campaign, negotiator);
@@ -153,15 +152,36 @@ public class EmployerNegotiator {
     }
 
     private static void adjustExperienceLevel(Campaign campaign, Person negotiator, PersonnelRole role,
-          boolean isClanForce) {
+          Faction faction, ChaosEmployerType chaosEmployerType) {
+        boolean isClan = faction.isClan();
         int experienceLevel = negotiator.getExperienceLevel(campaign.getCampaignOptions(),
-              isClanForce,
+              isClan,
               campaign.getLocalDate(),
               false,
               false);
 
-        if (experienceLevel <= SkillLevel.VETERAN.getExperienceLevel()) {
-            PersonUtility.overrideSkills(campaign, negotiator, role, SkillLevel.VETERAN, true);
+        // Due to modifiers, the final skill level will usually be one step above
+        SkillLevel targetSkillLevel = switch (chaosEmployerType) {
+            case ANY_SYSTEM_OWNER, LOCAL_SYSTEM_OWNER -> {
+                if (faction.isMajorOrSuperPower() || faction.isClan()) {
+                    yield SkillLevel.VETERAN;
+                } else if (faction.isComStarOrWoB()) {
+                    yield SkillLevel.ELITE;
+                } else {
+                    yield SkillLevel.REGULAR;
+                }
+            }
+            case NOBLE, MERCENARY_SUBCONTRACT, CORPORATION -> SkillLevel.REGULAR;
+            case CIVILIAN_ORGANIZATION_BUSINESS,
+                 CIVILIAN_ORGANIZATION_MILITIA,
+                 LOCAL_PLANETARY_GOVERNMENT,
+                 ANY_PLANETARY_GOVERNMENT ->
+                  SkillLevel.GREEN;
+            case CIVILIAN_ORGANIZATION_REBELS -> SkillLevel.ULTRA_GREEN;
+        };
+
+        if (experienceLevel > targetSkillLevel.getExperienceLevel()) {
+            PersonUtility.overrideSkills(campaign, negotiator, role, targetSkillLevel, true);
         }
     }
 
