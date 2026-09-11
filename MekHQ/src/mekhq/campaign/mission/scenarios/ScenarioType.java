@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2024-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -59,7 +59,9 @@ public enum ScenarioType {
     CONVOY,
     RIOT,
     OFFICIAL_CHALLENGE,
-    HOSTILE_FACILITY;
+    HOSTILE_FACILITY,
+    MOLE_HUNT,
+    PRISONER_LIBERATION;
 
     /**
      * @return {@code true} if the scenario is considered a LosTech scenario, {@code false} otherwise.
@@ -97,6 +99,14 @@ public enum ScenarioType {
      */
     public boolean isOfficialChallenge() {
         return this == OFFICIAL_CHALLENGE;
+    }
+
+    public boolean isPrisonerLiberation() {
+        return this == PRISONER_LIBERATION;
+    }
+
+    public boolean isMoleHunt() {
+        return this == MOLE_HUNT;
     }
 
     /**
