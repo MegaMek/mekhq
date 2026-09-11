@@ -55,6 +55,7 @@ import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.Formation;
@@ -177,6 +178,12 @@ class ContractAutomationTest {
             Campaign campaign = mock(Campaign.class);
             when(campaign.getUnit(idA)).thenReturn(unitA);
 
+            PlayerForce playerForce = mock(PlayerForce.class);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+
+            ForceHumanResources forceHumanResources = mock(ForceHumanResources.class);
+            when(playerForce.getHumanResources()).thenReturn(forceHumanResources);
+
             Detachment detachmentA = new Detachment();
             detachmentA.setAutomatedMothballUnits(new ArrayList<>(List.of(idA)));
             Detachment detachmentB = new Detachment();
@@ -201,6 +208,12 @@ class ContractAutomationTest {
 
             Campaign campaign = mock(Campaign.class);
             when(campaign.getUnit(id)).thenReturn(alreadyActive);
+
+            PlayerForce playerForce = mock(PlayerForce.class);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+
+            ForceHumanResources forceHumanResources = mock(ForceHumanResources.class);
+            when(playerForce.getHumanResources()).thenReturn(forceHumanResources);
 
             Detachment detachment = new Detachment();
             detachment.setAutomatedMothballUnits(new ArrayList<>(List.of(id)));

@@ -57,6 +57,7 @@ import mekhq.campaign.personnel.enums.MergingSurnameStyle;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.enums.SplittingSurnameStyle;
+import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.service.mrms.MRMSOption;
@@ -710,8 +711,14 @@ public class CampaignOptions {
         gameOptions.getOption(ADVANCED_STRATOPS_QUIRKS).setValue(get(CampaignOption.USE_QUIRKS));
         gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(get(CampaignOption.ALLOW_CANON_ONLY));
         gameOptions.getOption(ALLOWED_CANON_ONLY).setValue(get(CampaignOption.ALLOW_CANON_ONLY));
-
         gameOptions.getOption(ALLOWED_TECH_LEVEL)
               .setValue(TechConstants.T_SIMPLE_NAMES[get(CampaignOption.TECH_LEVEL)]);
+
+        boolean useNPCArmorKits = get(CampaignOption.NPC_FACTION_ARMOR_KITS);
+        boolean useMekWarriorArmorKit = !get(CampaignOption.MEKWARRIOR_DEFAULT_KIT).equals(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME);
+        boolean useVehicleArmorKit = !get(CampaignOption.VEHICLE_CREW_DEFAULT_KIT).equals(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME);
+        boolean useAeroArmorKit = !get(CampaignOption.AIRCRAFT_DEFAULT_KIT).equals(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME);
+        gameOptions.getOption(RPG_COMBAT_SUITS)
+              .setValue(useNPCArmorKits || useMekWarriorArmorKit || useVehicleArmorKit || useAeroArmorKit);
     }
 }

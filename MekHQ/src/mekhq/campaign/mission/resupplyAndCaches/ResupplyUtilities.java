@@ -33,21 +33,18 @@
 package mekhq.campaign.mission.resupplyAndCaches;
 
 import static java.lang.Math.max;
-import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.force.FormationType.CONVOY;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.CARGO_MULTIPLIER;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.calculateTargetCargoTonnage;
-import static mekhq.campaign.mission.resupplyAndCaches.Resupply.isProhibitedUnitType;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.KIA;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.UUID;
 
 import megamek.common.compute.Compute;
-import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -186,51 +183,5 @@ public class ResupplyUtilities {
         // Armor and ammo are always delivered in blocks, so cargo will never be less than the sum
         // of those blocks
         return max(RESUPPLY_AMMO_TONNAGE + RESUPPLY_ARMOR_TONNAGE, (int) Math.ceil(targetTonnage));
-    }
-
-    public static int estimateAvailablePlayerCargo(Campaign campaign) {
-        double totalPlayerCargoCapacity = 0;
-
-        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
-            if (!formation.isFormationType(CONVOY)) {
-                continue;
-            }
-
-            if (formation.getParentFormation() != null && formation.getParentFormation().isFormationType(CONVOY)) {
-                continue;
-            }
-
-            double cargoCapacitySubTotal = 0;
-            boolean hasCargo = false;
-            for (UUID unitId : formation.getAllUnits(false)) {
-                try {
-                    Unit unit = campaign.getUnit(unitId);
-                    Entity entity = unit.getEntity();
-
-                    if (unit.isDamaged() || !unit.isFullyCrewed() || isProhibitedUnitType(entity, true, true)) {
-                        continue;
-                    }
-
-                    double individualCargo = unit.getCargoCapacityForConvoy();
-
-                    if (individualCargo > 0) {
-                        hasCargo = true;
-                    }
-
-                    cargoCapacitySubTotal += individualCargo;
-                } catch (Exception ignored) {
-                    // If we run into an exception, it's because we failed to get Unit or Entity.
-                    // In either case, we just ignore that unit.
-                }
-            }
-
-            if (hasCargo) {
-                if (cargoCapacitySubTotal > 0) {
-                    totalPlayerCargoCapacity += cargoCapacitySubTotal;
-                }
-            }
-        }
-
-        return (int) round(totalPlayerCargoCapacity);
     }
 }

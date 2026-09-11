@@ -46,9 +46,11 @@ import java.util.stream.Collectors;
 
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
+import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -59,6 +61,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.mission.utilities.TransportCostCalculations;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
@@ -249,8 +252,85 @@ public class ContractAutomation {
             }
         }
 
+        fillTempPools(campaign);
+
         // We still want to clear out any units
-        detachment.setAutomatedMothballUnits(new ArrayList<UUID>());
+        detachment.setAutomatedMothballUnits(new ArrayList<>());
+    }
+
+    private static void fillTempPools(Campaign campaign) {
+        final MHQOptions mhqOptions = MekHQ.getMHQOptions();
+        if (mhqOptions == null) { // This makes unit testing easier
+            return;
+        }
+
+        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+
+        if (mhqOptions.getNewDaySoldierPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(), PersonnelRole.SOLDIER);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.SOLDIER);
+        }
+
+        if (mhqOptions.getNewDayBattleArmorPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.BATTLE_ARMOUR);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.BATTLE_ARMOUR);
+        }
+
+        if (mhqOptions.getNewDayVehicleCrewGroundPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VEHICLE_CREW_GROUND);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+
+        if (mhqOptions.getNewDayVehicleCrewVTOLPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VEHICLE_CREW_VTOL);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VEHICLE_CREW_VTOL);
+        }
+
+        if (mhqOptions.getNewDayVehicleCrewNavalPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VEHICLE_CREW_NAVAL);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VEHICLE_CREW_NAVAL);
+        }
+
+        if (mhqOptions.getNewDayVesselPilotPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(), PersonnelRole.VESSEL_PILOT);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VESSEL_PILOT);
+        }
+
+        if (mhqOptions.getNewDayVesselGunnerPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VESSEL_GUNNER);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VESSEL_GUNNER);
+        }
+
+        if (mhqOptions.getNewDayVesselCrewPoolFill()) {
+            humanResources.fillTempCrewPoolForRole(campaign, campaign.getCampaignOptions(), PersonnelRole.VESSEL_CREW);
+            humanResources.distributeTempCrewPoolToUnits(campaign,
+                  campaign.getCampaignOptions(),
+                  PersonnelRole.VESSEL_CREW);
+        }
     }
 
     public static void outOfContractMothballAutomation(Campaign campaign) {
