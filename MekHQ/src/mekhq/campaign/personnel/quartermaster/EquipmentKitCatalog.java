@@ -95,6 +95,17 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
     public static final String KIT_POCKET_TRANSCRIBER = "Pocket Transcriber";
     public static final String KIT_TELESCAN = "Telescan";
 
+    public static final List<String> REPAIR_KITS = List.of(KIT_AEROSPACE,
+          KIT_BIONIC_MAINTENANCE,
+          KIT_CUTTING_JOINING,
+          KIT_ELECTRONICS,
+          KIT_FISSION_FUSION,
+          KIT_MYOMER_ACTUATOR,
+          KIT_VEHICLE,
+          KIT_WEAPON,
+          KIT_BASIC_TOOLKIT,
+          KIT_DELUXE_TOOLKIT);
+
     /**
      * Kit internal name -> the non-technician skills it improves and by how much. The medical kits' Surgery bonus is
      * one above the CamOps value (raised by +1, even where the book lists none) per campaign customization. These
@@ -393,15 +404,23 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
 
     /**
      * Whether this technician carries a general tool kit - a Basic Toolkit or the better Deluxe Toolkit - which is the
-     * minimum kit required to perform a repair when the "Techs Need a Tool Kit" campaign option is enabled. Specialized
-     * equipment kits augment a tool kit rather than replace it, so they do not satisfy this requirement on their own.
+     * minimum kit required to perform a repair when the "Techs Need a Tool Kit" campaign option is enabled.
      *
      * @param person the technician, or {@code null}
      *
      * @return {@code true} if the technician carries at least a Basic Toolkit
      */
     public static boolean hasToolKit(@Nullable Person person) {
-        return (person != null)
-                     && (person.hasRepairKit(KIT_BASIC_TOOLKIT) || person.hasRepairKit(KIT_DELUXE_TOOLKIT));
+        if (person == null) {
+            return false;
+        }
+
+        for (String repairKit : REPAIR_KITS) {
+            if (person.hasRepairKit(repairKit)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
