@@ -506,9 +506,17 @@ public class LifePathTab {
      * number on save. That made the saved value disagree with the number on screen, and made
      * {@code TOO_MANY_FLEXIBLE_PICKS} impossible to produce from the wizard.</p>
      *
+     * <p>Only the Flexible XP tab shows the spinner, so the other tabs leave the model alone. Changing a
+     * {@link SpinnerNumberModel}'s maximum fires its change listener, which re-renders the wizard's progress panel,
+     * and there is no reason to do that for a spinner nobody can see.</p>
+     *
      * @since 0.50.11
      */
     private void updateFlexiblePicksMaximum() {
+        if (tabType != LifePathBuilderTabType.FLEXIBLE_XP) {
+            return;
+        }
+
         SpinnerNumberModel model = (SpinnerNumberModel) spnFlexibleXPPicks.getModel();
         int groupCount = getTabCount();
 

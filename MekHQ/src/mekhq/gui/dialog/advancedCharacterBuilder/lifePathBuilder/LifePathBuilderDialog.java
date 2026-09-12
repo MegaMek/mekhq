@@ -142,6 +142,16 @@ public class LifePathBuilderDialog extends JDialog {
      * Life Path would immediately count as edited.</p>
      */
     private boolean isPopulating = false;
+
+    /**
+     * Whether every panel of the wizard exists yet.
+     *
+     * <p>Building a tab can fire the same change listeners an author's editing does: adding a group caps the
+     * pick-count spinner, and changing a {@link javax.swing.SpinnerNumberModel}'s maximum fires its listener. Until
+     * this is {@code true} the later tabs and the progress pane may still be {@code null}, so
+     * {@link #updateTxtProgress()} must not read them.</p>
+     */
+    private boolean isInitialised = false;
     private LifePathTabBasicInformation basicInfoTab;
     private LifePathTab requirementsTab;
     private LifePathTab exclusionsTab;
@@ -201,14 +211,6 @@ public class LifePathBuilderDialog extends JDialog {
     }
 
     /**
-     * Rebuilds the progress panel, and notes that the Life Path now differs from what is on disk.
-     *
-     * <p>Every control in the wizard routes its changes through here, which makes it the one place that knows an
-     * edit happened.</p>
-     *
-     * @since 0.50.11
-     */
-    /**
      * Returns the identifier of the Life Path currently in the wizard.
      *
      * <p>Needed by the Life Path picker, which must not offer the path being edited as something that path requires
@@ -222,7 +224,21 @@ public class LifePathBuilderDialog extends JDialog {
         return lifePathId;
     }
 
+    /**
+     * Rebuilds the progress panel, and notes that the Life Path now differs from what is on disk.
+     *
+     * <p>Every control in the wizard routes its changes through here, which makes it the one place that knows an
+     * edit happened. Calls that arrive while the wizard is still being built are ignored: the validation summary
+     * reads every tab, and during construction some of them do not exist yet.</p>
+     *
+     * @since 0.50.11
+     */
     void updateTxtProgress() {
+        if (!isInitialised) {
+            LOGGER.debug("[LifePathWizard] Progress update skipped: the wizard is still being built");
+            return;
+        }
+
         if (!isPopulating) {
             hasUnsavedChanges = true;
         }
@@ -273,6 +289,10 @@ public class LifePathBuilderDialog extends JDialog {
         pnlInstructions = initializeInstructionsPanel();
         EnhancedTabbedPane tabMain = initializeMainPanel(today);
         pnlProgress = initializeProgressPanel();
+
+        // Every tab and the progress pane now exist, so this is the first render that can safely read them all.
+        isInitialised = true;
+        updateTxtProgress();
 
         // Layout using GridBagLayout for a width ratio of 1:2:1
         JPanel container = new JPanel(new GridBagLayout());
@@ -436,7 +456,6 @@ public class LifePathBuilderDialog extends JDialog {
         txtProgress = new JEditorPane();
         txtProgress.setContentType("text/html");
         txtProgress.setEditable(false);
-        updateTxtProgress();
 
         scrollProgress = new FastJScrollPane(txtProgress);
         scrollProgress.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
