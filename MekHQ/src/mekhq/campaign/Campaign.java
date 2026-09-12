@@ -5159,31 +5159,6 @@ public class Campaign implements ITechManager {
      *
      * @param entity the entity to clear the game data for
      */
-    /**
-     * Puts a unit's sensor back to the one it should start a battle on.
-     *
-     * <p>A sensor the player chose themselves is left alone. That means the sensor picked in the MegaMek lobby, and
-     * any sensor saved against this chassis and model, which the unit file parser applies as the unit loads. Without
-     * this check the campaign would hand every unit back its active probe, or radar when it has no probe, undoing
-     * the choice before the game even starts.</p>
-     *
-     * <p>Example: a player saves Infrared for the Marauder MAD-3R. Their MAD-3R deploys on Mek IR. A Griffin
-     * GRF-1N with nothing saved still deploys on Mek Radar exactly as it always did.</p>
-     *
-     * @param entity the unit being readied for a game
-     */
-    // Package-private rather than private so the rule can be tested without standing up a whole Campaign
-    static void resetSensorChoice(Entity entity) {
-        if (entity.getSensors().isEmpty() || entity.hasCustomSensorChoice()) {
-            return;
-        }
-        if (entity.hasBAP()) {
-            entity.setNextSensor(entity.getSensors().lastElement());
-        } else {
-            entity.setNextSensor(entity.getSensors().firstElement());
-        }
-    }
-
     public void clearGameData(Entity entity) {
         // First, lets remove any improvised clubs picked up during the combat
         entity.removeMisc(EquipmentTypeLookup.LIMB_CLUB);
@@ -5273,6 +5248,31 @@ public class Campaign implements ITechManager {
         // TODO: still a lot of stuff to do here, but oh well
         entity.setOwner(player);
         entity.setGame(game);
+    }
+
+    /**
+     * Puts a unit's sensor back to the one it should start a battle on.
+     *
+     * <p>A sensor the player chose themselves is left alone. That means the sensor picked in the MegaMek lobby, and
+     * any sensor saved against this chassis and model, which the unit file parser applies as the unit loads. Without
+     * this check the campaign would hand every unit back its active probe, or radar when it has no probe, undoing
+     * the choice before the game even starts.</p>
+     *
+     * <p>Example: a player saves Infrared for the Marauder MAD-3R. Their MAD-3R deploys on Mek IR. A Griffin
+     * GRF-1N with nothing saved still deploys on Mek Radar exactly as it always did.</p>
+     *
+     * @param entity the unit being readied for a game
+     */
+    // Package-private rather than private so the rule can be tested without standing up a whole Campaign
+    static void resetSensorChoice(Entity entity) {
+        if (entity.getSensors().isEmpty() || entity.hasCustomSensorChoice()) {
+            return;
+        }
+        if (entity.hasBAP()) {
+            entity.setNextSensor(entity.getSensors().lastElement());
+        } else {
+            entity.setNextSensor(entity.getSensors().firstElement());
+        }
     }
 
     /**

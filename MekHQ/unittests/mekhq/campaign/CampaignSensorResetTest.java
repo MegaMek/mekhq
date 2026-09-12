@@ -34,6 +34,7 @@ package mekhq.campaign;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import megamek.common.equipment.Sensor;
 import megamek.common.units.BipedMek;
@@ -97,7 +98,7 @@ class CampaignSensorResetTest {
 
         Campaign.resetSensorChoice(mek);
 
-        assertEquals(null, mek.getNextSensor(), "A unit carrying no sensors has nothing to reset");
+        assertNull(mek.getNextSensor(), "A unit carrying no sensors has nothing to reset");
     }
 
     @Test
