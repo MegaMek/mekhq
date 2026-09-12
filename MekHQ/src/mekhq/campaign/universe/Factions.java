@@ -117,17 +117,19 @@ public class Factions {
      */
     public Collection<Faction> getFactions(boolean includeCommands) {
         return factions.values().stream()
-                     .filter(f -> (includeCommands || !f.getShortName().contains(".")))
+                     .filter(faction -> (includeCommands || !faction.getShortName().contains(".")))
                      .toList();
     }
 
     /**
-     * Returns a collection of all {@link Faction} objects, excluding command subfactions (those whose short name
-     * contains a period ({@code '.'})).
+     * Returns a collection of all {@link Faction} objects, <b>including</b> command subfactions (those whose short
+     * name contains a period ({@code '.'})).
      *
-     * <p>This is a convenience method equivalent to calling {@link #getFactions(boolean)} with {@code true}.</p>
+     * <p>This is a convenience method equivalent to calling {@link #getFactions(boolean)} with {@code true}. It
+     * returns everything, which is what this method returned before {@link #getFactions(boolean)} existed. Callers
+     * that want only the factions a character can belong to should pass {@code false} instead.</p>
      *
-     * @return a {@link Collection} of {@link Faction} objects, excluding commands
+     * @return a {@link Collection} of every {@link Faction}, commands included
      */
     public Collection<Faction> getFactions() {
         return getFactions(true);
