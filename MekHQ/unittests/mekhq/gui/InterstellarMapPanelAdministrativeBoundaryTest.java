@@ -62,39 +62,41 @@ class InterstellarMapPanelAdministrativeBoundaryTest {
     private static final double HEX_SPACING_X = HEX_SIZE * Math.sqrt(3) / 2.0;
 
     @Test
-            void administrativeKeyUsesCommonPathForMatchingFactionEvidence() {
+    void administrativeKeyUsesNearestValidSameOwnerSystem() {
         Faction owner = faction("FS", Color.BLUE);
         Faction other = faction("DC", Color.RED);
-        PlanetarySystem first = system(owner, List.of("Crucis March", "Coreward PDZ"));
-        PlanetarySystem matching = system(owner, List.of("Crucis March", "Coreward PDZ"));
-                        PlanetarySystem regionOnly = system(owner, List.of("Crucis March"));
-                        PlanetarySystem anotherDistrict = system(owner, List.of("Crucis March", "Capellan PDZ"));
-        PlanetarySystem missing = system(owner, List.of());
-        PlanetarySystem conflicting = system(owner, List.of("Draconis March", "Robinson PDZ"));
-        PlanetarySystem wrongOwner = system(other, List.of("Dieron District", "Algedi Prefecture"));
+        PlanetarySystem nearest = system(owner, List.of("Crucis March", "Coreward PDZ"), "near", 10, 21);
+        PlanetarySystem missing = system(owner, List.of(), "missing", 10, 20);
+        PlanetarySystem malformed = system(owner, List.of(" "), "malformed", 10, 20);
+        PlanetarySystem wrongOwner = system(other, List.of("Dieron District"), "other", 10, 20);
+        for (List<String> path : List.of(List.of("Crucis March"),
+              List.of("Crucis March", "Capellan PDZ"), List.of("Draconis March", "Robinson PDZ"))) {
+            PlanetarySystem farther = system(owner, path, "far", 0, 0);
+            for (List<PlanetarySystem> evidence : List.of(
+                  List.of(farther, missing, malformed, wrongOwner, nearest),
+                  List.of(nearest, wrongOwner, malformed, missing, farther))) {
+                InterstellarMapPanel.AdministrativeKey key = InterstellarMapPanel.classifyAdministrativeKey(
+                      List.of(owner), evidence, DATE, 10, 20);
+                assertEquals(owner, key.faction());
+                assertEquals(List.of("Crucis March", "Coreward PDZ"), key.path());
+            }
+        }
+        assertNull(InterstellarMapPanel.classifyAdministrativeKey(List.of(owner), List.of(), DATE, 10, 20));
+        assertNull(InterstellarMapPanel.classifyAdministrativeKey(
+              List.of(owner), List.of(missing, malformed, wrongOwner), DATE, 10, 20));
+        assertNull(InterstellarMapPanel.classifyAdministrativeKey(
+              List.of(owner, other), List.of(nearest), DATE, 10, 20));
+    }
 
-        InterstellarMapPanel.AdministrativeKey key = InterstellarMapPanel.classifyAdministrativeKey(
-              List.of(owner), List.of(first, matching), DATE);
-
-        assertEquals(owner, key.faction());
-        assertEquals(List.of("Crucis March", "Coreward PDZ"), key.path());
-        assertEquals(List.of("Crucis March"), InterstellarMapPanel.classifyAdministrativeKey(
-              List.of(owner), List.of(first, regionOnly), DATE).path());
-        assertEquals(List.of("Crucis March"), InterstellarMapPanel.classifyAdministrativeKey(
-              List.of(owner), List.of(first, anotherDistrict), DATE).path());
-        assertNull(InterstellarMapPanel.classifyAdministrativeKey(
-              List.of(owner), List.of(first, conflicting), DATE));
-        assertNull(InterstellarMapPanel.classifyAdministrativeKey(
-              List.of(owner), List.of(conflicting, first), DATE));
-        assertNull(InterstellarMapPanel.classifyAdministrativeKey(List.of(owner), List.of(), DATE));
-        assertNull(InterstellarMapPanel.classifyAdministrativeKey(
-              List.of(owner), List.of(missing, first), DATE));
-        assertNull(InterstellarMapPanel.classifyAdministrativeKey(
-              List.of(owner), List.of(first, missing), DATE));
-        assertNull(InterstellarMapPanel.classifyAdministrativeKey(
-              List.of(owner), List.of(wrongOwner, first), DATE));
-        assertNull(InterstellarMapPanel.classifyAdministrativeKey(
-              List.of(owner, other), List.of(first), DATE));
+    @Test
+    void administrativeKeyBreaksDistanceTiesBySystemIdWithoutInventingDistricts() {
+        Faction owner = faction("FS", Color.BLUE);
+        PlanetarySystem first = system(owner, List.of("Crucis March"), "a", 9, 20);
+        PlanetarySystem second = system(owner, List.of("Draconis March", "Robinson PDZ"), "b", 11, 20);
+        for (List<PlanetarySystem> evidence : List.of(List.of(first, second), List.of(second, first))) {
+            assertEquals(List.of("Crucis March"), InterstellarMapPanel.classifyAdministrativeKey(
+                  List.of(owner), evidence, DATE, 10, 20).path());
+        }
     }
 
     @Test
@@ -129,6 +131,10 @@ class InterstellarMapPanelAdministrativeBoundaryTest {
             List<InterstellarMapPanel.TerritoryContour> contours = InterstellarMapPanel.buildTerritoryContours(cells);
 
             assertEquals(2, boundaries.size());
+            assertEquals(2, boundaries.stream().filter(boundary ->
+                  boundary.level() == InterstellarMapPanel.AdministrativeBoundaryLevel.REGION).count());
+            assertEquals(0, boundaries.stream().filter(boundary ->
+                  boundary.level() == InterstellarMapPanel.AdministrativeBoundaryLevel.DISTRICT).count());
             for (InterstellarMapPanel.AdministrativeBoundary boundary : boundaries) {
                   assertEquals(1, boundary.factions().size());
                   InterstellarMapPanel.TerritoryContour contour = contours.stream()
@@ -201,11 +207,13 @@ class InterstellarMapPanelAdministrativeBoundaryTest {
               InterstellarMapPanel.buildAdministrativeBoundaries(cells);
         InterstellarMapPanel.TerritoryContour national = InterstellarMapPanel.buildTerritoryContours(cells).getFirst();
 
-        assertEquals(1, boundaries.size());
-        java.awt.geom.Area difference = new java.awt.geom.Area(boundaries.getFirst().shape());
-        difference.exclusiveOr(new java.awt.geom.Area(national.shape()));
-        assertTrue(difference.isEmpty());
-        assertTrue(boundaries.getFirst().shape().contains(0.0, 0.0));
+            assertEquals(1, boundaries.size());
+            for (InterstellarMapPanel.AdministrativeBoundary boundary : boundaries) {
+                  java.awt.geom.Area difference = new java.awt.geom.Area(boundary.shape());
+                  difference.exclusiveOr(new java.awt.geom.Area(national.shape()));
+                  assertTrue(difference.isEmpty());
+                  assertTrue(boundary.shape().contains(0.0, 0.0));
+            }
 
         InterstellarMapPanel.TerritoryAtlas atlas = new InterstellarMapPanel.TerritoryAtlas(
               DATE, 0, 0, 0, 0, cells, List.of(), List.of(), boundaries);
@@ -216,7 +224,7 @@ class InterstellarMapPanelAdministrativeBoundaryTest {
         BufferedImage districts = render(atlas, viewKey,
               InterstellarMapPanel.AdministrativeDisplayDetail.REGIONS_AND_DISTRICTS);
         assertTrue(paintedPixelCount(regions) > 0);
-        assertEquals(imageSignature(regions), imageSignature(districts));
+                        assertEquals(imageSignature(regions), imageSignature(districts));
         assertEquals(0, regions.getRGB(80, 50));
     }
 
@@ -228,6 +236,34 @@ class InterstellarMapPanelAdministrativeBoundaryTest {
 
         assertTrue(InterstellarMapPanel.buildAdministrativeBoundaries(cells).isEmpty());
     }
+
+      @Test
+      void internalBoundariesUseOneSharedLineInsteadOfExpandedParallelOutlines() {
+            Faction owner = faction("FS", Color.YELLOW);
+            for (List<String> adjacent : List.of(List.of("Crucis March", "Capellan PDZ"),
+                    List.of("Draconis March", "Robinson PDZ"))) {
+                  Map<InterstellarMapPanel.TerritoryHex, InterstellarMapPanel.TerritoryCell> cells = new HashMap<>();
+                  addCell(cells, 0, 0, owner, List.of("Crucis March", "Coreward PDZ"));
+                  addCell(cells, 0, 1, owner, adjacent);
+                  InterstellarMapPanel.TerritoryAtlas atlas = new InterstellarMapPanel.TerritoryAtlas(
+                          DATE, 0, 0, 0, 1, cells, List.of(), List.of(),
+                          InterstellarMapPanel.buildAdministrativeBoundaries(cells));
+                  InterstellarMapPanel.RenderViewKey viewKey = InterstellarMapPanel.RenderViewKey.create(
+                          200, 200, 0.0, HEX_SIZE / 2.0, 2.0);
+                  BufferedImage image = render(atlas, viewKey,
+                          InterstellarMapPanel.AdministrativeDisplayDetail.REGIONS_AND_DISTRICTS);
+
+                  int sharedLinePixels = 0;
+                  for (int pixelX = 90; pixelX <= 110; pixelX++) {
+                        if ((image.getRGB(pixelX, 100) >>> 24) != 0) {
+                              sharedLinePixels++;
+                        }
+                        assertEquals(0, image.getRGB(pixelX, 95), "No offset outline above the shared edge");
+                        assertEquals(0, image.getRGB(pixelX, 105), "No offset outline below the shared edge");
+                  }
+                  assertTrue(sharedLinePixels > 0, "The administrative line must lie on the shared hex edge");
+            }
+      }
 
     @Test
     void detailSelectorIsCumulativeAndCachedOffscreenRenderingReusesPreparedGeometry() {
@@ -289,10 +325,14 @@ class InterstellarMapPanelAdministrativeBoundaryTest {
         return faction;
     }
 
-    private static PlanetarySystem system(Faction faction, List<String> administration) {
+      private static PlanetarySystem system(Faction faction, List<String> administration,
+              String id, double coordinateX, double coordinateY) {
         PlanetarySystem system = mock(PlanetarySystem.class);
         when(system.getFactionSet(DATE)).thenReturn(Set.of(faction));
         when(system.getAdministration(DATE)).thenReturn(administration);
+            when(system.getId()).thenReturn(id);
+            when(system.getX()).thenReturn(coordinateX);
+            when(system.getY()).thenReturn(coordinateY);
         return system;
     }
 
@@ -358,6 +398,9 @@ class InterstellarMapPanelAdministrativeBoundaryTest {
               InterstellarMapPanel.buildAdministrativeBoundaries(cells);
 
         assertEquals(1, boundaries.size());
-        assertEquals(InterstellarMapPanel.AdministrativeBoundaryLevel.REGION, boundaries.getFirst().level());
+        InterstellarMapPanel.AdministrativeBoundary region = boundaries.getFirst();
+        assertEquals(InterstellarMapPanel.AdministrativeBoundaryLevel.REGION, region.level());
+        assertTrue(region.shape().contains(0.0, 0.0));
+        assertTrue(region.shape().contains(HEX_SPACING_X, HEX_SIZE / 2.0));
     }
 }

@@ -118,11 +118,57 @@ class InterstellarMapPanelRenderLayerCacheTest {
 
     @Test
     void mergedNavigationRequiresStableRouteRendering() {
-        assertTrue(InterstellarMapPanel.canUseMergedNavigation(true, false, false, false));
-        assertFalse(InterstellarMapPanel.canUseMergedNavigation(false, false, false, false));
-        assertFalse(InterstellarMapPanel.canUseMergedNavigation(true, true, false, false));
-        assertFalse(InterstellarMapPanel.canUseMergedNavigation(true, false, true, false));
-        assertFalse(InterstellarMapPanel.canUseMergedNavigation(true, false, false, true));
+        assertTrue(InterstellarMapPanel.canUseMergedNavigation(true, false, false, false, false));
+        assertFalse(InterstellarMapPanel.canUseMergedNavigation(false, false, false, false, false));
+        assertFalse(InterstellarMapPanel.canUseMergedNavigation(true, true, false, false, false));
+        assertFalse(InterstellarMapPanel.canUseMergedNavigation(true, false, true, false, false));
+        assertFalse(InterstellarMapPanel.canUseMergedNavigation(true, false, false, true, false));
+        assertFalse(InterstellarMapPanel.canUseMergedNavigation(true, false, false, false, true));
+    }
+
+    @Test
+    void hpgFadeKeepsCartographyAndSystemArtRetainedWithoutMergingNavigation() {
+        boolean hpgAnimating = true;
+        boolean retainedCartography = InterstellarMapPanel.canUseRetainedCartography(true, false);
+        boolean mergedNavigation = InterstellarMapPanel.canUseMergedNavigation(
+              retainedCartography, hpgAnimating, false, false, false);
+
+        assertTrue(retainedCartography);
+        assertFalse(mergedNavigation);
+        assertTrue(InterstellarMapPanel.canUseRetainedSystemArt(
+              retainedCartography, false, hpgAnimating, false));
+    }
+
+        @Test
+        void navigationCacheTracksAdministrativeBoundarySelection() {
+          InterstellarMapPanel.RetainedCartographyKey cartography = new InterstellarMapPanel.RetainedCartographyKey(
+              new InterstellarMapPanel.TerritoryDataKey(LocalDate.of(3050, 12, 23), 1L),
+              InterstellarMapPanel.MapMode.FACTION, InterstellarMapPanel.HpgNetworkDetail.CLASS_A_B,
+              false, Double.doubleToLongBits(0.5), 1L, 2L, 3L, 4L, 5L, 6L, 24, 16, 100, 8, 2);
+          InterstellarMapPanel.PannableRenderLayerCache<InterstellarMapPanel.RetainedNavigationKey> cache =
+              new InterstellarMapPanel.PannableRenderLayerCache<>();
+          InterstellarMapPanel.RenderViewKey view = viewKey(100, 80, 0.0, 0.0, 2.0);
+          AtomicInteger rendererCalls = new AtomicInteger();
+          for (InterstellarMapPanel.AdministrativeDisplayDetail detail :
+              InterstellarMapPanel.AdministrativeDisplayDetail.values()) {
+            InterstellarMapPanel.RetainedNavigationKey key = new InterstellarMapPanel.RetainedNavigationKey(
+                cartography, List.of(), List.of(), 0L, detail);
+            cache.getOrRender(key, view, 20, graphics -> rendererCalls.incrementAndGet());
+            cache.getOrRender(key, view, 20, graphics -> rendererCalls.incrementAndGet());
+          }
+          assertEquals(InterstellarMapPanel.AdministrativeDisplayDetail.values().length, rendererCalls.get());
+          InterstellarMapPanel.RetainedNavigationKey disabled = new InterstellarMapPanel.RetainedNavigationKey(
+              cartography, List.of(), List.of(), 0L, null);
+          cache.getOrRender(disabled, view, 20, graphics -> rendererCalls.incrementAndGet());
+          assertEquals(InterstellarMapPanel.AdministrativeDisplayDetail.values().length + 1, rendererCalls.get());
+        }
+
+    @Test
+    void redirectedMapModeTransitionUsesTheVisuallyDominantEndpoint() {
+        assertEquals(InterstellarMapPanel.MapMode.FACTION, InterstellarMapPanel.dominantMapMode(
+              InterstellarMapPanel.MapMode.FACTION, InterstellarMapPanel.MapMode.TECHNOLOGY, 0.2));
+        assertEquals(InterstellarMapPanel.MapMode.TECHNOLOGY, InterstellarMapPanel.dominantMapMode(
+              InterstellarMapPanel.MapMode.FACTION, InterstellarMapPanel.MapMode.TECHNOLOGY, 0.8));
     }
 
     @Test

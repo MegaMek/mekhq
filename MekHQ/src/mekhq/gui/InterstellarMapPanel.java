@@ -722,7 +722,7 @@ public class InterstellarMapPanel extends JPanel {
 
     record RetainedNavigationKey(RetainedCartographyKey cartographyKey,
           List<String> proposedRouteSystemIds, List<String> activeRouteSystemIds,
-          long reachabilityRevision) {
+            long reachabilityRevision, @Nullable AdministrativeDisplayDetail administrativeDetail) {
         RetainedNavigationKey {
             proposedRouteSystemIds = List.copyOf(proposedRouteSystemIds);
             activeRouteSystemIds = List.copyOf(activeRouteSystemIds);
@@ -2229,14 +2229,15 @@ public class InterstellarMapPanel extends JPanel {
                           mapModeTransitionCacheStage = MapModeTransitionCacheStage.READY;
                           mapModeAnimationStartTime = System.nanoTime();
                         }
-                boolean useRetainedCartography = canUseRetainedCartography(
-                      atlas != null, hasActiveRetainedCartographyAnimation());
+                                        boolean useRetainedCartography = canUseRetainedCartography(
+                                            atlas != null, hasActiveRetainedCartographyAnimation());
                     boolean scaleChanging = isZoomInteractionActive();
+                                        boolean supportingLayerAnimating = territoryLayerAnimating || territoryLayerSettling
+                                                || hpgNetworkLayerAnimating;
                     boolean useMergedNavigation = canUseMergedNavigation(useRetainedCartography,
-                        proposedRouteAnimationTimer.isRunning(), showRouteActivation, scaleChanging);
+                                                supportingLayerAnimating, proposedRouteAnimationTimer.isRunning(), showRouteActivation,
+                                                scaleChanging);
                     boolean useRetainedNavigation = useMergedNavigation || useRetainedMapModeTransition;
-                    boolean supportingLayerAnimating = territoryLayerAnimating || territoryLayerSettling
-                        || hpgNetworkLayerAnimating;
                     boolean useRetainedSystemArt = canUseRetainedSystemArt(
                         useRetainedCartography, useRetainedMapModeTransition,
                         supportingLayerAnimating, scaleChanging);
@@ -2277,7 +2278,7 @@ public class InterstellarMapPanel extends JPanel {
                     paintStaticFactionLogoLayer(g2, atlas, factionLogoRenderKey,
                           visibleFactionLogoAlpha * FACTION_LOGO_OPACITY);
                 }
-                    if (optAdministrativeBoundaries.isSelected() && (atlas != null)
+                    if (!useRetainedNavigation && optAdministrativeBoundaries.isSelected() && (atlas != null)
                         && (territoryRenderKey != null)) {
                       AdministrativeDisplayDetail administrativeDetail = ObjectUtility.nonNull(
                           (AdministrativeDisplayDetail) optAdministrativeDetail.getSelectedItem(),
@@ -2670,7 +2671,7 @@ public class InterstellarMapPanel extends JPanel {
         optAdministrativeDetail.setSelectedItem(AdministrativeDisplayDetail.REGIONS);
         optAdministrativeDetail.setEnabled(false);
         Dimension administrativeDetailSize = new Dimension(UIUtil.scaleForGUI(148),
-              optAdministrativeDetail.getPreferredSize().height);
+              optAdministrativeBoundaries.getPreferredSize().height);
         optAdministrativeDetail.setPreferredSize(administrativeDetailSize);
         optAdministrativeDetail.setMinimumSize(administrativeDetailSize);
         optAdministrativeDetail.setMaximumSize(administrativeDetailSize);
@@ -2688,6 +2689,8 @@ public class InterstellarMapPanel extends JPanel {
         administrativeControl.setLayout(new BoxLayout(administrativeControl, BoxLayout.X_AXIS));
         administrativeControl.setOpaque(false);
         administrativeControl.setAlignmentX(Component.LEFT_ALIGNMENT);
+          administrativeControl.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+              optAdministrativeBoundaries.getPreferredSize().height));
         administrativeControl.add(optAdministrativeBoundaries);
         administrativeControl.add(Box.createHorizontalGlue());
         administrativeControl.add(optAdministrativeDetail);
@@ -2697,7 +2700,7 @@ public class InterstellarMapPanel extends JPanel {
                 optCapitalDetail = new LayerControlComboBox<>(CapitalDisplayDetail.values());
                 optCapitalDetail.setSelectedItem(CapitalDisplayDetail.NATIONAL);
                 Dimension capitalDetailSize = new Dimension(UIUtil.scaleForGUI(148),
-              optCapitalDetail.getPreferredSize().height);
+                            optCapitals.getPreferredSize().height);
                 optCapitalDetail.setPreferredSize(capitalDetailSize);
                 optCapitalDetail.setMinimumSize(capitalDetailSize);
                 optCapitalDetail.setMaximumSize(capitalDetailSize);
@@ -2712,6 +2715,8 @@ public class InterstellarMapPanel extends JPanel {
                 capitalControl.setLayout(new BoxLayout(capitalControl, BoxLayout.X_AXIS));
                 capitalControl.setOpaque(false);
                 capitalControl.setAlignmentX(Component.LEFT_ALIGNMENT);
+                capitalControl.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+                    optCapitals.getPreferredSize().height));
                 capitalControl.add(optCapitals);
                 capitalControl.add(Box.createHorizontalGlue());
                 capitalControl.add(optCapitalDetail);
@@ -2721,7 +2726,7 @@ public class InterstellarMapPanel extends JPanel {
         optHpgNetworkDetail.setSelectedItem(HpgNetworkDetail.CLASS_A_B);
         optHpgNetworkDetail.setEnabled(false);
           Dimension hpgDetailSize = new Dimension(UIUtil.scaleForGUI(148),
-              optHpgNetworkDetail.getPreferredSize().height);
+                            optHPGNetwork.getPreferredSize().height);
           optHpgNetworkDetail.setPreferredSize(hpgDetailSize);
           optHpgNetworkDetail.setMinimumSize(hpgDetailSize);
           optHpgNetworkDetail.setMaximumSize(hpgDetailSize);
@@ -2736,6 +2741,8 @@ public class InterstellarMapPanel extends JPanel {
           hpgControl.setLayout(new BoxLayout(hpgControl, BoxLayout.X_AXIS));
           hpgControl.setOpaque(false);
           hpgControl.setAlignmentX(Component.LEFT_ALIGNMENT);
+          hpgControl.setMaximumSize(new Dimension(Integer.MAX_VALUE,
+              optHPGNetwork.getPreferredSize().height));
           hpgControl.add(optHPGNetwork);
           hpgControl.add(Box.createHorizontalGlue());
           hpgControl.add(optHpgNetworkDetail);
@@ -2749,7 +2756,7 @@ public class InterstellarMapPanel extends JPanel {
               NavigationRouteAnalysis.MAXIMUM_REACHABILITY_HOPS, 1));
           reachabilityHops.setEditor(new JSpinner.NumberEditor(reachabilityHops, "0"));
           Dimension hopSpinnerSize = new Dimension(UIUtil.scaleForGUI(64),
-              reachabilityHops.getPreferredSize().height);
+              optReachability.getPreferredSize().height);
           reachabilityHops.setPreferredSize(hopSpinnerSize);
           reachabilityHops.setMinimumSize(hopSpinnerSize);
           reachabilityHops.setMaximumSize(hopSpinnerSize);
@@ -2768,7 +2775,7 @@ public class InterstellarMapPanel extends JPanel {
           reachabilityControl.setOpaque(false);
           reachabilityControl.setAlignmentX(Component.LEFT_ALIGNMENT);
           reachabilityControl.setMaximumSize(new Dimension(Integer.MAX_VALUE,
-              Math.max(optReachability.getPreferredSize().height, hopSpinnerSize.height)));
+              optReachability.getPreferredSize().height));
           reachabilityControl.add(optReachability);
           reachabilityControl.add(Box.createHorizontalGlue());
           JLabel hopLabel = new JLabel(hopLabelText);
@@ -2836,10 +2843,10 @@ public class InterstellarMapPanel extends JPanel {
                 && !proposedRouteAnimating && !routeActivationAnimating;
           }
 
-          static boolean canUseMergedNavigation(boolean retainedCartography,
-              boolean proposedRouteAnimating, boolean routeActivationAnimating, boolean scaleChanging) {
-            return retainedCartography && !proposedRouteAnimating && !routeActivationAnimating
-                && !scaleChanging;
+                    static boolean canUseMergedNavigation(boolean retainedCartography, boolean supportingLayerAnimating,
+                            boolean proposedRouteAnimating, boolean routeActivationAnimating, boolean scaleChanging) {
+                        return retainedCartography && !supportingLayerAnimating && !proposedRouteAnimating
+                                && !routeActivationAnimating && !scaleChanging;
           }
 
                     static boolean canUseRetainedSystemArt(boolean retainedCartography,
@@ -2855,7 +2862,7 @@ public class InterstellarMapPanel extends JPanel {
 
         private boolean hasActiveRetainedCartographyAnimation() {
             return territoryLayerAnimating || territoryLayerSettling
-                  || hpgNetworkLayerAnimating || mapModeAnimating;
+                  || mapModeAnimating;
     }
 
     @Override
@@ -3853,7 +3860,9 @@ public class InterstellarMapPanel extends JPanel {
             startProgress = 1.0 - mapModeAnimationProgress;
             previousMapMode = outgoingMode;
         } else {
-            previousMapMode = targetMapMode;
+            previousMapMode = mapModeAnimating
+                  ? dominantMapMode(previousMapMode, targetMapMode, mapModeAnimationProgress)
+                  : targetMapMode;
         }
         targetMapMode = selectedMode;
         mapModeAnimationStartProgress = startProgress;
@@ -3869,6 +3878,10 @@ public class InterstellarMapPanel extends JPanel {
               : MapModeTransitionCacheStage.CARTOGRAPHY;
         startLayerAnimationTimerIfNeeded();
         repaint();
+    }
+
+    static MapMode dominantMapMode(MapMode previousMode, MapMode targetMode, double transitionProgress) {
+        return transitionProgress < 0.5 ? previousMode : targetMode;
     }
 
     private void startLayerAnimationTimerIfNeeded() {
@@ -4353,6 +4366,21 @@ public class InterstellarMapPanel extends JPanel {
           drawPannableRenderLayer(graphics, territory, viewKey.width(), viewKey.height(), alpha);
     }
 
+    private @Nullable AdministrativeDisplayDetail selectedAdministrativeDetail() {
+        return optAdministrativeBoundaries.isSelected()
+              ? ObjectUtility.nonNull((AdministrativeDisplayDetail) optAdministrativeDetail.getSelectedItem(),
+                    AdministrativeDisplayDetail.REGIONS)
+              : null;
+    }
+
+    private void drawSelectedAdministrativeBoundaries(Graphics2D graphics, TerritoryAtlas atlas,
+          RenderViewKey viewKey, int overscan) {
+        AdministrativeDisplayDetail detail = selectedAdministrativeDetail();
+        if (detail != null) {
+            drawAdministrativeBoundaryLayer(graphics, atlas, viewKey, overscan, detail);
+        }
+    }
+
         private void paintAdministrativeBoundaryLayer(Graphics2D graphics, TerritoryAtlas atlas,
             TerritoryRenderKey renderKey, AdministrativeDisplayDetail detail) {
           RenderViewKey viewKey = renderKey.viewKey();
@@ -4387,7 +4415,8 @@ public class InterstellarMapPanel extends JPanel {
               renderKey, targetMode, hpgNetworkDetail, systemSize, territoryAlpha,
               0.0, hpgNetworkAlpha, semanticZoom, factionLogoRenderKey);
           RetainedNavigationKey stableKey = new RetainedNavigationKey(stableCartographyKey,
-              getPathSystemIds(jumpPath), getSystemIds(activeRouteSystems), reachabilityRevision);
+              getPathSystemIds(jumpPath), getSystemIds(activeRouteSystems), reachabilityRevision,
+              selectedAdministrativeDetail());
           PannableRenderLayer cartographyLayer = getRetainedCartographyLayer(
               stableCartographyKey, viewKey,
               retainedCartographyOverscan(viewKey.width(), viewKey.height()), overscan,
@@ -4396,6 +4425,7 @@ public class InterstellarMapPanel extends JPanel {
             mapModeTransitionBaseRenderCache.getOrRender(
                 stableKey, viewKey, overscan,
                 layerGraphics -> drawRetainedMapModeTransitionBase(layerGraphics, cartographyLayer,
+                                        atlas, viewKey, overscan,
                                         systemRenderData, hpgNetworkDetail, systemSize,
                                         hpgNetworkAlpha, semanticZoom, thick, dashed,
                     activeRouteSystems, revealedProposedRouteSystemCount));
@@ -4448,6 +4478,7 @@ public class InterstellarMapPanel extends JPanel {
           PannableRenderLayer stableLayer = mapModeTransitionBaseRenderCache.getOrRender(
               stableKey, viewKey, overscan,
               layerGraphics -> drawRetainedMapModeTransitionBase(layerGraphics, cartographyLayer,
+                  atlas, viewKey, overscan,
                   systemRenderData, hpgNetworkDetail, systemSize,
                   hpgNetworkAlpha, semanticZoom, thick, dashed,
                   activeRouteSystems, revealedProposedRouteSystemCount));
@@ -4487,6 +4518,7 @@ public class InterstellarMapPanel extends JPanel {
 
         private void drawRetainedMapModeTransitionBase(Graphics2D graphics,
                         PannableRenderLayer cartographyLayer,
+            TerritoryAtlas atlas, RenderViewKey viewKey, int overscan,
             Map<String, SystemRenderData> systemRenderData,
                         HpgNetworkDetail hpgNetworkDetail, double systemSize,
             double hpgNetworkAlpha, SemanticZoomProfile semanticZoom, Stroke thick,
@@ -4494,6 +4526,7 @@ public class InterstellarMapPanel extends JPanel {
                         int revealedProposedRouteSystemCount) {
                     graphics.drawImage(cartographyLayer.image(), cartographyLayer.drawX(),
                             cartographyLayer.drawY(), null);
+                  drawSelectedAdministrativeBoundaries(graphics, atlas, viewKey, overscan);
           drawReachability(graphics, systemSize, semanticZoom.detailedOverlayAlpha(), systemRenderData);
           drawProposedRoute(graphics, new Arc2D.Double(), systemSize,
               revealedProposedRouteSystemCount, semanticZoom.detailedOverlayAlpha());
@@ -4563,7 +4596,8 @@ public class InterstellarMapPanel extends JPanel {
           PannableRenderLayer cartographyLayer = getRetainedCartographyLayer(
               baseCartographyKey, viewKey, cartographyOverscan, overscan, atlas, territoryAlpha);
           RetainedNavigationKey key = new RetainedNavigationKey(cartographyKey,
-              getPathSystemIds(jumpPath), getSystemIds(activeRouteSystems), reachabilityRevision);
+              getPathSystemIds(jumpPath), getSystemIds(activeRouteSystems), reachabilityRevision,
+              selectedAdministrativeDetail());
           PannableRenderLayer retainedLayer = retainedNavigationRenderCache.getOrRender(
               key, viewKey, overscan,
               layerGraphics -> drawRetainedNavigationLayer(layerGraphics, cartographyLayer,
@@ -4594,6 +4628,8 @@ public class InterstellarMapPanel extends JPanel {
                           layerGraphics -> drawFactionLogoLayer(layerGraphics, atlas,
                               factionLogoRenderKey, false));
                     }
+          drawSelectedAdministrativeBoundaries(graphics, atlas,
+              factionLogoRenderKey.territoryKey().viewKey(), overscan);
           drawReachability(graphics, systemSize, semanticZoom.detailedOverlayAlpha(), systemRenderData);
           drawProposedRoute(graphics, new Arc2D.Double(), systemSize,
               revealedProposedRouteSystemCount, semanticZoom.detailedOverlayAlpha());
@@ -5330,7 +5366,7 @@ public class InterstellarMapPanel extends JPanel {
                     TerritoryClassification classification = classifyTerritoryHex(
                         centerX, centerY, date, independentFaction);
                     AdministrativeKey administration = classifyAdministrativeKey(
-                        classification.factions(), classification.evidenceSystems(), date);
+                        classification.factions(), classification.evidenceSystems(), date, centerX, centerY);
                     cells.put(hex, new TerritoryCell(hex, centerX, centerY,
                         classification.factions(), administration));
             }
@@ -5490,32 +5526,26 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     static @Nullable AdministrativeKey classifyAdministrativeKey(List<Faction> cellFactions,
-          List<PlanetarySystem> evidenceSystems, LocalDate date) {
+          List<PlanetarySystem> evidenceSystems, LocalDate date, double centerX, double centerY) {
         if ((cellFactions.size() != 1) || evidenceSystems.isEmpty()) {
             return null;
         }
         Faction owner = cellFactions.getFirst();
-        List<String> administration = null;
-        for (PlanetarySystem evidenceSystem : evidenceSystems) {
-            Set<Faction> systemFactions = evidenceSystem.getFactionSet(date);
-            if ((systemFactions == null) || (systemFactions.size() != 1) || !systemFactions.contains(owner)) {
-                return null;
-            }
-            List<String> systemAdministration = evidenceSystem.getAdministration(date);
-            if (systemAdministration.isEmpty() || systemAdministration.stream()
-                  .anyMatch(component -> (component == null) || component.isBlank())) {
-                return null;
-            }
-            if (administration == null) {
-                administration = systemAdministration;
-            } else {
-                administration = commonPrefix(administration, systemAdministration);
-                if (administration.isEmpty()) {
-                    return null;
-                }
-            }
-        }
-        return new AdministrativeKey(owner, administration);
+        return evidenceSystems.stream()
+              .filter(system -> {
+                  Set<Faction> factions = system.getFactionSet(date);
+                  return (factions != null) && (factions.size() == 1) && factions.contains(owner);
+              })
+              .filter(system -> {
+                  List<String> path = system.getAdministration(date);
+                  return !path.isEmpty() && path.stream()
+                        .noneMatch(component -> (component == null) || component.isBlank());
+              })
+              .min(Comparator.comparingDouble((PlanetarySystem system) ->
+                          Point2D.distanceSq(centerX, centerY, system.getX(), system.getY()))
+                    .thenComparing(PlanetarySystem::getId))
+              .map(system -> new AdministrativeKey(owner, system.getAdministration(date)))
+              .orElse(null);
     }
 
     private static List<String> commonPrefix(List<String> first, List<String> second) {
@@ -5527,17 +5557,13 @@ public class InterstellarMapPanel extends JPanel {
         return first.subList(0, commonLength);
     }
 
-    private static boolean isProperPrefix(List<String> first, List<String> second) {
-        return (first.size() < second.size()) && second.subList(0, first.size()).equals(first);
-    }
-
     static List<AdministrativeBoundary> buildAdministrativeBoundaries(
           Map<TerritoryHex, TerritoryCell> cells) {
-          return buildAdministrativeBoundaries(cells, buildTerritoryContours(cells));
-        }
+        return buildAdministrativeBoundaries(cells, buildTerritoryContours(cells));
+    }
 
-        private static List<AdministrativeBoundary> buildAdministrativeBoundaries(
-            Map<TerritoryHex, TerritoryCell> cells, List<TerritoryContour> contours) {
+    private static List<AdministrativeBoundary> buildAdministrativeBoundaries(
+          Map<TerritoryHex, TerritoryCell> cells, List<TerritoryContour> contours) {
         Map<AdministrativeBoundaryGroup, GeneralPath> paths = new HashMap<>();
         List<TerritoryCell> orderedCells = cells.values().stream()
               .sorted(Comparator.comparingInt((TerritoryCell cell) -> cell.hex().column())
@@ -5563,18 +5589,14 @@ public class InterstellarMapPanel extends JPanel {
                 AdministrativeBoundaryLevel level;
                 if (!first.region().equals(second.region())) {
                     level = AdministrativeBoundaryLevel.REGION;
-                } else if (!first.path().equals(second.path())) {
-                    if (isProperPrefix(first.path(), second.path())
-                          || isProperPrefix(second.path(), first.path())) {
-                        continue;
-                    }
+                } else if (commonPrefix(first.path(), second.path()).size()
+                      < Math.min(first.path().size(), second.path().size())) {
                     level = AdministrativeBoundaryLevel.DISTRICT;
                 } else {
                     continue;
                 }
-                    List<Faction> factions = List.of(first.faction());
                 GeneralPath boundaryPath = paths.computeIfAbsent(
-                      new AdministrativeBoundaryGroup(level, factions), ignored -> new GeneralPath());
+                      new AdministrativeBoundaryGroup(level, List.of(first.faction())), ignored -> new GeneralPath());
                 appendSharedTerritoryEdge(boundaryPath, cell, neighbor, cells);
             }
         }
@@ -5583,12 +5605,12 @@ public class InterstellarMapPanel extends JPanel {
         paths.entrySet().stream()
               .sorted(Comparator.comparing((Map.Entry<AdministrativeBoundaryGroup, GeneralPath> entry) ->
                           entry.getKey().level())
-                    .thenComparing(entry -> entry.getKey().factions().stream()
-                          .map(Faction::getShortName).reduce((first, second) -> first + ":" + second).orElse("")))
+                    .thenComparing(entry -> entry.getKey().factions().getFirst().getShortName()))
               .forEach(entry -> {
                   Rectangle2D bounds = entry.getValue().getBounds2D();
                   boundaries.add(new AdministrativeBoundary(entry.getKey().level(), entry.getKey().factions(),
-                        entry.getValue(), bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY()));
+                        entry.getValue(),
+                        bounds.getMinX(), bounds.getMaxX(), bounds.getMinY(), bounds.getMaxY()));
               });
         Map<Faction, List<TerritoryCell>> administeredCells = new HashMap<>();
         for (TerritoryCell cell : orderedCells) {

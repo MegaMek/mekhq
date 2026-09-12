@@ -168,13 +168,11 @@ class CapitalTypeTest {
 
     @Test
     void sameDateEventsMergeCapitalTypeAndFaction() throws Exception {
-        String yaml = SINGLE_PLANET_SYSTEM.replace("                - date: '3075-01-01'\n"
-                                                          + "                  capitalType: District Capital",
-              "                - date: '3075-01-01'\n"
-                    + "                  capitalType: District Capital\n"
-                    + "                - date: '3075-01-01'\n"
-                    + "                  faction:\n"
-                    + "                    - LC");
+        String yaml = SINGLE_PLANET_SYSTEM + """
+              - date: '3075-01-01'
+                faction:
+                  - LC
+              """.indent(6);
 
         Planet planet = PlanetarySystemYamlIO.read(yaml).getPrimaryPlanet();
 
