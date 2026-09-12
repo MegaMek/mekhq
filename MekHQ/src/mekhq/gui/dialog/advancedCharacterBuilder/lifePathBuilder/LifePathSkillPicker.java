@@ -59,7 +59,6 @@ import javax.swing.SpinnerNumberModel;
 import megamek.common.annotations.Nullable;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
-import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
@@ -70,13 +69,13 @@ import mekhq.campaign.personnel.skills.enums.SkillSubType;
  * <p>Two kinds of row appear: one per named skill, and one per meta skill, which stands for a whole family of skills
  * at once. They are split across tabs because there are over a hundred skills.</p>
  *
- * <p>This picker also serves the Natural Aptitudes buttons, which award XP towards raising a skill's aptitude rather
- * than the skill itself.</p>
+ * <p>On the Fixed XP and Flexible XP tabs every skill and meta skill also gets a second spinner, labelled
+ * {@code Natural Aptitude - [Skill]}. XP entered there goes towards the character gaining a Natural Aptitude for the
+ * skill rather than towards the skill itself, and is stored separately from the skill XP.</p>
  *
  * @since 0.50.11
  */
 class LifePathSkillPicker extends AbstractLifePathPicker {
-    private static final MMLogger LOGGER = MMLogger.create(LifePathSkillPicker.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.LifePathSkillPicker";
 
     private static final int MINIMUM_MAIN_WIDTH = scaleForGUI(575);
@@ -85,13 +84,30 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
     /** Highest level a meta skill row offers on the Requirements and Exclusions tabs. */
     private static final int MAXIMUM_META_SKILL_LEVEL = 10;
 
+    /** Lowest and highest XP an award spinner offers. Negative awards are allowed, so a path can take XP away. */
+    private static final int XP_SPINNER_LOWEST_VALUE = -1000;
+    private static final int XP_SPINNER_HIGHEST_VALUE = 1000;
+
+    /** Value that means "no entry" on an XP tab: an award of nothing is not stored. */
+    private static final int XP_KEY_VALUE = 0;
+
+    /** Rows per line on the Requirements and Exclusions tabs, which show one spinner per skill. */
+    private static final int LEVEL_COLUMNS = 3;
+
     private final LifePathBuilderTabType tabType;
+    private final boolean isXPTab;
 
     private final Map<String, Integer> storedSkillLevels;
-    private Map<String, Integer> selectedSkillLevels;
+    private final Map<String, Integer> selectedSkillLevels;
 
     private final Map<SkillSubType, Integer> storedMetaSkillLevels;
-    private Map<SkillSubType, Integer> selectedMetaSkillLevels;
+    private final Map<SkillSubType, Integer> selectedMetaSkillLevels;
+
+    private final Map<String, Integer> storedNaturalAptitudes;
+    private final Map<String, Integer> selectedNaturalAptitudes;
+
+    private final Map<SkillSubType, Integer> storedNaturalAptitudesMetaSkills;
+    private final Map<SkillSubType, Integer> selectedNaturalAptitudesMetaSkills;
 
     Map<String, Integer> getSelectedSkillLevels() {
         return selectedSkillLevels;
@@ -102,36 +118,67 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
     }
 
     /**
+     * @return XP awarded towards each skill's Natural Aptitude, keyed by skill name; always empty for the Requirements
+     *       and Exclusions tabs, which offer no such rows
+     */
+    Map<String, Integer> getSelectedNaturalAptitudes() {
+        return selectedNaturalAptitudes;
+    }
+
+    /**
+     * @return XP awarded towards each meta skill's Natural Aptitude; always empty for the Requirements and Exclusions
+     *       tabs, which offer no such rows
+     */
+    Map<SkillSubType, Integer> getSelectedNaturalAptitudesMetaSkills() {
+        return selectedNaturalAptitudesMetaSkills;
+    }
+
+    /**
      * Opens the picker.
      *
-     * @param owner                   the wizard this picker belongs to
-     * @param selectedSkillLevels     the per-skill values already on this group, which may be {@code null}
-     * @param selectedMetaSkillLevels the per-meta-skill values already on this group, which may be {@code null}
-     * @param tabType                 the section being edited
-     * @param groupIndex              the group being edited, shown in the title
+     * @param owner                              the wizard this picker belongs to
+     * @param selectedSkillLevels                the per-skill values already on this group, which may be {@code null}
+     * @param selectedMetaSkillLevels            the per-meta-skill values already on this group, which may be
+     *                                           {@code null}
+     * @param selectedNaturalAptitudes           the per-skill Natural Aptitude XP already on this group, which may be
+     *                                           {@code null}; ignored on the Requirements and Exclusions tabs
+     * @param selectedNaturalAptitudesMetaSkills the per-meta-skill Natural Aptitude XP already on this group, which
+     *                                           may be {@code null}; ignored on the Requirements and Exclusions tabs
+     * @param tabType                            the section being edited
+     * @param groupIndex                         the group being edited, shown in the title
      *
      * @since 0.50.11
      */
     LifePathSkillPicker(@Nullable Window owner, @Nullable Map<String, Integer> selectedSkillLevels,
-          @Nullable Map<SkillSubType, Integer> selectedMetaSkillLevels, LifePathBuilderTabType tabType,
+          @Nullable Map<SkillSubType, Integer> selectedMetaSkillLevels,
+          @Nullable Map<String, Integer> selectedNaturalAptitudes,
+          @Nullable Map<SkillSubType, Integer> selectedNaturalAptitudesMetaSkills, LifePathBuilderTabType tabType,
           int groupIndex) {
         super(owner, RESOURCE_BUNDLE, "LifePathSkillPicker", tabType, groupIndex, MINIMUM_MAIN_WIDTH,
               MINIMUM_COMPONENT_HEIGHT);
 
         this.tabType = tabType;
+        isXPTab = tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP;
 
-        // Defensive copies to avoid external modification
-        this.selectedSkillLevels = selectedSkillLevels == null ?
-                                         new HashMap<>() :
-                                         new HashMap<>(selectedSkillLevels);
+        // Defensive copies to avoid external modification. The "selected" maps are the live ones the spinners write
+        // to; the "stored" maps are what Cancel puts back.
+        this.selectedSkillLevels = copyOrEmpty(selectedSkillLevels);
         storedSkillLevels = new HashMap<>(this.selectedSkillLevels);
 
-        this.selectedMetaSkillLevels = selectedMetaSkillLevels == null ?
-                                             new HashMap<>() :
-                                             new HashMap<>(selectedMetaSkillLevels);
+        this.selectedMetaSkillLevels = copyOrEmpty(selectedMetaSkillLevels);
         storedMetaSkillLevels = new HashMap<>(this.selectedMetaSkillLevels);
 
+        this.selectedNaturalAptitudes = copyOrEmpty(selectedNaturalAptitudes);
+        storedNaturalAptitudes = new HashMap<>(this.selectedNaturalAptitudes);
+
+        this.selectedNaturalAptitudesMetaSkills = copyOrEmpty(selectedNaturalAptitudesMetaSkills);
+        storedNaturalAptitudesMetaSkills = new HashMap<>(this.selectedNaturalAptitudesMetaSkills);
+
         buildAndShow();
+    }
+
+    private static <K> Map<K, Integer> copyOrEmpty(@Nullable Map<K, Integer> source) {
+        return source == null ? new HashMap<>() : new HashMap<>(source);
     }
 
     @Override
@@ -201,46 +248,46 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
         EnhancedTabbedPane optionPane = new EnhancedTabbedPane();
 
         if (!combatSkills.isEmpty()) {
-            FastJScrollPane pnlCombatSkills = getSkillOptions(combatSkills, tabType);
+            FastJScrollPane pnlCombatSkills = getSkillOptions(combatSkills);
             optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.combat.label"),
                   pnlCombatSkills);
         }
 
         if (!supportSkills.isEmpty()) {
-            FastJScrollPane pnlSupportSkills = getSkillOptions(supportSkills, tabType);
+            FastJScrollPane pnlSupportSkills = getSkillOptions(supportSkills);
             optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.support.label"),
                   pnlSupportSkills);
         }
 
         if (!utilitySkills.isEmpty()) {
-            FastJScrollPane pnlUtilitySkills = getSkillOptions(utilitySkills, tabType);
+            FastJScrollPane pnlUtilitySkills = getSkillOptions(utilitySkills);
             optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.utility.label"),
                   pnlUtilitySkills);
         }
 
         if (!roleplaySkills1.isEmpty()) {
-            buildTab(roleplaySkills1, optionPane, getSkillOptions(roleplaySkills1, tabType));
+            buildTab(roleplaySkills1, optionPane, getSkillOptions(roleplaySkills1));
         }
 
         if (!roleplaySkills2.isEmpty()) {
-            buildTab(roleplaySkills2, optionPane, getSkillOptions(roleplaySkills2, tabType));
+            buildTab(roleplaySkills2, optionPane, getSkillOptions(roleplaySkills2));
         }
 
         if (!roleplaySkills3.isEmpty()) {
-            buildTab(roleplaySkills3, optionPane, getSkillOptions(roleplaySkills3, tabType));
+            buildTab(roleplaySkills3, optionPane, getSkillOptions(roleplaySkills3));
         }
 
         if (!roleplaySkills4.isEmpty()) {
-            buildTab(roleplaySkills4, optionPane, getSkillOptions(roleplaySkills4, tabType));
+            buildTab(roleplaySkills4, optionPane, getSkillOptions(roleplaySkills4));
         }
 
         if (!roleplaySkills5.isEmpty()) {
-            buildTab(roleplaySkills5, optionPane, getSkillOptions(roleplaySkills5, tabType));
+            buildTab(roleplaySkills5, optionPane, getSkillOptions(roleplaySkills5));
         }
 
         // Meta Skills
-        if (tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP) {
-            FastJScrollPane pnlMetaSkills = getMetaSkillOptions(metaSkills, tabType);
+        if (isXPTab) {
+            FastJScrollPane pnlMetaSkills = getMetaSkillOptions(metaSkills);
             optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.meta.label"),
                   pnlMetaSkills);
         }
@@ -261,7 +308,18 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
               lastLetter), pnlOptions);
     }
 
-    private FastJScrollPane getSkillOptions(List<SkillType> skills, LifePathBuilderTabType tabType) {
+    /**
+     * Builds one tab of skill rows.
+     *
+     * <p>On the Requirements and Exclusions tabs the rows are one spinner each and sit three to a line. On the XP
+     * tabs each skill takes a whole line: its XP spinner on the left and its Natural Aptitude spinner on the right,
+     * so the two entries for a skill are always read together.</p>
+     *
+     * @param skills the skills this tab shows
+     *
+     * @return the scrollable tab contents
+     */
+    private FastJScrollPane getSkillOptions(List<SkillType> skills) {
         JPanel pnlSkills = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
@@ -269,59 +327,130 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.weightx = 1.0;
 
-        int columns = 3;
-        for (int i = 0; i < skills.size(); i++) {
-            SkillType type = skills.get(i);
-            String label = type.getName();
+        int minimumValue = getMinimumValue();
 
-            int minimumSkillLevel = switch (tabType) {
-                case REQUIREMENTS, EXCLUSIONS -> 0;
-                case FIXED_XP, FLEXIBLE_XP -> -1000;
-            };
-            int maximumSkillLevel = switch (tabType) {
-                case REQUIREMENTS, EXCLUSIONS -> type.getMaxLevel();
-                case FIXED_XP, FLEXIBLE_XP -> 1000;
-            };
+        for (int index = 0; index < skills.size(); index++) {
+            SkillType type = skills.get(index);
+            String skillName = type.getName();
+            int maximumValue = getMaximumValue(type.getMaxLevel());
+            int keyValue = getKeyValue(minimumValue, maximumValue);
 
-            int keyValue = switch (tabType) {
-                case REQUIREMENTS -> minimumSkillLevel;
-                case EXCLUSIONS -> maximumSkillLevel;
-                case FIXED_XP, FLEXIBLE_XP -> 0;
-            };
+            JPanel pnlSkillRow = buildSpinnerRow(skillName, skillName, selectedSkillLevels, minimumValue,
+                  maximumValue, keyValue);
 
-            // Clamped first: a stored value from a hand-edited file can sit outside these bounds, and
-            // SpinnerNumberModel throws when its initial value is out of range.
-            int storedValue = selectedSkillLevels.getOrDefault(type.getName(), keyValue);
-            int defaultValue = clampSpinnerValue(storedValue, minimumSkillLevel, maximumSkillLevel, label);
+            if (isXPTab) {
+                gbc.gridx = 0;
+                gbc.gridy = index;
+                pnlSkills.add(pnlSkillRow, gbc);
 
-            JLabel lblSkill = new JLabel(label);
-            JSpinner spnSkillLevel = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
-                  maximumSkillLevel, 1));
-
-            spnSkillLevel.addChangeListener(changeEvent -> {
-                int value = (int) spnSkillLevel.getValue();
-                // Deliberately not compared against the value the spinner started at. Changing a spinner and
-                // then changing it back must write the original number, otherwise the map keeps the stale one.
-                if (value == keyValue) {
-                    selectedSkillLevels.remove(type.getName());
-                } else {
-                    selectedSkillLevels.put(type.getName(), value);
-                }
-            });
-
-            gbc.gridx = i % columns;
-            gbc.gridy = i / columns;
-
-            JPanel pnlRows = new JPanel();
-            pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
-            pnlRows.add(lblSkill);
-            pnlRows.add(Box.createHorizontalStrut(PADDING));
-            pnlRows.add(spnSkillLevel);
-            pnlRows.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-            pnlSkills.add(pnlRows, gbc);
+                String naturalAptitudeLabel = getFormattedTextAt(RESOURCE_BUNDLE,
+                      "LifePathSkillPicker.naturalAptitude.label", skillName);
+                JPanel pnlNaturalAptitudeRow = buildSpinnerRow(naturalAptitudeLabel, skillName,
+                      selectedNaturalAptitudes, XP_SPINNER_LOWEST_VALUE, XP_SPINNER_HIGHEST_VALUE, XP_KEY_VALUE);
+                gbc.gridx = 1;
+                pnlSkills.add(pnlNaturalAptitudeRow, gbc);
+            } else {
+                gbc.gridx = index % LEVEL_COLUMNS;
+                gbc.gridy = index / LEVEL_COLUMNS;
+                pnlSkills.add(pnlSkillRow, gbc);
+            }
         }
 
+        return wrapInScrollPane(pnlSkills);
+    }
+
+    /**
+     * Builds the meta skill tab, which only the XP tabs show.
+     *
+     * <p>Laid out like the XP skill tabs: the meta skill's XP spinner on the left, its Natural Aptitude spinner on
+     * the right.</p>
+     *
+     * @param metaSkills the meta skills to show
+     *
+     * @return the scrollable tab contents
+     */
+    private FastJScrollPane getMetaSkillOptions(List<SkillSubType> metaSkills) {
+        JPanel pnlSkills = new JPanel(new GridBagLayout());
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+
+        int minimumValue = getMinimumValue();
+        int maximumValue = getMaximumValue(MAXIMUM_META_SKILL_LEVEL);
+        int keyValue = getKeyValue(minimumValue, maximumValue);
+
+        for (int index = 0; index < metaSkills.size(); index++) {
+            SkillSubType metaSkill = metaSkills.get(index);
+            String label = metaSkill.getDisplayName();
+
+            JPanel pnlMetaSkillRow = buildSpinnerRow(label, metaSkill, selectedMetaSkillLevels, minimumValue,
+                  maximumValue, keyValue);
+            gbc.gridx = 0;
+            gbc.gridy = index;
+            pnlSkills.add(pnlMetaSkillRow, gbc);
+
+            String naturalAptitudeLabel = getFormattedTextAt(RESOURCE_BUNDLE,
+                  "LifePathSkillPicker.naturalAptitude.label", label);
+            JPanel pnlNaturalAptitudeRow = buildSpinnerRow(naturalAptitudeLabel, metaSkill,
+                  selectedNaturalAptitudesMetaSkills, XP_SPINNER_LOWEST_VALUE, XP_SPINNER_HIGHEST_VALUE,
+                  XP_KEY_VALUE);
+            gbc.gridx = 1;
+            pnlSkills.add(pnlNaturalAptitudeRow, gbc);
+        }
+
+        return wrapInScrollPane(pnlSkills);
+    }
+
+    /**
+     * Builds a label and a spinner, and wires the spinner to one entry of a selection map.
+     *
+     * <p>Moving the spinner to {@code keyValue} removes the entry rather than storing the key value, so an untouched
+     * or reset row leaves nothing in the map.</p>
+     *
+     * @param label        the text shown beside the spinner
+     * @param key          the map entry this spinner edits
+     * @param selection    the live map the spinner writes to
+     * @param minimumValue the lowest value the spinner offers
+     * @param maximumValue the highest value the spinner offers
+     * @param keyValue     the value that means "no entry"
+     * @param <K>          the map's key type
+     *
+     * @return the row, ready to add to a grid
+     */
+    private <K> JPanel buildSpinnerRow(String label, K key, Map<K, Integer> selection, int minimumValue,
+          int maximumValue, int keyValue) {
+        // Clamped first: a stored value from a hand-edited file can sit outside these bounds, and
+        // SpinnerNumberModel throws when its initial value is out of range.
+        int storedValue = selection.getOrDefault(key, keyValue);
+        int defaultValue = clampSpinnerValue(storedValue, minimumValue, maximumValue, label);
+
+        JLabel lblRow = new JLabel(label);
+        JSpinner spnRow = new JSpinner(new SpinnerNumberModel(defaultValue, minimumValue, maximumValue, 1));
+
+        spnRow.addChangeListener(changeEvent -> {
+            int value = (int) spnRow.getValue();
+            // Deliberately not compared against the value the spinner started at. Changing a spinner and
+            // then changing it back must write the original number, otherwise the map keeps the stale one.
+            if (value == keyValue) {
+                selection.remove(key);
+            } else {
+                selection.put(key, value);
+            }
+        });
+
+        JPanel pnlRow = new JPanel();
+        pnlRow.setLayout(new BoxLayout(pnlRow, BoxLayout.X_AXIS));
+        pnlRow.add(lblRow);
+        pnlRow.add(Box.createHorizontalStrut(PADDING));
+        pnlRow.add(spnRow);
+        pnlRow.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+        return pnlRow;
+    }
+
+    private static FastJScrollPane wrapInScrollPane(JPanel pnlSkills) {
         FastJScrollPane scrollSkills = new FastJScrollPane(pnlSkills);
         scrollSkills.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollSkills.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
@@ -330,85 +459,61 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
         return scrollSkills;
     }
 
-    private FastJScrollPane getMetaSkillOptions(List<SkillSubType> metaSkills, LifePathBuilderTabType tabType) {
-        JPanel pnlSkills = new JPanel(new GridBagLayout());
+    /** @return the lowest value a skill or meta skill spinner offers on this tab */
+    private int getMinimumValue() {
+        return switch (tabType) {
+            case REQUIREMENTS, EXCLUSIONS -> 0;
+            case FIXED_XP, FLEXIBLE_XP -> XP_SPINNER_LOWEST_VALUE;
+        };
+    }
 
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
+    /**
+     * @param maximumLevel the highest level the skill or meta skill can reach
+     *
+     * @return the highest value a skill or meta skill spinner offers on this tab
+     */
+    private int getMaximumValue(int maximumLevel) {
+        return switch (tabType) {
+            case REQUIREMENTS, EXCLUSIONS -> maximumLevel;
+            case FIXED_XP, FLEXIBLE_XP -> XP_SPINNER_HIGHEST_VALUE;
+        };
+    }
 
-        int columns = 3;
-        for (int i = 0; i < metaSkills.size(); i++) {
-            SkillSubType metaSkill = metaSkills.get(i);
-            String label = metaSkill.getDisplayName();
-
-            int minimumSkillLevel = switch (tabType) {
-                case REQUIREMENTS, EXCLUSIONS -> 0;
-                case FIXED_XP, FLEXIBLE_XP -> -1000;
-            };
-            int maximumSkillLevel = switch (tabType) {
-                case REQUIREMENTS, EXCLUSIONS -> MAXIMUM_META_SKILL_LEVEL;
-                case FIXED_XP, FLEXIBLE_XP -> 1000;
-            };
-
-            int keyValue = switch (tabType) {
-                case REQUIREMENTS -> minimumSkillLevel;
-                case EXCLUSIONS -> maximumSkillLevel;
-                case FIXED_XP, FLEXIBLE_XP -> 0;
-            };
-
-            // Clamped first: a stored value from a hand-edited file can sit outside these bounds, and
-            // SpinnerNumberModel throws when its initial value is out of range.
-            int storedValue = selectedMetaSkillLevels.getOrDefault(metaSkill, keyValue);
-            int defaultValue = clampSpinnerValue(storedValue, minimumSkillLevel, maximumSkillLevel, label);
-
-            JLabel lblMetaSkill = new JLabel(label);
-            JSpinner spnSkillLevel = new JSpinner(new SpinnerNumberModel(defaultValue, minimumSkillLevel,
-                  maximumSkillLevel, 1));
-
-            spnSkillLevel.addChangeListener(changeEvent -> {
-                int value = (int) spnSkillLevel.getValue();
-                // Deliberately not compared against the value the spinner started at. Changing a spinner and
-                // then changing it back must write the original number, otherwise the map keeps the stale one.
-                if (value == keyValue) {
-                    selectedMetaSkillLevels.remove(metaSkill);
-                } else {
-                    selectedMetaSkillLevels.put(metaSkill, value);
-                }
-            });
-
-            gbc.gridx = i % columns;
-            gbc.gridy = i / columns;
-
-            JPanel pnlRows = new JPanel();
-            pnlRows.setLayout(new BoxLayout(pnlRows, BoxLayout.X_AXIS));
-            pnlRows.add(lblMetaSkill);
-            pnlRows.add(Box.createHorizontalStrut(PADDING));
-            pnlRows.add(spnSkillLevel);
-            pnlRows.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-            pnlSkills.add(pnlRows, gbc);
-        }
-
-        FastJScrollPane scrollSkills = new FastJScrollPane(pnlSkills);
-        scrollSkills.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollSkills.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollSkills.setBorder(null);
-
-        return scrollSkills;
+    /**
+     * @param minimumValue the row's minimum, which is the "no entry" value for a requirement
+     * @param maximumValue the row's maximum, which is the "no entry" value for an exclusion, since barring a level
+     *                     the skill cannot exceed bars nothing
+     *
+     * @return the value that means "no entry" for a skill or meta skill spinner on this tab
+     */
+    private int getKeyValue(int minimumValue, int maximumValue) {
+        return switch (tabType) {
+            case REQUIREMENTS -> minimumValue;
+            case EXCLUSIONS -> maximumValue;
+            case FIXED_XP, FLEXIBLE_XP -> XP_KEY_VALUE;
+        };
     }
 
     @Override
     protected void restoreStoredSelection() {
-        selectedSkillLevels = new HashMap<>(storedSkillLevels);
-        selectedMetaSkillLevels = new HashMap<>(storedMetaSkillLevels);
+        // Put back in place rather than reassigned: the spinner listeners hold these map instances.
+        restore(selectedSkillLevels, storedSkillLevels);
+        restore(selectedMetaSkillLevels, storedMetaSkillLevels);
+        restore(selectedNaturalAptitudes, storedNaturalAptitudes);
+        restore(selectedNaturalAptitudesMetaSkills, storedNaturalAptitudesMetaSkills);
+    }
+
+    private static <K> void restore(Map<K, Integer> selection, Map<K, Integer> stored) {
+        selection.clear();
+        selection.putAll(stored);
     }
 
     @Override
     protected void clearSelection() {
         selectedSkillLevels.clear();
         selectedMetaSkillLevels.clear();
+        selectedNaturalAptitudes.clear();
+        selectedNaturalAptitudesMetaSkills.clear();
         rebuildOptions();
     }
 }

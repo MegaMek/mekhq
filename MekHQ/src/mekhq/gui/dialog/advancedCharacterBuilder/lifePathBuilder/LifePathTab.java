@@ -612,16 +612,7 @@ public class LifePathTab {
         );
         buttonsPanel.add(btnAddTrait);
 
-        String titleAddNaturalAptitude = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.button.addNaturalAptitude.label");
-        String tooltipAddNaturalAptitude = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog." + tabName + ".button.addNaturalAptitude.tooltip");
-        RoundedJButton btnAddNaturalAptitude = new RoundedJButton(titleAddNaturalAptitude);
-        btnAddNaturalAptitude.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddNaturalAptitude)
-        );
-
-        // Skills
+        // Skills (and, on the XP tabs, Natural Aptitudes: the skill picker offers both)
 
         String titleAddSkill = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addSkill.label");
@@ -632,10 +623,6 @@ public class LifePathTab {
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddSkill)
         );
         buttonsPanel.add(btnAddSkill);
-
-        if (tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP) {
-            buttonsPanel.add(btnAddNaturalAptitude);
-        }
 
         // SPAs
 
@@ -761,22 +748,16 @@ public class LifePathTab {
             LifePathGroup group = groupFor(currentIndex);
 
             LifePathSkillPicker picker = new LifePathSkillPicker(parent,
-                  group.getSkills(), group.getMetaSkills(), tabType, currentIndex);
-            group.setSkills(picker.getSelectedSkillLevels());
-            group.setMetaSkills(picker.getSelectedMetaSkillLevels());
-            standardizedActions(currentIndex, editorProgress);
-        });
-        btnAddNaturalAptitude.addActionListener(actionEvent -> {
-            int currentIndex = tabLocal.getSelectedIndex();
-            LifePathGroup group = groupFor(currentIndex);
-
-            LifePathSkillPicker picker = new LifePathSkillPicker(parent,
+                  group.getSkills(),
+                  group.getMetaSkills(),
                   group.getNaturalAptitudes(),
                   group.getNaturalAptitudesMetaSkills(),
                   tabType,
                   currentIndex);
-            group.setNaturalAptitudes(picker.getSelectedSkillLevels());
-            group.setNaturalAptitudesMetaSkills(picker.getSelectedMetaSkillLevels());
+            group.setSkills(picker.getSelectedSkillLevels());
+            group.setMetaSkills(picker.getSelectedMetaSkillLevels());
+            group.setNaturalAptitudes(picker.getSelectedNaturalAptitudes());
+            group.setNaturalAptitudesMetaSkills(picker.getSelectedNaturalAptitudesMetaSkills());
             standardizedActions(currentIndex, editorProgress);
         });
         btnAddSPA.addActionListener(actionEvent -> {
