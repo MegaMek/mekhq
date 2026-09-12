@@ -203,10 +203,11 @@ class LifePathTest {
     }
 
     @Test
-    void testXpCost_NegativeIsRejected() {
+    void testXpCost_NegativeIsAccepted() {
         LifePathBuilder builder = validBuilder().xpCost(-1);
 
-        assertThrows(IllegalArgumentException.class, builder::build, "A negative XP cost should be rejected.");
+        assertDoesNotThrow(builder::build,
+              "A negative XP cost is legitimate: drawbacks can outweigh awards.");
     }
 
     @Test

@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
-import static java.lang.Math.max;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -47,7 +45,8 @@ import mekhq.campaign.personnel.skills.enums.SkillSubType;
  * Works out what a Life Path costs a character in XP.
  *
  * <p>The total is everything the path awards from its Fixed XP section, plus a share of its Flexible XP section,
- * less the path's own discount. A path can cost nothing, but never less than nothing.</p>
+ * less the path's own discount. The total can be negative: a path whose drawbacks, such as negative trait awards,
+ * outweigh what it gives pays the character to take it.</p>
  *
  * <p><b>How the flexible share is charged.</b> The flexible section is a number of sets. Each set is a list of
  * individual awards and says how many of them the player takes, and the player picks from every set. Which items
@@ -85,7 +84,7 @@ public class LifePathXPCostCalculator {
      *
      * @param lifePath the Life Path being priced, finished or still under construction
      *
-     * @return the XP cost, never below zero
+     * @return the XP cost, which is negative when the path's drawbacks outweigh its awards
      *
      * @since 0.50.11
      */
@@ -109,8 +108,8 @@ public class LifePathXPCostCalculator {
         // Flexible XP
         globalCost += calculateFlexibleXPCost(lifePath);
 
-        // We can have 0 cost Life Paths, but not negative
-        return max(0, globalCost);
+        // Not floored at zero: a path whose drawbacks outweigh its awards pays the character to take it.
+        return globalCost;
     }
 
     /**
@@ -118,7 +117,7 @@ public class LifePathXPCostCalculator {
      *
      * @param lifePath the Life Path to price
      *
-     * @return the XP cost, never below zero
+     * @return the XP cost, which is negative when the path's drawbacks outweigh its awards
      *
      * @since 0.50.11
      */

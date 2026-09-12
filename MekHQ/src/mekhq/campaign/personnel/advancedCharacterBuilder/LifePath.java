@@ -162,9 +162,7 @@ public record LifePath(
         if (xpCost == null) {
             throw new IllegalArgumentException("xpCost cannot be null");
         }
-        if (xpCost < 0) {
-            throw new IllegalArgumentException("xpCost must be a non-negative integer");
-        }
+        // A negative cost is legitimate: a path whose drawbacks outweigh its awards pays the character to take it.
         // Basic Info
         if (source == null) {
             throw new IllegalArgumentException("source cannot be null");

@@ -106,12 +106,21 @@ class LifePathXPCostCalculatorTest {
     }
 
     @Test
-    void testDiscountLargerThanTheAwards_FloorsAtZero() {
+    void testDiscountLargerThanTheAwards_GoesNegative() {
         LifePathBuilder builder = validBuilder().xpDiscount(500)
                                         .fixedXPSkills(Map.of(0, Map.of("Gunnery/Mek", 100)));
 
-        assertEquals(0, LifePathXPCostCalculator.calculateXPCost(builder),
-              "A Life Path can cost nothing but never less than nothing.");
+        assertEquals(-400, LifePathXPCostCalculator.calculateXPCost(builder),
+              "A Life Path whose drawbacks outweigh its awards should have a negative cost, not be floored at zero.");
+    }
+
+    @Test
+    void testNegativeTraitsOutweighingAwards_GoNegative() {
+        LifePathBuilder builder = validBuilder().fixedXPSkills(Map.of(0, Map.of("Gunnery/Mek", 50)))
+                                        .fixedXPTraits(Map.of(0, Map.of(ATOWTraits.UNLUCKY, -200)));
+
+        assertEquals(-150, LifePathXPCostCalculator.calculateXPCost(builder),
+              "A path that mostly hands out drawbacks pays the character to take it.");
     }
 
     @Test
