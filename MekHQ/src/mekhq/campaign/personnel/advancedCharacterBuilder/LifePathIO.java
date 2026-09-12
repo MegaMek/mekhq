@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 
 import static mekhq.MHQConstants.CONFIRMATION_UPGRADE_LIFE_PATHS;
 import static mekhq.MHQConstants.LIFE_PATHS_DEFAULT_DIRECTORY_PATH;
+import static mekhq.MHQConstants.LIFE_PATHS_MM_DATA_DIRECTORY_PATH;
 import static mekhq.MHQConstants.LIFE_PATHS_USER_DIRECTORY_PATH;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -551,17 +552,53 @@ public class LifePathIO {
     }
 
     /**
-     * Returns the directory a file chooser should open in: the user's Life Path directory when there is one, and the
-     * shipped data directory otherwise.
+     * Returns the directory a file chooser should open in.
+     *
+     * <p>In order: the mm-data checkout beside this build when there is one, because that is where the shipped Life
+     * Paths are authored and the copy under {@code data} is overwritten on every launch; otherwise the user's Life
+     * Path directory when one is set; otherwise the shipped data directory.</p>
      *
      * @return the directory to start browsing from
      *
-     * @since 0.50.11
+     * @since 0.51.01
      */
     private static String resolveStartingDirectory() {
+        Path mmDataDirectory = resolveMMDataLifePathDirectory();
+        if (mmDataDirectory != null) {
+            return mmDataDirectory.toString();
+        }
+
         Path userDirectory = resolveUserLifePathDirectory();
 
         return userDirectory == null ? LIFE_PATHS_DEFAULT_DIRECTORY_PATH : userDirectory.toString();
+    }
+
+    /**
+     * Finds the Life Path directory of an mm-data checkout sitting beside this build, if the application is running
+     * inside a development environment.
+     *
+     * <p>The application runs from the {@code MekHQ/MekHQ} project directory in the development layout, which puts
+     * the checkout two levels up; one level up is checked as well in case it runs from the build root. A packaged
+     * install has no such sibling and gets {@code null}.</p>
+     *
+     * @return the checkout's Life Path directory, or {@code null} when there is no mm-data checkout beside the build
+     *
+     * @since 0.51.01
+     */
+    private static @Nullable Path resolveMMDataLifePathDirectory() {
+        List<Path> candidateRoots = List.of(Paths.get("..", ".."), Paths.get(".."));
+
+        for (Path candidateRoot : candidateRoots) {
+            Path candidate = candidateRoot.resolve(LIFE_PATHS_MM_DATA_DIRECTORY_PATH).toAbsolutePath().normalize();
+
+            if (Files.isDirectory(candidate)) {
+                LOGGER.debug("[LifePathIO] Development environment detected; dialogs start in {}", candidate);
+                return candidate;
+            }
+        }
+
+        LOGGER.debug("[LifePathIO] No mm-data checkout beside this build; dialogs start in the data directory");
+        return null;
     }
 
     /**

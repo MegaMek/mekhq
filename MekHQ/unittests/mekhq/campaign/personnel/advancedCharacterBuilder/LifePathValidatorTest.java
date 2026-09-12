@@ -34,11 +34,11 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.CATEGORY_NONE_NOT_ALONE;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.CONTRADICTORY_REQUIREMENT_EXCLUSION;
+import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.FLEXIBLE_PICKS_EQUAL_ITEMS;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MATCHING_UUID_EXCLUSION;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MATCHING_UUID_REQUIREMENT;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MIN_YEAR_ABOVE_MAX_YEAR;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MISSING_CATEGORIES;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MISSING_FACTION;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MISSING_LIFE_STAGE;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MISSING_NAME;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MISSING_SOURCE;
@@ -156,52 +156,13 @@ class LifePathValidatorTest {
     // region Affiliation factions
 
     @Test
-    void testAffiliationWithNoFaction_IsReported() {
+    void testAffiliationWithNoFaction_IsNotReported() {
+        // An affiliation path with no faction requirement is the author's choice, not a mistake. The rule that
+        // demanded one was removed on review.
         Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().lifeStages(Set.of(
               ATOWLifeStage.AFFILIATION)));
 
-        assertTrue(reasons.contains(MISSING_FACTION), "An affiliation with no faction should be reported.");
-    }
-
-    @Test
-    void testSubAffiliationWithNoFaction_IsReported() {
-        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().lifeStages(Set.of(
-              ATOWLifeStage.SUB_AFFILIATION)));
-
-        assertTrue(reasons.contains(MISSING_FACTION), "A sub-affiliation with no faction should be reported.");
-    }
-
-    @Test
-    void testClanCasteWithNoFaction_IsReported() {
-        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().lifeStages(Set.of(
-              ATOWLifeStage.CLAN_CASTE)));
-
-        assertTrue(reasons.contains(MISSING_FACTION),
-              "A Clan caste only exists inside a Clan, so it needs a faction requirement.");
-    }
-
-    @Test
-    void testAffiliationWithAnEmptyFactionGroup_IsReported() {
-        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().lifeStages(Set.of(
-              ATOWLifeStage.AFFILIATION)).requirementsFactions(Map.of(0, Set.of())));
-
-        assertTrue(reasons.contains(MISSING_FACTION), "An empty faction group is no faction at all.");
-    }
-
-    @Test
-    void testAffiliationWithAFaction_IsNotReported() {
-        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().lifeStages(Set.of(
-              ATOWLifeStage.AFFILIATION)).requirementsFactions(Map.of(0, Set.of("FS"))));
-
-        assertFalse(reasons.contains(MISSING_FACTION), "An affiliation naming a faction is valid.");
-    }
-
-    @Test
-    void testNonAffiliationWithNoFaction_IsNotReported() {
-        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().lifeStages(Set.of(
-              ATOWLifeStage.REAL_LIFE)));
-
-        assertFalse(reasons.contains(MISSING_FACTION), "Only affiliation stages and castes need a faction.");
+        assertTrue(reasons.isEmpty(), "An affiliation with no faction requirement is valid.");
     }
 
     // endregion Affiliation factions
@@ -209,37 +170,76 @@ class LifePathValidatorTest {
     // region Flexible picks
 
     @Test
-    void testFlexibleGroupsWithNoPicks_IsReported() {
+    void testFlexibleSetWithNoPicks_IsReported() {
         Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().flexibleXPSkills(Map.of(0,
-              Map.of("Gunnery/Mek", 100))).flexibleXPPickCount(0));
+              Map.of("Gunnery/Mek", 100, "Piloting/Mek", 100))).flexibleXPPickCounts(Map.of(0, 0)));
 
-        assertTrue(reasons.contains(NO_FLEXIBLE_PICKS), "Groups the player can never pick should be reported.");
+        assertTrue(reasons.contains(NO_FLEXIBLE_PICKS), "A set the player can never pick from should be reported.");
     }
 
     @Test
-    void testNoFlexibleGroupsAndNoPicks_IsNotReported() {
-        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().flexibleXPPickCount(0));
+    void testFlexibleSetWithNoPickCountRecorded_IsReported() {
+        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().flexibleXPSkills(Map.of(0,
+              Map.of("Gunnery/Mek", 100, "Piloting/Mek", 100))));
+
+        assertTrue(reasons.contains(NO_FLEXIBLE_PICKS), "A set with no pick count recorded allows no picks.");
+    }
+
+    @Test
+    void testNoFlexibleSetsAndNoPicks_IsNotReported() {
+        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder());
 
         assertFalse(reasons.contains(NO_FLEXIBLE_PICKS), "A Life Path with no flexible section is valid.");
     }
 
     @Test
-    void testMorePicksThanGroups_IsReported() {
+    void testMorePicksThanItems_IsReported() {
         Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().flexibleXPSkills(Map.of(0,
-              Map.of("Gunnery/Mek", 100))).flexibleXPPickCount(3));
+              Map.of("Gunnery/Mek", 100))).flexibleXPPickCounts(Map.of(0, 3)));
 
-        assertTrue(reasons.contains(TOO_MANY_FLEXIBLE_PICKS), "Picking three of one group should be reported.");
+        assertTrue(reasons.contains(TOO_MANY_FLEXIBLE_PICKS),
+              "Picking three items from a one-item set should be reported.");
     }
 
     @Test
-    void testPicksCountGroupsInEveryFlexibleMap() {
-        // Meta skills and both natural aptitude maps used to be left out of the count, so a path whose only groups
+    void testPicksEqualToItems_IsReported() {
+        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().flexibleXPSkills(Map.of(0,
+              Map.of("Gunnery/Mek", 100, "Piloting/Mek", 100))).flexibleXPPickCounts(Map.of(0, 2)));
+
+        assertTrue(reasons.contains(FLEXIBLE_PICKS_EQUAL_ITEMS),
+              "Picking every item in a set is a fixed award, and should be reported.");
+        assertFalse(reasons.contains(TOO_MANY_FLEXIBLE_PICKS), "Equal is not too many.");
+    }
+
+    @Test
+    void testPicksBelowItems_IsNotReported() {
+        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().flexibleXPSkills(Map.of(0,
+              Map.of("Gunnery/Mek", 100, "Piloting/Mek", 100))).flexibleXPPickCounts(Map.of(0, 1)));
+
+        assertFalse(reasons.contains(NO_FLEXIBLE_PICKS), "One pick from two items is a real choice.");
+        assertFalse(reasons.contains(TOO_MANY_FLEXIBLE_PICKS), "One pick from two items is a real choice.");
+        assertFalse(reasons.contains(FLEXIBLE_PICKS_EQUAL_ITEMS), "One pick from two items is a real choice.");
+    }
+
+    @Test
+    void testEachFlexibleSet_IsCheckedOnItsOwn() {
+        // Set 0 is fine. Set 1 has items but no picks. The report is about set 1, whatever set 0 looks like.
+        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().flexibleXPSkills(Map.of(0,
+                    Map.of("Gunnery/Mek", 100, "Piloting/Mek", 100), 1, Map.of("Tactics", 100, "Leadership", 100)))
+                                                                    .flexibleXPPickCounts(Map.of(0, 1)));
+
+        assertTrue(reasons.contains(NO_FLEXIBLE_PICKS), "A second set with no picks should be reported.");
+    }
+
+    @Test
+    void testPicksCountItemsInEveryFlexibleMap() {
+        // Meta skills and both natural aptitude maps used to be left out of the count, so a path whose only items
         // lived there was reported as having too many picks.
         Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().flexibleXPNaturalAptitudes(
-              Map.of(0, Map.of("Gunnery/Mek", 100), 1, Map.of("Piloting/Mek", 100))).flexibleXPPickCount(2));
+              Map.of(0, Map.of("Gunnery/Mek", 100, "Piloting/Mek", 100))).flexibleXPPickCounts(Map.of(0, 1)));
 
         assertFalse(reasons.contains(TOO_MANY_FLEXIBLE_PICKS),
-              "Groups held only in the natural aptitudes map should count.");
+              "Items held only in the natural aptitudes map should count.");
     }
 
     // endregion Flexible picks
@@ -380,9 +380,11 @@ class LifePathValidatorTest {
         // A separate case: an empty life stage set cannot also be an affiliation with no faction.
         produced.addAll(LifePathValidator.validate(validBuilder().lifeStages(Set.of())));
         produced.addAll(LifePathValidator.validate(validBuilder().flexibleXPSkills(Map.of(0,
-              Map.of("Gunnery/Mek", 100))).flexibleXPPickCount(0)));
+              Map.of("Gunnery/Mek", 100))).flexibleXPPickCounts(Map.of(0, 0))));
         produced.addAll(LifePathValidator.validate(validBuilder().flexibleXPSkills(Map.of(0,
-              Map.of("Gunnery/Mek", 100))).flexibleXPPickCount(3)));
+              Map.of("Gunnery/Mek", 100))).flexibleXPPickCounts(Map.of(0, 3))));
+        produced.addAll(LifePathValidator.validate(validBuilder().flexibleXPSkills(Map.of(0,
+              Map.of("Gunnery/Mek", 100))).flexibleXPPickCounts(Map.of(0, 1))));
         produced.addAll(LifePathValidator.validate(validBuilder().categories(Set.of(LifePathCategory.NONE,
               LifePathCategory.GENERAL_CLAN))));
         produced.addAll(LifePathValidator.validate(validBuilder().requirementsFactions(Map.of(0, Set.of("FS")))

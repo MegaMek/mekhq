@@ -143,7 +143,10 @@ class LifePathAttributePicker extends AbstractLifePathPicker {
 
         // Defensive copies to avoid external modification
         this.selectedAttributeScores = new HashMap<>(selectedAttributeScores);
-        this.storedAttributeScores = new HashMap<>(selectedAttributeScores);
+        // Edge lives in its own field, never in the attribute map. A file written while the picker still listed Edge
+        // among the attributes can carry one here, and left in place it would be priced with no row to clear it.
+        this.selectedAttributeScores.remove(SkillAttribute.EDGE);
+        this.storedAttributeScores = new HashMap<>(this.selectedAttributeScores);
 
         this.selectedEdge = selectedEdge;
         this.storedEdge = selectedEdge;
@@ -165,7 +168,11 @@ class LifePathAttributePicker extends AbstractLifePathPicker {
         int attributeKeyValue = getDefaultAttributeValue(tabType, false);
 
         for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (attribute == SkillAttribute.NO_ATTRIBUTE) {
+            // Edge is an attribute in the enum but gets its own row below, with its own bounds and its own storage.
+            // Listing it here as well showed it twice and let the two rows disagree.
+            boolean isPlaceholder = attribute == SkillAttribute.NO_ATTRIBUTE;
+            boolean hasOwnRow = attribute == SkillAttribute.EDGE;
+            if (isPlaceholder || hasOwnRow) {
                 continue;
             }
 

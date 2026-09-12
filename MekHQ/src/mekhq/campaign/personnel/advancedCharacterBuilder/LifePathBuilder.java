@@ -129,7 +129,7 @@ public class LifePathBuilder {
     private Map<Integer, Map<String, Integer>> flexibleXPNaturalAptitudes = new HashMap<>();
     private Map<Integer, Map<SkillSubType, Integer>> flexibleXPNaturalAptitudesMetaSkills = new HashMap<>();
     private Map<Integer, Map<String, Integer>> flexibleXPAbilities = new HashMap<>();
-    private Integer flexibleXPPickCount;
+    private Map<Integer, Integer> flexibleXPPickCounts = new HashMap<>();
 
     /**
      * Creates a builder with empty collections, the current version, and no other values set.
@@ -209,7 +209,7 @@ public class LifePathBuilder {
         builder.flexibleXPNaturalAptitudes = source.flexibleXPNaturalAptitudes();
         builder.flexibleXPNaturalAptitudesMetaSkills = source.flexibleXPNaturalAptitudesMetaSkills();
         builder.flexibleXPAbilities = source.flexibleXPAbilities();
-        builder.flexibleXPPickCount = source.flexibleXPPickCount();
+        builder.flexibleXPPickCounts = source.flexibleXPPickCounts();
 
         return builder;
     }
@@ -280,7 +280,7 @@ public class LifePathBuilder {
               flexibleXPNaturalAptitudes,
               flexibleXPNaturalAptitudesMetaSkills,
               flexibleXPAbilities,
-              flexibleXPPickCount);
+              flexibleXPPickCounts);
     }
 
     /**
@@ -986,16 +986,17 @@ public class LifePathBuilder {
         return this;
     }
     /**
-     * Sets {@code flexibleXPPickCount}.
+     * Sets {@code flexibleXPPickCounts}, how many items the player takes from each flexible XP set, keyed by set
+     * index.
      *
-     * @param flexibleXPPickCount the value to use
+     * @param flexibleXPPickCounts the value to use
      *
      * @return this builder
      *
      * @since 0.50.11
      */
-    public LifePathBuilder flexibleXPPickCount(Integer flexibleXPPickCount) {
-        this.flexibleXPPickCount = flexibleXPPickCount;
+    public LifePathBuilder flexibleXPPickCounts(Map<Integer, Integer> flexibleXPPickCounts) {
+        this.flexibleXPPickCounts = flexibleXPPickCounts;
         return this;
     }
 
@@ -1324,9 +1325,9 @@ public class LifePathBuilder {
         return flexibleXPAbilities;
     }
     /**
-     * @return the current value of {@code flexibleXPPickCount}
+     * @return the current value of {@code flexibleXPPickCounts}
      */
-    public Integer flexibleXPPickCount() {
-        return flexibleXPPickCount;
+    public Map<Integer, Integer> flexibleXPPickCounts() {
+        return flexibleXPPickCounts;
     }
 }
