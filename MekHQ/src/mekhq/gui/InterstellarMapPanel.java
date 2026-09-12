@@ -130,6 +130,7 @@ import mekhq.gui.baseComponents.ImmersiveComboBox;
 import mekhq.gui.baseComponents.ImmersiveRadioButton;
 import mekhq.gui.baseComponents.ImmersiveSpinner;
 import mekhq.gui.dialog.PlanetarySystemEditorDialog;
+import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.utilities.MHQInternationalization;
 
 /**
@@ -2602,34 +2603,29 @@ public class InterstellarMapPanel extends JPanel {
                 optionHeader.add(createLabel(text("map.layer.heading.text")));
                 optionPanel.add(optionHeader);
 
-                                optFactions = createOptionRadioButton(text("map.layer.faction.text"), MapMode.FACTION);
+                                                                optFactions = createOptionRadioButton("map.layer.faction", MapMode.FACTION);
         optionPanel.add(optFactions);
-                    optTech = createOptionRadioButton(text("map.layer.technology.text"), MapMode.TECHNOLOGY);
+                                        optTech = createOptionRadioButton("map.layer.technology", MapMode.TECHNOLOGY);
         optionPanel.add(optTech);
-                    optIndustry = createOptionRadioButton(text("map.layer.industry.text"), MapMode.INDUSTRY);
+                                        optIndustry = createOptionRadioButton("map.layer.industry", MapMode.INDUSTRY);
         optionPanel.add(optIndustry);
-                      optRawMaterials = createOptionRadioButton(text("map.layer.rawMaterials.text"),
-                          MapMode.RAW_MATERIALS);
+                                            optRawMaterials = createOptionRadioButton("map.layer.rawMaterials", MapMode.RAW_MATERIALS);
         optionPanel.add(optRawMaterials);
-                    optOutput = createOptionRadioButton(text("map.layer.output.text"), MapMode.OUTPUT);
+                                        optOutput = createOptionRadioButton("map.layer.output", MapMode.OUTPUT);
         optionPanel.add(optOutput);
-                      optAgriculture = createOptionRadioButton(text("map.layer.agriculture.text"),
-                          MapMode.AGRICULTURE);
+                                            optAgriculture = createOptionRadioButton("map.layer.agriculture", MapMode.AGRICULTURE);
         optionPanel.add(optAgriculture);
-                    optPopulation = createOptionRadioButton(text("map.layer.population.text"), MapMode.POPULATION);
+                                        optPopulation = createOptionRadioButton("map.layer.population", MapMode.POPULATION);
         optionPanel.add(optPopulation);
-                    optHPG = createOptionRadioButton(text("map.layer.hpg.text"), MapMode.HPG);
+                                        optHPG = createOptionRadioButton("map.layer.hpg", MapMode.HPG);
         optionPanel.add(optHPG);
-                      optRecharge = createOptionRadioButton(text("map.layer.recharge.text"),
-                          MapMode.RECHARGE_STATIONS);
+                                            optRecharge = createOptionRadioButton("map.layer.recharge", MapMode.RECHARGE_STATIONS);
         optionPanel.add(optRecharge);
-                    optAcademies = createOptionRadioButton(text("map.layer.academies.text"), MapMode.ACADEMIES);
+                                        optAcademies = createOptionRadioButton("map.layer.academies", MapMode.ACADEMIES);
         optionPanel.add(optAcademies);
-                      optHiringHalls = createOptionRadioButton(text("map.layer.hiringHalls.text"),
-                          MapMode.HIRING_HALLS);
+                                            optHiringHalls = createOptionRadioButton("map.layer.hiringHalls", MapMode.HIRING_HALLS);
         optionPanel.add(optHiringHalls);
-                      optDiseases = createOptionRadioButton(text("map.layer.diseases.text"),
-                          MapMode.DISEASE_OUTBREAKS);
+                                            optDiseases = createOptionRadioButton("map.layer.diseases", MapMode.DISEASE_OUTBREAKS);
         optionPanel.add(optDiseases);
 
         ButtonGroup colorChoice = new ButtonGroup();
@@ -2652,22 +2648,22 @@ public class InterstellarMapPanel extends JPanel {
         optionPanel.add(createOptionDivider());
         optionPanel.add(Box.createRigidArea(new Dimension(0, UIUtil.scaleForGUI(7))));
         optionPanel.add(createLabel(text("map.overlay.heading.text")));
-        optEmptySystems = createOptionCheckBox(text("map.overlay.emptySystems.text"));
+        optEmptySystems = createOptionCheckBox("map.overlay.emptySystems");
         optEmptySystems.setSelected(false);
         optEmptySystems.addActionListener(e -> repaint());
         optionPanel.add(optEmptySystems);
-        optTerritory = createOptionCheckBox(text("map.overlay.territory.text"));
+        optTerritory = createOptionCheckBox("map.overlay.territory");
         optTerritory.setSelected(true);
         optTerritory.addActionListener(e -> startTerritoryLayerAnimation());
         optionPanel.add(optTerritory);
-        optAdministrativeBoundaries = createOptionCheckBox(text("map.overlay.administrative.text"));
+        optAdministrativeBoundaries = createOptionCheckBox("map.overlay.administrative");
         optAdministrativeBoundaries.setSelected(false);
           Dimension administrativeCheckSize = new Dimension(UIUtil.scaleForGUI(190),
               optAdministrativeBoundaries.getPreferredSize().height);
           optAdministrativeBoundaries.setPreferredSize(administrativeCheckSize);
           optAdministrativeBoundaries.setMinimumSize(administrativeCheckSize);
           optAdministrativeBoundaries.setMaximumSize(administrativeCheckSize);
-        optAdministrativeDetail = new ImmersiveComboBox<>(AdministrativeDisplayDetail.values());
+        optAdministrativeDetail = new LayerControlComboBox<>(AdministrativeDisplayDetail.values());
         optAdministrativeDetail.setSelectedItem(AdministrativeDisplayDetail.REGIONS);
         optAdministrativeDetail.setEnabled(false);
         Dimension administrativeDetailSize = new Dimension(UIUtil.scaleForGUI(148),
@@ -2675,7 +2671,8 @@ public class InterstellarMapPanel extends JPanel {
         optAdministrativeDetail.setPreferredSize(administrativeDetailSize);
         optAdministrativeDetail.setMinimumSize(administrativeDetailSize);
         optAdministrativeDetail.setMaximumSize(administrativeDetailSize);
-        optAdministrativeDetail.setToolTipText(text("map.overlay.administrativeDetail.toolTipText"));
+          configureLayerControlTooltip(optAdministrativeDetail, text("map.overlay.administrative.text"),
+              text("map.overlay.administrativeDetail.toolTipText"));
         optAdministrativeDetail.addActionListener(event -> {
             administrativeRenderCache.clear();
             repaint();
@@ -2692,16 +2689,17 @@ public class InterstellarMapPanel extends JPanel {
         administrativeControl.add(Box.createHorizontalGlue());
         administrativeControl.add(optAdministrativeDetail);
         optionPanel.add(administrativeControl);
-                optCapitals = createOptionCheckBox(text("map.overlay.capitals.text"));
+                optCapitals = createOptionCheckBox("map.overlay.capitals");
                 optCapitals.setSelected(true);
-                optCapitalDetail = new ImmersiveComboBox<>(CapitalDisplayDetail.values());
+                optCapitalDetail = new LayerControlComboBox<>(CapitalDisplayDetail.values());
                 optCapitalDetail.setSelectedItem(CapitalDisplayDetail.NATIONAL);
                 Dimension capitalDetailSize = new Dimension(UIUtil.scaleForGUI(148),
               optCapitalDetail.getPreferredSize().height);
                 optCapitalDetail.setPreferredSize(capitalDetailSize);
                 optCapitalDetail.setMinimumSize(capitalDetailSize);
                 optCapitalDetail.setMaximumSize(capitalDetailSize);
-                                optCapitalDetail.setToolTipText(text("map.overlay.capitalDetail.toolTipText"));
+                                  configureLayerControlTooltip(optCapitalDetail, text("map.overlay.capitals.text"),
+                                      text("map.overlay.capitalDetail.toolTipText"));
                 optCapitalDetail.addActionListener(event -> repaint());
                 optCapitals.addActionListener(event -> {
             optCapitalDetail.setEnabled(optCapitals.isSelected());
@@ -2715,8 +2713,8 @@ public class InterstellarMapPanel extends JPanel {
                 capitalControl.add(Box.createHorizontalGlue());
                 capitalControl.add(optCapitalDetail);
                 optionPanel.add(capitalControl);
-        optHPGNetwork = createOptionCheckBox(text("map.overlay.hpgNetwork.text"));
-          optHpgNetworkDetail = new ImmersiveComboBox<>(HpgNetworkDetail.values());
+                optHPGNetwork = createOptionCheckBox("map.overlay.hpgNetwork");
+                    optHpgNetworkDetail = new LayerControlComboBox<>(HpgNetworkDetail.values());
         optHpgNetworkDetail.setSelectedItem(HpgNetworkDetail.CLASS_A_B);
         optHpgNetworkDetail.setEnabled(false);
           Dimension hpgDetailSize = new Dimension(UIUtil.scaleForGUI(148),
@@ -2724,7 +2722,8 @@ public class InterstellarMapPanel extends JPanel {
           optHpgNetworkDetail.setPreferredSize(hpgDetailSize);
           optHpgNetworkDetail.setMinimumSize(hpgDetailSize);
           optHpgNetworkDetail.setMaximumSize(hpgDetailSize);
-          optHpgNetworkDetail.setToolTipText(text("map.overlay.hpgDetail.toolTipText"));
+          configureLayerControlTooltip(optHpgNetworkDetail, text("map.overlay.hpgNetwork.text"),
+              text("map.overlay.hpgDetail.toolTipText"));
         optHpgNetworkDetail.addActionListener(e -> repaint());
         optHPGNetwork.addActionListener(e -> {
             optHpgNetworkDetail.setEnabled(optHPGNetwork.isSelected());
@@ -2738,16 +2737,12 @@ public class InterstellarMapPanel extends JPanel {
           hpgControl.add(Box.createHorizontalGlue());
           hpgControl.add(optHpgNetworkDetail);
           optionPanel.add(hpgControl);
-        optOperations = createOptionCheckBox(text("map.overlay.operations.text"));
+        optOperations = createOptionCheckBox("map.overlay.operations");
         optOperations.setSelected(true);
         optOperations.addActionListener(e -> startOperationsLayerAnimation());
         optionPanel.add(optOperations);
-          optReachability = createOptionCheckBox(text("map.overlay.reachability.text"));
-          String reachabilityTooltip = text("map.overlay.reachability.toolTipText");
-          optReachability.setToolTipText(reachabilityTooltip);
-          optReachability.getAccessibleContext().setAccessibleName(optReachability.getText());
-          optReachability.getAccessibleContext().setAccessibleDescription(reachabilityTooltip);
-          reachabilityHops = new ImmersiveSpinner(new SpinnerNumberModel(1, 1,
+          optReachability = createOptionCheckBox("map.overlay.reachability");
+          reachabilityHops = new LayerControlSpinner(new SpinnerNumberModel(1, 1,
               NavigationRouteAnalysis.MAXIMUM_REACHABILITY_HOPS, 1));
           reachabilityHops.setEditor(new JSpinner.NumberEditor(reachabilityHops, "0"));
           Dimension hopSpinnerSize = new Dimension(UIUtil.scaleForGUI(64),
@@ -2757,9 +2752,7 @@ public class InterstellarMapPanel extends JPanel {
           reachabilityHops.setMaximumSize(hopSpinnerSize);
           String hopLabelText = text("map.overlay.reachability.hops.text");
           String hopTooltip = text("map.overlay.reachability.hops.toolTipText");
-          reachabilityHops.setToolTipText(hopTooltip);
-          reachabilityHops.getAccessibleContext().setAccessibleName(hopLabelText);
-          reachabilityHops.getAccessibleContext().setAccessibleDescription(hopTooltip);
+          configureLayerControlTooltip(reachabilityHops, hopLabelText, hopTooltip);
           reachabilityHops.setEnabled(false);
           reachabilityHops.addChangeListener(event -> {
             if (optReachability.isSelected()) {
@@ -2788,11 +2781,7 @@ public class InterstellarMapPanel extends JPanel {
               refreshReachability();
               repaint();
           });
-          optMeasureDistance = createOptionCheckBox(text("map.overlay.measure.text"));
-          String measurementTooltip = text("map.overlay.measure.toolTipText");
-          optMeasureDistance.setToolTipText(measurementTooltip);
-          optMeasureDistance.getAccessibleContext().setAccessibleName(optMeasureDistance.getText());
-          optMeasureDistance.getAccessibleContext().setAccessibleDescription(measurementTooltip);
+          optMeasureDistance = createOptionCheckBox("map.overlay.measure");
           optMeasureDistance.addActionListener(event -> {
             measurementState = optMeasureDistance.isSelected()
                 ? MeasurementState.active()
@@ -4222,25 +4211,94 @@ public class InterstellarMapPanel extends JPanel {
         return divider;
     }
 
-    private JCheckBox createOptionCheckBox(String text) {
-        JCheckBox checkBox = new ImmersiveCheckBox(text);
+    private JCheckBox createOptionCheckBox(String resourceKey) {
+        String optionText = text(resourceKey + ".text");
+        JCheckBox checkBox = new LayerControlCheckBox(optionText);
         checkBox.setForeground(LAYER_CONTROL_TEXT);
         checkBox.setPreferredSize(UIUtil.scaleForGUI(150, 20));
         checkBox.setAlignmentX(Component.LEFT_ALIGNMENT);
+        configureLayerControlTooltip(checkBox, optionText, text(resourceKey + ".toolTipText"));
         return checkBox;
     }
 
-    private JRadioButton createOptionRadioButton(String text, MapMode mapMode) {
-        JRadioButton radioButton = new ImmersiveRadioButton(text);
+    private JRadioButton createOptionRadioButton(String resourceKey, MapMode mapMode) {
+        String optionText = text(resourceKey + ".text");
+        JRadioButton radioButton = new LayerControlRadioButton(optionText);
         radioButton.setForeground(LAYER_CONTROL_TEXT);
         radioButton.setPreferredSize(UIUtil.scaleForGUI(150, 20));
         radioButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+        configureLayerControlTooltip(radioButton, optionText, text(resourceKey + ".toolTipText"));
         radioButton.addActionListener(e -> {
             if (radioButton.isSelected()) {
                 startMapModeAnimation(mapMode);
             }
         });
         return radioButton;
+    }
+
+    private static void configureLayerControlTooltip(JComponent component, String accessibleName,
+          String tooltipText) {
+                component.setToolTipText(MultiLineTooltip.splitToolTip(tooltipText));
+        component.getAccessibleContext().setAccessibleName(accessibleName);
+        component.getAccessibleContext().setAccessibleDescription(tooltipText);
+    }
+
+    private static JToolTip createLayerControlTooltip(JComponent component) {
+        JToolTip tooltip = new JToolTip();
+        tooltip.setComponent(component);
+        tooltip.setOpaque(true);
+        tooltip.setBackground(MAP_POPUP_BACKGROUND);
+        tooltip.setForeground(MAP_POPUP_TEXT);
+        tooltip.setFont(component.getFont());
+        tooltip.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createLineBorder(LAYER_CONTROL_BORDER, Math.max(1, UIUtil.scaleForGUI(1))),
+              BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(8),
+                    UIUtil.scaleForGUI(5), UIUtil.scaleForGUI(8))));
+        return tooltip;
+    }
+
+    private static final class LayerControlCheckBox extends ImmersiveCheckBox {
+        private LayerControlCheckBox(String text) {
+            super(text);
+        }
+
+        @Override
+        public JToolTip createToolTip() {
+            return createLayerControlTooltip(this);
+        }
+    }
+
+    private static final class LayerControlRadioButton extends ImmersiveRadioButton {
+        private LayerControlRadioButton(String text) {
+            super(text);
+        }
+
+        @Override
+        public JToolTip createToolTip() {
+            return createLayerControlTooltip(this);
+        }
+    }
+
+    private static final class LayerControlComboBox<E> extends ImmersiveComboBox<E> {
+        private LayerControlComboBox(E[] items) {
+            super(items);
+        }
+
+        @Override
+        public JToolTip createToolTip() {
+            return createLayerControlTooltip(this);
+        }
+    }
+
+    private static final class LayerControlSpinner extends ImmersiveSpinner {
+        private LayerControlSpinner(SpinnerModel model) {
+            super(model);
+        }
+
+        @Override
+        public JToolTip createToolTip() {
+            return createLayerControlTooltip(this);
+        }
     }
 
     private void selectMapMode(MapMode mapMode) {
