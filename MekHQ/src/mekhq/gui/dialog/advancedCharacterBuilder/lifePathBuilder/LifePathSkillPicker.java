@@ -64,14 +64,15 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillSubType;
 
 /**
- * Lets an author set skill levels a Life Path requires or excludes, or skill XP it awards.
+ * Lets an author set skill levels a Life Path requires or excludes, or XP it awards.
  *
  * <p>Two kinds of row appear: one per named skill, and one per meta skill, which stands for a whole family of skills
  * at once. They are split across tabs because there are over a hundred skills.</p>
  *
- * <p>On the Fixed XP and Flexible XP tabs every skill and meta skill also gets a second spinner, labelled
- * {@code Natural Aptitude - [Skill]}. XP entered there goes towards the character gaining a Natural Aptitude for the
- * skill rather than towards the skill itself, and is stored separately from the skill XP.</p>
+ * <p>The same dialog serves two buttons on the XP tabs. Opened in {@link Mode#SKILLS} it edits the XP awarded to each
+ * skill. Opened in {@link Mode#NATURAL_APTITUDES} it looks the same but edits the XP awarded towards each skill's
+ * Natural Aptitude, and reads its title and instructions from its own resource keys so the author can tell the two
+ * apart. The caller decides which maps go in and where the result is stored.</p>
  *
  * @since 0.50.11
  */
@@ -91,11 +92,33 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
     /** Value that means "no entry" on an XP tab: an award of nothing is not stored. */
     private static final int XP_KEY_VALUE = 0;
 
-    /** Rows per line on the Requirements and Exclusions tabs, which show one spinner per skill. */
-    private static final int LEVEL_COLUMNS = 3;
+    /** Rows per line. */
+    private static final int COLUMNS = 3;
+
+    /**
+     * What the picker is editing.
+     *
+     * <p>Each mode has its own bundle prefix, which is where the base class finds the title, the button labels and the
+     * instructions. Everything else in the dialog is shared.</p>
+     */
+    enum Mode {
+        /** XP awarded to, or levels required or excluded in, the skill itself. */
+        SKILLS("LifePathSkillPicker"),
+        /** XP awarded towards the skill's Natural Aptitude. Only the XP tabs open the picker this way. */
+        NATURAL_APTITUDES("LifePathNaturalAptitudePicker");
+
+        private final String bundlePrefix;
+
+        Mode(String bundlePrefix) {
+            this.bundlePrefix = bundlePrefix;
+        }
+
+        String getBundlePrefix() {
+            return bundlePrefix;
+        }
+    }
 
     private final LifePathBuilderTabType tabType;
-    private final boolean isXPTab;
 
     private final Map<String, Integer> storedSkillLevels;
     private final Map<String, Integer> selectedSkillLevels;
@@ -103,62 +126,40 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
     private final Map<SkillSubType, Integer> storedMetaSkillLevels;
     private final Map<SkillSubType, Integer> selectedMetaSkillLevels;
 
-    private final Map<String, Integer> storedNaturalAptitudes;
-    private final Map<String, Integer> selectedNaturalAptitudes;
-
-    private final Map<SkillSubType, Integer> storedNaturalAptitudesMetaSkills;
-    private final Map<SkillSubType, Integer> selectedNaturalAptitudesMetaSkills;
-
+    /**
+     * @return the per-skill values as edited; in {@link Mode#NATURAL_APTITUDES} these are Natural Aptitude XP awards
+     */
     Map<String, Integer> getSelectedSkillLevels() {
         return selectedSkillLevels;
     }
 
+    /**
+     * @return the per-meta-skill values as edited; in {@link Mode#NATURAL_APTITUDES} these are Natural Aptitude XP
+     *       awards
+     */
     Map<SkillSubType, Integer> getSelectedMetaSkillLevels() {
         return selectedMetaSkillLevels;
     }
 
     /**
-     * @return XP awarded towards each skill's Natural Aptitude, keyed by skill name; always empty for the Requirements
-     *       and Exclusions tabs, which offer no such rows
-     */
-    Map<String, Integer> getSelectedNaturalAptitudes() {
-        return selectedNaturalAptitudes;
-    }
-
-    /**
-     * @return XP awarded towards each meta skill's Natural Aptitude; always empty for the Requirements and Exclusions
-     *       tabs, which offer no such rows
-     */
-    Map<SkillSubType, Integer> getSelectedNaturalAptitudesMetaSkills() {
-        return selectedNaturalAptitudesMetaSkills;
-    }
-
-    /**
      * Opens the picker.
      *
-     * @param owner                              the wizard this picker belongs to
-     * @param selectedSkillLevels                the per-skill values already on this group, which may be {@code null}
-     * @param selectedMetaSkillLevels            the per-meta-skill values already on this group, which may be
-     *                                           {@code null}
-     * @param selectedNaturalAptitudes           the per-skill Natural Aptitude XP already on this group, which may be
-     *                                           {@code null}; ignored on the Requirements and Exclusions tabs
-     * @param selectedNaturalAptitudesMetaSkills the per-meta-skill Natural Aptitude XP already on this group, which
-     *                                           may be {@code null}; ignored on the Requirements and Exclusions tabs
-     * @param tabType                            the section being edited
-     * @param groupIndex                         the group being edited, shown in the title
+     * @param owner                   the wizard this picker belongs to
+     * @param selectedSkillLevels     the per-skill values already on this group, which may be {@code null}
+     * @param selectedMetaSkillLevels the per-meta-skill values already on this group, which may be {@code null}
+     * @param tabType                 the section being edited
+     * @param groupIndex              the group being edited, shown in the title
+     * @param mode                    whether the values are skill XP or Natural Aptitude XP
      *
      * @since 0.50.11
      */
     LifePathSkillPicker(@Nullable Window owner, @Nullable Map<String, Integer> selectedSkillLevels,
-          @Nullable Map<SkillSubType, Integer> selectedMetaSkillLevels,
-          @Nullable Map<String, Integer> selectedNaturalAptitudes,
-          @Nullable Map<SkillSubType, Integer> selectedNaturalAptitudesMetaSkills, LifePathBuilderTabType tabType,
-          int groupIndex) {
-        super(owner, RESOURCE_BUNDLE, "LifePathSkillPicker", tabType, groupIndex, MINIMUM_MAIN_WIDTH,
+          @Nullable Map<SkillSubType, Integer> selectedMetaSkillLevels, LifePathBuilderTabType tabType,
+          int groupIndex, Mode mode) {
+        super(owner, RESOURCE_BUNDLE, mode.getBundlePrefix(), tabType, groupIndex, MINIMUM_MAIN_WIDTH,
               MINIMUM_COMPONENT_HEIGHT);
 
         this.tabType = tabType;
-        isXPTab = tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP;
 
         // Defensive copies to avoid external modification. The "selected" maps are the live ones the spinners write
         // to; the "stored" maps are what Cancel puts back.
@@ -167,12 +168,6 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
 
         this.selectedMetaSkillLevels = copyOrEmpty(selectedMetaSkillLevels);
         storedMetaSkillLevels = new HashMap<>(this.selectedMetaSkillLevels);
-
-        this.selectedNaturalAptitudes = copyOrEmpty(selectedNaturalAptitudes);
-        storedNaturalAptitudes = new HashMap<>(this.selectedNaturalAptitudes);
-
-        this.selectedNaturalAptitudesMetaSkills = copyOrEmpty(selectedNaturalAptitudesMetaSkills);
-        storedNaturalAptitudesMetaSkills = new HashMap<>(this.selectedNaturalAptitudesMetaSkills);
 
         buildAndShow();
     }
@@ -286,7 +281,7 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
         }
 
         // Meta Skills
-        if (isXPTab) {
+        if (tabType == LifePathBuilderTabType.FIXED_XP || tabType == LifePathBuilderTabType.FLEXIBLE_XP) {
             FastJScrollPane pnlMetaSkills = getMetaSkillOptions(metaSkills);
             optionPane.addTab(getTextAt(RESOURCE_BUNDLE, "LifePathSkillPicker.options.meta.label"),
                   pnlMetaSkills);
@@ -309,11 +304,7 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
     }
 
     /**
-     * Builds one tab of skill rows.
-     *
-     * <p>On the Requirements and Exclusions tabs the rows are one spinner each and sit three to a line. On the XP
-     * tabs each skill takes a whole line: its XP spinner on the left and its Natural Aptitude spinner on the right,
-     * so the two entries for a skill are always read together.</p>
+     * Builds one tab of skill rows, three to a line.
      *
      * @param skills the skills this tab shows
      *
@@ -321,11 +312,7 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
      */
     private FastJScrollPane getSkillOptions(List<SkillType> skills) {
         JPanel pnlSkills = new JPanel(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
+        GridBagConstraints gbc = createRowConstraints();
 
         int minimumValue = getMinimumValue();
 
@@ -338,32 +325,16 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
             JPanel pnlSkillRow = buildSpinnerRow(skillName, skillName, selectedSkillLevels, minimumValue,
                   maximumValue, keyValue);
 
-            if (isXPTab) {
-                gbc.gridx = 0;
-                gbc.gridy = index;
-                pnlSkills.add(pnlSkillRow, gbc);
-
-                String naturalAptitudeLabel = getFormattedTextAt(RESOURCE_BUNDLE,
-                      "LifePathSkillPicker.naturalAptitude.label", skillName);
-                JPanel pnlNaturalAptitudeRow = buildSpinnerRow(naturalAptitudeLabel, skillName,
-                      selectedNaturalAptitudes, XP_SPINNER_LOWEST_VALUE, XP_SPINNER_HIGHEST_VALUE, XP_KEY_VALUE);
-                gbc.gridx = 1;
-                pnlSkills.add(pnlNaturalAptitudeRow, gbc);
-            } else {
-                gbc.gridx = index % LEVEL_COLUMNS;
-                gbc.gridy = index / LEVEL_COLUMNS;
-                pnlSkills.add(pnlSkillRow, gbc);
-            }
+            gbc.gridx = index % COLUMNS;
+            gbc.gridy = index / COLUMNS;
+            pnlSkills.add(pnlSkillRow, gbc);
         }
 
         return wrapInScrollPane(pnlSkills);
     }
 
     /**
-     * Builds the meta skill tab, which only the XP tabs show.
-     *
-     * <p>Laid out like the XP skill tabs: the meta skill's XP spinner on the left, its Natural Aptitude spinner on
-     * the right.</p>
+     * Builds the meta skill tab, which only the XP tabs show, three rows to a line.
      *
      * @param metaSkills the meta skills to show
      *
@@ -371,11 +342,7 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
      */
     private FastJScrollPane getMetaSkillOptions(List<SkillSubType> metaSkills) {
         JPanel pnlSkills = new JPanel(new GridBagLayout());
-
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.NORTHWEST;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
+        GridBagConstraints gbc = createRowConstraints();
 
         int minimumValue = getMinimumValue();
         int maximumValue = getMaximumValue(MAXIMUM_META_SKILL_LEVEL);
@@ -387,20 +354,21 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
 
             JPanel pnlMetaSkillRow = buildSpinnerRow(label, metaSkill, selectedMetaSkillLevels, minimumValue,
                   maximumValue, keyValue);
-            gbc.gridx = 0;
-            gbc.gridy = index;
-            pnlSkills.add(pnlMetaSkillRow, gbc);
 
-            String naturalAptitudeLabel = getFormattedTextAt(RESOURCE_BUNDLE,
-                  "LifePathSkillPicker.naturalAptitude.label", label);
-            JPanel pnlNaturalAptitudeRow = buildSpinnerRow(naturalAptitudeLabel, metaSkill,
-                  selectedNaturalAptitudesMetaSkills, XP_SPINNER_LOWEST_VALUE, XP_SPINNER_HIGHEST_VALUE,
-                  XP_KEY_VALUE);
-            gbc.gridx = 1;
-            pnlSkills.add(pnlNaturalAptitudeRow, gbc);
+            gbc.gridx = index % COLUMNS;
+            gbc.gridy = index / COLUMNS;
+            pnlSkills.add(pnlMetaSkillRow, gbc);
         }
 
         return wrapInScrollPane(pnlSkills);
+    }
+
+    private static GridBagConstraints createRowConstraints() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.anchor = GridBagConstraints.NORTHWEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.weightx = 1.0;
+        return gbc;
     }
 
     /**
@@ -499,8 +467,6 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
         // Put back in place rather than reassigned: the spinner listeners hold these map instances.
         restore(selectedSkillLevels, storedSkillLevels);
         restore(selectedMetaSkillLevels, storedMetaSkillLevels);
-        restore(selectedNaturalAptitudes, storedNaturalAptitudes);
-        restore(selectedNaturalAptitudesMetaSkills, storedNaturalAptitudesMetaSkills);
     }
 
     private static <K> void restore(Map<K, Integer> selection, Map<K, Integer> stored) {
@@ -512,8 +478,6 @@ class LifePathSkillPicker extends AbstractLifePathPicker {
     protected void clearSelection() {
         selectedSkillLevels.clear();
         selectedMetaSkillLevels.clear();
-        selectedNaturalAptitudes.clear();
-        selectedNaturalAptitudesMetaSkills.clear();
         rebuildOptions();
     }
 }

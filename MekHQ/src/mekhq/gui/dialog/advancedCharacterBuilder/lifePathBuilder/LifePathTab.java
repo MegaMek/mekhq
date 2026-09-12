@@ -612,7 +612,7 @@ public class LifePathTab {
         );
         buttonsPanel.add(btnAddTrait);
 
-        // Skills (and, on the XP tabs, Natural Aptitudes: the skill picker offers both)
+        // Skills
 
         String titleAddSkill = getTextAt(RESOURCE_BUNDLE,
               "LifePathBuilderDialog.button.addSkill.label");
@@ -623,6 +623,22 @@ public class LifePathTab {
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddSkill)
         );
         buttonsPanel.add(btnAddSkill);
+
+        // Natural Aptitudes: the skill picker again, opened in its Natural Aptitude mode. XP tabs only, so the
+        // tooltip is only looked up where its key exists.
+        final boolean isXPTab = tabType == LifePathBuilderTabType.FIXED_XP
+                                      || tabType == LifePathBuilderTabType.FLEXIBLE_XP;
+        String titleAddNaturalAptitude = getTextAt(RESOURCE_BUNDLE,
+              "LifePathBuilderDialog.button.addNaturalAptitude.label");
+        RoundedJButton btnAddNaturalAptitude = new RoundedJButton(titleAddNaturalAptitude);
+        if (isXPTab) {
+            String tooltipAddNaturalAptitude = getTextAt(RESOURCE_BUNDLE,
+                  "LifePathBuilderDialog." + tabName + ".button.addNaturalAptitude.tooltip");
+            btnAddNaturalAptitude.addMouseListener(
+                  TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddNaturalAptitude)
+            );
+            buttonsPanel.add(btnAddNaturalAptitude);
+        }
 
         // SPAs
 
@@ -750,14 +766,26 @@ public class LifePathTab {
             LifePathSkillPicker picker = new LifePathSkillPicker(parent,
                   group.getSkills(),
                   group.getMetaSkills(),
+                  tabType,
+                  currentIndex,
+                  LifePathSkillPicker.Mode.SKILLS);
+            group.setSkills(picker.getSelectedSkillLevels());
+            group.setMetaSkills(picker.getSelectedMetaSkillLevels());
+            standardizedActions(currentIndex, editorProgress);
+        });
+        btnAddNaturalAptitude.addActionListener(actionEvent -> {
+            int currentIndex = tabLocal.getSelectedIndex();
+            LifePathGroup group = groupFor(currentIndex);
+
+            // Same dialog as Skills; only the maps differ. The picker's mode gives it its own title and instructions.
+            LifePathSkillPicker picker = new LifePathSkillPicker(parent,
                   group.getNaturalAptitudes(),
                   group.getNaturalAptitudesMetaSkills(),
                   tabType,
-                  currentIndex);
-            group.setSkills(picker.getSelectedSkillLevels());
-            group.setMetaSkills(picker.getSelectedMetaSkillLevels());
-            group.setNaturalAptitudes(picker.getSelectedNaturalAptitudes());
-            group.setNaturalAptitudesMetaSkills(picker.getSelectedNaturalAptitudesMetaSkills());
+                  currentIndex,
+                  LifePathSkillPicker.Mode.NATURAL_APTITUDES);
+            group.setNaturalAptitudes(picker.getSelectedSkillLevels());
+            group.setNaturalAptitudesMetaSkills(picker.getSelectedMetaSkillLevels());
             standardizedActions(currentIndex, editorProgress);
         });
         btnAddSPA.addActionListener(actionEvent -> {
