@@ -409,7 +409,7 @@ public record LifePath(
      *
      * @return the set indexes in ascending order
      *
-     * @since 0.50.11
+     * @since 0.51.01
      */
     public static SortedSet<Integer> flexibleXPGroupKeys(LifePathBuilder lifePath) {
         return flexibleXPGroupKeys(lifePath.flexibleXPAttributes(),
@@ -432,7 +432,7 @@ public record LifePath(
      * @return one value per item, in no particular order; empty when the set does not exist
      *
      * @see #flexibleXPItemValues(int, Map, Map, Map, Map, Map, Map, Map, Map, Map)
-     * @since 0.50.11
+     * @since 0.51.01
      */
     public static List<Integer> flexibleXPItemValues(LifePathBuilder lifePath, int setIndex) {
         return flexibleXPItemValues(setIndex,
@@ -472,7 +472,7 @@ public record LifePath(
      *
      * @return one value per item, in no particular order; empty when the set does not exist
      *
-     * @since 0.50.11
+     * @since 0.51.01
      */
     public static List<Integer> flexibleXPItemValues(int setIndex, @Nullable Map<Integer, Integer> edge,
           @Nullable Map<Integer, Integer> flexibleAttribute,

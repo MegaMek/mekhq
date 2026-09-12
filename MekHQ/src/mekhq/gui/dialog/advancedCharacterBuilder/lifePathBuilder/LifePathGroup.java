@@ -125,7 +125,7 @@ class LifePathGroup {
      *
      * @return the number of pickable items
      *
-     * @since 0.50.11
+     * @since 0.51.01
      */
     int countItems() {
         int itemCount = attributes.size()

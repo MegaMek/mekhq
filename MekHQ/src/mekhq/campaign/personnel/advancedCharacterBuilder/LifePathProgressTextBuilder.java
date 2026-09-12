@@ -232,7 +232,7 @@ public class LifePathProgressTextBuilder {
      *
      * @return the section as HTML, or an empty string when there are no sets
      *
-     * @since 0.50.11
+     * @since 0.51.01
      */
     private static String getFlexibleXPText(LifePathTab lifePathTab, LifePathBuilder costBasis) {
         StringBuilder newText = new StringBuilder();

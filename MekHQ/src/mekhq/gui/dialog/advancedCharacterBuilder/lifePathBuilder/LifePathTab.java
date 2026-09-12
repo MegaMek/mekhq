@@ -395,7 +395,7 @@ public class LifePathTab {
      *
      * @return the row
      *
-     * @since 0.50.11
+     * @since 0.51.01
      */
     private JPanel buildSetPickCountPanel(int setIndex) {
         LifePathGroup set = groupFor(setIndex);
@@ -440,7 +440,7 @@ public class LifePathTab {
      *
      * @return its set index, or {@code null} if the spinner belongs to no set (its set was removed)
      *
-     * @since 0.50.11
+     * @since 0.51.01
      */
     private @Nullable Integer indexOfPickCountSpinner(JSpinner spnPickCount) {
         for (Map.Entry<Integer, JSpinner> entry : pickCountSpinners.entrySet()) {
@@ -462,7 +462,7 @@ public class LifePathTab {
      *
      * @param setIndex the set whose spinner to refresh; sets without a spinner are ignored
      *
-     * @since 0.50.11
+     * @since 0.51.01
      */
     private void refreshPickCountSpinner(int setIndex) {
         JSpinner spnPickCount = pickCountSpinners.get(setIndex);
@@ -497,7 +497,7 @@ public class LifePathTab {
      *
      * @return the resource key
      *
-     * @since 0.50.11
+     * @since 0.51.01
      */
     private String groupButtonKey(String action, String part) {
         String noun = tabType == LifePathBuilderTabType.FLEXIBLE_XP ? "Set" : "Group";
@@ -578,7 +578,7 @@ public class LifePathTab {
      * @param removedIndex the index being removed
      * @param <T>          the value type
      *
-     * @since 0.50.11
+     * @since 0.51.01
      */
     private static <T> void closeGap(Map<Integer, T> indexed, int removedIndex) {
         Map<Integer, T> shifted = new TreeMap<>();
