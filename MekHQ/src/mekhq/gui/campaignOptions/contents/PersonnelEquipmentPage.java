@@ -97,6 +97,8 @@ class PersonnelEquipmentPage {
     private MMComboBox<String> cboAeroTechDefaultToolKit;
     private JLabel lblBATechDefaultToolKit;
     private MMComboBox<String> cboBATechDefaultToolKit;
+    private JLabel lblVesselCrewDefaultToolKit;
+    private MMComboBox<String> cboVesselCrewDefaultToolKit;
     private JLabel lblAstechDefaultToolKit;
     private MMComboBox<String> cboAstechDefaultToolKit;
     private JLabel lblDoctorDefaultToolKit;
@@ -128,6 +130,7 @@ class PersonnelEquipmentPage {
         cboMechanicDefaultToolKit = toolKitCombo("mechanicDefaultToolKit");
         cboAeroTechDefaultToolKit = toolKitCombo("aeroTechDefaultToolKit");
         cboBATechDefaultToolKit = toolKitCombo("baTechDefaultToolKit");
+        cboVesselCrewDefaultToolKit = toolKitCombo("VesselCrewDefaultToolKit");
         cboAstechDefaultToolKit = toolKitCombo("astechDefaultToolKit");
         cboDoctorDefaultToolKit = toolKitCombo("doctorDefaultToolKit");
         cboMedicDefaultToolKit = toolKitCombo("medicDefaultToolKit");
@@ -226,6 +229,11 @@ class PersonnelEquipmentPage {
         lblBATechDefaultToolKit.addMouseListener(createTipPanelUpdater("BATechDefaultToolKit"));
         cboBATechDefaultToolKit.addMouseListener(createTipPanelUpdater("BATechDefaultToolKit"));
 
+        lblVesselCrewDefaultToolKit = new CampaignOptionsLabel("VesselCrewDefaultToolKit", getMetadata(new Version(0,
+              51, 1)));
+        lblVesselCrewDefaultToolKit.addMouseListener(createTipPanelUpdater("VesselCrewDefaultToolKit"));
+        cboVesselCrewDefaultToolKit.addMouseListener(createTipPanelUpdater("VesselCrewDefaultToolKit"));
+
         lblAstechDefaultToolKit = new CampaignOptionsLabel("AstechDefaultToolKit", getMetadata(new Version(0, 51, 1)));
         lblAstechDefaultToolKit.addMouseListener(createTipPanelUpdater("AstechDefaultToolKit"));
         cboAstechDefaultToolKit.addMouseListener(createTipPanelUpdater("AstechDefaultToolKit"));
@@ -252,6 +260,7 @@ class PersonnelEquipmentPage {
         panel.addRow(lblMechanicDefaultToolKit, cboMechanicDefaultToolKit);
         panel.addRow(lblAeroTechDefaultToolKit, cboAeroTechDefaultToolKit);
         panel.addRow(lblBATechDefaultToolKit, cboBATechDefaultToolKit);
+        panel.addRow(lblVesselCrewDefaultToolKit, cboVesselCrewDefaultToolKit);
         panel.addRow(lblAstechDefaultToolKit, cboAstechDefaultToolKit);
         panel.addRow(lblDoctorDefaultToolKit, cboDoctorDefaultToolKit);
         panel.addRow(lblMedicDefaultToolKit, cboMedicDefaultToolKit);
@@ -399,6 +408,7 @@ class PersonnelEquipmentPage {
         cboMechanicDefaultToolKit.setSelectedItem(model.mechanicDefaultToolKit);
         cboAeroTechDefaultToolKit.setSelectedItem(model.aeroTechDefaultToolKit);
         cboBATechDefaultToolKit.setSelectedItem(model.baTechDefaultToolKit);
+        cboVesselCrewDefaultToolKit.setSelectedItem(model.vesselCrewDefaultToolKit);
         cboAstechDefaultToolKit.setSelectedItem(model.astechDefaultToolKit);
         cboDoctorDefaultToolKit.setSelectedItem(model.doctorDefaultToolKit);
         cboMedicDefaultToolKit.setSelectedItem(model.medicDefaultToolKit);
@@ -425,7 +435,7 @@ class PersonnelEquipmentPage {
         model.requireMekWarriorKitToDeploy = chkRequireMekWarriorKitToDeploy.isSelected();
         model.mekTechDefaultToolKit = cboMekTechDefaultToolKit.getSelectedItem();
         model.mechanicDefaultToolKit = cboMechanicDefaultToolKit.getSelectedItem();
-        model.aeroTechDefaultToolKit = cboAeroTechDefaultToolKit.getSelectedItem();
+        model.vesselCrewDefaultToolKit = cboVesselCrewDefaultToolKit.getSelectedItem();
         model.baTechDefaultToolKit = cboBATechDefaultToolKit.getSelectedItem();
         model.astechDefaultToolKit = cboAstechDefaultToolKit.getSelectedItem();
         model.doctorDefaultToolKit = cboDoctorDefaultToolKit.getSelectedItem();

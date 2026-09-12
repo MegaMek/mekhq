@@ -69,7 +69,7 @@ import org.w3c.dom.NodeList;
  * custom one there.
  */
 public class Ranks {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.Ranks";
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Legal";
     private static final MMLogger LOGGER = MMLogger.create(Ranks.class);
 
     // region Variable Declarations
