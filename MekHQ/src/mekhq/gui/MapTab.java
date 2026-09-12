@@ -323,7 +323,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
               BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(4), PADDING,
                   UIUtil.scaleForGUI(4), PADDING)));
 
-        JLabel searchLabel = new JLabel(text("mapHud.systemSearch.text"));
+        JLabel searchLabel = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "mapHud.systemSearch.text"));
         searchLabel.setForeground(ROUTE_MUTED_COLOR);
         searchLabel.setFont(searchLabel.getFont().deriveFont(Font.BOLD,
               searchLabel.getFont().getSize2D() * 0.8f));
@@ -335,7 +335,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         navigationHud.add(searchLabel, constraints);
 
         suggestPlanet = new JSuggestField(getFrame(), getCampaign().getSystemNames());
-        suggestPlanet.setToolTipText(text("mapHud.systemSearch.toolTipText"));
+        suggestPlanet.setToolTipText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "mapHud.systemSearch.toolTipText"));
         suggestPlanet.setBackground(HUD_CONTROL_BACKGROUND);
         suggestPlanet.setForeground(ROUTE_TEXT_COLOR);
         suggestPlanet.setCaretColor(PLANNED_ROUTE_COLOR);
@@ -475,8 +475,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         routeWorkspace.add(routeView, BorderLayout.CENTER);
 
         JButton collapseButton = createInspectorToggleButton(true,
-              text("mapContext.collapse.toolTipText"),
-              text("mapContext.collapse.accessibleName"));
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "mapContext.collapse.toolTipText"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "mapContext.collapse.accessibleName"));
         collapseButton.addActionListener(event -> toggleContextInspector());
 
         CardLayout contextCardLayout = new CardLayout();
@@ -484,8 +484,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         contextCards.add(systemView, "system");
         contextCards.add(routeWorkspace, "route");
 
-        JToggleButton systemTab = createContextTabButton(text("mapContext.system.text"));
-        JToggleButton routeTab = createContextTabButton(text("mapContext.route.text"));
+        JToggleButton systemTab = createContextTabButton(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "mapContext.system.text"));
+        JToggleButton routeTab = createContextTabButton(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "mapContext.route.text"));
         ButtonGroup contextTabGroup = new ButtonGroup();
         contextTabGroup.add(systemTab);
         contextTabGroup.add(routeTab);
@@ -573,8 +573,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         rail.setPreferredSize(railSize);
         rail.setMaximumSize(new Dimension(INSPECTOR_RAIL_WIDTH, Integer.MAX_VALUE));
         JButton expandButton = createInspectorToggleButton(false,
-              text("mapContext.expand.toolTipText"),
-              text("mapContext.expand.accessibleName"));
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "mapContext.expand.toolTipText"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "mapContext.expand.accessibleName"));
         expandButton.addActionListener(event -> toggleContextInspector());
         JPanel buttonRow = new JPanel(new BorderLayout());
         buttonRow.setOpaque(false);
@@ -619,7 +619,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
               BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(10), PADDING,
                   UIUtil.scaleForGUI(10), PADDING)));
 
-        JLabel heading = createRouteWorkspaceHeading(text("routePlanner.heading.text"));
+        JLabel heading = createRouteWorkspaceHeading(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routePlanner.heading.text"));
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.gridx = 0;
         constraints.gridy = 0;
@@ -680,9 +680,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         options.setOpaque(false);
 
           JCheckBox avoidAbandonedSystems = new ImmersiveCheckBox(
-              text("chkAvoidAbandonedSystems.text"));
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "chkAvoidAbandonedSystems.text"));
         avoidAbandonedSystems.setToolTipText(wordWrap(
-              text("chkAvoidAbandonedSystems.toolTipText")));
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "chkAvoidAbandonedSystems.toolTipText")));
         avoidAbandonedSystems.setSelected(getCampaign().getPlayerForce().isAvoidingEmptySystems());
         avoidAbandonedSystems.setAlignmentX(Component.LEFT_ALIGNMENT);
         avoidAbandonedSystems.addActionListener(event ->
@@ -690,8 +690,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         options.add(avoidAbandonedSystems);
 
           JCheckBox useCommandCircuits = new ImmersiveCheckBox(
-              text("chkUseCommandCircuits.text"));
-          useCommandCircuits.setToolTipText(wordWrap(text("chkUseCommandCircuits.toolTipText")));
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "chkUseCommandCircuits.text"));
+          useCommandCircuits.setToolTipText(wordWrap(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "chkUseCommandCircuits.toolTipText")));
         useCommandCircuits.setSelected(getCampaign().getPlayerForce().isOverridingCommandCircuitRequirements());
         useCommandCircuits.setAlignmentX(Component.LEFT_ALIGNMENT);
         useCommandCircuits.addActionListener(event -> {
@@ -748,7 +748,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     }
 
     private JToggleButton createRouteViewButton(String textKey, RouteViewMode mode) {
-        JToggleButton button = new JToggleButton(text(textKey));
+        JToggleButton button = new JToggleButton(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, textKey));
         button.setForeground(ROUTE_TEXT_COLOR);
         button.setFocusPainted(false);
         button.setContentAreaFilled(false);
@@ -763,7 +763,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     }
 
     private FramedCommandButton createHudButton(String textKey, String toolTipKey) {
-        return createNavigationButton(text(textKey), text(toolTipKey));
+        return createNavigationButton(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, textKey), MHQInternationalization.getTextAt(RESOURCE_BUNDLE, toolTipKey));
     }
 
     static FramedCommandButton createNavigationButton(String text, String toolTipText) {
@@ -879,7 +879,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     }
 
     private JLabel createRouteFieldLabel(String textKey) {
-        JLabel label = new JLabel(text(textKey));
+        JLabel label = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, textKey));
         label.setForeground(ROUTE_MUTED_COLOR);
         label.setFont(label.getFont().deriveFont(Font.BOLD, label.getFont().getSize2D() * 0.8f));
         return label;
@@ -887,7 +887,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
     private JSuggestField createRouteField(String accessibleNameKey, String toolTipKey) {
         JSuggestField field = new JSuggestField(getFrame(), getCampaign().getSystemNames());
-        field.setToolTipText(text(toolTipKey));
+        field.setToolTipText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, toolTipKey));
         field.setBackground(HUD_CONTROL_BACKGROUND);
         field.setForeground(ROUTE_TEXT_COLOR);
         field.setCaretColor(PLANNED_ROUTE_COLOR);
@@ -897,7 +897,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         Dimension preferredSize = field.getPreferredSize();
         field.setPreferredSize(new Dimension(UIUtil.scaleForGUI(180), preferredSize.height));
         field.setMinimumSize(new Dimension(UIUtil.scaleForGUI(96), preferredSize.height));
-        field.getAccessibleContext().setAccessibleName(text(accessibleNameKey));
+        field.getAccessibleContext().setAccessibleName(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, accessibleNameKey));
         field.getAccessibleContext().setAccessibleDescription(field.getToolTipText());
         field.addFocusListener(new FocusAdapter() {
             @Override
@@ -987,25 +987,25 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         boolean hasProposedPath = (proposedPath != null) && !proposedPath.isEmpty();
         boolean hasActivePath = (activePath != null) && !activePath.isEmpty();
         JumpPath displayedPath = hasProposedPath ? proposedPath : (hasActivePath ? activePath : null);
-        String unavailable = text("routeStrip.unavailable.text");
+        String unavailable = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.unavailable.text");
         boolean isCostVisible = getCampaign().getCampaignOptions().get(CampaignOption.PAY_FOR_TRANSPORT);
         PlanetarySystem selectedSystem = panMap.getSelectedSystem();
         boolean isQuickPlotVisible = true;
         boolean isQuickPlotEnabled = canQuickPlotRoute(selectedSystem, getCampaign().getCurrentSystem());
-          String quickPlotText = text(quickPlotResourceKey(hasProposedPath));
+          String quickPlotText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, quickPlotResourceKey(hasProposedPath));
 
         if (displayedPath == null) {
             String selectedSystemName = (selectedSystem == null)
                 ? unavailable
                 : selectedSystem.getPrintableName(getCampaign().getLocalDate());
             return new RouteStripSnapshot(RouteStripState.NO_ROUTE,
-                                    text("routeStrip.noRoute.text"),
+                                    MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.noRoute.text"),
                   ROUTE_MUTED_COLOR,
-                                text("routeStrip.target.text") + "  " + selectedSystemName,
-                                    text("routeStrip.jumps.text") + "  " + unavailable,
-                                    text("routeStrip.duration.text") + "  " + unavailable,
-                                    text("routeStrip.nextJump.text") + "  " + unavailable,
-                                    text("routeStrip.estimatedCost.text") + "  " + unavailable,
+                                MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.target.text") + "  " + selectedSystemName,
+                                    MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.jumps.text") + "  " + unavailable,
+                                    MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.duration.text") + "  " + unavailable,
+                                    MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.nextJump.text") + "  " + unavailable,
+                                    MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.estimatedCost.text") + "  " + unavailable,
                   ROUTE_MUTED_COLOR,
                   isCostVisible,
                   quickPlotText,
@@ -1020,7 +1020,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
               && isWhatIfRoute(proposedPath, getCampaign().getCurrentSystem());
           RouteStripState routeState = whatIfRoute ? RouteStripState.WHAT_IF_ROUTE
               : (isPlannedRoute ? RouteStripState.PLANNED_ROUTE : RouteStripState.IN_TRANSIT);
-          String statusText = text(switch (routeState) {
+          String statusText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, switch (routeState) {
             case NO_ROUTE -> "routeStrip.noRoute.text";
             case PLANNED_ROUTE -> "routeStrip.plannedRoute.text";
             case WHAT_IF_ROUTE -> "routeStrip.whatIfRoute.text";
@@ -1030,8 +1030,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         String destinationName = (destination == null)
               ? unavailable
               : destination.getPrintableName(getCampaign().getLocalDate());
-        String destinationText = text("routeStrip.destination.text") + "  " + destinationName;
-        String jumpsText = text(isPlannedRoute
+        String destinationText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.destination.text") + "  " + destinationName;
+        String jumpsText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, isPlannedRoute
               ? "routeStrip.jumps.text"
               : "routeStrip.jumpsRemaining.text") + "  " + displayedPath.getJumps();
 
@@ -1044,15 +1044,15 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
                   : currentLocation.getTransitTime());
           int duration = (int) ceil(displayedPath.getTotalTime(getCampaign().getLocalDate(), currentTransit,
               getCampaign().isUseCommandCircuit()));
-          String durationText = text("routeStrip.duration.text") + "  " + duration + ' '
-              + text("routeStrip.days.text");
+          String durationText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.duration.text") + "  " + duration + ' '
+              + MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.days.text");
           String nextJumpText = createNextJumpText(displayedPath, currentLocation, unavailable, useCampaignProgress);
 
-        String costText = text("routeStrip.estimatedCost.text") + "  " + unavailable;
+        String costText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.estimatedCost.text") + "  " + unavailable;
         if (isCostVisible) {
             TransportCostCalculations calculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
             Money journeyCost = calculations.calculateJumpCostForEntireJourney(duration, displayedPath.getJumps());
-            costText = text("routeStrip.estimatedCost.text") + "  "
+            costText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.estimatedCost.text") + "  "
                 + journeyCost.toAmountAndSymbolString();
         }
 
@@ -1077,7 +1077,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
         private String createNextJumpText(JumpPath displayedPath, AbstractLocation currentLocation, String unavailable,
             boolean useCampaignProgress) {
-        String label = text("routeStrip.nextJump.text") + "  ";
+        String label = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.nextJump.text") + "  ";
         if ((displayedPath == null) || displayedPath.isEmpty() || (displayedPath.getJumps() <= 0)
               || (displayedPath.getFirstSystem() == null)
               || (useCampaignProgress && ((currentLocation == null)
@@ -1097,7 +1097,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
                   - elapsedRecharge);
         double remainingDays = Math.max(remainingTransitDays, remainingRechargeHours / 24.0);
         if (remainingDays <= 0.0) {
-            return label + text("routeStrip.nextJump.ready.text");
+            return label + MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.nextJump.ready.text");
         }
 
         long totalHours = (long) Math.ceil(remainingDays * 24.0);
@@ -1105,12 +1105,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         long hours = totalHours % 24;
         String timeText;
         if ((days > 0) && (hours > 0)) {
-            timeText = days + text("routeStrip.nextJump.daySuffix.text") + ' '
-                  + hours + text("routeStrip.nextJump.hourSuffix.text");
+            timeText = days + MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.nextJump.daySuffix.text") + ' '
+                  + hours + MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.nextJump.hourSuffix.text");
         } else if (days > 0) {
-            timeText = days + text("routeStrip.nextJump.daySuffix.text");
+            timeText = days + MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.nextJump.daySuffix.text");
         } else {
-            timeText = hours + text("routeStrip.nextJump.hourSuffix.text");
+            timeText = hours + MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.nextJump.hourSuffix.text");
         }
         return label + timeText;
     }
@@ -1205,7 +1205,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         lblRouteStatus.setText(snapshot.statusText());
         lblRouteStatus.setForeground(snapshot.statusColor());
         String statusDescription = snapshot.state() == RouteStripState.WHAT_IF_ROUTE
-              ? text("routeStrip.whatIfRoute.toolTipText")
+              ? MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.whatIfRoute.toolTipText")
               : snapshot.statusText();
         lblRouteStatus.setToolTipText(statusDescription);
         lblRouteStatus.getAccessibleContext().setAccessibleName(snapshot.statusText());
@@ -1220,7 +1220,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         updateRouteEntryAction();
         btnQuickPlotCourse.setText(snapshot.quickPlotText());
         btnQuickPlotCourse.getAccessibleContext().setAccessibleName(snapshot.quickPlotText());
-          String quickPlotDescription = text("routeStrip.plot.toolTipText");
+          String quickPlotDescription = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.plot.toolTipText");
           btnQuickPlotCourse.setToolTipText(quickPlotDescription);
           btnQuickPlotCourse.getAccessibleContext().setAccessibleDescription(quickPlotDescription);
         btnQuickPlotCourse.setVisible(snapshot.quickPlotVisible());
@@ -1228,8 +1228,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         btnBeginTransit.setVisible(true);
                     btnBeginTransit.setEnabled(enableActions && snapshot.beginTransitEnabled());
                         String beginTransitDescription = snapshot.state() == RouteStripState.WHAT_IF_ROUTE
-              ? text("routePlanner.beginTransitWhatIf.toolTipText")
-              : text("btnBeginTransit.toolTipText");
+              ? MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routePlanner.beginTransitWhatIf.toolTipText")
+              : MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "btnBeginTransit.toolTipText");
           btnBeginTransit.setToolTipText(beginTransitDescription);
           btnBeginTransit.getAccessibleContext().setAccessibleDescription(beginTransitDescription);
         presentedRouteSnapshot = snapshot;
@@ -1548,10 +1548,10 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         constraints.gridy = 0;
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.HORIZONTAL;
-          message.add(createRouteWorkspaceHeading(text("routePlanner.empty.eyebrow.text")),
+          message.add(createRouteWorkspaceHeading(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routePlanner.empty.eyebrow.text")),
               constraints);
 
-          JLabel status = new JLabel(text("routePlanner.empty.text"));
+          JLabel status = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routePlanner.empty.text"));
         status.setForeground(ROUTE_TEXT_COLOR);
         status.setFont(status.getFont().deriveFont(Font.BOLD, status.getFont().getSize2D() * 1.3f));
         constraints = new GridBagConstraints();
@@ -1570,10 +1570,6 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         constraints.fill = GridBagConstraints.HORIZONTAL;
         emptyView.add(message, constraints);
         return emptyView;
-    }
-
-    private static String text(String key) {
-        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
     }
 
     private void showDossier(PlanetarySystem system, int planetPosition) {

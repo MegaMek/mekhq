@@ -218,7 +218,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         LocalDate currentDate = campaign.getLocalDate();
         String printableSystemName = system.getPrintableName(currentDate);
 
-        JLabel eyebrow = new JLabel(text("dossier.eyebrow.text"));
+        JLabel eyebrow = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "dossier.eyebrow.text"));
         eyebrow.setForeground(DOSSIER_ACCENT);
         eyebrow.setFont(eyebrow.getFont().deriveFont(Font.BOLD, eyebrow.getFont().getSize2D() * 0.85f));
         GridBagConstraints constraints = createFullWidthConstraints(0);
@@ -234,7 +234,7 @@ public class PlanetViewPanel extends JScrollablePanel {
 
         String context;
         if (planet == null) {
-            context = text("dossier.systemContext.text");
+            context = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "dossier.systemContext.text");
         } else {
             String printablePlanetName = planet.getPrintableName(currentDate);
             String factionDescription = planet.getFactionDesc(currentDate);
@@ -297,7 +297,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         JPanel metric = createBandPanel();
         metric.setLayout(new BoxLayout(metric, BoxLayout.Y_AXIS));
 
-        JLabel label = new JLabel(text(labelKey));
+        JLabel label = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, labelKey));
         label.setForeground(warning ? DOSSIER_WARNING : DOSSIER_MUTED_TEXT);
         label.setFont(label.getFont().deriveFont(Font.BOLD, label.getFont().getSize2D() * 0.8f));
         label.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -658,7 +658,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     private JLabel createSectionHeading(String headingKey) {
-        JLabel heading = new JLabel(text(headingKey));
+        JLabel heading = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, headingKey));
         heading.setForeground(DOSSIER_ACCENT);
         heading.setFont(heading.getFont().deriveFont(Font.BOLD, heading.getFont().getSize2D() * 0.85f));
         return heading;
@@ -756,7 +756,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         private void addRow(String labelKey, JComponent value) {
-            JLabel label = new JLabel(labelKey == null ? "" : text(labelKey));
+            JLabel label = new JLabel(labelKey == null ? "" : MHQInternationalization.getTextAt(RESOURCE_BUNDLE, labelKey));
             label.setForeground(DOSSIER_MUTED_TEXT);
             label.setFont(label.getFont().deriveFont(Font.BOLD));
             Dimension preferredSize = label.getPreferredSize();
@@ -788,7 +788,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
 
         private void addStackedRow(String labelKey, JComponent value) {
-            JLabel label = new JLabel(text(labelKey));
+            JLabel label = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, labelKey));
             label.setForeground(DOSSIER_MUTED_TEXT);
             label.setFont(label.getFont().deriveFont(Font.BOLD));
 
@@ -838,7 +838,4 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
     }
 
-    private static String text(String key) {
-        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
-    }
 }

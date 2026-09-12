@@ -184,8 +184,8 @@ final class InterstellarMapLegend {
         tabbedPane.setBackground(BACKGROUND);
         tabbedPane.setForeground(TEXT);
         tabbedPane.setFocusable(true);
-        tabbedPane.getAccessibleContext().setAccessibleName(text("map.legend.accessibleName"));
-        tabbedPane.getAccessibleContext().setAccessibleDescription(text("map.legend.accessibleDescription"));
+        tabbedPane.getAccessibleContext().setAccessibleName(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.legend.accessibleName"));
+        tabbedPane.getAccessibleContext().setAccessibleDescription(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.legend.accessibleDescription"));
         for (int sectionIndex = 0; sectionIndex < sectionPanels.size(); sectionIndex++) {
             Section section = SECTIONS.get(sectionIndex);
             JScrollPane scrollPane = createSectionScrollPane(sectionPanels.get(sectionIndex), contentWidth,
@@ -214,7 +214,7 @@ final class InterstellarMapLegend {
         String sectionName = section.getAccessibleContext().getAccessibleName();
         scrollPane.getAccessibleContext().setAccessibleName(sectionName);
         scrollPane.getAccessibleContext().setAccessibleDescription(
-              formatText("map.legend.section.accessibleDescription", sectionName));
+              MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "map.legend.section.accessibleDescription", sectionName));
         return scrollPane;
     }
 
@@ -329,19 +329,11 @@ final class InterstellarMapLegend {
     }
 
     private static Entry entry(Symbol symbol, String resourceKey) {
-        return new Entry(symbol, text(resourceKey + ".title"), text(resourceKey + ".description"));
+        return new Entry(symbol, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, resourceKey + ".title"), MHQInternationalization.getTextAt(RESOURCE_BUNDLE, resourceKey + ".description"));
     }
 
     private static Section section(String resourceKey, List<Entry> entries) {
-        return new Section(text(resourceKey), entries);
-    }
-
-    private static String text(String key) {
-        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
-    }
-
-    private static String formatText(String key, Object... arguments) {
-        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, arguments);
+        return new Section(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, resourceKey), entries);
     }
 
     private static final class MapLegendSwatch extends JComponent {

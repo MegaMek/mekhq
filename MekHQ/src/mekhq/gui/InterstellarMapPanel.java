@@ -376,7 +376,7 @@ public class InterstellarMapPanel extends JPanel {
 
         @Override
         public String toString() {
-            return text(labelKey);
+            return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, labelKey);
         }
     }
 
@@ -402,7 +402,7 @@ public class InterstellarMapPanel extends JPanel {
 
         @Override
         public String toString() {
-            return text(labelKey);
+            return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, labelKey);
         }
     }
 
@@ -422,7 +422,7 @@ public class InterstellarMapPanel extends JPanel {
 
         @Override
         public String toString() {
-            return text(labelKey);
+            return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, labelKey);
         }
     }
 
@@ -1871,21 +1871,21 @@ public class InterstellarMapPanel extends JPanel {
                     final Point popupAnchor = new Point(e.getPoint());
                     final PlanetarySystem popupSystem = findSystemAt(popupAnchor);
                     JPopupMenu popup = new JPopupMenu();
-                    JMenuItem item = new JMenuItem(text("map.context.zoomIn.text"));
+                    JMenuItem item = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.zoomIn.text"));
                     item.addActionListener(ae -> zoom(1.5, popupAnchor));
                     popup.add(item);
-                    item = new JMenuItem(text("map.context.zoomOut.text"));
+                    item = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.zoomOut.text"));
                     item.addActionListener(ae -> zoom(0.5, popupAnchor));
                     popup.add(item);
-                    JMenu centerM = new JMenu(text("map.context.center.text"));
-                    item = new JMenuItem(text("map.context.center.selected.text"));
+                    JMenu centerM = new JMenu(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.center.text"));
+                    item = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.center.selected.text"));
                     item.setEnabled(selectedSystem != null);
                     if (selectedSystem != null) {
                         // only add if there is a planet to center on
                         item.addActionListener(ae -> center(selectedSystem));
                     }
                     centerM.add(item);
-                    item = new JMenuItem(text("map.context.center.current.text"));
+                    item = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.center.current.text"));
                     item.setEnabled(InterstellarMapPanel.this.campaign.getCurrentSystem() != null);
                     if (InterstellarMapPanel.this.campaign.getCurrentSystem() != null) {
                         // only add if there is a planet to center on
@@ -1895,7 +1895,7 @@ public class InterstellarMapPanel extends JPanel {
                         });
                     }
                     centerM.add(item);
-                    item = new JMenuItem(text("map.context.center.terra.text"));
+                    item = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.center.terra.text"));
                     item.addActionListener(evt -> {
                         conf.centerX = 0.0;
                         conf.centerY = 0.0;
@@ -1922,11 +1922,11 @@ public class InterstellarMapPanel extends JPanel {
                           routePlanningHandler.hasPlannedRoute(),
                           routePlanningHandler::clearPlannedRoute));
                       popup.addSeparator();
-                    item = new JMenuItem(text("map.context.cancelTrip.text"));
+                    item = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.cancelTrip.text"));
                     item.setEnabled(routePlanningHandler.hasActiveTrip());
                     item.addActionListener(evt -> routePlanningHandler.cancelCurrentTrip());
                     popup.add(item);
-                    item = new JMenuItem(text("map.context.save.text"));
+                    item = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.save.text"));
                     item.setEnabled(true);
                     item.addActionListener(evt -> {
                         final int imgSize = 8192;
@@ -1957,8 +1957,8 @@ public class InterstellarMapPanel extends JPanel {
                         mapPanel.repaint();
                     });
                     popup.add(item);
-                    JMenu menuGM = new JMenu(text("map.context.gm.text"));
-                    item = new JMenuItem(text("map.context.gm.move.text"));
+                    JMenu menuGM = new JMenu(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.gm.text"));
+                    item = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.gm.move.text"));
                       item.setEnabled((selectedSystem != null)
                           && InterstellarMapPanel.this.campaign.isGM());
                     if (selectedSystem != null) {
@@ -1973,7 +1973,7 @@ public class InterstellarMapPanel extends JPanel {
                     }
                     menuGM.add(item);
 
-                    item = new JMenuItem(text("map.context.gm.editSystem.text"));
+                    item = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.gm.editSystem.text"));
                                             item.setEnabled((selectedSystem != null)
                           && InterstellarMapPanel.this.campaign.isGM());
                     if (selectedSystem != null) {
@@ -1982,7 +1982,7 @@ public class InterstellarMapPanel extends JPanel {
                     }
                     menuGM.add(item);
 
-                    item = new JMenuItem(text("map.context.gm.recharge.text"));
+                    item = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.gm.recharge.text"));
                     item.setEnabled(InterstellarMapPanel.this.campaign.getPlayerForce()
                                           .getForceDetachment()
                                           .getCurrentLocation()
@@ -1992,7 +1992,7 @@ public class InterstellarMapPanel extends JPanel {
                         InterstellarMapPanel.this.campaign.getPlayerForce().getForceDetachment().getCurrentLocation()
                               .chargeFully(InterstellarMapPanel.this.campaign);
                         InterstellarMapPanel.this.campaign.addReport(GENERAL,
-                            text("map.context.gm.recharge.report"));
+                            MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.context.gm.recharge.report"));
                     });
                     menuGM.add(item);
 
@@ -2604,7 +2604,7 @@ public class InterstellarMapPanel extends JPanel {
                 optionHeader.setLayout(new BoxLayout(optionHeader, BoxLayout.X_AXIS));
                 optionHeader.setOpaque(false);
                 optionHeader.setAlignmentX(Component.LEFT_ALIGNMENT);
-                optionHeader.add(createLabel(text("map.layer.heading.text")));
+                optionHeader.add(createLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.layer.heading.text")));
                 optionPanel.add(optionHeader);
 
                                                                 optFactions = createOptionRadioButton("map.layer.faction", MapMode.FACTION);
@@ -2651,7 +2651,7 @@ public class InterstellarMapPanel extends JPanel {
         optionPanel.add(Box.createRigidArea(new Dimension(0, UIUtil.scaleForGUI(7))));
         optionPanel.add(createOptionDivider());
         optionPanel.add(Box.createRigidArea(new Dimension(0, UIUtil.scaleForGUI(7))));
-        optionPanel.add(createLabel(text("map.overlay.heading.text")));
+        optionPanel.add(createLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.overlay.heading.text")));
         optEmptySystems = createOptionCheckBox("map.overlay.emptySystems");
         optEmptySystems.setSelected(false);
         optEmptySystems.addActionListener(e -> repaint());
@@ -2675,8 +2675,8 @@ public class InterstellarMapPanel extends JPanel {
         optAdministrativeDetail.setPreferredSize(administrativeDetailSize);
         optAdministrativeDetail.setMinimumSize(administrativeDetailSize);
         optAdministrativeDetail.setMaximumSize(administrativeDetailSize);
-          configureLayerControlTooltip(optAdministrativeDetail, text("map.overlay.administrative.text"),
-              text("map.overlay.administrativeDetail.toolTipText"));
+          configureLayerControlTooltip(optAdministrativeDetail, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.overlay.administrative.text"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.overlay.administrativeDetail.toolTipText"));
         optAdministrativeDetail.addActionListener(event -> {
             administrativeRenderCache.clear();
             repaint();
@@ -2704,8 +2704,8 @@ public class InterstellarMapPanel extends JPanel {
                 optCapitalDetail.setPreferredSize(capitalDetailSize);
                 optCapitalDetail.setMinimumSize(capitalDetailSize);
                 optCapitalDetail.setMaximumSize(capitalDetailSize);
-                                  configureLayerControlTooltip(optCapitalDetail, text("map.overlay.capitals.text"),
-                                      text("map.overlay.capitalDetail.toolTipText"));
+                                  configureLayerControlTooltip(optCapitalDetail, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.overlay.capitals.text"),
+                                      MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.overlay.capitalDetail.toolTipText"));
                 optCapitalDetail.addActionListener(event -> repaint());
                 optCapitals.addActionListener(event -> {
             optCapitalDetail.setEnabled(optCapitals.isSelected());
@@ -2730,8 +2730,8 @@ public class InterstellarMapPanel extends JPanel {
           optHpgNetworkDetail.setPreferredSize(hpgDetailSize);
           optHpgNetworkDetail.setMinimumSize(hpgDetailSize);
           optHpgNetworkDetail.setMaximumSize(hpgDetailSize);
-          configureLayerControlTooltip(optHpgNetworkDetail, text("map.overlay.hpgNetwork.text"),
-              text("map.overlay.hpgDetail.toolTipText"));
+          configureLayerControlTooltip(optHpgNetworkDetail, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.overlay.hpgNetwork.text"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.overlay.hpgDetail.toolTipText"));
         optHpgNetworkDetail.addActionListener(e -> repaint());
         optHPGNetwork.addActionListener(e -> {
             optHpgNetworkDetail.setEnabled(optHPGNetwork.isSelected());
@@ -2760,8 +2760,8 @@ public class InterstellarMapPanel extends JPanel {
           reachabilityHops.setPreferredSize(hopSpinnerSize);
           reachabilityHops.setMinimumSize(hopSpinnerSize);
           reachabilityHops.setMaximumSize(hopSpinnerSize);
-          String hopLabelText = text("map.overlay.reachability.hops.text");
-          String hopTooltip = text("map.overlay.reachability.hops.toolTipText");
+          String hopLabelText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.overlay.reachability.hops.text");
+          String hopTooltip = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.overlay.reachability.hops.toolTipText");
           configureLayerControlTooltip(reachabilityHops, hopLabelText, hopTooltip);
           reachabilityHops.setEnabled(false);
           reachabilityHops.addChangeListener(event -> {
@@ -3402,14 +3402,6 @@ public class InterstellarMapPanel extends JPanel {
         drawNavigationContact(graphics, new Arc2D.Double(), 52, 19, 2.5);
     }
 
-    private static String text(String key) {
-        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
-    }
-
-    private static String formatText(String key, Object... arguments) {
-        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, arguments);
-    }
-
     private static void paintLegendOperation(Graphics2D graphics) {
           SystemMarkerLayout urgentLayout = SystemMarkerLayout.create(46, 32, 2,
               RouteMarkerState.NONE, false, false);
@@ -3547,9 +3539,9 @@ public class InterstellarMapPanel extends JPanel {
             }
         };
         Dimension buttonSize = UIUtil.scaleForGUI(MAP_LEGEND_BUTTON_SIZE, MAP_LEGEND_BUTTON_SIZE);
-          String accessibleText = text("map.legend.button.text");
+          String accessibleText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.legend.button.text");
         configureNavigationUtilityButton(legendButton, buttonSize, accessibleText, accessibleText,
-              text("map.legend.button.accessibleDescription"));
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.legend.button.accessibleDescription"));
         return legendButton;
     }
 
@@ -3645,7 +3637,7 @@ public class InterstellarMapPanel extends JPanel {
         mapLegendDialog = null;
 
         Window owner = SwingUtilities.getWindowAncestor(this);
-        JDialog dialog = new JDialog(owner, text("map.legend.dialog.title"), Dialog.ModalityType.MODELESS);
+        JDialog dialog = new JDialog(owner, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.legend.dialog.title"), Dialog.ModalityType.MODELESS);
         dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         dialog.getRootPane().putClientProperty("JRootPane.titleBarBackground", MAP_LEGEND_TITLE_BACKGROUND);
         dialog.getRootPane().putClientProperty("JRootPane.titleBarForeground", MAP_LEGEND_TITLE_FOREGROUND);
@@ -4228,22 +4220,22 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     private JCheckBox createOptionCheckBox(String resourceKey) {
-        String optionText = text(resourceKey + ".text");
+        String optionText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, resourceKey + ".text");
         JCheckBox checkBox = new LayerControlCheckBox(optionText);
         checkBox.setForeground(LAYER_CONTROL_TEXT);
         checkBox.setPreferredSize(UIUtil.scaleForGUI(150, 20));
         checkBox.setAlignmentX(Component.LEFT_ALIGNMENT);
-        configureLayerControlTooltip(checkBox, optionText, text(resourceKey + ".toolTipText"));
+        configureLayerControlTooltip(checkBox, optionText, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, resourceKey + ".toolTipText"));
         return checkBox;
     }
 
     private JRadioButton createOptionRadioButton(String resourceKey, MapMode mapMode) {
-        String optionText = text(resourceKey + ".text");
+        String optionText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, resourceKey + ".text");
         JRadioButton radioButton = new LayerControlRadioButton(optionText);
         radioButton.setForeground(LAYER_CONTROL_TEXT);
         radioButton.setPreferredSize(UIUtil.scaleForGUI(150, 20));
         radioButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-        configureLayerControlTooltip(radioButton, optionText, text(resourceKey + ".toolTipText"));
+        configureLayerControlTooltip(radioButton, optionText, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, resourceKey + ".toolTipText"));
         radioButton.addActionListener(e -> {
             if (radioButton.isSelected()) {
                 startMapModeAnimation(mapMode);
@@ -6201,8 +6193,8 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     private JMenuItem createRoutePlanningMenuItem(String resourceKey, boolean enabled, Runnable action) {
-        JMenuItem item = new JMenuItem(text(resourceKey + ".text"));
-        item.setToolTipText(text(resourceKey + ".toolTipText"));
+        JMenuItem item = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, resourceKey + ".text"));
+        item.setToolTipText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, resourceKey + ".toolTipText"));
         item.getAccessibleContext().setAccessibleName(item.getText());
         item.getAccessibleContext().setAccessibleDescription(item.getToolTipText());
         item.setEnabled(enabled);
@@ -6985,7 +6977,7 @@ public class InterstellarMapPanel extends JPanel {
             return;
         }
         PlanetarySystem anchor = cachedReachability.anchor();
-          String annotation = formatText("map.reachability.anchor.format",
+          String annotation = MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "map.reachability.anchor.format",
               anchor.getPrintableName(campaign.getLocalDate()), cachedReachability.maximumHops());
         Font oldFont = graphics.getFont();
         Paint oldPaint = graphics.getPaint();
@@ -7104,9 +7096,9 @@ public class InterstellarMapPanel extends JPanel {
         String jumps = NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getLocale())
                              .format(assessment.facts().minimumStandardJumps());
         String circuitSuffix = assessment.facts().commandCircuitAssumed()
-              ? text("map.measurement.circuitSuffix.text")
+              ? MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.measurement.circuitSuffix.text")
               : "";
-          String labelText = formatText("map.measurement.label.format",
+          String labelText = MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "map.measurement.label.format",
               distance, jumps, measurementStatusText(assessment, numberFormat), circuitSuffix);
         Font labelFont = graphics.getFont().deriveFont(Font.BOLD,
               Math.max(9.0f, Math.min(11.0f, graphics.getFont().getSize2D() * 0.82f)));
@@ -7141,12 +7133,12 @@ public class InterstellarMapPanel extends JPanel {
                 case RECHARGE_IMPOSSIBLE -> "map.measurement.status.rechargeBlocked.text";
                 default -> "map.measurement.status.blocked.text";
             };
-            return text(key);
+            return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
         }
-        return formatText("map.measurement.status.clear.format",
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "map.measurement.status.clear.format",
               numberFormat.format(assessment.facts().rechargeHours()),
               assessment.facts().rechargeStationCount() > 0
-                    ? text("map.measurement.stationSuffix.text")
+                    ? MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.measurement.stationSuffix.text")
                     : "");
     }
 
@@ -7973,7 +7965,7 @@ public class InterstellarMapPanel extends JPanel {
         float headingFontSize = Math.max(UIUtil.scaleForGUI(9), baseFont.getSize2D() * 0.78f);
         graphics.setFont(baseFont.deriveFont(Font.BOLD, headingFontSize));
         double headingBaseline = layout.scaleBarY() - Math.max(7, UIUtil.scaleForGUI(9));
-        drawNavigationText(graphics, text("map.navigation.distance.text"), layout.scaleBarStartX(), headingBaseline,
+        drawNavigationText(graphics, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.navigation.distance.text"), layout.scaleBarStartX(), headingBaseline,
               MAP_LEGEND_MUTED_TEXT);
 
         float lineWidth = Math.max(1.0f, UIUtil.scaleForGUI(1));
@@ -8050,26 +8042,26 @@ public class InterstellarMapPanel extends JPanel {
         }
 
         String corewardLabel() {
-            return text("map.navigation.coreward.text");
+            return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.navigation.coreward.text");
         }
 
         String rimwardLabel() {
-            return text("map.navigation.rimward.text");
+            return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.navigation.rimward.text");
         }
 
         String antiSpinwardLabel() {
-            return text("map.navigation.antiSpinward.text");
+            return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.navigation.antiSpinward.text");
         }
 
         String spinwardLabel() {
-            return text("map.navigation.spinward.text");
+            return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.navigation.spinward.text");
         }
 
         String distanceLabel() {
             BigDecimal exactDistance = BigDecimal.valueOf(distanceLy);
             BigDecimal displayedDistance = exactDistance.round(NAVIGATION_DISTANCE_FORMAT).stripTrailingZeros();
             String approximationMarker = displayedDistance.compareTo(exactDistance) == 0 ? "" : "~";
-            return formatText("map.navigation.distance.format", approximationMarker,
+            return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "map.navigation.distance.format", approximationMarker,
                 displayedDistance.toPlainString());
         }
 

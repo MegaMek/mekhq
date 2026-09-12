@@ -431,8 +431,9 @@ public class PlanetarySystemMapPanel extends JPanel {
         };
 
           btnBack = InterstellarMapPanel.createNavigationUtilityIconButton(0xE5C4, BACK_BUTTON_SIZE,
-              text("map.system.back.toolTipText"), text("map.system.back.accessibleName"),
-              text("map.system.back.accessibleDescription"));
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.system.back.toolTipText"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.system.back.accessibleName"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.system.back.accessibleDescription"));
         btnBack.addActionListener(ev -> back());
 
         // set up key bindings
@@ -499,10 +500,6 @@ public class PlanetarySystemMapPanel extends JPanel {
 
         repaint();
 
-    }
-
-    private static String text(String key) {
-        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
     }
 
     private Map<String, Integer> playerBaseCountsByPlanet() {

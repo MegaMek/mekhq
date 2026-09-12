@@ -285,7 +285,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         boolean activeRoute = isActiveRoute();
         Color routeColor = activeRoute ? DOSSIER_ACTIVE : DOSSIER_ACCENT;
 
-        JLabel eyebrow = new JLabel(text("dossier.eyebrow.text"));
+        JLabel eyebrow = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "dossier.eyebrow.text"));
         eyebrow.setForeground(routeColor);
         eyebrow.setFont(eyebrow.getFont().deriveFont(Font.BOLD, eyebrow.getFont().getSize2D() * 0.85f));
         GridBagConstraints constraints = createFullWidthConstraints(0);
@@ -295,7 +295,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         LocalDate currentDate = campaign.getLocalDate();
         String startName = getSystemName(path.getFirstSystem(), currentDate);
         String endName = getSystemName(path.getLastSystem(), currentDate);
-        JLabel endpoints = new JLabel(formatText("dossier.route.format", startName, endName));
+        JLabel endpoints = new JLabel(MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "dossier.route.format", startName, endName));
         endpoints.setForeground(DOSSIER_MUTED_TEXT);
           constraints = createFullWidthConstraints(1);
         header.add(endpoints, constraints);
@@ -324,10 +324,10 @@ public class JumpPathViewPanel extends JScrollablePanel {
         }
         if (jumpFeeSummaryHandler != null) {
             FramedCommandButton jumpFees = new FramedCommandButton(
-                text("summary.jumpFees.text"), COURSE_BUTTON_COLORS);
+                MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "summary.jumpFees.text"), COURSE_BUTTON_COLORS);
             jumpFees.setMargin(new Insets(UIUtil.scaleForGUI(4), UIUtil.scaleForGUI(10),
                   UIUtil.scaleForGUI(4), UIUtil.scaleForGUI(10)));
-            jumpFees.setToolTipText(text("summary.jumpFees.tooltip"));
+            jumpFees.setToolTipText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "summary.jumpFees.tooltip"));
             jumpFees.getAccessibleContext().setAccessibleDescription(jumpFees.getToolTipText());
             jumpFees.addActionListener(event -> jumpFeeSummaryHandler.run());
             GridBagConstraints constraints = createFullWidthConstraints(1 + ((metricIndex + 1) / 2));
@@ -337,10 +337,10 @@ public class JumpPathViewPanel extends JScrollablePanel {
         }
         if (isActiveRoute() && (cancelCurrentTripHandler != null)) {
             FramedCommandButton cancelTrip = new FramedCommandButton(
-                text("summary.cancelTrip.text"), COURSE_BUTTON_COLORS);
+                MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "summary.cancelTrip.text"), COURSE_BUTTON_COLORS);
             cancelTrip.setMargin(new Insets(UIUtil.scaleForGUI(4), UIUtil.scaleForGUI(10),
                   UIUtil.scaleForGUI(4), UIUtil.scaleForGUI(10)));
-            cancelTrip.setToolTipText(text("summary.cancelTrip.tooltip"));
+            cancelTrip.setToolTipText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "summary.cancelTrip.tooltip"));
             cancelTrip.getAccessibleContext().setAccessibleDescription(cancelTrip.getToolTipText());
             cancelTrip.addActionListener(event -> cancelCurrentTripHandler.run());
             GridBagConstraints constraints = createFullWidthConstraints(2 + ((metricIndex + 1) / 2));
@@ -356,9 +356,9 @@ public class JumpPathViewPanel extends JScrollablePanel {
         advanced.setLayout(new GridBagLayout());
         advanced.setBorder(BorderFactory.createMatteBorder(UIUtil.scaleForGUI(1), 0, 0, 0, DOSSIER_DIVIDER));
 
-        JToggleButton toggle = new JToggleButton(text("advanced.show.text"));
+        JToggleButton toggle = new JToggleButton(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "advanced.show.text"));
           toggle.setSelected(advancedPlanningInitiallyExpanded);
-          toggle.setText(text(advancedPlanningInitiallyExpanded
+          toggle.setText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, advancedPlanningInitiallyExpanded
               ? "advanced.hide.text"
               : "advanced.show.text"));
           toggle.setIcon(symbolIcon(advancedPlanningInitiallyExpanded ? 0xE5CF : 0xE5CC,
@@ -368,7 +368,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         toggle.setFocusPainted(false);
         toggle.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(10), HORIZONTAL_PADDING,
               UIUtil.scaleForGUI(10), HORIZONTAL_PADDING));
-        toggle.setToolTipText(text("advanced.tooltip"));
+        toggle.setToolTipText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "advanced.tooltip"));
         toggle.getAccessibleContext().setAccessibleDescription(toggle.getToolTipText());
         GridBagConstraints constraints = createFullWidthConstraints(0);
         advanced.add(toggle, constraints);
@@ -389,7 +389,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
             boolean expanded = toggle.isSelected();
             content.setVisible(expanded);
             advancedPlanningStateHandler.accept(expanded);
-            toggle.setText(text(expanded ? "advanced.hide.text" : "advanced.show.text"));
+            toggle.setText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, expanded ? "advanced.hide.text" : "advanced.show.text"));
             toggle.setIcon(symbolIcon(expanded ? 0xE5CF : 0xE5CC,
                 UIUtil.scaleForGUI(18), DOSSIER_ACCENT));
             advanced.revalidate();
@@ -410,7 +410,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
                         DOSSIER_DIVIDER));
             }
 
-            JLabel name = new JLabel(text(switch (course.kind()) {
+            JLabel name = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, switch (course.kind()) {
                 case FASTEST -> "course.fastest.text";
                 case FEWEST_JUMPS -> "course.fewestJumps.text";
                 case COMMAND_CIRCUIT -> "course.commandCircuit.text";
@@ -427,9 +427,9 @@ public class JumpPathViewPanel extends JScrollablePanel {
                 UIUtil.scaleForGUI(8));
             courseRow.add(name, constraints);
 
-            JLabel facts = new JLabel(formatText("course.facts.format", course.jumps(),
+            JLabel facts = new JLabel(MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "course.facts.format", course.jumps(),
                   formatNumber(course.oneGTotalDays(), 2),
-                                    text(course.circuitCoverage() == CircuitCoverage.WHOLE
+                                    MHQInternationalization.getTextAt(RESOURCE_BUNDLE, course.circuitCoverage() == CircuitCoverage.WHOLE
                                                          ? "course.circuit.whole.text"
                                                          : "course.circuit.none.text")));
                         facts.setForeground(DOSSIER_MUTED_TEXT);
@@ -444,7 +444,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
                 UIUtil.scaleForGUI(8));
             courseRow.add(facts, constraints);
 
-            FramedCommandButton useCourse = new FramedCommandButton(text(selected
+            FramedCommandButton useCourse = new FramedCommandButton(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, selected
                   ? "course.selected.text"
                   : "course.use.text"), COURSE_BUTTON_COLORS);
             Dimension buttonSize = new Dimension(COURSE_BUTTON_WIDTH, COURSE_BUTTON_HEIGHT);
@@ -452,7 +452,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
             useCourse.setMinimumSize(buttonSize);
             useCourse.setMaximumSize(buttonSize);
             useCourse.setEnabled(!selected);
-            useCourse.setToolTipText(text(selected
+            useCourse.setToolTipText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, selected
                   ? "course.selected.tooltip"
                   : "course.use.tooltip"));
             useCourse.getAccessibleContext().setAccessibleDescription(useCourse.getToolTipText());
@@ -474,9 +474,9 @@ public class JumpPathViewPanel extends JScrollablePanel {
     private JPanel createCircuitPlanner() {
         JPanel planner = createSection("section.circuit.text");
         JComboBox<String> modeSelector = new ImmersiveComboBox<>(new String[] {
-              text("circuit.none.text"),
-              text("circuit.whole.text"),
-              text("circuit.custom.text")
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "circuit.none.text"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "circuit.whole.text"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "circuit.custom.text")
         });
         modeSelector.setSelectedIndex(circuitPlan.mode().ordinal());
         configureComboBox(modeSelector, "circuit.mode.text", "circuit.mode.tooltip", DENSE_SELECTOR_WIDTH);
@@ -530,7 +530,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
         List<PlanetarySystem> systems = path.getSystems();
         if (systems.size() <= 2) {
-            JLabel none = new JLabel(text("circuit.noDepartures.text"));
+            JLabel none = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "circuit.noDepartures.text"));
             none.setForeground(DOSSIER_MUTED_TEXT);
             none.setFont(none.getFont().deriveFont(Font.PLAIN, none.getFont().getSize2D() * 0.78f));
             circuitDepartures.add(none, createFullWidthConstraints(0));
@@ -539,7 +539,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
                 PlanetarySystem system = systems.get(index);
                 JCheckBox covered = new ImmersiveCheckBox(system.getPrintableName(campaign.getLocalDate()),
                         circuitPlan.usesCircuitAt(index));
-                covered.setToolTipText(text("circuit.departure.tooltip"));
+                covered.setToolTipText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "circuit.departure.tooltip"));
                 covered.getAccessibleContext().setAccessibleDescription(covered.getToolTipText());
                 int departureIndex = index;
                 covered.addActionListener(event -> {
@@ -620,26 +620,26 @@ public class JumpPathViewPanel extends JScrollablePanel {
     private JPanel createSchedulePlanner() {
         JPanel planner = createSection("section.schedule.text");
         JComboBox<String> modeSelector = new ImmersiveComboBox<>(new String[] {
-              text("schedule.departAt.text"),
-              text("schedule.arriveBy.text")
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "schedule.departAt.text"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "schedule.arriveBy.text")
         });
         modeSelector.setSelectedIndex(scheduleMode.ordinal());
           configureComboBox(modeSelector, "schedule.mode.text", "schedule.mode.tooltip",
               WIDE_PLANNER_CONTROL_WIDTH);
-          addPlannerControl(planner, 1, text("schedule.mode.text"),
-              text("schedule.mode.tooltip"), modeSelector);
+          addPlannerControl(planner, 1, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "schedule.mode.text"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "schedule.mode.tooltip"), modeSelector);
 
         scheduleAnchorSpinner = new ImmersiveSpinner(new SpinnerDateModel(toDate(departureAnchor), null, null,
               Calendar.HOUR_OF_DAY));
         configureScheduleAnchorSpinner();
-          addPlannerControl(planner, 2, text("schedule.anchor.text"),
-              text("schedule.anchor.tooltip"), scheduleAnchorSpinner);
+          addPlannerControl(planner, 2, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "schedule.anchor.text"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "schedule.anchor.tooltip"), scheduleAnchorSpinner);
 
         int row = 3;
         for (Dwell dwell : schedule.dwells()) {
-            String label = formatText("schedule.dwell.label.format",
+            String label = MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "schedule.dwell.label.format",
                   dwell.requestedStopIndex() + 1, dwell.system().getPrintableName(campaign.getLocalDate()));
-            String tooltip = text("schedule.dwell.tooltip");
+            String tooltip = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "schedule.dwell.tooltip");
             JSpinner dwellSpinner = new ImmersiveSpinner(new SpinnerNumberModel(
                 dwellHoursByRequestedStop.get(dwell.requestedStopIndex()).intValue(),
                 0, MAXIMUM_DWELL_HOURS, 1));
@@ -653,7 +653,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
             });
         }
         if (schedule.dwells().isEmpty()) {
-            JLabel none = new JLabel(text("schedule.noDwells.text"));
+            JLabel none = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "schedule.noDwells.text"));
             none.setForeground(DOSSIER_MUTED_TEXT);
             none.setFont(none.getFont().deriveFont(Font.PLAIN, none.getFont().getSize2D() * 0.78f));
             GridBagConstraints constraints = createFullWidthConstraints(row++);
@@ -709,13 +709,13 @@ public class JumpPathViewPanel extends JScrollablePanel {
         int row = 1;
 
         piratePointModeSelector = new ImmersiveComboBox<>(new String[] {
-              text("pirate.mode.standard.text"),
-              text("pirate.mode.assumed.text")
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "pirate.mode.standard.text"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "pirate.mode.assumed.text")
         });
           configureComboBox(piratePointModeSelector, "pirate.mode.text", "pirate.mode.tooltip",
               PIRATE_SELECTOR_WIDTH);
-          addPlannerControl(planner, row++, text("pirate.mode.text"),
-              text("pirate.mode.tooltip"), piratePointModeSelector);
+          addPlannerControl(planner, row++, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "pirate.mode.text"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "pirate.mode.tooltip"), piratePointModeSelector);
 
         List<NavigationSource> navigationSources = navigationSources();
         navigationSourceSelector = new ImmersiveComboBox<>(navigationSources.toArray(NavigationSource[]::new));
@@ -723,8 +723,8 @@ public class JumpPathViewPanel extends JScrollablePanel {
               PIRATE_SELECTOR_WIDTH);
         if (navigationSources.size() > 1) {
           piratePointControlLabels.add(addPlannerControl(planner, row++,
-              text("pirate.skillSource.text"),
-              text("pirate.skillSource.tooltip"), navigationSourceSelector));
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "pirate.skillSource.text"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "pirate.skillSource.tooltip"), navigationSourceSelector));
         }
 
         piratePointTargetSpinner = new ImmersiveSpinner(new SpinnerNumberModel(DEFAULT_MANUAL_TARGET_NUMBER,
@@ -816,8 +816,8 @@ public class JumpPathViewPanel extends JScrollablePanel {
     }
 
     private <T> void configureComboBox(JComboBox<T> comboBox, String labelKey, String tooltipKey, int width) {
-        comboBox.setToolTipText(text(tooltipKey));
-        comboBox.getAccessibleContext().setAccessibleName(text(labelKey));
+        comboBox.setToolTipText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, tooltipKey));
+        comboBox.getAccessibleContext().setAccessibleName(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, labelKey));
         comboBox.getAccessibleContext().setAccessibleDescription(comboBox.getToolTipText());
         setPlannerControlWidth(comboBox, width);
     }
@@ -837,18 +837,18 @@ public class JumpPathViewPanel extends JScrollablePanel {
                 continue;
             }
             int targetNumber = navigation.getFinalSkillValue(navigator.getSkillModifierData());
-            sources.add(new NavigationSource(formatText("pirate.skillSource.navigator.format",
+            sources.add(new NavigationSource(MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "pirate.skillSource.navigator.format",
                   navigator.getFullName(), unit.getName(), targetNumber), targetNumber, false));
         }
         sources.sort(Comparator.comparing(NavigationSource::label));
-          sources.addFirst(new NavigationSource(text("pirate.skillSource.manual.text"),
+          sources.addFirst(new NavigationSource(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "pirate.skillSource.manual.text"),
               DEFAULT_MANUAL_TARGET_NUMBER, true));
         return List.copyOf(sources);
     }
 
     private void addPiratePointModifier(JPanel planner, int row, ModifierCategory category) {
-        String label = text(modifierLabelKey(category));
-        String tooltip = text("pirate.modifier.tooltip");
+        String label = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, modifierLabelKey(category));
+        String tooltip = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "pirate.modifier.tooltip");
         JCheckBox enabled = new ImmersiveCheckBox(label);
         enabled.setToolTipText(tooltip);
         enabled.getAccessibleContext().setAccessibleName(label);
@@ -893,7 +893,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
     private ApproachLabels createApproachColumn(JPanel comparison, int column, String headingKey) {
         JPanel approach = createBandPanel();
         approach.setLayout(new GridBagLayout());
-        JLabel heading = new JLabel(text(headingKey));
+        JLabel heading = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, headingKey));
         heading.setForeground(column == 0 ? DOSSIER_TEXT : DOSSIER_ACTIVE);
         heading.setFont(heading.getFont().deriveFont(Font.BOLD, heading.getFont().getSize2D() * 0.8f));
         GridBagConstraints constraints = createFullWidthConstraints(0);
@@ -982,11 +982,11 @@ public class JumpPathViewPanel extends JScrollablePanel {
         updateApproachLabels(standardPointLabels, facts.standardPoint());
         updateApproachLabels(piratePointLabels, facts.piratePoint());
         DifficultyFacts difficulty = facts.difficulty();
-          piratePointTargetValue.setText(formatText("pirate.target.format",
+          piratePointTargetValue.setText(MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "pirate.target.format",
               difficulty.targetNumber(), formatSignedNumber(difficulty.enabledModifierTotal())));
         piratePointOddsValue.setText(format2d6Odds(difficulty, locale));
         boolean transitAdded = facts.transitAddedDays() > 0.0;
-          piratePointTransitDifferenceLabel.setText(text(transitAdded
+          piratePointTransitDifferenceLabel.setText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, transitAdded
               ? "pirate.transitAdded.text"
               : "pirate.transitSaved.text"));
         piratePointTransitDifferenceValue.setText(formatDuration(transitAdded
@@ -1019,18 +1019,18 @@ public class JumpPathViewPanel extends JScrollablePanel {
     }
 
     private void updateApproachLabels(ApproachLabels labels, PiratePointAnalysis.ApproachFacts facts) {
-          labels.distance().setText(formatText("pirate.distance.format",
+          labels.distance().setText(MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "pirate.distance.format",
               formatNumber(facts.distanceKm() / MILLION_KILOMETERS, 2)));
         labels.transit().setText(formatDuration(facts.transitDays()));
         labels.exposure().setText(formatDuration(facts.exposureDays()));
-          labels.detection().setText(text(facts.emergenceInsideDetectionEnvelope()
+          labels.detection().setText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, facts.emergenceInsideDetectionEnvelope()
               ? "pirate.detection.inside.text"
               : "pirate.detection.outside.text"));
         labels.detection().setForeground(facts.emergenceInsideDetectionEnvelope() ? DOSSIER_ACTIVE : DOSSIER_ACCENT);
     }
 
     private void setApproachUnavailable(ApproachLabels labels) {
-        String unavailable = text("pirate.unavailable.text");
+        String unavailable = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "pirate.unavailable.text");
         labels.distance().setText(unavailable);
         labels.transit().setText(unavailable);
         labels.exposure().setText(unavailable);
@@ -1039,7 +1039,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
     }
 
     private void setPiratePointResultUnavailable() {
-        String unavailable = text("pirate.unavailable.text");
+        String unavailable = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "pirate.unavailable.text");
         piratePointTargetValue.setText(unavailable);
         piratePointOddsValue.setText(unavailable);
         piratePointTransitDifferenceValue.setText(unavailable);
@@ -1079,7 +1079,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         NumberFormat percentage = NumberFormat.getNumberInstance(locale);
         percentage.setMaximumFractionDigits(1);
         percentage.setMinimumFractionDigits(0);
-        return formatText("pirate.odds.format", difficulty.successfulOutcomes(),
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "pirate.odds.format", difficulty.successfulOutcomes(),
               percentage.format(difficulty.successProbability() * 100.0));
     }
 
@@ -1118,17 +1118,17 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
     private void configureScheduleAnchorSpinner() {
         JSpinner.DateEditor editor = new JSpinner.DateEditor(scheduleAnchorSpinner,
-              text("schedule.datePattern.text"));
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "schedule.datePattern.text"));
         editor.getFormat().setTimeZone(TimeZone.getTimeZone("UTC"));
         scheduleAnchorSpinner.setEditor(editor);
-        String label = text("schedule.anchor.text");
-        String tooltip = text("schedule.anchor.tooltip");
+        String label = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "schedule.anchor.text");
+        String tooltip = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "schedule.anchor.tooltip");
           styleSpinner(scheduleAnchorSpinner, label, tooltip);
                 setPlannerControlWidth(scheduleAnchorSpinner, WIDE_PLANNER_CONTROL_WIDTH);
     }
 
     private void configureSpinner(JSpinner spinner, String pattern, String labelKey, String tooltipKey) {
-        configureNumberSpinner(spinner, pattern, text(labelKey), text(tooltipKey));
+        configureNumberSpinner(spinner, pattern, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, labelKey), MHQInternationalization.getTextAt(RESOURCE_BUNDLE, tooltipKey));
     }
 
     private void configureNumberSpinner(JSpinner spinner, String pattern, String label, String tooltip) {
@@ -1153,7 +1153,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
     }
 
     private JLabel addPlannerInput(JPanel planner, int row, String labelKey, String tooltipKey, JSpinner spinner) {
-        return addPlannerControl(planner, row, text(labelKey), text(tooltipKey), spinner);
+        return addPlannerControl(planner, row, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, labelKey), MHQInternationalization.getTextAt(RESOURCE_BUNDLE, tooltipKey), spinner);
     }
 
     private JLabel addPlannerControl(JPanel planner, int row, String labelText, String tooltip,
@@ -1187,7 +1187,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
     }
 
     private JLabel createPlannerLabel(String labelKey) {
-        JLabel label = new JLabel(text(labelKey));
+        JLabel label = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, labelKey));
         label.setForeground(DOSSIER_MUTED_TEXT);
         label.setFont(label.getFont().deriveFont(Font.BOLD, label.getFont().getSize2D() * 0.8f));
         return label;
@@ -1200,15 +1200,15 @@ public class JumpPathViewPanel extends JScrollablePanel {
               circuitPlan);
         String resultText;
         if (result.isPossible()) {
-            resultText = formatText("planning.requiredAcceleration.format",
+            resultText = MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "planning.requiredAcceleration.format",
                   formatNumber(result.accelerationG().orElseThrow(), 2));
             requiredAccelerationValue.setForeground(DOSSIER_ACCENT);
         } else {
-            resultText = text("planning.requiredAcceleration.impossible.text");
+            resultText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "planning.requiredAcceleration.impossible.text");
             requiredAccelerationValue.setForeground(DOSSIER_ACTIVE);
         }
         requiredAccelerationValue.setText(resultText);
-          requiredAccelerationValue.getAccessibleContext().setAccessibleName(formatText(
+          requiredAccelerationValue.getAccessibleContext().setAccessibleName(MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE,
               "planning.requiredAcceleration.accessible.format", resultText));
     }
 
@@ -1262,7 +1262,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
             String systemNameText = entry.system().getPrintableName(currentDate);
             if (entry.destination() && (path.getTargetPlanet() != null)) {
-                systemNameText = formatText("timeline.targetPlanet.format", systemNameText,
+                systemNameText = MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.targetPlanet.format", systemNameText,
                       path.getTargetPlanet().getPrintableName(currentDate));
             }
             JLabel systemName = new JLabel(systemNameText);
@@ -1303,36 +1303,36 @@ public class JumpPathViewPanel extends JScrollablePanel {
                 }
             }
             if (entry.origin()) {
-                addTimelineEvent(waypoint, eventRow++, text("timeline.originStart.text"),
+                addTimelineEvent(waypoint, eventRow++, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "timeline.originStart.text"),
                     formatScheduleMoment(scheduledEntry.arrival(), locale));
                 addTimelineEvent(waypoint, eventRow++,
-                    formatText("timeline.jumpDeparture.format",
+                    MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.jumpDeparture.format",
                         formatDuration(itineraryPlan.startingTransitDays())),
                     formatScheduleMoment(scheduledEntry.departure(), locale));
             } else {
-                addTimelineEvent(waypoint, eventRow++, text("timeline.jumpArrival.text"),
+                addTimelineEvent(waypoint, eventRow++, MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "timeline.jumpArrival.text"),
                     formatScheduleMoment(scheduledEntry.arrival(), locale));
             }
             if (!entry.origin() && !entry.destination()) {
                 if (scheduledEntry.dwellHours() > 0) {
                     addTimelineEvent(waypoint, eventRow++,
-                        formatText("timeline.rechargeComplete.format",
+                        MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.rechargeComplete.format",
                             formatHours(entry.rechargeHours(), locale)),
                         formatScheduleMoment(scheduledEntry.readyForDeparture(), locale));
                     addTimelineEvent(waypoint, eventRow++,
-                        formatText("timeline.dwellDeparture.format",
+                        MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.dwellDeparture.format",
                             formatHours(scheduledEntry.dwellHours(), locale)),
                         formatScheduleMoment(scheduledEntry.departure(), locale));
                 } else {
                     addTimelineEvent(waypoint, eventRow++,
-                        formatText("timeline.rechargeDeparture.format",
+                        MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.rechargeDeparture.format",
                             formatHours(entry.rechargeHours(), locale)),
                         formatScheduleMoment(scheduledEntry.departure(), locale));
                 }
             }
             if (entry.destination()) {
                 addTimelineEvent(waypoint, eventRow,
-                    formatText("timeline.endpointArrival.format",
+                    MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.endpointArrival.format",
                         formatDuration(entry.endpointTransitDays())),
                     formatScheduleMoment(scheduledEntry.endpointArrival(), locale));
             }
@@ -1348,22 +1348,22 @@ public class JumpPathViewPanel extends JScrollablePanel {
           numberFormat.setMinimumFractionDigits(0);
           String status = navigationStatusText(assessment);
           String recharge = Double.isFinite(assessment.facts().rechargeHours())
-              ? formatText("timeline.rechargeHours.format",
+              ? MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.rechargeHours.format",
                   numberFormat.format(assessment.facts().rechargeHours()))
-              : text("timeline.rechargeImpossible.text");
+              : MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "timeline.rechargeImpossible.text");
           String solar = Double.isFinite(assessment.facts().solarRechargeHours())
-              ? formatText("timeline.solarRecharge.format",
+              ? MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.solarRecharge.format",
                   numberFormat.format(assessment.facts().solarRechargeHours()))
-              : text("timeline.solarRechargeImpossible.text");
+              : MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "timeline.solarRechargeImpossible.text");
           String stations = assessment.facts().rechargeStationCount() == 0
-              ? text("timeline.noRechargeStation.text")
-              : formatText("timeline.rechargeStations.format",
+              ? MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "timeline.noRechargeStation.text")
+              : MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.rechargeStations.format",
                   assessment.facts().rechargeStationCount());
-          String rechargeSources = formatText("timeline.rechargeSources.format", solar, stations);
+          String rechargeSources = MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.rechargeSources.format", solar, stations);
           String circuit = assessment.facts().commandCircuitAssumed()
-              ? text("timeline.circuitAssumed.text")
+              ? MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "timeline.circuitAssumed.text")
               : "";
-          return formatText("timeline.legFacts.format",
+          return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.legFacts.format",
               numberFormat.format(assessment.facts().distanceLy()),
               assessment.facts().minimumStandardJumps(), status, recharge, rechargeSources, circuit);
         }
@@ -1371,9 +1371,9 @@ public class JumpPathViewPanel extends JScrollablePanel {
         private static String navigationStatusText(LegAssessment assessment) {
                     NavigationRouteAnalysis.FindingKind primaryFinding = assessment.primaryFindingKind();
           if (primaryFinding == null) {
-                        return text("timeline.status.clear.text");
+                        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "timeline.status.clear.text");
           }
-                    return text(switch (primaryFinding) {
+                    return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, switch (primaryFinding) {
             case OUT_OF_STANDARD_JUMP_RANGE -> "timeline.status.rangeBlocked.text";
             case ACCESS_DENIED -> "timeline.status.accessBlocked.text";
             case ABANDONED_DESTINATION_AVOIDED -> "timeline.status.emptyBlocked.text";
@@ -1425,7 +1425,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
               BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(9), HORIZONTAL_PADDING,
                   UIUtil.scaleForGUI(10), HORIZONTAL_PADDING)));
 
-        JLabel heading = new JLabel(text(headingKey));
+        JLabel heading = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, headingKey));
         heading.setForeground(DOSSIER_ACCENT);
         heading.setFont(heading.getFont().deriveFont(Font.BOLD, heading.getFont().getSize2D() * 0.85f));
         GridBagConstraints constraints = createFullWidthConstraints(0);
@@ -1438,7 +1438,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         JPanel metric = createBandPanel();
         metric.setLayout(new BoxLayout(metric, BoxLayout.Y_AXIS));
 
-        JLabel label = new JLabel(text(labelKey));
+        JLabel label = new JLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, labelKey));
         label.setForeground(DOSSIER_MUTED_TEXT);
         label.setFont(label.getFont().deriveFont(Font.BOLD, label.getFont().getSize2D() * 0.8f));
         label.setAlignmentX(LEFT_ALIGNMENT);
@@ -1511,7 +1511,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         if (scheduleAnchorValue == null) {
             return;
         }
-        scheduleAnchorLabel.setText(text(schedule.mode() == Mode.DEPART_AT
+        scheduleAnchorLabel.setText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, schedule.mode() == Mode.DEPART_AT
               ? "schedule.departureAnchor.text"
               : "schedule.arrivalDeadline.text"));
         scheduleAnchorValue.setText(formatScheduleMoment(schedule.anchor(), locale));
@@ -1574,14 +1574,14 @@ public class JumpPathViewPanel extends JScrollablePanel {
     }
 
     private String formatDays(double days) {
-        return formatText("metric.days.format", formatNumber(days, 2));
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "metric.days.format", formatNumber(days, 2));
     }
 
     private String formatDuration(double days) {
         long roundedHours = Math.round(days * 24.0);
         String duration = formatHours(Math.abs(roundedHours), locale);
         return (roundedHours < 0)
-              ? formatText("timeline.negativeDuration.format", duration)
+              ? MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.negativeDuration.format", duration)
               : duration;
     }
 
@@ -1598,7 +1598,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
                             .withLocale(locale)
                             .format(startDate.plusDays(elapsedWholeDays));
         String sign = (roundedHours < 0) ? "-" : "+";
-          return formatText("timeline.moment.format", date, sign,
+          return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.moment.format", date, sign,
               formatHours(Math.abs(roundedHours), locale));
     }
 
@@ -1610,13 +1610,13 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
     static String scheduleStatusText(Result schedule, Locale locale) {
         if (schedule.feasible()) {
-            return text(schedule.mode() == Mode.DEPART_AT
+            return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, schedule.mode() == Mode.DEPART_AT
                   ? "schedule.status.forecast.text"
                   : "schedule.status.feasible.text");
         }
         long missedHours = Math.max(1,
               (Duration.between(schedule.departure(), schedule.earliestFeasibleDeparture()).toMinutes() + 59) / 60);
-        return formatText(schedule.mode() == Mode.DEPART_AT
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, schedule.mode() == Mode.DEPART_AT
                     ? "schedule.status.departureUnavailable.format"
                 : "schedule.status.missed.format",
               formatHours(missedHours, locale));
@@ -1627,25 +1627,17 @@ public class JumpPathViewPanel extends JScrollablePanel {
         long days = totalHours / 24;
         long hours = totalHours % 24;
         if ((days > 0) && (hours > 0)) {
-            return formatText("timeline.daysHours.format", numberFormat.format(days),
+            return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.daysHours.format", numberFormat.format(days),
                   numberFormat.format(hours));
         } else if (days > 0) {
-            return formatText("timeline.days.format", numberFormat.format(days));
+            return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.days.format", numberFormat.format(days));
         }
-        return formatText("timeline.hours.format", numberFormat.format(hours));
+        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "timeline.hours.format", numberFormat.format(hours));
     }
 
     private String getSystemName(PlanetarySystem system, LocalDate currentDate) {
-        return (system == null) ? text("dossier.unknownSystem.text")
+        return (system == null) ? MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "dossier.unknownSystem.text")
                      : system.getPrintableName(currentDate);
-    }
-
-    private static String text(String key) {
-        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
-    }
-
-    private static String formatText(String key, Object... arguments) {
-        return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, arguments);
     }
 
     private record NavigationSource(String label, int targetNumber, boolean manual) {
