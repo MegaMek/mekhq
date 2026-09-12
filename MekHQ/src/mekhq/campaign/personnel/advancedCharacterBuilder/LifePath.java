@@ -32,7 +32,9 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -40,6 +42,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 
 import megamek.Version;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.personnel.ATOWTraits;
@@ -117,7 +120,7 @@ public record LifePath(
       Map<Integer, Map<String, Integer>> flexibleXPNaturalAptitudes,
       Map<Integer, Map<SkillSubType, Integer>> flexibleXPNaturalAptitudesMetaSkills,
       Map<Integer, Map<String, Integer>> flexibleXPAbilities,
-      Integer flexibleXPPickCount
+      Map<Integer, Integer> flexibleXPPickCounts
 ) {
     private static final MMLogger LOGGER = MMLogger.create(LifePath.class);
 
@@ -348,49 +351,182 @@ public record LifePath(
         if (flexibleXPAbilities == null) {
             throw new IllegalArgumentException("flexibleXPAbilities cannot be null");
         }
-        if (flexibleXPPickCount == null) {
-            throw new IllegalArgumentException("flexibleXPPickCount cannot be null");
-        }
-        if (flexibleXPPickCount < 0) {
-            throw new IllegalArgumentException("flexibleXPPickCount must be a non-negative integer");
+        if (flexibleXPPickCounts == null) {
+            throw new IllegalArgumentException("flexibleXPPickCounts cannot be null");
         }
 
-        int groupCount = countFlexibleXPGroups(flexibleXPAttributes,
-              flexibleXPEdge,
-              flexibleXPFlexibleAttribute,
-              flexibleXPTraits,
-              flexibleXPSkills,
-              flexibleXPMetaSkills,
-              flexibleXPNaturalAptitudes,
-              flexibleXPNaturalAptitudesMetaSkills,
-              flexibleXPAbilities);
+        for (Map.Entry<Integer, Integer> pickCountEntry : flexibleXPPickCounts.entrySet()) {
+            Integer setIndex = pickCountEntry.getKey();
+            Integer pickCount = pickCountEntry.getValue();
 
-        if (flexibleXPPickCount > groupCount) {
-            throw new IllegalArgumentException(
-                  "flexibleXPPickCount must be less than or equal to the total number of flexible XP award groups");
+            if (setIndex == null || pickCount == null) {
+                throw new IllegalArgumentException("flexibleXPPickCounts cannot contain null keys or values");
+            }
+            if (pickCount < 0) {
+                throw new IllegalArgumentException("flexibleXPPickCounts must be non-negative integers");
+            }
+
+            int itemCount = flexibleXPItemValues(setIndex,
+                  flexibleXPEdge,
+                  flexibleXPFlexibleAttribute,
+                  flexibleXPAttributes,
+                  flexibleXPTraits,
+                  flexibleXPSkills,
+                  flexibleXPMetaSkills,
+                  flexibleXPNaturalAptitudes,
+                  flexibleXPNaturalAptitudesMetaSkills,
+                  flexibleXPAbilities).size();
+
+            if (pickCount > itemCount) {
+                throw new IllegalArgumentException("flexibleXPPickCounts for set " + setIndex + " is " + pickCount
+                                                         + ", which exceeds the " + itemCount + " items in that set");
+            }
         }
     }
 
     /**
-     * Counts how many distinct flexible XP award groups the supplied maps describe.
+     * Counts how many distinct flexible XP award sets the supplied maps describe.
      *
-     * <p>Each of the nine flexible XP maps is keyed by group index, and a group exists as soon as any one of them
-     * holds that index. The count is therefore the size of the union of all their keys, not the size of the largest
-     * map. Counting the largest map instead would miss a group that only appears in, say, the meta skills map.</p>
+     * <p>Each of the nine flexible XP maps is keyed by set index, and a set exists as soon as any one of them holds
+     * that index. The count is therefore the size of the union of all their keys, not the size of the largest map.
+     * Counting the largest map instead would miss a set that only appears in, say, the meta skills map.</p>
      *
-     * <p>This is the single source of truth for the group count. The compact constructor uses it to bound
-     * {@code flexibleXPPickCount}, and {@link LifePathValidator} uses it so the wizard cannot save a path the
-     * constructor would then refuse to load.</p>
+     * @param flexibleGroupMaps the flexible XP set maps; {@code null} entries are ignored
      *
-     * @param flexibleGroupMaps the flexible XP group maps; {@code null} entries are ignored
-     *
-     * @return the number of distinct flexible XP award groups
+     * @return the number of distinct flexible XP award sets
      *
      * @since 0.50.11
      */
     @SafeVarargs
     public static int countFlexibleXPGroups(Map<Integer, ?>... flexibleGroupMaps) {
         return flexibleXPGroupKeys(flexibleGroupMaps).size();
+    }
+
+    /**
+     * Returns the index of every flexible XP set a Life Path under construction describes.
+     *
+     * @param lifePath the Life Path, finished or not
+     *
+     * @return the set indexes in ascending order
+     *
+     * @since 0.50.11
+     */
+    public static SortedSet<Integer> flexibleXPGroupKeys(LifePathBuilder lifePath) {
+        return flexibleXPGroupKeys(lifePath.flexibleXPAttributes(),
+              lifePath.flexibleXPEdge(),
+              lifePath.flexibleXPFlexibleAttribute(),
+              lifePath.flexibleXPTraits(),
+              lifePath.flexibleXPSkills(),
+              lifePath.flexibleXPMetaSkills(),
+              lifePath.flexibleXPNaturalAptitudes(),
+              lifePath.flexibleXPNaturalAptitudesMetaSkills(),
+              lifePath.flexibleXPAbilities());
+    }
+
+    /**
+     * Returns the XP value of every item in one flexible XP set of a Life Path under construction.
+     *
+     * @param lifePath the Life Path, finished or not
+     * @param setIndex the set to read
+     *
+     * @return one value per item, in no particular order; empty when the set does not exist
+     *
+     * @see #flexibleXPItemValues(int, Map, Map, Map, Map, Map, Map, Map, Map, Map)
+     * @since 0.50.11
+     */
+    public static List<Integer> flexibleXPItemValues(LifePathBuilder lifePath, int setIndex) {
+        return flexibleXPItemValues(setIndex,
+              lifePath.flexibleXPEdge(),
+              lifePath.flexibleXPFlexibleAttribute(),
+              lifePath.flexibleXPAttributes(),
+              lifePath.flexibleXPTraits(),
+              lifePath.flexibleXPSkills(),
+              lifePath.flexibleXPMetaSkills(),
+              lifePath.flexibleXPNaturalAptitudes(),
+              lifePath.flexibleXPNaturalAptitudesMetaSkills(),
+              lifePath.flexibleXPAbilities());
+    }
+
+    /**
+     * Returns the XP value of every item in one flexible XP set.
+     *
+     * <p>An item is one award entry: one skill, one meta skill, one natural aptitude, one special ability, one trait
+     * or one attribute, and the set's Edge and "any attribute" awards when they are present. The player picks items,
+     * so this list is what the pick count is bounded by and what the set's price is averaged over.</p>
+     *
+     * <p>A {@code null} value is skipped rather than counted: a hand-edited file can leave one, and an award of
+     * nothing is not something the player can pick. This is the single definition of "item"; the compact
+     * constructor, {@link LifePathValidator} and {@link LifePathXPCostCalculator} all read it, so the wizard cannot
+     * save a set the constructor would then refuse to load.</p>
+     *
+     * @param setIndex                   the set to read
+     * @param edge                       Edge awards, keyed by set
+     * @param flexibleAttribute          "any attribute" awards, keyed by set
+     * @param attributes                 attribute awards, keyed by set then attribute
+     * @param traits                     trait awards, keyed by set then trait
+     * @param skills                     skill awards, keyed by set then skill name
+     * @param metaSkills                 meta skill awards, keyed by set then meta skill
+     * @param naturalAptitudes           natural aptitude awards, keyed by set then skill name
+     * @param naturalAptitudesMetaSkills natural aptitude meta skill awards, keyed by set then meta skill
+     * @param abilities                  special ability awards, keyed by set then ability name
+     *
+     * @return one value per item, in no particular order; empty when the set does not exist
+     *
+     * @since 0.50.11
+     */
+    public static List<Integer> flexibleXPItemValues(int setIndex, @Nullable Map<Integer, Integer> edge,
+          @Nullable Map<Integer, Integer> flexibleAttribute,
+          @Nullable Map<Integer, Map<SkillAttribute, Integer>> attributes,
+          @Nullable Map<Integer, Map<ATOWTraits, Integer>> traits,
+          @Nullable Map<Integer, Map<String, Integer>> skills,
+          @Nullable Map<Integer, Map<SkillSubType, Integer>> metaSkills,
+          @Nullable Map<Integer, Map<String, Integer>> naturalAptitudes,
+          @Nullable Map<Integer, Map<SkillSubType, Integer>> naturalAptitudesMetaSkills,
+          @Nullable Map<Integer, Map<String, Integer>> abilities) {
+        List<Integer> itemValues = new ArrayList<>();
+
+        addSingleItemValue(itemValues, edge, setIndex);
+        addSingleItemValue(itemValues, flexibleAttribute, setIndex);
+
+        addNestedItemValues(itemValues, attributes, setIndex);
+        addNestedItemValues(itemValues, traits, setIndex);
+        addNestedItemValues(itemValues, skills, setIndex);
+        addNestedItemValues(itemValues, metaSkills, setIndex);
+        addNestedItemValues(itemValues, naturalAptitudes, setIndex);
+        addNestedItemValues(itemValues, naturalAptitudesMetaSkills, setIndex);
+        addNestedItemValues(itemValues, abilities, setIndex);
+
+        return itemValues;
+    }
+
+    private static void addSingleItemValue(List<Integer> itemValues, @Nullable Map<Integer, Integer> groups,
+          int setIndex) {
+        if (groups == null) {
+            return;
+        }
+
+        Integer value = groups.get(setIndex);
+        if (value != null) {
+            itemValues.add(value);
+        }
+    }
+
+    private static <K> void addNestedItemValues(List<Integer> itemValues,
+          @Nullable Map<Integer, Map<K, Integer>> groups, int setIndex) {
+        if (groups == null) {
+            return;
+        }
+
+        Map<K, Integer> set = groups.get(setIndex);
+        if (set == null) {
+            return;
+        }
+
+        for (Integer value : set.values()) {
+            if (value != null) {
+                itemValues.add(value);
+            }
+        }
     }
 
     /**

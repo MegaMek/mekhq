@@ -79,6 +79,13 @@ class LifePathGroup {
     private Map<String, Integer> abilities = new HashMap<>();
 
     /**
+     * How many items the player takes from this set, or {@code null} when the section has no such notion.
+     *
+     * <p>Only Flexible XP sets carry one. It is the one thing a set holds that is not an award.</p>
+     */
+    private Integer pickCount;
+
+    /**
      * Returns an independent copy of this group.
      *
      * <p>The collections are copied, not shared, so editing the copy cannot reach back into the original. This is what
@@ -104,8 +111,50 @@ class LifePathGroup {
         copy.naturalAptitudes = new HashMap<>(naturalAptitudes);
         copy.naturalAptitudesMetaSkills = new HashMap<>(naturalAptitudesMetaSkills);
         copy.abilities = new HashMap<>(abilities);
+        copy.pickCount = pickCount;
 
         return copy;
+    }
+
+    /**
+     * Counts the items a player could pick from this set.
+     *
+     * <p>Mirrors {@code LifePath.flexibleXPItemValues}: one per scored entry in every award map, plus one each for
+     * Edge and the "any attribute" award when they are set. Factions, systems, Life Paths and categories are
+     * requirements, not awards, and are not counted.</p>
+     *
+     * @return the number of pickable items
+     *
+     * @since 0.50.11
+     */
+    int countItems() {
+        int itemCount = attributes.size()
+                              + traits.size()
+                              + skills.size()
+                              + metaSkills.size()
+                              + naturalAptitudes.size()
+                              + naturalAptitudesMetaSkills.size()
+                              + abilities.size();
+
+        if (edge != null) {
+            itemCount++;
+        }
+        if (flexibleAttribute != null) {
+            itemCount++;
+        }
+
+        return itemCount;
+    }
+
+    /** @return how many items the player takes from this set, or {@code null} when not a flexible set */
+    @Nullable
+    Integer getPickCount() {
+        return pickCount;
+    }
+
+    /** @param pickCount how many items the player takes from this set; {@code null} clears it */
+    void setPickCount(@Nullable Integer pickCount) {
+        this.pickCount = pickCount;
     }
 
     /** @return the faction codes this group names */

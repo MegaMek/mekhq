@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
+import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.FLEXIBLE_PICKS_EQUAL_ITEMS;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MISSING_FACTION;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.NO_FLEXIBLE_PICKS;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.TOO_MANY_FLEXIBLE_PICKS;
@@ -158,30 +159,35 @@ public class LifePathValidator {
     }
 
     /**
-     * Flags a mismatch between the flexible XP groups an author created and the number the player may pick.
+     * Flags every flexible XP set whose pick count does not fit the items it holds.
      *
-     * <p>Groups with no picks are unreachable, and more picks than groups is impossible.</p>
+     * <p>Each set is checked on its own. A set with items but no picks is unreachable; more picks than items is
+     * impossible; and picks equal to the items means the player chooses nothing, which is a fixed award wearing the
+     * wrong label. Sets with no items are skipped, because the wizard drops their pick count on save.</p>
      *
      * @since 0.50.11
      */
     private void checkFlexiblePicks() {
-        int flexiblePicks = lifePath.flexibleXPPickCount() == null ? 0 : lifePath.flexibleXPPickCount();
-        int groupCount = LifePath.countFlexibleXPGroups(lifePath.flexibleXPAttributes(),
-              lifePath.flexibleXPEdge(),
-              lifePath.flexibleXPFlexibleAttribute(),
-              lifePath.flexibleXPTraits(),
-              lifePath.flexibleXPSkills(),
-              lifePath.flexibleXPMetaSkills(),
-              lifePath.flexibleXPNaturalAptitudes(),
-              lifePath.flexibleXPNaturalAptitudesMetaSkills(),
-              lifePath.flexibleXPAbilities());
+        Map<Integer, Integer> pickCounts = lifePath.flexibleXPPickCounts() == null
+                                                 ? Map.of()
+                                                 : lifePath.flexibleXPPickCounts();
 
-        if (flexiblePicks <= 0) {
-            if (groupCount > 0) {
-                invalidReasons.add(NO_FLEXIBLE_PICKS);
+        for (int setIndex : LifePath.flexibleXPGroupKeys(lifePath)) {
+            int itemCount = LifePath.flexibleXPItemValues(lifePath, setIndex).size();
+            if (itemCount == 0) {
+                continue;
             }
-        } else if (flexiblePicks > groupCount) {
-            invalidReasons.add(TOO_MANY_FLEXIBLE_PICKS);
+
+            Integer storedPickCount = pickCounts.get(setIndex);
+            int pickCount = storedPickCount == null ? 0 : storedPickCount;
+
+            if (pickCount <= 0) {
+                invalidReasons.add(NO_FLEXIBLE_PICKS);
+            } else if (pickCount > itemCount) {
+                invalidReasons.add(TOO_MANY_FLEXIBLE_PICKS);
+            } else if (pickCount == itemCount) {
+                invalidReasons.add(FLEXIBLE_PICKS_EQUAL_ITEMS);
+            }
         }
     }
 

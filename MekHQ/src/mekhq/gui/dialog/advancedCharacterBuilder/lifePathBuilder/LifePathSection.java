@@ -107,17 +107,28 @@ public final class LifePathSection {
                                    .fixedXPNaturalAptitudesMetaSkills(
                                          stripEmptyEntries(tab.getNaturalAptitudesMetaSkills()))
                                    .fixedXPAbilities(stripEmptyEntries(tab.getAbilities()));
-            case FLEXIBLE_XP -> builder.flexibleXPAttributes(stripEmptyEntries(tab.getAttributes()))
-                                      .flexibleXPEdge(stripNullValues(tab.getEdge()))
-                                      .flexibleXPFlexibleAttribute(stripNullValues(tab.getFlexibleAttribute()))
-                                      .flexibleXPTraits(stripEmptyEntries(tab.getTraits()))
-                                      .flexibleXPSkills(stripEmptyEntries(tab.getSkills()))
-                                      .flexibleXPMetaSkills(stripEmptyEntries(tab.getMetaSkills()))
-                                      .flexibleXPNaturalAptitudes(stripEmptyEntries(tab.getNaturalAptitudes()))
-                                      .flexibleXPNaturalAptitudesMetaSkills(
-                                            stripEmptyEntries(tab.getNaturalAptitudesMetaSkills()))
-                                      .flexibleXPAbilities(stripEmptyEntries(tab.getAbilities()))
-                                      .flexibleXPPickCount(tab.getPickCount());
+            case FLEXIBLE_XP -> {
+                builder.flexibleXPAttributes(stripEmptyEntries(tab.getAttributes()))
+                      .flexibleXPEdge(stripNullValues(tab.getEdge()))
+                      .flexibleXPFlexibleAttribute(stripNullValues(tab.getFlexibleAttribute()))
+                      .flexibleXPTraits(stripEmptyEntries(tab.getTraits()))
+                      .flexibleXPSkills(stripEmptyEntries(tab.getSkills()))
+                      .flexibleXPMetaSkills(stripEmptyEntries(tab.getMetaSkills()))
+                      .flexibleXPNaturalAptitudes(stripEmptyEntries(tab.getNaturalAptitudes()))
+                      .flexibleXPNaturalAptitudesMetaSkills(stripEmptyEntries(tab.getNaturalAptitudesMetaSkills()))
+                      .flexibleXPAbilities(stripEmptyEntries(tab.getAbilities()));
+
+                // A pick count only means something for a set that holds items. A set the author added and never
+                // filled is dropped along with its pick count, so the file never records picks from nothing.
+                Set<Integer> populatedSets = LifePath.flexibleXPGroupKeys(builder);
+                Map<Integer, Integer> pickCounts = new HashMap<>();
+                for (Map.Entry<Integer, Integer> entry : stripNullValues(tab.getPickCounts()).entrySet()) {
+                    if (populatedSets.contains(entry.getKey())) {
+                        pickCounts.put(entry.getKey(), entry.getValue());
+                    }
+                }
+                builder.flexibleXPPickCounts(pickCounts);
+            }
         }
     }
 
@@ -237,7 +248,7 @@ public final class LifePathSection {
                 tab.setNaturalAptitudes(record.flexibleXPNaturalAptitudes());
                 tab.setNaturalAptitudesMetaSkills(record.flexibleXPNaturalAptitudesMetaSkills());
                 tab.setAbilities(record.flexibleXPAbilities());
-                tab.setPickCount(record.flexibleXPPickCount());
+                tab.setPickCounts(record.flexibleXPPickCounts());
             }
         }
     }

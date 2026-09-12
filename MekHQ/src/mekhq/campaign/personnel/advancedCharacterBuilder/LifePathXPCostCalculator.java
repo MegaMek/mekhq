@@ -38,7 +38,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 
 import mekhq.campaign.personnel.ATOWTraits;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
@@ -50,30 +49,34 @@ import mekhq.campaign.personnel.skills.enums.SkillSubType;
  * <p>The total is everything the path awards from its Fixed XP section, plus a share of its Flexible XP section,
  * less the path's own discount. A path can cost nothing, but never less than nothing.</p>
  *
- * <p><b>How the flexible share is charged.</b> The player picks some number of the flexible groups, and which ones
- * they pick is up to them, so the path has to carry one price that covers any choice. That price is a weighted
- * average of the groups, charged once per pick. The groups are sorted by cost and weighted with a bell curve
- * centred on the middle of that order, so the middle group sets the price and an unusually cheap or unusually
- * expensive group barely moves it. The weight of the group at position {@code p} is
- * {@code exp(-0.5 * ((p - middle) / 0.5) ^ 2)}, where {@code middle} is {@code (groupCount - 1) / 2}.</p>
+ * <p><b>How the flexible share is charged.</b> The flexible section is a number of sets. Each set is a list of
+ * individual awards and says how many of them the player takes, and the player picks from every set. Which items
+ * they pick is up to them, so each set has to carry one price that covers any choice. That price is a weighted
+ * average of the set's item values, charged once per pick from that set, and the Life Path pays the sum of its set
+ * prices. Within a set the items are sorted by value and weighted with a bell curve centred on the middle of that
+ * order, so the middle item sets the price and an unusually cheap or unusually expensive item barely moves it. The
+ * weight of the item at position {@code p} is {@code exp(-0.5 * ((p - middle) / 0.5) ^ 2)}, where {@code middle}
+ * is {@code (itemCount - 1) / 2}.</p>
  *
- * <p>Example: a Life Path has three flexible groups worth 60, 90 and 150 XP and lets the player pick two. The
- * middle group is the 90, and the 60 and the 150 each carry about an eighth of its weight, so the weighted average
- * is about 93 rather than the flat average of 100. Two picks therefore cost about 186. Add 200 XP of fixed skills
- * and take off a 50 XP discount and the path costs 336 XP, whichever two groups the player chooses.</p>
+ * <p>Example: set A holds Gunnery/Mek 30 XP, Piloting/Mek 30 XP and the SPA Pain Resistance at 200 XP, and the
+ * player takes one. The middle item is a 30, and the other 30 and the 200 each carry about an eighth of its weight,
+ * so the set prices at 48 XP rather than the flat average of 87. Set B holds Small Arms 20 XP and Melee 20 XP, and
+ * the player takes both, so it prices at 40 XP. The flexible section costs 88 XP, whichever items the player
+ * chooses. Pricing the two sets together, as the calculator once did, would have charged 150.</p>
  *
- * <p>A flat average would let one expensive group drag the whole path's price up even for a player who never takes
- * it, and would make the price jump every time an author added an outlier group.</p>
+ * <p>A flat average would let one expensive item drag a set's price up even for a player who never takes it, and
+ * would make the price jump every time an author added an outlier. Pricing sets separately keeps an expensive set
+ * from touching a cheap one.</p>
  *
  * @since 0.50.11
  */
 public class LifePathXPCostCalculator {
     /**
-     * How quickly a flexible group's weight falls away as it moves from the middle of the cost order, measured in
+     * How quickly an item's weight falls away as it moves from the middle of its set's value order, measured in
      * positions.
      *
-     * <p>At 0.5 a group one position from the middle carries about an eighth of the middle group's weight, which is
-     * what keeps a single outlier group from setting the price.</p>
+     * <p>At 0.5 an item one position from the middle carries about an eighth of the middle item's weight, which is
+     * what keeps a single outlier from setting a set's price.</p>
      */
     private static final double GAUSSIAN_SPREAD = 0.5;
 
@@ -88,7 +91,6 @@ public class LifePathXPCostCalculator {
      */
     public static int calculateXPCost(LifePathBuilder lifePath) {
         int discount = lifePath.xpDiscount() == null ? 0 : lifePath.xpDiscount();
-        int flexiblePickCount = lifePath.flexibleXPPickCount() == null ? 0 : lifePath.flexibleXPPickCount();
 
         // Basic Info
         int globalCost = -discount;
@@ -105,10 +107,7 @@ public class LifePathXPCostCalculator {
               lifePath.fixedXPAbilities());
 
         // Flexible XP
-        if (flexiblePickCount > 0) {
-            double costPerPick = getWeightedFlexibleCost(lifePath);
-            globalCost += (int) Math.round(costPerPick * flexiblePickCount);
-        }
+        globalCost += calculateFlexibleXPCost(lifePath);
 
         // We can have 0 cost Life Paths, but not negative
         return max(0, globalCost);
@@ -128,124 +127,82 @@ public class LifePathXPCostCalculator {
     }
 
     /**
-     * Returns the weighted average cost of one flexible XP pick.
+     * Returns the XP the whole flexible section costs: every set's price added together.
      *
-     * <p>See the class documentation for why the average is weighted rather than flat.</p>
+     * @param lifePath the Life Path whose flexible sets are being priced
      *
-     * @param lifePath the Life Path whose flexible groups are being priced
-     *
-     * @return the XP one pick costs, or zero when there are no flexible groups
+     * @return the flexible XP cost, zero when there are no sets or none allow a pick
      *
      * @since 0.50.11
      */
-    private static double getWeightedFlexibleCost(LifePathBuilder lifePath) {
-        SortedSet<Integer> groupKeys = LifePath.flexibleXPGroupKeys(lifePath.flexibleXPAttributes(),
-              lifePath.flexibleXPEdge(),
-              lifePath.flexibleXPFlexibleAttribute(),
-              lifePath.flexibleXPTraits(),
-              lifePath.flexibleXPSkills(),
-              lifePath.flexibleXPMetaSkills(),
-              lifePath.flexibleXPNaturalAptitudes(),
-              lifePath.flexibleXPNaturalAptitudesMetaSkills(),
-              lifePath.flexibleXPAbilities());
+    public static int calculateFlexibleXPCost(LifePathBuilder lifePath) {
+        int flexibleCost = 0;
 
-        if (groupKeys.isEmpty()) {
+        for (int setIndex : LifePath.flexibleXPGroupKeys(lifePath)) {
+            flexibleCost += calculateFlexibleSetCost(lifePath, setIndex);
+        }
+
+        return flexibleCost;
+    }
+
+    /**
+     * Returns the XP one flexible set costs: the weighted average of its item values, multiplied by the number of
+     * items the player picks from it, rounded to the nearest XP.
+     *
+     * <p>Rounded here, per set, so that the per-set prices the wizard shows add up to the total the file records.
+     * See the class documentation for why the average is weighted rather than flat.</p>
+     *
+     * @param lifePath the Life Path the set belongs to
+     * @param setIndex the set's index
+     *
+     * @return the set's price, zero when it has no items or allows no picks
+     *
+     * @since 0.50.11
+     */
+    public static int calculateFlexibleSetCost(LifePathBuilder lifePath, int setIndex) {
+        Map<Integer, Integer> pickCounts = lifePath.flexibleXPPickCounts();
+        Integer storedPickCount = pickCounts == null ? null : pickCounts.get(setIndex);
+        int pickCount = storedPickCount == null ? 0 : storedPickCount;
+
+        if (pickCount <= 0) {
             return 0;
         }
 
-        List<Integer> groupCosts = new ArrayList<>();
-        for (int groupKey : groupKeys) {
-            groupCosts.add(getGroupCost(lifePath, groupKey));
+        List<Integer> itemValues = LifePath.flexibleXPItemValues(lifePath, setIndex);
+        if (itemValues.isEmpty()) {
+            return 0;
         }
 
-        // Sorted so that "the middle group" means the middle by cost, not whichever index the author happened to
-        // create first.
-        Collections.sort(groupCosts);
+        return (int) Math.round(weightedMiddleAverage(itemValues) * pickCount);
+    }
 
-        double middlePosition = (groupCosts.size() - 1) / 2.0;
+    /**
+     * Returns the average of the values with a bell curve centred on the middle one.
+     *
+     * @param values the values to average; at least one
+     *
+     * @return the weighted average
+     *
+     * @since 0.50.11
+     */
+    private static double weightedMiddleAverage(List<Integer> values) {
+        // Sorted so that "the middle item" means the middle by value, not whichever the author happened to add first.
+        List<Integer> sortedValues = new ArrayList<>(values);
+        Collections.sort(sortedValues);
+
+        double middlePosition = (sortedValues.size() - 1) / 2.0;
         double weightedTotal = 0;
         double totalWeight = 0;
 
-        for (int position = 0; position < groupCosts.size(); position++) {
+        for (int position = 0; position < sortedValues.size(); position++) {
             double offset = (position - middlePosition) / GAUSSIAN_SPREAD;
             double weight = Math.exp(-0.5 * offset * offset);
 
-            weightedTotal += weight * groupCosts.get(position);
+            weightedTotal += weight * sortedValues.get(position);
             totalWeight += weight;
         }
 
         return weightedTotal / totalWeight;
-    }
-
-    /**
-     * Returns the XP held in a single flexible XP group.
-     *
-     * @param lifePath the Life Path the group belongs to
-     * @param groupKey the group's index
-     *
-     * @return the group's total XP
-     *
-     * @since 0.50.11
-     */
-    private static int getGroupCost(LifePathBuilder lifePath, int groupKey) {
-        int cost = 0;
-
-        cost += singleValue(lifePath.flexibleXPEdge(), groupKey);
-        cost += singleValue(lifePath.flexibleXPFlexibleAttribute(), groupKey);
-
-        cost += nestedValues(lifePath.flexibleXPAttributes(), groupKey);
-        cost += nestedValues(lifePath.flexibleXPTraits(), groupKey);
-        cost += nestedValues(lifePath.flexibleXPSkills(), groupKey);
-        cost += nestedValues(lifePath.flexibleXPMetaSkills(), groupKey);
-        cost += nestedValues(lifePath.flexibleXPNaturalAptitudes(), groupKey);
-        cost += nestedValues(lifePath.flexibleXPNaturalAptitudesMetaSkills(), groupKey);
-        cost += nestedValues(lifePath.flexibleXPAbilities(), groupKey);
-
-        return cost;
-    }
-
-    /**
-     * Returns one group's single value, treating a missing or null entry as zero.
-     *
-     * @param groups   values keyed by group index
-     * @param groupKey the group to read
-     *
-     * @return the value, or zero
-     *
-     * @since 0.50.11
-     */
-    private static int singleValue(Map<Integer, Integer> groups, int groupKey) {
-        Integer value = groups.get(groupKey);
-
-        return value == null ? 0 : value;
-    }
-
-    /**
-     * Returns the sum of one group's scored entries, treating missing or null entries as zero.
-     *
-     * @param groups   scored entries keyed by group index
-     * @param groupKey the group to read
-     * @param <K>      the inner key type, which the total does not depend on
-     *
-     * @return the group's total
-     *
-     * @since 0.50.11
-     */
-    private static <K> int nestedValues(Map<Integer, Map<K, Integer>> groups, int groupKey) {
-        Map<K, Integer> group = groups.get(groupKey);
-
-        if (group == null) {
-            return 0;
-        }
-
-        int total = 0;
-        for (Integer value : group.values()) {
-            if (value != null) {
-                total += value;
-            }
-        }
-
-        return total;
     }
 
     /**

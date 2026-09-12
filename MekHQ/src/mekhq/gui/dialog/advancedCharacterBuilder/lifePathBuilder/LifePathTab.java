@@ -32,7 +32,6 @@
  */
 package mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder;
 
-import static java.lang.Math.min;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_EDGE_SCORE;
 import static mekhq.campaign.personnel.skills.Attributes.MINIMUM_ATTRIBUTE_SCORE;
@@ -66,6 +65,7 @@ import javax.swing.JSpinner;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.ui.EnhancedTabbedPane;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
@@ -119,8 +119,16 @@ public class LifePathTab {
      */
     private final Map<Integer, LifePathGroup> groups = new TreeMap<>();
 
-    private final JLabel lblFlexibleXPPicks = new JLabel();
-    private final JSpinner spnFlexibleXPPicks = new JSpinner(new SpinnerNumberModel(0, 0, 100, 1));
+    /** How many items a freshly added Flexible XP set lets the player take. */
+    private static final int DEFAULT_SET_PICK_COUNT = 1;
+
+    /**
+     * The "picks from this set" spinner of every Flexible XP set, keyed by set index.
+     *
+     * <p>Only the Flexible XP tab fills this. The spinners live inside their set's tab, so this map is shifted
+     * alongside {@link #groups} when a set is removed.</p>
+     */
+    private final Map<Integer, JSpinner> pickCountSpinners = new TreeMap<>();
 
     /**
      * Returns the group at the given index, creating it if this section does not have one yet.
@@ -295,12 +303,25 @@ public class LifePathTab {
         applyToGroups(abilities, LifePathGroup::setAbilities);
     }
 
-    public int getPickCount() {
-        return min((int) spnFlexibleXPPicks.getValue(), getTabCount());
+    /**
+     * @return how many items the player takes from each set, keyed by set index; values are {@code null} on tabs
+     *       that are not Flexible XP
+     */
+    public Map<Integer, Integer> getPickCounts() {
+        return collectFromGroups(LifePathGroup::getPickCount);
     }
 
-    public void setPickCount(int pickCount) {
-        spnFlexibleXPPicks.setValue(pickCount);
+    /**
+     * Sets how many items the player takes from each set and moves the spinners to match.
+     *
+     * @param pickCounts pick counts keyed by set index
+     */
+    public void setPickCounts(Map<Integer, Integer> pickCounts) {
+        applyToGroups(pickCounts, LifePathGroup::setPickCount);
+
+        for (int setIndex : pickCountSpinners.keySet()) {
+            refreshPickCountSpinner(setIndex);
+        }
     }
 
     public int getTabCount() {
@@ -353,13 +374,7 @@ public class LifePathTab {
         btnDuplicateGroup.setVisible(enableGroupControls);
         btnDuplicateGroup.addActionListener(actionEvent -> duplicateGroup());
 
-        JPanel panelPicksRow = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        buildFlexiblePicksPanel(panelPicksRow);
-        spnFlexibleXPPicks.setVisible(tabType == LifePathBuilderTabType.FLEXIBLE_XP);
-        lblFlexibleXPPicks.setVisible(tabType == LifePathBuilderTabType.FLEXIBLE_XP);
-
         buttonPanel.add(panelButtonsRow);
-        buttonPanel.add(panelPicksRow);
 
         if (!enableGroupControls) {
             addTab();
@@ -369,28 +384,129 @@ public class LifePathTab {
         pnlLocal.add(tabLocal, BorderLayout.CENTER);
     }
 
-    private void buildFlexiblePicksPanel(JPanel panelPicksRow) {
-        String titlePicks = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.flexible_xp.button.pickCount.label");
-        String tooltipPicks = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.flexible_xp.button.pickCount.tooltip");
-        lblFlexibleXPPicks.setText(titlePicks);
-        lblFlexibleXPPicks.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipPicks)
-        );
-        spnFlexibleXPPicks.addMouseListener(
-              TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipPicks)
-        );
-        spnFlexibleXPPicks.addChangeListener(changeEvent -> parent.updateTxtProgress());
-        panelPicksRow.add(lblFlexibleXPPicks);
-        panelPicksRow.add(spnFlexibleXPPicks);
+    /**
+     * Builds the "picks from this set" row that sits at the top of a Flexible XP set tab.
+     *
+     * <p>The spinner is bounded by the set's item count and re-bounded whenever a picker closes, so the author can
+     * never save more picks than the set holds. A set with no items yet keeps a ceiling of one, because the default
+     * pick count is one and a set nobody has filled is dropped on save anyway.</p>
+     *
+     * @param setIndex the set the row belongs to
+     *
+     * @return the row
+     *
+     * @since 0.50.11
+     */
+    private JPanel buildSetPickCountPanel(int setIndex) {
+        LifePathGroup set = groupFor(setIndex);
+        if (set.getPickCount() == null) {
+            set.setPickCount(DEFAULT_SET_PICK_COUNT);
+        }
+
+        String labelText = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexible_xp.set.pickCount.label");
+        String tooltipText = getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexible_xp.set.pickCount.tooltip");
+
+        JLabel lblPickCount = new JLabel(labelText);
+        lblPickCount.addMouseListener(TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipText));
+
+        int ceiling = Math.max(1, set.countItems());
+        int initialValue = Math.clamp(set.getPickCount(), 0, ceiling);
+        JSpinner spnPickCount = new JSpinner(new SpinnerNumberModel(initialValue, 0, ceiling, 1));
+        spnPickCount.addMouseListener(TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipText));
+        spnPickCount.addChangeListener(changeEvent -> {
+            // Looked up at change time, not captured: removing a set shifts every set above it down one index, and
+            // this spinner moves with its set.
+            Integer currentIndex = indexOfPickCountSpinner(spnPickCount);
+            if (currentIndex == null) {
+                return;
+            }
+
+            groupFor(currentIndex).setPickCount((int) spnPickCount.getValue());
+            parent.updateTxtProgress();
+        });
+        pickCountSpinners.put(setIndex, spnPickCount);
+
+        JPanel pnlPickCount = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        pnlPickCount.add(lblPickCount);
+        pnlPickCount.add(spnPickCount);
+
+        return pnlPickCount;
+    }
+
+    /**
+     * Returns the set index a pick-count spinner currently belongs to.
+     *
+     * @param spnPickCount the spinner
+     *
+     * @return its set index, or {@code null} if the spinner belongs to no set (its set was removed)
+     *
+     * @since 0.50.11
+     */
+    private @Nullable Integer indexOfPickCountSpinner(JSpinner spnPickCount) {
+        for (Map.Entry<Integer, JSpinner> entry : pickCountSpinners.entrySet()) {
+            if (entry.getValue() == spnPickCount) {
+                return entry.getKey();
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Brings a set's pick-count spinner back into line with the set: its ceiling is the set's item count, and its
+     * value is what the set holds, clamped to that ceiling.
+     *
+     * <p>Called after a picker closes, after a set is duplicated, and after a file is loaded. Changing a
+     * {@link SpinnerNumberModel}'s bounds fires its change listener, which is harmless: the listener writes the
+     * value the set already has.</p>
+     *
+     * @param setIndex the set whose spinner to refresh; sets without a spinner are ignored
+     *
+     * @since 0.50.11
+     */
+    private void refreshPickCountSpinner(int setIndex) {
+        JSpinner spnPickCount = pickCountSpinners.get(setIndex);
+        if (spnPickCount == null) {
+            return;
+        }
+
+        LifePathGroup set = groupFor(setIndex);
+        int ceiling = Math.max(1, set.countItems());
+        Integer storedPickCount = set.getPickCount();
+        int pickCount = Math.clamp(storedPickCount == null ? DEFAULT_SET_PICK_COUNT : storedPickCount, 0, ceiling);
+
+        SpinnerNumberModel model = (SpinnerNumberModel) spnPickCount.getModel();
+        model.setMaximum(ceiling);
+
+        if ((int) spnPickCount.getValue() != pickCount) {
+            spnPickCount.setValue(pickCount);
+        } else {
+            // The spinner already shows the right number, but the set may not hold it yet (a clamped load).
+            set.setPickCount(pickCount);
+        }
+    }
+
+    /**
+     * Returns the key of a group-management button label or tooltip for this section.
+     *
+     * <p>The Flexible XP tab calls its groups sets, because the player picks items from within one rather than
+     * choosing between them, so its buttons read Add Set rather than Add Group.</p>
+     *
+     * @param action {@code add}, {@code remove} or {@code duplicate}
+     * @param part   {@code label} or {@code tooltip}
+     *
+     * @return the resource key
+     *
+     * @since 0.50.11
+     */
+    private String groupButtonKey(String action, String part) {
+        String noun = tabType == LifePathBuilderTabType.FLEXIBLE_XP ? "Set" : "Group";
+        return "LifePathBuilderDialog.button." + action + noun + '.' + part;
     }
 
     private RoundedJButton getDuplicateGroup(JPanel buttonPanel) {
-        String titleDuplicateGroup = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.button.duplicateGroup.label");
-        String tooltipDuplicateGroup = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.button.duplicateGroup.tooltip");
+        String titleDuplicateGroup = getTextAt(RESOURCE_BUNDLE, groupButtonKey("duplicate", "label"));
+        String tooltipDuplicateGroup = getTextAt(RESOURCE_BUNDLE, groupButtonKey("duplicate", "tooltip"));
         RoundedJButton btnDuplicateGroup = new RoundedJButton(titleDuplicateGroup);
         btnDuplicateGroup.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipDuplicateGroup)
@@ -400,10 +516,8 @@ public class LifePathTab {
     }
 
     private RoundedJButton getRemoveGroup(JPanel buttonPanel) {
-        String titleRemoveGroup = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.button.removeGroup.label");
-        String tooltipRemoveGroup = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.button.removeGroup.tooltip");
+        String titleRemoveGroup = getTextAt(RESOURCE_BUNDLE, groupButtonKey("remove", "label"));
+        String tooltipRemoveGroup = getTextAt(RESOURCE_BUNDLE, groupButtonKey("remove", "tooltip"));
         RoundedJButton btnRemoveGroup = new RoundedJButton(titleRemoveGroup);
         btnRemoveGroup.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipRemoveGroup)
@@ -413,10 +527,8 @@ public class LifePathTab {
     }
 
     private RoundedJButton getAddGroup(JPanel buttonPanel) {
-        String titleAddGroup = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.button.addGroup.label");
-        String tooltipAddGroup = getTextAt(RESOURCE_BUNDLE,
-              "LifePathBuilderDialog.button.addGroup.tooltip");
+        String titleAddGroup = getTextAt(RESOURCE_BUNDLE, groupButtonKey("add", "label"));
+        String tooltipAddGroup = getTextAt(RESOURCE_BUNDLE, groupButtonKey("add", "tooltip"));
         RoundedJButton btnAddGroup = new RoundedJButton(titleAddGroup);
         btnAddGroup.addMouseListener(
               TooltipMouseListenerUtil.forTooltip(parent::setTxtTooltipArea, tooltipAddGroup)
@@ -442,19 +554,8 @@ public class LifePathTab {
 
         int selectedIndex = tabLocal.getSelectedIndex();
 
-        Map<Integer, LifePathGroup> shifted = new TreeMap<>();
-        for (Map.Entry<Integer, LifePathGroup> entry : groups.entrySet()) {
-            int groupIndex = entry.getKey();
-
-            if (groupIndex < selectedIndex) {
-                shifted.put(groupIndex, entry.getValue());
-            } else if (groupIndex > selectedIndex) {
-                shifted.put(groupIndex - 1, entry.getValue());
-            }
-        }
-
-        groups.clear();
-        groups.putAll(shifted);
+        closeGap(groups, selectedIndex);
+        closeGap(pickCountSpinners, selectedIndex);
 
         // Remove the desired tab
         tabLocal.remove(selectedIndex);
@@ -462,10 +563,37 @@ public class LifePathTab {
         // The titles are the group indexes, and every index above the removed one has just shifted down, so the
         // labels have to be rewritten. Without this, removing group 1 of three leaves tabs titled 0 and 2.
         renumberGroupTabs();
-        updateFlexiblePicksMaximum();
 
         // Update the progress panel
         parent.updateTxtProgress();
+    }
+
+    /**
+     * Drops one index from an index-keyed map and shifts every higher index down by one.
+     *
+     * <p>The indexes are the keys the saved file uses and they have to stay consecutive, so removing a group is a
+     * shift, not just a delete. Applied to the groups and to their spinners, which must stay in step.</p>
+     *
+     * @param indexed      the map to close the gap in; modified in place
+     * @param removedIndex the index being removed
+     * @param <T>          the value type
+     *
+     * @since 0.50.11
+     */
+    private static <T> void closeGap(Map<Integer, T> indexed, int removedIndex) {
+        Map<Integer, T> shifted = new TreeMap<>();
+        for (Map.Entry<Integer, T> entry : indexed.entrySet()) {
+            int index = entry.getKey();
+
+            if (index < removedIndex) {
+                shifted.put(index, entry.getValue());
+            } else if (index > removedIndex) {
+                shifted.put(index - 1, entry.getValue());
+            }
+        }
+
+        indexed.clear();
+        indexed.putAll(shifted);
     }
 
     /**
@@ -499,34 +627,6 @@ public class LifePathTab {
         };
     }
 
-    /**
-     * Caps the "how many groups may the player pick?" spinner at the number of groups that exist.
-     *
-     * <p>The spinner used to accept up to 100 regardless, and {@link #getPickCount()} then quietly reduced the
-     * number on save. That made the saved value disagree with the number on screen, and made
-     * {@code TOO_MANY_FLEXIBLE_PICKS} impossible to produce from the wizard.</p>
-     *
-     * <p>Only the Flexible XP tab shows the spinner, so the other tabs leave the model alone. Changing a
-     * {@link SpinnerNumberModel}'s maximum fires its change listener, which re-renders the wizard's progress panel,
-     * and there is no reason to do that for a spinner nobody can see.</p>
-     *
-     * @since 0.50.11
-     */
-    private void updateFlexiblePicksMaximum() {
-        if (tabType != LifePathBuilderTabType.FLEXIBLE_XP) {
-            return;
-        }
-
-        SpinnerNumberModel model = (SpinnerNumberModel) spnFlexibleXPPicks.getModel();
-        int groupCount = getTabCount();
-
-        model.setMaximum(groupCount);
-
-        if ((int) spnFlexibleXPPicks.getValue() > groupCount) {
-            spnFlexibleXPPicks.setValue(groupCount);
-        }
-    }
-
     private void duplicateGroup() {
         int selectedIndex = tabLocal.getSelectedIndex();
         if (selectedIndex < 0) {
@@ -540,6 +640,8 @@ public class LifePathTab {
         // groupFor rather than a bare get: a group loaded from a hand-edited file need not be present, and copy()
         // deep-copies the collections so editing the duplicate cannot reach back into the original.
         groups.put(newIndex, groupFor(selectedIndex).copy());
+        // The copy carries the original's pick count; the new tab's spinner was built before the copy existed.
+        refreshPickCountSpinner(newIndex);
 
         JPanel pnlNewTab = (JPanel) tabLocal.getComponentAt(newIndex);
         JPanel pnlMain = (JPanel) pnlNewTab.getComponent(1);
@@ -725,12 +827,19 @@ public class LifePathTab {
 
         pnlDisplay.add(scrollMain, BorderLayout.CENTER);
 
-        // Add panels and then add Tab
-        groupPanel.add(buttonsPanel, BorderLayout.NORTH);
+        // Add panels and then add Tab. The top panel is always index 0 and the display panel index 1, which
+        // duplicateGroup and the dialog rely on when they look the progress pane up.
+        JPanel pnlTop = new JPanel();
+        pnlTop.setLayout(new BoxLayout(pnlTop, BoxLayout.Y_AXIS));
+        if (tabType == LifePathBuilderTabType.FLEXIBLE_XP) {
+            pnlTop.add(buildSetPickCountPanel(index));
+        }
+        pnlTop.add(buttonsPanel);
+
+        groupPanel.add(pnlTop, BorderLayout.NORTH);
         groupPanel.add(pnlDisplay, BorderLayout.CENTER);
 
         tabLocal.addTab(buildGroupTabTitle(index), groupPanel);
-        updateFlexiblePicksMaximum();
 
         // Action Listeners
         // No hide and show around any of these: the pickers are owned by the wizard, so they cannot end up behind
@@ -899,6 +1008,8 @@ public class LifePathTab {
     private void standardizedActions(int index, JEditorPane newText) {
         List<String> textArray = buildProgressText();
         newText.setText(textArray.get(index));
+        // A picker may have added or removed items, which moves the ceiling on how many the player can pick.
+        refreshPickCountSpinner(index);
         parent.updateTxtProgress();
     }
 
@@ -1233,7 +1344,7 @@ public class LifePathTab {
         tabLocal.removeAll();
 
         groups.clear();
-        spnFlexibleXPPicks.setValue(0);
+        pickCountSpinners.clear();
 
         parent.updateTxtProgress();
     }

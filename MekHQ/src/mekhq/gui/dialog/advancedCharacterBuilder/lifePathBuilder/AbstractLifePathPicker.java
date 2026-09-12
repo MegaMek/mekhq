@@ -340,8 +340,14 @@ abstract class AbstractLifePathPicker extends JDialog {
                   "LifePathBuilderDialog.picker.title.section", baseTitle, sectionName);
         }
 
-        return getFormattedTextAt("mekhq.resources.LifePathBuilderDialog",
-              "LifePathBuilderDialog.picker.title.group", baseTitle, sectionName, groupIndex);
+        // Flexible XP calls its groups sets, because the player picks items from within one rather than choosing
+        // between them.
+        String groupTitleKey = tabType == LifePathBuilderTabType.FLEXIBLE_XP
+                                     ? "LifePathBuilderDialog.picker.title.set"
+                                     : "LifePathBuilderDialog.picker.title.group";
+
+        return getFormattedTextAt("mekhq.resources.LifePathBuilderDialog", groupTitleKey, baseTitle, sectionName,
+              groupIndex);
     }
 
     /**

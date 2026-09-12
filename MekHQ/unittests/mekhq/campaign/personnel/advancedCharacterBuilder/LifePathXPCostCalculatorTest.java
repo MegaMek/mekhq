@@ -129,38 +129,46 @@ class LifePathXPCostCalculatorTest {
     // region Flexible XP weighting
 
     @Test
-    void testFlexibleSection_IsNotChargedWithoutPicks() {
+    void testFlexibleSet_IsNotChargedWithoutPicks() {
         LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 500)))
-                                        .flexibleXPPickCount(0);
+                                        .flexibleXPPickCounts(Map.of(0, 0));
 
         assertEquals(0, LifePathXPCostCalculator.calculateXPCost(builder),
-              "Groups the player cannot pick should not be charged for.");
+              "A set the player cannot pick from should not be charged for.");
     }
 
     @Test
-    void testSingleFlexibleGroup_CostsItsOwnValue() {
+    void testFlexibleSet_IsNotChargedWhenNoPickCountIsRecorded() {
+        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 500)));
+
+        assertEquals(0, LifePathXPCostCalculator.calculateXPCost(builder),
+              "A set with no pick count recorded allows no picks, so it costs nothing.");
+    }
+
+    @Test
+    void testSingleItemSet_CostsItsOwnValue() {
         LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 120)))
-                                        .flexibleXPPickCount(1);
+                                        .flexibleXPPickCounts(Map.of(0, 1));
 
         assertEquals(120, LifePathXPCostCalculator.calculateXPCost(builder),
-              "With one group there is nothing to average, so the price is that group.");
+              "With one item there is nothing to average, so the price is that item.");
     }
 
     @Test
-    void testIdenticalFlexibleGroups_CostTheirSharedValue() {
-        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 100),
-              1, Map.of("Piloting/Mek", 100), 2, Map.of("Tactics", 100))).flexibleXPPickCount(2);
+    void testIdenticalItems_CostTheirSharedValue() {
+        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 100,
+              "Piloting/Mek", 100, "Tactics", 100))).flexibleXPPickCounts(Map.of(0, 2));
 
         assertEquals(200, LifePathXPCostCalculator.calculateXPCost(builder),
-              "Three equal groups should price at that value however they are weighted.");
+              "Three equal items should price at that value however they are weighted.");
     }
 
     @Test
-    void testWeightedAverage_FavoursTheMiddleGroup() {
-        // The documented example: groups worth 60, 90 and 150, two picks. A flat average would charge 200. The
-        // weighted average leans on the middle group, so it charges less.
-        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 60),
-              1, Map.of("Piloting/Mek", 90), 2, Map.of("Tactics", 150))).flexibleXPPickCount(2);
+    void testWeightedAverage_FavoursTheMiddleItem() {
+        // Items worth 60, 90 and 150 in one set, two picks. A flat average would charge 200. The weighted average
+        // leans on the middle item, so it charges less.
+        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 60,
+              "Piloting/Mek", 90, "Tactics", 150))).flexibleXPPickCounts(Map.of(0, 2));
 
         int cost = LifePathXPCostCalculator.calculateXPCost(builder);
 
@@ -169,69 +177,113 @@ class LifePathXPCostCalculatorTest {
 
     @Test
     void testWeightedAverage_AnOutlierBarelyMovesThePrice() {
-        Map<Integer, Map<String, Integer>> tightGroups = Map.of(0, Map.of("A", 100),
-              1, Map.of("B", 100),
-              2, Map.of("C", 100));
-        Map<Integer, Map<String, Integer>> withOutlier = Map.of(0, Map.of("A", 100),
-              1, Map.of("B", 100),
-              2, Map.of("C", 1000));
+        Map<Integer, Map<String, Integer>> tightSet = Map.of(0, Map.of("A", 100, "B", 100, "C", 100));
+        Map<Integer, Map<String, Integer>> withOutlier = Map.of(0, Map.of("A", 100, "B", 100, "C", 1000));
 
-        int tightCost = LifePathXPCostCalculator.calculateXPCost(validBuilder().flexibleXPSkills(tightGroups)
-                                                                      .flexibleXPPickCount(1));
+        int tightCost = LifePathXPCostCalculator.calculateXPCost(validBuilder().flexibleXPSkills(tightSet)
+                                                                      .flexibleXPPickCounts(Map.of(0, 1)));
         int outlierCost = LifePathXPCostCalculator.calculateXPCost(validBuilder().flexibleXPSkills(withOutlier)
-                                                                        .flexibleXPPickCount(1));
+                                                                        .flexibleXPPickCounts(Map.of(0, 1)));
 
         // A flat average would have jumped from 100 to 400.
-        assertEquals(100, tightCost, "Three equal groups should price at their shared value.");
+        assertEquals(100, tightCost, "Three equal items should price at their shared value.");
         assertEquals(196, outlierCost, "A tenfold outlier should move the price from 100 to 196, not to 400.");
         assertTrue(outlierCost > tightCost, "The outlier should still raise the price a little.");
     }
 
     @Test
-    void testWeightedAverage_IgnoresGroupOrder() {
-        LifePathBuilder ascending = validBuilder().flexibleXPSkills(Map.of(0, Map.of("A", 60),
-              1, Map.of("B", 90), 2, Map.of("C", 150))).flexibleXPPickCount(2);
-        LifePathBuilder descending = validBuilder().flexibleXPSkills(Map.of(0, Map.of("A", 150),
-              1, Map.of("B", 90), 2, Map.of("C", 60))).flexibleXPPickCount(2);
+    void testWeightedAverage_IgnoresWhichMapAnItemLivesIn() {
+        // The same three values, once all as skills and once spread across skills, an ability and Edge. The average
+        // is over item values, so where the items live must not matter.
+        LifePathBuilder allSkills = validBuilder().flexibleXPSkills(Map.of(0, Map.of("A", 60, "B", 90, "C", 150)))
+                                          .flexibleXPPickCounts(Map.of(0, 2));
+        LifePathBuilder spread = validBuilder().flexibleXPSkills(Map.of(0, Map.of("A", 60)))
+                                       .flexibleXPAbilities(Map.of(0, Map.of("Melee Specialist", 90)))
+                                       .flexibleXPEdge(Map.of(0, 150))
+                                       .flexibleXPPickCounts(Map.of(0, 2));
 
-        assertEquals(LifePathXPCostCalculator.calculateXPCost(ascending),
-              LifePathXPCostCalculator.calculateXPCost(descending),
-              "The groups are sorted by cost, so the order the author created them in must not matter.");
+        assertEquals(LifePathXPCostCalculator.calculateXPCost(allSkills),
+              LifePathXPCostCalculator.calculateXPCost(spread),
+              "Items are priced by value, whichever award map they come from.");
     }
 
     @Test
-    void testFlexibleCost_ScalesWithPickCount() {
-        Map<Integer, Map<String, Integer>> groups = Map.of(0, Map.of("A", 100),
-              1, Map.of("B", 100),
-              2, Map.of("C", 100));
+    void testFlexibleSetCost_ScalesWithItsPickCount() {
+        Map<Integer, Map<String, Integer>> set = Map.of(0, Map.of("A", 100, "B", 100, "C", 100, "D", 100));
 
-        int onePick = LifePathXPCostCalculator.calculateXPCost(validBuilder().flexibleXPSkills(groups)
-                                                                    .flexibleXPPickCount(1));
-        int threePicks = LifePathXPCostCalculator.calculateXPCost(validBuilder().flexibleXPSkills(groups)
-                                                                       .flexibleXPPickCount(3));
+        int onePick = LifePathXPCostCalculator.calculateXPCost(validBuilder().flexibleXPSkills(set)
+                                                                    .flexibleXPPickCounts(Map.of(0, 1)));
+        int threePicks = LifePathXPCostCalculator.calculateXPCost(validBuilder().flexibleXPSkills(set)
+                                                                       .flexibleXPPickCounts(Map.of(0, 3)));
 
-        assertEquals(onePick * 3, threePicks, "Each pick should cost the same weighted average.");
+        assertEquals(onePick * 3, threePicks, "Each pick from a set should cost that set's weighted average.");
     }
 
     @Test
-    void testFlexibleGroups_CountSparseIndexes() {
-        // Empty groups are stripped on save, so indexes need not run from zero.
-        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(4, Map.of("A", 100),
-              9, Map.of("B", 100))).flexibleXPPickCount(2);
+    void testFlexibleSets_ArePricedSeparatelyAndAdded() {
+        // The plan's worked example. Set A: 30, 30 and 200, one pick, weighted average 48. Set B: 20 and 20, two
+        // picks, 40. Pricing the sets together used to give 150; pricing them apart gives 88.
+        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 30,
+                    "Piloting/Mek", 30), 1, Map.of("Small Arms", 20, "Melee", 20)))
+                                        .flexibleXPAbilities(Map.of(0, Map.of("Pain Resistance", 200)))
+                                        .flexibleXPPickCounts(Map.of(0, 1, 1, 2));
+
+        assertEquals(48, LifePathXPCostCalculator.calculateFlexibleSetCost(builder, 0),
+              "Set A should price at its own weighted average times one pick.");
+        assertEquals(40, LifePathXPCostCalculator.calculateFlexibleSetCost(builder, 1),
+              "Set B should price at 20 times two picks.");
+        assertEquals(88, LifePathXPCostCalculator.calculateXPCost(builder),
+              "The Life Path's flexible cost is the sum of the set prices.");
+    }
+
+    @Test
+    void testOneExpensiveSet_DoesNotChangeAnotherSetsPrice() {
+        LifePathBuilder cheapOnly = validBuilder().flexibleXPSkills(Map.of(1, Map.of("Small Arms", 20, "Melee", 20)))
+                                          .flexibleXPPickCounts(Map.of(1, 2));
+        LifePathBuilder withExpensive = validBuilder().flexibleXPSkills(Map.of(1, Map.of("Small Arms", 20,
+                    "Melee", 20)))
+                                              .flexibleXPAbilities(Map.of(0, Map.of("Pain Resistance", 1000)))
+                                              .flexibleXPPickCounts(Map.of(0, 1, 1, 2));
+
+        assertEquals(LifePathXPCostCalculator.calculateFlexibleSetCost(cheapOnly, 1),
+              LifePathXPCostCalculator.calculateFlexibleSetCost(withExpensive, 1),
+              "A set is priced on its own items; an expensive neighbouring set cannot touch it.");
+    }
+
+    @Test
+    void testFlexibleSets_CountSparseIndexes() {
+        // Empty sets are stripped on save, so indexes need not run from zero.
+        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(4, Map.of("A", 100, "B", 100),
+              9, Map.of("C", 100, "D", 100))).flexibleXPPickCounts(Map.of(4, 1, 9, 1));
 
         assertEquals(200, LifePathXPCostCalculator.calculateXPCost(builder),
-              "Sparse group indexes should be priced the same as consecutive ones.");
+              "Sparse set indexes should be priced the same as consecutive ones.");
     }
 
     @Test
-    void testFlexibleGroup_SumsEveryMapForThatGroup() {
-        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("A", 50)))
-                                        .flexibleXPEdge(Map.of(0, 30))
-                                        .flexibleXPAbilities(Map.of(0, Map.of("Melee Specialist", 20)))
-                                        .flexibleXPPickCount(1);
+    void testFlexibleSet_PricesEveryMapForThatSet() {
+        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("A", 100)))
+                                        .flexibleXPEdge(Map.of(0, 100))
+                                        .flexibleXPAbilities(Map.of(0, Map.of("Melee Specialist", 100)))
+                                        .flexibleXPPickCounts(Map.of(0, 2));
 
-        assertEquals(100, LifePathXPCostCalculator.calculateXPCost(builder),
-              "A group's cost is everything that group awards, across every map.");
+        assertEquals(200, LifePathXPCostCalculator.calculateXPCost(builder),
+              "Items in every award map belong to the set and share its pick count.");
+    }
+
+    @Test
+    void testFlexibleSetCost_IsRoundedPerSet() {
+        // Two sets whose exact prices are 47.5 each. Rounded once at the end they would come to 95; rounded per set
+        // they come to 96, and the per-set figures shown in the wizard add up to what the file records.
+        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("A", 45, "B", 50),
+                    1, Map.of("C", 45, "D", 50)))
+                                        .flexibleXPPickCounts(Map.of(0, 1, 1, 1));
+
+        int setZero = LifePathXPCostCalculator.calculateFlexibleSetCost(builder, 0);
+        int setOne = LifePathXPCostCalculator.calculateFlexibleSetCost(builder, 1);
+
+        assertEquals(setZero + setOne, LifePathXPCostCalculator.calculateFlexibleXPCost(builder),
+              "The flexible total should be the sum of the rounded set prices.");
     }
 
     // endregion Flexible XP weighting
@@ -280,8 +332,8 @@ class LifePathXPCostCalculatorTest {
     @Test
     void testRecordAndBuilder_PriceIdentically() {
         LifePath lifePath = validBuilder().fixedXPSkills(Map.of(0, Map.of("Gunnery/Mek", 150)))
-                                  .flexibleXPSkills(Map.of(0, Map.of("A", 60), 1, Map.of("B", 90)))
-                                  .flexibleXPPickCount(1)
+                                  .flexibleXPSkills(Map.of(0, Map.of("A", 60, "B", 90)))
+                                  .flexibleXPPickCounts(Map.of(0, 1))
                                   .xpCost(0)
                                   .build();
 

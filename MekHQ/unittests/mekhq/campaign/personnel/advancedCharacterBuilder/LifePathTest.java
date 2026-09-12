@@ -40,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
@@ -164,7 +166,7 @@ class LifePathTest {
               nulled("flexibleXPNaturalAptitudesMetaSkills",
                     builder -> builder.flexibleXPNaturalAptitudesMetaSkills(null)),
               nulled("flexibleXPAbilities", builder -> builder.flexibleXPAbilities(null)),
-              nulled("flexibleXPPickCount", builder -> builder.flexibleXPPickCount(null)));
+              nulled("flexibleXPPickCounts", builder -> builder.flexibleXPPickCounts(null)));
     }
 
     private static Arguments nulled(String componentName, Consumer<LifePathBuilder> setToNull) {
@@ -252,52 +254,133 @@ class LifePathTest {
 
     @Test
     void testFlexiblePickCount_NegativeIsRejected() {
-        LifePathBuilder builder = validBuilder().flexibleXPPickCount(-1);
+        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 100)))
+                                        .flexibleXPPickCounts(Map.of(0, -1));
 
         assertThrows(IllegalArgumentException.class, builder::build, "A negative pick count should be rejected.");
     }
 
+    @Test
+    void testFlexiblePickCount_NullValueIsRejected() {
+        Map<Integer, Integer> pickCounts = new HashMap<>();
+        pickCounts.put(0, null);
+        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 100)))
+                                        .flexibleXPPickCounts(pickCounts);
+
+        assertThrows(IllegalArgumentException.class, builder::build, "A null pick count should be rejected.");
+    }
+
     // endregion Value ranges
 
-    // region Flexible group counting
+    // region Flexible sets and items
 
     @Test
-    void testPickCount_AboveGroupCountIsRejected() {
+    void testPickCount_AboveItemCountIsRejected() {
         LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 100)))
-                                        .flexibleXPPickCount(2);
+                                        .flexibleXPPickCounts(Map.of(0, 2));
 
         assertThrows(IllegalArgumentException.class, builder::build,
-              "Picking two of one group should be rejected.");
+              "Picking two items from a set holding one should be rejected.");
     }
 
     @Test
-    void testPickCount_EqualToGroupCountIsAccepted() {
-        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 100),
-                    1, Map.of("Piloting/Mek", 100)))
-                                        .flexibleXPPickCount(2);
+    void testPickCount_EqualToItemCountIsAcceptedByTheRecord() {
+        // The validator reports this as an authoring mistake; the record itself accepts it, because the file is
+        // well-formed and the wizard is the place to tell the author.
+        LifePathBuilder builder = validBuilder().flexibleXPSkills(Map.of(0, Map.of("Gunnery/Mek", 100,
+                    "Piloting/Mek", 100)))
+                                        .flexibleXPPickCounts(Map.of(0, 2));
 
-        assertDoesNotThrow(builder::build, "Picking both of two groups should be accepted.");
+        assertDoesNotThrow(builder::build, "Picking both items of a two-item set is well-formed.");
     }
 
     @Test
-    void testPickCount_CountsGroupsHeldOnlyInMetaSkills() {
-        // The group count used to be taken from the largest of six maps, which left out meta skills and both natural
-        // aptitude maps. A path whose only flexible groups lived in one of those passed the wizard and then failed to
-        // load.
+    void testPickCount_ForASetWithNoItemsIsRejected() {
+        LifePathBuilder builder = validBuilder().flexibleXPPickCounts(Map.of(3, 1));
+
+        assertThrows(IllegalArgumentException.class, builder::build,
+              "A pick count for a set that holds nothing exceeds its zero items and should be rejected.");
+    }
+
+    @Test
+    void testPickCount_OfZeroForASetWithNoItemsIsAccepted() {
+        LifePathBuilder builder = validBuilder().flexibleXPPickCounts(Map.of(3, 0));
+
+        assertDoesNotThrow(builder::build, "Zero picks from an empty set exceeds nothing.");
+    }
+
+    @Test
+    void testPickCount_IsBoundedPerSet() {
+        // Set 0 holds three items, set 1 holds one. Two picks are fine for set 0 and too many for set 1, and the
+        // bound must not be the total across sets.
+        LifePathBuilder accepted = validBuilder().flexibleXPSkills(Map.of(0, Map.of("A", 10, "B", 10, "C", 10),
+                    1, Map.of("D", 10)))
+                                         .flexibleXPPickCounts(Map.of(0, 2, 1, 1));
+        LifePathBuilder rejected = validBuilder().flexibleXPSkills(Map.of(0, Map.of("A", 10, "B", 10, "C", 10),
+                    1, Map.of("D", 10)))
+                                         .flexibleXPPickCounts(Map.of(0, 2, 1, 2));
+
+        assertDoesNotThrow(accepted::build, "Each set is bounded by its own items.");
+        assertThrows(IllegalArgumentException.class, rejected::build,
+              "Two picks from a one-item set should be rejected even though four items exist overall.");
+    }
+
+    @Test
+    void testPickCount_CountsItemsHeldOnlyInMetaSkills() {
         LifePathBuilder builder = validBuilder().flexibleXPMetaSkills(Map.of(0,
-                    Map.of(mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY, 100)))
-                                        .flexibleXPPickCount(1);
+                    Map.of(mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_GUNNERY, 100,
+                          mekhq.campaign.personnel.skills.enums.SkillSubType.COMBAT_PILOTING, 100)))
+                                        .flexibleXPPickCounts(Map.of(0, 1));
 
-        assertDoesNotThrow(builder::build, "A group held only in the meta skills map should count as a group.");
+        assertDoesNotThrow(builder::build, "Items held only in the meta skills map should count as items.");
     }
 
     @Test
-    void testPickCount_CountsGroupsHeldOnlyInNaturalAptitudes() {
-        LifePathBuilder builder = validBuilder().flexibleXPNaturalAptitudes(Map.of(0, Map.of("Gunnery/Mek", 100)))
-                                        .flexibleXPPickCount(1);
+    void testPickCount_CountsItemsHeldOnlyInNaturalAptitudes() {
+        LifePathBuilder builder = validBuilder().flexibleXPNaturalAptitudes(Map.of(0, Map.of("Gunnery/Mek", 100,
+                    "Piloting/Mek", 100)))
+                                        .flexibleXPPickCounts(Map.of(0, 1));
 
         assertDoesNotThrow(builder::build,
-              "A group held only in the natural aptitudes map should count as a group.");
+              "Items held only in the natural aptitudes map should count as items.");
+    }
+
+    @Test
+    void testFlexibleXPItemValues_ListsEveryAwardInTheSet() {
+        Map<Integer, Integer> edge = Map.of(0, 10);
+        Map<Integer, Integer> flexibleAttribute = Map.of(0, 20);
+        Map<Integer, Map<String, Integer>> skills = Map.of(0, Map.of("A", 30, "B", 40));
+        Map<Integer, Map<String, Integer>> abilities = Map.of(0, Map.of("Melee Specialist", 200));
+
+        List<Integer> values = LifePath.flexibleXPItemValues(0, edge, flexibleAttribute, null, null, skills,
+              null, null, null, abilities);
+
+        assertEquals(5, values.size(), "Edge, the flexible attribute, two skills and an ability are five items.");
+        assertEquals(300, values.stream().mapToInt(Integer::intValue).sum(), "Every item value should be listed.");
+    }
+
+    @Test
+    void testFlexibleXPItemValues_OnlyReadsTheRequestedSet() {
+        Map<Integer, Map<String, Integer>> skills = Map.of(0, Map.of("A", 30), 1, Map.of("B", 40, "C", 50));
+
+        assertEquals(1, LifePath.flexibleXPItemValues(0, null, null, null, null, skills, null, null, null, null)
+                                .size(), "Set 0 holds one item.");
+        assertEquals(2, LifePath.flexibleXPItemValues(1, null, null, null, null, skills, null, null, null, null)
+                                .size(), "Set 1 holds two items.");
+        assertTrue(LifePath.flexibleXPItemValues(2, null, null, null, null, skills, null, null, null, null).isEmpty(),
+              "A set that does not exist holds nothing.");
+    }
+
+    @Test
+    void testFlexibleXPItemValues_SkipsNullValues() {
+        Map<String, Integer> skills = new HashMap<>();
+        skills.put("A", 30);
+        skills.put("B", null);
+
+        List<Integer> values = LifePath.flexibleXPItemValues(0, null, null, null, null, Map.of(0, skills),
+              null, null, null, null);
+
+        assertEquals(List.of(30), values, "A null award is not an item the player can pick.");
     }
 
     @Test
@@ -466,6 +549,6 @@ class LifePathTest {
                      .flexibleXPNaturalAptitudesMetaSkills(Map.of(0,
                            Map.of(mekhq.campaign.personnel.skills.enums.SkillSubType.ROLEPLAY_GENERAL, 10)))
                      .flexibleXPAbilities(Map.of(0, Map.of("Dodge Maneuver", 200)))
-                     .flexibleXPPickCount(1);
+                     .flexibleXPPickCounts(Map.of(0, 1));
     }
 }
