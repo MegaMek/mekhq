@@ -120,6 +120,14 @@ public class Attributes {
      */
     public static final int MAXIMUM_ATTRIBUTE_SCORE = 10;
 
+    /**
+     * The maximum Edge score a character can have.
+     *
+     * <p>Edge shares the attribute ceiling, but it is named separately so that callers which bound Edge do not have
+     * to reference the attribute constant and so that the two can diverge without hunting down every use.</p>
+     */
+    public static final int MAXIMUM_EDGE_SCORE = MAXIMUM_ATTRIBUTE_SCORE;
+
     // Constructor
 
     /**

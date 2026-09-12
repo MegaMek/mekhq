@@ -42,10 +42,18 @@ import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.POLITICS;
 import static mekhq.campaign.finances.enums.TransactionType.MEDICAL_EXPENSES;
+import static mekhq.campaign.personnel.ATOWTraits.BLOODMARK;
+import static mekhq.campaign.personnel.ATOWTraits.CONNECTIONS;
+import static mekhq.campaign.personnel.ATOWTraits.EXTRA_INCOME;
+import static mekhq.campaign.personnel.ATOWTraits.FAME;
+import static mekhq.campaign.personnel.ATOWTraits.TRAIT_MODIFICATION_COST;
+import static mekhq.campaign.personnel.ATOWTraits.UNLUCKY;
+import static mekhq.campaign.personnel.ATOWTraits.WEALTH;
 import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditure;
 import static mekhq.campaign.personnel.DiscretionarySpending.getExpenditureExhaustedReportMessage;
 import static mekhq.campaign.personnel.DiscretionarySpending.performExtremeExpenditure;
-import static mekhq.campaign.personnel.Person.*;
+import static mekhq.campaign.personnel.Person.TECH_IS1;
+import static mekhq.campaign.personnel.Person.performMassForcedDirectionLoyaltyChange;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_ESCAPE_ATTEMPTS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_RECON_FAIL;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_TRAINING;
@@ -750,14 +758,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 int cost = MathUtility.parseInt(data[2]);
                 int target = MathUtility.parseInt(data[3]);
 
-                switch (type) {
-                    case CONNECTIONS_LABEL -> selectedPerson.setConnections(target);
-                    case FAME_LABEL -> selectedPerson.setFame(target);
-                    case WEALTH_LABEL -> selectedPerson.setWealth(target);
-                    case UNLUCKY_LABEL -> selectedPerson.setUnlucky(target);
-                    case BLOODMARK_LABEL -> selectedPerson.setBloodmark(target);
-                    case EXTRA_INCOME_LABEL -> selectedPerson.setExtraIncomeFromTraitLevel(target);
-                    default -> LOGGER.error("Invalid trait type: {}", type);
+                if (CONNECTIONS.getLookupName().equals(type)) {
+                    selectedPerson.setConnections(target);
+                } else if (FAME.getLookupName().equals(type)) {
+                    selectedPerson.setFame(target);
+                } else if (WEALTH.getLookupName().equals(type)) {
+                    selectedPerson.setWealth(target);
+                } else if (UNLUCKY.getLookupName().equals(type)) {
+                    selectedPerson.setUnlucky(target);
+                } else if (BLOODMARK.getLookupName().equals(type)) {
+                    selectedPerson.setBloodmark(target);
+                } else if (EXTRA_INCOME.getLookupName().equals(type)) {
+                    selectedPerson.setExtraIncomeFromTraitLevel(target);
+                } else {
+                    LOGGER.error("Invalid trait type: {}", type);
                 }
 
                 selectedPerson.spendXP(cost);
@@ -1361,7 +1375,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                         continue;
                     }
 
-                    if (person.getWealth() > MINIMUM_WEALTH) {
+                    if (person.getWealth() > WEALTH.getMinimum()) {
                         if (person.isHasPerformedExtremeExpenditure()) {
                             String report = getExpenditureExhaustedReportMessage(person.getHyperlinkedFullTitle());
                             getCampaign().addReport(FINANCES, report);
@@ -3316,11 +3330,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem.setToolTipText(wordWrap(getFormattedText("spendOnConnections.tooltip",
                   ((target > 0 ? "+" : "-") + target))));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  CONNECTIONS_LABEL,
+                  CONNECTIONS.getLookupName(),
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target <= MAXIMUM_CONNECTIONS && person.getXP() >= traitCost);
+            menuItem.setEnabled(target <= CONNECTIONS.getMaximum() && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             // Reputation
@@ -3331,11 +3345,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   (target == 0 ? 0 : (target > 0 ? "+" : "-") + target),
                   target)));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  FAME_LABEL,
+                  FAME.getLookupName(),
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target <= MAXIMUM_FAME && person.getXP() >= traitCost);
+            menuItem.setEnabled(target <= FAME.getMaximum() && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             target = fame - 1;
@@ -3344,11 +3358,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   (target == 0 ? 0 : (target > 0 ? "+" : "-") + target),
                   target)));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  FAME_LABEL,
+                  FAME.getLookupName(),
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target >= MINIMUM_FAME);
+            menuItem.setEnabled(target >= FAME.getMinimum());
             traitsMenu.add(menuItem);
 
             // Wealth
@@ -3357,22 +3371,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem(String.format(resources.getString("spendOnWealth.text"), target, traitCost));
             menuItem.setToolTipText(resources.getString("spendOnWealth.tooltip"));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  WEALTH_LABEL,
+                  WEALTH.getLookupName(),
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target <= MAXIMUM_WEALTH && person.getXP() >= traitCost);
+            menuItem.setEnabled(target <= WEALTH.getMaximum() && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             target = wealth - 1;
             menuItem = new JMenuItem(String.format(resources.getString("spendOnWealth.text"), target, -traitCost));
             menuItem.setToolTipText(resources.getString("spendOnWealth.tooltip"));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  WEALTH_LABEL,
+                  WEALTH.getLookupName(),
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target >= MINIMUM_WEALTH);
+            menuItem.setEnabled(target >= WEALTH.getMinimum());
             traitsMenu.add(menuItem);
 
             // Unlucky
@@ -3381,22 +3395,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem(String.format(resources.getString("spendOnUnlucky.text"), target, -traitCost));
             menuItem.setToolTipText(String.format(resources.getString("spendOnUnlucky.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  UNLUCKY_LABEL,
+                  UNLUCKY.getLookupName(),
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target <= MAXIMUM_UNLUCKY);
+            menuItem.setEnabled(target <= UNLUCKY.getMaximum());
             traitsMenu.add(menuItem);
 
             target = unlucky - 1;
             menuItem = new JMenuItem(String.format(resources.getString("spendOnUnlucky.text"), target, traitCost));
             menuItem.setToolTipText(String.format(resources.getString("spendOnUnlucky.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  UNLUCKY_LABEL,
+                  UNLUCKY.getLookupName(),
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target >= MINIMUM_UNLUCKY && person.getXP() >= traitCost);
+            menuItem.setEnabled(target >= UNLUCKY.getMinimum() && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             // Bloodmark
@@ -3406,22 +3420,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem(String.format(resources.getString("spendOnBloodmark.text"), target, -traitCost));
             menuItem.setToolTipText(String.format(resources.getString("spendOnBloodmark.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  BLOODMARK_LABEL,
+                  BLOODMARK.getLookupName(),
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target <= MAXIMUM_BLOODMARK);
+            menuItem.setEnabled(target <= BLOODMARK.getMaximum());
             traitsMenu.add(menuItem);
 
             target = bloodmark - 1;
             menuItem = new JMenuItem(String.format(resources.getString("spendOnBloodmark.text"), target, traitCost));
             menuItem.setToolTipText(String.format(resources.getString("spendOnBloodmark.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  BLOODMARK_LABEL,
+                  BLOODMARK.getLookupName(),
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target >= MINIMUM_BLOODMARK && person.getXP() >= traitCost);
+            menuItem.setEnabled(target >= BLOODMARK.getMinimum() && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             // Extra Income
@@ -3431,22 +3445,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             menuItem = new JMenuItem(String.format(resources.getString("spendOnExtraIncome.text"), target, traitCost));
             menuItem.setToolTipText(String.format(resources.getString("spendOnExtraIncome.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  EXTRA_INCOME_LABEL,
+                  EXTRA_INCOME.getLookupName(),
                   String.valueOf(traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target <= MAXIMUM_EXTRA_INCOME && person.getXP() >= traitCost);
+            menuItem.setEnabled(target <= EXTRA_INCOME.getMaximum() && person.getXP() >= traitCost);
             traitsMenu.add(menuItem);
 
             target = extraIncome - 1;
             menuItem = new JMenuItem(String.format(resources.getString("spendOnExtraIncome.text"), target, -traitCost));
             menuItem.setToolTipText(String.format(resources.getString("spendOnExtraIncome.tooltip"), target));
             menuItem.setActionCommand(makeCommand(CMD_BUY_TRAIT,
-                  EXTRA_INCOME_LABEL,
+                  EXTRA_INCOME.getLookupName(),
                   String.valueOf(-traitCost),
                   String.valueOf(target)));
             menuItem.addActionListener(this);
-            menuItem.setEnabled(target >= MINIMUM_EXTRA_INCOME);
+            menuItem.setEnabled(target >= EXTRA_INCOME.getMinimum());
             traitsMenu.add(menuItem);
 
             menu.add(traitsMenu);

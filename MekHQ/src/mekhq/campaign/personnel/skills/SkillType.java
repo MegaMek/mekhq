@@ -698,7 +698,6 @@ public class SkillType {
      * @author Illiani
      * @since 0.50.06
      */
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isCombatSkill() {
         return this.subType == COMBAT_GUNNERY || this.subType == COMBAT_PILOTING;
     }

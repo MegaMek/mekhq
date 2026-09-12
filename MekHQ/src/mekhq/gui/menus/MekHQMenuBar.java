@@ -119,6 +119,7 @@ import mekhq.gui.developerTools.ContractDefinitionEditorDialog;
 import mekhq.gui.developerTools.ScenarioModifierEditorDialog;
 import mekhq.gui.developerTools.StratConFacilityEditorDialog;
 import mekhq.gui.dialog.*;
+import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
 import mekhq.gui.dialog.reportDialogs.ChaosReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
@@ -351,7 +352,7 @@ public class MekHQMenuBar extends JMenuBar {
         miExportXMLFile.add(createMenuItem("miExportIndividualRankSystem.text", KeyEvent.VK_I,
               event -> getCampaign().getPlayerForce()
                            .getRankSystem()
-                           .writeToFile(mekhq.gui.FileDialogs.saveIndividualRankSystem(getFrame()).orElse(null))));
+                           .writeToFile(FileDialogs.saveIndividualRankSystem(getFrame()).orElse(null))));
 
         JMenuItem miExportPlanetsXML = createMenuItem("miExportPlanets.text", KeyEvent.VK_P, event -> {
             try {
@@ -625,6 +626,10 @@ public class MekHQMenuBar extends JMenuBar {
         JMenuItem miFacilityEditor = createMenuItem("miFacilityEditor.text", KeyEvent.VK_F,
               event -> new StratConFacilityEditorDialog(getFrame()).setVisible(true));
         menuDeveloperTools.add(miFacilityEditor);
+
+        JMenuItem miLifePathBuilder = createMenuItem("miLifePathBuilder.text", KeyEvent.VK_L,
+              event -> new LifePathBuilderDialog(getCampaign(), getFrame()));
+        menuDeveloperTools.add(miLifePathBuilder);
 
         return menuDeveloperTools;
     }

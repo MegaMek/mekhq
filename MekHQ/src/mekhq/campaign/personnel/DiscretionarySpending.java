@@ -34,7 +34,6 @@ package mekhq.campaign.personnel;
 
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.finances.enums.TransactionType.WEALTH;
-import static mekhq.campaign.personnel.Person.MINIMUM_WEALTH;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -250,7 +249,7 @@ public class DiscretionarySpending {
      */
     public static String performExtremeExpenditure(Person person, Finances finances, LocalDate today) {
         final int wealth = person.getWealth();
-        if (wealth == MINIMUM_WEALTH) {
+        if (wealth == ATOWTraits.WEALTH.getMinimum()) {
             return "";
         }
 

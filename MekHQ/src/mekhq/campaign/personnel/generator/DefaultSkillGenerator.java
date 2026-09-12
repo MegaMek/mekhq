@@ -34,7 +34,12 @@ package mekhq.campaign.personnel.generator;
 
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.personnel.Person.*;
+import static mekhq.campaign.personnel.ATOWTraits.BLOODMARK;
+import static mekhq.campaign.personnel.ATOWTraits.CONNECTIONS;
+import static mekhq.campaign.personnel.ATOWTraits.EXTRA_INCOME;
+import static mekhq.campaign.personnel.ATOWTraits.FAME;
+import static mekhq.campaign.personnel.ATOWTraits.UNLUCKY;
+import static mekhq.campaign.personnel.ATOWTraits.WEALTH;
 import static mekhq.campaign.personnel.skills.Attributes.DEFAULT_ATTRIBUTE_SCORE;
 import static mekhq.campaign.personnel.skills.InfantryGunnerySkills.INFANTRY_GUNNERY_SKILLS;
 import static mekhq.campaign.personnel.skills.SkillDeprecationTool.DEPRECATED_SKILLS;
@@ -331,15 +336,17 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             return;
         }
 
-        person.setConnections(Math.clamp(performTraitRoll(), MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS));
-        person.setFame(Math.clamp(performTraitRoll(), MINIMUM_FAME, MAXIMUM_FAME));
-        person.setWealth(Math.clamp(performTraitRoll(), MINIMUM_WEALTH, MAXIMUM_WEALTH));
-        person.setExtraIncomeFromTraitLevel(Math.clamp(performTraitRoll(), MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME));
+        person.setConnections(Math.clamp(performTraitRoll(), CONNECTIONS.getMinimum(), CONNECTIONS.getMaximum()));
+        person.setFame(Math.clamp(performTraitRoll(), FAME.getMinimum(), FAME.getMaximum()));
+        person.setWealth(Math.clamp(performTraitRoll(), WEALTH.getMinimum(), WEALTH.getMaximum()));
+        person.setExtraIncomeFromTraitLevel(Math.clamp(performTraitRoll(),
+              EXTRA_INCOME.getMinimum(),
+              EXTRA_INCOME.getMaximum()));
 
         int baseUnluckyDiceSize = 5;
         int unluckyRoll = randomInt(baseUnluckyDiceSize);
         if (unluckyRoll == 0) { // 5% chance of positive value
-            person.setUnlucky(Math.clamp(performTraitRoll(), MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY));
+            person.setUnlucky(Math.clamp(performTraitRoll(), UNLUCKY.getMinimum(), UNLUCKY.getMaximum()));
         }
         // We want the chance of a Bloodmark to be low as it can be quite disruptive
         int baseBloodmarkDiceSize = person.getOriginFaction().isPirate() ? 5 : 50;
@@ -347,7 +354,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         // non-pirates = approx 1.11% chance of a bloodmark
         int bloodmarkRoll = randomInt(baseBloodmarkDiceSize);
         if (bloodmarkRoll == 0) {
-            person.setBloodmark(Math.clamp(performBloodmarkRoll(), MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK));
+            person.setBloodmark(Math.clamp(performBloodmarkRoll(), BLOODMARK.getMinimum(), BLOODMARK.getMaximum()));
         }
     }
 
