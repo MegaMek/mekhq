@@ -88,8 +88,12 @@ public class TransportBayPart extends Part {
 
     @Override
     public String getName() {
-        if (null != getBay()) {
-            return getBay().getTransporterType() + " Bay #" + bayNumber;
+        // Resolved once. getBay() reads through to the unit's entity, and the Warehouse tab refreshes on a Swing
+        // timer that can run while a campaign is still loading, so asking twice could return a bay and then null
+        // and throw between the two calls (issue #8925). Every other method here already caches it.
+        Bay bay = getBay();
+        if (null != bay) {
+            return bay.getTransporterType() + " Bay #" + bayNumber;
         }
         return super.getName();
     }
