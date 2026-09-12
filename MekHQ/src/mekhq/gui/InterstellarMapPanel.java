@@ -572,6 +572,9 @@ public class InterstellarMapPanel extends JPanel {
     record AdministrativeKey(Faction faction, List<String> path) {
         AdministrativeKey {
             path = List.copyOf(path);
+            if (path.isEmpty()) {
+                throw new IllegalArgumentException("Administrative path cannot be empty");
+            }
         }
 
         String region() {
@@ -5505,11 +5508,27 @@ public class InterstellarMapPanel extends JPanel {
             }
             if (administration == null) {
                 administration = systemAdministration;
-            } else if (!administration.equals(systemAdministration)) {
-                return null;
+            } else {
+                administration = commonPrefix(administration, systemAdministration);
+                if (administration.isEmpty()) {
+                    return null;
+                }
             }
         }
         return new AdministrativeKey(owner, administration);
+    }
+
+    private static List<String> commonPrefix(List<String> first, List<String> second) {
+        int commonLength = 0;
+        int maximumLength = Math.min(first.size(), second.size());
+        while ((commonLength < maximumLength) && first.get(commonLength).equals(second.get(commonLength))) {
+            commonLength++;
+        }
+        return first.subList(0, commonLength);
+    }
+
+    private static boolean isProperPrefix(List<String> first, List<String> second) {
+        return (first.size() < second.size()) && second.subList(0, first.size()).equals(first);
     }
 
     static List<AdministrativeBoundary> buildAdministrativeBoundaries(
@@ -5545,6 +5564,10 @@ public class InterstellarMapPanel extends JPanel {
                 if (!first.region().equals(second.region())) {
                     level = AdministrativeBoundaryLevel.REGION;
                 } else if (!first.path().equals(second.path())) {
+                    if (isProperPrefix(first.path(), second.path())
+                          || isProperPrefix(second.path(), first.path())) {
+                        continue;
+                    }
                     level = AdministrativeBoundaryLevel.DISTRICT;
                 } else {
                     continue;

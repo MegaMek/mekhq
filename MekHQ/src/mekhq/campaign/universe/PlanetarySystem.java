@@ -80,7 +80,7 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonDeserialize(converter = PlanetarySystem.PlanetarySystemPostLoader.class)
 public class PlanetarySystem {
-    private static final double COMMAND_CIRCUIT_RECHARGE_TIME_HOURS = 10;
+    public static final double MINIMUM_RECHARGE_TIME_HOURS = 10;
 
     // --- Sophistication Rating Enum ---
     public enum PlanetarySophistication {
@@ -709,9 +709,9 @@ public class PlanetarySystem {
     public double getRechargeTime(LocalDate when, boolean isUseCommandCircuits) {
         if (isZenithCharge(when) || isNadirCharge(when)) {
             // The 176 value comes from pg. 87-88 and 138 of StratOps
-            return Math.min(isUseCommandCircuits ? COMMAND_CIRCUIT_RECHARGE_TIME_HOURS : 176.0, getSolarRechargeTime());
+            return Math.min(isUseCommandCircuits ? MINIMUM_RECHARGE_TIME_HOURS : 176.0, getSolarRechargeTime());
         } else {
-            return Math.min(isUseCommandCircuits ? COMMAND_CIRCUIT_RECHARGE_TIME_HOURS : Double.MAX_VALUE,
+            return Math.min(isUseCommandCircuits ? MINIMUM_RECHARGE_TIME_HOURS : Double.MAX_VALUE,
                   getSolarRechargeTime());
         }
     }

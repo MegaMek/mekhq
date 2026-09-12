@@ -56,7 +56,6 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.GMModeEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
@@ -102,6 +101,7 @@ import org.jfree.data.time.Day;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import org.jfree.data.xy.XYDataset;
+import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Shows record of financial transactions.

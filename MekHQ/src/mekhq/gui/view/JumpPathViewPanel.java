@@ -97,7 +97,6 @@ import mekhq.campaign.PiratePointAnalysis.Facts;
 import mekhq.campaign.PiratePointAnalysis.Input;
 import mekhq.campaign.PiratePointAnalysis.Modifier;
 import mekhq.campaign.PiratePointAnalysis.ModifierCategory;
-import mekhq.campaign.RouteAlternativesPlanner.AccessStatus;
 import mekhq.campaign.RouteAlternativesPlanner.CircuitCoverage;
 import mekhq.campaign.RouteAlternativesPlanner.Course;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -430,13 +429,10 @@ public class JumpPathViewPanel extends JScrollablePanel {
 
             JLabel facts = new JLabel(formatText("course.facts.format", course.jumps(),
                   formatNumber(course.oneGTotalDays(), 2),
-                text(course.circuitCoverage() == CircuitCoverage.WHOLE
-                                              ? "course.circuit.whole.text"
-                                              : "course.circuit.none.text"),
-                text(course.accessStatus() == AccessStatus.CLEAR
-                                              ? "course.access.clear.text"
-                                              : "course.access.blocked.text")));
-            facts.setForeground(course.accessStatus() == AccessStatus.CLEAR ? DOSSIER_MUTED_TEXT : DOSSIER_ACTIVE);
+                                    text(course.circuitCoverage() == CircuitCoverage.WHOLE
+                                                         ? "course.circuit.whole.text"
+                                                         : "course.circuit.none.text")));
+                        facts.setForeground(DOSSIER_MUTED_TEXT);
             facts.setFont(facts.getFont().deriveFont(Font.PLAIN, facts.getFont().getSize2D() * 0.78f));
             constraints = new GridBagConstraints();
             constraints.gridx = 0;

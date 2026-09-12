@@ -104,13 +104,11 @@ public final class JumpPathItinerary {
 
         int[] rechargeHours = new int[systems.size()];
         int totalRechargeHours = 0;
-        for (int index = 0; index < systems.size(); index++) {
+        for (int index = 1; index < systems.size() - 1; index++) {
             PlanetarySystem system = systems.get(index);
-            if (!system.equals(firstSystem) && !system.equals(lastSystem)) {
-                rechargeHours[index] = (int) Math.ceil(system.getRechargeTime(startDate,
-                        circuitPlan.usesCircuitAt(index)));
-                totalRechargeHours += rechargeHours[index];
-            }
+            rechargeHours[index] = (int) Math.ceil(system.getRechargeTime(startDate,
+                  circuitPlan.usesCircuitAt(index)));
+            totalRechargeHours += rechargeHours[index];
         }
 
         double rechargeDays = totalRechargeHours / 24.0;

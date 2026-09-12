@@ -57,7 +57,6 @@ import mekhq.campaign.NavigationRouteAnalysis.Severity;
 import mekhq.campaign.PiratePointAnalysis.ApproachFacts;
 import mekhq.campaign.PiratePointAnalysis.DifficultyFacts;
 import mekhq.campaign.PiratePointAnalysis.Facts;
-import mekhq.campaign.RouteAlternativesPlanner.AccessStatus;
 import mekhq.campaign.RouteAlternativesPlanner.CircuitCoverage;
 import mekhq.campaign.RouteAlternativesPlanner.Course;
 import mekhq.campaign.RouteAlternativesPlanner.CourseKind;
@@ -105,10 +104,10 @@ class JumpPathViewPanelTest {
           PlanetarySystem destination = new PlanetarySystem("Destination");
           JumpPath path = pathOf(origin, destination);
           Course sameCourse = new Course(CourseKind.FASTEST, List.of(origin, destination), 10.0,
-              CircuitCoverage.NONE, AccessStatus.CLEAR);
+              CircuitCoverage.NONE);
           Course differentCourse = new Course(CourseKind.FEWEST_JUMPS,
               List.of(origin, new PlanetarySystem("Elsewhere"), destination), 11.0,
-              CircuitCoverage.NONE, AccessStatus.CLEAR);
+              CircuitCoverage.NONE);
 
           assertTrue(JumpPathViewPanel.isCourseSelected(path, sameCourse));
           assertFalse(JumpPathViewPanel.isCourseSelected(path, differentCourse));
@@ -121,7 +120,7 @@ class JumpPathViewPanelTest {
           PlanetarySystem destination = new PlanetarySystem("Destination");
           JumpPath path = pathOf(origin, intermediate, destination);
           Course circuitCourse = new Course(CourseKind.COMMAND_CIRCUIT, path.getSystems(), 8.0,
-              CircuitCoverage.WHOLE, AccessStatus.CLEAR);
+              CircuitCoverage.WHOLE);
 
           assertEquals(CircuitMode.WHOLE,
               JumpPathViewPanel.initialCircuitPlan(path, List.of(circuitCourse), false).mode());

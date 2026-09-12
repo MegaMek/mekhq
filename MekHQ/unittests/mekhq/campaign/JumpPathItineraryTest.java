@@ -84,6 +84,20 @@ class JumpPathItineraryTest {
     }
 
     @Test
+    void repeatedEndpointSystemsRechargeAtIntermediatePositions() {
+        PlanetarySystem origin = system("ORIGIN", 4.0, 24.0);
+        PlanetarySystem destination = system("DESTINATION", 6.0, 48.0);
+        JumpPath path = pathOf(origin, destination, origin, destination);
+
+        Plan plan = JumpPathItinerary.calculate(path, TEST_DATE, 1.0, origin, 0.0, false);
+
+        assertEquals(3.0, path.getTotalRechargeTime(TEST_DATE, false), TOLERANCE);
+        assertEquals(3.0, plan.rechargeDays(), TOLERANCE);
+        assertEquals(48, plan.entries().get(1).rechargeHours());
+        assertEquals(24, plan.entries().get(2).rechargeHours());
+    }
+
+    @Test
     void accelerationScalesEndpointTransitAndInverseRoundTrips() {
         PlanetarySystem origin = system("ORIGIN", 4.0, 0.0);
         PlanetarySystem destination = system("DESTINATION", 6.0, 0.0);

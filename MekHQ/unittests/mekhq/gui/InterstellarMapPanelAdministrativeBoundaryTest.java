@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -61,11 +62,13 @@ class InterstellarMapPanelAdministrativeBoundaryTest {
     private static final double HEX_SPACING_X = HEX_SIZE * Math.sqrt(3) / 2.0;
 
     @Test
-            void administrativeKeyRequiresConsistentCompleteMatchingFactionEvidence() {
+            void administrativeKeyUsesCommonPathForMatchingFactionEvidence() {
         Faction owner = faction("FS", Color.BLUE);
         Faction other = faction("DC", Color.RED);
         PlanetarySystem first = system(owner, List.of("Crucis March", "Coreward PDZ"));
         PlanetarySystem matching = system(owner, List.of("Crucis March", "Coreward PDZ"));
+                        PlanetarySystem regionOnly = system(owner, List.of("Crucis March"));
+                        PlanetarySystem anotherDistrict = system(owner, List.of("Crucis March", "Capellan PDZ"));
         PlanetarySystem missing = system(owner, List.of());
         PlanetarySystem conflicting = system(owner, List.of("Draconis March", "Robinson PDZ"));
         PlanetarySystem wrongOwner = system(other, List.of("Dieron District", "Algedi Prefecture"));
@@ -75,6 +78,10 @@ class InterstellarMapPanelAdministrativeBoundaryTest {
 
         assertEquals(owner, key.faction());
         assertEquals(List.of("Crucis March", "Coreward PDZ"), key.path());
+        assertEquals(List.of("Crucis March"), InterstellarMapPanel.classifyAdministrativeKey(
+              List.of(owner), List.of(first, regionOnly), DATE).path());
+        assertEquals(List.of("Crucis March"), InterstellarMapPanel.classifyAdministrativeKey(
+              List.of(owner), List.of(first, anotherDistrict), DATE).path());
         assertNull(InterstellarMapPanel.classifyAdministrativeKey(
               List.of(owner), List.of(first, conflicting), DATE));
         assertNull(InterstellarMapPanel.classifyAdministrativeKey(
@@ -332,5 +339,25 @@ class InterstellarMapPanelAdministrativeBoundaryTest {
             }
         }
         return signature;
+    }
+
+    @Test
+    void administrativeKeyRejectsAnEmptyPath() {
+        assertThrows(IllegalArgumentException.class,
+              () -> new InterstellarMapPanel.AdministrativeKey(faction("FS", Color.BLUE), List.of()));
+    }
+
+    @Test
+    void prefixPathsDoNotCreateFalseDistrictBoundaries() {
+        Faction owner = faction("LC", new Color(70, 156, 220));
+        Map<InterstellarMapPanel.TerritoryHex, InterstellarMapPanel.TerritoryCell> cells = new HashMap<>();
+        addCell(cells, 0, 0, owner, List.of("Skye Province"));
+        addCell(cells, 1, 0, owner, List.of("Skye Province", "Freedom Theater"));
+
+        List<InterstellarMapPanel.AdministrativeBoundary> boundaries =
+              InterstellarMapPanel.buildAdministrativeBoundaries(cells);
+
+        assertEquals(1, boundaries.size());
+        assertEquals(InterstellarMapPanel.AdministrativeBoundaryLevel.REGION, boundaries.getFirst().level());
     }
 }

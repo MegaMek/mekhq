@@ -50,6 +50,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import mekhq.campaign.RouteAlternativesPlanner.Course;
 import mekhq.campaign.RouteAlternativesPlanner.CourseKind;
@@ -181,8 +182,49 @@ class RouteAlternativesPlannerTest {
 
           assertEquals(1, courses.size());
           assertEquals(List.of(origin, clear, destination), courses.getFirst().systems());
-          assertEquals(RouteAlternativesPlanner.AccessStatus.CLEAR, courses.getFirst().accessStatus());
         }
+
+    @Test
+    void fastestPlanningUsesAStarEstimateToAvoidDeadEndBranches() {
+        PlanetarySystem origin = positionedSystem("ORIGIN", 10.0, 0.0);
+        PlanetarySystem firstStep = positionedSystem("FIRST_STEP", 10.0, 30.0);
+        PlanetarySystem secondStep = positionedSystem("SECOND_STEP", 10.0, 60.0);
+        PlanetarySystem destination = positionedSystem("DESTINATION", 0.0, 90.0);
+        PlanetarySystem firstDeadEnd = positionedSystem("FIRST_DEAD_END", 10.0, -30.0);
+        PlanetarySystem secondDeadEnd = positionedSystem("SECOND_DEAD_END", 10.0, -29.0);
+        Map<PlanetarySystem, List<PlanetarySystem>> neighbors = Map.of(
+              origin, List.of(firstDeadEnd, secondDeadEnd, firstStep),
+              firstStep, List.of(secondStep),
+              secondStep, List.of(destination));
+        AtomicInteger expandedSystems = new AtomicInteger();
+        RoutePolicy policy = new RoutePolicy() {
+            @Override
+            public Collection<PlanetarySystem> getNeighbors(PlanetarySystem system) {
+                expandedSystems.incrementAndGet();
+                return neighbors.getOrDefault(system, List.of());
+            }
+
+            @Override
+            public boolean isSystemAllowed(PlanetarySystem system) {
+                return true;
+            }
+
+            @Override
+            public boolean canTraverse(PlanetarySystem legOrigin, PlanetarySystem legDestination) {
+                return true;
+            }
+
+            @Override
+            public double minimumRechargeHours() {
+                return PlanetarySystem.MINIMUM_RECHARGE_TIME_HOURS;
+            }
+        };
+
+        JumpPath path = RouteAlternativesPlanner.planFastestSegment(origin, destination, TEST_DATE, false, policy);
+
+        assertEquals(List.of(origin, firstStep, secondStep, destination), path.getSystems());
+        assertEquals(3, expandedSystems.get());
+    }
 
                 @Test
                 void requestedEmptyDestinationIsAllowedWhileEmptyIntermediatesRemainFiltered() {
@@ -410,6 +452,14 @@ class RouteAlternativesPlannerTest {
                                        : rechargeHours);
         when(system.getTimeToJumpPoint(anyDouble()))
               .thenAnswer(invocation -> 1.0 / sqrt(invocation.getArgument(0)));
+        return system;
+    }
+
+    private static PlanetarySystem positionedSystem(String id, double rechargeHours, double x) {
+        PlanetarySystem system = system(id, rechargeHours);
+        when(system.getX()).thenReturn(x);
+        when(system.getDistanceTo(any(PlanetarySystem.class)))
+              .thenAnswer(invocation -> Math.abs(x - ((PlanetarySystem) invocation.getArgument(0)).getX()));
         return system;
     }
 

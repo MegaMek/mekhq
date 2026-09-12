@@ -4244,7 +4244,9 @@ public class Campaign implements ITechManager {
         class CampaignNavigationPolicy implements NavigationRouteAnalysis.Policy {
             @Override
             public Collection<PlanetarySystem> getNeighbors(PlanetarySystem system) {
-                return systemsInstance.getNearbySystems(system, MHQConstants.MAX_JUMP_RADIUS);
+                List<PlanetarySystem> neighbors = new ArrayList<>();
+                systemsInstance.visitNearbySystems(system, MHQConstants.MAX_JUMP_RADIUS, neighbors::add);
+                return neighbors;
             }
 
             @Override
@@ -4263,6 +4265,11 @@ public class Campaign implements ITechManager {
                              || FactionStandingUtilities.canEnterTargetSystem(getPlayerForce().getFaction(),
                                    getPlayerForce().getFactionStandings(), origin, destination, currentDay,
                                    activeContracts, factionHints);
+            }
+
+            @Override
+            public double minimumRechargeHours() {
+                return PlanetarySystem.MINIMUM_RECHARGE_TIME_HOURS;
             }
 
             @Override

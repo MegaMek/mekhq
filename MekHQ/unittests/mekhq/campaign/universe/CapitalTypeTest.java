@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import mekhq.campaign.universe.enums.CapitalType;
 import org.junit.jupiter.api.Test;
@@ -163,6 +164,22 @@ class CapitalTypeTest {
 
         assertEquals(CapitalType.NATIONAL, reloadedPlanet.getCapitalType(LocalDate.of(3030, 1, 1)));
         assertEquals(CapitalType.DISTRICT, reloadedPlanet.getCapitalType(LocalDate.of(3080, 1, 1)));
+    }
+
+    @Test
+    void sameDateEventsMergeCapitalTypeAndFaction() throws Exception {
+        String yaml = SINGLE_PLANET_SYSTEM.replace("                - date: '3075-01-01'\n"
+                                                          + "                  capitalType: District Capital",
+              "                - date: '3075-01-01'\n"
+                    + "                  capitalType: District Capital\n"
+                    + "                - date: '3075-01-01'\n"
+                    + "                  faction:\n"
+                    + "                    - LC");
+
+        Planet planet = PlanetarySystemYamlIO.read(yaml).getPrimaryPlanet();
+
+        assertEquals(CapitalType.DISTRICT, planet.getCapitalType(LocalDate.of(3075, 1, 1)));
+        assertEquals(List.of("LC"), planet.getFactions(LocalDate.of(3075, 1, 1)));
     }
 
     @Test

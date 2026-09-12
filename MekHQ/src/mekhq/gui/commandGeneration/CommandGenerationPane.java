@@ -32,6 +32,7 @@
  */
 package mekhq.gui.commandGeneration;
 
+import megamek.logging.MMLogger;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -45,10 +46,9 @@ import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ManeiDominiCrewAugmentor;
 import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.enums.ForceNamingMethod;
+import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.gui.baseComponents.AbstractMHQTabbedPane;
 import mekhq.gui.commandGeneration.contents.ForceGeneratorTab;
 import mekhq.gui.commandGeneration.contents.SetupTab;

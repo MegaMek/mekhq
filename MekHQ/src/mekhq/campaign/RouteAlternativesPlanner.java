@@ -32,9 +32,12 @@
  */
 package mekhq.campaign;
 
+import static mekhq.MHQConstants.MAX_JUMP_RADIUS;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -65,12 +68,6 @@ public final class RouteAlternativesPlanner {
     public enum CircuitCoverage {
         NONE,
         WHOLE
-    }
-
-    /** Whether every leg in a generated course passed the supplied access policy. */
-    public enum AccessStatus {
-        CLEAR,
-        BLOCKED
     }
 
     /** Outcome of planning one requested route segment. */
@@ -118,16 +115,19 @@ public final class RouteAlternativesPlanner {
         default RoutePolicy forSegment(PlanetarySystem origin, PlanetarySystem destination) {
             return this;
         }
+
+        default double minimumRechargeHours() {
+            return 0.0;
+        }
     }
 
     /** One immutable route comparison. */
     public record Course(CourseKind kind, List<PlanetarySystem> systems, double oneGTotalDays,
-                         CircuitCoverage circuitCoverage, AccessStatus accessStatus) {
+                         CircuitCoverage circuitCoverage) {
         public Course {
             Objects.requireNonNull(kind);
             systems = List.copyOf(systems);
             Objects.requireNonNull(circuitCoverage);
-            Objects.requireNonNull(accessStatus);
         }
 
         public int jumps() {
@@ -211,8 +211,7 @@ public final class RouteAlternativesPlanner {
 
         JumpPath path = new JumpPath();
         path.addSystems(systems);
-        return new Course(kind, systems, path.getTotalTime(date, 0.0, useCommandCircuit), circuitCoverage,
-              AccessStatus.CLEAR);
+                return new Course(kind, systems, path.getTotalTime(date, 0.0, useCommandCircuit), circuitCoverage);
     }
 
     static JumpPath planFastestSegment(PlanetarySystem origin, PlanetarySystem destination, LocalDate date,
@@ -282,6 +281,11 @@ public final class RouteAlternativesPlanner {
             public RoutePolicy forSegment(PlanetarySystem origin, PlanetarySystem destination) {
                 return withoutAccessRestrictions(delegate.forSegment(origin, destination));
             }
+
+            @Override
+            public double minimumRechargeHours() {
+                return delegate.minimumRechargeHours();
+            }
         };
     }
 
@@ -294,11 +298,17 @@ public final class RouteAlternativesPlanner {
             return List.of();
         }
 
-        Comparator<SearchNode> nodeOrder = Comparator.comparingDouble(SearchNode::score)
-                                                   .thenComparing(SearchNode::pathKey);
+        double minimumRechargeHours = policy.minimumRechargeHours();
+        if (!Double.isFinite(minimumRechargeHours) || (minimumRechargeHours < 0.0)) {
+            throw new IllegalArgumentException("Minimum recharge hours must be finite and nonnegative");
+        }
+        Comparator<SearchNode> nodeOrder = Comparator.comparingDouble(SearchNode::estimatedTotal)
+                                                   .thenComparingDouble(SearchNode::score)
+                                                   .thenComparing(node -> systemKey(node.system()));
         PriorityQueue<SearchNode> frontier = new PriorityQueue<>(nodeOrder);
         Map<String, SearchNode> bestNodes = new HashMap<>();
-        SearchNode start = new SearchNode(origin, 0.0, systemKey(origin), List.of(origin));
+        SearchNode start = new SearchNode(origin, 0.0,
+              estimateRemainingCost(origin, destination, origin, objective, minimumRechargeHours), null, 1);
         frontier.add(start);
         bestNodes.put(systemKey(origin), start);
 
@@ -308,16 +318,16 @@ public final class RouteAlternativesPlanner {
                 continue;
             }
             if (sameSystem(current.system(), destination)) {
-                return current.systems();
+                return reconstructPath(current);
             }
-            if (current.systems().size() >= MAXIMUM_SYSTEMS_PER_COURSE) {
+            if (current.depth() >= MAXIMUM_SYSTEMS_PER_COURSE) {
                 continue;
             }
 
             List<PlanetarySystem> neighbors = new ArrayList<>(policy.getNeighbors(current.system()));
             neighbors.sort(Comparator.comparing(RouteAlternativesPlanner::systemKey));
             for (PlanetarySystem neighbor : neighbors) {
-                if ((neighbor == null) || containsSystem(current.systems(), neighbor)
+                if ((neighbor == null) || containsSystem(current, neighbor)
                                             || (!sameSystem(neighbor, destination) && !policy.isSystemAllowed(neighbor))
                       || !policy.canTraverse(current.system(), neighbor)) {
                     continue;
@@ -326,16 +336,15 @@ public final class RouteAlternativesPlanner {
                 double edgeScore = objective == Objective.FEWEST_JUMPS ? 1.0
                                          : getDepartureRecharge(current.system(), origin, date, useCommandCircuit);
                 double candidateScore = current.score() + edgeScore;
-                String candidatePathKey = current.pathKey() + PATH_SEPARATOR + systemKey(neighbor);
                 SearchNode previous = bestNodes.get(systemKey(neighbor));
-                if (!isBetter(candidateScore, candidatePathKey, previous)) {
+                if (!isBetter(candidateScore, current, previous)) {
                     continue;
                 }
 
-                List<PlanetarySystem> candidateSystems = new ArrayList<>(current.systems());
-                candidateSystems.add(neighbor);
-                SearchNode candidate = new SearchNode(neighbor, candidateScore, candidatePathKey,
-                      List.copyOf(candidateSystems));
+                double estimatedTotal = candidateScore + estimateRemainingCost(neighbor, destination, origin,
+                      objective, minimumRechargeHours);
+                SearchNode candidate = new SearchNode(neighbor, candidateScore, estimatedTotal, current,
+                      current.depth() + 1);
                 bestNodes.put(systemKey(neighbor), candidate);
                 frontier.add(candidate);
             }
@@ -343,12 +352,25 @@ public final class RouteAlternativesPlanner {
         return List.of();
     }
 
+    private static double estimateRemainingCost(PlanetarySystem system, PlanetarySystem destination,
+          PlanetarySystem segmentOrigin, Objective objective, double minimumRechargeHours) {
+        int minimumJumps = (int) Math.ceil(Math.max(0.0,
+              system.getDistanceTo(destination) - SCORE_TOLERANCE) / MAX_JUMP_RADIUS);
+        if (objective == Objective.FEWEST_JUMPS) {
+            return minimumJumps;
+        }
+        int minimumRechargeStops = sameSystem(system, segmentOrigin)
+              ? Math.max(0, minimumJumps - 1)
+              : minimumJumps;
+        return minimumRechargeStops * minimumRechargeHours;
+    }
+
     private static double getDepartureRecharge(PlanetarySystem system, PlanetarySystem segmentOrigin,
           LocalDate date, boolean useCommandCircuit) {
         return sameSystem(system, segmentOrigin) ? 0.0 : system.getRechargeTime(date, useCommandCircuit);
     }
 
-    private static boolean isBetter(double candidateScore, String candidatePathKey, SearchNode previous) {
+    private static boolean isBetter(double candidateScore, SearchNode candidateParent, SearchNode previous) {
         if (previous == null) {
             return true;
         }
@@ -356,7 +378,38 @@ public final class RouteAlternativesPlanner {
             return true;
         }
         return (Math.abs(candidateScore - previous.score()) <= SCORE_TOLERANCE)
-                     && (candidatePathKey.compareTo(previous.pathKey()) < 0);
+                     && (comparePaths(candidateParent, previous.parent()) < 0);
+    }
+
+    private static int comparePaths(SearchNode first, SearchNode second) {
+        List<String> firstPath = pathTo(first);
+        List<String> secondPath = pathTo(second);
+        int sharedLength = Math.min(firstPath.size(), secondPath.size());
+        for (int index = 0; index < sharedLength; index++) {
+            int comparison = firstPath.get(index).compareTo(secondPath.get(index));
+            if (comparison != 0) {
+                return comparison;
+            }
+        }
+        return Integer.compare(firstPath.size(), secondPath.size());
+    }
+
+    private static List<String> pathTo(SearchNode node) {
+        List<String> path = new ArrayList<>(node.depth());
+        for (SearchNode current = node; current != null; current = current.parent()) {
+            path.add(systemKey(current.system()));
+        }
+        Collections.reverse(path);
+        return path;
+    }
+
+    private static List<PlanetarySystem> reconstructPath(SearchNode destination) {
+        List<PlanetarySystem> systems = new ArrayList<>(destination.depth());
+        for (SearchNode current = destination; current != null; current = current.parent()) {
+            systems.add(current.system());
+        }
+        Collections.reverse(systems);
+        return List.copyOf(systems);
     }
 
     private static boolean isUsefulCircuitCourse(Course circuitCourse, Course fastestCourse, LocalDate date) {
@@ -374,8 +427,13 @@ public final class RouteAlternativesPlanner {
         }
     }
 
-    private static boolean containsSystem(List<PlanetarySystem> systems, PlanetarySystem candidate) {
-        return systems.stream().anyMatch(system -> sameSystem(system, candidate));
+    private static boolean containsSystem(SearchNode node, PlanetarySystem candidate) {
+        for (SearchNode current = node; current != null; current = current.parent()) {
+            if (sameSystem(current.system(), candidate)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static boolean sameSystem(PlanetarySystem first, PlanetarySystem second) {
@@ -395,7 +453,7 @@ public final class RouteAlternativesPlanner {
         FEWEST_JUMPS
     }
 
-    private record SearchNode(PlanetarySystem system, double score, String pathKey,
-                              List<PlanetarySystem> systems) {
+    private record SearchNode(PlanetarySystem system, double score, double estimatedTotal,
+                              SearchNode parent, int depth) {
     }
 }
