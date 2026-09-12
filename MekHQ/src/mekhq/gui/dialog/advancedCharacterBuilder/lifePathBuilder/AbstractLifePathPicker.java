@@ -50,7 +50,6 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.UIManager;
@@ -112,7 +111,16 @@ abstract class AbstractLifePathPicker extends JDialog {
     private final LifePathBuilderTabType tabType;
     private final Integer groupIndex;
 
-    private JLabel lblTooltipDisplay;
+    /**
+     * Height reserved for the help text, in pixels.
+     *
+     * <p>The help text used to be a label that grew with its contents, so a long description pushed the options
+     * panel up and the spinners out from under the pointer. The text now scrolls inside a strip of this height and
+     * the options keep their space.</p>
+     */
+    private static final int TOOLTIP_PANEL_HEIGHT = scaleForGUI(80);
+
+    private JEditorPane txtTooltipDisplay;
     private RoundedJButton btnConfirm;
     private JPanel pnlMain;
     private JPanel pnlOptions;
@@ -220,8 +228,10 @@ abstract class AbstractLifePathPicker extends JDialog {
      * @since 0.50.11
      */
     protected void setLblTooltipDisplay(String newText) {
-        if (lblTooltipDisplay != null) {
-            lblTooltipDisplay.setText(String.format(PANEL_HTML_FORMAT, getTooltipPanelWidth(), newText));
+        if (txtTooltipDisplay != null) {
+            txtTooltipDisplay.setText(String.format(PANEL_HTML_FORMAT, getTooltipPanelWidth(), newText));
+            // Back to the top, so a long description starts where the reader expects rather than at its end.
+            txtTooltipDisplay.setCaretPosition(0);
         }
     }
 
@@ -362,10 +372,24 @@ abstract class AbstractLifePathPicker extends JDialog {
         pnlControls.setLayout(new BoxLayout(pnlControls, BoxLayout.Y_AXIS));
         pnlControls.setBorder(RoundedLineBorder.createRoundedLineBorder());
 
-        lblTooltipDisplay = new JLabel();
-        lblTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
-        lblTooltipDisplay.setAlignmentX(Component.CENTER_ALIGNMENT);
+        txtTooltipDisplay = new JEditorPane("text/html", "");
+        txtTooltipDisplay.setEditable(false);
+        txtTooltipDisplay.setOpaque(false);
+        txtTooltipDisplay.setBorder(new EmptyBorder(0, PADDING, 0, PADDING));
         setLblTooltipDisplay("");
+
+        // A fixed-height strip, so the help text scrolls rather than fighting the options panel for room.
+        FastJScrollPane scrollTooltip = new FastJScrollPane(txtTooltipDisplay);
+        scrollTooltip.setBorder(null);
+        scrollTooltip.setOpaque(false);
+        scrollTooltip.getViewport().setOpaque(false);
+        scrollTooltip.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollTooltip.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED);
+        Dimension tooltipSize = new Dimension(minimumMainWidth, TOOLTIP_PANEL_HEIGHT);
+        scrollTooltip.setPreferredSize(tooltipSize);
+        scrollTooltip.setMinimumSize(tooltipSize);
+        scrollTooltip.setMaximumSize(new Dimension(Integer.MAX_VALUE, TOOLTIP_PANEL_HEIGHT));
+        scrollTooltip.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -392,7 +416,7 @@ abstract class AbstractLifePathPicker extends JDialog {
         buttonPanel.add(btnConfirm);
         buttonPanel.add(Box.createHorizontalGlue());
 
-        pnlControls.add(lblTooltipDisplay);
+        pnlControls.add(scrollTooltip);
         pnlControls.add(Box.createVerticalStrut(PADDING));
         pnlControls.add(buttonPanel);
 
