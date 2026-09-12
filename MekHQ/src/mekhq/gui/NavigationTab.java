@@ -71,6 +71,17 @@ public class NavigationTab extends CampaignGuiTab {
         return mapTab;
     }
 
+    /**
+     * Shows the interstellar map without changing its selected system or proposed route.
+     */
+    public void showInterstellarMap() {
+        mapTab.switchSystemsMap();
+        int index = innerTabs.indexOfComponent(mapTab);
+        if (index >= 0) {
+            innerTabs.setSelectedIndex(index);
+        }
+    }
+
     public void showSystem(PlanetarySystem planetarySystem) {
         mapTab.switchSystemsMap(planetarySystem);
         int index = innerTabs.indexOfComponent(mapTab);

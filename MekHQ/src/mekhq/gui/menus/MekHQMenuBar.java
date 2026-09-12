@@ -530,11 +530,21 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The View menu uses the following Mnemonic keys as of 02-June-2020: H, R
+    * The View menu uses the following Mnemonic keys: H, N, R
      */
     private JMenu initViewMenu() {
         JMenu menuView = new JMenu(getTextAt("menuView.text"));
         menuView.setMnemonic(KeyEvent.VK_V);
+
+        JMenuItem miNavigationMap = createMenuItem("miNavigationMap.text", KeyEvent.VK_N, evt -> {
+            getGui().setSelectedTab(getGui().getNavigationTab());
+            getGui().getNavigationTab().showInterstellarMap();
+        });
+        miNavigationMap.setToolTipText(getTextAt("miNavigationMap.toolTipText"));
+        miNavigationMap.getAccessibleContext().setAccessibleName(miNavigationMap.getText());
+        miNavigationMap.getAccessibleContext().setAccessibleDescription(miNavigationMap.getToolTipText());
+        menuView.add(miNavigationMap);
+        menuView.addSeparator();
 
         JMenuItem miHistoricalDailyReportDialog = createMenuItem("miShowHistoricalReportLog.text",
               KeyEvent.VK_H,

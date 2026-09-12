@@ -33,13 +33,11 @@
 package mekhq.gui;
 
 import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
-import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -54,16 +52,17 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.imageio.ImageIO;
 import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import megamek.client.ui.util.UIUtil;
 import megamek.common.units.Dropship;
 import megamek.common.units.Jumpship;
 import megamek.common.util.ImageUtil;
@@ -72,10 +71,12 @@ import mekhq.MHQConstants;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.StarUtil;
+import mekhq.utilities.MHQInternationalization;
 
 /**
  * This panel displays a particular star system with suns and planets and information about the player's unit's position
@@ -85,6 +86,9 @@ import mekhq.campaign.universe.StarUtil;
  */
 public class PlanetarySystemMapPanel extends JPanel {
     private static final MMLogger LOGGER = MMLogger.create(PlanetarySystemMapPanel.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
+    private static final int BACK_BUTTON_SIZE = UIUtil.scaleForGUI(36);
+    private static final int BACK_BUTTON_INSET = UIUtil.scaleForGUI(4);
     private final JLayeredPane pane;
     private final JPanel mapPanel;
     private final JButton btnBack;
@@ -104,10 +108,10 @@ public class PlanetarySystemMapPanel extends JPanel {
     private BufferedImage imgJumpshipFleet;
     private BufferedImage imgSpace;
 
-    private static final int minDiameter = 16;
-    private static final int maxDiameter = 64;
-    private static final int maxStarWidth = 178;
-    private static final int starImgSize = 356;
+    private static final int minDiameter = UIUtil.scaleForGUI(16);
+    private static final int maxDiameter = UIUtil.scaleForGUI(64);
+    private static final int maxStarWidth = UIUtil.scaleForGUI(178);
+    private static final int starImgSize = UIUtil.scaleForGUI(356);
 
     public PlanetarySystemMapPanel(Campaign campaign, CampaignGUI view) {
         this.hqView = view;
@@ -202,25 +206,26 @@ public class PlanetarySystemMapPanel extends JPanel {
                 int y = getHeight() / 2;
                 int x;
 
-                int jumpPointImgWidth = 84;
-                int jumpPointImgHeight = 72;
-                int rechargeImgSize = 64;
-                int shipImgSize = 24;
-                int nadirX = 12;
-                int nadirY = getHeight() - 60 - jumpPointImgHeight;
-                int zenithX = 12;
-                int zenithY = 60;
+                int jumpPointImgWidth = UIUtil.scaleForGUI(84);
+                int jumpPointImgHeight = UIUtil.scaleForGUI(72);
+                int rechargeImgSize = UIUtil.scaleForGUI(64);
+                int shipImgSize = UIUtil.scaleForGUI(24);
+                int nadirX = UIUtil.scaleForGUI(12);
+                int nadirY = getHeight() - UIUtil.scaleForGUI(60) - jumpPointImgHeight;
+                int zenithX = UIUtil.scaleForGUI(12);
+                int zenithY = UIUtil.scaleForGUI(60);
 
                 // where is the JumpShip
-                int jumpshipX = zenithX + jumpPointImgWidth + 8;
+                int jumpshipX = zenithX + jumpPointImgWidth + UIUtil.scaleForGUI(8);
                 int jumpshipY = zenithY + (jumpPointImgHeight / 2) - (shipImgSize / 2);
                 if (!PlanetarySystemMapPanel.this.campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isJumpZenith()) {
-                    jumpshipX = nadirX + jumpPointImgWidth + 8;
+                    jumpshipX = nadirX + jumpPointImgWidth + UIUtil.scaleForGUI(8);
                     jumpshipY = nadirY + (jumpPointImgHeight / 2) - (shipImgSize / 2);
                 }
 
                 // choose the font based on sizes
-                chooseFont(g2, system, PlanetarySystemMapPanel.this.campaign, rectWidth - 6);
+                    chooseFont(g2, system, PlanetarySystemMapPanel.this.campaign,
+                        rectWidth - UIUtil.scaleForGUI(6));
 
                 // place the sun first
                 Image starIcon = ImageUtil.loadImageFromFile("data/" + StarUtil.getIconImage(system)); // TODO : Remove
@@ -234,7 +239,8 @@ public class PlanetarySystemMapPanel extends JPanel {
                 }
                 if (system.isZenithCharge(PlanetarySystemMapPanel.this.campaign.getLocalDate()) &&
                           (null != imgRechargeStation)) {
-                    drawRotatedImage(g2, imgRechargeStation, 90.0, zenithX, zenithY + 12, rechargeImgSize,
+                      drawRotatedImage(g2, imgRechargeStation, 90.0, zenithX,
+                          zenithY + UIUtil.scaleForGUI(12), rechargeImgSize,
                           rechargeImgSize);
                 }
                 if (null != imgNadirPoint) {
@@ -242,12 +248,13 @@ public class PlanetarySystemMapPanel extends JPanel {
                 }
                 if (system.isNadirCharge(PlanetarySystemMapPanel.this.campaign.getLocalDate()) &&
                           (null != imgRechargeStation)) {
-                    drawRotatedImage(g2, imgRechargeStation, 90.0, nadirX, nadirY + 12, rechargeImgSize,
+                      drawRotatedImage(g2, imgRechargeStation, 90.0, nadirX,
+                          nadirY + UIUtil.scaleForGUI(12), rechargeImgSize,
                           rechargeImgSize);
                 }
 
                 // get the biggest diameter allowed within this space for a planet
-                int biggestDiameterPixels = rectWidth - 32;
+                int biggestDiameterPixels = rectWidth - UIUtil.scaleForGUI(32);
                 if (biggestDiameterPixels < minDiameter) {
                     biggestDiameterPixels = minDiameter;
                 } else if (biggestDiameterPixels > maxDiameter) {
@@ -261,6 +268,7 @@ public class PlanetarySystemMapPanel extends JPanel {
                         biggestDiameter = p.getDiameter();
                     }
                 }
+                Map<String, Integer> playerBaseCounts = playerBaseCountsByPlanet();
 
                 for (int i = 1; i <= n; i++) {
                     x = (rectWidth * (i - 1)) + starWidth + midpoint;
@@ -311,11 +319,11 @@ public class PlanetarySystemMapPanel extends JPanel {
                                     // the unit has a flight plan in this system so draw the line
                                     // in transit so draw a path
                                     g2.setColor(java.awt.Color.YELLOW);
-                                    java.awt.Stroke dashed = new java.awt.BasicStroke(3,
+                                    java.awt.Stroke dashed = new java.awt.BasicStroke(UIUtil.scaleForGUI(3),
                                           java.awt.BasicStroke.CAP_BUTT,
                                           java.awt.BasicStroke.JOIN_BEVEL,
                                           0,
-                                          new float[] { 9 },
+                                          new float[] { UIUtil.scaleForGUI(9) },
                                           0);
                                     g2.setStroke(dashed);
                                     g2.drawLine(lineX1, lineY1, lineX2, lineY2);
@@ -400,25 +408,32 @@ public class PlanetarySystemMapPanel extends JPanel {
                         // inline
                         // file path
                         g2.drawImage(planetIcon, x - radius, y - radius, diameter, diameter, null);
+                        int playerBaseCount = playerBaseCounts.getOrDefault(p.getId(), 0);
+                        if (playerBaseCount > 0) {
+                            double markerRadius = UIUtil.scaleForGUI(7);
+                            double selectionRingClearance = (selectedPlanet == i) ? UIUtil.scaleForGUI(6) : 0.0;
+                            InterstellarMapPanel.drawPlayerBaseGlyph(g2,
+                                new java.awt.geom.Point2D.Double(x - radius - markerRadius - selectionRingClearance,
+                                    y + radius + markerRadius + selectionRingClearance),
+                                markerRadius, playerBaseCount, 1.0);
+                        }
                         final String planetName = p.getPrintableName(PlanetarySystemMapPanel.this.campaign.getLocalDate());
 
                         // planet name
                         g2.setColor(Color.WHITE);
                         drawCenteredString(g2, planetName, x,
-                              y + (biggestDiameterPixels / 2) + 12 + g.getFontMetrics().getHeight(), rectWidth - 6);
+                            y + (biggestDiameterPixels / 2) + UIUtil.scaleForGUI(12)
+                                + g.getFontMetrics().getHeight(),
+                            rectWidth - UIUtil.scaleForGUI(6));
                     }
                 }
             }
         };
 
-        btnBack = new JButton();
-        btnBack.setFocusable(false);
-        btnBack.setPreferredSize(new Dimension(36, 36));
-        btnBack.setMargin(new Insets(0, 0, 0, 0));
-        btnBack.setBorder(BorderFactory.createEmptyBorder());
-        btnBack.setToolTipText("Back to Interstellar Map");
-        btnBack.setBackground(Color.DARK_GRAY);
-        btnBack.setIcon(new ImageIcon("data/images/misc/back_button.png")); // TODO : Remove inline file path
+          btnBack = InterstellarMapPanel.createNavigationUtilityIconButton(0xE5C4, BACK_BUTTON_SIZE,
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.system.back.toolTipText"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.system.back.accessibleName"),
+              MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.system.back.accessibleDescription"));
         btnBack.addActionListener(ev -> back());
 
         // set up key bindings
@@ -487,13 +502,24 @@ public class PlanetarySystemMapPanel extends JPanel {
 
     }
 
+    private Map<String, Integer> playerBaseCountsByPlanet() {
+        Map<String, Integer> counts = new HashMap<>();
+        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
+            if ((base.getPlanetId() != null) && (base.getCurrentLocation() != null)
+                  && system.equals(base.getCurrentLocation().getCurrentSystem())) {
+                counts.merge(base.getPlanetId(), 1, Integer::sum);
+            }
+        }
+        return counts;
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         int width = getWidth();
         int height = getHeight();
         pane.setBounds(0, 0, width, height);
         mapPanel.setBounds(0, 0, width, height);
-        btnBack.setBounds(4, 4, 40, 40);
+        btnBack.setBounds(BACK_BUTTON_INSET, BACK_BUTTON_INSET, BACK_BUTTON_SIZE, BACK_BUTTON_SIZE);
         super.paintComponent(g);
     }
 
@@ -506,10 +532,10 @@ public class PlanetarySystemMapPanel extends JPanel {
      * @param limit  - an integer indicating how large the text can be
      */
     private void chooseFont(Graphics g, PlanetarySystem system, Campaign c, int limit) {
-        // start with 16
-        int fontSize = 16;
+        int fontSize = UIUtil.scaleForGUI(16);
+        int minimumFontSize = UIUtil.scaleForGUI(10);
         g.setFont(new Font(MHQConstants.FONT_HELVETICA, Font.PLAIN, fontSize));
-        while (areNamesTooBig(g, system, campaign.getLocalDate(), limit) && fontSize >= 10) {
+        while (areNamesTooBig(g, system, campaign.getLocalDate(), limit) && fontSize >= minimumFontSize) {
             fontSize--;
             g.setFont(new Font(MHQConstants.FONT_HELVETICA, Font.PLAIN, fontSize));
         }
@@ -693,16 +719,16 @@ public class PlanetarySystemMapPanel extends JPanel {
     private void drawRing(Graphics2D g, int x, int y, int radius, Color c) {
         Arc2D.Double arc = new Arc2D.Double();
         g.setPaint(c);
-        arc.setArcByCenter(x, y, radius + 6, 0, 360, Arc2D.OPEN);
+        arc.setArcByCenter(x, y, radius + UIUtil.scaleForGUI(6), 0, 360, Arc2D.OPEN);
         g.fill(arc);
         g.setPaint(Color.BLACK);
-        arc.setArcByCenter(x, y, radius + 4, 0, 360, Arc2D.OPEN);
+        arc.setArcByCenter(x, y, radius + UIUtil.scaleForGUI(4), 0, 360, Arc2D.OPEN);
         g.fill(arc);
         g.setPaint(c);
-        arc.setArcByCenter(x, y, radius + 3, 0, 360, Arc2D.OPEN);
+        arc.setArcByCenter(x, y, radius + UIUtil.scaleForGUI(3), 0, 360, Arc2D.OPEN);
         g.fill(arc);
         g.setPaint(Color.BLACK);
-        arc.setArcByCenter(x, y, radius + 2, 0, 360, Arc2D.OPEN);
+        arc.setArcByCenter(x, y, radius + UIUtil.scaleForGUI(2), 0, 360, Arc2D.OPEN);
         g.fill(arc);
     }
 

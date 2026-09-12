@@ -41,6 +41,7 @@ import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -79,7 +80,7 @@ import mekhq.campaign.universe.enums.HiringHallLevel;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonDeserialize(converter = PlanetarySystem.PlanetarySystemPostLoader.class)
 public class PlanetarySystem {
-    private static final double COMMAND_CIRCUIT_RECHARGE_TIME_HOURS = 10;
+    public static final double MINIMUM_RECHARGE_TIME_HOURS = 10;
 
     // --- Sophistication Rating Enum ---
     public enum PlanetarySophistication {
@@ -332,6 +333,25 @@ public class PlanetarySystem {
             factions.remove(Factions.getInstance().getFaction("ABN"));
         }
         return factions;
+    }
+
+    /**
+     * @return the shared nonempty administration path recorded by this system's planets, or an empty list when none is
+     *       recorded or the planets disagree
+     */
+    public List<String> getAdministration(LocalDate when) {
+        List<String> administration = null;
+        for (Planet planet : planets.values()) {
+            List<String> planetAdministration = planet.getAdministration(when);
+            if (planetAdministration.isEmpty()) {
+                continue;
+            }
+            if ((administration != null) && !administration.equals(planetAdministration)) {
+                return Collections.emptyList();
+            }
+            administration = planetAdministration;
+        }
+        return (administration == null) ? Collections.emptyList() : List.copyOf(administration);
     }
 
     /**
@@ -689,9 +709,9 @@ public class PlanetarySystem {
     public double getRechargeTime(LocalDate when, boolean isUseCommandCircuits) {
         if (isZenithCharge(when) || isNadirCharge(when)) {
             // The 176 value comes from pg. 87-88 and 138 of StratOps
-            return Math.min(isUseCommandCircuits ? COMMAND_CIRCUIT_RECHARGE_TIME_HOURS : 176.0, getSolarRechargeTime());
+            return Math.min(isUseCommandCircuits ? MINIMUM_RECHARGE_TIME_HOURS : 176.0, getSolarRechargeTime());
         } else {
-            return Math.min(isUseCommandCircuits ? COMMAND_CIRCUIT_RECHARGE_TIME_HOURS : Double.MAX_VALUE,
+            return Math.min(isUseCommandCircuits ? MINIMUM_RECHARGE_TIME_HOURS : Double.MAX_VALUE,
                   getSolarRechargeTime());
         }
     }

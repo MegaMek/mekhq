@@ -39,8 +39,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Font;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
@@ -187,26 +187,6 @@ final class ImmersiveDialogStyle {
         return isDarkTheme() ? DARK_THEME_INFORMATION : LIGHT_THEME_INFORMATION;
     }
 
-    static ResponseButtonColors getResponseButtonColors() {
-        Color panelColor = getPanelColor();
-        Color surfaceColor = getSurfaceColor();
-        Color signalColor = getSignalColor();
-        Color labelColor = getLabelColor();
-        return new ResponseButtonColors(
-              new ResponseButtonStateColors(withAlpha(surfaceColor, 190),
-                    mix(labelColor, signalColor, 0.18f),
-                    getSubtleSignalColor()),
-              new ResponseButtonStateColors(mix(surfaceColor, signalColor, 0.16f),
-                    signalColor,
-                    signalColor),
-              new ResponseButtonStateColors(mix(surfaceColor, signalColor, 0.27f),
-                    signalColor,
-                    signalColor),
-              new ResponseButtonStateColors(withAlpha(surfaceColor, 120),
-                    mix(panelColor, labelColor, 0.36f),
-                    mix(panelColor, signalColor, 0.20f)));
-    }
-
     private static JLabel createTechnicalLabel(String text, Color color, float sizeAdjustment) {
         JLabel label = new JLabel(text);
         Font baseFont = label.getFont();
@@ -256,13 +236,6 @@ final class ImmersiveDialogStyle {
 
     private static Color withAlpha(Color color, int alpha) {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
-    }
-
-    record ResponseButtonStateColors(Color background, Color foreground, Color frame) {
-    }
-
-    record ResponseButtonColors(ResponseButtonStateColors idle, ResponseButtonStateColors active,
-          ResponseButtonStateColors pressed, ResponseButtonStateColors disabled) {
     }
 
     private static Path2D createAngularFrame(float left, float top, float right, float bottom) {

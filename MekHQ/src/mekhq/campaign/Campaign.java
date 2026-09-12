@@ -78,7 +78,7 @@ import java.time.format.TextStyle;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.WeekFields;
 import java.util.*;
-import java.util.Map.Entry;
+import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 import javax.swing.ImageIcon;
 import javax.swing.JOptionPane;
@@ -4090,6 +4090,93 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Calculates a user-planned route without relaxing access restrictions. If avoiding abandoned systems leaves no
+     * route, the returned explanation route may include abandoned intermediate systems.
+     *
+     * @param start the starting planetary system
+     * @param end   the explicitly requested destination
+     *
+     * @return the strict route when available, otherwise an abandoned-system fallback or a failure status
+     */
+    public RouteAlternativesPlanner.PlanningResult calculateJumpPathForPlanning(PlanetarySystem start,
+          PlanetarySystem end) {
+        return RouteAlternativesPlanner.planFastestSegmentWithFallback(start, end, getLocalDate(),
+              isUseCommandCircuit(), createNavigationPolicy(false, false), createNavigationPolicy(false, true));
+    }
+
+    /** Displays the applicable feedback when a requested route cannot be plotted. */
+    public void showRoutePlanningFailure(RouteAlternativesPlanner.PlanningStatus status) {
+        if (status == RouteAlternativesPlanner.PlanningStatus.ROUTE_FOUND) {
+            return;
+        }
+
+        String resourcePrefix = status == RouteAlternativesPlanner.PlanningStatus.ACCESS_DENIED
+                                      ? "unableToEnterSystem.outlawed"
+                                      : "unableToEnterSystem.noRoute";
+        new ImmersiveDialogSimple(this, getPlayerForce().getHumanResources()
+                                    .getSeniorAdminPerson(getCampaignOptions(),
+                                        getPlayerForce().isClanForce(), getLocalDate()), null,
+              String.format(resources.getString(resourcePrefix + ".ic"), getCommanderAddress()), null,
+              resources.getString(resourcePrefix + ".ooc"), null, false);
+    }
+
+    /**
+     * Calculates dialog-free route comparisons under the same policy used by the navigation map.
+     *
+     * @param origin         first system in every course
+     * @param requestedStops explicit stops in order, including the final destination
+     *
+     * @return unique deterministic courses, or an empty list when any requested segment is unavailable
+     */
+    public List<RouteAlternativesPlanner.Course> calculateRouteAlternatives(PlanetarySystem origin,
+          List<PlanetarySystem> requestedStops) {
+                if (!RouteAlternativesPlanner.isValidRequest(origin, requestedStops)) {
+            return List.of();
+        }
+        List<AbstractContract> activeContracts = getActiveContracts();
+        FactionHints factionHints = FactionHints.getInstance();
+          NavigationRouteAnalysis.Policy policy = createNavigationPolicy(false, false, activeContracts,
+              factionHints);
+        return RouteAlternativesPlanner.plan(origin, requestedStops, getLocalDate(), isUseCommandCircuit(), policy);
+    }
+
+        /** Assesses one direct navigation leg without changing campaign or route state. */
+        public NavigationRouteAnalysis.LegAssessment assessNavigationLeg(PlanetarySystem origin,
+            PlanetarySystem destination, boolean useCommandCircuit) {
+          NavigationRouteAnalysis.Policy policy = createNavigationPolicy(false, false);
+          return NavigationRouteAnalysis.assessLeg(origin, destination, getLocalDate(), useCommandCircuit,
+              policy.forSegment(origin, destination));
+        }
+
+        /** Assesses path legs in route order without changing campaign or route state. */
+        public NavigationRouteAnalysis.PathAssessment assessNavigationPath(List<PlanetarySystem> systems,
+            boolean useCommandCircuit) {
+          return NavigationRouteAnalysis.assessPath(systems, getLocalDate(), useCommandCircuit,
+              createNavigationPolicy(false, false));
+        }
+
+            /** Assesses path legs with an explicit command-circuit assumption for each destination index. */
+            public NavigationRouteAnalysis.PathAssessment assessNavigationPath(List<PlanetarySystem> systems,
+                IntPredicate useCommandCircuitAtDestination) {
+              return NavigationRouteAnalysis.assessPath(systems, getLocalDate(), useCommandCircuitAtDestination,
+                  createNavigationPolicy(false, false));
+            }
+
+            /** Assesses path legs while preserving explicitly requested stop semantics. */
+            public NavigationRouteAnalysis.PathAssessment assessNavigationPath(List<PlanetarySystem> systems,
+                List<PlanetarySystem> requestedStops, IntPredicate useCommandCircuitAtDestination) {
+                return NavigationRouteAnalysis.assessPath(systems, requestedStops, getLocalDate(),
+                    useCommandCircuitAtDestination, createNavigationPolicy(false, false));
+            }
+
+        /** Computes bounded minimum-hop navigation shells and their blocked frontier. */
+        public NavigationRouteAnalysis.Reachability calculateNavigationReachability(PlanetarySystem anchor,
+            int maximumHops, boolean useCommandCircuit) {
+          return NavigationRouteAnalysis.assessReachability(anchor, maximumHops, getLocalDate(), useCommandCircuit,
+              createNavigationPolicy(false, false));
+        }
+
+    /**
      * Calculates the optimal jump path between two planetary systems using the A* algorithm.
      *
      * <p>This implementation minimizes a combination of jump counts and recharge times to find the most efficient
@@ -4127,19 +4214,6 @@ public class Campaign implements ITechManager {
             return jumpPath;
         }
 
-        // Shortcuts to ensure we're not processing a lot of data when we're unable to reach the target system
-        if (!skipEmptySystemCheck && getPlayerForce().isAvoidingEmptySystems()
-                  && end.getPopulation(currentDay) == 0) {
-            new ImmersiveDialogSimple(this, getPlayerForce().getHumanResources()
-                                                  .getSeniorAdminPerson(getCampaignOptions(),
-                                                        getPlayerForce().isClanForce(),
-                                                        getLocalDate()), null,
-                  String.format(resources.getString("unableToEnterSystem.abandoned.ic"), getCommanderAddress()),
-                  null, resources.getString("unableToEnterSystem.abandoned.ooc"), null, false);
-
-            return new JumpPath();
-        }
-
         List<AbstractContract> activeAtBContracts = getActiveContracts();
 
         FactionHints factionHints = FactionHints.getInstance();
@@ -4148,175 +4222,67 @@ public class Campaign implements ITechManager {
                   getPlayerForce().getFactionStandings(),
                   start, end, currentDay, activeAtBContracts, factionHints);
             if (!canAccessSystem) {
-                new ImmersiveDialogSimple(this, getPlayerForce().getHumanResources()
-                                                      .getSeniorAdminPerson(getCampaignOptions(),
-                                                            getPlayerForce().isClanForce(),
-                                                            getLocalDate()), null,
-                      String.format(resources.getString("unableToEnterSystem.outlawed.ic"), getCommanderAddress()),
-                      null, resources.getString("unableToEnterSystem.outlawed.ooc"), null, false);
-
+                showRoutePlanningFailure(RouteAlternativesPlanner.PlanningStatus.ACCESS_DENIED);
                 return new JumpPath();
             }
         }
 
-        // Initialize A* algorithm variables
-        String startKey = start.getId();
-        String endKey = end.getId();
-
-        Set<String> closed = new HashSet<>();
-        Set<String> open = new HashSet<>();
-
-        Map<String, String> parent = new HashMap<>();
-        Map<String, Double> scoreH = new HashMap<>(); // Heuristic scores (estimated cost to goal)
-        Map<String, Double> scoreG = new HashMap<>(); // Path costs from start
-
-        // Precompute heuristics
-        Map<String, PlanetarySystem> allSystems = this.systemsInstance.getSystems();
-
-        for (Entry<String, PlanetarySystem> entry : allSystems.entrySet()) {
-            scoreH.put(entry.getKey(), end.getDistanceTo(entry.getValue()));
-        }
-
-        // Initialize starting node
-        String current = startKey;
-        scoreG.put(current, 0.0);
-        closed.add(current);
-
-        // We need this additional check as later we're going to be comparing neighbors, rather than start point.
-        // Which means that if we're passing through more than one Outlawed system en route to our escape our
-        // progress will be blocked.
-        boolean isEscapingOutlawing = !FactionStandingUtilities.canEnterTargetSystem(getPlayerForce().getFaction(),
-              getPlayerForce().getFactionStandings(),
-              null, start, currentDay, activeAtBContracts, factionHints);
-
-        // A* search
-        final int MAX_JUMPS = 10000;
-        for (int jumps = 0; jumps < MAX_JUMPS; jumps++) {
-            PlanetarySystem currentSystem = systemsInstance.getSystemById(current);
-
-            boolean isUseCommandCircuits =
-                  FactionStandingUtilities.isUseCommandCircuit(getPlayerForce().isOverridingCommandCircuitRequirements(),
-                        gmMode,
-                        campaignOptions.isUseFactionStandingCommandCircuitSafe(),
-                        getPlayerForce().getFactionStandings(), getFutureContracts());
-
-            // Get current node's information
-            double currentG = scoreG.get(current) + currentSystem.getRechargeTime(getLocalDate(), isUseCommandCircuits);
-            final String localCurrent = current;
-
-            // Explore neighbors
-            systemsInstance.visitNearbySystems(currentSystem, 30, neighborSystem -> {
-                String neighborId = neighborSystem.getId();
-
-                // Skip systems without population if avoiding empty systems
-                if (!skipEmptySystemCheck && getPlayerForce().isAvoidingEmptySystems()
-                          && neighborSystem.getPopulation(currentDay) == 0) {
-                    return;
-                }
-
-                // Skip systems where the campaign is outlawed
-                if (!skipAccessCheck &&
-                          !isEscapingOutlawing &&
-                          campaignOptions.isUseFactionStandingOutlawedSafe()) {
-                    boolean canAccessSystem = FactionStandingUtilities.canEnterTargetSystem(getPlayerForce().getFaction(),
-                          getPlayerForce().getFactionStandings(),
-                          currentSystem, neighborSystem, currentDay, activeAtBContracts, factionHints);
-                    if (!canAccessSystem) {
-                        return;
-                    }
-                }
-
-                if (closed.contains(neighborId)) {
-                    return; // Already evaluated
-                }
-
-                if (open.contains(neighborId)) {
-                    // Check if this path is better than the previously found one
-                    if (currentG < scoreG.get(neighborId)) {
-                        scoreG.put(neighborId, currentG);
-                        parent.put(neighborId, localCurrent);
-                    }
-                } else {
-                    // Discover a new node
-                    scoreG.put(neighborId, currentG);
-                    parent.put(neighborId, localCurrent);
-                    open.add(neighborId);
-                }
-            });
-
-            // Find the open node with the lowest f score
-            String bestMatch = findNodeWithLowestFScore(open, scoreG, scoreH);
-
-            if (bestMatch == null) {
-                break; // No path exists
-            }
-
-            // Move to the best node
-            current = bestMatch;
-            closed.add(current);
-            open.remove(current);
-
-            // Check if we've reached the destination
-            if (current.equals(endKey)) {
-                return reconstructPath(current, parent, systemsInstance);
-            }
-        }
-
-        // No path found or maximum jumps reached
-        return reconstructPath(current, parent, systemsInstance);
+        NavigationRouteAnalysis.Policy policy = createNavigationPolicy(skipAccessCheck, skipEmptySystemCheck,
+              activeAtBContracts, factionHints);
+        return RouteAlternativesPlanner.planFastestSegment(start, end, getLocalDate(), isUseCommandCircuit(),
+              policy);
     }
 
-    /**
-     * Finds the node in the open set with the lowest f-score (g + h).
-     *
-     * @param openSet The set of nodes to evaluate
-     * @param gScores Map of path costs from start
-     * @param hScores Map of heuristic distances to goal
-     *
-     * @return The node with the lowest f-score, or null if openSet is empty
-     */
-    private String findNodeWithLowestFScore(Set<String> openSet, Map<String, Double> gScores,
-          Map<String, Double> hScores) {
-        String bestMatch = null;
-        double bestF = Double.POSITIVE_INFINITY;
-
-        for (String candidate : openSet) {
-            double f = gScores.get(candidate) + hScores.get(candidate);
-            if (f < bestF) {
-                bestMatch = candidate;
-                bestF = f;
-            }
-        }
-
-        return bestMatch;
+    private NavigationRouteAnalysis.Policy createNavigationPolicy(boolean skipAccessCheck,
+          boolean skipEmptySystemCheck) {
+        return createNavigationPolicy(skipAccessCheck, skipEmptySystemCheck, getActiveContracts(),
+              FactionHints.getInstance());
     }
 
-    /**
-     * Reconstructs the path from the parent map.
-     *
-     * @param current         The final node in the path
-     * @param parent          Map of parent nodes
-     * @param systemsInstance The systems registry
-     *
-     * @return A JumpPath containing the sequence of systems
-     */
-    private JumpPath reconstructPath(String current, Map<String, String> parent, Systems systemsInstance) {
-        // Reconstruct path
-        List<PlanetarySystem> path = new ArrayList<>();
-        String nextKey = current;
+    private NavigationRouteAnalysis.Policy createNavigationPolicy(boolean skipAccessCheck,
+          boolean skipEmptySystemCheck, List<AbstractContract> activeContracts, FactionHints factionHints) {
+        class CampaignNavigationPolicy implements NavigationRouteAnalysis.Policy {
+            @Override
+            public Collection<PlanetarySystem> getNeighbors(PlanetarySystem system) {
+                List<PlanetarySystem> neighbors = new ArrayList<>();
+                systemsInstance.visitNearbySystems(system, MHQConstants.MAX_JUMP_RADIUS, neighbors::add);
+                return neighbors;
+            }
 
-        while (nextKey != null) {
-            path.add(systemsInstance.getSystemById(nextKey));
-            nextKey = parent.get(nextKey);
+            @Override
+            public boolean isSystemAllowed(PlanetarySystem system) {
+                return !isAvoidingAbandonedSystems() || !isAbandoned(system);
+            }
+
+            @Override
+            public boolean isRequestedDestinationAllowed(PlanetarySystem system) {
+                return true;
+            }
+
+            @Override
+            public boolean canTraverse(PlanetarySystem origin, PlanetarySystem destination) {
+                return skipAccessCheck || !campaignOptions.isUseFactionStandingOutlawedSafe()
+                             || FactionStandingUtilities.canEnterTargetSystem(getPlayerForce().getFaction(),
+                                   getPlayerForce().getFactionStandings(), origin, destination, currentDay,
+                                   activeContracts, factionHints);
+            }
+
+            @Override
+            public double minimumRechargeHours() {
+                return PlanetarySystem.MINIMUM_RECHARGE_TIME_HOURS;
+            }
+
+            @Override
+            public boolean isAbandoned(PlanetarySystem system) {
+                return !system.isConnector() && (system.getPopulation(currentDay) == 0);
+            }
+
+            @Override
+            public boolean isAvoidingAbandonedSystems() {
+                return !skipEmptySystemCheck && getPlayerForce().isAvoidingEmptySystems();
+            }
         }
-
-        // Create the final path in the correct order (start to end)
-        JumpPath finalPath = new JumpPath();
-        for (int i = path.size() - 1; i >= 0; i--) {
-            finalPath.addSystem(path.get(i));
-        }
-
-        return finalPath;
+        return new CampaignNavigationPolicy();
     }
 
     /**
