@@ -366,6 +366,14 @@ public final class MHQConstants extends SuiteConstants {
     public static final String RAT_INFO_DIR = "data/universe/ratdata/";
     public static final String LIFE_PATHS_DEFAULT_DIRECTORY_PATH = "data/advancedCharacterBuilder/lifePaths";
     public static final String LIFE_PATHS_USER_DIRECTORY_PATH = "/advancedCharacterBuilder/lifePaths";
+    /**
+     * Where Life Paths live inside an mm-data checkout, relative to that checkout's root.
+     *
+     * <p>In a development environment mm-data sits beside this build as a sibling directory, and that checkout is the
+     * canonical home of the shipped Life Paths. The copy under {@link #LIFE_PATHS_DEFAULT_DIRECTORY_PATH} is staged
+     * from it on launch and overwritten on the next.</p>
+     */
+    public static final String LIFE_PATHS_MM_DATA_DIRECTORY_PATH = "mm-data/data/advancedCharacterBuilder/lifePaths";
     public static final String ERAS_FILE_PATH = "data/universe/eras.xml";
     public static final String FACTION_HINTS_FILE = "data/universe/factionhints.xml";
     public static final String FACTION_DIPLOMACY_DIRECTORY_PATH = "data/universe/factionDiplomacy";

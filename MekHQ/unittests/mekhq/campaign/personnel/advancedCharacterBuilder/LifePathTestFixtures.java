@@ -82,8 +82,7 @@ final class LifePathTestFixtures {
                      .randomWeight(1.0)
                      .lifeStages(Set.of(ATOWLifeStage.EARLY_CHILDHOOD))
                      .categories(Set.of(LifePathCategory.GENERAL_INNER_SPHERE))
-                     .isPlayerRestricted(false)
-                     .flexibleXPPickCount(0);
+                     .isPlayerRestricted(false);
     }
 
     /**

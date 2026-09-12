@@ -36,6 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathSection;
@@ -49,8 +50,7 @@ public class LifePathProgressTextBuilder {
           LifePathTab exclusionsTab, LifePathTab fixedXPTab, LifePathTab flexibleXPTab) {
         StringBuilder newProgressText = new StringBuilder();
 
-        LifePathBuilder costBasis = new LifePathBuilder().xpDiscount(basicInfoTab.getDiscount())
-                                          .flexibleXPPickCount(flexibleXPTab.getPickCount());
+        LifePathBuilder costBasis = new LifePathBuilder().xpDiscount(basicInfoTab.getDiscount());
         LifePathSection.readFromTab(LifePathBuilderTabType.FIXED_XP, fixedXPTab, costBasis);
         LifePathSection.readFromTab(LifePathBuilderTabType.FLEXIBLE_XP, flexibleXPTab, costBasis);
 
@@ -62,7 +62,7 @@ public class LifePathProgressTextBuilder {
         String newFixedXPText = getFixedXPText(fixedXPTab);
         newProgressText.append(newFixedXPText);
 
-        String newFlexibleXPText = getFlexibleXPText(flexibleXPTab);
+        String newFlexibleXPText = getFlexibleXPText(flexibleXPTab, costBasis);
         newProgressText.append(newFlexibleXPText);
 
         String newRequirementsText = getNewRequirementsText(requirementsTab);
@@ -220,7 +220,21 @@ public class LifePathProgressTextBuilder {
         return newText.toString();
     }
 
-    private static String getFlexibleXPText(LifePathTab lifePathTab) {
+    /**
+     * Renders the Flexible XP section, one line per set.
+     *
+     * <p>Each line says how many items the player takes from the set, lists the items, and ends with the set's price.
+     * The prices are the same per-set figures the calculator adds up, so the lines account for the total shown at
+     * the top of the panel.</p>
+     *
+     * @param lifePathTab the Flexible XP tab
+     * @param costBasis   the Life Path as the wizard currently describes it, used to price each set
+     *
+     * @return the section as HTML, or an empty string when there are no sets
+     *
+     * @since 0.51.01
+     */
+    private static String getFlexibleXPText(LifePathTab lifePathTab, LifePathBuilder costBasis) {
         StringBuilder newText = new StringBuilder();
 
         List<String> progress = lifePathTab.buildProgressText();
@@ -232,24 +246,25 @@ public class LifePathProgressTextBuilder {
         newText.append("<h2 style='text-align:center; margin:0;'>").append(title).append(
               "</h2>");
 
-        newText.append("<b>");
-        newText.append(getTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexible_xp.button.pickCount.label"));
-        newText.append(":</b> ");
-        newText.append(lifePathTab.getPickCount());
-        newText.append("<br>");
+        Map<Integer, Integer> pickCounts = lifePathTab.getPickCounts();
 
-        for (int i = 0; i < progress.size(); i++) {
-            String group = progress.get(i);
-            if (group.isBlank()) {
+        for (int setIndex = 0; setIndex < progress.size(); setIndex++) {
+            String setItems = progress.get(setIndex);
+            if (setItems.isBlank()) {
                 continue;
             }
 
-            if (i != 0) {
+            if (setIndex != 0) {
                 newText.append("<br>");
             }
 
+            Integer storedPickCount = pickCounts.get(setIndex);
+            int pickCount = storedPickCount == null ? 0 : storedPickCount;
+            int setCost = LifePathXPCostCalculator.calculateFlexibleSetCost(costBasis, setIndex);
+
             newText.append("&#9654; ");
-            newText.append(group);
+            newText.append(getFormattedTextAt(RESOURCE_BUNDLE, "LifePathBuilderDialog.flexible_xp.progress.set",
+                  pickCount, setItems, setCost));
         }
 
         return newText.toString();

@@ -79,6 +79,13 @@ class LifePathGroup {
     private Map<String, Integer> abilities = new HashMap<>();
 
     /**
+     * How many items the player takes from this set, or {@code null} when the section has no such notion.
+     *
+     * <p>Only Flexible XP sets carry one. It is the one thing a set holds that is not an award.</p>
+     */
+    private Integer pickCount;
+
+    /**
      * Returns an independent copy of this group.
      *
      * <p>The collections are copied, not shared, so editing the copy cannot reach back into the original. This is what
@@ -104,8 +111,73 @@ class LifePathGroup {
         copy.naturalAptitudes = new HashMap<>(naturalAptitudes);
         copy.naturalAptitudesMetaSkills = new HashMap<>(naturalAptitudesMetaSkills);
         copy.abilities = new HashMap<>(abilities);
+        copy.pickCount = pickCount;
 
         return copy;
+    }
+
+    /**
+     * Counts the items a player could pick from this set.
+     *
+     * <p>Mirrors {@code LifePath.flexibleXPItemValues}: one per scored entry in every award map, plus one each for
+     * Edge and the "any attribute" award when they are set. Factions, systems, Life Paths and categories are
+     * requirements, not awards, and are not counted.</p>
+     *
+     * @return the number of pickable items
+     *
+     * @since 0.51.01
+     */
+    int countItems() {
+        // Counted the same way the record counts them: an entry whose value is null is not an item. A hand-edited
+        // file can leave one, and counting it here would let the spinner allow a pick the record then refuses.
+        int itemCount = countAwards(attributes)
+                              + countAwards(traits)
+                              + countAwards(skills)
+                              + countAwards(metaSkills)
+                              + countAwards(naturalAptitudes)
+                              + countAwards(naturalAptitudesMetaSkills)
+                              + countAwards(abilities);
+
+        if (edge != null) {
+            itemCount++;
+        }
+        if (flexibleAttribute != null) {
+            itemCount++;
+        }
+
+        return itemCount;
+    }
+
+    /**
+     * Counts the entries of an award map that carry a value.
+     *
+     * @param awards awards keyed by whatever the map awards
+     *
+     * @return the number of entries whose value is not {@code null}
+     *
+     * @since 0.51.01
+     */
+    private static int countAwards(Map<?, Integer> awards) {
+        int count = 0;
+
+        for (Integer value : awards.values()) {
+            if (value != null) {
+                count++;
+            }
+        }
+
+        return count;
+    }
+
+    /** @return how many items the player takes from this set, or {@code null} when not a flexible set */
+    @Nullable
+    Integer getPickCount() {
+        return pickCount;
+    }
+
+    /** @param pickCount how many items the player takes from this set; {@code null} clears it */
+    void setPickCount(@Nullable Integer pickCount) {
+        this.pickCount = pickCount;
     }
 
     /** @return the faction codes this group names */
