@@ -39,7 +39,6 @@ import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathR
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MATCHING_UUID_REQUIREMENT;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MIN_YEAR_ABOVE_MAX_YEAR;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MISSING_CATEGORIES;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MISSING_FACTION;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MISSING_LIFE_STAGE;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MISSING_NAME;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MISSING_SOURCE;
@@ -157,52 +156,13 @@ class LifePathValidatorTest {
     // region Affiliation factions
 
     @Test
-    void testAffiliationWithNoFaction_IsReported() {
+    void testAffiliationWithNoFaction_IsNotReported() {
+        // An affiliation path with no faction requirement is the author's choice, not a mistake. The rule that
+        // demanded one was removed on review.
         Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().lifeStages(Set.of(
               ATOWLifeStage.AFFILIATION)));
 
-        assertTrue(reasons.contains(MISSING_FACTION), "An affiliation with no faction should be reported.");
-    }
-
-    @Test
-    void testSubAffiliationWithNoFaction_IsReported() {
-        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().lifeStages(Set.of(
-              ATOWLifeStage.SUB_AFFILIATION)));
-
-        assertTrue(reasons.contains(MISSING_FACTION), "A sub-affiliation with no faction should be reported.");
-    }
-
-    @Test
-    void testClanCasteWithNoFaction_IsReported() {
-        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().lifeStages(Set.of(
-              ATOWLifeStage.CLAN_CASTE)));
-
-        assertTrue(reasons.contains(MISSING_FACTION),
-              "A Clan caste only exists inside a Clan, so it needs a faction requirement.");
-    }
-
-    @Test
-    void testAffiliationWithAnEmptyFactionGroup_IsReported() {
-        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().lifeStages(Set.of(
-              ATOWLifeStage.AFFILIATION)).requirementsFactions(Map.of(0, Set.of())));
-
-        assertTrue(reasons.contains(MISSING_FACTION), "An empty faction group is no faction at all.");
-    }
-
-    @Test
-    void testAffiliationWithAFaction_IsNotReported() {
-        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().lifeStages(Set.of(
-              ATOWLifeStage.AFFILIATION)).requirementsFactions(Map.of(0, Set.of("FS"))));
-
-        assertFalse(reasons.contains(MISSING_FACTION), "An affiliation naming a faction is valid.");
-    }
-
-    @Test
-    void testNonAffiliationWithNoFaction_IsNotReported() {
-        Set<InvalidLifePathReason> reasons = LifePathValidator.validate(validBuilder().lifeStages(Set.of(
-              ATOWLifeStage.REAL_LIFE)));
-
-        assertFalse(reasons.contains(MISSING_FACTION), "Only affiliation stages and castes need a faction.");
+        assertTrue(reasons.isEmpty(), "An affiliation with no faction requirement is valid.");
     }
 
     // endregion Affiliation factions

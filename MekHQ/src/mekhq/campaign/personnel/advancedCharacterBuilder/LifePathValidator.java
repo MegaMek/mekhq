@@ -33,11 +33,9 @@
 package mekhq.campaign.personnel.advancedCharacterBuilder;
 
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.FLEXIBLE_PICKS_EQUAL_ITEMS;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.MISSING_FACTION;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.NO_FLEXIBLE_PICKS;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.InvalidLifePathReason.TOO_MANY_FLEXIBLE_PICKS;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -135,7 +133,6 @@ public class LifePathValidator {
         // Tests
         checkYears();
         checkFlexiblePicks();
-        checkAffiliationFactionRequirement();
         checkSource();
         checkName();
         checkLifeStages();
@@ -187,36 +184,6 @@ public class LifePathValidator {
                 invalidReasons.add(TOO_MANY_FLEXIBLE_PICKS);
             } else if (pickCount == itemCount) {
                 invalidReasons.add(FLEXIBLE_PICKS_EQUAL_ITEMS);
-            }
-        }
-    }
-
-    /**
-     * Flags a Life Path that places a character in a faction without saying which faction.
-     *
-     * <p>Clan caste is included alongside the two affiliation stages: a caste only exists inside a Clan, so a caste
-     * path with no faction requirement cannot be qualified for.</p>
-     *
-     * @since 0.50.11
-     */
-    private void checkAffiliationFactionRequirement() {
-        // If the Life Path has an affiliation stage, but no factions are selected, then the Life Path is invalid
-        Set<ATOWLifeStage> lifeStages = lifePath.lifeStages();
-
-        if (lifeStages.contains(ATOWLifeStage.AFFILIATION) ||
-                  lifeStages.contains(ATOWLifeStage.SUB_AFFILIATION) ||
-                  lifeStages.contains(ATOWLifeStage.CLAN_CASTE)) {
-            Collection<Set<String>> requirements = lifePath.requirementsFactions().values();
-            if (requirements.isEmpty()) {
-                invalidReasons.add(MISSING_FACTION);
-                return;
-            }
-
-            for (Set<String> group : requirements) {
-                if (group.isEmpty()) {
-                    invalidReasons.add(MISSING_FACTION);
-                    return;
-                }
             }
         }
     }
