@@ -42,15 +42,15 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Dimension;
 import java.util.HashSet;
-import java.util.UUID;
 import java.util.Set;
+import java.util.UUID;
 import javax.swing.GroupLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
-import javax.swing.JTextField;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpinnerNumberModel;
 

@@ -35,7 +35,6 @@ package mekhq.campaign.personnel.advancedCharacterBuilder;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathTestFixtures.ANCIENT_VERSION;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathTestFixtures.FUTURE_VERSION;
 import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathTestFixtures.validBuilder;
-import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathTestFixtures.validLifePath;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -46,14 +45,13 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import mekhq.MHQConstants;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.Arguments;
-
-import java.util.stream.Stream;
+import org.junit.jupiter.params.provider.MethodSource;
 
 /**
  * Tests the {@link LifePath} record: what its constructor accepts, what it rejects, and the group counting that bounds

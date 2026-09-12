@@ -62,8 +62,8 @@ import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathBuilderTabType;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.Systems;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.utilities.TooltipMouseListenerUtil;
 import mekhq.gui.utilities.JSuggestField;
+import mekhq.gui.utilities.TooltipMouseListenerUtil;
 
 /**
  * Lets an author name the planetary systems a Life Path requires or excludes.
