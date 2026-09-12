@@ -128,13 +128,15 @@ class LifePathGroup {
      * @since 0.51.01
      */
     int countItems() {
-        int itemCount = attributes.size()
-                              + traits.size()
-                              + skills.size()
-                              + metaSkills.size()
-                              + naturalAptitudes.size()
-                              + naturalAptitudesMetaSkills.size()
-                              + abilities.size();
+        // Counted the same way the record counts them: an entry whose value is null is not an item. A hand-edited
+        // file can leave one, and counting it here would let the spinner allow a pick the record then refuses.
+        int itemCount = countAwards(attributes)
+                              + countAwards(traits)
+                              + countAwards(skills)
+                              + countAwards(metaSkills)
+                              + countAwards(naturalAptitudes)
+                              + countAwards(naturalAptitudesMetaSkills)
+                              + countAwards(abilities);
 
         if (edge != null) {
             itemCount++;
@@ -144,6 +146,27 @@ class LifePathGroup {
         }
 
         return itemCount;
+    }
+
+    /**
+     * Counts the entries of an award map that carry a value.
+     *
+     * @param awards awards keyed by whatever the map awards
+     *
+     * @return the number of entries whose value is not {@code null}
+     *
+     * @since 0.51.01
+     */
+    private static int countAwards(Map<?, Integer> awards) {
+        int count = 0;
+
+        for (Integer value : awards.values()) {
+            if (value != null) {
+                count++;
+            }
+        }
+
+        return count;
     }
 
     /** @return how many items the player takes from this set, or {@code null} when not a flexible set */
