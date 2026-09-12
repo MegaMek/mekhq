@@ -37,6 +37,7 @@ import static mekhq.campaign.personnel.advancedCharacterBuilder.LifePathTestFixt
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -241,7 +242,10 @@ class LifePathIOTest {
 
         File[] written = temporaryDirectory.toFile().listFiles();
 
-        assertEquals(1, written == null ? 0 : written.length, "Exactly one file should have been written.");
+        // Asserted rather than folded into the count below: listFiles returns null for an unreadable directory, and
+        // indexing the array afterwards has to be safe.
+        assertNotNull(written, "The temporary directory should be readable.");
+        assertEquals(1, written.length, "Exactly one file should have been written.");
         assertEquals("BadNameWithCharacters.json", written[0].getName(),
               "Characters a file name cannot hold should be removed.");
     }
