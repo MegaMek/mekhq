@@ -313,7 +313,11 @@ abstract class AbstractLifePathPicker extends JDialog {
     }
 
     /**
-     * Returns the dialog title, naming the group being edited when there is one.
+     * Returns the dialog title, naming the section and the group being edited when there is one.
+     *
+     * <p>The section name comes from the {@code picker.section} keys, which are plain text. The tabbed pane's
+     * {@code tab.title} keys are HTML, and a window title does not render HTML, so they cannot be reused here.
+     * Fixed XP and Exclusions only ever have one group, so their titles carry no group number.</p>
      *
      * @return the title
      *
@@ -327,7 +331,14 @@ abstract class AbstractLifePathPicker extends JDialog {
         }
 
         String sectionName = getTextAt("mekhq.resources.LifePathBuilderDialog",
-              "LifePathBuilderDialog.tab.title." + tabType.getLookupName());
+              "LifePathBuilderDialog.picker.section." + tabType.getLookupName());
+
+        boolean hasSingleGroup = tabType == LifePathBuilderTabType.FIXED_XP
+                                       || tabType == LifePathBuilderTabType.EXCLUSIONS;
+        if (hasSingleGroup) {
+            return getFormattedTextAt("mekhq.resources.LifePathBuilderDialog",
+                  "LifePathBuilderDialog.picker.title.section", baseTitle, sectionName);
+        }
 
         return getFormattedTextAt("mekhq.resources.LifePathBuilderDialog",
               "LifePathBuilderDialog.picker.title.group", baseTitle, sectionName, groupIndex);
