@@ -39,20 +39,18 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
-import java.awt.Frame;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
-import megamek.common.ui.FastJScrollPane;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.utilities.TransportCostCalculations;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 
 /**
  * Dialog to display a detailed summary of jump-related transport costs for a campaign in MekHQ.
@@ -64,12 +62,10 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * @author Illiani
  * @since 0.50.10
  */
-public class JumpCostsSummary extends JDialog {
+public class JumpCostsSummary {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.TransportCostCalculations";
-
-    private static final String TITLE = getTextAt(RESOURCE_BUNDLE,
-          "TransportCostCalculations.report.header.title");
     private static final int PADDING = scaleForGUI(10);
+      private static final Color SECTION_DIVIDER = new Color(35, 66, 82);
 
     private final TransportCostCalculations calculations;
 
@@ -79,41 +75,34 @@ public class JumpCostsSummary extends JDialog {
      * includes sections for overall costs, cargo and passengers, units, and DropShip hiring. All content is
      * automatically formatted and displayed in a scrollable pane.
      *
-     * @param owner        the parent window for this dialog (can be null)
+      * @param campaign     the campaign that owns the immersive dialog
      * @param calculations the {@link TransportCostCalculations} used for summary calculations and display
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public JumpCostsSummary(Frame owner, TransportCostCalculations calculations) {
-        super(owner, TITLE, true);
+      public JumpCostsSummary(Campaign campaign, TransportCostCalculations calculations) {
         this.calculations = calculations;
 
-        JPanel leftPanel = new JPanel();
-        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
-        leftPanel.add(getTotalCost());
-        leftPanel.add(getCargoAndPassengersSummary());
-        leftPanel.add(getDropShipSummary());
-
-        JPanel rightPanel = new JPanel();
-        rightPanel.setLayout(new BoxLayout(rightPanel, BoxLayout.Y_AXIS));
-        rightPanel.add(getUnitsSummary());
-
         JPanel mainPanel = new JPanel(new BorderLayout());
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
-        mainPanel.add(leftPanel, BorderLayout.WEST);
-        mainPanel.add(rightPanel, BorderLayout.EAST);
+            JPanel report = new JPanel();
+            report.setLayout(new BoxLayout(report, BoxLayout.Y_AXIS));
+            report.setOpaque(false);
+            report.add(getTotalCost());
+            report.add(getCargoAndPassengersSummary());
+            JPanel unitsSummary = getUnitsSummary();
+            if (unitsSummary.getComponentCount() > 0) {
+                  report.add(unitsSummary);
+            }
+            report.add(getDropShipSummary());
+            mainPanel.setOpaque(false);
+            mainPanel.add(report, BorderLayout.CENTER);
 
-        JScrollPane scrollPane = new FastJScrollPane(mainPanel);
-        scrollPane.setBorder(null);
-
-        this.setLayout(new BorderLayout());
-        this.add(scrollPane, BorderLayout.CENTER);
-        this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-
-        this.pack();
-        this.setLocationRelativeTo(owner);
-        this.setVisible(true);
+            new ImmersiveDialogNotification(campaign,
+                    getTextAt(RESOURCE_BUNDLE, "TransportCostCalculations.report.message"),
+                    null,
+                    mainPanel,
+                    true);
     }
 
 
@@ -149,10 +138,8 @@ public class JumpCostsSummary extends JDialog {
         JLabel lblPerDay = new JLabel(perDayText);
 
 
-        JPanel summary = new JPanel();
-        summary.setLayout(new BoxLayout(summary, BoxLayout.Y_AXIS));
         String title = getTextAt(RESOURCE_BUNDLE, "TransportCostCalculations.report.header.all");
-        summary.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
+      JPanel summary = createSection(title);
         summary.add(lblPerMonth);
         summary.add(lblPerWeek);
         summary.add(lblPerDay);
@@ -191,10 +178,8 @@ public class JumpCostsSummary extends JDialog {
               "TransportCostCalculations.report.entry.cost", passengerCost);
         JLabel lblPassengerCost = new JLabel(passengersCostLabel);
 
-        JPanel cargoSummary = new JPanel();
-        cargoSummary.setLayout(new BoxLayout(cargoSummary, BoxLayout.Y_AXIS));
         String title = getTextAt(RESOURCE_BUNDLE, "TransportCostCalculations.report.header.cargo");
-        cargoSummary.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
+      JPanel cargoSummary = createSection(title);
         cargoSummary.add(lblCargo);
         cargoSummary.add(lblCargoCost);
         cargoSummary.add(Box.createVerticalStrut(PADDING));
@@ -216,10 +201,8 @@ public class JumpCostsSummary extends JDialog {
      * @since 0.50.10
      */
     private JPanel getUnitsSummary() {
-        JPanel cargoSummary = new JPanel();
-        cargoSummary.setLayout(new BoxLayout(cargoSummary, BoxLayout.Y_AXIS));
         String title = getTextAt(RESOURCE_BUNDLE, "TransportCostCalculations.report.header.units");
-        cargoSummary.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
+      JPanel cargoSummary = createSection(title);
         cargoSummary.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         boolean hasContents = false;
@@ -353,10 +336,8 @@ public class JumpCostsSummary extends JDialog {
      * @since 0.50.10
      */
     private JPanel getDropShipSummary() {
-        JPanel summary = new JPanel();
-        summary.setLayout(new BoxLayout(summary, BoxLayout.Y_AXIS));
         String title = getTextAt(RESOURCE_BUNDLE, "TransportCostCalculations.report.header.dropShipHiring");
-        summary.setBorder(RoundedLineBorder.createRoundedLineBorder(title));
+      JPanel summary = createSection(title);
         summary.setAlignmentX(Component.LEFT_ALIGNMENT);
 
         int totalAdditionalBaysRequired = calculations.getTotalAdditionalBaysRequired();
@@ -393,4 +374,18 @@ public class JumpCostsSummary extends JDialog {
 
         return summary;
     }
+
+      private static JPanel createSection(String title) {
+            JPanel section = new JPanel();
+            section.setLayout(new BoxLayout(section, BoxLayout.Y_AXIS));
+            section.setOpaque(false);
+            section.setBorder(BorderFactory.createCompoundBorder(
+                    BorderFactory.createMatteBorder(1, 0, 0, 0, SECTION_DIVIDER),
+                    BorderFactory.createEmptyBorder(PADDING, 0, PADDING, 0)));
+            JLabel heading = new JLabel(title);
+            heading.setAlignmentX(Component.LEFT_ALIGNMENT);
+            section.add(heading);
+            section.add(Box.createVerticalStrut(PADDING / 2));
+            return section;
+      }
 }

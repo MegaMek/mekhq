@@ -32,9 +32,6 @@
  */
 package mekhq.gui.commandGeneration.contents;
 
-import java.util.EnumMap;
-import java.util.EnumSet;
-import megamek.client.ui.util.UIUtil;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.getCommandGenerationResourceBundle;
 import static mekhq.gui.commandGeneration.components.CommandGenerationUtilities.wrapTooltip;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -43,8 +40,6 @@ import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.util.EnumMap;
-import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import javax.swing.*;
@@ -58,7 +53,6 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.enums.ForceNamingMethod;

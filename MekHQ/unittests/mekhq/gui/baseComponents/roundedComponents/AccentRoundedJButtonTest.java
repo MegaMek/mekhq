@@ -39,9 +39,8 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
-import org.junit.jupiter.api.Test;
-
 import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton.Accent;
+import org.junit.jupiter.api.Test;
 
 class AccentRoundedJButtonTest {
 

@@ -33,10 +33,10 @@
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import megamek.common.units.UnitType;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import megamek.common.units.UnitType;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.personnel.ranks.Rank;
 import org.junit.jupiter.api.Test;
