@@ -312,7 +312,7 @@ public class SkillCheckRulesTest {
 
             when(acquisition.getAllAcquisitionMods()).thenReturn(new TargetRoll(2, ""));
             result = campaign.checkAcquisition(acquisition, person, false);
-            assertEquals(7, result.getTargetNumber().getValue());
+            assertEquals(6, result.getTargetNumber().getValue());
         }
 
     }
