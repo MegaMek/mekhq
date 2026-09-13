@@ -41,7 +41,6 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
@@ -176,6 +175,8 @@ public class InsufficientAsTechsNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed due to insufficient AsTechs, {@code false} otherwise.
      */
     public static boolean checkNag(int asTechsNeeded) {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INSUFFICIENT_AS_TECHS) && hasAsTechsNeeded(asTechsNeeded);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INSUFFICIENT_AS_TECHS) &&
+                     !MekHQ.getMHQOptions().getNewDayAsTechPoolFill() &&
+                     hasAsTechsNeeded(asTechsNeeded);
     }
 }
