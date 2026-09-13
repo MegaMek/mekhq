@@ -130,7 +130,7 @@ class PersonnelEquipmentPage {
         cboMechanicDefaultToolKit = toolKitCombo("mechanicDefaultToolKit");
         cboAeroTechDefaultToolKit = toolKitCombo("aeroTechDefaultToolKit");
         cboBATechDefaultToolKit = toolKitCombo("baTechDefaultToolKit");
-        cboVesselCrewDefaultToolKit = toolKitCombo("VesselCrewDefaultToolKit");
+        cboVesselCrewDefaultToolKit = toolKitCombo("vesselCrewDefaultToolKit");
         cboAstechDefaultToolKit = toolKitCombo("astechDefaultToolKit");
         cboDoctorDefaultToolKit = toolKitCombo("doctorDefaultToolKit");
         cboMedicDefaultToolKit = toolKitCombo("medicDefaultToolKit");

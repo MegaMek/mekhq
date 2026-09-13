@@ -69,6 +69,13 @@ import org.w3c.dom.NodeList;
  * custom one there.
  */
 public class Ranks {
+    /**
+     * The bundle holding the MegaMek Data licence header written above exported rank systems.
+     *
+     * <p>Shared with the Life Path exporter. It used to be a bundle of its own, and when that file was renamed the
+     * key here moved but this name did not, so every export threw on the lookup after the XML declaration had gone out
+     * and left the user's file with nothing else in it.</p>
+     */
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Legal";
     private static final MMLogger LOGGER = MMLogger.create(Ranks.class);
 
