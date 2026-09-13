@@ -161,7 +161,7 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
      * The professions that receive a per-profession default equipment kit on recruitment: the four technician
      * professions (Astechs excluded), plus doctors and administrators for their medical and computer kits.
      */
-    public enum KitProfession {MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, ASTECH, DOCTOR, MEDIC, ADMIN}
+    public enum KitProfession {MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, VESSEL_CREW, ASTECH, DOCTOR, MEDIC, ADMIN}
 
     private EquipmentKitCatalog() {
     }
@@ -204,6 +204,10 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
             }
             if (role.isBATech()) {
                 professions.add(KitProfession.BA_TECH);
+                continue;
+            }
+            if (role.isVesselCrewMember()) {
+                professions.add(KitProfession.VESSEL_CREW);
                 continue;
             }
             if (role.isDoctor()) {

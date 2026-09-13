@@ -41,7 +41,6 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
@@ -179,6 +178,8 @@ public class InsufficientMedicsNagDialog extends ImmersiveDialogNag {
      * @return {@code true} if the nag dialog should be displayed due to insufficient medics, {@code false} otherwise.
      */
     public static boolean checkNag(int medicsRequired) {
-        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INSUFFICIENT_MEDICS) && hasMedicsNeeded(medicsRequired);
+        return !MekHQ.getMHQOptions().getNagDialogIgnore(NAG_INSUFFICIENT_MEDICS) &&
+                     !MekHQ.getMHQOptions().getNewDayMedicPoolFill() &&
+                     hasMedicsNeeded(medicsRequired);
     }
 }
