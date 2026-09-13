@@ -152,7 +152,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
 
         List<Person> trained = new ArrayList<>();
         for (Person person : detachment.getPersonnel().values()) {
-            if (person.hasSkill(SkillType.S_NEGOTIATION)) {
+            if (person.isActive() && person.hasSkill(SkillType.S_NEGOTIATION)) {
                 trained.add(person);
             }
         }
