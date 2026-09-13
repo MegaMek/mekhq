@@ -1,0 +1,147 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.gui.view;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
+import java.util.List;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JToolTip;
+import javax.swing.JViewport;
+import javax.swing.SwingUtilities;
+
+import mekhq.campaign.Campaign;
+import org.junit.jupiter.api.Test;
+import testUtilities.MHQTestUtilities;
+
+class PlanetViewPanelTest {
+    @Test
+    void administrationPathPreservesHierarchyOrder() {
+        assertEquals("Pesht Military District > Kagoshima Prefecture",
+              PlanetViewPanel.formatAdministrationPath(
+                    List.of("Pesht Military District", "Kagoshima Prefecture")));
+        assertEquals("", PlanetViewPanel.formatAdministrationPath(List.of()));
+    }
+
+    @Test
+    void administrationTooltipAppearsOnlyWhenClippedAndUsesDossierStyle() {
+        JLabel label = PlanetViewPanel.createClippedDossierValue(
+              "Tamarind March > Solihull Operational Area");
+        MouseEvent hover = new MouseEvent(label, MouseEvent.MOUSE_MOVED, 0, 0, 1, 1, 0, false);
+
+        label.setSize(label.getPreferredSize());
+        assertNull(label.getToolTipText(hover));
+
+        label.setSize(label.getPreferredSize().width - 1, label.getPreferredSize().height);
+        assertEquals(label.getText(), label.getToolTipText(hover));
+        JToolTip tooltip = label.createToolTip();
+        assertEquals(new Color(7, 16, 27), tooltip.getBackground());
+        assertEquals(new Color(218, 231, 235), tooltip.getForeground());
+        assertTrue(tooltip.getBorder() != null);
+    }
+
+    @Test
+    void animatedDossierResetsPreviouslyScrolledViewportBeforeReveal() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            Campaign campaign = MHQTestUtilities.getTestCampaign();
+            PlanetViewPanel panel = new PlanetViewPanel(campaign.getCurrentSystem(), campaign, 0, true);
+            JScrollPane scrollPane = new JScrollPane(panel);
+            JViewport viewport = scrollPane.getViewport();
+            viewport.setExtentSize(new Dimension(320, 200));
+            viewport.setViewSize(new Dimension(320, 1_000));
+            viewport.setViewPosition(new Point(0, 160));
+
+            panel.addNotify();
+            try {
+                assertTrue(viewport.getViewPosition().y == 0);
+                assertFalse(panel.isRevealAnimationRunning());
+                paintDossier(panel);
+                assertTrue(panel.isRevealAnimationRunning());
+            } finally {
+                panel.removeNotify();
+            }
+        });
+    }
+
+    @Test
+    void layoutAndScrollMovementsPreserveRevealUntilRemoval() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            Campaign campaign = MHQTestUtilities.getTestCampaign();
+            PlanetViewPanel panel = new PlanetViewPanel(campaign.getCurrentSystem(), campaign, 0, true);
+            JScrollPane scrollPane = new JScrollPane(panel);
+            JViewport viewport = scrollPane.getViewport();
+            viewport.setExtentSize(new Dimension(320, 200));
+            viewport.setViewSize(new Dimension(320, 1_000));
+            panel.addNotify();
+            try {
+                assertFalse(panel.isRevealAnimationRunning());
+                viewport.setViewPosition(new Point(0, 160));
+                viewport.setViewPosition(new Point(0, 0));
+                paintDossier(panel);
+                assertTrue(panel.isRevealAnimationRunning());
+                assertEquals(JViewport.SIMPLE_SCROLL_MODE, viewport.getScrollMode());
+
+                viewport.setExtentSize(new Dimension(300, 200));
+                assertTrue(panel.isRevealAnimationRunning());
+
+                viewport.setViewPosition(new Point(0, 16));
+                assertTrue(panel.isRevealAnimationRunning());
+            } finally {
+                panel.removeNotify();
+            }
+            assertFalse(panel.isRevealAnimationRunning());
+            assertEquals(JViewport.BLIT_SCROLL_MODE, viewport.getScrollMode());
+        });
+    }
+
+    private static void paintDossier(PlanetViewPanel panel) {
+        panel.setSize(320, 1_000);
+        BufferedImage image = new BufferedImage(320, 200, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        try {
+            panel.paint(graphics);
+        } finally {
+            graphics.dispose();
+        }
+    }
+}
