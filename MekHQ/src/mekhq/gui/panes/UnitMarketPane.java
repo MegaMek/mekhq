@@ -441,8 +441,8 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         return (getMarketTable().getSelectedRow() < 0) ?
                      null :
                      getMarketModel().getOffer(getMarketTable().convertRowIndexToModel(getMarketTable().getSelectedRow()))
-                           .map(UnitMarketOffer::getEntity)
-                           .orElse(null);
+                     .map(UnitMarketOffer::getEntity)
+                     .orElse(null);
     }
 
     /**
@@ -566,7 +566,7 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
                                                             String.format(resources.getString(
                                                                         "UnitMarketPane.UnitDeliveryLength.report") +
                                                                                 "</font>",
-                                                                  offer.getTransitDuration()));
+                                                                  transitDuration));
             }
             getCampaign().getUnitMarket().getOffers().remove(offer);
         }
@@ -587,7 +587,9 @@ public class UnitMarketPane extends AbstractMHQSplitPane {
         final Entity entity = getSelectedEntity();
         getEntityViewPane().updateDisplayedEntity(entity);
         getEntityImagePanel().updateDisplayedEntity(entity,
-              (entity == null) ? new Camouflage() : entity.getCamouflageOrElse(getCampaign().getPlayerForce().getCamouflage(), false));
+              (entity == null) ?
+                    new Camouflage() :
+                    entity.getCamouflageOrElse(getCampaign().getPlayerForce().getCamouflage(), false));
     }
 
     private void filterOffers() {
