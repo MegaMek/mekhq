@@ -36,6 +36,7 @@ import static mekhq.campaign.personnel.Person.MEKWARRIOR_AERO_RANSOM_VALUES;
 import static mekhq.campaign.personnel.Person.OTHER_RANSOM_VALUES;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
 import static mekhq.campaign.personnel.skills.SkillType.S_PILOT_MEK;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
@@ -206,7 +207,9 @@ class PrisonerMissionEndEventTest {
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
 
         Money actualValue = endEvent.getRansom(List.of(prisoner));
-        Money expectedValue = MEKWARRIOR_AERO_RANSOM_VALUES.get(SKILL_LEVEL - 1);
+        // Gunnery/Mek 3 and Piloting/Mek 3 average to 3, which is Green under the default Gunnery/Mek thresholds
+        // (Regular starts at 4)
+        Money expectedValue = MEKWARRIOR_AERO_RANSOM_VALUES.get(EXP_GREEN);
 
         // Assert
         assertEquals(expectedValue, actualValue);
@@ -246,7 +249,8 @@ class PrisonerMissionEndEventTest {
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
 
         Money actualValue = endEvent.getRansom(List.of(prisoner));
-        Money expectedValue = OTHER_RANSOM_VALUES.get(SKILL_LEVEL - 1);
+        // Small Arms 3 is Green under the default thresholds (Regular starts at 4)
+        Money expectedValue = OTHER_RANSOM_VALUES.get(EXP_GREEN);
 
         // Assert
         assertEquals(expectedValue, actualValue);

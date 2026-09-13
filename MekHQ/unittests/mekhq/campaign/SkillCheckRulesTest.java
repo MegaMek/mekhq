@@ -302,17 +302,23 @@ public class SkillCheckRulesTest {
             IAcquisitionWork acquisition = mock(IAcquisitionWork.class);
             when(options.get(CampaignOption.ACQUISITIONS_TYPE)).thenReturn(AcquisitionsType.valueOf(acquisitionType));
 
+            final int skillLevel = 5;
+            final int acquisitionModifier = 2;
             Person person = new Person(campaign);
-            person.addSkill(skillName, 5, 0);
+            person.addSkill(skillName, skillLevel, 0);
             when(acquisition.getAllAcquisitionMods()).thenReturn(new TargetRoll());
 
+            // The target number is the skill's base target minus the skill level. The three skills have different
+            // base targets, so derive the expectation from the skill type instead of hard-coding one number for all.
+            int expectedTargetNumber = SkillType.getType(skillName).getTarget() - skillLevel;
+
             SkillCheck result = campaign.checkAcquisition(acquisition, person, false);
-            assertEquals(5, result.getTargetNumber().getValue());
+            assertEquals(expectedTargetNumber, result.getTargetNumber().getValue());
             assertEquals(skillName, result.getSkillType().getName());
 
-            when(acquisition.getAllAcquisitionMods()).thenReturn(new TargetRoll(2, ""));
+            when(acquisition.getAllAcquisitionMods()).thenReturn(new TargetRoll(acquisitionModifier, ""));
             result = campaign.checkAcquisition(acquisition, person, false);
-            assertEquals(7, result.getTargetNumber().getValue());
+            assertEquals(expectedTargetNumber + acquisitionModifier, result.getTargetNumber().getValue());
         }
 
     }

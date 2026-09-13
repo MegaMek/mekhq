@@ -2208,7 +2208,7 @@ public class PersonTest {
                 Person person = new Person("GivenName", "Surname", null, "Faction");
                 person.addSkill(SkillType.S_GUN_MEK, 4, 0);
                 SkillCheck check = person.checkSkill(SkillType.S_GUN_MEK, true, true, LocalDate.of(3151, 1, 1));
-                assertEquals(3, check.getTargetNumber().getValue());
+                assertEquals(4, check.getTargetNumber().getValue());
             }
 
             @Test
@@ -2234,7 +2234,7 @@ public class PersonTest {
                 SkillCheck check = person.checkSkill(SkillType.S_GUN_MEK, campaign);
 
                 assertNotNull(check);
-                assertEquals(3, check.getTargetNumber().getValue());
+                assertEquals(4, check.getTargetNumber().getValue());
                 verify(campaign).getCampaignOptions();
                 verify(options).get(CampaignOption.USE_AGE_EFFECTS);
                 verify(campaign.getPlayerForce()).isClanForce();

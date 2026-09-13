@@ -1497,25 +1497,24 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunneryMek() {
         return new SkillType(S_GUN_MEK,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1532,25 +1531,24 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunneryAero() {
         return new SkillType(S_GUN_AERO,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1567,25 +1565,24 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunneryJet() {
         return new SkillType(S_GUN_JET,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1602,25 +1599,24 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunnerySpace() {
         return new SkillType(S_GUN_SPACE,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1637,7 +1633,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1654,7 +1650,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1671,7 +1667,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1688,96 +1684,92 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunneryVehicle() {
         return new SkillType(S_GUN_VEE,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createArtillery() {
         return new SkillType(S_ARTILLERY,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               INTELLIGENCE,
               WILLPOWER,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunneryBA() {
         return new SkillType(S_GUN_BA,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createGunneryProto() {
         return new SkillType(S_GUN_PROTO,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createSmallArms() {
         return new SkillType(S_SMALL_ARMS,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
               NO_ATTRIBUTE,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1795,14 +1787,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechMek() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_MEK,
-              10,
+              9,
               false,
               SUPPORT_TECHNICIAN,
               DEXTERITY,
@@ -1813,15 +1805,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechVehicle() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_VEHICLE,
-              10,
+              9,
               false,
               SUPPORT_TECHNICIAN,
               DEXTERITY,
@@ -1832,15 +1823,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechAero() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_AERO,
-              10,
+              9,
               false,
               SUPPORT_TECHNICIAN,
               DEXTERITY,
@@ -1851,15 +1841,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechBA() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_BA,
-              10,
+              9,
               false,
               SUPPORT_TECHNICIAN,
               DEXTERITY,
@@ -1870,15 +1859,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechVessel() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_VESSEL,
-              10,
+              9,
               false,
               SUPPORT_TECHNICIAN,
               DEXTERITY,
@@ -1889,15 +1877,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechMilitary() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_MILITARY,
-              10,
+              9,
               false,
               ROLEPLAY_GENERAL,
               DEXTERITY,
@@ -1908,15 +1895,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechCivilian() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_CIVILIAN,
-              10,
+              9,
               false,
               ROLEPLAY_GENERAL,
               DEXTERITY,
@@ -1927,15 +1913,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechElectronic() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_ELECTRONIC,
-              10,
+              9,
               false,
               UTILITY,
               DEXTERITY,
@@ -1946,15 +1931,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechNuclear() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_NUCLEAR,
-              10,
+              9,
               false,
               UTILITY,
               DEXTERITY,
@@ -1965,15 +1949,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechAeronautics() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_AERONAUTICS,
-              10,
+              9,
               false,
               UTILITY,
               DEXTERITY,
@@ -1984,15 +1967,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechMechanical() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_MECHANICAL,
-              10,
+              9,
               false,
               UTILITY,
               DEXTERITY,
@@ -2003,15 +1985,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechMyomer() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_MYOMER,
-              10,
+              9,
               false,
               UTILITY,
               DEXTERITY,
@@ -2022,15 +2003,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechJets() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_JETS,
-              10,
+              9,
               false,
               UTILITY,
               DEXTERITY,
@@ -2041,15 +2021,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechWeapons() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_WEAPONS,
-              10,
+              9,
               false,
               UTILITY,
               DEXTERITY,
@@ -2060,15 +2039,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createTechCybernetics() {
         // This skill corresponds to the ATOW skill 'Technician'
         return new SkillType(S_TECH_CYBERNETICS,
-              10,
+              9,
               false,
               ROLEPLAY_GENERAL,
               DEXTERITY,
@@ -2079,15 +2057,14 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createAstech() {
         // This doesn't correspond to an ATOW skill, so we went with INTELLIGENCE as the tech equivalent of MedTech
         return new SkillType(S_ASTECH,
-              10,
+              7,
               false,
               SUPPORT_TECHNICIAN,
               INTELLIGENCE,
@@ -2098,9 +2075,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2118,8 +2093,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 16, 8, 0, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2136,9 +2110,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 16, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2156,7 +2128,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2173,7 +2145,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2190,13 +2162,13 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
     public static SkillType createAdmin() {
         return new SkillType(S_ADMIN,
-              10,
+              8,
               false,
               SUPPORT,
               INTELLIGENCE,
@@ -2207,8 +2179,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 0, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2225,7 +2196,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2242,7 +2213,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2316,17 +2287,17 @@ public class SkillType {
 
     public static SkillType createArchery() {
         return new SkillType(S_ARCHERY,
-              7,
+              8,
               false,
               COMBAT_GUNNERY,
               DEXTERITY,
               NO_ATTRIBUTE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -2561,12 +2532,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               DEXTERITY,
               INTELLIGENCE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -3071,12 +3042,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -3498,12 +3469,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -3515,12 +3486,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               DEXTERITY,
               NO_ATTRIBUTE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -3532,12 +3503,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               DEXTERITY,
               NO_ATTRIBUTE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
