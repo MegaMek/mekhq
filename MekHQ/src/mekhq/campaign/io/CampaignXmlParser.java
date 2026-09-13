@@ -2793,19 +2793,20 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         if (primary) {
+            reportInvalidProfession(person, campaign, "ineligibleForPrimaryRole", person.getPrimaryRole());
             person.setPrimaryRole(today, PersonnelRole.NONE);
-            reportInvalidProfession(person, campaign, "ineligibleForPrimaryRole");
         } else {
+            reportInvalidProfession(person, campaign, "ineligibleForSecondaryRole", person.getSecondaryRole());
             person.setSecondaryRole(PersonnelRole.NONE);
-            reportInvalidProfession(person, campaign, "ineligibleForSecondaryRole");
         }
     }
 
-    private static void reportInvalidProfession(Person person, Campaign campaign, String key) {
+    private static void reportInvalidProfession(Person person, Campaign campaign, String key, PersonnelRole role) {
         campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, key,
               spanOpeningWithCustomColor(getWarningColor()),
               CLOSING_SPAN_TAG,
-              person.getHyperlinkedFullTitle()));
+              person.getHyperlinkedFullTitle(),
+              role));
     }
 
     //region Migration Methods
