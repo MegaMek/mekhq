@@ -320,6 +320,8 @@ public final class CampaignOption<T> {
           of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "aeroTechDefaultToolKit");
     public static final CampaignOption<String> BA_TECH_DEFAULT_TOOL_KIT =
           of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "baTechDefaultToolKit");
+    public static final CampaignOption<String> VESSEL_CREW_DEFAULT_TOOL_KIT =
+          of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "vesselCrewDefaultToolKit");
     public static final CampaignOption<String> ASTECH_DEFAULT_TOOL_KIT =
           of(String.class, EquipmentKitCatalog.NO_DEFAULT_KIT, "asTechDefaultToolKit");
     public static final CampaignOption<String> DOCTOR_DEFAULT_TOOL_KIT =
