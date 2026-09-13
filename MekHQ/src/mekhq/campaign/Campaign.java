@@ -198,6 +198,7 @@ import mekhq.campaign.parts.protomeks.ProtoMekArmor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -361,8 +362,9 @@ public class Campaign implements ITechManager {
     // We deliberately don't write this data to the save file as we want it rebuilt
     // every time the campaign loads. This ensures updates can be applied and there is no risk of
     // bugs being permanently locked into the campaign file.
-    RandomEventLibraries randomEventLibraries;
-    FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+    private RandomEventLibraries randomEventLibraries;
+    private FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+    private Map<UUID, LifePath> lifePathLibrary = new HashMap<>();
 
     private Map<Integer, List<WarriorsAlmanacEntry>> partsAlmanac;
     private Map<Integer, List<WarriorsAlmanacEntry>> unitsAlmanac;
@@ -414,6 +416,7 @@ public class Campaign implements ITechManager {
               campConf.getfinances(),
               campConf.getRandomEvents(),
               campConf.getUltimatums(),
+              campConf.getLifePaths(),
               campConf.getRetDefTracker(),
               campConf.getAutosave(),
               campConf.getBehaviorSettings(),
@@ -431,7 +434,7 @@ public class Campaign implements ITechManager {
           Faction faction, megamek.common.enums.Faction techFaction, CurrencyManager currencyManager,
           Systems systemsInstance, AbstractLocation startLocation, ForceReputationController reputationController,
           FactionStandings factionStandings, RankSystem rankSystem, Formation formation, Finances finances,
-          RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums,
+          RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums, Map<UUID, LifePath> lifePaths,
           RetirementDefectionTracker retDefTracker, IAutosaveService autosave,
           BehaviorSettings behaviorSettings,
           AbstractUnitMarket unitMarket,
@@ -462,6 +465,7 @@ public class Campaign implements ITechManager {
         playerForce.getFormationIds().put(0, formation);
         randomEventLibraries = randomEvents;
         factionStandingUltimatumsLibrary = ultimatums;
+        lifePathLibrary = lifePaths;
         getPlayerForce().getHumanResources().setRetirementDefectionTracker(retDefTracker);
         autosaveService = autosave;
         autoResolveBehaviorSettings = behaviorSettings;
@@ -3676,6 +3680,18 @@ public class Campaign implements ITechManager {
 
     public void setUnitsAlmanac(Map<Integer, List<WarriorsAlmanacEntry>> unitsAlmanac) {
         this.unitsAlmanac = unitsAlmanac;
+    }
+
+    public Map<UUID, LifePath> getLifePathLibrary() {
+        return lifePathLibrary;
+    }
+
+    public @Nullable LifePath getSingleLifePath(UUID lifePathID) {
+        return lifePathLibrary.get(lifePathID);
+    }
+
+    public void setLifePathLibrary(Map<UUID, LifePath> lifePathLibrary) {
+        this.lifePathLibrary = lifePathLibrary;
     }
 
     public void writeToXML(final PrintWriter writer, boolean isBugReportPrep) {
