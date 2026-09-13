@@ -74,6 +74,9 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.event.HyperlinkEvent;
 import javax.swing.event.HyperlinkEvent.EventType;
 import javax.swing.plaf.basic.BasicHTML;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.codeUtilities.MathUtility;
@@ -599,7 +602,7 @@ public class ImmersiveDialogCore extends JDialog {
     private JEditorPane getJEditorPane(String centerMessage, JPanel buttonPanel) {
         int preferredWidth = max(buttonPanel.getPreferredSize().width, CENTER_WIDTH) + (getPadding() * 2);
         JEditorPane editorPane = new ResponsiveHtmlEditorPane(preferredWidth);
-        editorPane.setContentType("text/html");
+        configureHtmlEditorPane(editorPane);
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
         editorPane.setOpaque(false);
@@ -738,7 +741,7 @@ public class ImmersiveDialogCore extends JDialog {
         width += rightSpeaker != null ? IMAGE_WIDTH + PADDING : 0;
 
         JEditorPane editorPane = new ResponsiveHtmlEditorPane(width);
-        editorPane.setContentType("text/html");
+        configureHtmlEditorPane(editorPane);
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
         editorPane.setOpaque(false);
@@ -750,6 +753,20 @@ public class ImmersiveDialogCore extends JDialog {
                                                "<body><div>%s</div></body></html>",
               outOfCharacterMessage));
         return editorPane;
+    }
+
+    private void configureHtmlEditorPane(JEditorPane editorPane) {
+        StyleSheet styleSheet = new StyleSheet();
+        styleSheet.addRule("body, div, p, span { background-color: transparent; }");
+        styleSheet.addRule("body { margin: 0; padding: 0; }");
+        styleSheet.addRule("p { margin: 0 0 0.5em 0; }");
+
+        HTMLEditorKit editorKit = new HTMLEditorKit();
+        editorKit.setStyleSheet(styleSheet);
+        editorPane.setEditorKit(editorKit);
+        editorPane.setDocument(new HTMLDocument(styleSheet));
+        editorPane.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
+        editorPane.setOpaque(false);
     }
 
     static final class ResponsiveHtmlEditorPane extends JEditorPane {

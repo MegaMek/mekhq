@@ -43,21 +43,21 @@ import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.SkillLevel;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.ranks.Rank;
-import megamek.common.enums.SkillLevel;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
-import megamek.common.units.UnitType;
 
 /**
  * Tree-aware rank assignment pass for the Force Generator pipeline.

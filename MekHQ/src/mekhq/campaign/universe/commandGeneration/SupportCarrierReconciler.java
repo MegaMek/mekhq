@@ -48,7 +48,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.EchelonProfile;
-import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSection;
 import mekhq.campaign.universe.commandGeneration.ratgen.FormationIconBuilder;
 
 /**

@@ -694,6 +694,15 @@ public class Planet {
         return getEventData(when, null, e -> e.faction);
     }
 
+    public @Nonnull List<String> getAdministration(LocalDate when) {
+        SourceableValue<List<String>> sourced = getSourcedAdministration(when);
+        return ((sourced == null) || (sourced.getValue() == null)) ? List.of() : List.copyOf(sourced.getValue());
+    }
+
+    public @Nullable SourceableValue<List<String>> getSourcedAdministration(LocalDate when) {
+        return getEventData(when, null, event -> event.administration);
+    }
+
     private static Set<Faction> getFactionsFrom(Collection<String> codes) {
         if (null == codes) {
             return Collections.emptySet();
@@ -981,6 +990,8 @@ public class Planet {
 
         @JsonProperty("faction")
         public SourceableValue<List<String>> faction;
+        @JsonProperty("administration")
+        public SourceableValue<List<String>> administration;
         @JsonIgnore
         public Set<Faction> factions;
         @JsonProperty("lifeForm")
@@ -1013,6 +1024,7 @@ public class Planet {
 
         public void copyDataFrom(PlanetaryEvent other) {
             faction = ObjectUtility.nonNull(other.faction, faction);
+            administration = ObjectUtility.nonNull(other.administration, administration);
             if (null != other.faction) {
                 factions = updateFactions(factions, faction.getValue(), other.faction.getValue());
             }
@@ -1048,6 +1060,7 @@ public class Planet {
         /** @return <code>true</code> if the event doesn't contain any change */
         public boolean isEmpty() {
             return (null == faction) &&
+                         (null == administration) &&
                          (null == hpg) &&
                          (null == lifeForm) &&
                          (null == message) &&
@@ -1086,7 +1099,10 @@ public class Planet {
             if (null != planet.eventList) {
                 for (PlanetaryEvent event : planet.eventList) {
                     if ((null != event) && (null != event.date)) {
-                        planet.events.put(event.date, event);
+                        planet.events.merge(event.date, event, (existing, additional) -> {
+                            existing.copyDataFrom(additional);
+                            return existing;
+                        });
                     }
                 }
                 planet.eventList.clear();
