@@ -294,4 +294,3 @@ public class LanceAssignmentView extends JPanel {
         return 0;
     };
 }
-

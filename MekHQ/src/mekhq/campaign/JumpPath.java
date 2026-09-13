@@ -159,13 +159,8 @@ public class JumpPath {
      */
     public double getTotalRechargeTime(LocalDate when, boolean isUseCommandCircuit) {
         int rechargeTime = 0;
-        for (PlanetarySystem system : path) {
-            if (system.equals(getFirstSystem())) {
-                continue;
-            }
-            if (system.equals(getLastSystem())) {
-                continue;
-            }
+        for (int index = 1; index < path.size() - 1; index++) {
+            PlanetarySystem system = path.get(index);
             rechargeTime += (int) Math.ceil(system.getRechargeTime(when, isUseCommandCircuit));
         }
         return rechargeTime / 24.0;
