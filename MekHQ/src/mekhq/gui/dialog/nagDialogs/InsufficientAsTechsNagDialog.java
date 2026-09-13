@@ -41,7 +41,6 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNag;
 
