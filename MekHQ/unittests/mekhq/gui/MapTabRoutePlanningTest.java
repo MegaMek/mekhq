@@ -34,6 +34,8 @@ package mekhq.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -42,7 +44,9 @@ import java.util.List;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.NavigationRouteAnalysis.PathAssessment;
 import mekhq.campaign.NavigationRouteAnalysis.Severity;
+import mekhq.campaign.RouteAlternativesPlanner.PlanningResult;
 import mekhq.campaign.RouteAlternativesPlanner.PlanningStatus;
+import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
 
@@ -96,6 +100,23 @@ class MapTabRoutePlanningTest {
         assertFalse(MapTab.canQuickPlotRoute(null, fleetSystem));
         assertFalse(MapTab.canQuickPlotRoute(destination, null));
         assertFalse(MapTab.canQuickPlotRoute(fleetSystem, fleetSystem));
+    }
+
+    @Test
+    void quickPlotTargetsSelectedPlanetOnlyWhenProvided() {
+        PlanetarySystem origin = new PlanetarySystem("Origin");
+        PlanetarySystem destination = new PlanetarySystem("Destination");
+        Planet targetPlanet = new Planet("target-planet");
+        targetPlanet.setParentSystem(destination);
+        RoutePlanningIntent intent = new RoutePlanningIntent(origin);
+        RoutePlanningIntent.SegmentPlanner planner = (segmentOrigin, segmentDestination) ->
+              PlanningResult.found(path(segmentOrigin, segmentDestination));
+
+        assertTrue(MapTab.plotQuickRoute(intent, origin, destination, targetPlanet, planner).changed());
+        assertSame(targetPlanet, intent.getJumpPath().getTargetPlanet());
+
+        assertTrue(MapTab.plotQuickRoute(intent, origin, destination, null, planner).changed());
+        assertNull(intent.getJumpPath().getTargetPlanet());
     }
 
     @Test

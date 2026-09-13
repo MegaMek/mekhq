@@ -80,6 +80,7 @@ import javax.swing.Timer;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
@@ -229,10 +230,20 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
                             && (routeAssessment.severity() != Severity.BLOCKED);
         }
 
-                    static boolean canQuickPlotRoute(PlanetarySystem selectedSystem, PlanetarySystem campaignCurrentSystem) {
+                                        static boolean canQuickPlotRoute(PlanetarySystem selectedSystem, PlanetarySystem campaignCurrentSystem) {
                   return (selectedSystem != null) && (campaignCurrentSystem != null)
                           && !Objects.equals(selectedSystem, campaignCurrentSystem);
                 }
+
+        static ChangeResult plotQuickRoute(RoutePlanningIntent intent, PlanetarySystem origin,
+                    PlanetarySystem destination, @Nullable Planet destinationPlanet,
+                    RoutePlanningIntent.SegmentPlanner planner) {
+                if ((destinationPlanet != null)
+                            && Objects.equals(destination, destinationPlanet.getParentSystem())) {
+                        return intent.plotToPlanet(origin, destinationPlanet, planner);
+                }
+                return intent.plot(origin, destination, planner);
+        }
 
             static String quickPlotResourceKey(boolean hasProposedPath) {
                 return hasProposedPath ? "routeStrip.replot.text" : "routeStrip.plot.text";
@@ -373,7 +384,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         navigationHud.add(suggestPlanet, constraints);
 
                 btnQuickPlotCourse = createHudButton("routeStrip.plot.text", "routeStrip.plot.toolTipText");
-                btnQuickPlotCourse.addActionListener(event -> plotRouteToSelectedSystem());
+                btnQuickPlotCourse.addActionListener(event -> plotRouteToSelectedDestination());
                 constraints = new GridBagConstraints();
                 constraints.gridx = 2;
                 constraints.gridy = 0;
@@ -1026,10 +1037,13 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
             case WHAT_IF_ROUTE -> "routeStrip.whatIfRoute.text";
             case IN_TRANSIT -> "routeStrip.inTransit.text";
           });
-        PlanetarySystem destination = displayedPath.getLastSystem();
-        String destinationName = (destination == null)
-              ? unavailable
-              : destination.getPrintableName(getCampaign().getLocalDate());
+          PlanetarySystem destination = displayedPath.getLastSystem();
+          Planet destinationPlanet = displayedPath.getTargetPlanet();
+          String destinationName = (destinationPlanet != null)
+              ? destinationPlanet.getPrintableName(getCampaign().getLocalDate())
+              : (destination == null)
+                  ? unavailable
+                  : destination.getPrintableName(getCampaign().getLocalDate());
         String destinationText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.destination.text") + "  " + destinationName;
         String jumpsText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, isPlannedRoute
               ? "routeStrip.jumps.text"
@@ -1264,14 +1278,15 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         }
     }
 
-    private void plotRouteToSelectedSystem() {
+    private void plotRouteToSelectedDestination() {
         PlanetarySystem origin = getCampaign().getCurrentSystem();
         PlanetarySystem destination = panMap.getSelectedSystem();
         if (!canQuickPlotRoute(destination, origin)) {
             return;
         }
-        applyRoutePlanningChange(routePlanningIntent.plot(origin, destination, this::calculateRouteSegment),
-              destination);
+        Planet destinationPlanet = mapView.getView() == panSystem ? panSystem.getSelectedPlanet() : null;
+        applyRoutePlanningChange(plotQuickRoute(routePlanningIntent, origin, destination, destinationPlanet,
+              this::calculateRouteSegment), destination);
     }
 
     @Override

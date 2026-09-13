@@ -327,7 +327,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     private DossierSection getWorldProfilePanel(Planet planet) {
-        DossierSection section = new DossierSection("section.worldProfile.text");
+        DossierSection section = createDossierSection("section.worldProfile.text");
         LocalDate currentDate = campaign.getLocalDate();
 
         JLabel lblOwner = new JLabel("<html><nobr><i>" +
@@ -412,7 +412,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     private DossierSection getEnvironmentPanel(Planet planet) {
-        DossierSection section = new DossierSection("section.environment.text");
+        DossierSection section = createDossierSection("section.environment.text");
         LocalDate currentDate = campaign.getLocalDate();
 
         // Gravity
@@ -464,7 +464,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     private DossierSection getInfrastructurePanel(Planet planet, Set<InjuryType> activeDiseases) {
-        DossierSection section = new DossierSection("section.infrastructure.text");
+        DossierSection section = createDossierSection("section.infrastructure.text");
         LocalDate currentDate = campaign.getLocalDate();
 
         // HPG status
@@ -533,7 +533,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     private DossierSection getReferencePanel(Planet planet) {
-        DossierSection section = new DossierSection("section.reference.text");
+        DossierSection section = createDossierSection("section.reference.text");
         JTextPane txtDesc = createHtmlTextPane(MarkdownRenderer.getRenderedHtml(planet.getDescription()));
         section.addFullWidth(txtDesc);
         return section;
@@ -602,6 +602,18 @@ public class PlanetViewPanel extends JScrollablePanel {
         RevealBandPanel panel = new RevealBandPanel();
         registerRevealBand(panel, revealDelay, revealDuration);
         return panel;
+    }
+
+    private DossierSection createDossierSection(String headingKey) {
+        DossierSection section = new DossierSection();
+        long revealDelay = SECTION_REVEAL_INITIAL_DELAY_NS +
+                                 (detailRevealIndex++ * SECTION_REVEAL_STAGGER_NS);
+        registerRevealBand(section, revealDelay, SECTION_REVEAL_DURATION_NS);
+
+        GridBagConstraints constraints = createFullWidthConstraints(0);
+        constraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(6), 0);
+        section.add(createSectionHeading(headingKey), constraints);
+        return section;
     }
 
     private void registerRevealBand(RevealBandPanel panel, long revealDelay, long revealDuration) {
@@ -733,22 +745,15 @@ public class PlanetViewPanel extends JScrollablePanel {
         }
     }
 
-    private final class DossierSection extends RevealBandPanel {
+    private static final class DossierSection extends RevealBandPanel {
         private int row = 1;
 
-        private DossierSection(String headingKey) {
+        private DossierSection() {
             setLayout(new GridBagLayout());
-            long revealDelay = SECTION_REVEAL_INITIAL_DELAY_NS +
-                                     (detailRevealIndex++ * SECTION_REVEAL_STAGGER_NS);
-            registerRevealBand(this, revealDelay, SECTION_REVEAL_DURATION_NS);
             setBorder(BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(UIUtil.scaleForGUI(1), 0, 0, 0, DOSSIER_DIVIDER),
                 BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(9), HORIZONTAL_PADDING,
                     UIUtil.scaleForGUI(10), HORIZONTAL_PADDING)));
-
-            GridBagConstraints constraints = createFullWidthConstraints(0);
-            constraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(6), 0);
-            add(createSectionHeading(headingKey), constraints);
         }
 
         private boolean hasContent() {

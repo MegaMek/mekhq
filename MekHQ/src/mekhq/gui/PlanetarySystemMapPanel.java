@@ -62,6 +62,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.units.Dropship;
 import megamek.common.units.Jumpship;
@@ -643,6 +644,10 @@ public class PlanetarySystemMapPanel extends JPanel {
      */
     public int getSelectedPlanetPosition() {
         return selectedPlanet;
+    }
+
+    public @Nullable Planet getSelectedPlanet() {
+        return system.getPlanet(selectedPlanet);
     }
 
     /**

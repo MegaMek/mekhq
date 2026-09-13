@@ -36,7 +36,6 @@ import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.swing.*;
 
 import megamek.client.ui.util.UIUtil;
