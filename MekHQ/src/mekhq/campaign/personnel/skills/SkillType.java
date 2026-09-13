@@ -1497,7 +1497,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1509,13 +1509,12 @@ public class SkillType {
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1532,7 +1531,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1544,13 +1543,12 @@ public class SkillType {
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1567,7 +1565,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1579,13 +1577,12 @@ public class SkillType {
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1602,7 +1599,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1614,13 +1611,12 @@ public class SkillType {
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1637,7 +1633,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1654,7 +1650,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1671,7 +1667,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1688,7 +1684,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1700,13 +1696,12 @@ public class SkillType {
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1718,13 +1713,12 @@ public class SkillType {
               INTELLIGENCE,
               WILLPOWER,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1736,13 +1730,12 @@ public class SkillType {
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1754,13 +1747,12 @@ public class SkillType {
               REFLEXES,
               DEXTERITY,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 16, 8, 8, 8, 8, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1772,12 +1764,12 @@ public class SkillType {
               DEXTERITY,
               NO_ATTRIBUTE,
               2,
-              null,
-              null,
-              null,
-              null,
-              null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              4,
+              5,
+              6,
+              7,
+              9,
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1795,7 +1787,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1813,8 +1805,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1832,8 +1823,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1851,8 +1841,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1870,8 +1859,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1889,8 +1877,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1908,8 +1895,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1927,8 +1913,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1946,8 +1931,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1965,8 +1949,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -1984,8 +1967,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2003,8 +1985,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2022,8 +2003,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2041,8 +2021,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2060,8 +2039,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2079,8 +2057,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 0, 6, 6, 6, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2098,9 +2075,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2118,8 +2093,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 16, 8, 0, 8, 8, 8, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2136,9 +2110,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 16, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2156,7 +2128,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2173,7 +2145,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2190,7 +2162,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2207,8 +2179,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 0, 4, 4, 4, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL,
-                              DISABLED_SKILL_LEVEL, DISABLED_SKILL_LEVEL }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2225,7 +2196,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 12, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6 }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2242,7 +2213,7 @@ public class SkillType {
               null,
               null,
               null,
-              new Integer[] { 8, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4 }
+              new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
 
@@ -2321,12 +2292,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               DEXTERITY,
               NO_ATTRIBUTE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -2561,12 +2532,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               DEXTERITY,
               INTELLIGENCE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -3071,12 +3042,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -3498,12 +3469,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               REFLEXES,
               DEXTERITY,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -3515,12 +3486,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               DEXTERITY,
               NO_ATTRIBUTE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
@@ -3532,12 +3503,12 @@ public class SkillType {
               COMBAT_GUNNERY,
               DEXTERITY,
               NO_ATTRIBUTE,
-              null,
-              null,
-              null,
-              null,
-              null,
-              null,
+              2,
+              4,
+              5,
+              6,
+              7,
+              9,
               new Integer[] { 20, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 }
         );
     }
