@@ -38,6 +38,9 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 
 import megamek.Version;
@@ -61,6 +64,8 @@ import mekhq.campaign.io.CampaignXmlParser;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.unitMarket.DisabledUnitMarket;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePathIO;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.DisabledRandomDivorce;
 import mekhq.campaign.personnel.marriage.DisabledRandomMarriage;
@@ -184,6 +189,7 @@ public class CampaignFactory {
         Finances finances = new Finances();
         RandomEventLibraries randomEvents = null;
         FactionStandingUltimatumsLibrary ultimatums = null;
+        Map<UUID, LifePath> lifePaths = new HashMap<>();
 
         RetirementDefectionTracker retirementDefectionTracker = new RetirementDefectionTracker();
         AutosaveService autosave = new AutosaveService();
@@ -232,6 +238,7 @@ public class CampaignFactory {
                   finances,
                   randomEvents,
                   ultimatums,
+                    lifePaths,
                   retirementDefectionTracker,
                   autosave,
                   behaviorSettings,
@@ -324,6 +331,17 @@ public class CampaignFactory {
             campaign = new Campaign(campaignConfig);
         } catch (Exception e) {
             LOGGER.error("Unable to create campaign.", e);
+        }
+
+        if (campaign != null) {
+            try {
+                Map<UUID, LifePath> lifePathLibrary = LifePathIO.loadAllLifePaths(campaign);
+                campaignConfig.setLifePathLibrary(lifePathLibrary);
+                campaign.setLifePathLibrary(lifePathLibrary);
+            } catch (Exception ex) {
+                LOGGER.error("Unable to initialize Life Path Library. If this wasn't during automated testing this " +
+                                   "must be investigated.", ex);
+            }
         }
 
         return campaign;

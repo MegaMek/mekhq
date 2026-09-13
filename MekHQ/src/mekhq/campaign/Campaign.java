@@ -198,6 +198,7 @@ import mekhq.campaign.parts.protomeks.ProtoMekArmor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
+import mekhq.campaign.personnel.advancedCharacterBuilder.LifePath;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -361,8 +362,9 @@ public class Campaign implements ITechManager {
     // We deliberately don't write this data to the save file as we want it rebuilt
     // every time the campaign loads. This ensures updates can be applied and there is no risk of
     // bugs being permanently locked into the campaign file.
-    RandomEventLibraries randomEventLibraries;
-    FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+    private RandomEventLibraries randomEventLibraries;
+    private FactionStandingUltimatumsLibrary factionStandingUltimatumsLibrary;
+    private Map<UUID, LifePath> lifePathLibrary = new HashMap<>();
 
     private Map<Integer, List<WarriorsAlmanacEntry>> partsAlmanac;
     private Map<Integer, List<WarriorsAlmanacEntry>> unitsAlmanac;
@@ -414,6 +416,7 @@ public class Campaign implements ITechManager {
               campConf.getfinances(),
               campConf.getRandomEvents(),
               campConf.getUltimatums(),
+              campConf.getLifePaths(),
               campConf.getRetDefTracker(),
               campConf.getAutosave(),
               campConf.getBehaviorSettings(),
@@ -431,7 +434,7 @@ public class Campaign implements ITechManager {
           Faction faction, megamek.common.enums.Faction techFaction, CurrencyManager currencyManager,
           Systems systemsInstance, AbstractLocation startLocation, ForceReputationController reputationController,
           FactionStandings factionStandings, RankSystem rankSystem, Formation formation, Finances finances,
-          RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums,
+          RandomEventLibraries randomEvents, FactionStandingUltimatumsLibrary ultimatums, Map<UUID, LifePath> lifePaths,
           RetirementDefectionTracker retDefTracker, IAutosaveService autosave,
           BehaviorSettings behaviorSettings,
           AbstractUnitMarket unitMarket,
@@ -462,6 +465,7 @@ public class Campaign implements ITechManager {
         playerForce.getFormationIds().put(0, formation);
         randomEventLibraries = randomEvents;
         factionStandingUltimatumsLibrary = ultimatums;
+        lifePathLibrary = lifePaths;
         getPlayerForce().getHumanResources().setRetirementDefectionTracker(retDefTracker);
         autosaveService = autosave;
         autoResolveBehaviorSettings = behaviorSettings;
@@ -3678,6 +3682,18 @@ public class Campaign implements ITechManager {
         this.unitsAlmanac = unitsAlmanac;
     }
 
+    public Map<UUID, LifePath> getLifePathLibrary() {
+        return lifePathLibrary;
+    }
+
+    public @Nullable LifePath getSingleLifePath(UUID lifePathID) {
+        return lifePathLibrary.get(lifePathID);
+    }
+
+    public void setLifePathLibrary(Map<UUID, LifePath> lifePathLibrary) {
+        this.lifePathLibrary = lifePathLibrary;
+    }
+
     public void writeToXML(final PrintWriter writer, boolean isBugReportPrep) {
         int indent = 0;
 
@@ -5204,13 +5220,7 @@ public class Campaign implements ITechManager {
         entity.setShutDown(false);
         entity.setSearchlightState(false);
 
-        if (!entity.getSensors().isEmpty()) {
-            if (entity.hasBAP()) {
-                entity.setNextSensor(entity.getSensors().lastElement());
-            } else {
-                entity.setNextSensor(entity.getSensors().firstElement());
-            }
-        }
+        resetSensorChoice(entity);
 
         if (entity instanceof IBomber bomber) {
             List<BombMounted> mountedBombs = bomber.getBombs();
@@ -5254,6 +5264,31 @@ public class Campaign implements ITechManager {
         // TODO: still a lot of stuff to do here, but oh well
         entity.setOwner(player);
         entity.setGame(game);
+    }
+
+    /**
+     * Puts a unit's sensor back to the one it should start a battle on.
+     *
+     * <p>A sensor the player chose themselves is left alone. That means the sensor picked in the MegaMek lobby, and
+     * any sensor saved against this chassis and model, which the unit file parser applies as the unit loads. Without
+     * this check the campaign would hand every unit back its active probe, or radar when it has no probe, undoing
+     * the choice before the game even starts.</p>
+     *
+     * <p>Example: a player saves Infrared for the Marauder MAD-3R. Their MAD-3R deploys on Mek IR. A Griffin
+     * GRF-1N with nothing saved still deploys on Mek Radar exactly as it always did.</p>
+     *
+     * @param entity the unit being readied for a game
+     */
+    // Package-private rather than private so the rule can be tested without standing up a whole Campaign
+    static void resetSensorChoice(Entity entity) {
+        if (entity.getSensors().isEmpty() || entity.hasCustomSensorChoice()) {
+            return;
+        }
+        if (entity.hasBAP()) {
+            entity.setNextSensor(entity.getSensors().lastElement());
+        } else {
+            entity.setNextSensor(entity.getSensors().firstElement());
+        }
     }
 
     /**

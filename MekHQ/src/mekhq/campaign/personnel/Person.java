@@ -54,6 +54,13 @@ import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
 import static mekhq.campaign.log.LogEntryType.PATIENT;
 import static mekhq.campaign.log.LogEntryType.PERFORMANCE;
+import static mekhq.campaign.personnel.ATOWTraits.BLOODMARK;
+import static mekhq.campaign.personnel.ATOWTraits.CONNECTIONS;
+import static mekhq.campaign.personnel.ATOWTraits.CONNECTIONS_TARGET_NUMBER;
+import static mekhq.campaign.personnel.ATOWTraits.EXTRA_INCOME;
+import static mekhq.campaign.personnel.ATOWTraits.FAME;
+import static mekhq.campaign.personnel.ATOWTraits.UNLUCKY;
+import static mekhq.campaign.personnel.ATOWTraits.WEALTH;
 import static mekhq.campaign.personnel.PersonnelOptions.*;
 import static mekhq.campaign.personnel.education.EducationController.getAcademy;
 import static mekhq.campaign.personnel.enums.BloodGroup.getRandomBloodGroup;
@@ -193,35 +200,6 @@ public class Person implements ILocatable {
     // region Variable Declarations
     public static final Map<Integer, Money> MEKWARRIOR_AERO_RANSOM_VALUES;
     public static final Map<Integer, Money> OTHER_RANSOM_VALUES;
-
-    // Traits
-    public static final int TRAIT_MODIFICATION_COST = 100;
-
-    public static final String CONNECTIONS_LABEL = "CONNECTIONS";
-    public static final int MINIMUM_CONNECTIONS = 0;
-    public static final int MAXIMUM_CONNECTIONS = 10;
-
-    public static final String FAME_LABEL = "FAME";
-    public static final int MINIMUM_FAME = -5;
-    public static final int MAXIMUM_FAME = 5;
-
-    public static final String WEALTH_LABEL = "WEALTH";
-    public static final int MINIMUM_WEALTH = -1;
-    public static final int MAXIMUM_WEALTH = 10;
-
-    public static final String UNLUCKY_LABEL = "UNLUCKY";
-    public static final int MINIMUM_UNLUCKY = 0;
-    public static final int MAXIMUM_UNLUCKY = 5;
-
-    public static final String BLOODMARK_LABEL = "BLOODMARK";
-    public static final int MINIMUM_BLOODMARK = 0;
-    public static final int MAXIMUM_BLOODMARK = 5;
-
-    public static final String EXTRA_INCOME_LABEL = "EXTRA_INCOME";
-    public static final int MINIMUM_EXTRA_INCOME = ExtraIncome.NEGATIVE_TEN.getTraitLevel();
-    public static final int MAXIMUM_EXTRA_INCOME = ExtraIncome.POSITIVE_TEN.getTraitLevel();
-
-    public static final int CONNECTIONS_TARGET_NUMBER = 4; // Arbitrary value
 
     private static final String DELIMITER = "::";
 
@@ -7931,11 +7909,11 @@ public class Person implements ILocatable {
 
         modifiers += getDarkSecretModifier(false);
 
-        return clamp(connections + modifiers, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        return clamp(connections + modifiers, CONNECTIONS.getMinimum(), CONNECTIONS.getMaximum());
     }
 
     public void setConnections(final int connections) {
-        this.connections = clamp(connections, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        this.connections = clamp(connections, CONNECTIONS.getMinimum(), CONNECTIONS.getMaximum());
     }
 
     /**
@@ -7948,7 +7926,7 @@ public class Person implements ILocatable {
      */
     public void changeConnections(final int delta) {
         int newValue = connections + delta;
-        connections = clamp(newValue, MINIMUM_CONNECTIONS, MAXIMUM_CONNECTIONS);
+        connections = clamp(newValue, CONNECTIONS.getMinimum(), CONNECTIONS.getMaximum());
     }
 
     public int getWealth() {
@@ -7956,7 +7934,7 @@ public class Person implements ILocatable {
     }
 
     public void setWealth(final int wealth) {
-        this.wealth = clamp(wealth, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+        this.wealth = clamp(wealth, WEALTH.getMinimum(), WEALTH.getMaximum());
     }
 
     /**
@@ -7969,7 +7947,7 @@ public class Person implements ILocatable {
      */
     public void changeWealth(final int delta) {
         int newValue = wealth + delta;
-        wealth = clamp(newValue, MINIMUM_WEALTH, MAXIMUM_WEALTH);
+        wealth = clamp(newValue, WEALTH.getMinimum(), WEALTH.getMaximum());
     }
 
     public boolean isHasPerformedExtremeExpenditure() {
@@ -8016,7 +7994,7 @@ public class Person implements ILocatable {
      * @since 0.50.10
      */
     public void setExtraIncomeFromTraitLevel(final int traitLevel) {
-        int newExtraIncomeTraitLevel = clamp(traitLevel, MINIMUM_EXTRA_INCOME, MAXIMUM_EXTRA_INCOME);
+        int newExtraIncomeTraitLevel = clamp(traitLevel, EXTRA_INCOME.getMinimum(), EXTRA_INCOME.getMaximum());
         extraIncome = ExtraIncome.extraIncomeParseFromInteger(newExtraIncomeTraitLevel);
     }
 
@@ -8087,11 +8065,11 @@ public class Person implements ILocatable {
 
         modifiers += getDarkSecretModifier(true);
 
-        return clamp(fame + modifiers, MINIMUM_FAME, MAXIMUM_FAME);
+        return clamp(fame + modifiers, FAME.getMinimum(), FAME.getMaximum());
     }
 
     public void setFame(final int fame) {
-        this.fame = clamp(fame, MINIMUM_FAME, MAXIMUM_FAME);
+        this.fame = clamp(fame, FAME.getMinimum(), FAME.getMaximum());
     }
 
     /**
@@ -8104,7 +8082,7 @@ public class Person implements ILocatable {
      */
     public void changeFame(final int delta) {
         int newValue = fame + delta;
-        fame = clamp(newValue, MINIMUM_FAME, MAXIMUM_FAME);
+        fame = clamp(newValue, FAME.getMinimum(), FAME.getMaximum());
     }
 
     public int getUnlucky() {
@@ -8112,12 +8090,12 @@ public class Person implements ILocatable {
     }
 
     public void setUnlucky(final int unlucky) {
-        this.unlucky = clamp(unlucky, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+        this.unlucky = clamp(unlucky, UNLUCKY.getMinimum(), UNLUCKY.getMaximum());
     }
 
     public void changeUnlucky(final int delta) {
         int newValue = unlucky + delta;
-        unlucky = clamp(newValue, MINIMUM_UNLUCKY, MAXIMUM_UNLUCKY);
+        unlucky = clamp(newValue, UNLUCKY.getMinimum(), UNLUCKY.getMaximum());
     }
 
     public int getBloodmark() {
@@ -8129,12 +8107,12 @@ public class Person implements ILocatable {
     }
 
     public void setBloodmark(final int unlucky) {
-        this.bloodmark = clamp(unlucky, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+        this.bloodmark = clamp(unlucky, BLOODMARK.getMinimum(), BLOODMARK.getMaximum());
     }
 
     public void changeBloodmark(final int delta) {
         int newValue = bloodmark + delta;
-        bloodmark = clamp(newValue, MINIMUM_BLOODMARK, MAXIMUM_BLOODMARK);
+        bloodmark = clamp(newValue, BLOODMARK.getMinimum(), BLOODMARK.getMaximum());
     }
 
     public List<LocalDate> getBloodhuntSchedule() {
