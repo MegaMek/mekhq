@@ -122,6 +122,11 @@ public class Ranks {
             path += ".xml";
             file = new File(path);
         }
+        // Everything that can fail is resolved before the file is opened for writing. Opening it first truncates
+        // it, and a failure part-way through then leaves the user with an empty rank systems file.
+        String year = String.valueOf(LocalDate.now().getYear());
+        String legalStatement = getFormattedTextAt(RESOURCE_BUNDLE, "Legal.legalStatement", year).trim();
+
         int indent = 0;
         try (OutputStream fileOutputStream = new FileOutputStream(file);
               OutputStream outputStream = new BufferedOutputStream(fileOutputStream);
@@ -129,10 +134,7 @@ public class Ranks {
               PrintWriter writer = new PrintWriter(osw)) {
             // Then save it out to that file.
             writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-
-            String year = String.valueOf(LocalDate.now().getYear()).replace(",", "");
-            String legalStatement = getFormattedTextAt(RESOURCE_BUNDLE, "Ranks.legalStatement", year);
-            writer.println(legalStatement.trim());
+            writer.println(legalStatement);
 
             MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "rankSystems", "version", MHQConstants.VERSION);
             for (final RankSystem rankSystem : rankSystems) {
