@@ -34,6 +34,7 @@ package mekhq.gui.dialog.markets.contractMarket;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -508,18 +509,22 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     /**
-     * The search types a campaign may choose between. Mercenary and pirate bands may look for mercenary or pirate work,
-     * or the tournament circuit; government campaigns are limited to government orders and pirate actions.
+     * The search types a campaign may choose between. Acts of piracy ({@link ContractSearchType#PIRATE}) are reserved
+     * for pirate bands. Mercenary commands may look for mercenary work or the tournament circuit; every other
+     * (government) campaign is limited to government orders.
      *
      * @author Illiani
      * @since 0.51.01
      */
     private static List<ContractSearchType> allowedSearchTypes(Campaign campaign) {
         Faction faction = campaign.getPlayerForce().getFaction();
-        if (faction.isMercenary() || faction.isPirate()) {
-            return List.of(ContractSearchType.MERCENARY, ContractSearchType.PIRATE, ContractSearchType.TOURNAMENT);
+        if (faction.getShortName().equals(PIRATE_FACTION_CODE)) {
+            return List.of(ContractSearchType.PIRATE);
         }
-        return List.of(ContractSearchType.GOVERNMENT, ContractSearchType.PIRATE);
+        if (faction.isMercenary()) {
+            return List.of(ContractSearchType.MERCENARY, ContractSearchType.TOURNAMENT);
+        }
+        return List.of(ContractSearchType.GOVERNMENT);
     }
 
     /**

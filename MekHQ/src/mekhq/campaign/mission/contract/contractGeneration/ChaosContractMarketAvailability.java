@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.contract.contractGeneration;
 
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -226,9 +227,6 @@ public final class ChaosContractMarketAvailability {
      * {@link ContractSearchType#TOURNAMENT} is never offered and is omitted; the rest are rolled from the current
      * system's hiring hall level.
      *
-     * <p>An uninhabited or abandoned system (zero population) has no legitimate market and draws only
-     * {@link ContractSearchType#PIRATE} contracts; mercenary and government offers are omitted there.</p>
-     *
      * <p>Government orders are only offered to government (non-mercenary, non-pirate) forces; for mercenary and pirate
      * forces {@link ContractSearchType#GOVERNMENT} is omitted entirely. For a government force, government offers also
      * concentrate on its own faction's worlds: off a world its faction controls they are capped at
@@ -243,6 +241,7 @@ public final class ChaosContractMarketAvailability {
         final HiringHallLevel level = campaign.getSystemHiringHallLevel();
         final Faction playerFaction = campaign.getPlayerForce().getFaction();
         final boolean governmentForce = isGovernmentFaction(playerFaction);
+        final boolean pirateForce = playerFaction.getShortName().equals(PIRATE_FACTION_CODE);
         final boolean uninhabited = isUninhabitedSystem(campaign);
 
         // The Networker SPA (senior-most Admin) grants one extra offer slot for the force's primary line of work.
@@ -254,8 +253,8 @@ public final class ChaosContractMarketAvailability {
             if (type == ContractSearchType.TOURNAMENT) {
                 continue; // tournament bouts are never drawn from the hiring-hall market
             }
-            if (uninhabited && (type != ContractSearchType.PIRATE)) {
-                continue; // uninhabited or abandoned systems draw only pirate contracts - there is no legitimate market
+            if ((type == ContractSearchType.PIRATE) && !pirateForce && !uninhabited) {
+                continue; // acts of piracy are only offered to pirate forces (the uninhabited fallback above is exempt)
             }
             if ((type == ContractSearchType.GOVERNMENT) && !governmentForce) {
                 continue; // government orders are only offered to government (non-mercenary, non-pirate) forces
