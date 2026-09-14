@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2017-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -337,7 +337,7 @@ public class MissionCompletionManager {
      * @author Illiani
      * @since 0.51.01
      */
-    private static void payCompletionBonusAndReputation(Campaign campaign, AbstractContract mission,
+    static void payCompletionBonusAndReputation(Campaign campaign, AbstractContract mission,
           MissionStatus status) {
         // Pay the completion bonus, if the contract earned one (Completion Bonus characteristic, success only).
         ContractCharacteristics.payCompletionBonus(campaign, mission, status);
@@ -371,7 +371,7 @@ public class MissionCompletionManager {
      * @author Illiani
      * @since 0.51.01
      */
-    private static void awardMissionExperience(Campaign campaign, CampaignOptions campaignOptions,
+    static void awardMissionExperience(Campaign campaign, CampaignOptions campaignOptions,
           AbstractContract mission, MissionStatus status) {
         int xpAward = getMissionExperienceAward(campaignOptions, status, mission);
         if (xpAward <= 0) {
@@ -407,7 +407,7 @@ public class MissionCompletionManager {
      * @author Illiani
      * @since 0.51.01
      */
-    private static List<Person> resolvePrisoners(Campaign campaign, PrisonerMissionEndEvent prisonerMissionEndEvent,
+    static List<Person> resolvePrisoners(Campaign campaign, PrisonerMissionEndEvent prisonerMissionEndEvent,
           MissionStatus status) {
         PlayerForce playerForce = campaign.getPlayerForce();
         ForceHumanResources humanResources = playerForce.getHumanResources();
@@ -440,7 +440,7 @@ public class MissionCompletionManager {
      * @author Illiani
      * @since 0.51.01
      */
-    private static void updateFactionStandings(Campaign campaign, CampaignOptions campaignOptions,
+    static void updateFactionStandings(Campaign campaign, CampaignOptions campaignOptions,
           AbstractContract mission, MissionStatus status) {
         if (!campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
             return;
@@ -474,7 +474,7 @@ public class MissionCompletionManager {
      * @author Illiani
      * @since 0.51.01
      */
-    private static boolean undeployFormations(Campaign campaign, AbstractContract mission) {
+    static boolean undeployFormations(Campaign campaign, AbstractContract mission) {
         boolean isCadreDuty = mission.getObjectiveType().isCadreDuty();
         boolean hadCadreForces = false;
         for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
@@ -506,7 +506,7 @@ public class MissionCompletionManager {
      * @author Illiani
      * @since 0.51.01
      */
-    private static void undeployUnits(Campaign campaign, AbstractContract mission) {
+    static void undeployUnits(Campaign campaign, AbstractContract mission) {
         for (Unit unit : campaign.getUnits()) {
             int scenarioAssignment = unit.getScenarioId();
             if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
@@ -528,7 +528,7 @@ public class MissionCompletionManager {
      * @author Illiani
      * @since 0.51.01
      */
-    private static void resolveOutstandingScenarios(AbstractContract mission) {
+    static void resolveOutstandingScenarios(AbstractContract mission) {
         for (Scenario scenario : mission.getCurrentScenarios()) {
             scenario.setStatus(DRAW);
         }
@@ -543,7 +543,7 @@ public class MissionCompletionManager {
      * @author Illiani
      * @since 0.51.01
      */
-    private static void applyPirateCrimeModifier(Campaign campaign, AbstractContract mission) {
+    static void applyPirateCrimeModifier(Campaign campaign, AbstractContract mission) {
         if (mission.getEmployerFactionCode().equals(PIRATE_FACTION_CODE)) {
             // CamOps 'other crimes' value
             campaign.getPlayerForce().changeCrimePirateModifier(10);
@@ -558,7 +558,7 @@ public class MissionCompletionManager {
      * @author Illiani
      * @since 0.51.01
      */
-    private static void clearStratConState(AbstractContract mission) {
+    static void clearStratConState(AbstractContract mission) {
         mission.setStratConCampaignState(null);
     }
 
@@ -574,7 +574,7 @@ public class MissionCompletionManager {
      * @author Illiani
      * @since 0.51.01
      */
-    private static int getMissionExperienceAward(CampaignOptions campaignOptions, MissionStatus missionStatus,
+    static int getMissionExperienceAward(CampaignOptions campaignOptions, MissionStatus missionStatus,
           AbstractContract mission) {
         return switch (missionStatus) {
             case FAILED, BREACH -> campaignOptions.get(CampaignOption.MISSION_XP_FAIL);
