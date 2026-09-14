@@ -162,6 +162,46 @@ class AddSupportUnitsToTOETest {
     }
 
     @Test
+    void vehiclesStillNeeded_freshCampaignGetsTheFullCount() {
+        // A newly generated command owns no capability vehicles, so generation is unchanged: it builds them all.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+
+        List<SupportPersonnelToTOE.VehicleSpec> specs = SupportPersonnelToTOE.vehiclesStillNeeded(campaign,
+              "Locust LCT-1V", 3);
+
+        assertEquals(1, specs.size());
+        assertEquals("Locust LCT-1V", specs.get(0).unitName());
+        assertEquals(3, specs.get(0).count(), "a campaign that owns none must get the full count");
+    }
+
+    @Test
+    void vehiclesStillNeeded_buildsOnlyWhatTheCampaignLacks() {
+        // Issue 10037: converting a campaign to support teams built a full set of MASH and recovery vehicles on top
+        // of the ones it already owned. Two owned against a target of three means one more, not three.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+
+        List<SupportPersonnelToTOE.VehicleSpec> specs = SupportPersonnelToTOE.vehiclesStillNeeded(campaign,
+              "Locust LCT-1V", 3);
+
+        assertEquals(1, specs.size());
+        assertEquals(1, specs.get(0).count(), "only the vehicle the campaign lacks may be built");
+    }
+
+    @Test
+    void vehiclesStillNeeded_buildsNothingWhenTheTargetIsAlreadyOwned() {
+        // An empty list, not a spec of zero: organizeSection creates the vehicle company for any non-empty list, so a
+        // zero-count spec would leave an empty formation in the TOE.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+
+        assertTrue(SupportPersonnelToTOE.vehiclesStillNeeded(campaign, "Locust LCT-1V", 2).isEmpty(),
+              "a campaign that already fields the target must get no new vehicles");
+    }
+
+    @Test
     void organize_keepsTheLayersThatSeparateProfessions() {
         // Two professions means the companies actually tell them apart, so nothing collapses.
         Campaign campaign = MHQTestUtilities.getTestCampaign();
