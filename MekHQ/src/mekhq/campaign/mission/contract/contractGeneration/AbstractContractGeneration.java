@@ -72,7 +72,7 @@ import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
-public class AbstractContractGeneration {
+public abstract class AbstractContractGeneration {
     private static final MMLogger LOGGER = MMLogger.create(AbstractContractGeneration.class);
     private static final String RESOURCE_BUNDLES = "mekhq.resources.AbstractMission";
 
@@ -93,8 +93,34 @@ public class AbstractContractGeneration {
      */
     private static final int COMSTAR_WOB_FALSE_FLAG_ODDS = 2;
 
-    public static @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
-          LocalDate currentDate, Detachment detachment, int contractGenerationModifier, ContractSearchType searchType,
+    /**
+     * Returns the contract generator appropriate to the search type. Each search type has its own concrete generator,
+     * mirroring {@link AbstractContractDeterminationEmployer#forSearchType}: the shared generation skeleton lives here,
+     * while the search-type-specific handlers live in the inheritor.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static AbstractContractGeneration forSearchType(ContractSearchType searchType) {
+        return switch (searchType) {
+            case MERCENARY -> new MercenaryContractGeneration();
+            case PIRATE -> new ActsOfPiracyContractGeneration();
+            case GOVERNMENT -> new GovernmentContractGeneration();
+            case TOURNAMENT -> new TournamentContractGeneration();
+        };
+    }
+
+    /**
+     * The search type this generator produces contracts for. Drives the employer determination and the covert-status
+     * rules, and lets the shared skeleton stay type-agnostic.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected abstract ContractSearchType getSearchType();
+
+    public @Nullable AbstractContract createContract(Campaign campaign, CampaignOptions campaignOptions,
+          LocalDate currentDate, Detachment detachment, int contractGenerationModifier,
           FactionStandings factionStandings, boolean overridingCommandCircuitRequirements, boolean isGM,
           boolean provingGround) {
         final ChaosContract contract = new ChaosContract();
@@ -112,7 +138,7 @@ public class AbstractContractGeneration {
 
         // Step 2: Employer
         AbstractLocation currentLocation = detachment.getCurrentLocation();
-        EmployerData employerData = pickEmployer(campaign, currentDate, currentLocation, searchType,
+        EmployerData employerData = pickEmployer(campaign, currentDate, currentLocation, getSearchType(),
               chaosObjectiveType.isCovertCandidate(), contract);
         if (employerData == null) {
             return null;
@@ -120,7 +146,7 @@ public class AbstractContractGeneration {
 
         // Covert status - needs both the objective and the now-resolved employer/sponsor (its odds depend on the true
         // backer). Must be set before the enemy is picked, which draws under covert rules when this is true.
-        determineCovertStatus(chaosObjectiveType, contract, searchType == ContractSearchType.GOVERNMENT);
+        determineCovertStatus(chaosObjectiveType, contract);
 
         // Step 3: Scale & Intensity
         setAncillaryValues(campaign, detachment.getHangar(), contract);
@@ -180,6 +206,8 @@ public class AbstractContractGeneration {
         if (campaignOptions.get(CampaignOption.USE_NON_NEGOTIABLE_TERMS)) {
             lockNonNegotiableTerms(contract);
         }
+        // Type-specific fixed/locked terms applied on top of the rolled baseline (e.g. a pirate raid's dictated terms).
+        applyTypeSpecificTerms(contract);
 
         // Step 9: Final Tasks
         performFinalTasks(campaign, currentDate, contract, currentLocation);
@@ -217,8 +245,9 @@ public class AbstractContractGeneration {
         String employerName = contract.isCovert()
                                     ? contract.getEmployerMarketDisplayName()
                                     : contract.getEmployerDisplayName();
+        boolean useOperationCodenames = campaign.getCampaignOptions().get(CampaignOption.USE_OPERATION_CODENAMES);
         String contractName;
-        if (campaign.getCampaignOptions().get(CampaignOption.USE_OPERATION_CODENAMES)) {
+        if (useOperationCodenames) {
             contractName = getFormattedTextAt(RESOURCE_BUNDLES,
                   "AbstractContractGeneration.operationContractName",
                   contract.getStartDate(),
@@ -232,6 +261,7 @@ public class AbstractContractGeneration {
                   contract.getEnemyDisplayName());
         }
         contract.setContractName(contractName);
+        contract.setNameOperationCodename(useOperationCodenames);
 
         // Morale
         MHQMorale.determineStartingMorale(contract, campaign);
@@ -281,16 +311,19 @@ public class AbstractContractGeneration {
      * under covert rules (see {@link ChaosContractDeterminationEnemy#generateEnemyFactionForObjective}), where even the
      * employer's allies can become rare targets.
      *
-     * <p>A government contract cannot be classified as Covert.</p>
+     * <p>A government contract cannot be classified as Covert. This is an overridable hook: a search type with its own
+     * covert rules (e.g. an acts-of-piracy raid, which is covert only when secretly bankrolled) overrides it.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    private static void determineCovertStatus(ChaosObjectiveType chaosObjectiveType, ChaosContract contract,
-          boolean isGovernmentSearchType) {
+    protected void determineCovertStatus(ChaosObjectiveType chaosObjectiveType, ChaosContract contract) {
         if (contract.getNature() != ContractNature.NORMAL) {
             return;
         }
         // The employer of a government contract is the player's own faction, the single possible employer, so there is
         // no point concealing it - leave the contract as a normal, openly-attributed operation.
-        if (isGovernmentSearchType) {
+        if (getSearchType() == ContractSearchType.GOVERNMENT) {
             return;
         }
         if (chaosObjectiveType.isCovertCandidate() && Compute.randomInt(COVERT_CONTRACT_ODDS) == 0) {
@@ -446,10 +479,11 @@ public class AbstractContractGeneration {
     /**
      * Determines a contract's combat pay the way generation does, tracking the campaign's chosen pay scheme: CamOps
      * folds combat compensation into the monthly retainer (zero here), while the Chaos scheme pays a separate combat
-     * bonus derived from scale.
+     * bonus derived from scale. An opportunistic (non-covert) pirate raid always earns zero (see
+     * {@link AbstractContractDeterminationPay#getContractCombatPay}).
      */
     public static Money determineCombatPay(Campaign campaign, AbstractContract contract) {
-        return AbstractContractDeterminationPay.forCampaign(campaign).getCombatPay(campaign, contract);
+        return AbstractContractDeterminationPay.forCampaign(campaign).getContractCombatPay(campaign, contract);
     }
 
     /**
@@ -617,6 +651,18 @@ public class AbstractContractGeneration {
         return Compute.randomInt(NON_NEGOTIABLE_TERM_ODDS) == 0;
     }
 
+    /**
+     * Hook for the fixed, non-negotiable terms a particular search type dictates on top of the rolled baseline, applied
+     * after the optional random non-negotiable locks. The base contract has none; a search type that dictates terms
+     * (e.g. an acts-of-piracy raid) overrides this hook.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected void applyTypeSpecificTerms(ChaosContract contract) {
+        // No type-specific terms by default.
+    }
+
     private static void determineSchedule(Campaign campaign, boolean useVariableContractLength, LocalDate currentDate,
           PlanetarySystem currentSystem, Planet targetPlanet, FactionStandings factionStandings,
           boolean overridingCommandCircuitRequirements, boolean isGM, PlanetarySystem targetSystem,
@@ -712,8 +758,14 @@ public class AbstractContractGeneration {
         return systemsTargetData;
     }
 
-    private static @Nonnull ContractObjectiveData pickObjective(int contractGenerationModifier,
-          ChaosContract contract) {
+    /**
+     * Picks the contract's objective. The base rolls the general objective table; a search type with a fixed objective
+     * (e.g. an acts-of-piracy raid) overrides this hook.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected @Nonnull ContractObjectiveData pickObjective(int contractGenerationModifier, ChaosContract contract) {
         ContractObjectiveData objectiveData = ChaosContractDeterminationObjective.determineContractObjectiveType(
               contractGenerationModifier);
         contract.setObjectiveData(objectiveData);

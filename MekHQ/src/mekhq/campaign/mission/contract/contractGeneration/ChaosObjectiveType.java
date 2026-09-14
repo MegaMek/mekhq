@@ -65,7 +65,7 @@ public enum ChaosObjectiveType {
           Collections.emptyList()),
     INVASION(false, 6, 2, -1, 2, -1, 1, -2, 3, true,
           Collections.emptyList()),
-    PIRATE_RAID(true, 3, 1, 0, 0, 0, -1, 0, -2, true,
+    PIRATE_RAID(false, 3, 1, 0, 0, 0, -1, 0, -2, true,
           List.of(END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS, USE_PIRATE_LOOTING));
 
     private static final MMLogger LOGGER = MMLogger.create(ChaosObjectiveType.class);

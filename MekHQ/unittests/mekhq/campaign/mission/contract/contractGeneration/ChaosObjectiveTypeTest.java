@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.EnumMap;
 import java.util.Map;
 
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
@@ -127,5 +128,19 @@ class ChaosObjectiveTypeTest {
         assertTrue(ChaosObjectiveType.EXPEDITION.getSpecialRules().isEmpty(),
               "an expedition carries no special rules");
         assertFalse(ChaosObjectiveType.EXPEDITION.usesSpecialRule(ChaosObjectiveSpecialRules.SIMULATED_DAMAGE));
+    }
+
+    // --- covert candidacy / CamOps mapping ---
+
+    @Test
+    void pirateRaidIsNotACovertCandidate() {
+        assertFalse(ChaosObjectiveType.PIRATE_RAID.isCovertCandidate(),
+              "a pirate raid is overt opportunism; covert status is forced only when it is secretly bankrolled");
+    }
+
+    @Test
+    void pirateRaidMapsToItsOwnCamOpsObjective() {
+        assertEquals(ContractObjectiveType.PIRATE_RAID, ChaosObjectiveType.PIRATE_RAID.getCamOpsObjectiveType(),
+              "PIRATE_RAID is the only CamOps objective mapped to the pirate-raid category");
     }
 }

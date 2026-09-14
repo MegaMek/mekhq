@@ -65,7 +65,8 @@ class ChaosEmployerTypeTest {
                  "LOCAL_PLANETARY_GOVERNMENT, 0, 1, 0, 1, 0",
                  "LOCAL_SYSTEM_OWNER, 0, 2, 1, -2, -3",
                  "MERCENARY_SUBCONTRACT, 0, 0, 0, 0, 3",
-                 "NOBLE, 0, 0, 0, 0, 0" })
+                 "NOBLE, 0, 0, 0, 0, 0",
+                 "UNDERWORLD_CONTACT, -2, -2, -1, 4, 4" })
     void negotiationModifiersMatchTheSourcebook(final ChaosEmployerType employerType, final int pay,
           final int support, final int transport, final int salvage, final int command) {
         assertEquals(pay, employerType.getPayRateModifier(), "pay rate modifier for " + employerType);

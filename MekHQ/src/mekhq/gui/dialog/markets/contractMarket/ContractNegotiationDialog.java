@@ -73,6 +73,7 @@ import mekhq.campaign.mission.contract.contractData.NegotiationData;
 import mekhq.campaign.mission.contract.contractData.NonNegotiableTermsData;
 import mekhq.campaign.mission.contract.contractData.RentedFacilitiesData;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
 import mekhq.campaign.mission.contract.contractGeneration.negotiationsAndNPCs.TermFunding;
 import mekhq.campaign.mission.contract.utilities.ActiveNegotiationMath;
 import mekhq.campaign.mission.contract.utilities.NegotiationStepMath;
@@ -487,10 +488,17 @@ public class ContractNegotiationDialog extends JDialog {
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
 
         body.add(buildTermsCard());
-        body.add(javax.swing.Box.createVerticalStrut(PADDING));
-        body.add(buildFacilitiesCard());
+        if (!isPirateContract()) {
+            body.add(javax.swing.Box.createVerticalStrut(PADDING));
+            body.add(buildFacilitiesCard());
+        }
 
         return body;
+    }
+
+    /** Whether this contract is a pirate raid, which cannot rent support facilities. */
+    private boolean isPirateContract() {
+        return contract.getObjectiveType().getChaosObjectiveType() == ChaosObjectiveType.PIRATE_RAID;
     }
 
     private JPanel buildTermsCard() {
@@ -861,7 +869,25 @@ public class ContractNegotiationDialog extends JDialog {
 
     /** Whether the employer has locked this clause as non-negotiable - it can be neither raised nor lowered. */
     private boolean isLocked(Clause clause) {
-        return nonNegotiableTerms.isLocked(clause.term);
+        return isPermanentlyLocked(clause) || nonNegotiableTerms.isLocked(clause.term);
+    }
+
+    /**
+     * Whether this clause is permanently fixed for this contract and can never be re-negotiated, lowered, raised, or
+     * waived. Unlike an ordinary employer's non-negotiable lock - which the "exception" active negotiation can waive -
+     * these are dictated outright by a pirate raid: command rights and salvage on every pirate raid, plus support and
+     * transport on a self-directed (non-covert) raid (a secretly-bankrolled covert raid leaves those to its hidden
+     * sponsor).
+     */
+    private boolean isPermanentlyLocked(Clause clause) {
+        if (!isPirateContract()) {
+            return false;
+        }
+        return switch (clause) {
+            case COMMAND, SALVAGE -> true;
+            case SUPPORT, TRANSPORT -> !contract.isCovertOperation();
+            case PAY -> false;
+        };
     }
 
     /** Whether this clause's lower button should be active: an earlier raise can be undone, or a sacrifice is allowed. */
@@ -908,8 +934,12 @@ public class ContractNegotiationDialog extends JDialog {
     private void confirmAction() {
         commitTermsAndPay();
 
-        contract.setRentedFacilitiesData(new RentedFacilitiesData(facilityQuantity[0],
-              facilityQuantity[1], facilityQuantity[2]));
+        if (isPirateContract()) {
+            contract.setRentedFacilitiesData(new RentedFacilitiesData(0, 0, 0));
+        } else {
+            contract.setRentedFacilitiesData(new RentedFacilitiesData(facilityQuantity[0],
+                  facilityQuantity[1], facilityQuantity[2]));
+        }
 
         List<List<TermFunding>> fundingByClause = new ArrayList<>();
         for (Clause clause : CANONICAL_ORDER) {
@@ -931,7 +961,7 @@ public class ContractNegotiationDialog extends JDialog {
               step(Clause.SALVAGE), step(Clause.COMMAND)));
         AbstractContractDeterminationPay payScheme = AbstractContractDeterminationPay.forCampaign(campaign);
         contract.updateMonthlyPay(payScheme.getMonthlyPay(campaign, contract));
-        contract.updateCombatPay(payScheme.getCombatPay(campaign, contract));
+        contract.updateCombatPay(payScheme.getContractCombatPay(campaign, contract));
         contract.updateTransportPay(payScheme.getTransportPay(campaign,
               campaign.getLocalDate(), contract, currentLocation));
     }
@@ -1113,7 +1143,8 @@ public class ContractNegotiationDialog extends JDialog {
         for (int move = 0; move < count; move++) {
             List<Clause> eligible = new ArrayList<>();
             for (Clause clause : Clause.values()) {
-                if (nonNegotiableTerms.isLocked(clause.term) == waive) {
+                // A permanently-locked term (a pirate raid's dictated terms) can never be waived or toggled.
+                if (!isPermanentlyLocked(clause) && (nonNegotiableTerms.isLocked(clause.term) == waive)) {
                     eligible.add(clause);
                 }
             }
@@ -1272,11 +1303,22 @@ public class ContractNegotiationDialog extends JDialog {
         for (Clause clause : Clause.values()) {
             int index = clause.ordinal();
             termValueLabels[index].setText(termValueHtml(clause));
-            // A locked term shows a "non-negotiable" badge in place of its raise-cap counter; its steppers are disabled.
-            termCapLabels[index].setText(isLocked(clause)
-                                               ? getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.locked")
-                                               : getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.cap",
-                  max(0, currentStep[index] - originalStep[index]), capPerTerm));
+            // A locked term shows a badge in place of its raise-cap counter and disables its steppers. A permanently
+            // locked term (a pirate raid's dictated terms) shows a distinct "fixed" badge, so the player knows not to
+            // spend an exception attempt trying to waive it; an ordinary non-negotiable lock (waivable) shows
+            // "non-negotiable".
+            if (isPermanentlyLocked(clause)) {
+                termCapLabels[index].setText(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.locked.permanent"));
+                termCapLabels[index].setToolTipText(getTextAt(RESOURCE_BUNDLE,
+                      "negotiate.contractMarket.locked.permanent.tooltip"));
+            } else if (isLocked(clause)) {
+                termCapLabels[index].setText(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.locked"));
+                termCapLabels[index].setToolTipText(null);
+            } else {
+                termCapLabels[index].setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.cap",
+                      max(0, currentStep[index] - originalStep[index]), capPerTerm));
+                termCapLabels[index].setToolTipText(null);
+            }
             termRaiseButtons[index].setEnabled(canRaise(clause));
             termLowerButtons[index].setEnabled(canLower(clause));
         }
@@ -1284,11 +1326,13 @@ public class ContractNegotiationDialog extends JDialog {
         payImpactLabel.setText(payImpactHtml());
 
         Money rentalTotal = Money.zero();
-        for (int i = 0; i < facilityQuantity.length; i++) {
-            Money lineTotal = Money.of((double) facilityQuantity[i] * facilityUnitCost[i]);
-            rentalTotal = rentalTotal.plus(lineTotal);
-            facilityQuantityLabels[i].setText(Integer.toString(facilityQuantity[i]));
-            facilityTotalLabels[i].setText(lineTotal.toAmountAndSymbolString());
+        if (!isPirateContract()) {
+            for (int i = 0; i < facilityQuantity.length; i++) {
+                Money lineTotal = Money.of((double) facilityQuantity[i] * facilityUnitCost[i]);
+                rentalTotal = rentalTotal.plus(lineTotal);
+                facilityQuantityLabels[i].setText(Integer.toString(facilityQuantity[i]));
+                facilityTotalLabels[i].setText(lineTotal.toAmountAndSymbolString());
+            }
         }
 
         summaryLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.summary",

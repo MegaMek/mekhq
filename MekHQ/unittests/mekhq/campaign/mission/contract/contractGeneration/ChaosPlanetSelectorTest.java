@@ -149,9 +149,9 @@ class ChaosPlanetSelectorTest {
     // --- preferenceFor ---
 
     @ParameterizedTest
-    @CsvSource({ "INVASION, HIGH_VALUE", "GARRISON, HIGH_VALUE", "RAID, HIGH_VALUE", "PIRATE_RAID, HIGH_VALUE",
-                 "GUERILLA_OPERATION, HIGH_VALUE", "PIRATE_HUNT, LOW_VALUE", "EXPEDITION, NEUTRAL",
-                 "CADRE_DUTY, NEUTRAL" })
+    @CsvSource({ "INVASION, HIGH_VALUE", "GARRISON, HIGH_VALUE", "RAID, HIGH_VALUE",
+                 "GUERILLA_OPERATION, HIGH_VALUE", "PIRATE_HUNT, LOW_VALUE", "PIRATE_RAID, LOW_VALUE",
+                 "EXPEDITION, NEUTRAL", "CADRE_DUTY, NEUTRAL" })
     void preferenceForByObjective(final ChaosObjectiveType objectiveType, final PlanetValuePreference expected) {
         assertEquals(expected, ChaosPlanetSelector.preferenceFor(objectiveType));
     }
