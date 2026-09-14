@@ -92,7 +92,7 @@ public abstract class AbstractContractDeterminationPay {
     public void determineContractPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
           AbstractLocation currentLocation) {
         Money monthlyPay = getMonthlyPay(campaign, contract);
-        Money combatPay = getCombatPay(campaign, contract);
+        Money combatPay = getContractCombatPay(campaign, contract);
         Money transportPay = getTransportPay(campaign, currentDate, contract, currentLocation);
 
         // A false flag operation quietly pays a deniability premium on the retainer and combat bonus - the "too
@@ -112,6 +112,24 @@ public abstract class AbstractContractDeterminationPay {
 
     /** The per-battle combat bonus the employer pays; some schemes fold this into the monthly retainer and return zero. */
     public abstract @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract);
+
+    /**
+     * The per-battle combat bonus actually owed for this contract: the active scheme's {@link #getCombatPay combat pay},
+     * except an opportunistic (non-covert) pirate raid always earns zero - the band loots for itself, and only a
+     * secretly-bankrolled (covert) pirate raid is paid a combat bonus, by its hidden sponsor. Prefer this over
+     * {@link #getCombatPay} wherever a contract's real combat bonus is computed, so the rule holds on every path
+     * (generation, the GM editor, and negotiation).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @NonNull Money getContractCombatPay(Campaign campaign, AbstractContract contract) {
+        if ((contract.getObjectiveType().getChaosObjectiveType() == ChaosObjectiveType.PIRATE_RAID)
+                  && !contract.isCovertOperation()) {
+            return Money.zero();
+        }
+        return getCombatPay(campaign, contract);
+    }
 
     /**
      * Up-front transport compensation for the journey from the player's current location to the contract's target,

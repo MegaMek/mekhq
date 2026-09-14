@@ -52,6 +52,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -106,7 +107,7 @@ class AbstractContractDeterminationPayTest {
         }
 
         @Override
-        public Money getCombatPay(Campaign campaign, AbstractContract contract) {
+        public @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract) {
             return COMBAT;
         }
 

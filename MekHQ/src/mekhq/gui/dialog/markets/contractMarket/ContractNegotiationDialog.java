@@ -931,7 +931,7 @@ public class ContractNegotiationDialog extends JDialog {
               step(Clause.SALVAGE), step(Clause.COMMAND)));
         AbstractContractDeterminationPay payScheme = AbstractContractDeterminationPay.forCampaign(campaign);
         contract.updateMonthlyPay(payScheme.getMonthlyPay(campaign, contract));
-        contract.updateCombatPay(payScheme.getCombatPay(campaign, contract));
+        contract.updateCombatPay(payScheme.getContractCombatPay(campaign, contract));
         contract.updateTransportPay(payScheme.getTransportPay(campaign,
               campaign.getLocalDate(), contract, currentLocation));
     }

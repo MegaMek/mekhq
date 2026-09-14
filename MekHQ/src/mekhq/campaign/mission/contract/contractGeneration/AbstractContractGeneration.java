@@ -454,10 +454,11 @@ public class AbstractContractGeneration {
     /**
      * Determines a contract's combat pay the way generation does, tracking the campaign's chosen pay scheme: CamOps
      * folds combat compensation into the monthly retainer (zero here), while the Chaos scheme pays a separate combat
-     * bonus derived from scale.
+     * bonus derived from scale. An opportunistic (non-covert) pirate raid always earns zero (see
+     * {@link AbstractContractDeterminationPay#getContractCombatPay}).
      */
     public static Money determineCombatPay(Campaign campaign, AbstractContract contract) {
-        return AbstractContractDeterminationPay.forCampaign(campaign).getCombatPay(campaign, contract);
+        return AbstractContractDeterminationPay.forCampaign(campaign).getContractCombatPay(campaign, contract);
     }
 
     /**
