@@ -1615,6 +1615,7 @@ public class InterstellarMapPanel extends JPanel {
     private final JCheckBox optCapitals;
     private final ImmersiveComboBox<CapitalDisplayDetail> optCapitalDetail;
     private final JCheckBox optTerritory;
+    private final JCheckBox optEmblems;
     private final JCheckBox optAdministrativeBoundaries;
     private final ImmersiveComboBox<AdministrativeDisplayDetail> optAdministrativeDetail;
     private final JCheckBox optOperations;
@@ -1727,6 +1728,8 @@ public class InterstellarMapPanel extends JPanel {
     private transient LocalDate now;
     private final PreparedRenderData<TerritoryDataKey, TerritoryAtlas> preparedTerritoryAtlas =
           new PreparedRenderData<>();
+        private TerritoryAtlas experimentalTerritorySource;
+        private ExperimentalMapView.Territories experimentalTerritories;
     private final PreparedRenderData<SystemRenderDataKey, Map<String, SystemRenderData>> preparedSystemRenderData =
           new PreparedRenderData<>();
     private final RenderLayerCache<RenderViewKey> backgroundRenderCache = new RenderLayerCache<>();
@@ -2663,8 +2666,19 @@ public class InterstellarMapPanel extends JPanel {
         optionPanel.add(optEmptySystems);
         optTerritory = createOptionCheckBox("map.overlay.territory");
         optTerritory.setSelected(true);
-        optTerritory.addActionListener(e -> startTerritoryLayerAnimation());
+        optTerritory.addActionListener(e -> {
+            startTerritoryLayerAnimation();
+            firePropertyChange("cartographyLayers", null, getCartographyLayers());
+        });
         optionPanel.add(optTerritory);
+        optEmblems = createOptionCheckBox("map.overlay.emblems");
+        optEmblems.setSelected(true);
+        optEmblems.addActionListener(event -> {
+            clearRenderLayerCaches();
+            firePropertyChange("cartographyLayers", null, getCartographyLayers());
+            repaint();
+        });
+        optionPanel.add(optEmblems);
         optAdministrativeBoundaries = createOptionCheckBox("map.overlay.administrative");
         optAdministrativeBoundaries.setSelected(false);
           Dimension administrativeCheckSize = new Dimension(UIUtil.scaleForGUI(190),
@@ -2684,10 +2698,12 @@ public class InterstellarMapPanel extends JPanel {
               MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.overlay.administrativeDetail.toolTipText"));
         optAdministrativeDetail.addActionListener(event -> {
             administrativeRenderCache.clear();
+            firePropertyChange("cartographyLayers", null, getCartographyLayers());
             repaint();
         });
         optAdministrativeBoundaries.addActionListener(event -> {
             optAdministrativeDetail.setEnabled(optAdministrativeBoundaries.isSelected());
+            firePropertyChange("cartographyLayers", null, getCartographyLayers());
             repaint();
         });
         JPanel administrativeControl = new JPanel();
@@ -5799,6 +5815,9 @@ public class InterstellarMapPanel extends JPanel {
 
         private void drawFactionLogoLayer(Graphics2D graphics, TerritoryAtlas atlas,
             FactionLogoRenderKey renderKey, boolean cullToViewport) {
+        if (!optEmblems.isSelected()) {
+            return;
+        }
         int majorMinimumLogoSize = renderKey.majorMinimumSize();
         int compactMinimumLogoSize = renderKey.compactMinimumSize();
         int maximumLogoSize = Math.max(majorMinimumLogoSize, renderKey.maximumSize());
@@ -8119,6 +8138,47 @@ public class InterstellarMapPanel extends JPanel {
     }
 
     ExperimentalMapView.Presentation getExperimentalPresentation() {
+        prepareStaticCartography(campaign.getLocalDate());
+        TerritoryAtlas atlas = getPreparedTerritoryAtlas(campaign.getLocalDate());
+        if (atlas != experimentalTerritorySource) {
+            List<ExperimentalMapView.Territory> contours = new ArrayList<>();
+            for (TerritoryContour contour : atlas.contours()) {
+                if (contour.semantic() == TerritorySemantic.UNCLAIMED_EXTERIOR) {
+                    continue;
+                }
+                List<Integer> colors = new ArrayList<>();
+                for (Faction faction : contour.factions()) {
+                    colors.add(faction.getColor().getRGB());
+                }
+                contours.add(new ExperimentalMapView.Territory(new java.awt.geom.Path2D.Double(contour.shape()), colors,
+                      contour.semantic() == TerritorySemantic.UNCLAIMED_POCKET,
+                      contour.semantic() == TerritorySemantic.ENCLAVE));
+            }
+            List<ExperimentalMapView.Emblem> emblems = new ArrayList<>();
+            for (TerritoryComponent component : atlas.components()) {
+                Faction faction = component.faction();
+                int priority = getFactionLogoPriority(faction);
+                if (priority >= 0) {
+                    emblems.add(new ExperimentalMapView.Emblem(faction.getShortName(),
+                          Factions.getFactionLogoAddress(atlas.date().getYear(), faction.getShortName()),
+                          faction.getColor().getRGB(), priority, component.anchorX(), component.anchorY(),
+                          component.cellCount(), component.maxMapX() - component.minMapX(),
+                          component.maxMapY() - component.minMapY()));
+                }
+            }
+            List<ExperimentalMapView.AdministrativeBorder> borders = new ArrayList<>();
+            for (AdministrativeBoundary boundary : atlas.administrativeBoundaries()) {
+                List<Integer> colors = new ArrayList<>();
+                for (Faction faction : boundary.factions()) {
+                    colors.add(faction.getColor().getRGB());
+                }
+                borders.add(new ExperimentalMapView.AdministrativeBorder(
+                      new java.awt.geom.Path2D.Double(boundary.shape()), colors,
+                      boundary.level() == AdministrativeBoundaryLevel.REGION));
+            }
+            experimentalTerritories = new ExperimentalMapView.Territories(atlas.date(), contours, emblems, borders);
+            experimentalTerritorySource = atlas;
+        }
         Map<String, SystemRenderData> prepared = getPreparedSystemRenderData(campaign.getLocalDate());
         if (prepared != experimentalPresentationSource) {
             List<ExperimentalMapView.SystemPresentation> entries = new ArrayList<>(systems.size());
@@ -8133,15 +8193,47 @@ public class InterstellarMapPanel extends JPanel {
             experimentalSystems = List.copyOf(entries);
             experimentalPresentationSource = prepared;
         }
+        List<PlanetarySystem> planned = getPathSystems(jumpPath);
+        List<PlanetarySystem> active = getPathSystems(getActiveJumpPath());
         Set<String> routeSystems = new HashSet<>();
-        for (PlanetarySystem system : getPathSystems(jumpPath)) {
+        for (PlanetarySystem system : planned) {
             routeSystems.add(system.getId());
         }
-        for (PlanetarySystem system : getPathSystems(getActiveJumpPath())) {
+        for (PlanetarySystem system : active) {
             routeSystems.add(system.getId());
         }
+        var location = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
+        boolean inTransit = (location != null) && (campaign.getCurrentSystem() != null) && location.isInTransit();
+        ExperimentalMapView.Routes routes = new ExperimentalMapView.Routes(planned, active,
+              campaign.getCurrentSystem(), inTransit, inTransit ? location.getPercentageTransit() : 0);
         return new ExperimentalMapView.Presentation(experimentalSystems, routeSystems,
-              isShowingEmptySystems(), getSemanticZoomReference(conf.showPlanetNamesThreshold));
+              isShowingEmptySystems(), getSemanticZoomReference(conf.showPlanetNamesThreshold), routes,
+              experimentalTerritories, getCartographyLayers());
+    }
+
+    ExperimentalMapView.CartographyLayers getCartographyLayers() {
+        ExperimentalMapView.BoundaryDetail detail = !optAdministrativeBoundaries.isSelected()
+              ? ExperimentalMapView.BoundaryDetail.OFF
+              : optAdministrativeDetail.getSelectedItem() == AdministrativeDisplayDetail.REGIONS
+                    ? ExperimentalMapView.BoundaryDetail.REGIONS : ExperimentalMapView.BoundaryDetail.DISTRICTS;
+        return new ExperimentalMapView.CartographyLayers(optTerritory.isSelected(), optEmblems.isSelected(), detail);
+    }
+
+    void setCartographyLayers(ExperimentalMapView.CartographyLayers layers) {
+        var previous = getCartographyLayers();
+        optTerritory.setSelected(layers.territories());
+        optEmblems.setSelected(layers.emblems());
+        optAdministrativeBoundaries.setSelected(layers.administrative() != ExperimentalMapView.BoundaryDetail.OFF);
+        optAdministrativeDetail.setSelectedItem(layers.administrative() == ExperimentalMapView.BoundaryDetail.DISTRICTS
+              ? AdministrativeDisplayDetail.REGIONS_AND_DISTRICTS : AdministrativeDisplayDetail.REGIONS);
+        optAdministrativeDetail.setEnabled(optAdministrativeBoundaries.isSelected());
+        territoryLayerAnimating = false;
+        territoryLayerSettling = false;
+        territoryLayerAlpha = layers.territories() ? 1 : 0;
+        territoryLayerAnimationTargetAlpha = territoryLayerAlpha;
+        clearRenderLayerCaches();
+        firePropertyChange("cartographyLayers", previous, getCartographyLayers());
+        repaint();
     }
 
     void restoreMapScale(double scale) {

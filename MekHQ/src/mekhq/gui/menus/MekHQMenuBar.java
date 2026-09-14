@@ -44,15 +44,18 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.ButtonGroup;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JRadioButtonMenuItem;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 import javax.swing.UIManager;
@@ -77,6 +80,8 @@ import mekhq.MHQConstants;
 import mekhq.MHQOptionsChangedEvent;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
+import mekhq.gui.ExperimentalMapView.BoundaryDetail;
+import mekhq.gui.ExperimentalMapView.CartographyLayers;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -550,8 +555,49 @@ public class MekHQMenuBar extends JMenuBar {
             skiaMap.setEnabled(false);
             JCheckBoxMenuItem emptySystems = new JCheckBoxMenuItem(getTextAt("miMapEmptySystems.text"));
             emptySystems.setEnabled(false);
+            JCheckBoxMenuItem territories = new JCheckBoxMenuItem(getTextAt("miMapTerritories.text"));
+            territories.setEnabled(false);
+            JCheckBoxMenuItem emblems = new JCheckBoxMenuItem(getTextAt("miMapEmblems.text"));
+            emblems.setEnabled(false);
+            JMenu administrative = new JMenu(getTextAt("menuMapAdministrative.text"));
+            administrative.setEnabled(false);
+            ButtonGroup detailGroup = new ButtonGroup();
+            EnumMap<BoundaryDetail, JRadioButtonMenuItem> detailItems = new EnumMap<>(BoundaryDetail.class);
+            for (BoundaryDetail detail : BoundaryDetail.values()) {
+                JRadioButtonMenuItem item = new JRadioButtonMenuItem(getTextAt("miMapAdministrative." + detail + ".text"));
+                detailGroup.add(item);
+                administrative.add(item);
+                detailItems.put(detail, item);
+            }
             javax.swing.SwingUtilities.invokeLater(() -> {
                 var mapTab = getGui().getNavigationTab().getMapTab();
+                Runnable syncLayers = () -> {
+                    var layers = mapTab.getCartographyLayers();
+                    territories.setSelected(layers.territories());
+                    emblems.setSelected(layers.emblems());
+                    detailItems.get(layers.administrative()).setSelected(true);
+                };
+                syncLayers.run();
+                territories.setEnabled(true);
+                emblems.setEnabled(true);
+                administrative.setEnabled(true);
+                territories.addActionListener(event -> {
+                    var layers = mapTab.getCartographyLayers();
+                    mapTab.setCartographyLayers(new CartographyLayers(territories.isSelected(), layers.emblems(),
+                          layers.administrative()));
+                });
+                emblems.addActionListener(event -> {
+                    var layers = mapTab.getCartographyLayers();
+                    mapTab.setCartographyLayers(new CartographyLayers(layers.territories(), emblems.isSelected(),
+                          layers.administrative()));
+                });
+                for (var entry : detailItems.entrySet()) {
+                    entry.getValue().addActionListener(event -> {
+                        var layers = mapTab.getCartographyLayers();
+                        mapTab.setCartographyLayers(new CartographyLayers(layers.territories(), layers.emblems(), entry.getKey()));
+                    });
+                }
+                mapTab.addPropertyChangeListener("cartographyLayers", event -> syncLayers.run());
                 skiaMap.setVisible(mapTab.isExperimentalMapAvailable());
                 skiaMap.setEnabled(mapTab.isExperimentalMapAvailable());
                 skiaMap.setSelected(mapTab.isExperimentalMapActive());
@@ -568,6 +614,9 @@ public class MekHQMenuBar extends JMenuBar {
             });
             menuView.add(skiaMap);
             menuView.add(emptySystems);
+            menuView.add(territories);
+            menuView.add(emblems);
+            menuView.add(administrative);
           }
         menuView.addSeparator();
 

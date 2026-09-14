@@ -100,6 +100,7 @@ import mekhq.campaign.events.LocationAddedEvent;
 import mekhq.campaign.events.LocationRemovedEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
+import mekhq.campaign.events.TransitStatusChangedEvent;
 import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.events.scenarios.ScenarioEvent;
 import mekhq.campaign.finances.Money;
@@ -324,6 +325,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
         panMap.setCampaign(getCampaign());
         panMap.addActionListener(this);
+        panMap.addPropertyChangeListener("cartographyLayers", event -> {
+            if (experimentalMap != null && experimentalMapActive) {
+                experimentalMap.refresh();
+            }
+            firePropertyChange("cartographyLayers", event.getOldValue(), event.getNewValue());
+        });
         panMap.addPropertyChangeListener("showEmptySystems", event -> {
             if (experimentalMap != null) {
                 experimentalMap.refresh();
@@ -480,6 +487,14 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
     public void setShowingEmptySystems(boolean show) {
         panMap.setShowingEmptySystems(show);
+    }
+
+    public ExperimentalMapView.CartographyLayers getCartographyLayers() {
+        return panMap.getCartographyLayers();
+    }
+
+    public void setCartographyLayers(ExperimentalMapView.CartographyLayers layers) {
+        panMap.setCartographyLayers(layers);
     }
 
     public boolean setExperimentalMapActive(boolean enabled) {
@@ -1499,6 +1514,11 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         routeViewMode = RouteViewMode.PLANNED;
         panMap.setJumpPath(routePlanningIntent.getJumpPath());
         panMap.selectRouteTarget(selection);
+        if (experimentalMapActive) {
+            ExperimentalMapView.ViewState state = experimentalMap.getViewState();
+            experimentalMap.setViewState(new ExperimentalMapView.ViewState(state.centerX(), state.centerY(),
+                  state.scale(), panMap.getSelectedSystem()));
+        }
         setRouteFieldSystem(suggestRouteOrigin, routePlanningIntent.getOrigin());
         List<PlanetarySystem> requestedStops = routePlanningIntent.getRequestedStops();
         setRouteFieldSystem(suggestRouteDestination,
@@ -1827,6 +1847,17 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
             experimentalMap.refresh();
         }
         updateRouteStrip();
+    }
+
+    @Subscribe
+    public void handle(TransitStatusChangedEvent event) {
+        if (event.getLocation() == getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation()) {
+            SwingUtilities.invokeLater(() -> {
+                if (experimentalMapActive) {
+                    experimentalMap.refresh();
+                }
+            });
+        }
     }
 
     @Subscribe

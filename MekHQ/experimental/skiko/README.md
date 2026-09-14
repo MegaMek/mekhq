@@ -34,17 +34,60 @@ labels inside the viewport and prevent label overlap. Priority labels use a smal
 background plate over ordinary stars when needed; other labels avoid star markers.
 Crowded labels with no valid placement are omitted.
 
+Territory fills and borders reuse the existing campaign-date territory atlas as
+vector geometry. Sovereign regions use subdued faction colors; disputed regions
+use native clipped diagonal bands and dashed neutral borders. Enclaves and
+unclaimed pockets retain distinct boundary treatments. Curves, closed contours,
+and winding rules are converted to native paths, cached across pan/zoom, and
+released when the native surface is removed. Date/data changes rebuild the cache.
+Only viewport-intersecting contours are drawn, beneath routes, stars, and labels.
+
+If the dated atlas is missing, the snapshot prepares it on the EDT using the
+existing map implementation, then reuses it. First display or date changes can
+therefore still pause for atlas preparation; this is not an asynchronous geometry
+pipeline or a performance benchmark.
+
+Faction emblems use the existing dated asset resolver and territory anchors.
+Skia decodes the original PNGs, tints their alpha masks, and draws aspect-preserving
+images with the existing priority, minimum-area, collision, and zoom-fade rules.
+Decoded images are cached across camera changes and disposed on atlas replacement
+or native surface removal. Missing assets are skipped rather than replaced with
+invented artwork. Administrative regions use solid borders; district detail adds
+dashed boundaries. These reuse the atlas's vector paths, not a Java2D render.
+
+The experimental launch adds shared View controls for **Show Territories**,
+**Show Faction Emblems**, and **Administrative Borders** (Off, Regions, or Regions
+and Districts). They stay synchronized with the Java2D Layers controls, including
+the new Faction Emblems checkbox. Territories and emblems start enabled;
+administrative borders start off. These choices survive renderer switches but
+are session-only.
+
+Planned routes are dashed cyan; active routes are solid amber. Native waypoint
+rings, double-ring destinations, and direction marks preserve the ordered paths
+from the existing campaign planner. Both paths can be displayed together, and
+the existing HUD/sidebar controls still own planning, editing, and beginning transit.
+Switching renderers does not alter either route.
+
+While the fleet is in in-system transit, an arc around its current system shows
+its proximity to the destination world, using the campaign's transit fraction.
+The arc decreases outbound toward the jump point and increases inbound toward
+the world; it is not overall route completion or continuous travel between stars.
+It refreshes on fleet transit events and campaign-day updates without an idle
+animation timer. Arrival removes the arc. Route reveal animations, jump effects,
+numbered waypoint badges, and route-constraint overlays are not yet ported.
+
 **View > Show Empty Systems** controls both renderers and stays synchronized with
 the Java2D Layers checkbox. Empty systems are hidden by default, except selected,
 current, and route systems. Hidden systems are excluded from native hit-testing.
 Names, faction colors, and empty-system classification reuse a cached read-only
 snapshot of Java2D's prepared campaign data; drawing remains entirely native.
 
-This replaces the earlier hybrid experiment: no Java2D map painting or raster
-uploads run inside the native renderer. Layers and legend controls are disabled
-in Skia mode. Territories, route lines, analytical map modes, overlays, map export,
-and other map gestures have not been ported. Apart from empty-system visibility,
-Java2D layer settings do not apply to Skia. Switch back to
+This replaces the earlier hybrid experiment: no Java2D map painting or raster-frame
+uploads run inside the native renderer; emblem PNGs are ordinary native image
+assets. The full Layers and legend controls are disabled
+in Skia mode. Analytical map modes, other overlays, map export,
+and other map gestures have not been ported. Only the shared View controls apply
+to both renderers. Switch back to
 Java2D for the complete map. Native initialization or drawing failures return to
 Java2D and disable the experimental toggle for that campaign window.
 
@@ -61,19 +104,47 @@ selection round trips, changes tabs, resizes, and checks native peer disposal.
 It checks native label bounds and collisions at detailed/overview zoom, compares
 dated names and faction colors with campaign data before and after a temporary
 date change, and verifies empty-system filter changes across renderer switches.
+Territory checks compare sampled native interior pixels with expected faction
+tints at detailed/overview zoom and a historical date, verify snapshot/path reuse
+across camera changes, capture a disputed region, and check native path disposal.
+Emblem checks verify dated asset selection, nonoverlapping placement, and pixels
+changed by visibility toggles. Region/district checks verify additional native
+paths and pixel changes. The real menu actions change all shared layers across
+renderer round trips; image and administrative-path disposal are also checked.
+It also plots and appends a route through MapTab, checks planned/active route
+colors in a desktop capture, exercises fleet progress updates and renderer round
+trips, and verifies clearing, cancellation, arrival, and single-system paths.
 It samples sidebar pixels during 80 Map/Locations tab hovers and then performs
 six additional renderer switches. It exits nonzero on failure.
 
-The sequence passed on Windows / Direct3D at 175% display scale, including the
-tab-hover regression that failed with the hybrid renderer. This is a bounded
+The stars/labels/routes/territory sequence passed on Windows / Direct3D at 175%
+display scale, including the tab-hover regression that failed with the hybrid
+renderer. The later emblem/administrative/control pass has passed the offscreen
+mode below; its desktop run was blocked by all-black desktop captures, including
+Java2D. An unlocked-desktop rerun is still required for that pass. This is a bounded
 integration check, not proof against every flicker, a memory-leak test, or
 cross-platform acceptance. The two renderers currently draw different workloads,
 so their timings are not a like-for-like performance comparison.
 
-Both smoke drivers require an unlocked interactive desktop and temporarily place
+The default smoke drivers require an unlocked interactive desktop and temporarily place
 their windows on top. Do not interact with them during a run; the real-map check
 also moves the pointer. Captures in `MekHQ/build/skiko-stress/` may include other
 windows if the test is occluded. Inspect them before sharing.
+
+### Unattended native checks
+
+```powershell
+.\gradlew.bat :MekHQ:runSkikoMapSmoke --args=--offscreen
+```
+
+This explicit alternative uses the same map drawing callback with a native Skia
+raster surface for pixel assertions and PNG captures. It still creates the Swing
+campaign window and native peers, and exercises menus, camera input, dated data,
+route changes, and surface recreation. It works without readable desktop pixels,
+but is not a headless-JVM mode. It skips desktop capture and the tab-hover check;
+its `OFFSCREEN_MAP_SMOKE_COMPLETE` report must not be treated as desktop GPU
+compositing acceptance. Captures use the `offscreen-` prefix and contain only the
+native map. No campaign files are loaded or saved.
 
 ## Isolated integration harness
 

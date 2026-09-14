@@ -9,11 +9,18 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
+import java.awt.geom.PathIterator;
+import java.awt.geom.Rectangle2D;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import javax.swing.JComponent;
@@ -26,11 +33,23 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQInternationalization;
 import org.jetbrains.skia.Canvas;
+import org.jetbrains.skia.BlendMode;
+import org.jetbrains.skia.ColorFilter;
 import org.jetbrains.skia.Font;
 import org.jetbrains.skia.FontMgr;
 import org.jetbrains.skia.FontStyle;
+import org.jetbrains.skia.Image;
+import org.jetbrains.skia.Data;
+import org.jetbrains.skia.EncodedImageFormat;
+import org.jetbrains.skia.Surface;
 import org.jetbrains.skia.Paint;
 import org.jetbrains.skia.PaintMode;
+import org.jetbrains.skia.PaintStrokeCap;
+import org.jetbrains.skia.PaintStrokeJoin;
+import org.jetbrains.skia.Path;
+import org.jetbrains.skia.PathBuilder;
+import org.jetbrains.skia.PathEffect;
+import org.jetbrains.skia.PathFillMode;
 import org.jetbrains.skia.PixelGeometry;
 import org.jetbrains.skia.Rect;
 import org.jetbrains.skia.Typeface;
@@ -43,9 +62,14 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
     private static final int STAR_COLOR = 0xFFDAE5E8;
     private static final int CURRENT_COLOR = 0xFF66E1ED;
     private static final int SELECTED_COLOR = 0xFFF4BB62;
+    private static final int PLANNED_ROUTE_COLOR = 0xFF41D2E0;
+    private static final int ACTIVE_ROUTE_COLOR = 0xFFEBA642;
     private static long completedFrames;
     private static long completedStars;
     private static int activeSurfaces;
+    private static int activeTerritoryPaths;
+    private static int activeEmblemImages;
+    private static int activeAdministrativePaths;
 
     private final Campaign campaign;
     private final Supplier<Presentation> presentationSupplier;
@@ -61,6 +85,24 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
     private Paint starPaint;
     private Paint markerPaint;
     private Paint textPaint;
+    private Paint plannedRoutePaint;
+    private Paint activeRoutePaint;
+    private PathEffect routeDashes;
+    private Paint territoryFill;
+    private Paint territoryEdge;
+    private Territories territorySource;
+    private final List<NativeTerritory> territories = new ArrayList<>();
+    private final List<NativeBorder> administrativeBorders = new ArrayList<>();
+    private int renderedAdministrativeBorders;
+    private int territoryBuilds;
+    private int renderedTerritories;
+    private Paint emblemPaint;
+    private final Map<String, Image> emblemImages = new HashMap<>();
+    private final Set<String> missingEmblems = new HashSet<>();
+    private List<EmblemPlacement> emblemPlacements = List.of();
+    private int plannedLegs;
+    private int activeLegs;
+    private boolean transitMarkerDrawn;
     private Font labelFont;
     private Typeface labelTypeface;
     private boolean requested;
@@ -94,6 +136,62 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         return activeSurfaces;
     }
 
+    public static int getActiveTerritoryPaths() {
+        return activeTerritoryPaths;
+    }
+
+    public int getTerritoryBuilds() {
+        return territoryBuilds;
+    }
+
+    public int getRenderedTerritories() {
+        return renderedTerritories;
+    }
+
+    private record NativeTerritory(Territory data, Path path, Rectangle2D bounds) {
+    }
+
+    private record NativeBorder(AdministrativeBorder data, Path path, Rectangle2D bounds) {
+    }
+
+    public static int getActiveAdministrativePaths() {
+        return activeAdministrativePaths;
+    }
+
+    public int getRenderedAdministrativeBorders() {
+        return renderedAdministrativeBorders;
+    }
+
+    public record EmblemPlacement(Emblem emblem, Rect bounds, double projectedArea) {
+    }
+
+    public List<EmblemPlacement> getEmblemPlacements() {
+        return emblemPlacements;
+    }
+
+    public static int getActiveEmblemImages() {
+        return activeEmblemImages;
+    }
+
+    public byte[] captureNativePng() {
+        requireEdt();
+        if (layer == null || failed || getWidth() <= 0 || getHeight() <= 0) {
+            throw new IllegalStateException("Native map surface is unavailable");
+        }
+        try (Surface surface = Surface.Companion.makeRasterN32Premul(getWidth(), getHeight())) {
+            Canvas canvas = surface.getCanvas();
+            canvas.scale(1 / layer.getContentScale(), 1 / layer.getContentScale());
+            render(canvas, getWidth(), getHeight(), 0);
+            if (failed) {
+                throw new IllegalStateException("Native map snapshot failed");
+            }
+            try (Image image = surface.makeImageSnapshot();
+                  Data data = Objects.requireNonNull(image.encodeToData(EncodedImageFormat.PNG, 100, 0))) {
+                return data.getBytes();
+            }
+        }
+    }
+
     public record LabelPlacement(String systemId, String text, Rect bounds, float baselineX, float baselineY,
           float alpha) {
     }
@@ -108,6 +206,18 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
 
     public Presentation getPresentation() {
         return presentation;
+    }
+
+    public int getPlannedLegs() {
+        return plannedLegs;
+    }
+
+    public int getActiveLegs() {
+        return activeLegs;
+    }
+
+    public boolean isTransitMarkerDrawn() {
+        return transitMarkerDrawn;
     }
 
     @Override
@@ -161,6 +271,17 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
             markerPaint.setAntiAlias(true);
             markerPaint.setMode(PaintMode.STROKE);
             markerPaint.setStrokeWidth(UIUtil.scaleForGUI(1));
+            routeDashes = PathEffect.Companion.makeDash(new float[] {
+                UIUtil.scaleForGUI(8), UIUtil.scaleForGUI(6) }, 0);
+            plannedRoutePaint = createRoutePaint(PLANNED_ROUTE_COLOR, 2);
+            plannedRoutePaint.setPathEffect(routeDashes);
+            activeRoutePaint = createRoutePaint(ACTIVE_ROUTE_COLOR, 3);
+            territoryFill = new Paint();
+            territoryFill.setAntiAlias(true);
+            territoryEdge = createRoutePaint(0, 1);
+            territoryEdge.setStrokeJoin(PaintStrokeJoin.ROUND);
+            emblemPaint = new Paint();
+            emblemPaint.setAntiAlias(true);
             textPaint = new Paint();
             textPaint.setAntiAlias(true);
             java.awt.Font swingFont = UIManager.getFont("Label.font");
@@ -198,6 +319,20 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
                 }
             }
         } finally {
+            clearTerritories();
+            clearEmblems();
+            if (emblemPaint != null) {
+                emblemPaint.close();
+                emblemPaint = null;
+            }
+            if (territoryFill != null) {
+                territoryFill.close();
+                territoryFill = null;
+            }
+            if (territoryEdge != null) {
+                territoryEdge.close();
+                territoryEdge = null;
+            }
             if (starPaint != null) {
                 starPaint.close();
                 starPaint = null;
@@ -205,6 +340,18 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
             if (markerPaint != null) {
                 markerPaint.close();
                 markerPaint = null;
+            }
+            if (plannedRoutePaint != null) {
+                plannedRoutePaint.close();
+                plannedRoutePaint = null;
+            }
+            if (activeRoutePaint != null) {
+                activeRoutePaint.close();
+                activeRoutePaint = null;
+            }
+            if (routeDashes != null) {
+                routeDashes.close();
+                routeDashes = null;
             }
             if (textPaint != null) {
                 textPaint.close();
@@ -245,6 +392,11 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
             canvas.clear(BACKGROUND_COLOR);
             canvas.scale(layer.getContentScale(), layer.getContentScale());
             updatePresentation();
+            drawTerritories(canvas);
+            drawAdministrativeBorders(canvas);
+            drawEmblems(canvas);
+            activeLegs = drawRouteLines(canvas, presentation.routes().active(), activeRoutePaint);
+            plannedLegs = drawRouteLines(canvas, presentation.routes().planned(), plannedRoutePaint);
             float radius = UIUtil.scaleForGUI(2);
             int visibleStars = 0;
             List<SystemPresentation> visible = new ArrayList<>();
@@ -264,8 +416,7 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
                     drawStar(canvas, data, horizontal, vertical, radius);
                     visible.add(data);
                     renderedIds.add(system.getId());
-                    float markerRadius = Objects.equals(system, state.selectedSystem())
-                        ? UIUtil.scaleForGUI(8) : UIUtil.scaleForGUI(4);
+                    float markerRadius = markerRadius(system);
                     markerBounds.add(Rect.makeLTRB(horizontal - markerRadius, vertical - markerRadius,
                         horizontal + markerRadius, vertical + markerRadius));
                 visibleStars++;
@@ -281,6 +432,9 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
                 markerPaint.setColor(CURRENT_COLOR);
                 canvas.drawCircle(screenX(current), screenY(current), UIUtil.scaleForGUI(4), markerPaint);
             }
+            drawRouteMarkers(canvas, presentation.routes().active(), ACTIVE_ROUTE_COLOR, 5);
+            drawRouteMarkers(canvas, presentation.routes().planned(), PLANNED_ROUTE_COLOR, 8);
+            drawTransitMarker(canvas);
             drawLabels(canvas, visible, markerBounds);
             completedFrames++;
             completedStars += visibleStars;
@@ -294,6 +448,410 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         } finally {
             canvas.restore();
         }
+    }
+
+    private void clearTerritories() {
+        for (NativeTerritory territory : territories) {
+            territory.path().close();
+            activeTerritoryPaths--;
+        }
+        territories.clear();
+        for (NativeBorder border : administrativeBorders) {
+            border.path().close();
+            activeAdministrativePaths--;
+        }
+        administrativeBorders.clear();
+        territorySource = null;
+    }
+
+    private void prepareTerritories() {
+        if (territorySource == presentation.territories()) {
+            return;
+        }
+        clearTerritories();
+        clearEmblems();
+        for (Territory territory : presentation.territories().contours()) {
+            territories.add(new NativeTerritory(territory, toNativePath(territory.shape()), territory.shape().getBounds2D()));
+            activeTerritoryPaths++;
+        }
+        for (AdministrativeBorder border : presentation.territories().administrativeBorders()) {
+            administrativeBorders.add(new NativeBorder(border, toNativePath(border.shape()), border.shape().getBounds2D()));
+            activeAdministrativePaths++;
+        }
+        territorySource = presentation.territories();
+        territoryBuilds++;
+    }
+
+    private static Path toNativePath(java.awt.Shape shape) {
+        PathIterator iterator = shape.getPathIterator(null);
+        PathFillMode fillMode = iterator.getWindingRule() == PathIterator.WIND_EVEN_ODD
+                  ? PathFillMode.EVEN_ODD : PathFillMode.WINDING;
+        try (PathBuilder builder = new PathBuilder(fillMode)) {
+                float[] coordinates = new float[6];
+                while (!iterator.isDone()) {
+                    switch (iterator.currentSegment(coordinates)) {
+                        case PathIterator.SEG_MOVETO -> builder.moveTo(coordinates[0], coordinates[1]);
+                        case PathIterator.SEG_LINETO -> builder.lineTo(coordinates[0], coordinates[1]);
+                        case PathIterator.SEG_QUADTO -> builder.quadTo(coordinates[0], coordinates[1],
+                              coordinates[2], coordinates[3]);
+                        case PathIterator.SEG_CUBICTO -> builder.cubicTo(coordinates[0], coordinates[1],
+                              coordinates[2], coordinates[3], coordinates[4], coordinates[5]);
+                        case PathIterator.SEG_CLOSE -> builder.closePath();
+                        default -> throw new IllegalStateException("Unknown territory path segment");
+                    }
+                    iterator.next();
+                }
+            return builder.detach();
+        }
+    }
+
+    private void drawAdministrativeBorders(Canvas canvas) {
+        renderedAdministrativeBorders = 0;
+        BoundaryDetail detail = presentation.layers().administrative();
+        if (detail == BoundaryDetail.OFF) {
+            return;
+        }
+        float scale = (float) state.scale();
+        float unit = (float) UIUtil.scaleForGUI(1) / scale;
+        Rectangle2D viewport = new Rectangle2D.Double(state.centerX() - getWidth() / (2.0 * scale),
+              state.centerY() - getHeight() / (2.0 * scale), getWidth() / scale, getHeight() / scale);
+        try (PathEffect dash = PathEffect.Companion.makeDash(new float[] { 4 * unit, 5 * unit }, 0)) {
+            canvas.save();
+            try {
+                canvas.translate(getWidth() / 2.0f, getHeight() / 2.0f);
+                canvas.scale(scale, -scale);
+                canvas.translate((float) -state.centerX(), (float) -state.centerY());
+                for (NativeBorder border : administrativeBorders) {
+                    AdministrativeBorder data = border.data();
+                    if ((!data.region() && detail == BoundaryDetail.REGIONS)
+                          || !border.bounds().intersects(viewport) || data.factionColors().isEmpty()) {
+                        continue;
+                    }
+                    territoryEdge.setPathEffect(data.region() ? null : dash);
+                    territoryEdge.setColor(0xAF02060A);
+                    territoryEdge.setStrokeWidth((data.region() ? 3.8f : 2.6f) * unit);
+                    canvas.drawPath(border.path(), territoryEdge);
+                    territoryEdge.setColor(((data.region() ? 215 : 165) << 24)
+                          | (data.factionColors().getFirst() & 0xFFFFFF));
+                    territoryEdge.setStrokeWidth((data.region() ? 1.8f : 1) * unit);
+                    canvas.drawPath(border.path(), territoryEdge);
+                    if (data.factionColors().size() > 1) {
+                        territoryEdge.setPathEffect(null);
+                        territoryEdge.setColor(0xF0000000 | (data.factionColors().get(1) & 0xFFFFFF));
+                        territoryEdge.setStrokeWidth(1.2f * unit);
+                        canvas.drawPath(border.path(), territoryEdge);
+                    }
+                    renderedAdministrativeBorders++;
+                }
+            } finally {
+                territoryEdge.setPathEffect(null);
+                canvas.restore();
+            }
+        }
+    }
+
+    private void clearEmblems() {
+        for (Image image : emblemImages.values()) {
+            image.close();
+            activeEmblemImages--;
+        }
+        emblemImages.clear();
+        missingEmblems.clear();
+        emblemPlacements = List.of();
+    }
+
+    private Image getEmblemImage(String path) {
+        if (emblemImages.containsKey(path)) {
+            return emblemImages.get(path);
+        }
+        if (missingEmblems.contains(path)) {
+            return null;
+        }
+        try {
+            Image image = Image.Companion.makeFromEncoded(Files.readAllBytes(java.nio.file.Path.of(path)));
+            emblemImages.put(path, image);
+            activeEmblemImages++;
+            return image;
+        } catch (IOException | IllegalArgumentException exception) {
+            missingEmblems.add(path);
+            return null;
+        }
+    }
+
+    private void drawEmblems(Canvas canvas) {
+        float alpha = (float) (0.34 * InterstellarMapPanel.SemanticZoomProfile.create(state.scale(),
+              presentation.labelZoomReference()).factionLogoAlpha());
+        if (alpha <= 0 || !presentation.layers().emblems()) {
+            emblemPlacements = List.of();
+            return;
+        }
+        double cellArea = 30 * 30 * Math.sqrt(3) / 2 * state.scale() * state.scale();
+        int maximum = UIUtil.scaleForGUI(100);
+        int padding = UIUtil.scaleForGUI(8);
+        List<EmblemPlacement> candidates = new ArrayList<>();
+        for (Emblem emblem : presentation.territories().emblems()) {
+            int minimum = UIUtil.scaleForGUI(emblem.priority() == 0 ? 36 : 24);
+            double area = emblem.cellCount() * cellArea;
+            double width = emblem.width() * state.scale();
+            double height = emblem.height() * state.scale();
+            double areaFactor = emblem.priority() == 0 ? 4 : emblem.priority() == 1 ? 2.25 : 3;
+            double extentFactor = emblem.priority() == 0 ? 1.25 : emblem.priority() == 1 ? 0.9 : 1;
+            if (area < minimum * minimum * areaFactor || width < minimum * extentFactor
+                  || height < minimum * extentFactor) {
+                continue;
+            }
+            double containment = emblem.priority() == 0 ? 0.68 : 0.85;
+            double desired = Math.min(Math.sqrt(area) * (emblem.priority() == 0 ? 0.5 : 0.65),
+                  Math.min(width, height) * containment);
+            int size = InterstellarMapPanel.resolveLogoSize(desired, minimum, maximum);
+            float horizontal = (float) (getWidth() / 2.0 + (emblem.anchorX() - state.centerX()) * state.scale());
+            float vertical = (float) (getHeight() / 2.0 - (emblem.anchorY() - state.centerY()) * state.scale());
+            if (size < minimum || horizontal + size / 2f < 0 || horizontal - size / 2f > getWidth()
+                  || vertical + size / 2f < 0 || vertical - size / 2f > getHeight()) {
+                continue;
+            }
+            Image image = getEmblemImage(emblem.imagePath());
+            if (image == null) {
+                continue;
+            }
+            float targetWidth = size * image.getWidth() / (float) Math.max(image.getWidth(), image.getHeight());
+            float targetHeight = size * image.getHeight() / (float) Math.max(image.getWidth(), image.getHeight());
+            candidates.add(new EmblemPlacement(emblem, Rect.makeXYWH(horizontal - targetWidth / 2,
+                  vertical - targetHeight / 2, targetWidth, targetHeight), area));
+        }
+        candidates.sort(Comparator.comparingInt((EmblemPlacement candidate) -> candidate.emblem().priority())
+              .thenComparing(Comparator.comparingDouble(EmblemPlacement::projectedArea).reversed())
+              .thenComparing(candidate -> candidate.emblem().factionCode())
+              .thenComparingDouble(candidate -> candidate.emblem().anchorX())
+              .thenComparingDouble(candidate -> candidate.emblem().anchorY()));
+        List<EmblemPlacement> accepted = new ArrayList<>();
+        List<Rectangle2D> occupied = new ArrayList<>();
+        for (EmblemPlacement candidate : candidates) {
+            Rect bounds = candidate.bounds();
+            Rectangle2D padded = new Rectangle2D.Double(bounds.getLeft() - padding, bounds.getTop() - padding,
+                  bounds.getWidth() + padding * 2, bounds.getHeight() + padding * 2);
+            boolean collision = false;
+            for (Rectangle2D previous : occupied) {
+                if (previous.intersects(padded)) {
+                    collision = true;
+                    break;
+                }
+            }
+            if (collision) {
+                continue;
+            }
+            occupied.add(padded);
+            accepted.add(candidate);
+            int color = candidate.emblem().color();
+            int tint = 0xFF000000 | (((color >> 16 & 255) + 510) / 3 << 16)
+                  | (((color >> 8 & 255) + 510) / 3 << 8) | ((color & 255) + 510) / 3;
+            Image image = emblemImages.get(candidate.emblem().imagePath());
+            float shadow = UIUtil.scaleForGUI(2);
+            try (ColorFilter shadowFilter = ColorFilter.Companion.makeBlend(0xFF000000, BlendMode.SRC_IN);
+                  ColorFilter tintFilter = ColorFilter.Companion.makeBlend(tint, BlendMode.SRC_IN)) {
+                emblemPaint.setAlphaf(alpha * 0.72f);
+                emblemPaint.setColorFilter(shadowFilter);
+                canvas.drawImageRect(image, Rect.makeXYWH(bounds.getLeft() + shadow, bounds.getTop() + shadow,
+                      bounds.getWidth(), bounds.getHeight()), emblemPaint);
+                emblemPaint.setAlphaf(alpha);
+                emblemPaint.setColorFilter(tintFilter);
+                canvas.drawImageRect(image, bounds, emblemPaint);
+            } finally {
+                emblemPaint.setColorFilter(null);
+            }
+        }
+        emblemPlacements = List.copyOf(accepted);
+    }
+
+    private void drawTerritories(Canvas canvas) {
+        prepareTerritories();
+        renderedTerritories = 0;
+        if (!presentation.layers().territories()) {
+            return;
+        }
+        float scale = (float) state.scale();
+        double halfWidth = getWidth() / (2.0 * scale);
+        double halfHeight = getHeight() / (2.0 * scale);
+        Rectangle2D viewport = new Rectangle2D.Double(state.centerX() - halfWidth,
+              state.centerY() - halfHeight, halfWidth * 2, halfHeight * 2);
+        var profile = InterstellarMapPanel.TerritoryVisualProfile.create(scale);
+        float unit = (float) UIUtil.scaleForGUI(1) / scale;
+        try (PathEffect disputedDashes = PathEffect.Companion.makeDash(new float[] { 7 * unit, 4 * unit }, 0);
+              PathEffect pocketDashes = PathEffect.Companion.makeDash(new float[] { unit, 5 * unit }, 0)) {
+            canvas.save();
+            try {
+                canvas.translate(getWidth() / 2.0f, getHeight() / 2.0f);
+                canvas.scale(scale, -scale);
+                canvas.translate((float) -state.centerX(), (float) -state.centerY());
+                for (NativeTerritory territory : territories) {
+                    if (!territory.bounds().intersects(viewport)) {
+                        continue;
+                    }
+                    Territory data = territory.data();
+                    List<Integer> colors = data.factionColors();
+                    int color = colors.isEmpty() ? 0xFFC6D3D6 : colors.getFirst();
+                    if (colors.size() > 1) {
+                        drawDisputedBands(canvas, territory, viewport, profile, scale);
+                    } else {
+                        territoryFill.setColor(territoryColor(data.pocket() ? 0xFF010509 : color,
+                              data.pocket() ? 70 : 41));
+                        canvas.drawPath(territory.path(), territoryFill);
+                    }
+                    territoryEdge.setPathEffect(null);
+                    if (!data.pocket()) {
+                        territoryEdge.setColor(territoryColor(0xFF02060A, 175));
+                        territoryEdge.setStrokeWidth(2.8f * unit);
+                        canvas.drawPath(territory.path(), territoryEdge);
+                    }
+                    if (data.pocket() || colors.size() > 1) {
+                        territoryEdge.setPathEffect(data.pocket() ? pocketDashes : disputedDashes);
+                        territoryEdge.setColor(territoryColor(0xFFC6D3D6,
+                              data.pocket() ? (int) (145 * profile.secondaryDetailAlpha()) : 145));
+                        territoryEdge.setStrokeWidth((data.pocket() ? 1.6f : 1) * unit);
+                    } else {
+                        territoryEdge.setColor(territoryColor(color, 170));
+                        territoryEdge.setStrokeWidth(unit);
+                    }
+                    canvas.drawPath(territory.path(), territoryEdge);
+                    if (data.enclave() && profile.secondaryDetailAlpha() > 0) {
+                        territoryEdge.setStrokeWidth(4.4f * unit);
+                        territoryEdge.setColor(territoryColor(color, (int) (75 * profile.secondaryDetailAlpha())));
+                        canvas.drawPath(territory.path(), territoryEdge);
+                    }
+                    renderedTerritories++;
+                }
+            } finally {
+                territoryEdge.setPathEffect(null);
+                canvas.restore();
+            }
+        }
+    }
+
+    private void drawDisputedBands(Canvas canvas, NativeTerritory territory, Rectangle2D viewport,
+          InterstellarMapPanel.TerritoryVisualProfile profile, float scale) {
+        List<Integer> colors = territory.data().factionColors();
+        int red = 0;
+        int green = 0;
+        int blue = 0;
+        for (int color : colors) {
+            red += color >> 16 & 255;
+            green += color >> 8 & 255;
+            blue += color & 255;
+        }
+        red /= colors.size();
+        green /= colors.size();
+        blue /= colors.size();
+        double width = UIUtil.scaleForGUI(1) * profile.disputedBandWidth() / scale;
+        Rectangle2D bounds = territory.bounds().createIntersection(viewport);
+        double bottom = bounds.getMinY() - width;
+        double top = bounds.getMaxY() + width;
+        double height = top - bottom;
+        long firstBand = (long) Math.floor((bounds.getMinX() - top) / width);
+        long lastBand = (long) Math.ceil((bounds.getMaxX() - bottom) / width);
+        canvas.save();
+        try {
+            canvas.clipPath(territory.path());
+            territoryEdge.setPathEffect(null);
+            territoryEdge.setStrokeWidth((float) (width / Math.sqrt(2) + 0.5 / scale));
+            for (long band = firstBand; band <= lastBand; band++) {
+                int color = colors.get(Math.floorMod(band, colors.size()));
+                double detail = profile.secondaryDetailAlpha();
+                int bandRed = (int) (red + ((color >> 16 & 255) - red) * detail);
+                int bandGreen = (int) (green + ((color >> 8 & 255) - green) * detail);
+                int bandBlue = (int) (blue + ((color & 255) - blue) * detail);
+                territoryEdge.setColor(territoryColor(bandRed << 16 | bandGreen << 8 | bandBlue, 46));
+                float start = (float) (band * width + bottom);
+                canvas.drawLine(start, (float) bottom, (float) (start + height), (float) top, territoryEdge);
+            }
+        } finally {
+            canvas.restore();
+        }
+    }
+
+    private static int territoryColor(int color, int alpha) {
+        return ((int) (alpha * 0.72) << 24) | (color & 0xFFFFFF);
+    }
+
+    private static Paint createRoutePaint(int color, int width) {
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setMode(PaintMode.STROKE);
+        paint.setStrokeCap(PaintStrokeCap.ROUND);
+        paint.setStrokeWidth(UIUtil.scaleForGUI(width));
+        paint.setColor(color);
+        return paint;
+    }
+
+    private int drawRouteLines(Canvas canvas, List<PlanetarySystem> route, Paint paint) {
+        for (int index = 1; index < route.size(); index++) {
+            PlanetarySystem origin = route.get(index - 1);
+            PlanetarySystem destination = route.get(index);
+            canvas.drawLine(screenX(origin), screenY(origin), screenX(destination), screenY(destination), paint);
+        }
+        return Math.max(0, route.size() - 1);
+    }
+
+    private void drawRouteMarkers(Canvas canvas, List<PlanetarySystem> route, int color, int size) {
+        markerPaint.setColor(color);
+        float radius = UIUtil.scaleForGUI(size);
+        for (int index = 0; index < route.size(); index++) {
+            PlanetarySystem system = route.get(index);
+            float horizontal = screenX(system);
+            float vertical = screenY(system);
+            canvas.drawCircle(horizontal, vertical, radius, markerPaint);
+            if (index == route.size() - 1) {
+                canvas.drawCircle(horizontal, vertical, radius + UIUtil.scaleForGUI(2), markerPaint);
+            }
+            if (index > 0) {
+                PlanetarySystem previous = route.get(index - 1);
+                float deltaX = horizontal - screenX(previous);
+                float deltaY = vertical - screenY(previous);
+                double length = Math.hypot(deltaX, deltaY);
+                if (length > UIUtil.scaleForGUI(30)) {
+                    float directionX = (float) (deltaX / length);
+                    float directionY = (float) (deltaY / length);
+                    float centerX = (horizontal + screenX(previous)) / 2;
+                    float centerY = (vertical + screenY(previous)) / 2;
+                    float arrow = UIUtil.scaleForGUI(5);
+                    canvas.drawLine(centerX, centerY,
+                          centerX - directionX * arrow - directionY * arrow,
+                          centerY - directionY * arrow + directionX * arrow, markerPaint);
+                    canvas.drawLine(centerX, centerY,
+                          centerX - directionX * arrow + directionY * arrow,
+                          centerY - directionY * arrow - directionX * arrow, markerPaint);
+                }
+            }
+        }
+    }
+
+    private void drawTransitMarker(Canvas canvas) {
+        Routes routes = presentation.routes();
+        transitMarkerDrawn = routes.inTransit() && (routes.currentSystem() != null);
+        if (!transitMarkerDrawn) {
+            return;
+        }
+        float horizontal = screenX(routes.currentSystem());
+        float vertical = screenY(routes.currentSystem());
+        float radius = UIUtil.scaleForGUI(13);
+        markerPaint.setColor(0xFF45606C);
+        canvas.drawCircle(horizontal, vertical, radius, markerPaint);
+        float sweep = (float) (routes.planetProximity() * 360);
+        canvas.drawArc(horizontal - radius, vertical - radius, horizontal + radius, vertical + radius,
+              -90, sweep, false, activeRoutePaint);
+        double angle = Math.toRadians(sweep - 90);
+        starPaint.setColor(CURRENT_COLOR);
+        canvas.drawCircle(horizontal + radius * (float) Math.cos(angle),
+              vertical + radius * (float) Math.sin(angle), UIUtil.scaleForGUI(3), starPaint);
+    }
+
+    private float markerRadius(PlanetarySystem system) {
+        if (presentation.routes().inTransit() && Objects.equals(system, presentation.routes().currentSystem())) {
+            return UIUtil.scaleForGUI(17);
+        }
+        if (presentation.routeSystemIds().contains(system.getId())) {
+            return UIUtil.scaleForGUI(11);
+        }
+        return UIUtil.scaleForGUI(Objects.equals(system, state.selectedSystem()) ? 8 : 4);
     }
 
     private boolean isVisible(SystemPresentation data) {
@@ -324,7 +882,7 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         for (SystemPresentation data : visible) {
             if (Objects.equals(data.system(), state.selectedSystem())
                   || Objects.equals(data.system(), campaign.getCurrentSystem())) {
-                float radius = UIUtil.scaleForGUI(8);
+                float radius = markerRadius(data.system());
                 priorityMarkers.add(Rect.makeLTRB(screenX(data.system()) - radius, screenY(data.system()) - radius,
                       screenX(data.system()) + radius, screenY(data.system()) + radius));
             }
@@ -373,7 +931,7 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         float height = ink.getHeight() + 2 * padding;
         float horizontal = screenX(data.system());
         float vertical = screenY(data.system());
-        float gap = UIUtil.scaleForGUI(10);
+        float gap = Math.max(UIUtil.scaleForGUI(10), markerRadius(data.system()) + UIUtil.scaleForGUI(2));
         for (int candidate = 0; candidate < 4; candidate++) {
             float left = switch (candidate) {
                 case 0 -> horizontal + gap;
