@@ -35,16 +35,10 @@ package mekhq.gui;
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.isForceDeployedToStratCon;
-import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
-import static mekhq.campaign.mission.contract.contractData.MissionStatus.PARTIAL;
-import static mekhq.campaign.mission.contract.contractData.MissionStatus.SUCCESS;
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.getPlanetOwnerAlignment;
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.getPlanetOwnerFaction;
-import static mekhq.campaign.mission.scenarios.ScenarioStatus.DRAW;
-import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -84,7 +78,6 @@ import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.CampaignNewDayManager;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -106,11 +99,8 @@ import mekhq.campaign.events.scenarios.ScenarioRemovedEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
-import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
-import mekhq.campaign.mission.contract.utilities.ContractEmergencyExtension;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.scenarios.AtBScenario;
@@ -122,24 +112,16 @@ import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageFormationData;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageTechData;
-import mekhq.campaign.mission.utilities.CombatRole;
+import mekhq.campaign.mission.utilities.MissionCompletionManager;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
-import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
-import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
-import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
-import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.camOpsSalvage.SalvageFormationPicker;
 import mekhq.gui.dialog.camOpsSalvage.SalvageTechPicker;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
@@ -816,235 +798,11 @@ public final class BriefingTab extends CampaignGuiTab {
             return;
         }
 
-        CampaignOptions campaignOptions = getCampaignOptions();
-
-        app.getAutosaveService().requestBeforeMissionEndAutosave(getCampaign());
-
-        final CompleteMissionDialog cmd = new CompleteMissionDialog(getFrame());
-        if (!cmd.showDialog().isConfirmed()) {
+        MissionCompletionManager missionCompletionManager = new MissionCompletionManager(app, getCampaignGui(),
+              mission);
+        if (!missionCompletionManager.completeMission()) {
             return;
         }
-
-        final MissionStatus status = cmd.getStatus();
-        if (status.isActive()) {
-            return;
-        }
-
-        PrisonerMissionEndEvent prisoners = new PrisonerMissionEndEvent(getCampaign(), mission);
-
-        if (!getCampaign().getPlayerForce().getHumanResources().getPrisonerDefectors().isEmpty() &&
-                  prisoners.handlePrisonerDefectors() == 0) { // This is the cancel choice index
-            return;
-        }
-
-        if (campaignOptions.isUseStratCon()) { // TODO make contract extension a campaign option
-            if (ContractEmergencyExtension.contractExtended(getCampaign(), mission)) {
-                return;
-            }
-        }
-
-        // Set up some variables we'll be using later
-        NewPersonnelMarket newPersonnelMarket = getCampaign().getPlayerForce()
-                                                      .getHumanResources()
-                                                      .getNewPersonnelMarket();
-        boolean marketPreviouslyDisabled = !newPersonnelMarket.getAvailabilityMessage().isBlank();
-
-        getCampaign().completeMission(mission, status);
-        MekHQ.triggerEvent(new MissionCompletedEvent(mission));
-
-        // Pay the completion bonus, if the contract earned one (Completion Bonus characteristic, success only).
-        ContractCharacteristics.payCompletionBonus(getCampaign(), mission, status);
-
-        if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)) {
-            List<Person> personnel = getCampaign().getPlayerForce()
-                                           .getHumanResources()
-                                           .getPersonnelFilteringOutDepartedAndAbsent();
-            ChaosReputation.processContractCompletion(getCampaign(), status, personnel,
-                  ContractCharacteristics.getUnitReputationMultiplier(mission, status));
-
-            if (mission.getEmployerFactionCode() == PIRATE_FACTION_CODE) {
-                ChaosReputation.resolveActOfPiracy(getCampaign(),
-                      personnel,
-                      mission.getScale(),
-                      mission.getScenarios(),
-                      status.isOverallSuccess(),
-                      mission.getName());
-            }
-        }
-
-        // apply mission xp
-        int xpAward = getMissionXpAward(cmd.getStatus(), mission);
-
-        LocalDate today = getCampaign().getLocalDate();
-        if (xpAward > 0) {
-            Campaign campaign = getCampaign();
-            for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
-                if (person.isChild(today)) {
-                    continue;
-                }
-
-                if (person.isDependent()) {
-                    continue;
-                }
-
-                person.awardXP(getCampaign(), xpAward);
-            }
-        }
-
-        // Prisoners
-        boolean wasOverallSuccess = cmd.getStatus() == SUCCESS || cmd.getStatus() == PARTIAL;
-
-        List<Person> POWPersonnel = getCampaign().getPlayerForce().getHumanResources().getFriendlyPrisoners();
-
-        // We only resolve prisoners if there are no active Missions
-        if (getCampaign().getActiveContracts().isEmpty()) {
-            if (!getCampaign().getPlayerForce().getHumanResources().getFriendlyPrisoners().isEmpty()) {
-                prisoners.handlePrisoners(wasOverallSuccess, true);
-            }
-
-            if (!getCampaign().getPlayerForce().getHumanResources().getCurrentPrisoners().isEmpty()) {
-                prisoners.handlePrisoners(wasOverallSuccess, false);
-            }
-
-            Campaign campaign = getCampaign();
-            campaign.getPlayerForce().setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
-        }
-
-        // resolve turnover
-        if ((campaignOptions.get(CampaignOption.USE_RANDOM_RETIREMENT)) && (campaignOptions.get(CampaignOption.USE_CONTRACT_COMPLETION_RANDOM_RETIREMENT))) {
-            RetirementDefectionDialog rdd = new RetirementDefectionDialog(getCampaignGui(), mission, true);
-
-            if (rdd.wasAborted()) {
-                /*
-                 * Once the retirement rolls have been made, the outstanding payouts can be
-                 * resolved
-                 * without a reference to the contract and the dialog can be accessed through
-                 * the menu
-                 * provided they aren't still assigned to the mission in question.
-                 */
-                if (!getCampaign().getPlayerForce()
-                           .getHumanResources()
-                           .getRetirementDefectionTracker()
-                           .isOutstanding(mission.getId())) {
-                    return;
-                }
-            } else {
-                if ((getCampaign().getPlayerForce()
-                           .getHumanResources()
-                           .getRetirementDefectionTracker()
-                           .getRetirees(mission) != null) &&
-                          getCampaign().getPlayerForce()
-                                .getFinances()
-                                .getBalance()
-                                .isGreaterOrEqualThan(rdd.totalPayout())) {
-                    for (PersonnelRole role : PersonnelRole.getAdministratorRoles()) {
-                        Campaign campaign = getCampaign();
-                        Person admin = campaign.getPlayerForce().getHumanResources()
-                                             .findBestInRole(role,
-                                                   SkillType.S_ADMIN,
-                                                   campaign.getCampaignOptions(),
-                                                   campaign.getPlayerForce().isClanForce(),
-                                                   campaign.getLocalDate());
-                        if (admin != null) {
-                            admin.awardXP(getCampaign(), 1);
-                            getCampaign().addReport(PERSONNEL, admin.getHyperlinkedName() + " has gained 1 XP.");
-                        }
-                    }
-                }
-
-                if (!getCampaign().applyRetirement(rdd.totalPayout(), rdd.getUnitAssignments())) {
-                    return;
-                }
-            }
-        }
-
-        // prompt autoAwards ceremony
-        if (campaignOptions.get(CampaignOption.ENABLE_AUTO_AWARDS)) {
-            AutoAwardsController autoAwardsController = new AutoAwardsController();
-
-            // for the purposes of Mission Accomplished awards, we do not count partial
-            // Successes as Success
-            autoAwardsController.PostMissionController(getCampaign(),
-                  mission,
-                  Objects.equals(String.valueOf(cmd.getStatus()), "Success"),
-                  POWPersonnel);
-        }
-
-        // Update Faction Standings
-        if (campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
-            FactionStandings factionStandings = getCampaign().getPlayerForce().getFactionStandings();
-            List<String> reports = new ArrayList<>();
-
-            // The employer's disposition characteristic (Employer's Favorite / On Probation) scales the standing change.
-            double regardMultiplier = campaignOptions.get(CampaignOption.REGARD_MULTIPLIER)
-                                            * ContractCharacteristics.getEmployerRegardMultiplier(mission);
-
-            // A covert sponsor, if any, takes the standing change in the visible employer's place.
-            Faction employer = mission.getStandingEmployerFaction();
-            reports = factionStandings.processContractCompletion(getCampaign().getPlayerForce().getFaction(),
-                  employer,
-                  today,
-                  status, regardMultiplier, mission.getLengthInMonths());
-        }
-
-        // Refresh personnel market if it was previously disabled
-        if (marketPreviouslyDisabled) {
-            Campaign campaign = getCampaign();
-            campaign.getPlayerForce().getHumanResources().refreshApplicants(campaign, true);
-            CampaignNewDayManager.showRarePersonnelDialog(getCampaign(), false);
-        }
-
-        // Undeploy forces & units
-        boolean isCadreDuty = mission.getObjectiveType().isCadreDuty();
-        boolean hadCadreForces = false;
-        for (Formation formation : getCampaign().getPlayerForce().getAllFormations()) {
-            if (isCadreDuty && formation.getCombatRoleInMemory().isCadre()) {
-                formation.setCombatRoleInMemory(CombatRole.FRONTLINE);
-                hadCadreForces = true;
-            }
-
-            int scenarioAssignment = formation.getScenarioId();
-            if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
-                Scenario scenario = getCampaign().getScenario(scenarioAssignment);
-
-                // This shouldn't be necessary, but now is as good a time as any to check for null scenarios
-                if (scenario == null || Objects.equals(scenario.getMissionId(), mission.getId())) {
-                    formation.setScenarioId(NO_ASSIGNED_SCENARIO, getCampaign());
-                }
-            }
-        }
-
-        if (hadCadreForces) {
-            new ImmersiveDialogNotification(getCampaign(), getTextAt(RESOURCE_BUNDLE, "cadreReassignment.text"),
-                  true);
-        }
-
-        for (Unit unit : getCampaign().getUnits()) {
-            int scenarioAssignment = unit.getScenarioId();
-            if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
-                Scenario scenario = getCampaign().getScenario(scenarioAssignment);
-
-                // This shouldn't be necessary, but now is as good a time as any to check for null scenarios
-                if (scenario == null || Objects.equals(scenario.getMissionId(), mission.getId())) {
-                    unit.setScenarioId(NO_ASSIGNED_SCENARIO);
-                }
-            }
-        }
-
-        // Resolve any outstanding scenarios
-        for (Scenario scenario : mission.getCurrentScenarios()) {
-            scenario.setStatus(DRAW);
-        }
-
-        if (mission.getEmployerFactionCode().equals(PIRATE_FACTION_CODE)) {
-            // CamOps 'other crimes' value
-            Campaign campaign = getCampaign();
-            campaign.getPlayerForce().changeCrimePirateModifier(10);
-        }
-
-        // Clear out any old StratCon campaign data (it's not going to be used, moving forward). We do this near the
-        // end to ensure there isn't any risk of us accidentally killing the data when it's still required.
-        mission.setStratConCampaignState(null);
 
         final List<AbstractContract> missions = getCampaign().getSortedContracts();
         comboMission.setSelectedItem(missions.isEmpty() ? null : missions.getFirst());
@@ -1094,33 +852,6 @@ public final class BriefingTab extends CampaignGuiTab {
               status,
               mission.getName(),
               mission.getLengthInMonths());
-    }
-
-    /**
-     * Calculates the XP award for completing a mission.
-     *
-     * @param missionStatus The status of the mission as a MissionStatus enum.
-     * @param mission       The Mission object representing the completed mission.
-     *
-     * @return The XP award for completing the mission.
-     */
-    private int getMissionXpAward(MissionStatus missionStatus, AbstractContract mission) {
-        return switch (missionStatus) {
-            case FAILED, BREACH -> getCampaignOptions().get(CampaignOption.MISSION_XP_FAIL);
-            case SUCCESS, PARTIAL -> {
-                StratConCampaignState stratConCampaignState = mission.getStratConCampaignState();
-                if (stratConCampaignState != null) {
-                    if (stratConCampaignState.getVictoryPoints() < 3) {
-                        yield getCampaignOptions().get(CampaignOption.MISSION_XP_SUCCESS);
-                    } else {
-                        yield getCampaignOptions().get(CampaignOption.MISSION_XP_OUTSTANDING_SUCCESS);
-                    }
-                } else {
-                    yield getCampaignOptions().get(CampaignOption.MISSION_XP_SUCCESS);
-                }
-            }
-            case ACTIVE -> 0;
-        };
     }
 
     private void deleteMission() {
