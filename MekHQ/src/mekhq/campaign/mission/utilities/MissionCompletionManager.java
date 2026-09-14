@@ -349,7 +349,7 @@ public class MissionCompletionManager {
             ChaosReputation.processContractCompletion(campaign, status, personnel,
                   ContractCharacteristics.getUnitReputationMultiplier(mission, status));
 
-            if (mission.getEmployerFactionCode() == PIRATE_FACTION_CODE) {
+            if (mission.getEmployerFactionCode().equals(PIRATE_FACTION_CODE)) {
                 ChaosReputation.resolveActOfPiracy(campaign,
                       personnel,
                       mission.getScale(),
