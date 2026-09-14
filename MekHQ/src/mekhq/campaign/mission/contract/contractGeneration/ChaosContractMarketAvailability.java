@@ -523,12 +523,11 @@ public final class ChaosContractMarketAvailability {
         final FactionStandings factionStandings = playerForce.getFactionStandings();
         final boolean isOverridingCommandCircuitRequirements = playerForce.isOverridingCommandCircuitRequirements();
 
-        return AbstractContractGeneration.createContract(campaign,
+        return AbstractContractGeneration.forSearchType(searchType).createContract(campaign,
               campaignOptions,
               currentDate,
               detachment,
               0,
-              searchType,
               factionStandings,
               isOverridingCommandCircuitRequirements,
               isGM,
