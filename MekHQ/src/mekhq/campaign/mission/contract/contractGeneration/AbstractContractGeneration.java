@@ -106,7 +106,7 @@ public class AbstractContractGeneration {
         }
 
         // Step 1: Type. Resolved before the employer so the employer step knows whether the contract is covert-viable
-        ContractObjectiveData objectiveData = pickObjective(contractGenerationModifier, contract);
+        ContractObjectiveData objectiveData = pickObjective(contractGenerationModifier, searchType, contract);
         ChaosObjectiveType chaosObjectiveType = objectiveData.playerObjectiveType().getChaosObjectiveType();
         boolean isDefensiveObjective = !chaosObjectiveType.isAttacker();
 
@@ -713,9 +713,10 @@ public class AbstractContractGeneration {
     }
 
     private static @Nonnull ContractObjectiveData pickObjective(int contractGenerationModifier,
-          ChaosContract contract) {
-        ContractObjectiveData objectiveData = ChaosContractDeterminationObjective.determineContractObjectiveType(
-              contractGenerationModifier);
+          ContractSearchType searchType, ChaosContract contract) {
+        ContractObjectiveData objectiveData = (searchType == ContractSearchType.PIRATE)
+              ? ChaosContractDeterminationObjective.determinePirateContractObjectiveType()
+              : ChaosContractDeterminationObjective.determineContractObjectiveType(contractGenerationModifier);
         contract.setObjectiveData(objectiveData);
         return objectiveData;
     }
