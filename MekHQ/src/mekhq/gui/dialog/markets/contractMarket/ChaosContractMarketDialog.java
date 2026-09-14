@@ -499,7 +499,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      */
     private static ContractSearchType defaultSearchType(Campaign campaign) {
         Faction faction = campaign.getPlayerForce().getFaction();
-        if (faction.isPirate()) {
+        if (faction.getShortName().equals(PIRATE_FACTION_CODE)) {
             return ContractSearchType.PIRATE;
         }
         if (faction.isMercenary()) {

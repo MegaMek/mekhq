@@ -50,6 +50,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.jspecify.annotations.NonNull;
@@ -112,7 +113,7 @@ class AbstractContractDeterminationPayTest {
         }
 
         @Override
-        public Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
+        public @NonNull Money getTransportPay(Campaign campaign, LocalDate currentDate, AbstractContract contract,
               AbstractLocation currentLocation) {
             return TRANSPORT;
         }
@@ -121,6 +122,9 @@ class AbstractContractDeterminationPayTest {
     @Test
     void determineContractPayComposesTheThreeComponentsIntoTheContract() {
         AbstractContract contract = mock(AbstractContract.class);
+
+        // A non-pirate objective keeps the scheme's combat pay (the pirate-raid rule would zero it).
+        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.GARRISON_DUTY);
 
         new FixedPay().determineContractPay(mock(Campaign.class), DATE, contract, mock(AbstractLocation.class));
 
@@ -133,6 +137,49 @@ class AbstractContractDeterminationPayTest {
     }
 
     // endregion determineContractPay template
+
+    // region combat pay (pirate raids)
+
+    /** A contract mock whose objective and covert flag drive the combat-pay rule. */
+    private static AbstractContract contractWith(ContractObjectiveType objectiveType, boolean covertOperation) {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getObjectiveType()).thenReturn(objectiveType);
+        when(contract.isCovertOperation()).thenReturn(covertOperation);
+        return contract;
+    }
+
+    @Test
+    void getContractCombatPayIsZeroForANonCovertPirateRaid() {
+        AbstractContract contract = contractWith(ContractObjectiveType.PIRATE_RAID, false);
+        assertEquals(Money.zero(), new FixedPay().getContractCombatPay(mock(Campaign.class), contract));
+    }
+
+    @Test
+    void getContractCombatPayIsPaidForACovertPirateRaid() {
+        AbstractContract contract = contractWith(ContractObjectiveType.PIRATE_RAID, true);
+        assertEquals(FixedPay.COMBAT, new FixedPay().getContractCombatPay(mock(Campaign.class), contract));
+    }
+
+    @Test
+    void getContractCombatPayIsPaidForANonPirateContract() {
+        AbstractContract contract = contractWith(ContractObjectiveType.OBJECTIVE_RAID, false);
+        assertEquals(FixedPay.COMBAT, new FixedPay().getContractCombatPay(mock(Campaign.class), contract));
+    }
+
+    @Test
+    void determineContractPayZeroesCombatForANonCovertPirateRaid() {
+        AbstractContract contract = contractWith(ContractObjectiveType.PIRATE_RAID, false);
+
+        new FixedPay().determineContractPay(mock(Campaign.class), DATE, contract, mock(AbstractLocation.class));
+
+        ArgumentCaptor<ContractFinanceData> captor = ArgumentCaptor.forClass(ContractFinanceData.class);
+        verify(contract).setContractFinanceData(captor.capture());
+        assertEquals(Money.zero(), captor.getValue().combatPay());
+        // The retainer is untouched by the combat-pay rule.
+        assertEquals(FixedPay.MONTHLY, captor.getValue().monthlyPay());
+    }
+
+    // endregion combat pay (pirate raids)
 
     // region transport pay
 

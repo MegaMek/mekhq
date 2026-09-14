@@ -44,6 +44,7 @@ import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.jspecify.annotations.NonNull;
@@ -124,8 +125,9 @@ public abstract class AbstractContractDeterminationPay {
      * @since 0.51.01
      */
     public @NonNull Money getContractCombatPay(Campaign campaign, AbstractContract contract) {
-        if ((contract.getObjectiveType().getChaosObjectiveType() == ChaosObjectiveType.PIRATE_RAID)
-                  && !contract.isCovertOperation()) {
+        ContractObjectiveType objectiveType = contract.getObjectiveType();
+        ChaosObjectiveType chaosObjectiveType = objectiveType == null ? null : objectiveType.getChaosObjectiveType();
+        if ((chaosObjectiveType == ChaosObjectiveType.PIRATE_RAID) && !contract.isCovertOperation()) {
             return Money.zero();
         }
         return getCombatPay(campaign, contract);

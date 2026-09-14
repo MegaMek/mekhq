@@ -109,6 +109,7 @@ class ContractXmlCodecTest {
         AbstractContract contract = new ChaosContract();
         contract.setContractId(UUID.fromString("11111111-2222-3333-4444-555555555555"));
         contract.setContractName("Operation Sundowner");
+        contract.setNameOperationCodename(true);
         contract.setDescription("A punitive raid into the Periphery.");
         contract.setScale(4);
         contract.setTrackCount(2);
@@ -341,6 +342,7 @@ class ContractXmlCodecTest {
     private static void assertCoreFieldsEqual(AbstractContract expected, AbstractContract actual) {
         assertEquals(expected.getId(), actual.getId(), "contractId");
         assertEquals(expected.getName(), actual.getName(), "contractName");
+        assertEquals(expected.isNameOperationCodename(), actual.isNameOperationCodename(), "nameIsOperationCodename");
         assertEquals(expected.getDescription(), actual.getDescription(), "description");
         assertEquals(expected.getScale(), actual.getScale(), "scale");
         assertEquals(expected.getTrackCount(), actual.getTrackCount(), "trackCount");
