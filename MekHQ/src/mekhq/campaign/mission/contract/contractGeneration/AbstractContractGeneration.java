@@ -288,6 +288,14 @@ public class AbstractContractGeneration {
         if (contract.getNature() != ContractNature.NORMAL) {
             return;
         }
+        // A pirate raid that a real power has secretly bankrolled is always run covert: the band is fed an anonymous
+        // tip and never learns who really pointed them at the target. Identified by the hidden sponsor the pirate
+        // employer determination attaches (see ChaosContractDeterminationEmployerPirate).
+        if ((chaosObjectiveType == ChaosObjectiveType.PIRATE_RAID)
+                  && (contract.getEmployerData().sponsorFactionCode() != null)) {
+            contract.setNature(ContractNature.COVERT);
+            return;
+        }
         // The employer of a government contract is the player's own faction, the single possible employer, so there is
         // no point concealing it - leave the contract as a normal, openly-attributed operation.
         if (isGovernmentSearchType) {
