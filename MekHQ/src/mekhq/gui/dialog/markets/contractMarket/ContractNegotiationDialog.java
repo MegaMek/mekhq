@@ -1326,11 +1326,13 @@ public class ContractNegotiationDialog extends JDialog {
         payImpactLabel.setText(payImpactHtml());
 
         Money rentalTotal = Money.zero();
-        for (int i = 0; i < facilityQuantity.length; i++) {
-            Money lineTotal = Money.of((double) facilityQuantity[i] * facilityUnitCost[i]);
-            rentalTotal = rentalTotal.plus(lineTotal);
-            facilityQuantityLabels[i].setText(Integer.toString(facilityQuantity[i]));
-            facilityTotalLabels[i].setText(lineTotal.toAmountAndSymbolString());
+        if (!isPirateContract()) {
+            for (int i = 0; i < facilityQuantity.length; i++) {
+                Money lineTotal = Money.of((double) facilityQuantity[i] * facilityUnitCost[i]);
+                rentalTotal = rentalTotal.plus(lineTotal);
+                facilityQuantityLabels[i].setText(Integer.toString(facilityQuantity[i]));
+                facilityTotalLabels[i].setText(lineTotal.toAmountAndSymbolString());
+            }
         }
 
         summaryLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.summary",
