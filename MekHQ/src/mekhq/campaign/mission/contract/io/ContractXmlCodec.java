@@ -109,6 +109,8 @@ public final class ContractXmlCodec {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractId", contract.getId());
         }
         writeStringIfPresent(printWriter, indent, "contractName", contract.getName());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "nameIsOperationCodename",
+              contract.isNameOperationCodename());
         writeStringIfPresent(printWriter, indent, "description", contract.getDescription());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "scale", contract.getScale());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "requiredVictoryPoints",
@@ -416,6 +418,8 @@ public final class ContractXmlCodec {
         readers.put("contractId",
               (contract, node, campaign, version) -> contract.setContractId(UUID.fromString(text(node))));
         readers.put("contractName", (contract, node, campaign, version) -> contract.setContractName(text(node)));
+        readers.put("nameIsOperationCodename",
+              (contract, node, campaign, version) -> contract.setNameOperationCodename(Boolean.parseBoolean(text(node))));
         readers.put("description", (contract, node, campaign, version) -> contract.setDescription(text(node)));
         readers.put("scale", (contract, node, campaign, version) -> contract.setScale(parseInt(node)));
         readers.put("requiredVictoryPoints",

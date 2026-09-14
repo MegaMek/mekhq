@@ -89,6 +89,12 @@ public abstract class AbstractContract {
 
     private UUID contractId;
     private String contractName;
+    /**
+     * Whether {@link #contractName} is an operation codename (e.g. "Operation RED PLUNDER"), which is opposition-free,
+     * rather than a descriptive title that names the enemy. A codename title stays visible even when the opposition is
+     * hidden, since it reveals nothing about it.
+     */
+    private boolean nameIsOperationCodename;
     private @Nonnull String description = "";
 
     private EmployerData employerData;
@@ -234,6 +240,18 @@ public abstract class AbstractContract {
 
     public void setContractName(String contractName) {
         this.contractName = contractName;
+    }
+
+    /**
+     * @return {@code true} if this contract's name is an operation codename (opposition-free), rather than a descriptive
+     *       title that names the enemy. Such a title stays visible even when the opposition is hidden.
+     */
+    public boolean isNameOperationCodename() {
+        return nameIsOperationCodename;
+    }
+
+    public void setNameOperationCodename(boolean nameIsOperationCodename) {
+        this.nameIsOperationCodename = nameIsOperationCodename;
     }
 
     /**

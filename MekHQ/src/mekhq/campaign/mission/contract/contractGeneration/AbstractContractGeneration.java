@@ -245,8 +245,9 @@ public abstract class AbstractContractGeneration {
         String employerName = contract.isCovert()
                                     ? contract.getEmployerMarketDisplayName()
                                     : contract.getEmployerDisplayName();
+        boolean useOperationCodenames = campaign.getCampaignOptions().get(CampaignOption.USE_OPERATION_CODENAMES);
         String contractName;
-        if (campaign.getCampaignOptions().get(CampaignOption.USE_OPERATION_CODENAMES)) {
+        if (useOperationCodenames) {
             contractName = getFormattedTextAt(RESOURCE_BUNDLES,
                   "AbstractContractGeneration.operationContractName",
                   contract.getStartDate(),
@@ -260,6 +261,7 @@ public abstract class AbstractContractGeneration {
                   contract.getEnemyDisplayName());
         }
         contract.setContractName(contractName);
+        contract.setNameOperationCodename(useOperationCodenames);
 
         // Morale
         MHQMorale.determineStartingMorale(contract, campaign);
