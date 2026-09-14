@@ -191,6 +191,7 @@ public final class EquipmentKitIssuer extends AbstractKitIssuer {
             case MECHANIC -> campaign.getCampaignOptions().get(CampaignOption.MECHANIC_DEFAULT_TOOL_KIT);
             case AERO_TEK -> campaign.getCampaignOptions().get(CampaignOption.AERO_TECH_DEFAULT_TOOL_KIT);
             case BA_TECH -> campaign.getCampaignOptions().get(CampaignOption.BA_TECH_DEFAULT_TOOL_KIT);
+            case VESSEL_CREW -> campaign.getCampaignOptions().get(CampaignOption.VESSEL_CREW_DEFAULT_TOOL_KIT);
             case ASTECH -> campaign.getCampaignOptions().get(CampaignOption.ASTECH_DEFAULT_TOOL_KIT);
             case DOCTOR -> campaign.getCampaignOptions().get(CampaignOption.DOCTOR_DEFAULT_TOOL_KIT);
             case MEDIC -> campaign.getCampaignOptions().get(CampaignOption.MEDIC_DEFAULT_TOOL_KIT);
