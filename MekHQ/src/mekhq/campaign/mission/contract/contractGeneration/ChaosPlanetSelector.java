@@ -48,9 +48,10 @@ import mekhq.campaign.universe.Planet;
  *
  * <p>Where the system picker weights by raw population and industry, this weights by a world's overall
  * {@link ChaosPlanetStrategicValue}, and the direction of that weighting is set by the player's objective. Most
- * operations are drawn toward the valuable worlds worth conquering, garrisoning, or raiding; a pirate hunt is instead
- * drawn toward the lawless backwaters where raiders actually hole up; and objectives with no geographic preference draw
- * uniformly.</p>
+ * operations are drawn toward the valuable worlds worth conquering, garrisoning, or raiding; pirate work is instead
+ * drawn toward the low-value fringe &mdash; a pirate hunt tracks raiders to the lawless backwaters they hole up on, and
+ * a pirate raid seeks the weakest, least-defended world in the area &mdash; and objectives with no geographic preference
+ * draw uniformly.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -162,8 +163,8 @@ public final class ChaosPlanetSelector {
      */
     static PlanetValuePreference preferenceFor(final ChaosObjectiveType objectiveType) {
         return switch (objectiveType) {
-            case INVASION, GARRISON, RAID, PIRATE_RAID, GUERILLA_OPERATION -> PlanetValuePreference.HIGH_VALUE;
-            case PIRATE_HUNT -> PlanetValuePreference.LOW_VALUE;
+            case INVASION, GARRISON, RAID, GUERILLA_OPERATION -> PlanetValuePreference.HIGH_VALUE;
+            case PIRATE_HUNT, PIRATE_RAID -> PlanetValuePreference.LOW_VALUE;
             case EXPEDITION, CADRE_DUTY -> PlanetValuePreference.NEUTRAL;
         };
     }
