@@ -227,6 +227,9 @@ public final class ChaosContractMarketAvailability {
      * {@link ContractSearchType#TOURNAMENT} is never offered and is omitted; the rest are rolled from the current
      * system's hiring hall level.
      *
+     * <p>An uninhabited or abandoned system (zero population) has no legitimate market and draws only
+     * {@link ContractSearchType#PIRATE} contracts; mercenary and government offers are omitted there.</p>
+     *
      * <p>Government orders are only offered to government (non-mercenary, non-pirate) forces; for mercenary and pirate
      * forces {@link ContractSearchType#GOVERNMENT} is omitted entirely. For a government force, government offers also
      * concentrate on its own faction's worlds: off a world its faction controls they are capped at
@@ -253,6 +256,9 @@ public final class ChaosContractMarketAvailability {
             if (type == ContractSearchType.TOURNAMENT) {
                 continue; // tournament bouts are never drawn from the hiring-hall market
             }
+            if (uninhabited && (type != ContractSearchType.PIRATE)) {
+                continue; // an uninhabited or abandoned system has no legitimate market - only pirate work is drawn there
+            }
             if ((type == ContractSearchType.PIRATE) && !pirateForce && !uninhabited) {
                 continue; // acts of piracy are only offered to pirate forces (the uninhabited fallback above is exempt)
             }
@@ -276,9 +282,9 @@ public final class ChaosContractMarketAvailability {
         return rolls;
     }
 
-    /** A government campaign is any player force that is neither a mercenary command nor a pirate band. */
+    /** A government campaign is any player force that is neither a mercenary command nor the pirate band. */
     static boolean isGovernmentFaction(final Faction faction) {
-        return !faction.isMercenary() && !faction.isPirate();
+        return !faction.isMercenary() && !faction.getShortName().equals(PIRATE_FACTION_CODE);
     }
 
     /**
@@ -301,7 +307,7 @@ public final class ChaosContractMarketAvailability {
      * mercenary.
      */
     private static ContractSearchType primarySearchType(final Faction faction) {
-        if (faction.isPirate()) {
+        if (faction.getShortName().equals(PIRATE_FACTION_CODE)) {
             return ContractSearchType.PIRATE;
         }
         if (isGovernmentFaction(faction)) {

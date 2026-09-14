@@ -43,7 +43,7 @@ public class ChaosContractDeterminationEmployerPirate extends AbstractContractDe
      * own enemies. The pirate faction stays the visible flavor (the anonymous tip the player deals with), but the
      * sponsor becomes both the covert backer - so Faction Standing accrues to it - and the territorial anchor, so the
      * victim is drawn as that sponsor's enemy. The contract is forced covert downstream (see
-     * {@code AbstractContractGeneration#determineCovertStatus), concealing the sponsor as "Undisclosed Employer". If no
+     * {@link ActsOfPiracyContractGeneration#determineCovertStatus}), concealing the sponsor as "Undisclosed Employer". If no
      * plausible sponsor is in range the raid falls back to the plain self-directed form.</p>
      *
      * @author Illiani
