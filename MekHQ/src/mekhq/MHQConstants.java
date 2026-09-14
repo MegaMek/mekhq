@@ -528,6 +528,10 @@ public final class MHQConstants extends SuiteConstants {
           "data/universe/contracts/randomOperationNameGenerator/nounPirateHunting.csv").toString();
     public static final String OPERATION_NAME_NOUN_PIRATE_HUNTING_USER = Paths.get(
           "userdata/data/universe/contracts/randomOperationNameGenerator/nounPirateHunting.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PIRATE_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounPirateRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PIRATE_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounPirateRaid.csv").toString();
     public static final String OPERATION_NAME_NOUN_PLANETARY_ASSAULT = Paths.get(
           "data/universe/contracts/randomOperationNameGenerator/nounPlanetaryAssault.csv").toString();
     public static final String OPERATION_NAME_NOUN_PLANETARY_ASSAULT_USER = Paths.get(
