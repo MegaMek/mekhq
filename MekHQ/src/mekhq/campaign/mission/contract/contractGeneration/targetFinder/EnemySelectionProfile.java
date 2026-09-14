@@ -98,7 +98,6 @@ public enum EnemySelectionProfile {
      * drawn the same way a legitimate employer would be. Falls back to the standard enemy pool when no plausible victim
      * is in range, so generation never fails. Pairs with a pirate attacker, whose lawless anchor keeps the two distinct.
      *
-     * @author Illiani
      * @since 0.51.01
      */
     PIRATE_VICTIM {
