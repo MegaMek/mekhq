@@ -1768,6 +1768,8 @@ public class InterstellarMapPanel extends JPanel {
     private Font systemLabelWidthFont;
     private FontRenderContext systemLabelWidthFontRenderContext;
     private double maximumSystemLabelWidth;
+    private Map<String, SystemRenderData> experimentalPresentationSource;
+    private List<ExperimentalMapView.SystemPresentation> experimentalSystems = List.of();
 
     public InterstellarMapPanel(Campaign campaign, CampaignGUI view) {
         this.campaign = campaign;
@@ -2654,7 +2656,10 @@ public class InterstellarMapPanel extends JPanel {
         optionPanel.add(createLabel(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.overlay.heading.text")));
         optEmptySystems = createOptionCheckBox("map.overlay.emptySystems");
         optEmptySystems.setSelected(false);
-        optEmptySystems.addActionListener(e -> repaint());
+        optEmptySystems.addActionListener(e -> {
+            firePropertyChange("showEmptySystems", !optEmptySystems.isSelected(), optEmptySystems.isSelected());
+            repaint();
+        });
         optionPanel.add(optEmptySystems);
         optTerritory = createOptionCheckBox("map.overlay.territory");
         optTerritory.setSelected(true);
@@ -8096,6 +8101,52 @@ public class InterstellarMapPanel extends JPanel {
 
     MapCenter getMapCenter() {
         return new MapCenter(-conf.centerX, conf.centerY);
+    }
+
+    double getMapScale() {
+        return conf.scale;
+    }
+
+    boolean isShowingEmptySystems() {
+        return optEmptySystems.isSelected();
+    }
+
+    void setShowingEmptySystems(boolean show) {
+        boolean previous = optEmptySystems.isSelected();
+        optEmptySystems.setSelected(show);
+        firePropertyChange("showEmptySystems", previous, show);
+        repaint();
+    }
+
+    ExperimentalMapView.Presentation getExperimentalPresentation() {
+        Map<String, SystemRenderData> prepared = getPreparedSystemRenderData(campaign.getLocalDate());
+        if (prepared != experimentalPresentationSource) {
+            List<ExperimentalMapView.SystemPresentation> entries = new ArrayList<>(systems.size());
+            for (PlanetarySystem system : systems) {
+                SystemRenderData data = prepared.get(system.getId());
+                List<Integer> colors = new ArrayList<>(data.factionColors().size());
+                for (Color color : data.factionColors()) {
+                    colors.add(color.getRGB());
+                }
+                entries.add(new ExperimentalMapView.SystemPresentation(system, data.printableName(), colors, data.empty()));
+            }
+            experimentalSystems = List.copyOf(entries);
+            experimentalPresentationSource = prepared;
+        }
+        Set<String> routeSystems = new HashSet<>();
+        for (PlanetarySystem system : getPathSystems(jumpPath)) {
+            routeSystems.add(system.getId());
+        }
+        for (PlanetarySystem system : getPathSystems(getActiveJumpPath())) {
+            routeSystems.add(system.getId());
+        }
+        return new ExperimentalMapView.Presentation(experimentalSystems, routeSystems,
+              isShowingEmptySystems(), getSemanticZoomReference(conf.showPlanetNamesThreshold));
+    }
+
+    void restoreMapScale(double scale) {
+        conf.scale = boundedMapScale(scale);
+        repaint();
     }
 
     void restoreMapCenter(MapCenter center) {

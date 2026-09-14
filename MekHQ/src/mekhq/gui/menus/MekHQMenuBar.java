@@ -545,6 +545,30 @@ public class MekHQMenuBar extends JMenuBar {
         miNavigationMap.getAccessibleContext().setAccessibleName(miNavigationMap.getText());
         miNavigationMap.getAccessibleContext().setAccessibleDescription(miNavigationMap.getToolTipText());
         menuView.add(miNavigationMap);
+          if (Boolean.getBoolean("mekhq.experimental.skikoMap")) {
+            JCheckBoxMenuItem skiaMap = new JCheckBoxMenuItem(getTextAt("miExperimentalSkiaMap.text"));
+            skiaMap.setEnabled(false);
+            JCheckBoxMenuItem emptySystems = new JCheckBoxMenuItem(getTextAt("miMapEmptySystems.text"));
+            emptySystems.setEnabled(false);
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                var mapTab = getGui().getNavigationTab().getMapTab();
+                skiaMap.setVisible(mapTab.isExperimentalMapAvailable());
+                skiaMap.setEnabled(mapTab.isExperimentalMapAvailable());
+                skiaMap.setSelected(mapTab.isExperimentalMapActive());
+                    emptySystems.setSelected(mapTab.isShowingEmptySystems());
+                    emptySystems.setEnabled(true);
+                    emptySystems.addActionListener(event -> mapTab.setShowingEmptySystems(emptySystems.isSelected()));
+                    mapTab.addPropertyChangeListener("showEmptySystems",
+                        event -> emptySystems.setSelected(mapTab.isShowingEmptySystems()));
+                skiaMap.addActionListener(event -> skiaMap.setSelected(mapTab.setExperimentalMapActive(skiaMap.isSelected())));
+                mapTab.addPropertyChangeListener("experimentalMapActive",
+                    event -> skiaMap.setSelected(mapTab.isExperimentalMapActive()));
+                mapTab.addPropertyChangeListener("experimentalMapAvailable",
+                    event -> skiaMap.setEnabled(mapTab.isExperimentalMapAvailable()));
+            });
+            menuView.add(skiaMap);
+            menuView.add(emptySystems);
+          }
         menuView.addSeparator();
 
         JMenuItem miHistoricalDailyReportDialog = createMenuItem("miShowHistoricalReportLog.text",

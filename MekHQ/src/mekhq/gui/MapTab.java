@@ -62,6 +62,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.util.List;
 import java.util.Objects;
+import java.util.ServiceConfigurationError;
+import java.util.ServiceLoader;
 import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -84,6 +86,7 @@ import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.JumpPath;
@@ -128,6 +131,7 @@ import mekhq.utilities.MHQInternationalization;
 public final class MapTab extends CampaignGuiTab implements ActionListener,
     InterstellarMapPanel.RoutePlanningHandler {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
+    private static final MMLogger LOGGER = MMLogger.create(MapTab.class);
     private static final int PADDING = UIUtil.scaleForGUI(10);
     private static final Color ROUTE_STRIP_BACKGROUND = new Color(7, 16, 27);
     private static final Color ROUTE_STRIP_BORDER = new Color(35, 66, 82);
@@ -160,6 +164,11 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private JViewport mapView;
     private JPanel panMapView;
     private InterstellarMapPanel panMap;
+    private ExperimentalMapView.Factory experimentalMapFactory;
+    private ExperimentalMapView experimentalMap;
+    private boolean experimentalMapActive;
+    private JButton mapLayersButton;
+    private JButton mapInformationButton;
     private PlanetarySystemMapPanel panSystem;
     private JScrollPane systemView;
     private JScrollPane routeView;
@@ -315,6 +324,19 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
         panMap.setCampaign(getCampaign());
         panMap.addActionListener(this);
+        panMap.addPropertyChangeListener("showEmptySystems", event -> {
+            if (experimentalMap != null) {
+                experimentalMap.refresh();
+            }
+            firePropertyChange("showEmptySystems", event.getOldValue(), event.getNewValue());
+        });
+        if (Boolean.getBoolean("mekhq.experimental.skikoMap")) {
+            try {
+                experimentalMapFactory = ServiceLoader.load(ExperimentalMapView.Factory.class).findFirst().orElse(null);
+            } catch (RuntimeException | LinkageError | ServiceConfigurationError exception) {
+                LOGGER.error(exception, "Experimental map provider unavailable; retaining Java2D");
+            }
+        }
 
         panSystem = new PlanetarySystemMapPanel(getCampaign(), getCampaignGui());
         panSystem.addActionListener(this);
@@ -356,7 +378,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         suggestPlanet.addActionListener(ev -> {
             PlanetarySystem system = getCampaign().getSystemByName(suggestPlanet.getText());
             if (system != null) {
-                panMap.setSelectedSystem(system);
+                selectMapSystem(system);
                 panSystem.updatePlanetarySystem(system);
                 syncRouteDestinationToSelection();
                 refreshPlanetView();
@@ -403,7 +425,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
                 FramedCommandButton centerOnFleet = createHudButton("mapHud.centerOnFleet.text",
               "mapHud.centerOnFleet.toolTipText");
-        centerOnFleet.addActionListener(event -> panMap.centerOnCurrentSystem());
+        centerOnFleet.addActionListener(event -> {
+            panMap.centerOnCurrentSystem();
+            if (experimentalMapActive) {
+                centerExperimentalMap(getCampaign().getCurrentSystem());
+            }
+        });
         constraints = new GridBagConstraints();
                 constraints.gridx = 4;
         constraints.gridy = 0;
@@ -412,6 +439,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         navigationHud.add(centerOnFleet, constraints);
 
                 FramedCommandButton layers = createHudButton("mapHud.layers.text", "mapHud.layers.toolTipText");
+                mapLayersButton = layers;
                 layers.addActionListener(event -> panMap.toggleLayerControls(layers));
         constraints = new GridBagConstraints();
                 constraints.gridx = 5;
@@ -421,6 +449,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         navigationHud.add(layers, constraints);
 
         JButton information = InterstellarMapPanel.createMapLegendButton();
+        mapInformationButton = information;
           int utilityButtonSize = layers.getPreferredSize().height;
           InterstellarMapPanel.setNavigationUtilityButtonSize(information,
               new Dimension(utilityButtonSize, utilityButtonSize));
@@ -435,6 +464,104 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         preferredSize.height = Math.max(preferredSize.height, HUD_MINIMUM_HEIGHT);
         navigationHud.setPreferredSize(preferredSize);
         return navigationHud;
+    }
+
+    public boolean isExperimentalMapAvailable() {
+        return experimentalMapFactory != null;
+    }
+
+    public boolean isExperimentalMapActive() {
+        return experimentalMapActive;
+    }
+
+    public boolean isShowingEmptySystems() {
+        return panMap.isShowingEmptySystems();
+    }
+
+    public void setShowingEmptySystems(boolean show) {
+        panMap.setShowingEmptySystems(show);
+    }
+
+    public boolean setExperimentalMapActive(boolean enabled) {
+        if ((enabled == experimentalMapActive) || (enabled && !isExperimentalMapAvailable())) {
+            return experimentalMapActive;
+        }
+        boolean previouslyActive = experimentalMapActive;
+        try {
+            if (enabled) {
+                if (experimentalMap == null) {
+                      experimentalMap = experimentalMapFactory.create(getCampaign(), panMap::getExperimentalPresentation,
+                          this::selectExperimentalSystem,
+                          this::handleExperimentalMapFailure);
+                }
+                InterstellarMapPanel.MapCenter center = panMap.getMapCenter();
+                experimentalMap.setViewState(new ExperimentalMapView.ViewState(center.x(), center.y(),
+                      panMap.getMapScale(), panMap.getSelectedSystem()));
+                panMapView.remove(panMap);
+                panMapView.add(experimentalMap.component(), BorderLayout.CENTER);
+            } else {
+                ExperimentalMapView.ViewState state = experimentalMap.getViewState();
+                panMapView.remove(experimentalMap.component());
+                panMap.setSelectedSystem(state.selectedSystem());
+                panMap.restoreMapScale(state.scale());
+                panMap.restoreMapCenter(new InterstellarMapPanel.MapCenter(state.centerX(), state.centerY()));
+                panMapView.add(panMap, BorderLayout.CENTER);
+            }
+            experimentalMapActive = enabled;
+        } catch (RuntimeException | LinkageError exception) {
+            handleExperimentalMapFailure(exception);
+            return false;
+        }
+        mapLayersButton.setEnabled(!experimentalMapActive);
+        mapInformationButton.setEnabled(!experimentalMapActive);
+        mapView.setScrollMode(experimentalMapActive ? JViewport.SIMPLE_SCROLL_MODE : JViewport.BLIT_SCROLL_MODE);
+        panMapView.revalidate();
+        panMapView.repaint();
+        firePropertyChange("experimentalMapActive", previouslyActive, experimentalMapActive);
+        return experimentalMapActive;
+    }
+
+    private void handleExperimentalMapFailure(Throwable exception) {
+        LOGGER.error(exception, "Experimental map failed; reverting to Java2D");
+        SwingUtilities.invokeLater(() -> {
+            boolean previouslyActive = experimentalMapActive;
+            if (experimentalMap != null) {
+                panMapView.remove(experimentalMap.component());
+                experimentalMap = null;
+            }
+            panMapView.add(panMap, BorderLayout.CENTER);
+            experimentalMapActive = false;
+            experimentalMapFactory = null;
+            mapLayersButton.setEnabled(true);
+            mapInformationButton.setEnabled(true);
+            mapView.setScrollMode(JViewport.BLIT_SCROLL_MODE);
+            panMapView.revalidate();
+            panMapView.repaint();
+            firePropertyChange("experimentalMapActive", previouslyActive, false);
+            firePropertyChange("experimentalMapAvailable", true, false);
+        });
+    }
+
+    private void selectExperimentalSystem(PlanetarySystem system) {
+        panMap.setSelectedSystem(system);
+        panSystem.updatePlanetarySystem(system);
+        syncRouteDestinationToSelection();
+        refreshSystemView();
+    }
+
+    private void selectMapSystem(PlanetarySystem system) {
+        panMap.setSelectedSystem(system);
+        if (experimentalMapActive) {
+            centerExperimentalMap(system);
+        }
+    }
+
+    private void centerExperimentalMap(PlanetarySystem system) {
+        if (system != null) {
+            ExperimentalMapView.ViewState state = experimentalMap.getViewState();
+            experimentalMap.setViewState(new ExperimentalMapView.ViewState(system.getX(), system.getY(),
+                  state.scale(), system));
+        }
     }
 
     private void applyLayoutState() {
@@ -986,6 +1113,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         }
 
         panMap.refreshNavigationAnalysis();
+        if (experimentalMapActive) {
+            experimentalMap.refresh();
+        }
         transitionToRouteSnapshot(createRouteStripSnapshot());
     }
 
@@ -1620,7 +1750,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
      */
     public void switchPlanetaryMap(Planet p) {
         PlanetarySystem s = p.getParentSystem();
-        panMap.setSelectedSystem(s);
+        selectMapSystem(s);
         panSystem.updatePlanetarySystem(p);
         mapView.setView(panSystem);
         refreshPlanetView();
@@ -1632,7 +1762,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
      * @param s The {@link PlanetarySystem} to select.
      */
     public void switchPlanetaryMap(PlanetarySystem s) {
-        panMap.setSelectedSystem(s);
+        selectMapSystem(s);
         panSystem.updatePlanetarySystem(s);
         mapView.setView(panSystem);
         refreshPlanetView();
@@ -1644,7 +1774,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
      * @param s The {@link PlanetarySystem} to select.
      */
     public void switchSystemsMap(PlanetarySystem s) {
-        panMap.setSelectedSystem(s);
+        selectMapSystem(s);
         panSystem.updatePlanetarySystem(s);
         switchSystemsMap();
     }
@@ -1653,7 +1783,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         boolean returningFromSystem = mapView.getView() == panSystem;
         mapView.setView(panMapView);
         refreshSystemView();
-        if (returningFromSystem) {
+        if (returningFromSystem && !experimentalMapActive) {
             panMap.startSystemReturn();
         }
     }
@@ -1677,6 +1807,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     public void handle(NewDayEvent ev) {
         panMap.requestStaticCartographyPreparation();
         panMap.repaint();
+        if (experimentalMap != null) {
+            experimentalMap.refresh();
+        }
         if (!hasPlannedRoute()) {
             routePlanningIntent.clear(getCampaign().getCurrentSystem());
             setRouteFieldSystem(suggestRouteOrigin, routePlanningIntent.getOrigin());
@@ -1690,6 +1823,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     @Subscribe
     public void handle(OptionsChangedEvent ev) {
         panMap.repaint();
+        if (experimentalMap != null) {
+            experimentalMap.refresh();
+        }
         updateRouteStrip();
     }
 
