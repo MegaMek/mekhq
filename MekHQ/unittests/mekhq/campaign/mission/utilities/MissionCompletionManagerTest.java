@@ -40,7 +40,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
@@ -51,15 +53,19 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import megamek.client.ui.enums.DialogResult;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.CampaignNewDayManager;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
@@ -71,6 +77,7 @@ import mekhq.campaign.mission.contract.utilities.ContractEmergencyExtension;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
@@ -78,6 +85,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
 import org.junit.jupiter.api.Nested;
@@ -776,6 +784,177 @@ public class MissionCompletionManagerTest {
 
                 assertFalse(completed);
                 // Completion itself happens before turnover, so it must already have been applied.
+                verify(fixture.campaign).completeMission(fixture.mission, MissionStatus.SUCCESS);
+            }
+        }
+
+        @Test
+        void appliedTurnoverAwardsAdministratorExperienceAndContinues() {
+            Fixture fixture = new Fixture();
+            when(fixture.campaignOptions.get(CampaignOption.USE_RANDOM_RETIREMENT)).thenReturn(true);
+            when(fixture.campaignOptions.get(CampaignOption.USE_CONTRACT_COMPLETION_RANDOM_RETIREMENT)).thenReturn(
+                  true);
+
+            RetirementDefectionTracker tracker = mock(RetirementDefectionTracker.class);
+            when(fixture.humanResources.getRetirementDefectionTracker()).thenReturn(tracker);
+            when(tracker.getRetirees(fixture.mission)).thenReturn(Set.of(UUID.randomUUID()));
+
+            Finances finances = mock(Finances.class);
+            Money balance = mock(Money.class);
+            when(fixture.playerForce.getFinances()).thenReturn(finances);
+            when(finances.getBalance()).thenReturn(balance);
+            when(balance.isGreaterOrEqualThan(any(Money.class))).thenReturn(true);
+
+            Person administrator = mock(Person.class);
+            when(fixture.humanResources.findBestInRole(any(), any(), any(), anyBoolean(), any())).thenReturn(
+                  administrator);
+            when(fixture.campaign.applyRetirement(any(), any())).thenReturn(true);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
+                        ContractCharacteristics.class);
+                  MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
+                        MissionStatus.SUCCESS);
+                  MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
+                        PrisonerMissionEndEvent.class);
+                  MockedConstruction<RetirementDefectionDialog> retirementDefectionDialog = mockConstruction(
+                        RetirementDefectionDialog.class,
+                        (dialog, context) -> {
+                            when(dialog.wasAborted()).thenReturn(false);
+                            when(dialog.totalPayout()).thenReturn(Money.zero());
+                        })) {
+                boolean completed = fixture.manager.completeMission();
+
+                assertTrue(completed);
+                verify(administrator, atLeastOnce()).awardXP(fixture.campaign, 1);
+            }
+        }
+
+        @Test
+        void turnoverApplyRetirementFailureAborts() {
+            Fixture fixture = new Fixture();
+            when(fixture.campaignOptions.get(CampaignOption.USE_RANDOM_RETIREMENT)).thenReturn(true);
+            when(fixture.campaignOptions.get(CampaignOption.USE_CONTRACT_COMPLETION_RANDOM_RETIREMENT)).thenReturn(
+                  true);
+
+            RetirementDefectionTracker tracker = mock(RetirementDefectionTracker.class);
+            when(fixture.humanResources.getRetirementDefectionTracker()).thenReturn(tracker);
+            // A null retiree set skips the administrator-experience block, isolating the applyRetirement abort.
+            when(tracker.getRetirees(fixture.mission)).thenReturn(null);
+            when(fixture.campaign.applyRetirement(any(), any())).thenReturn(false);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
+                        ContractCharacteristics.class);
+                  MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
+                        MissionStatus.SUCCESS);
+                  MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
+                        PrisonerMissionEndEvent.class);
+                  MockedConstruction<RetirementDefectionDialog> retirementDefectionDialog = mockConstruction(
+                        RetirementDefectionDialog.class,
+                        (dialog, context) -> {
+                            when(dialog.wasAborted()).thenReturn(false);
+                            when(dialog.totalPayout()).thenReturn(Money.zero());
+                        })) {
+                boolean completed = fixture.manager.completeMission();
+
+                assertFalse(completed);
+                verify(fixture.campaign).completeMission(fixture.mission, MissionStatus.SUCCESS);
+            }
+        }
+
+        @Test
+        void autoAwardsCeremonyRunsWhenEnabled() {
+            Fixture fixture = new Fixture();
+            when(fixture.campaignOptions.get(CampaignOption.ENABLE_AUTO_AWARDS)).thenReturn(true);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
+                        ContractCharacteristics.class);
+                  MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
+                        MissionStatus.SUCCESS);
+                  MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
+                        PrisonerMissionEndEvent.class);
+                  MockedConstruction<AutoAwardsController> autoAwardsController = mockConstruction(
+                        AutoAwardsController.class)) {
+                boolean completed = fixture.manager.completeMission();
+
+                assertTrue(completed);
+                AutoAwardsController controller = autoAwardsController.constructed().get(0);
+                verify(controller).PostMissionController(eq(fixture.campaign), eq(fixture.mission), eq(true), any());
+            }
+        }
+
+        @Test
+        void personnelMarketRefreshedWhenPreviouslyDisabled() {
+            Fixture fixture = new Fixture();
+            when(fixture.newPersonnelMarket.getAvailabilityMessage()).thenReturn("Disabled");
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
+                        ContractCharacteristics.class);
+                  MockedStatic<CampaignNewDayManager> campaignNewDayManager = mockStatic(CampaignNewDayManager.class);
+                  MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
+                        MissionStatus.SUCCESS);
+                  MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
+                        PrisonerMissionEndEvent.class)) {
+                boolean completed = fixture.manager.completeMission();
+
+                assertTrue(completed);
+                verify(fixture.humanResources).refreshApplicants(fixture.campaign, true);
+                campaignNewDayManager.verify(
+                      () -> CampaignNewDayManager.showRarePersonnelDialog(fixture.campaign, false));
+            }
+        }
+
+        @Test
+        void cadreForcesReassignmentShowsNotification() {
+            Fixture fixture = new Fixture();
+            when(fixture.mission.getObjectiveType()).thenReturn(ContractObjectiveType.CADRE_DUTY);
+
+            Formation formation = mock(Formation.class);
+            when(fixture.playerForce.getAllFormations()).thenReturn(List.of(formation));
+            when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.CADRE);
+            when(formation.getScenarioId()).thenReturn(NO_ASSIGNED_SCENARIO);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
+                        ContractCharacteristics.class);
+                  MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
+                        MissionStatus.SUCCESS);
+                  MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
+                        PrisonerMissionEndEvent.class);
+                  MockedConstruction<ImmersiveDialogNotification> notifications = mockConstruction(
+                        ImmersiveDialogNotification.class)) {
+                boolean completed = fixture.manager.completeMission();
+
+                assertTrue(completed);
+                verify(formation).setCombatRoleInMemory(CombatRole.FRONTLINE);
+                assertEquals(1, notifications.constructed().size());
+            }
+        }
+
+        @Test
+        void declinedContractExtensionContinues() {
+            Fixture fixture = new Fixture();
+            when(fixture.campaignOptions.isUseStratCon()).thenReturn(true);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
+                        ContractCharacteristics.class);
+                  MockedStatic<ContractEmergencyExtension> contractEmergencyExtension = mockStatic(
+                        ContractEmergencyExtension.class);
+                  MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
+                        MissionStatus.SUCCESS);
+                  MockedConstruction<PrisonerMissionEndEvent> prisonerMissionEndEvent = mockConstruction(
+                        PrisonerMissionEndEvent.class)) {
+                contractEmergencyExtension.when(
+                            () -> ContractEmergencyExtension.contractExtended(fixture.campaign, fixture.mission))
+                      .thenReturn(false);
+
+                boolean completed = fixture.manager.completeMission();
+
+                assertTrue(completed);
                 verify(fixture.campaign).completeMission(fixture.mission, MissionStatus.SUCCESS);
             }
         }
