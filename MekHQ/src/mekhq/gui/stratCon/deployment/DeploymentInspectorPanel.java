@@ -32,24 +32,25 @@
  */
 package mekhq.gui.stratCon.deployment;
 
+import static mekhq.gui.stratCon.deployment.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.getNegativeColor;
-import static mekhq.utilities.ReportingUtilities.getPositiveColor;
-import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.Font;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
-import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementEligibilityType;
 import mekhq.campaign.digitalGM.stratCon.deployment.ReinforcementRoll;
@@ -58,11 +59,12 @@ import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.unit.Unit;
 
 /**
- * The right-hand panel of the StratCon deployment wizard: a dossier for whichever force the player is currently
- * looking at, the running list of forces staged for deployment, and the stage / commit / cancel controls.
+ * The right-hand HUD panel of the StratCon deployment wizard: a dossier for whichever force the player is looking at,
+ * the running list of forces staged for deployment, a budget line, and the stage / commit / cancel controls. Styled to
+ * match the interstellar-map chrome via {@link HudStyle}.
  *
- * <p>This panel is a view. It renders what the wizard tells it to and exposes its buttons; the wizard owns the
- * staged state and decides what a click means.</p>
+ * <p>This panel is a view. It renders what the wizard tells it to and exposes its buttons; the wizard owns the staged
+ * state and decides what a click means.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -70,7 +72,7 @@ import mekhq.campaign.unit.Unit;
 public class DeploymentInspectorPanel extends JPanel {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBStratCon";
 
-    private final Campaign campaign;
+    private final transient Campaign campaign;
 
     private final JLabel dossierLabel = new JLabel();
     private final JLabel budgetLabel = new JLabel();
@@ -78,41 +80,81 @@ public class DeploymentInspectorPanel extends JPanel {
     private final DefaultListModel<Object> stagedModel = new DefaultListModel<>();
     private final JList<Object> stagedList = new JList<>(stagedModel);
 
-    private final JButton stageButton = new JButton();
-    private final JButton commitButton = new JButton(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.commit"));
-    private final JButton cancelButton = new JButton(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.cancel"));
+    private final HudButton stageButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.stage"), false);
+    private final HudButton cancelButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.cancel"), false);
+    private final HudButton commitButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.commit"), true);
 
     public DeploymentInspectorPanel(Campaign campaign) {
-        super(new BorderLayout(0, 8));
+        super(new BorderLayout(0, UIUtil.scaleForGUI(10)));
         this.campaign = campaign;
 
-        dossierLabel.setVerticalAlignment(JLabel.TOP);
-        dossierLabel.setBorder(BorderFactory.createEmptyBorder(8, 8, 8, 8));
-        JScrollPane dossierScroll = new JScrollPane(dossierLabel);
-        dossierScroll.setBorder(BorderFactory.createEmptyBorder());
+        setOpaque(true);
+        setBackground(GROUND);
+        int pad = UIUtil.scaleForGUI(12);
+        setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, UIUtil.scaleForGUI(1), 0, 0, BORDER),
+              BorderFactory.createEmptyBorder(pad, pad, pad, pad)));
 
-        stagedList.setCellRenderer(new DeploymentItemRenderer(campaign));
-        budgetLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
-        JPanel stagedHeader = new JPanel(new BorderLayout());
-        stagedHeader.add(budgetLabel, BorderLayout.NORTH);
-        stagedHeader.add(stagedTitle, BorderLayout.SOUTH);
-        JPanel stagedPanel = new JPanel(new BorderLayout(0, 4));
-        stagedPanel.add(stagedHeader, BorderLayout.NORTH);
-        stagedPanel.add(new JScrollPane(stagedList), BorderLayout.CENTER);
-
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.add(stageButton);
-        buttonPanel.add(cancelButton);
-        buttonPanel.add(commitButton);
-
-        add(dossierScroll, BorderLayout.NORTH);
-        add(stagedPanel, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(buildDossierSection(), BorderLayout.NORTH);
+        add(buildStagedSection(), BorderLayout.CENTER);
+        add(buildButtonRow(), BorderLayout.SOUTH);
 
         setStageButtonEnabled(false);
         showEmpty();
         setStaged(List.of());
         clearBudget();
+    }
+
+    private JPanel buildDossierSection() {
+        dossierLabel.setVerticalAlignment(JLabel.TOP);
+        dossierLabel.setForeground(TEXT);
+        dossierLabel.setFont(hudFont(Font.PLAIN, 0.95f, 0.0f));
+        int inset = UIUtil.scaleForGUI(10);
+        dossierLabel.setBorder(BorderFactory.createEmptyBorder(inset, inset, inset, inset));
+
+        JScrollPane dossierScroll = new JScrollPane(dossierLabel);
+        dossierScroll.setBorder(BorderFactory.createLineBorder(BORDER, UIUtil.scaleForGUI(1)));
+        dossierScroll.getViewport().setBackground(SURFACE_DEEP);
+        dossierScroll.setPreferredSize(new java.awt.Dimension(UIUtil.scaleForGUI(320), UIUtil.scaleForGUI(220)));
+
+        JPanel section = new JPanel(new BorderLayout(0, UIUtil.scaleForGUI(4)));
+        section.setOpaque(false);
+        section.add(HudStyle.keyLabel(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.dossier.title")), BorderLayout.NORTH);
+        section.add(dossierScroll, BorderLayout.CENTER);
+        return section;
+    }
+
+    private JPanel buildStagedSection() {
+        budgetLabel.setForeground(ACCENT);
+        budgetLabel.setFont(hudFont(Font.BOLD, 0.95f, 0.0f));
+
+        stagedList.setCellRenderer(new DeploymentItemRenderer(campaign));
+        stagedList.setBackground(SURFACE_DEEP);
+        stagedList.setBorder(null);
+
+        JScrollPane stagedScroll = new JScrollPane(stagedList);
+        stagedScroll.setBorder(BorderFactory.createLineBorder(BORDER, UIUtil.scaleForGUI(1)));
+        stagedScroll.getViewport().setBackground(SURFACE_DEEP);
+
+        JPanel header = new JPanel(new BorderLayout(0, UIUtil.scaleForGUI(4)));
+        header.setOpaque(false);
+        header.add(budgetLabel, BorderLayout.NORTH);
+        header.add(stagedTitle, BorderLayout.SOUTH);
+
+        JPanel section = new JPanel(new BorderLayout(0, UIUtil.scaleForGUI(4)));
+        section.setOpaque(false);
+        section.add(header, BorderLayout.NORTH);
+        section.add(stagedScroll, BorderLayout.CENTER);
+        return section;
+    }
+
+    private JPanel buildButtonRow() {
+        JPanel row = new JPanel(new FlowLayout(FlowLayout.RIGHT, UIUtil.scaleForGUI(8), 0));
+        row.setOpaque(false);
+        row.add(stageButton);
+        row.add(cancelButton);
+        row.add(commitButton);
+        return row;
     }
 
     /**
@@ -193,7 +235,8 @@ public class DeploymentInspectorPanel extends JPanel {
     private String formationSummaryHtml(Formation formation) {
         StringBuilder summary = new StringBuilder();
         summary.append("<b>").append(formation.getName()).append("</b><br/>");
-        summary.append(formation.getFullName()).append("<br/><br/>");
+        summary.append("<font color='").append(hex(HudStyle.TEXT_MUTED)).append("'>")
+              .append(formation.getFullName()).append("</font><br/><br/>");
 
         List<OperationalStatus> statuses = formation.updateFormationIconOperationalStatus(campaign);
         if (!statuses.isEmpty()) {
@@ -236,7 +279,8 @@ public class DeploymentInspectorPanel extends JPanel {
      * @since 0.51.01
      */
     public void showEmpty() {
-        setDossier("<html>" + getTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.empty") + "</html>");
+        setDossier("<html><font color='" + hex(HudStyle.TEXT_MUTED) + "'>" +
+                         getTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.empty") + "</font></html>");
     }
 
     /**
@@ -250,9 +294,11 @@ public class DeploymentInspectorPanel extends JPanel {
         for (Object item : stagedItems) {
             stagedModel.addElement(item);
         }
+        stagedTitle.setForeground(HudStyle.TEXT_FAINT);
+        stagedTitle.setFont(hudFont(Font.BOLD, 0.7f, 0.14f));
         stagedTitle.setText(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.staged.title",
-              stagedItems.size()));
+              stagedItems.size()).toUpperCase(java.util.Locale.ROOT));
     }
 
     /**
@@ -266,28 +312,28 @@ public class DeploymentInspectorPanel extends JPanel {
     }
 
     public void setStageButtonEnabled(boolean enabled) {
-        stageButton.setEnabled(enabled);
+        stageButton.setArmed(enabled);
     }
 
-    public JButton getStageButton() {
+    public HudButton getStageButton() {
         return stageButton;
     }
 
-    public JButton getCommitButton() {
+    public HudButton getCommitButton() {
         return commitButton;
     }
 
-    public JButton getCancelButton() {
+    public HudButton getCancelButton() {
         return cancelButton;
     }
 
     private static String readinessSpan(OperationalStatus status) {
-        String color = switch (status) {
-            case FULLY_OPERATIONAL, FACTORY_FRESH -> getPositiveColor();
-            case SUBSTANTIALLY_OPERATIONAL -> getWarningColor();
-            case MARGINALLY_OPERATIONAL, NOT_OPERATIONAL -> getNegativeColor();
+        Color color = switch (status) {
+            case FULLY_OPERATIONAL, FACTORY_FRESH -> READY;
+            case SUBSTANTIALLY_OPERATIONAL -> CAUTION;
+            case MARGINALLY_OPERATIONAL, NOT_OPERATIONAL -> DANGER;
         };
         String label = getTextAt(RESOURCE_BUNDLE, "deploymentWizard.readiness." + status.name());
-        return spanOpeningWithCustomColor(color) + label + CLOSING_SPAN_TAG;
+        return spanOpeningWithCustomColor(hex(color)) + label + CLOSING_SPAN_TAG;
     }
 }

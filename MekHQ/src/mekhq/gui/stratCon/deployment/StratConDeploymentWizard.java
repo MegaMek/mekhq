@@ -44,9 +44,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
+import java.awt.Font;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -55,6 +54,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import mekhq.MekHQ;
@@ -123,6 +123,7 @@ public class StratConDeploymentWizard extends JDialog {
     private final DefaultListModel<Object> boardModel = new DefaultListModel<>();
     private final JList<Object> boardList = new JList<>(boardModel);
     private final JTextField searchField = new JTextField(20);
+    private final JLabel instructionsLabel = new JLabel();
 
     // One shared staged set, kept typed by the page each item was staged from, so the single Commit can batch them.
     private final transient List<Formation> stagedPrimaryForces = new ArrayList<>();
@@ -138,7 +139,7 @@ public class StratConDeploymentWizard extends JDialog {
     private int leadershipPointsUsed;
     private int defensivePoints;
 
-    private final Map<DeploymentMode, JToggleButton> modeButtons = new EnumMap<>(DeploymentMode.class);
+    private final HudModeSelector modeSelector = new HudModeSelector(this::switchMode);
     private transient ReinforcementAdvisor reinforcementAdvisor;
 
     private final transient DeploymentInspectorPanel inspector;
@@ -151,6 +152,7 @@ public class StratConDeploymentWizard extends JDialog {
 
         setTitle(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.title"));
         setLayout(new BorderLayout());
+        getContentPane().setBackground(HudStyle.GROUND);
         add(buildCommandBar(), BorderLayout.NORTH);
         add(buildBody(), BorderLayout.CENTER);
 
@@ -188,7 +190,7 @@ public class StratConDeploymentWizard extends JDialog {
 
         clearStaged();
         mode = initialMode;
-        modeButtons.get(initialMode).setSelected(true);
+        modeSelector.setSelected(initialMode);
         enterMode();
 
         setVisible(true);
@@ -199,6 +201,7 @@ public class StratConDeploymentWizard extends JDialog {
             return;
         }
         mode = newMode;
+        modeSelector.setSelected(newMode);
         enterMode();
     }
 
@@ -207,6 +210,8 @@ public class StratConDeploymentWizard extends JDialog {
      * mode switch (they are only cleared when the wizard is reopened), so the batch Commit can gather them all.
      */
     private void enterMode() {
+        instructionsLabel.setText(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.instructions." + mode.name()));
+
         loadEligibleItems();
         applySearchFilter();
 
@@ -225,42 +230,69 @@ public class StratConDeploymentWizard extends JDialog {
     }
 
     private JPanel buildCommandBar() {
-        JPanel commandBar = new JPanel(new BorderLayout());
+        JPanel commandBar = new JPanel(new BorderLayout(0, UIUtil.scaleForGUI(8)));
+        commandBar.setOpaque(true);
+        commandBar.setBackground(HudStyle.GROUND);
+        int pad = UIUtil.scaleForGUI(12);
+        commandBar.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, UIUtil.scaleForGUI(1), 0, HudStyle.BORDER),
+              BorderFactory.createEmptyBorder(pad, UIUtil.scaleForGUI(14), pad, UIUtil.scaleForGUI(14))));
 
-        JPanel modeStrip = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        ButtonGroup modeGroup = new ButtonGroup();
-        for (DeploymentMode deploymentMode : DeploymentMode.values()) {
-            JToggleButton modeButton = new JToggleButton(deploymentMode.getLabel());
-            modeGroup.add(modeButton);
-            modeButtons.put(deploymentMode, modeButton);
-            modeButton.addActionListener(event -> switchMode(deploymentMode));
-            modeStrip.add(modeButton);
-        }
+        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.title").toUpperCase(Locale.ROOT));
+        title.setForeground(HudStyle.ACCENT_BRIGHT);
+        title.setFont(HudStyle.hudFont(Font.BOLD, 1.25f, 0.16f));
 
-        JLabel instructions = new JLabel(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.primary.instructions"));
-        instructions.setBorder(BorderFactory.createEmptyBorder(0, 8, 4, 8));
+        instructionsLabel.setForeground(HudStyle.TEXT_MUTED);
+        instructionsLabel.setFont(HudStyle.hudFont(Font.PLAIN, 0.9f, 0.0f));
 
-        commandBar.add(modeStrip, BorderLayout.CENTER);
-        commandBar.add(instructions, BorderLayout.SOUTH);
+        commandBar.add(title, BorderLayout.NORTH);
+        commandBar.add(modeSelector, BorderLayout.CENTER);
+        commandBar.add(instructionsLabel, BorderLayout.SOUTH);
         return commandBar;
     }
 
     private JSplitPane buildBody() {
-        JPanel boardPanel = new JPanel(new BorderLayout(0, 4));
+        JPanel boardPanel = new JPanel(new BorderLayout(0, UIUtil.scaleForGUI(6)));
+        boardPanel.setOpaque(true);
+        boardPanel.setBackground(HudStyle.GROUND);
+        int pad = UIUtil.scaleForGUI(12);
+        boardPanel.setBorder(BorderFactory.createEmptyBorder(pad, pad, pad, pad));
 
-        JPanel searchRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        searchRow.add(new JLabel(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.search.label")));
-        searchRow.add(searchField);
+        JPanel searchRow = new JPanel(new BorderLayout(UIUtil.scaleForGUI(8), 0));
+        searchRow.setOpaque(false);
+        searchRow.add(HudStyle.keyLabel(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.search.label")
+              .toUpperCase(Locale.ROOT)), BorderLayout.WEST);
+        styleField(searchField);
+        searchRow.add(searchField, BorderLayout.CENTER);
 
         boardList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         boardList.setCellRenderer(new DeploymentItemRenderer(campaign));
+        boardList.setBackground(HudStyle.SURFACE_DEEP);
+        boardList.setBorder(null);
+
+        JScrollPane boardScroll = new JScrollPane(boardList);
+        boardScroll.setBorder(BorderFactory.createLineBorder(HudStyle.BORDER, UIUtil.scaleForGUI(1)));
+        boardScroll.getViewport().setBackground(HudStyle.SURFACE_DEEP);
 
         boardPanel.add(searchRow, BorderLayout.NORTH);
-        boardPanel.add(new JScrollPane(boardList), BorderLayout.CENTER);
+        boardPanel.add(boardScroll, BorderLayout.CENTER);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, boardPanel, inspector);
         splitPane.setResizeWeight(0.58);
+        splitPane.setOpaque(false);
+        splitPane.setBorder(null);
+        splitPane.setBackground(HudStyle.GROUND);
         return splitPane;
+    }
+
+    private static void styleField(JTextField field) {
+        field.setBackground(HudStyle.SURFACE_DEEP);
+        field.setForeground(HudStyle.TEXT);
+        field.setCaretColor(HudStyle.ACCENT);
+        field.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createLineBorder(HudStyle.BORDER, UIUtil.scaleForGUI(1)),
+              BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(4), UIUtil.scaleForGUI(8),
+                    UIUtil.scaleForGUI(4), UIUtil.scaleForGUI(8))));
     }
 
     private void wireBoard() {
@@ -463,8 +495,9 @@ public class StratConDeploymentWizard extends JDialog {
         if (isStaged(focused)) {
             unstage(focused);
         } else {
-            // Official challenges permit a single primary force: staging a new one replaces whatever was staged before.
-            if (restrictToSingleForce && (mode == DeploymentMode.PRIMARY)) {
+            // Exactly one force may be the primary; any others must be deployed as reinforcements. Staging a new
+            // primary force therefore replaces whatever was staged before.
+            if (mode == DeploymentMode.PRIMARY) {
                 stagedPrimaryForces.clear();
             }
             stage(focused);
@@ -551,7 +584,7 @@ public class StratConDeploymentWizard extends JDialog {
     }
 
     private void refreshCommitEnabled() {
-        inspector.getCommitButton().setEnabled(!nothingStaged());
+        inspector.getCommitButton().setArmed(!nothingStaged());
     }
 
     // endregion
