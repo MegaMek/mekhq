@@ -315,7 +315,7 @@ public class Maintenance {
                                              .resolve(false, null);
             roll = result.getRollResult();
             partReport += getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.check.report",
-                  result.getReport(false), target.getDesc());
+                  result.getReport(), target.getDesc());
         }
         int margin = roll - target.getValue();
         partReport += getFormattedTextAt(RESOURCE_BUNDLE, "Maintenance.check.margin", String.valueOf(margin));

@@ -2684,7 +2684,7 @@ public class Campaign implements ITechManager {
                     ActionCheckResult refitResult = refitCheck.resolve(canUseEdge, null);
                     roll = refitResult.getRollResult();
                     report = report + getFormattedTextAt(RESOURCE_BUNDLE, "refit.check.report",
-                          target.getValueAsString(), refitResult.getReport(true)) + " ";
+                          target.getValueAsString(), refitResult.getReport()) + " ";
                 }
 
                 if (roll >= target.getValue()) {
@@ -2935,7 +2935,7 @@ public class Campaign implements ITechManager {
             ActionCheckResult repairResult = repairCheck.resolve(canUseEdge, null);
             roll = repairResult.getRollResult();
             report = report + getFormattedTextAt(RESOURCE_BUNDLE, "repair.check.report",
-                  target.getValueAsString(), repairResult.getReport(true));
+                  target.getValueAsString(), repairResult.getReport());
         }
 
         final boolean taskSucceeded = roll >= target.getValue();

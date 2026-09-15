@@ -49,8 +49,8 @@ import megamek.codeUtilities.StringUtility;
 import megamek.common.TargetRollModifier;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheck;
@@ -334,7 +334,7 @@ public class RandomEventDialog {
         if (actionCheck != null) {
             String reason = getTextAt(RESOURCES_RANDOM_EVENT_DIALOG, CHECK_REASON_KEY);
             ActionCheckResult result = actionCheck.resolve(useEdge, reason);
-            actionCheckResultsText = result.getReport(true);
+            actionCheckResultsText = result.getReport();
             wasSuccessful = result.isSuccess();
             return;
         }

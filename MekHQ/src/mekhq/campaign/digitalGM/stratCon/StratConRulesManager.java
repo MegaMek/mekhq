@@ -1771,7 +1771,7 @@ public class StratConRulesManager {
                     if (useAdvancedScouting) {
                         actionCheckResult = scoutData.skillCheck().resolve(
                               isUseEdge, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"));
-                        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(false));
+                        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
                     }
 
                     remainingScans--;

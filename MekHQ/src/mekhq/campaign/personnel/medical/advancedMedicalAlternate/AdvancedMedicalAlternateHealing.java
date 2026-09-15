@@ -55,6 +55,8 @@ import java.util.Set;
 import megamek.common.TargetRollModifier;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PatientLogger;
 import mekhq.campaign.personnel.Injury;
@@ -65,7 +67,6 @@ import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.AttributeCheck;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 
 /**
@@ -370,6 +371,8 @@ public class AdvancedMedicalAlternateHealing {
                   useEdge,
                   isUseKinderHealing);
         }
+
+        campaign.addReport(DailyReportType.SKILL_CHECKS, actionCheckResult.getReport());
 
         return actionCheckResult;
     }
