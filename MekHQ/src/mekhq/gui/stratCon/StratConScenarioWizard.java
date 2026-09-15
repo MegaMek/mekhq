@@ -51,15 +51,23 @@ import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.scaleOb
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.translateTemplateObjectives;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.campaign.utilities.CampaignTransportUtilities.getLeadershipDropdownVectorPair;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
-import java.awt.CardLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+import java.util.Vector;
 import java.util.stream.Collectors;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -98,7 +106,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.StratConReinforcementsConfirmationDialog;
 import mekhq.gui.dialog.StratConSinglesReinforcementsDialog;
 import mekhq.gui.dialog.SupportCarrierDeploymentDialogs;
-import mekhq.utilities.MHQInternationalization;
 import mekhq.utilities.ReportingUtilities;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.util.Pair;
@@ -110,18 +117,15 @@ public class StratConScenarioWizard extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBStratCon";
     private static final MMLogger LOGGER = MMLogger.create(StratConScenarioWizard.class);
 
+    /** Each support point spent on a reinforcement roll shifts the target number down by this much. */
+    private static final int SUPPORT_POINTS_MODIFIER = -2;
+
     private StratConScenario currentScenario;
     private final Campaign campaign;
     private StratConTrackState currentTrackState;
     private StratConCampaignState currentCampaignState;
-    @Deprecated(since = "0.50.10", forRemoval = false)
-    private final String resourcePath = "mekhq.resources.AtBStratCon";
-    @Deprecated(since = "0.50.10", forRemoval = false)
-    private final transient ResourceBundle resources = ResourceBundle.getBundle(resourcePath,
-          MekHQ.getMHQOptions().getLocale());
 
     private final Map<String, JList<Formation>> availableForceLists = new HashMap<>();
-    private final Map<String, JList<Unit>> availableUnitLists = new HashMap<>();
 
     private List<Unit> eligibleLeadershipUnits;
     private JList<Unit> availableInfantryUnits = new JList<>();
@@ -167,7 +171,6 @@ public class StratConScenarioWizard extends JDialog {
         currentCampaignState = campaignState;
         currentTrackState = trackState;
         availableForceLists.clear();
-        availableUnitLists.clear();
 
         availableInfantryUnits.clearSelection();
         availableLeadershipUnits.clearSelection();
@@ -209,13 +212,12 @@ public class StratConScenarioWizard extends JDialog {
      *                       </ul>
      */
     private void setUI(boolean isPrimaryForce) {
-        setTitle(resources.getString("scenarioSetupWizard.title"));
+        setTitle(getTextAt(RESOURCE_BUNDLE, "scenarioSetupWizard.title"));
         getContentPane().removeAll();
         setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
 
         // Create a new panel to hold all components
-        contentPanel = new JPanel(new CardLayout());
-        contentPanel.setLayout(new GridBagLayout());
+        contentPanel = new JPanel(new GridBagLayout());
 
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -283,8 +285,8 @@ public class StratConScenarioWizard extends JDialog {
      *
      * @param unit The Unit whose Force hierarchy names are to be returned.
      *
-     * @return A concatenated string of Force names in reversed order separated by a slash, or an empty string if the
-     *       unit is not assigned to any Force.
+     * @return A concatenated string of Force names in reversed order, or an empty string if the unit is not assigned to
+     *       any Force.
      */
     private String getForceNameReversed(Unit unit) {
         List<String> forceNames = new ArrayList<>();
@@ -400,8 +402,8 @@ public class StratConScenarioWizard extends JDialog {
 
             // Add instructions for assigning forces
             String reinforcementMessage = currentCampaignState.getSupportPoints() > 0 ?
-                                                resources.getString("selectReinforcementsForTemplate.Text") :
-                                                resources.getString(
+                                                getTextAt(RESOURCE_BUNDLE, "selectReinforcementsForTemplate.Text") :
+                                                getTextAt(RESOURCE_BUNDLE,
                                                       "selectReinforcementsForTemplateNoSupportPoints.Text");
 
             JLabel assignForceListInstructions = new JLabel(reinforcementMessage);
@@ -442,7 +444,7 @@ public class StratConScenarioWizard extends JDialog {
     private void setDefensiveUI(GridBagConstraints gbc) {
         // Label with defensive posture instructions
         gbc.anchor = GridBagConstraints.WEST;
-        JLabel lblDefensivePostureInstructions = new JLabel(resources.getString("lblFrontlineInstructions.text"));
+        JLabel lblDefensivePostureInstructions = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblFrontlineInstructions.text"));
         contentPanel.add(lblDefensivePostureInstructions, gbc);
 
         gbc.gridy++;
@@ -461,7 +463,7 @@ public class StratConScenarioWizard extends JDialog {
         gbc.anchor = GridBagConstraints.WEST;
 
         // Label to display the minefield count
-        JLabel lblDefensiveMinefieldCount = new JLabel(String.format(resources.getString(
+        JLabel lblDefensiveMinefieldCount = new JLabel(String.format(getTextAt(RESOURCE_BUNDLE,
               "lblDefensiveMinefieldCount.text"), currentScenario.getNumDefensivePoints()));
 
         // Add a listener to update the minefield count label when infantry units are selected
@@ -477,13 +479,13 @@ public class StratConScenarioWizard extends JDialog {
 
         gbc.anchor = GridBagConstraints.WEST;
 
-        JLabel lblLeadershipInstructions = new JLabel(String.format(resources.getString("lblLeadershipInstructions.Text"),
-              maxSelectionSize));
+        JLabel lblLeadershipInstructions = new JLabel(String.format(getTextAt(RESOURCE_BUNDLE,
+              "lblLeadershipInstructions.Text"), maxSelectionSize));
         contentPanel.add(lblLeadershipInstructions, gbc);
 
         // Transport Type
         gbc.gridy++;
-        JLabel lblTransportInstructions = new JLabel(getTextAt(resourcePath,
+        JLabel lblTransportInstructions = new JLabel(getTextAt(RESOURCE_BUNDLE,
               "lblLeadershipTransportInstructions.text"));
         contentPanel.add(lblTransportInstructions, gbc);
 
@@ -498,14 +500,10 @@ public class StratConScenarioWizard extends JDialog {
 
 
         gbc.gridy++;
-        CardLayout leadershipTransportCard = new CardLayout();
-        JPanel leadershipUnitJPanel = new JPanel(leadershipTransportCard);
-
         availableLeadershipUnits = addIndividualUnitSelector(eligibleUnits, gbc, maxSelectionSize, true);
 
         ItemListener dropdownChangeListener = this::campaignTransportTypeChangeHandler;
         cboTransportType.addItemListener(dropdownChangeListener);
-        contentPanel.add(leadershipUnitJPanel);
     }
 
     /**
@@ -557,7 +555,7 @@ public class StratConScenarioWizard extends JDialog {
         localGbc.anchor = GridBagConstraints.WEST;
 
         // Instructions for selecting units
-        JLabel instructions = new JLabel(String.format(resources.getString("lblSelectIndividualUnits.text"),
+        JLabel instructions = new JLabel(String.format(getTextAt(RESOURCE_BUNDLE, "lblSelectIndividualUnits.text"),
               maxSelectionSize));
         unitPanel.add(instructions, localGbc);
 
@@ -567,7 +565,7 @@ public class StratConScenarioWizard extends JDialog {
 
         // Add labels for unit selection details
         JLabel unitStatusLabel = new JLabel();
-        JLabel unitSelectionLabel = new JLabel(resources.getString("unitSelectLabelDefaultValue.text"));
+        JLabel unitSelectionLabel = new JLabel(getTextAt(RESOURCE_BUNDLE, "unitSelectLabelDefaultValue.text"));
 
         // Add the "# units selected" label
         localGbc.gridy++;
@@ -664,16 +662,16 @@ public class StratConScenarioWizard extends JDialog {
 
         switch (getReinforcementType(forceID, currentTrackState, campaign, currentCampaignState)) {
             case REGULAR:
-                costBuilder.append(resources.getString("regular.text"));
+                costBuilder.append(getTextAt(RESOURCE_BUNDLE, "regular.text"));
                 break;
             case CHAINED_SCENARIO:
-                costBuilder.append(resources.getString("fromChainedScenario.text"));
+                costBuilder.append(getTextAt(RESOURCE_BUNDLE, "fromChainedScenario.text"));
                 break;
             case AUXILIARY:
-                costBuilder.append(resources.getString("auxiliary.text"));
+                costBuilder.append(getTextAt(RESOURCE_BUNDLE, "auxiliary.text"));
                 break;
             default:
-                costBuilder.append("Error: Invalid Reinforcement Type");
+                costBuilder.append(getTextAt(RESOURCE_BUNDLE, "invalidReinforcementType.error"));
                 break;
         }
 
@@ -720,7 +718,7 @@ public class StratConScenarioWizard extends JDialog {
      */
     private void setNavigationButtons(GridBagConstraints constraints, boolean isPrimaryForce) {
         // Create the commit button
-        btnCommit = new JButton(getTextAt(resourcePath, "leadershipCommit.text"));
+        btnCommit = new JButton(getTextAt(RESOURCE_BUNDLE, "leadershipCommit.text"));
         btnCommit.setActionCommand("COMMIT_CLICK");
         if (isPrimaryForce) {
             btnCommit.addActionListener(evt -> btnCommitClicked(null, false, true));
@@ -728,7 +726,7 @@ public class StratConScenarioWizard extends JDialog {
             btnCommit.addActionListener(evt -> reinforcementConfirmDialog());
         }
 
-        JButton btnCancel = new JButton(getTextAt(resourcePath, "leadershipCancel.text"));
+        JButton btnCancel = new JButton(getTextAt(RESOURCE_BUNDLE, "leadershipCancel.text"));
         btnCancel.setActionCommand("CANCEL_CLICK");
         btnCancel.setVisible(!isPrimaryForce);
         btnCancel.addActionListener(evt -> closeWizard());
@@ -747,11 +745,11 @@ public class StratConScenarioWizard extends JDialog {
                                                .findFirst()
                                                .orElse(null);
             if (primaryFormation != null) {
-                instructions = MHQInternationalization.getFormattedTextAt(resourcePath,
+                instructions = getFormattedTextAt(RESOURCE_BUNDLE,
                       "lblLeadershipCommitForces.text",
                       primaryFormation.getName());
             } else {
-                instructions = getTextAt(resourcePath,
+                instructions = getTextAt(RESOURCE_BUNDLE,
                       "lblLeadershipCommitForces.fallback.text");
             }
 
@@ -848,7 +846,6 @@ public class StratConScenarioWizard extends JDialog {
         // Hide the old dialog until we're done.
         // The dialog will be 'disposed' if the confirmation dialog is confirmed and re-shown if the dialog is canceled
         setVisible(false);
-        final int SUPPORT_POINTS_MODIFIER = -2;
 
         if (currentScenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge()) {
             new ImmersiveDialogNotification(campaign, getTextAt(RESOURCE_BUNDLE, "officialChallenge.notice"), true);
@@ -895,39 +892,45 @@ public class StratConScenarioWizard extends JDialog {
               dialog.getResponseType();
         switch (responseType) {
             case CANCEL -> setVisible(true);
-            case REINFORCE -> {
-                // The addition here is to cover the base cost
-                int supportPointsSpent = dialog.getSupportPoints() + 1;
-                currentCampaignState.changeSupportPoints(-(supportPointsSpent * selectedForceCount));
-
-                int supportPointModifier = (dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER) / selectedForceCount;
-                int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
-
-                btnCommitClicked(finalTargetNumber, false, false);
-                if (brokeBatchallTerms) {
-                    processBatchallBreach(contract, enemy.getShortName());
-                }
-            }
-            case REINFORCE_INSTANTLY -> {
-                // The addition here is to cover the base cost
-                int supportPointsSpent = dialog.getSupportPoints() + 2;
-                currentCampaignState.changeSupportPoints(-(supportPointsSpent * selectedForceCount));
-
-                int supportPointModifier = (selectedForceCount == 0)
-                                                 ?
-                                                 0
-                                                 :
-                                                 (dialog.getSupportPoints() * SUPPORT_POINTS_MODIFIER) /
-                                                       selectedForceCount;
-                int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
-
-                btnCommitClicked(finalTargetNumber, false, true);
-                if (brokeBatchallTerms) {
-                    processBatchallBreach(contract, enemy.getShortName());
-                }
-            }
+            case REINFORCE -> commitPaidReinforcements(1, false, dialog.getSupportPoints(), selectedForceCount,
+                  targetNumber, brokeBatchallTerms, contract, enemy.getShortName());
+            case REINFORCE_INSTANTLY -> commitPaidReinforcements(2, true, dialog.getSupportPoints(), selectedForceCount,
+                  targetNumber, brokeBatchallTerms, contract, enemy.getShortName());
             case REINFORCE_GM -> btnCommitClicked(0, true, false);
             case REINFORCE_GM_INSTANTLY -> btnCommitClicked(0, true, true);
+        }
+    }
+
+    /**
+     * Spends support points on a reinforcement roll and commits the selected forces, then records a batchall breach if
+     * one occurred. Shared by the normal and instant paid-reinforcement paths, which differ only in the base cost added
+     * per force and whether the forces deploy instantly.
+     *
+     * @param baseCostAddend      support points added on top of the player's chosen spend to cover the base cost (1 for
+     *                            normal, 2 for instant)
+     * @param isInstantlyDeployed whether the reinforcements deploy instantly
+     * @param chosenSupportPoints the support points the player chose to spend per force
+     * @param selectedForceCount  the number of forces being reinforced; always greater than zero here
+     * @param targetNumber        the base reinforcement target number, before the support-point modifier
+     * @param brokeBatchallTerms  whether committing these reinforcements breaches accepted batchall terms
+     * @param contract            the active contract, for recording a batchall breach
+     * @param enemyCode           the enemy faction's short name, for recording a batchall breach
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void commitPaidReinforcements(int baseCostAddend, boolean isInstantlyDeployed, int chosenSupportPoints,
+          int selectedForceCount, TargetRoll targetNumber, boolean brokeBatchallTerms, AbstractContract contract,
+          String enemyCode) {
+        int supportPointsSpent = chosenSupportPoints + baseCostAddend;
+        currentCampaignState.changeSupportPoints(-(supportPointsSpent * selectedForceCount));
+
+        int supportPointModifier = (chosenSupportPoints * SUPPORT_POINTS_MODIFIER) / selectedForceCount;
+        int finalTargetNumber = targetNumber.getValue() + supportPointModifier;
+
+        btnCommitClicked(finalTargetNumber, false, isInstantlyDeployed);
+        if (brokeBatchallTerms) {
+            processBatchallBreach(contract, enemyCode);
         }
     }
 
@@ -985,30 +988,11 @@ public class StratConScenarioWizard extends JDialog {
                     currentScenario.addForce(formation, templateID, campaign);
 
                     if (reinforcementResults == DELAYED) {
-                        for (UUID unitId : formation.getAllUnits(true)) {
-                            Unit unit = campaign.getUnit(unitId);
-                            if ((unit != null) && !SupportCarrierDeployment.staysHome(unit,
-                                  currentScenario.getBackingScenario())) {
-                                delayedReinforcements.add(unitId);
-                            }
-                        }
+                        collectDeployingUnits(formation, delayedReinforcements);
                     } else if (reinforcementResults == INSTANT) {
-
-                        for (UUID unitId : formation.getAllUnits(true)) {
-                            Unit unit = campaign.getUnit(unitId);
-                            if ((unit != null) && !SupportCarrierDeployment.staysHome(unit,
-                                  currentScenario.getBackingScenario())) {
-                                instantReinforcements.add(unitId);
-                            }
-                        }
+                        collectDeployingUnits(formation, instantReinforcements);
                     }
                 }
-            }
-        }
-
-        for (String templateID : availableUnitLists.keySet()) {
-            for (Unit unit : availableUnitLists.get(templateID).getSelectedValuesList()) {
-                currentScenario.addUnit(unit, templateID, false);
             }
         }
 
@@ -1045,6 +1029,25 @@ public class StratConScenarioWizard extends JDialog {
     }
 
     /**
+     * Collects every unit of the given formation that is actually deploying - that is, not staying home - into the
+     * supplied reinforcement list.
+     *
+     * @param formation      the formation whose units are deploying
+     * @param reinforcements the list to add the deploying unit IDs to
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void collectDeployingUnits(Formation formation, List<UUID> reinforcements) {
+        for (UUID unitId : formation.getAllUnits(true)) {
+            Unit unit = campaign.getUnit(unitId);
+            if ((unit != null) && !SupportCarrierDeployment.staysHome(unit, currentScenario.getBackingScenario())) {
+                reinforcements.add(unitId);
+            }
+        }
+    }
+
+    /**
      * Displays a warning dialog to the user regarding a Batchall breach and captures their decision.
      *
      * <p>The dialog presents an in-character and out-of-character message and allows the user to either cancel or
@@ -1066,11 +1069,11 @@ public class StratConScenarioWizard extends JDialog {
                                .getSeniorAdminPerson(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(),
                                      campaign.getLocalDate());
-        String inCharacterMessage = String.format(resources.getString("batchallBreach.ic"),
+        String inCharacterMessage = String.format(getTextAt(RESOURCE_BUNDLE, "batchallBreach.ic"),
               campaign.getCommanderAddress());
-        String outOfCharacterMessage = resources.getString("batchallBreach.ooc");
-        String cancelButton = resources.getString("batchallBreach.button.cancel");
-        String continueButton = resources.getString("batchallBreach.button.continue");
+        String outOfCharacterMessage = getTextAt(RESOURCE_BUNDLE, "batchallBreach.ooc");
+        String cancelButton = getTextAt(RESOURCE_BUNDLE, "batchallBreach.button.cancel");
+        String continueButton = getTextAt(RESOURCE_BUNDLE, "batchallBreach.button.continue");
 
         while (!dialogAccepted) {
             ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign, speaker, null,
@@ -1123,7 +1126,7 @@ public class StratConScenarioWizard extends JDialog {
     }
 
     private void closeWizard() {
-        this.getParent().repaint();
+        parent.repaint();
 
         dispose();
     }
@@ -1138,8 +1141,8 @@ public class StratConScenarioWizard extends JDialog {
      * @param forceStatusLabel   the {@link JLabel} used to display the status of the selected forces.
      * @param isPrimaryForce     a boolean flag indicating whether the selected forces are part of the primary force:
      *                                                  <ul>
-     *                                                    <li>{@code true}: Displays details relevant to the primary force (listSelectionEvent.g., leadership, roles).</li>
-     *                                                    <li>{@code false}: Displays details relevant to reinforcement forces (listSelectionEvent.g., support point requirements).</li>
+     *                                                    <li>{@code true}: Displays details relevant to the primary force (e.g., leadership, roles).</li>
+     *                                                    <li>{@code false}: Displays details relevant to reinforcement forces (e.g., support point requirements).</li>
      *                                                  </ul>
      *
      *                           <p>Behavior and Process:</p>
@@ -1176,11 +1179,10 @@ public class StratConScenarioWizard extends JDialog {
             return;
         }
 
-        JList<Formation> sourceList = new JList<>(formationList);
         StringBuilder statusBuilder = new StringBuilder();
         statusBuilder.append("<html>");
 
-        for (Formation formation : sourceList.getSelectedValuesList()) {
+        for (Formation formation : formationList) {
             statusBuilder.append(buildForceStatus(formation, isPrimaryForce));
         }
 
@@ -1233,7 +1235,7 @@ public class StratConScenarioWizard extends JDialog {
                 selectedItems += unit.getEntity().calculateBattleValue(true, true);
                 selectionCountLabel.setText(String.format("%d %s",
                       selectedItems,
-                      resources.getString("unitsSelectedLabel.bv")));
+                      getTextAt(RESOURCE_BUNDLE, "unitsSelectedLabel.bv")));
                 selectTransportedUnitsAndTransport(selectedCampaignTransportType, unit, changedList);
 
             }
@@ -1241,7 +1243,7 @@ public class StratConScenarioWizard extends JDialog {
             selectedItems = changedList.getSelectedIndices().length;
             selectionCountLabel.setText(String.format("%d %s",
                   selectedItems,
-                  resources.getString("unitsSelectedLabel.count")));
+                  getTextAt(RESOURCE_BUNDLE, "unitsSelectedLabel.count")));
         }
 
         // if we've selected too many units here, change the label and disable the
@@ -1256,12 +1258,6 @@ public class StratConScenarioWizard extends JDialog {
 
         // go through the other unit lists in the wizard and deselect the selected units
         // to avoid "issues" and "unpredictable behavior"
-        for (JList<Unit> unitList : availableUnitLists.values()) {
-            if (!changedList.equals(unitList)) {
-                unselectDuplicateUnits(unitList, changedList.getSelectedValuesList());
-            }
-        }
-
         if (!changedList.equals(availableInfantryUnits)) {
             unselectDuplicateUnits(availableInfantryUnits, changedList.getSelectedValuesList());
         }
@@ -1334,7 +1330,7 @@ public class StratConScenarioWizard extends JDialog {
      * Specific event handler for logic related to available infantry units. Updates the defensive minefield count
      */
     private void availableInfantrySelectorChanged(JLabel defensiveMineCountLabel) {
-        defensiveMineCountLabel.setText(String.format(resources.getString("lblDefensiveMinefieldCount.text"),
+        defensiveMineCountLabel.setText(String.format(getTextAt(RESOURCE_BUNDLE, "lblDefensiveMinefieldCount.text"),
               getNumMinefields()));
     }
 
