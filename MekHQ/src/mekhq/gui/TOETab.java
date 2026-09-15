@@ -337,7 +337,6 @@ public final class TOETab extends CampaignGuiTab {
     }
 
     public void refreshOrganization() {
-        LOGGER.info("TOE-DEBUG: TOETab.refreshOrganization RUNNING (updateUI + refreshForceView)");
         SwingUtilities.invokeLater(() -> {
             // Preserve the tree's expansion and selection across the refresh so adding units (for
             // example committing a generated command) updates the tree in place rather than
@@ -516,7 +515,6 @@ public final class TOETab extends CampaignGuiTab {
 
     @Subscribe
     public void organizationChanged(OrganizationChangedEvent ev) {
-        LOGGER.info("TOE-DEBUG: TOETab.organizationChanged RECEIVED event; scheduling refresh");
         orgRefreshScheduler.schedule();
     }
 
