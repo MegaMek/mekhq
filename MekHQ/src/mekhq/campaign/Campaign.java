@@ -2674,7 +2674,6 @@ public class Campaign implements ITechManager {
                                                            .booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT) &&
                                                      (tech.getCurrentEdge() > 0);
                     SkillCheck refitCheck = new SkillCheck(tech, refitSkill.getType(), target)
-                                                  .withoutLogging()
                                                   .withoutSubject()
                                                   .withEdgeRerollCondition(firstRoll -> firstRoll.result() <
                                                                                               target.getValue());
@@ -2909,7 +2908,6 @@ public class Campaign implements ITechManager {
                                              (tech.getCurrentEdge() > 0) &&
                                              (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS);
             SkillCheck repairCheck = new SkillCheck(tech, repairSkill.getType(), target)
-                                           .withoutLogging()
                                            .withoutSubject()
                                            .withEdgeRerollCondition(firstRoll -> {
                                                int rolled = firstRoll.result();

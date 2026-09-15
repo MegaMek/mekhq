@@ -285,11 +285,11 @@ class ActionCheckTest {
     }
 
     @Test
-    void testWithoutLogging_StillReturnsResult() {
+    void testWithLogging_StillReturnsResult() {
         Person person = new Person("F", "L", null, "Faction");
         TargetRoll target = new TargetRoll(7, "Base");
         ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action")
-                                          .withoutLogging();
+                                          .withLogging();
         ActionCheckResult result = resolveWithFixedRoll(check, false, 4, 5);
 
         assertTrue(result.isSuccess());

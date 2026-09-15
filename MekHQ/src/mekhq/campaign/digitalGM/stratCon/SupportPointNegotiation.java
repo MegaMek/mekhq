@@ -203,8 +203,7 @@ public class SupportPointNegotiation {
             Person admin = iterator.next();
 
             // No forced roll type: the check derives ADVANTAGE from the admin's Natural Aptitude when they have it.
-            SkillCheck skillCheck = admin.checkSkill(S_ADMIN, campaign)
-                                          .withoutLogging();
+            SkillCheck skillCheck = admin.checkSkill(S_ADMIN, campaign);
             if (modifier != 0) {
                 skillCheck.withMiscModifier(-modifier);
             }
