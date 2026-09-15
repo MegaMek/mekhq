@@ -15,6 +15,7 @@ import java.awt.RenderingHints;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -45,6 +46,7 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
     private final JPanel card = new JPanel(new BorderLayout(UIUtil.scaleForGUI(10), 0));
     private final Ring ring = new Ring();
     private final JLabel nameLabel = new JLabel();
+    private final JLabel roleLabel = new JLabel();
     private final JLabel subLabel = new JLabel();
 
     // A separate cached component for section-divider rows in the staged tray (see SectionHeader).
@@ -68,13 +70,23 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
         header.add(headerLabel, BorderLayout.CENTER);
 
         nameLabel.setFont(hudFont(Font.BOLD, 1.0f, 0.02f));
+        roleLabel.setFont(hudFont(Font.PLAIN, 0.82f, 0.06f));
+        roleLabel.setForeground(TEXT_MUTED);
         subLabel.setFont(hudFont(Font.PLAIN, 0.82f, 0.0f));
         subLabel.setForeground(TEXT_MUTED);
+
+        // Name row: the force/unit name, then its assigned combat role (formations only) as a muted suffix.
+        JPanel nameRow = new JPanel();
+        nameRow.setOpaque(false);
+        nameRow.setLayout(new BoxLayout(nameRow, BoxLayout.X_AXIS));
+        nameRow.add(nameLabel);
+        nameRow.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(8)));
+        nameRow.add(roleLabel);
 
         JPanel text = new JPanel();
         text.setOpaque(false);
         text.setLayout(new BoxLayout(text, BoxLayout.Y_AXIS));
-        text.add(HudStyle.leftAligned(nameLabel));
+        text.add(HudStyle.leftAligned(nameRow));
         text.add(HudStyle.leftAligned(subLabel));
 
         card.add(ring, BorderLayout.WEST);
@@ -107,6 +119,7 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
         } else {
             ring.setColor(TEXT_MUTED);
             nameLabel.setText("");
+            roleLabel.setText("");
             subLabel.setText("");
         }
         return card;
@@ -117,6 +130,7 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
         ring.setColor(statuses.isEmpty() ? TEXT_MUTED : readinessColor(statuses.get(0)));
         nameLabel.setText(formation.getName());
         nameLabel.setForeground(TEXT);
+        roleLabel.setText(formation.getCombatRoleInMemory().toString());
         subLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.row.formationSub",
               formation.getTotalBV(campaign, true), formation.getAllUnits(true).size()));
     }
@@ -125,6 +139,7 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
         ring.setColor(ACCENT);
         nameLabel.setText(unit.getName());
         nameLabel.setForeground(TEXT);
+        roleLabel.setText("");
         int battleValue = (unit.getEntity() == null) ? 0 : unit.getEntity().calculateBattleValue(true, true);
         subLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.row.unitSub",
               unit.getStatus(), battleValue));

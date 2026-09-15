@@ -74,6 +74,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -123,6 +124,8 @@ public class StratConDeploymentWizard extends JDialog {
     private final DefaultListModel<Object> boardModel = new DefaultListModel<>();
     private final JList<Object> boardList = new JList<>(boardModel);
     private final JTextField searchField = new JTextField(20);
+    private final JComboBox<Object> roleFilter = new JComboBox<>();
+    private JPanel roleFilterPanel;
     private final JLabel instructionsLabel = new JLabel();
 
     // One shared staged set, kept typed by the page each item was staged from, so the single Commit can batch them.
@@ -218,6 +221,13 @@ public class StratConDeploymentWizard extends JDialog {
     private void enterMode() {
         instructionsLabel.setText(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.instructions." + mode.name()));
 
+        // The role filter only applies to formation pages; hide it (and drop any stale selection) on the unit pages.
+        boolean showRoleFilter = !mode.isUnitTier();
+        if (!showRoleFilter && (roleFilter.getSelectedIndex() != 0)) {
+            roleFilter.setSelectedIndex(0);
+        }
+        roleFilterPanel.setVisible(showRoleFilter);
+
         loadEligibleItems();
         applySearchFilter();
 
@@ -269,6 +279,7 @@ public class StratConDeploymentWizard extends JDialog {
               .toUpperCase(Locale.ROOT)), BorderLayout.WEST);
         styleField(searchField);
         searchRow.add(searchField, BorderLayout.CENTER);
+        searchRow.add(buildRoleFilter(), BorderLayout.EAST);
 
         boardList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         boardList.setCellRenderer(new DeploymentItemRenderer(campaign));
@@ -288,6 +299,31 @@ public class StratConDeploymentWizard extends JDialog {
         splitPane.setBorder(null);
         splitPane.setBackground(HudStyle.GROUND);
         return splitPane;
+    }
+
+    /**
+     * Builds the combat-role filter: an "All Roles" entry followed by every {@link CombatRole}, letting the player show
+     * only formations of a chosen role (for example, only Patrols). Hidden on the unit-tier pages, which have no roles.
+     */
+    private JPanel buildRoleFilter() {
+        roleFilter.addItem(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.filter.allRoles"));
+        for (CombatRole role : CombatRole.values()) {
+            // Auxiliary and Reserve are not deployable combat roles, so they are not offered as filters.
+            if ((role == CombatRole.AUXILIARY) || (role == CombatRole.RESERVE)) {
+                continue;
+            }
+            roleFilter.addItem(role);
+        }
+        roleFilter.setBackground(HudStyle.SURFACE_DEEP);
+        roleFilter.setForeground(HudStyle.TEXT);
+        roleFilter.addActionListener(event -> applySearchFilter());
+
+        roleFilterPanel = new JPanel(new BorderLayout(UIUtil.scaleForGUI(8), 0));
+        roleFilterPanel.setOpaque(false);
+        roleFilterPanel.add(HudStyle.keyLabel(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.filter.role.label")
+              .toUpperCase(Locale.ROOT)), BorderLayout.WEST);
+        roleFilterPanel.add(roleFilter, BorderLayout.CENTER);
+        return roleFilterPanel;
     }
 
     private static void styleField(JTextField field) {
@@ -437,6 +473,8 @@ public class StratConDeploymentWizard extends JDialog {
 
     private void applySearchFilter() {
         String query = searchField.getText().trim().toLowerCase(Locale.ROOT);
+        Object roleSelection = roleFilter.getSelectedItem();
+        CombatRole roleQuery = (roleSelection instanceof CombatRole role) ? role : null;
         Object focused = boardList.getSelectedValue();
 
         boardModel.clear();
@@ -445,6 +483,9 @@ public class StratConDeploymentWizard extends JDialog {
             // the picker until it is unstaged, so the same force cannot be staged twice - for example as both the
             // primary force and a reinforcement.
             if (isStagedAnywhere(item)) {
+                continue;
+            }
+            if (!matchesRole(item, roleQuery)) {
                 continue;
             }
             if (matchesQuery(item, query)) {
@@ -456,6 +497,14 @@ public class StratConDeploymentWizard extends JDialog {
         if ((focused != null) && boardModel.contains(focused)) {
             boardList.setSelectedValue(focused, true);
         }
+    }
+
+    private static boolean matchesRole(Object item, @Nullable CombatRole roleQuery) {
+        if (roleQuery == null) {
+            return true;
+        }
+        // Only formations carry a combat role; the filter is hidden on the unit pages, so roleQuery is null there.
+        return (item instanceof Formation formation) && (formation.getCombatRoleInMemory() == roleQuery);
     }
 
     private static boolean matchesQuery(Object item, String query) {
