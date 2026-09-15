@@ -62,6 +62,7 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import org.apache.commons.text.StringEscapeUtils;
@@ -373,10 +374,13 @@ public class ContractNegotiatorPickerDialog extends JDialog {
                          "</b> " +
                          getTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.detail.skill.untrained");
         }
-        int target = person.checkSkill(SkillType.S_NEGOTIATION, campaign).getTargetNumber().getValue();
+
+        SkillModifierData skillModifierData = person.getSkillModifierData();
+        int skillLevel = skill.getTotalSkillLevel(skillModifierData);
+        String target = skill.toString(skillModifierData);
         return "<b>" + getTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.detail.skill.label") + "</b> "
                      + getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.detail.skill.value",
-              skill.getFinalSkillValue(person.getSkillModifierData()), target);
+              skillLevel, target);
     }
 
     private JPanel buildButtons() {
@@ -405,8 +409,9 @@ public class ContractNegotiatorPickerDialog extends JDialog {
         if (skill == null) {
             return getTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.skill.none");
         }
-        return getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.skill",
-              skill.getFinalSkillValue(person.getSkillModifierData()));
+        SkillModifierData skillModifierData = person.getSkillModifierData();
+        String target = skill.toString(skillModifierData);
+        return getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.skill", target);
     }
 
     /** Renders each candidate with a portrait thumbnail, their title, and their negotiation skill. */

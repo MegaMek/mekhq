@@ -1771,7 +1771,7 @@ public class StratConRulesManager {
                     if (useAdvancedScouting) {
                         actionCheckResult = scoutData.skillCheck().resolve(
                               isUseEdge, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"));
-                        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(false));
+                        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
                     }
 
                     remainingScans--;
@@ -2224,12 +2224,13 @@ public class StratConRulesManager {
             return DELAYED;
         }
 
-        // FIXME: roll and target number are not present in the template
         campaign.addReport(BATTLE, String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG,
               actionCheckResult.getRollResult(),
               9));
+
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
 
         ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(formation,
               campaign.getPlayerForce().getHangar());

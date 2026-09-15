@@ -205,15 +205,12 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     }
 
     /**
-     * Suppresses the standard results-line logging performed by {@link #resolve(boolean, String)}.
-     *
-     * <p>Callers that assemble their own running report and merely need the roll, edge handling, and margin from this
-     * utility use this to avoid the utility logging a line that does not slot into their report.</p>
+     * Adds a results-line log performed by {@link #resolve(boolean, String)}.
      *
      * @return updated action check
      */
-    public T withoutLogging() {
-        this.logResult = false;
+    public T withLogging() {
+        this.logResult = true;
         return getThis();
     }
 
@@ -289,10 +286,6 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
         int marginOfSuccess = Math.clamp(isCountUp() ? difference : -difference,
               MARGIN_OF_SUCCESS_MIN, MARGIN_OF_SUCCESS_MAX);
         String resultsText = generateResultsText(roll.result(), marginOfSuccess, reason, rollType);
-
-        if (logResult) {
-            LOGGER.info(resultsText);
-        }
 
         return new ActionCheckResult(roll, marginOfSuccess, usedEdge, resultsText);
     }
