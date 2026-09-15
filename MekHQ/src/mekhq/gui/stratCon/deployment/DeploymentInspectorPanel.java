@@ -43,6 +43,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -94,6 +95,7 @@ public class DeploymentInspectorPanel extends JPanel {
     private final JLabel stagedTitle = new JLabel();
     private final DefaultListModel<Object> stagedModel = new DefaultListModel<>();
     private final JList<Object> stagedList = new JList<>(stagedModel);
+    private DeploymentItemRenderer stagedRenderer;
 
     private final HudButton stageButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.stage"), false);
     private final HudButton cancelButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.cancel"), false);
@@ -151,7 +153,8 @@ public class DeploymentInspectorPanel extends JPanel {
         budgetLabel.setForeground(ACCENT);
         budgetLabel.setFont(hudFont(Font.BOLD, 0.95f, 0.0f));
 
-        stagedList.setCellRenderer(new DeploymentItemRenderer(campaign));
+        stagedRenderer = new DeploymentItemRenderer(campaign);
+        stagedList.setCellRenderer(stagedRenderer);
         stagedList.setBackground(SURFACE_DEEP);
         stagedList.setBorder(null);
         stagedList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -430,6 +433,17 @@ public class DeploymentInspectorPanel extends JPanel {
      * @author Illiani
      * @since 0.51.01
      */
+    /**
+     * Flags which staged forces are deploying off-board, so the staged tray shows an off-board indicator on those rows.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setStagedOffBoardForceIds(Set<Integer> offBoardForceIds) {
+        stagedRenderer.setOffBoardForceIds(offBoardForceIds);
+        stagedList.repaint();
+    }
+
     public void setStaged(List<?> stagedItems) {
         stagedModel.clear();
         int count = 0;

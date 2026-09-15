@@ -6,6 +6,7 @@ import static mekhq.gui.stratCon.deployment.HudStyle.SURFACE;
 import static mekhq.gui.stratCon.deployment.HudStyle.SURFACE_DEEP;
 import static mekhq.gui.stratCon.deployment.HudStyle.SURFACE_HIGHLIGHT;
 import static mekhq.gui.stratCon.deployment.HudStyle.TEXT;
+import static mekhq.gui.stratCon.deployment.HudStyle.TEXT_FAINT;
 import static mekhq.gui.stratCon.deployment.HudStyle.TEXT_MUTED;
 import static mekhq.gui.stratCon.deployment.HudStyle.hudFont;
 
@@ -62,12 +63,27 @@ public class HudModeSelector extends JPanel {
         }
     }
 
+    /**
+     * Locks or unlocks a mode's cell. A locked cell is dimmed and ignores clicks and keys, so the page cannot be
+     * selected.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setModeEnabled(DeploymentMode mode, boolean enabled) {
+        Cell cell = cells.get(mode);
+        if (cell != null) {
+            cell.setCellEnabled(enabled);
+        }
+    }
+
     private final class Cell extends JPanel {
         private final transient DeploymentMode mode;
         private final boolean rightBorder;
         private final JLabel title;
         private boolean selected;
         private boolean hovered;
+        private boolean cellEnabled = true;
 
         private Cell(DeploymentMode mode, boolean rightBorder) {
             this.mode = mode;
@@ -93,6 +109,9 @@ public class HudModeSelector extends JPanel {
 
                 @Override
                 public void mouseEntered(MouseEvent event) {
+                    if (!cellEnabled) {
+                        return;
+                    }
                     hovered = true;
                     refreshTitleColor();
                     repaint();
@@ -117,6 +136,9 @@ public class HudModeSelector extends JPanel {
         }
 
         private void choose() {
+            if (!cellEnabled) {
+                return;
+            }
             requestFocusInWindow();
             onSelect.accept(mode);
         }
@@ -127,7 +149,20 @@ public class HudModeSelector extends JPanel {
             repaint();
         }
 
+        private void setCellEnabled(boolean cellEnabled) {
+            this.cellEnabled = cellEnabled;
+            if (!cellEnabled) {
+                hovered = false;
+            }
+            refreshTitleColor();
+            repaint();
+        }
+
         private void refreshTitleColor() {
+            if (!cellEnabled) {
+                title.setForeground(TEXT_FAINT);
+                return;
+            }
             title.setForeground((selected || hovered) ? TEXT : TEXT_MUTED);
         }
 

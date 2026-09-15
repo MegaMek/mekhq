@@ -38,20 +38,16 @@ import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.calculateRe
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.commanderLanceHasDefensiveAssignment;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.getEligibleFrontlineUnits;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.getEligibleLeadershipUnits;
+import static mekhq.campaign.personnel.skills.SkillType.SKILL_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
+import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -72,6 +68,7 @@ import mekhq.campaign.digitalGM.stratCon.deployment.ReinforcementAdvisor;
 import mekhq.campaign.digitalGM.stratCon.deployment.ReinforcementCost;
 import mekhq.campaign.digitalGM.stratCon.deployment.ReinforcementRoll;
 import mekhq.campaign.digitalGM.stratCon.deployment.StratConDeploymentService;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
@@ -79,6 +76,7 @@ import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.StratConPanel;
@@ -245,6 +243,7 @@ public class StratConDeploymentWizard extends JDialog {
         refreshStagedTray();
         updateBudget();
         refreshCommitEnabled();
+        updateTabLocks();
     }
 
     private void clearStaged() {
@@ -389,6 +388,10 @@ public class StratConDeploymentWizard extends JDialog {
     private void loadEligibleItems() {
         allItems.clear();
 
+        // Refresh the leadership/defensive budget inputs before loading, so the auxiliary eligibility query and both
+        // unit-page budgets reflect the primary force staged this session rather than the scenario's generated force.
+        refreshBudgetInputs();
+
         switch (mode) {
             case PRIMARY -> loadEligiblePrimaryFormations();
             case REINFORCE -> loadEligibleReinforcementForces();
@@ -447,8 +450,6 @@ public class StratConDeploymentWizard extends JDialog {
             return;
         }
 
-        leadershipSkill = resolveLeadershipSkill();
-        leadershipPointsUsed = scenario.getLeadershipPointsUsed();
         allItems.addAll(getEligibleLeadershipUnits(campaign, scenario, leadershipSkill));
     }
 
@@ -457,13 +458,63 @@ public class StratConDeploymentWizard extends JDialog {
             return;
         }
 
-        defensivePoints = scenario.getNumDefensivePoints();
         allItems.addAll(getEligibleFrontlineUnits(campaign, scenario));
     }
 
     /**
-     * @return the commander's leadership skill for auxiliary-unit budgeting: zero unless the commander lance is on a
-     *       defensive assignment, and always zero for official challenges (leadership units would be cheating)
+     * Recomputes the leadership and defensive-point budget inputs from the primary force staged this session. The staged
+     * primary is not assigned to the backing scenario until commit, so the scenario-derived budgets would otherwise stay
+     * pinned to whatever force the scenario was generated around and never track the player's choice. When no primary is
+     * staged - reinforcing an already-committed scenario - the scenario's committed values are used instead.
+     */
+    private void refreshBudgetInputs() {
+        if (scenario == null) {
+            leadershipSkill = 0;
+            leadershipPointsUsed = 0;
+            defensivePoints = 0;
+            return;
+        }
+
+        leadershipPointsUsed = scenario.getLeadershipPointsUsed();
+
+        Formation stagedPrimary = stagedPrimaryForces.isEmpty() ? null : stagedPrimaryForces.get(0);
+        if (stagedPrimary == null) {
+            // Reinforcing a committed scenario: fall back to the scenario's assigned commander lance.
+            leadershipSkill = resolveLeadershipSkill();
+            defensivePoints = scenario.getNumDefensivePoints();
+            return;
+        }
+
+        // The staged primary becomes the commander lance on commit. Leadership units and defensive minefields are only
+        // available when that lance is on a frontline (defensive) assignment, and never during official challenges.
+        CombatTeam combatTeam = campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(stagedPrimary.getId());
+        boolean defensiveAssignment = (combatTeam != null) && combatTeam.getRole().isFrontline();
+        if (!defensiveAssignment || scenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge()) {
+            leadershipSkill = 0;
+            defensivePoints = 0;
+            return;
+        }
+
+        leadershipSkill = commanderSkill(combatTeam, S_LEADER);
+        defensivePoints = commanderSkill(combatTeam, S_TACTICS) * 2;
+    }
+
+    /** The staged primary's commander skill level, mirroring {@code AtBDynamicScenario.getLanceCommanderSkill}. */
+    private int commanderSkill(CombatTeam combatTeam, String skillType) {
+        combatTeam.refreshCommander(campaign);
+        Person commander = combatTeam.getCommander(campaign);
+        if ((commander == null) || !commander.hasSkill(skillType)) {
+            return SKILL_NONE;
+        }
+        SkillModifierData skillModifierData = commander.getSkillModifierData(
+              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
+              campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
+        return commander.getSkill(skillType).getTotalSkillLevel(skillModifierData);
+    }
+
+    /**
+     * @return the committed scenario commander's leadership skill: zero unless that lance is on a defensive assignment,
+     *       and always zero for official challenges (leadership units would be cheating)
      */
     private int resolveLeadershipSkill() {
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
@@ -613,6 +664,8 @@ public class StratConDeploymentWizard extends JDialog {
             return;
         }
         offBoardChoiceByForceId.put(formation.getId(), inspector.isOffBoardOptionSelected());
+        // Refresh the staged-tray indicator in case the toggled force is already staged.
+        inspector.setStagedOffBoardForceIds(stagedOffBoardForceIds());
     }
 
     /**
@@ -640,6 +693,8 @@ public class StratConDeploymentWizard extends JDialog {
             return;
         }
 
+        Integer primaryBefore = stagedPrimaryId();
+
         if (focusedFromStagedTray) {
             unstage(focusedItem);
         } else {
@@ -651,12 +706,20 @@ public class StratConDeploymentWizard extends JDialog {
             stage(focusedItem);
         }
 
+        // If the primary force was assigned, swapped, or removed, the auxiliaries and utility choices no longer apply to
+        // it, so reset them.
+        if (!Objects.equals(primaryBefore, stagedPrimaryId())) {
+            stagedAuxiliaryUnits.clear();
+            stagedUtilityUnits.clear();
+        }
+
         // The item just moved between the board and the staged tray, so drop the focus and rebuild both views.
         clearFocus();
         applySearchFilter();
         refreshStagedTray();
         updateBudget();
         refreshCommitEnabled();
+        updateTabLocks();
     }
 
     /** Clears the focused item and both selections, and resets the inspector to its "nothing focused" state. */
@@ -708,6 +771,26 @@ public class StratConDeploymentWizard extends JDialog {
         addStagedSection(staged, DeploymentMode.AUXILIARIES, stagedAuxiliaryUnits);
         addStagedSection(staged, DeploymentMode.UTILITY, stagedUtilityUnits);
         inspector.setStaged(staged);
+        inspector.setStagedOffBoardForceIds(stagedOffBoardForceIds());
+    }
+
+    /**
+     * @return the IDs of staged formations that will actually deploy off-board (those with artillery whose effective
+     *       off-board choice is on), for the staged-tray indicator
+     */
+    private Set<Integer> stagedOffBoardForceIds() {
+        Set<Integer> ids = new HashSet<>();
+        collectOffBoardForceIds(ids, stagedPrimaryForces);
+        collectOffBoardForceIds(ids, stagedReinforcementForces);
+        return ids;
+    }
+
+    private void collectOffBoardForceIds(Set<Integer> ids, List<Formation> stagedFormations) {
+        for (Formation formation : stagedFormations) {
+            if (formationHasArtillery(formation) && effectiveOffBoard(formation.getId())) {
+                ids.add(formation.getId());
+            }
+        }
     }
 
     private static void addStagedSection(List<Object> staged, DeploymentMode section, List<?> items) {
@@ -752,7 +835,31 @@ public class StratConDeploymentWizard extends JDialog {
     }
 
     private void refreshCommitEnabled() {
-        inspector.getCommitButton().setArmed(!nothingStaged());
+        // A deployment is meaningless without a primary force, so commit stays disabled until one is present - either
+        // staged this session, or already committed on the scenario being reinforced.
+        inspector.getCommitButton().setArmed(hasPrimary() && !nothingStaged());
+    }
+
+    /**
+     * Auxiliaries and Utility only make sense once a primary force is committed to the scenario, so their tabs are
+     * locked until a primary is assigned - either already on the scenario, or staged in this session.
+     */
+    private void updateTabLocks() {
+        boolean hasPrimary = hasPrimary();
+        modeSelector.setModeEnabled(DeploymentMode.AUXILIARIES, hasPrimary);
+        modeSelector.setModeEnabled(DeploymentMode.UTILITY, hasPrimary);
+    }
+
+    private boolean hasPrimary() {
+         // When reinforcing an already-committed scenario, its committed primary counts. When assigning a fresh primary
+        // (the Primary page), an unresolved scenario may already carry an auto-assigned primary from generation, so
+        // ignore that and key the lock purely off what the player has staged in the Primary tab this session.
+        boolean committedPrimary = !assignToScenario && (scenario != null) && !scenario.getPrimaryForceIDs().isEmpty();
+        return committedPrimary || !stagedPrimaryForces.isEmpty();
+    }
+
+    private Integer stagedPrimaryId() {
+        return stagedPrimaryForces.isEmpty() ? null : stagedPrimaryForces.get(0).getId();
     }
 
     // endregion

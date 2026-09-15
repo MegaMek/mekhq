@@ -2,6 +2,7 @@ package mekhq.gui.stratCon.deployment;
 
 import static mekhq.gui.stratCon.deployment.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -12,8 +13,10 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -47,7 +50,11 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
     private final Ring ring = new Ring();
     private final JLabel nameLabel = new JLabel();
     private final JLabel roleLabel = new JLabel();
+    private final JLabel offBoardLabel = new JLabel();
     private final JLabel subLabel = new JLabel();
+
+    // Force IDs to flag as deploying off-board (used by the staged tray). Empty on the board renderer.
+    private transient Set<Integer> offBoardForceIds = Collections.emptySet();
 
     // A separate cached component for section-divider rows in the staged tray (see SectionHeader).
     private final JPanel header = new JPanel(new BorderLayout());
@@ -72,16 +79,23 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
         nameLabel.setFont(hudFont(Font.BOLD, 1.0f, 0.02f));
         roleLabel.setFont(hudFont(Font.PLAIN, 0.82f, 0.06f));
         roleLabel.setForeground(TEXT_MUTED);
+        offBoardLabel.setFont(hudFont(Font.BOLD, 0.72f, 0.12f));
+        offBoardLabel.setForeground(AMBER);
+        offBoardLabel.setText(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.offBoard.tag").toUpperCase(Locale.ROOT));
+        offBoardLabel.setVisible(false);
         subLabel.setFont(hudFont(Font.PLAIN, 0.82f, 0.0f));
         subLabel.setForeground(TEXT_MUTED);
 
-        // Name row: the force/unit name, then its assigned combat role (formations only) as a muted suffix.
+        // Name row: the force/unit name, its assigned combat role (formations only), and an off-board flag when staged
+        // off-board.
         JPanel nameRow = new JPanel();
         nameRow.setOpaque(false);
         nameRow.setLayout(new BoxLayout(nameRow, BoxLayout.X_AXIS));
         nameRow.add(nameLabel);
         nameRow.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(8)));
         nameRow.add(roleLabel);
+        nameRow.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(8)));
+        nameRow.add(offBoardLabel);
 
         JPanel text = new JPanel();
         text.setOpaque(false);
@@ -114,15 +128,29 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
 
         if (value instanceof Formation formation) {
             configureFormation(formation);
+            offBoardLabel.setVisible(offBoardForceIds.contains(formation.getId()));
         } else if (value instanceof Unit unit) {
             configureUnit(unit);
+            offBoardLabel.setVisible(false);
         } else {
             ring.setColor(TEXT_MUTED);
             nameLabel.setText("");
             roleLabel.setText("");
             subLabel.setText("");
+            offBoardLabel.setVisible(false);
         }
         return card;
+    }
+
+    /**
+     * Sets the force IDs to flag as deploying off-board. The staged tray passes the committed off-board selection here so
+     * off-board forces show an indicator; the board renderer leaves this empty.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setOffBoardForceIds(Set<Integer> offBoardForceIds) {
+        this.offBoardForceIds = (offBoardForceIds == null) ? Collections.emptySet() : offBoardForceIds;
     }
 
     private void configureFormation(Formation formation) {
