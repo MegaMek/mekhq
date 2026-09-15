@@ -156,4 +156,21 @@ public final class DeploymentEvaluator {
         int targetNumberModifier = (chosenSupportPoints * SUPPORT_POINTS_MODIFIER) / forceCount;
         return new ReinforcementCost(perForce, total, targetNumberModifier);
     }
+
+    /**
+     * Composes a reinforcement roll from a contract-modified base target number and the modifier bought by spending
+     * support points.
+     *
+     * @param baseTargetNumber     the target number after command-liaison and contract modifiers, before support points
+     * @param targetNumberModifier the (non-positive) support-point modifier, from {@link #reinforcementCost}
+     *
+     * @return the final target number and its 2d6 success probability
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static ReinforcementRoll reinforcementRoll(int baseTargetNumber, int targetNumberModifier) {
+        int finalTargetNumber = baseTargetNumber + targetNumberModifier;
+        return new ReinforcementRoll(finalTargetNumber, successProbabilityTwoD6(finalTargetNumber));
+    }
 }

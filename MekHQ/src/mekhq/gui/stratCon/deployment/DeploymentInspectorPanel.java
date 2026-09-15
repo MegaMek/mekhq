@@ -51,9 +51,11 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementEligibilityType;
+import mekhq.campaign.digitalGM.stratCon.deployment.ReinforcementRoll;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.enums.OperationalStatus;
-import mekhq.gui.stratCon.ScenarioWizardLanceRenderer;
+import mekhq.campaign.unit.Unit;
 
 /**
  * The right-hand panel of the StratCon deployment wizard: a dossier for whichever force the player is currently
@@ -71,9 +73,10 @@ public class DeploymentInspectorPanel extends JPanel {
     private final Campaign campaign;
 
     private final JLabel dossierLabel = new JLabel();
+    private final JLabel budgetLabel = new JLabel();
     private final JLabel stagedTitle = new JLabel();
-    private final DefaultListModel<Formation> stagedModel = new DefaultListModel<>();
-    private final JList<Formation> stagedList = new JList<>(stagedModel);
+    private final DefaultListModel<Object> stagedModel = new DefaultListModel<>();
+    private final JList<Object> stagedList = new JList<>(stagedModel);
 
     private final JButton stageButton = new JButton();
     private final JButton commitButton = new JButton(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.commit"));
@@ -88,9 +91,13 @@ public class DeploymentInspectorPanel extends JPanel {
         JScrollPane dossierScroll = new JScrollPane(dossierLabel);
         dossierScroll.setBorder(BorderFactory.createEmptyBorder());
 
-        stagedList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
+        stagedList.setCellRenderer(new DeploymentItemRenderer(campaign));
+        budgetLabel.setBorder(BorderFactory.createEmptyBorder(0, 8, 0, 8));
+        JPanel stagedHeader = new JPanel(new BorderLayout());
+        stagedHeader.add(budgetLabel, BorderLayout.NORTH);
+        stagedHeader.add(stagedTitle, BorderLayout.SOUTH);
         JPanel stagedPanel = new JPanel(new BorderLayout(0, 4));
-        stagedPanel.add(stagedTitle, BorderLayout.NORTH);
+        stagedPanel.add(stagedHeader, BorderLayout.NORTH);
         stagedPanel.add(new JScrollPane(stagedList), BorderLayout.CENTER);
 
         JPanel buttonPanel = new JPanel();
@@ -105,6 +112,7 @@ public class DeploymentInspectorPanel extends JPanel {
         setStageButtonEnabled(false);
         showEmpty();
         setStaged(List.of());
+        clearBudget();
     }
 
     /**
@@ -114,24 +122,111 @@ public class DeploymentInspectorPanel extends JPanel {
      * @since 0.51.01
      */
     public void showFormation(Formation formation) {
+        setDossier("<html>" + formationSummaryHtml(formation) + "</html>");
+    }
+
+    /**
+     * Renders the dossier for a focused individual unit (auxiliaries and utility pages): name, status, and battle
+     * value.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void showUnit(Unit unit) {
         StringBuilder dossier = new StringBuilder("<html>");
-        dossier.append("<b>").append(formation.getName()).append("</b><br/>");
-        dossier.append(formation.getFullName()).append("<br/><br/>");
+        dossier.append("<b>").append(unit.getName()).append("</b><br/><br/>");
+        dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "deploymentWizard.inspector.unitStatus",
+              unit.getStatus())).append("<br/>");
+        if (unit.getEntity() != null) {
+            dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "deploymentWizard.inspector.battleValue",
+                  unit.getEntity().calculateBattleValue(true, true)));
+        }
+        dossier.append("</html>");
+        setDossier(dossier.toString());
+    }
+
+    /**
+     * Sets the budget line above the staged tray (leadership battle value or minefields remaining, depending on the
+     * page). Pass {@code null} to hide it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setBudget(String html) {
+        budgetLabel.setText(html == null ? " " : "<html>" + html + "</html>");
+    }
+
+    public void clearBudget() {
+        budgetLabel.setText(" ");
+    }
+
+    /**
+     * Renders the reinforcement dossier for a focused force: the shared formation summary plus how it is eligible to
+     * reinforce, its roll and odds, and its per-force support-point cost.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void showReinforcementFormation(Formation formation, ReinforcementEligibilityType eligibility,
+          ReinforcementRoll roll, int perForceSupportPoints) {
+        StringBuilder dossier = new StringBuilder("<html>");
+        dossier.append(formationSummaryHtml(formation)).append("<br/><br/>");
+        dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "deploymentWizard.reinforce.eligibility",
+              eligibilityLabel(eligibility))).append("<br/>");
+        dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "deploymentWizard.reinforce.targetNumber",
+              roll.finalTargetNumber())).append("<br/>");
+        dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "deploymentWizard.reinforce.odds",
+              (int) Math.round(roll.successProbability() * 100))).append("<br/>");
+        dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "deploymentWizard.reinforce.cost",
+              perForceSupportPoints));
+        dossier.append("</html>");
+
+        setDossier(dossier.toString());
+    }
+
+    private String formationSummaryHtml(Formation formation) {
+        StringBuilder summary = new StringBuilder();
+        summary.append("<b>").append(formation.getName()).append("</b><br/>");
+        summary.append(formation.getFullName()).append("<br/><br/>");
 
         List<OperationalStatus> statuses = formation.updateFormationIconOperationalStatus(campaign);
         if (!statuses.isEmpty()) {
-            dossier.append(readinessSpan(statuses.get(0))).append("<br/>");
+            summary.append(readinessSpan(statuses.get(0))).append("<br/>");
         }
 
-        dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+        summary.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.inspector.battleValue",
               formation.getTotalBV(campaign, true))).append("<br/>");
-        dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+        summary.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.inspector.units",
               formation.getAllUnits(true).size()));
-        dossier.append("</html>");
+        return summary.toString();
+    }
 
-        dossierLabel.setText(dossier.toString());
+    private static String eligibilityLabel(ReinforcementEligibilityType eligibility) {
+        return switch (eligibility) {
+            case REGULAR -> getTextAt(RESOURCE_BUNDLE, "regular.text");
+            case AUXILIARY -> getTextAt(RESOURCE_BUNDLE, "auxiliary.text");
+            case CHAINED_SCENARIO -> getTextAt(RESOURCE_BUNDLE, "fromChainedScenario.text");
+            case NONE -> getTextAt(RESOURCE_BUNDLE, "deploymentWizard.reinforce.ineligible");
+        };
+    }
+
+    /**
+     * Sets the dossier area to arbitrary HTML. Used by pages (such as Reinforce) that show more than the shared
+     * formation summary.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setDossier(String html) {
+        dossierLabel.setText(html);
     }
 
     /**
@@ -141,7 +236,7 @@ public class DeploymentInspectorPanel extends JPanel {
      * @since 0.51.01
      */
     public void showEmpty() {
-        dossierLabel.setText("<html>" + getTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.empty") + "</html>");
+        setDossier("<html>" + getTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.empty") + "</html>");
     }
 
     /**
@@ -150,14 +245,14 @@ public class DeploymentInspectorPanel extends JPanel {
      * @author Illiani
      * @since 0.51.01
      */
-    public void setStaged(List<Formation> stagedFormations) {
+    public void setStaged(List<?> stagedItems) {
         stagedModel.clear();
-        for (Formation formation : stagedFormations) {
-            stagedModel.addElement(formation);
+        for (Object item : stagedItems) {
+            stagedModel.addElement(item);
         }
         stagedTitle.setText(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.staged.title",
-              stagedFormations.size()));
+              stagedItems.size()));
     }
 
     /**

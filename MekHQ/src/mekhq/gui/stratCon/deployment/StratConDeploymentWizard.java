@@ -33,6 +33,10 @@
 package mekhq.gui.stratCon.deployment;
 
 import static mekhq.MHQConstants.CONFIRMATION_STRATCON_DEPLOY;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.commanderLanceHasDefensiveAssignment;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.getEligibleFrontlineUnits;
+import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.getEligibleLeadershipUnits;
+import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -40,49 +44,43 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultListModel;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JTextField;
-import javax.swing.JToggleButton;
-import javax.swing.ListSelectionModel;
+import java.util.Map;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
-import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementEligibilityType;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
-import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentContext;
+import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentEvaluator;
 import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
-import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
+import mekhq.campaign.digitalGM.stratCon.deployment.ReinforcementAdvisor;
+import mekhq.campaign.digitalGM.stratCon.deployment.ReinforcementRoll;
+import mekhq.campaign.digitalGM.stratCon.deployment.StratConDeploymentService;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.unit.Unit;
 import mekhq.gui.StratConPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.stratCon.ScenarioWizardLanceModel;
-import mekhq.gui.stratCon.ScenarioWizardLanceRenderer;
 
 /**
  * The redesigned StratCon deployment wizard: a non-modal, four-page window that browses the player's forces on a
  * searchable board and shows a dossier for the focused force before it is committed.
  *
- * <p>This is the first vertical slice of the redesign - the {@link DeploymentMode#PRIMARY} page, fully wired to the
- * existing deployment pipeline ({@link StratConGMs}). The Reinforce, Auxiliaries, and Utility pages follow the same
- * board-plus-inspector shape and are stubbed here until later phases. The legacy {@code StratConScenarioWizard} and
+ * <p>The {@link DeploymentMode#PRIMARY} page is fully wired, delegating its commit to the non-GUI
+ * {@link StratConDeploymentService}. Reinforce, Auxiliaries, and Utility are browsable - their boards and inspectors
+ * show the real decision data (reinforcement eligibility/roll/odds/cost; leadership battle-value budget; the
+ * minefield tradeoff) - but their commit is wired in a later step. The legacy {@code StratConScenarioWizard} and
  * {@code TrackForceAssignmentUI} remain the live path until this replacement is validated in-game.</p>
  *
  * @author Illiani
@@ -101,14 +99,18 @@ public class StratConDeploymentWizard extends JDialog {
 
     private final transient DeploymentContext context = new DeploymentContext(DeploymentMode.PRIMARY);
 
-    // The full eligible set for the current page, and the filtered view the board actually shows.
-    private final transient List<Formation> allFormations = new ArrayList<>();
-    private final DefaultListModel<Formation> boardModel = new DefaultListModel<>();
-    private final JList<Formation> boardList = new JList<>(boardModel);
+    // The full eligible set for the current page (formations on Primary/Reinforce, units on Auxiliaries/Utility), and
+    // the filtered view the board actually shows.
+    private final transient List<Object> allItems = new ArrayList<>();
+    private final DefaultListModel<Object> boardModel = new DefaultListModel<>();
+    private final JList<Object> boardList = new JList<>(boardModel);
     private final JTextField searchField = new JTextField(20);
 
-    // Staged forces are kept here as the display source of truth and mirrored into the context by id.
-    private final transient List<Formation> stagedFormations = new ArrayList<>();
+    // Staged items are kept here as the display source of truth and mirrored into the context.
+    private final transient List<Object> stagedItems = new ArrayList<>();
+
+    private final Map<DeploymentMode, JToggleButton> modeButtons = new EnumMap<>(DeploymentMode.class);
+    private transient ReinforcementAdvisor reinforcementAdvisor;
 
     private final transient DeploymentInspectorPanel inspector;
 
@@ -149,22 +151,49 @@ public class StratConDeploymentWizard extends JDialog {
         this.scenario = scenario;
         this.assignToScenario = assignToScenario;
         this.restrictToSingleForce = restrictToSingleForce;
+        this.reinforcementAdvisor = (scenario == null)
+                                          ? null
+                                          : new ReinforcementAdvisor(campaign, campaignState, owner.getCurrentTrack());
 
         context.setMode(DeploymentMode.PRIMARY);
-        stagedFormations.clear();
-        for (Integer stagedId : new ArrayList<>(context.getStagedFormationIds())) {
-            context.unstageFormation(stagedId);
-        }
+        modeButtons.get(DeploymentMode.PRIMARY).setSelected(true);
+        enterMode();
 
-        loadEligibleFormations();
+        setVisible(true);
+    }
+
+    private void switchMode(DeploymentMode mode) {
+        if (context.getMode() == mode) {
+            return;
+        }
+        context.setMode(mode);
+        enterMode();
+    }
+
+    /**
+     * Loads the current page's items and resets the inspector, staged tray, and budget. Shared by the initial display
+     * and every mode switch.
+     */
+    private void enterMode() {
+        clearStaged();
+        loadEligibleItems();
         applySearchFilter();
 
         inspector.showEmpty();
         inspector.setStageButtonEnabled(false);
-        inspector.setStaged(stagedFormations);
+        inspector.setStaged(stagedItems);
+        updateBudget();
         refreshCommitEnabled();
+    }
 
-        setVisible(true);
+    private void clearStaged() {
+        stagedItems.clear();
+        for (Integer stagedId : new ArrayList<>(context.getStagedFormationIds())) {
+            context.unstageFormation(stagedId);
+        }
+        for (Unit stagedUnit : new ArrayList<>(context.getStagedUnits())) {
+            context.unstageUnit(stagedUnit);
+        }
     }
 
     private JPanel buildCommandBar() {
@@ -175,15 +204,8 @@ public class StratConDeploymentWizard extends JDialog {
         for (DeploymentMode mode : DeploymentMode.values()) {
             JToggleButton modeButton = new JToggleButton(mode.getLabel());
             modeGroup.add(modeButton);
-            if (mode == DeploymentMode.PRIMARY) {
-                modeButton.setSelected(true);
-            } else {
-                // The other pages arrive in later phases; keep them visible so the shape is clear, but inert.
-                modeButton.setEnabled(false);
-                modeButton.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE,
-                      "deploymentWizard.page.placeholder",
-                      mode.getLabel()));
-            }
+            modeButtons.put(mode, modeButton);
+            modeButton.addActionListener(event -> switchMode(mode));
             modeStrip.add(modeButton);
         }
 
@@ -203,7 +225,7 @@ public class StratConDeploymentWizard extends JDialog {
         searchRow.add(searchField);
 
         boardList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        boardList.setCellRenderer(new ScenarioWizardLanceRenderer(campaign));
+        boardList.setCellRenderer(new DeploymentItemRenderer(campaign));
 
         boardPanel.add(searchRow, BorderLayout.NORTH);
         boardPanel.add(new JScrollPane(boardList), BorderLayout.CENTER);
@@ -233,7 +255,7 @@ public class StratConDeploymentWizard extends JDialog {
 
         boardList.addListSelectionListener(event -> {
             if (!event.getValueIsAdjusting()) {
-                focusSelectedFormation();
+                focusSelectedItem();
             }
         });
     }
@@ -244,94 +266,205 @@ public class StratConDeploymentWizard extends JDialog {
         inspector.getCommitButton().addActionListener(event -> commit());
     }
 
-    private void loadEligibleFormations() {
-        allFormations.clear();
+    private void loadEligibleItems() {
+        allItems.clear();
 
-        // Matches TrackForceAssignmentUI's primary-force query: the whole eligible mix from the current track.
+        switch (context.getMode()) {
+            case PRIMARY, REINFORCE -> loadEligibleFormations();
+            case AUXILIARIES -> loadEligibleAuxiliaryUnits();
+            case UTILITY -> loadEligibleUtilityUnits();
+        }
+    }
+
+    private void loadEligibleFormations() {
+        boolean reinforcements = context.getMode() == DeploymentMode.REINFORCE;
+        // Primary mirrors TrackForceAssignmentUI's query (whole eligible mix, no scenario); Reinforce asks for the
+        // reinforcement-eligible mix for this scenario.
+        StratConScenario eligibilityScenario = reinforcements ? scenario : null;
+        boolean singleForceOnly = !reinforcements && restrictToSingleForce;
+
         List<Integer> eligibleIds = StratConRulesManager.getAvailableForceIDsForManualDeployment(
               ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX,
               campaign,
               owner.getCurrentTrack(),
-              false,
-              null,
+              reinforcements,
+              eligibilityScenario,
               campaignState,
-              restrictToSingleForce);
+              singleForceOnly);
 
         ScenarioWizardLanceModel lanceModel = new ScenarioWizardLanceModel(campaign, eligibleIds);
         for (int index = 0; index < lanceModel.getSize(); index++) {
-            allFormations.add(lanceModel.getElementAt(index));
+            allItems.add(lanceModel.getElementAt(index));
         }
+    }
+
+    private void loadEligibleAuxiliaryUnits() {
+        if (scenario == null) {
+            return;
+        }
+
+        int leadershipSkill = resolveLeadershipSkill();
+        context.setLeadershipSkill(leadershipSkill);
+        context.setLeadershipPointsUsed(scenario.getLeadershipPointsUsed());
+        allItems.addAll(getEligibleLeadershipUnits(campaign, scenario, leadershipSkill));
+    }
+
+    private void loadEligibleUtilityUnits() {
+        if (scenario == null) {
+            return;
+        }
+
+        context.setDefensivePoints(scenario.getNumDefensivePoints());
+        allItems.addAll(getEligibleFrontlineUnits(campaign, scenario));
+    }
+
+    /**
+     * @return the commander's leadership skill for auxiliary-unit budgeting: zero unless the commander lance is on a
+     *       defensive assignment, and always zero for official challenges (leadership units would be cheating)
+     */
+    private int resolveLeadershipSkill() {
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        if (!commanderLanceHasDefensiveAssignment(backingScenario, campaign)) {
+            return 0;
+        }
+        if (backingScenario.getStratConScenarioType().isOfficialChallenge()) {
+            return 0;
+        }
+        return backingScenario.getLanceCommanderSkill(S_LEADER, campaign);
     }
 
     private void applySearchFilter() {
         String query = searchField.getText().trim().toLowerCase(Locale.ROOT);
-        Formation focused = boardList.getSelectedValue();
+        Object focused = boardList.getSelectedValue();
 
         boardModel.clear();
-        for (Formation formation : allFormations) {
-            if (matchesQuery(formation, query)) {
-                boardModel.addElement(formation);
+        for (Object item : allItems) {
+            if (matchesQuery(item, query)) {
+                boardModel.addElement(item);
             }
         }
 
-        // Keep the focused force selected if it survived the filter, so the dossier does not flicker away mid-search.
+        // Keep the focused item selected if it survived the filter, so the dossier does not flicker away mid-search.
         if ((focused != null) && boardModel.contains(focused)) {
             boardList.setSelectedValue(focused, true);
         }
     }
 
-    private static boolean matchesQuery(Formation formation, String query) {
+    private static boolean matchesQuery(Object item, String query) {
         if (query.isEmpty()) {
             return true;
         }
-        return formation.getName().toLowerCase(Locale.ROOT).contains(query) ||
-                     formation.getFullName().toLowerCase(Locale.ROOT).contains(query);
+        if (item instanceof Formation formation) {
+            return formation.getName().toLowerCase(Locale.ROOT).contains(query) ||
+                         formation.getFullName().toLowerCase(Locale.ROOT).contains(query);
+        }
+        if (item instanceof Unit unit) {
+            return unit.getName().toLowerCase(Locale.ROOT).contains(query);
+        }
+        return false;
     }
 
-    private void focusSelectedFormation() {
-        Formation focused = boardList.getSelectedValue();
+    private void focusSelectedItem() {
+        Object focused = boardList.getSelectedValue();
         if (focused == null) {
             inspector.showEmpty();
             inspector.setStageButtonEnabled(false);
             return;
         }
 
-        inspector.showFormation(focused);
+        if (focused instanceof Unit unit) {
+            inspector.showUnit(unit);
+        } else if (focused instanceof Formation formation) {
+            if ((context.getMode() == DeploymentMode.REINFORCE) && (reinforcementAdvisor != null)) {
+                ReinforcementEligibilityType eligibility = reinforcementAdvisor.getEligibility(formation.getId());
+                ReinforcementRoll roll = reinforcementAdvisor.getRoll(context.getChosenSupportPoints(),
+                      context.isInstantArrival());
+                int perForceCost = DeploymentEvaluator.reinforcementCost(context.getChosenSupportPoints(),
+                      context.isInstantArrival(),
+                      1).perForceSupportPoints();
+                inspector.showReinforcementFormation(formation, eligibility, roll, perForceCost);
+            } else {
+                inspector.showFormation(formation);
+            }
+        }
+
         inspector.setStageButtonEnabled(true);
-        inspector.setStageButtonStaged(stagedFormations.contains(focused));
+        inspector.setStageButtonStaged(stagedItems.contains(focused));
     }
 
     private void toggleStageSelected() {
-        Formation focused = boardList.getSelectedValue();
+        Object focused = boardList.getSelectedValue();
         if (focused == null) {
             return;
         }
 
-        if (stagedFormations.contains(focused)) {
-            stagedFormations.remove(focused);
-            context.unstageFormation(focused.getId());
+        if (stagedItems.contains(focused)) {
+            unstageItem(focused);
         } else {
             // Official challenges permit a single force: staging a new one replaces whatever was staged before.
-            if (restrictToSingleForce) {
-                for (Formation staged : stagedFormations) {
-                    context.unstageFormation(staged.getId());
+            if (restrictToSingleForce && (context.getMode() == DeploymentMode.PRIMARY)) {
+                for (Object staged : new ArrayList<>(stagedItems)) {
+                    unstageItem(staged);
                 }
-                stagedFormations.clear();
             }
-            stagedFormations.add(focused);
-            context.stageFormation(focused.getId());
+            stageItem(focused);
         }
 
-        inspector.setStaged(stagedFormations);
-        inspector.setStageButtonStaged(stagedFormations.contains(focused));
+        inspector.setStaged(stagedItems);
+        inspector.setStageButtonStaged(stagedItems.contains(focused));
+        updateBudget();
         refreshCommitEnabled();
     }
 
+    private void stageItem(Object item) {
+        stagedItems.add(item);
+        if (item instanceof Formation formation) {
+            context.stageFormation(formation.getId());
+        } else if (item instanceof Unit unit) {
+            context.stageUnit(unit);
+        }
+    }
+
+    private void unstageItem(Object item) {
+        stagedItems.remove(item);
+        if (item instanceof Formation formation) {
+            context.unstageFormation(formation.getId());
+        } else if (item instanceof Unit unit) {
+            context.unstageUnit(unit);
+        }
+    }
+
+    /**
+     * Updates the inspector's budget line for the current page: leadership battle value remaining (Auxiliaries),
+     * minefields remaining (Utility), or nothing (Primary/Reinforce, until reinforcement commit is wired).
+     */
+    private void updateBudget() {
+        switch (context.getMode()) {
+            case AUXILIARIES -> inspector.setBudget(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "deploymentWizard.budget.leadership",
+                  context.getLeadershipBattleValueRemaining()));
+            case UTILITY -> inspector.setBudget(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "deploymentWizard.budget.minefields",
+                  context.getMinefieldsRemaining()));
+            default -> inspector.clearBudget();
+        }
+    }
+
     private void refreshCommitEnabled() {
-        inspector.getCommitButton().setEnabled(!stagedFormations.isEmpty());
+        // Only Primary has a wired commit for now; the other pages are browse-only until their commit is wired.
+        boolean primary = context.getMode() == DeploymentMode.PRIMARY;
+        boolean reinforce = context.getMode() == DeploymentMode.REINFORCE;
+        inspector.getCommitButton().setEnabled(primary && !stagedItems.isEmpty());
+        inspector.getCommitButton().setToolTipText(primary ? null : getTextAt(RESOURCE_BUNDLE,
+              reinforce ? "deploymentWizard.reinforce.commitPending" : "deploymentWizard.unitCommitPending"));
     }
 
     private void commit() {
+        // Guard: only the Primary page commits in this slice.
+        if (context.getMode() != DeploymentMode.PRIMARY) {
+            return;
+        }
+
         // This is a point of no return, so confirm unless the player has silenced the nag.
         if (!MekHQ.getMHQOptions().getNagDialogIgnore(CONFIRMATION_STRATCON_DEPLOY)) {
             ImmersiveDialogConfirmation confirmation = new ImmersiveDialogConfirmation(campaign,
@@ -341,27 +474,19 @@ public class StratConDeploymentWizard extends JDialog {
             }
         }
 
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        StratConCoords coords = owner.getSelectedCoords();
-        StratConTrackState track = owner.getCurrentTrack();
-
-        for (Formation formation : stagedFormations) {
-            if (assignToScenario) {
-                StratConGMs.forceDeployment(campaignOptions).assignForceToScenario(coords,
-                      formation.getId(),
-                      campaign,
-                      campaignState.getContract(),
-                      track,
-                      false);
-            } else {
-                StratConGMs.forceDeployment(campaignOptions).deployForceToCoords(coords,
-                      formation.getId(),
-                      campaign,
-                      campaignState.getContract(),
-                      track,
-                      false);
+        List<Integer> stagedForceIds = new ArrayList<>();
+        for (Object staged : stagedItems) {
+            if (staged instanceof Formation formation) {
+                stagedForceIds.add(formation.getId());
             }
         }
+
+        StratConDeploymentService.deployPrimaryForces(campaign,
+              campaignState,
+              owner.getCurrentTrack(),
+              owner.getSelectedCoords(),
+              assignToScenario,
+              stagedForceIds);
 
         owner.repaint();
         dispose();
