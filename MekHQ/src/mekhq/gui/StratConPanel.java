@@ -80,7 +80,6 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpac
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
-import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.ImageType;
@@ -209,8 +208,6 @@ public class StratConPanel extends JPanel implements ActionListener {
     private final JLabel infoArea;
 
     private final Map<String, BufferedImage> imageCache = new HashMap<>();
-
-    private boolean commitForces = false;
 
     public StratConScenarioWizard getStratConScenarioWizard() {
         return scenarioWizard;
@@ -1909,52 +1906,79 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Handles action events triggered by various StratCon-related commands from the right-click context menu. This
-     * method processes user interactions to update the game state, scenarios, facilities, and UI elements based on the
-     * selected command and inputs from the context menu.
+     * Shows the force-assignment dialog for the selected hex. The dialog is modal, so this call blocks until the player
+     * dismisses it.
      *
-     * <p>The supported commands and their effects are as follows:</p>
+     * <p>With no scenario on the hex, forces are deployed to the coordinates directly. With an unresolved scenario on
+     * the hex, forces are assigned to that scenario (restricted to a single force for official challenges). Any other
+     * scenario state shows nothing.</p>
+     *
+     * @param scenario       the scenario currently on the selected hex, or {@code null} if there is none
+     * @param selectedCoords the hex the deployment targets
+     *
+     * @return {@code true} if the dialog was shown, meaning the deployed forces are the scenario's primary forces
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean displayForceAssignment(@Nullable StratConScenario scenario, StratConCoords selectedCoords) {
+        if (scenario == null) {
+            assignmentUI.display(campaign, campaignState, selectedCoords, false, false);
+            assignmentUI.setVisible(true);
+            return true;
+        }
+
+        if (scenario.getCurrentState() == UNRESOLVED) {
+            AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+            boolean restrictToSingleForce = backingScenario != null &&
+                                                  backingScenario.getStratConScenarioType().isOfficialChallenge();
+            assignmentUI.display(campaign, campaignState, selectedCoords, restrictToSingleForce, true);
+            assignmentUI.setVisible(true);
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * Opens the scenario wizard for the given scenario when its primary forces have been committed; otherwise does
+     * nothing.
+     *
+     * @param scenario       the scenario to manage, or {@code null} if there is none
+     * @param isPrimaryForce whether the forces being managed are the scenario's primary forces
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void openScenarioWizardIfCommitted(@Nullable StratConScenario scenario, boolean isPrimaryForce) {
+        if (scenario != null && scenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
+            scenarioWizard.setCurrentScenario(scenario, currentTrack, campaignState, isPrimaryForce);
+            scenarioWizard.toFront();
+            scenarioWizard.setVisible(true);
+        }
+    }
+
+    /**
+     * Handles action events triggered by StratCon commands from the right-click context menu, dispatching on the
+     * event's action command. Each command reads the currently selected {@link StratConCoords} and updates the
+     * {@link #currentTrack}'s scenarios, forces, facilities, or cities accordingly, then repaints. If no hex is
+     * selected, or the command matches no case, the method does nothing.
+     *
+     * <p>The supported commands are:</p>
      * <ul>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_MANAGE_FORCES}:</b> Displays the force management UI for the selected coordinates.
-     *       <ul>
-     *           <li>If no scenario exists at the selected coordinates, the force management UI is directly displayed.</li>
-     *           <li>If a scenario exists, it only displays the UI if the scenario is unresolved.</li>
-     *       </ul>
-     *   </li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_MANAGE_SCENARIO}:</b> Displays the scenario wizard with the current scenario at the
-     *       selected coordinates if the scenario's state is {@code PRIMARY_FORCES_COMMITTED}.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_REVEAL_TRACK}:</b> Toggles the "GM revealed" state for the current track and updates
-     *       the menu text to reflect the state ("Hide Track" or "Reveal Track").</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_STICKY_FORCE}:</b> Toggles the sticky force assignment for a given force ID at the
-     *       selected track. When toggled:</li>
-     *           <li>-- If selected, the force is added to the track as sticky.</li>
-     *           <li>-- If deselected, the force is removed from the track's sticky forces.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_REMOVE_FACILITY}:</b> Deletes the facility present at the selected coordinates.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_CAPTURE_FACILITY}:</b> Changes the ownership of the facility at the selected coordinates
-     *       to a different faction or player, as per the rules defined in {@link StratConRulesManager}.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_ADD_FACILITY}:</b> Adds a new facility to the selected coordinates. The facility's
-     *       properties (visibility, type, etc.) are copied from the provided source facility.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_REMOVE_SCENARIO}:</b> Deletes the currently selected scenario from the campaign.</li>
+     *   <li>{@code MANAGE_FORCES} - deploys forces to the hex (or its unresolved scenario) via
+     *       {@link #displayForceAssignment}, then opens the scenario wizard if forces were committed.</li>
+     *   <li>{@code MANAGE_SCENARIO} - opens the scenario wizard for a scenario whose primary forces are committed.</li>
+     *   <li>{@code STICKY_FORCE} - toggles whether a force remains deployed on the track.</li>
+     *   <li>{@code REMOVE_FACILITY} / {@code CAPTURE_FACILITY} / {@code ADD_FACILITY} - GM facility edits. Adding or
+     *       removing a facility recomputes roads; capturing deliberately does not.</li>
+     *   <li>{@code ADD_CITY} / {@code REMOVE_CITY} - GM city edits, each recomputing roads.</li>
+     *   <li>{@code REMOVE_SCENARIO} - removes the selected scenario from the campaign.</li>
+     *   <li>{@code RESET_DEPLOYMENT} - resets the selected scenario.</li>
      * </ul>
      *
-     * @param evt the {@link ActionEvent} representing the user's action. Contains information about the triggering
-     *            source and command (e.g., which menu item was selected).
-     *
-     *            <p><b>Behavior:</b></p>
-     *            <ul>
-     *              <li>The method retrieves the {@link StratConCoords} currently selected by the user, and performs actions based on the
-     *                  provided command string in the event.</li>
-     *              <li>The scenarios, forces, and facilities of the {@link #currentTrack} are modified based on the command type, and
-     *                  updates are visually reflected in the UI.</li>
-     *              <li>If a UI-related command is processed (e.g., displaying the scenario wizard or force assignment UI), the appropriate
-     *                  UI components are updated and made visible to the user.</li>
-     *            </ul>
-     *
-     *            <p><b>General Information:</b> If no valid {@link StratConCoords} are selected at the time of the event,
-     *            the method will terminate with no further action. Certain commands (e.g., {@code RIGHT_CLICK_COMMAND_REVEAL_TRACK},
-     *            {@code RIGHT_CLICK_COMMAND_ADD_FACILITY}) require valid coordinates or source properties to execute successfully.</p>
-     *
-     *            <p>If no specific actions from the above list are matched (no corresponding `case`), the method performs no effect.</p>
+     * @param evt the triggering action event; its action command selects the branch and its source carries any
+     *            per-item data (e.g. the sticky force ID or the facility to add)
      */
     @Override
     public void actionPerformed(ActionEvent evt) {
@@ -1963,58 +1987,19 @@ public class StratConPanel extends JPanel implements ActionListener {
             return;
         }
 
-        boolean isPrimaryForce = false;
         StratConScenario selectedScenario = currentTrack.getScenario(selectedCoords);
         switch (evt.getActionCommand()) {
             case RIGHT_CLICK_COMMAND_MANAGE_FORCES:
-                if (selectedScenario == null) {
-                    assignmentUI.display(campaign, campaignState, selectedCoords, false, false);
-                    assignmentUI.setVisible(true);
-                    isPrimaryForce = true;
-                }
+                boolean isPrimaryForce = displayForceAssignment(selectedScenario, selectedCoords);
 
-                if (selectedScenario != null) {
-                    ScenarioState currentState = selectedScenario.getCurrentState();
-
-                    if (currentState.equals(UNRESOLVED)) {
-                        AtBDynamicScenario backingScenario = selectedScenario.getBackingScenario();
-                        boolean restrictToSingleForce = backingScenario != null &&
-                                                              backingScenario.getStratConScenarioType()
-                                                                    .isOfficialChallenge();
-                        assignmentUI.display(campaign, campaignState, selectedCoords, restrictToSingleForce, true);
-                        assignmentUI.setVisible(true);
-                        isPrimaryForce = true;
-                    }
-                }
-
-                // Let's reload the scenario in case it updated
+                // The assignment dialog is modal, so forces may have been committed (and a scenario spawned) by the
+                // time it returns; reload before deciding whether to open the wizard.
                 selectedScenario = currentTrack.getScenario(selectedCoords);
-
-                if (selectedScenario != null && selectedScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
-                    scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
-                          currentTrack,
-                          campaignState,
-                          isPrimaryForce);
-
-                    scenarioWizard.toFront();
-                    scenarioWizard.setVisible(true);
-                }
-
-                setCommitForces(false);
+                openScenarioWizardIfCommitted(selectedScenario, isPrimaryForce);
                 break;
             case RIGHT_CLICK_COMMAND_MANAGE_SCENARIO:
-                // It's possible a scenario may have been placed when deploying the force, so we
-                // need to recheck
-                selectedScenario = currentTrack.getScenario(selectedCoords);
-                if (selectedScenario != null && selectedScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
-                    scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
-                          currentTrack,
-                          campaignState,
-                          false);
-
-                    scenarioWizard.toFront();
-                    scenarioWizard.setVisible(true);
-                }
+                // A scenario may have been placed while deploying the force, so re-check.
+                openScenarioWizardIfCommitted(currentTrack.getScenario(selectedCoords), false);
                 break;
             case RIGHT_CLICK_COMMAND_STICKY_FORCE:
                 JCheckBoxMenuItem source = (JCheckBoxMenuItem) evt.getSource();
@@ -2086,12 +2071,4 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean isCommitForces() {
-        return commitForces;
-    }
-
-    public void setCommitForces(boolean commitForces) {
-        this.commitForces = commitForces;
-    }
 }

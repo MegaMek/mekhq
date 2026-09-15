@@ -215,7 +215,6 @@ public class MaplessStratCon {
             scenarioWizard.setVisible(true);
         }
 
-        stratConPanel.setCommitForces(false);
         stratConPanel.repaint();
     }
 }

@@ -955,10 +955,6 @@ public class StratConScenarioWizard extends JDialog {
           boolean isInstantlyDeployed) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
-        if (parent != null) {
-            parent.setCommitForces(true);
-        }
-
         // go through all the force lists and add the selected forces to the scenario
         List<UUID> delayedReinforcements = currentScenario.getBackingScenario().getFriendlyDelayedReinforcements();
         List<UUID> instantReinforcements = currentScenario.getBackingScenario().getFriendlyInstantReinforcements();
