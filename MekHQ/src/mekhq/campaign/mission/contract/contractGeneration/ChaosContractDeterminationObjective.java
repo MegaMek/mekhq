@@ -40,6 +40,21 @@ import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.jspecify.annotations.NonNull;
 
 public class ChaosContractDeterminationObjective {
+    /**
+     * Builds the objective for an acts-of-piracy contract. Unlike the general table roll, a pirate search always yields
+     * a pirate raid: the player's band raids a target while the victim defends (a garrison posture).
+     *
+     * @return the fixed pirate-raid objective pairing
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static ContractObjectiveData determinePirateContractObjectiveType() {
+        ContractObjectiveType playerObjective = ChaosObjectiveType.PIRATE_RAID.getCamOpsObjectiveType();
+        ContractObjectiveType opposingObjective = ChaosObjectiveType.GARRISON.getCamOpsObjectiveType();
+        return new ContractObjectiveData(playerObjective, opposingObjective);
+    }
+
     public static ContractObjectiveData determineContractObjectiveType(int contractGenerationModifier) {
         int roll = d6(2);
         int result = clamp(roll + contractGenerationModifier, 1, 13);

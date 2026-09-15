@@ -179,7 +179,16 @@ public final class SupportUnitGenerator {
         return planned;
     }
 
-    private static int shortfall(Campaign campaign, String unitName, int targetCount) {
+    /**
+     * How many more of {@code unitName} the campaign needs to reach {@code targetCount}, never negative.
+     *
+     * @param campaign    the campaign whose hangar is counted
+     * @param unitName    the support unit name to match
+     * @param targetCount how many the command should field
+     *
+     * @return the number still missing
+     */
+    static int shortfall(Campaign campaign, String unitName, int targetCount) {
         return Math.max(0, targetCount - countGeneratedUnitsNamed(campaign, unitName));
     }
 

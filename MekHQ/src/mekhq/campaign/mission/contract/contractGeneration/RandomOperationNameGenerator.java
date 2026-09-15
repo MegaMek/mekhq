@@ -264,6 +264,8 @@ public class RandomOperationNameGenerator {
                                                  MHQConstants.OPERATION_NAME_NOUN_SECURITY_DUTY_USER };
             case TERRORISM -> new String[] { MHQConstants.OPERATION_NAME_NOUN_TERRORISM,
                                              MHQConstants.OPERATION_NAME_NOUN_TERRORISM_USER };
+            case PIRATE_RAID -> new String[] { MHQConstants.OPERATION_NAME_NOUN_PIRATE_RAID,
+                                               MHQConstants.OPERATION_NAME_NOUN_PIRATE_RAID_USER };
             case UNDEFINED -> new String[] { MHQConstants.OPERATION_NAME_NOUN_UNDEFINED,
                                              MHQConstants.OPERATION_NAME_NOUN_UNDEFINED_USER };
         };

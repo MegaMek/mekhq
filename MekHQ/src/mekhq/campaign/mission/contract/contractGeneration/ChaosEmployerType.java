@@ -36,6 +36,7 @@ import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomC
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomCorporationCompanyNameGenerator;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMercenaryCompanyNameGenerator;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomMilitiaCompanyNameGenerator;
+import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomPirateCompanyNameGenerator;
 import static mekhq.campaign.personnel.backgrounds.BackgroundsController.randomRebelCompanyNameGenerator;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -51,11 +52,11 @@ public enum ChaosEmployerType {
     LOCAL_PLANETARY_GOVERNMENT("ChaosEmployerType.LOCAL_PLANETARY_GOVERNMENT.text", 0, 1, 0, 1, 0),
     LOCAL_SYSTEM_OWNER("ChaosEmployerType.LOCAL_SYSTEM_OWNER.text", 0, 2, 1, -2, -3),
     MERCENARY_SUBCONTRACT("ChaosEmployerType.MERCENARY_SUBCONTRACT.text", 0, 0, 0, 0, 3),
-    NOBLE("ChaosEmployerType.NOBLE.text", 0, 0, 0, 0, 0);
+    NOBLE("ChaosEmployerType.NOBLE.text", 0, 0, 0, 0, 0),
+    UNDERWORLD_CONTACT("ChaosEmployerType.UNDERWORLD_CONTACT.text", -2, -2, -1, 4, 4);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Mission";
 
-    private final String lookup;
     private final String label;
     private final int payRateModifier; // Hot Spots Draconis Reach pg 144 first printing
     private final int supportModifier; // Hot Spots Draconis Reach pg 144 first printing
@@ -65,7 +66,6 @@ public enum ChaosEmployerType {
 
     ChaosEmployerType(final String lookup, final int payRateModifier, final int supportModifier,
           final int transportModifier, final int salvageRightsModifier, final int commandRightsModifier) {
-        this.lookup = lookup;
         this.label = getTextAt(RESOURCE_BUNDLE, lookup);
         this.payRateModifier = payRateModifier;
         this.supportModifier = supportModifier;
@@ -128,6 +128,7 @@ public enum ChaosEmployerType {
             case CIVILIAN_ORGANIZATION_BUSINESS -> randomCivilianCompanyNameGenerator();
             case CIVILIAN_ORGANIZATION_MILITIA -> randomMilitiaCompanyNameGenerator(null);
             case CIVILIAN_ORGANIZATION_REBELS -> randomRebelCompanyNameGenerator(null);
+            case UNDERWORLD_CONTACT -> randomPirateCompanyNameGenerator();
             default -> null;
         };
     }
@@ -150,6 +151,7 @@ public enum ChaosEmployerType {
             case CIVILIAN_ORGANIZATION_REBELS ->
                   getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.CIVILIAN_ORGANIZATION_REBELS.marketTag");
             case NOBLE -> getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.NOBLE.marketTag");
+            case UNDERWORLD_CONTACT -> getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.UNDERWORLD_CONTACT.marketTag");
             case LOCAL_PLANETARY_GOVERNMENT, ANY_PLANETARY_GOVERNMENT ->
                   getTextAt(RESOURCE_BUNDLE, "ChaosEmployerType.PLANETARY_GOVERNMENT.marketTag");
             default -> null;

@@ -144,7 +144,12 @@ public enum ContractObjectiveType {
           ChaosObjectiveType.RAID,
           1.0,
           EnemySelectionProfile.DEFAULT,
-          MissionLocationProfile.DEFAULT);
+          MissionLocationProfile.DEFAULT),
+    PIRATE_RAID("ContractObjectiveType.PIRATE_RAID.text", "ContractObjectiveType.PIRATE_RAID.toolTipText",
+          ChaosObjectiveType.PIRATE_RAID,
+          1.6,
+          EnemySelectionProfile.PIRATE_VICTIM,
+          MissionLocationProfile.HIGH_VALUE);
     // endregion Enum Declarations
 
     // region Variable Declarations
