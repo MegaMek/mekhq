@@ -416,7 +416,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRAT_CON_URBAN_PROFILES_PATH = "./data/stratconbiomedefinitions/UrbanProfiles.yaml";
     public static final String STRAT_CON_SECTOR_SHAPE_PROFILES_PATH =
           "./data/stratconbiomedefinitions/SectorShapeProfiles.yaml";
-    public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.xml";
+    public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.yaml";
     public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.json";
     public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.json";
     public static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.json";
