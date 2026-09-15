@@ -33,6 +33,7 @@
 package mekhq.gui.dialog;
 
 import static megamek.common.compute.Compute.d6;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_RANDOM_EVENTS;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.getPersonalityValue;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -51,7 +52,6 @@ import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheck;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
@@ -349,7 +349,7 @@ public class RandomEventDialog {
 
     public void reportActionCheckResults() {
         if (!actionCheckResultsText.isBlank()) {
-            campaign.addReport(DailyReportType.SKILL_CHECKS, actionCheckResultsText);
+            campaign.addReport(SKILL_CHECKS, actionCheckResultsText);
         }
     }
 

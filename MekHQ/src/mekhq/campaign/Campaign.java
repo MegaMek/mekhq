@@ -45,6 +45,7 @@ import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
@@ -2375,6 +2376,8 @@ public class Campaign implements ITechManager {
                 boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE) &&
                                           person.getOptions().booleanOption(EDGE_ADMIN_APPRAISAL_FAIL);
                 ActionCheckResult appraisalResult = Appraisal.performAppraisalCheck(person, currentDay, isUseEdge);
+                addReport(SKILL_CHECKS, appraisalResult.getReport());
+
                 valueChange = Appraisal.getAppraisalCostMultiplier(appraisalResult.getMarginOfSuccess());
                 appraisalReport = Appraisal.getAppraisalReport(valueChange, appraisalResult.getReportMargin());
             }
