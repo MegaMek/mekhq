@@ -204,6 +204,9 @@ public class StratConDeploymentWizard extends JDialog {
                                           ? null
                                           : new ReinforcementAdvisor(campaign, campaignState, owner.getCurrentTrack());
 
+        inspector.setEnvironment((scenario == null) ? null : scenario.getBackingScenario(),
+              owner.getCurrentTrack(), owner.getSelectedCoords());
+
         clearStaged();
         mode = initialMode;
         modeSelector.setSelected(initialMode);

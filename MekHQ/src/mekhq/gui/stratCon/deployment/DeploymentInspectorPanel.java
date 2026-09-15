@@ -43,6 +43,7 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.util.List;
+import java.util.UUID;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
 import javax.swing.JCheckBox;
@@ -54,11 +55,18 @@ import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionListener;
 
 import megamek.client.ui.util.UIUtil;
+import megamek.common.annotations.Nullable;
+import megamek.common.ui.FastJScrollPane;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementEligibilityType;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.deployment.ReinforcementRoll;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.enums.OperationalStatus;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -78,6 +86,8 @@ public class DeploymentInspectorPanel extends JPanel {
     private final transient Campaign campaign;
 
     private final JLabel dossierLabel = new JLabel();
+    // The scenario's hex and environment block, prepended to every dossier so it is always visible. Set once per open.
+    private String environmentHtml = "";
     private final JCheckBox offBoardCheckBox =
           new JCheckBox(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.offBoard.label"));
     private final JLabel budgetLabel = new JLabel();
@@ -117,10 +127,10 @@ public class DeploymentInspectorPanel extends JPanel {
         int inset = UIUtil.scaleForGUI(10);
         dossierLabel.setBorder(BorderFactory.createEmptyBorder(inset, inset, inset, inset));
 
-        JScrollPane dossierScroll = new JScrollPane(dossierLabel);
+        FastJScrollPane dossierScroll = new FastJScrollPane(dossierLabel);
         dossierScroll.setBorder(BorderFactory.createLineBorder(BORDER, UIUtil.scaleForGUI(1)));
         dossierScroll.getViewport().setBackground(SURFACE_DEEP);
-        dossierScroll.setPreferredSize(new java.awt.Dimension(UIUtil.scaleForGUI(320), UIUtil.scaleForGUI(220)));
+        dossierScroll.setPreferredSize(new java.awt.Dimension(UIUtil.scaleForGUI(320), UIUtil.scaleForGUI(280)));
 
         offBoardCheckBox.setOpaque(false);
         offBoardCheckBox.setForeground(TEXT);
@@ -178,29 +188,29 @@ public class DeploymentInspectorPanel extends JPanel {
      * @since 0.51.01
      */
     public void showFormation(Formation formation) {
-        setDossier("<html>" + formationSummaryHtml(formation) + "</html>");
+        renderDossier(formationSummaryHtml(formation) + formationRosterHtml(formation));
     }
 
     /**
-     * Renders the dossier for a focused individual unit (auxiliaries and utility pages): name, status, and battle
-     * value.
+     * Renders the dossier for a focused individual unit (auxiliaries and utility pages): name, status, battle value,
+     * crew, and repair state.
      *
      * @author Illiani
      * @since 0.51.01
      */
     public void showUnit(Unit unit) {
-        StringBuilder dossier = new StringBuilder("<html>");
-        dossier.append("<b>").append(unit.getName()).append("</b><br/><br/>");
-        dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+        StringBuilder body = new StringBuilder();
+        body.append("<b>").append(unit.getName()).append("</b><br/>");
+        body.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.inspector.unitStatus",
               unit.getStatus())).append("<br/>");
         if (unit.getEntity() != null) {
-            dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+            body.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "deploymentWizard.inspector.battleValue",
-                  unit.getEntity().calculateBattleValue(true, true)));
+                  unit.getEntity().calculateBattleValue(true, true))).append("<br/>");
         }
-        dossier.append("</html>");
-        setDossier(dossier.toString());
+        body.append(unitCrewAndRepairHtml(unit));
+        renderDossier(body.toString());
     }
 
     /**
@@ -227,23 +237,81 @@ public class DeploymentInspectorPanel extends JPanel {
      */
     public void showReinforcementFormation(Formation formation, ReinforcementEligibilityType eligibility,
           ReinforcementRoll roll, int perForceSupportPoints) {
-        StringBuilder dossier = new StringBuilder("<html>");
-        dossier.append(formationSummaryHtml(formation)).append("<br/><br/>");
-        dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+        StringBuilder body = new StringBuilder();
+        body.append(formationSummaryHtml(formation)).append("<br/><br/>");
+        body.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.reinforce.eligibility",
               eligibilityLabel(eligibility))).append("<br/>");
-        dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+        body.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.reinforce.targetNumber",
               roll.finalTargetNumber())).append("<br/>");
-        dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+        body.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.reinforce.odds",
               (int) Math.round(roll.successProbability() * 100))).append("<br/>");
-        dossier.append(getFormattedTextAt(RESOURCE_BUNDLE,
+        body.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.reinforce.cost",
               perForceSupportPoints));
-        dossier.append("</html>");
+        body.append(formationRosterHtml(formation));
 
-        setDossier(dossier.toString());
+        renderDossier(body.toString());
+    }
+
+    /**
+     * Sets the persistent hex-and-environment block shown at the top of every dossier. Pass {@code null} scenario data
+     * to clear it (for example, a bare-hex deployment with no scenario yet).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setEnvironment(@Nullable AtBDynamicScenario backingScenario, @Nullable StratConTrackState track,
+          @Nullable StratConCoords coords) {
+        environmentHtml = buildEnvironmentHtml(backingScenario, track, coords);
+    }
+
+    private static String buildEnvironmentHtml(@Nullable AtBDynamicScenario backingScenario,
+          @Nullable StratConTrackState track, @Nullable StratConCoords coords) {
+        if ((backingScenario == null) && (coords == null)) {
+            return "";
+        }
+        StringBuilder environment = new StringBuilder();
+
+        environment.append(faintHeading("deploymentWizard.inspector.hex.title")).append("<br/>");
+        if (coords != null) {
+            environment.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.hex.coords",
+                  coords.toBTString())).append("<br/>");
+            if (track != null) {
+                String terrain = track.getTerrainTile(coords);
+                if (!terrain.isBlank()) {
+                    environment.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.hex.terrain",
+                          terrain)).append("<br/>");
+                }
+            }
+        }
+
+        if (backingScenario != null) {
+            environment.append("<br/>").append(faintHeading("deploymentWizard.inspector.env.title")).append("<br/>");
+            environment.append(envLine("deploymentWizard.inspector.env.atmosphere", backingScenario.getAtmosphere()));
+            environment.append(envLine("deploymentWizard.inspector.env.taint", backingScenario.getAtmosphericTaint()));
+            environment.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.env.temperature",
+                  backingScenario.getTemperature())).append("<br/>");
+            environment.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.env.gravity",
+                  backingScenario.getGravity())).append("<br/>");
+            environment.append(envLine("deploymentWizard.inspector.env.light", backingScenario.getLight()));
+            environment.append(envLine("deploymentWizard.inspector.env.weather", backingScenario.getWeather()));
+            environment.append(envLine("deploymentWizard.inspector.env.wind", backingScenario.getWind()));
+            environment.append(envLine("deploymentWizard.inspector.env.fog", backingScenario.getFog()));
+        }
+
+        environment.append("<hr>");
+        return environment.toString();
+    }
+
+    private static String faintHeading(String key) {
+        return "<b><font color='" + hex(HudStyle.TEXT_FAINT) + "'>" + getTextAt(RESOURCE_BUNDLE, key) + "</font></b>";
+    }
+
+    private static String envLine(String key, Object value) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, key, value) + "<br/>";
     }
 
     private String formationSummaryHtml(Formation formation) {
@@ -266,6 +334,66 @@ public class DeploymentInspectorPanel extends JPanel {
         return summary.toString();
     }
 
+    /**
+     * Builds the per-unit roster for a formation: every unit's name, crew, and repair state, so the player can see what
+     * shape the force is in before committing it.
+     */
+    private String formationRosterHtml(Formation formation) {
+        StringBuilder roster = new StringBuilder();
+        roster.append("<br/><br/>").append(faintHeading("deploymentWizard.inspector.roster")).append("<br/>");
+        for (UUID unitId : formation.getAllUnits(true)) {
+            Unit unit = campaign.getUnit(unitId);
+            if (unit == null) {
+                continue;
+            }
+            roster.append("<br/><b>").append(unit.getName()).append("</b><br/>");
+            roster.append(unitCrewAndRepairHtml(unit));
+        }
+        return roster.toString();
+    }
+
+    /**
+     * Builds the crew and repair-state lines for a single unit: the commander and crew skills, the overall condition,
+     * and the count of parts awaiting repair.
+     */
+    private String unitCrewAndRepairHtml(Unit unit) {
+        StringBuilder details = new StringBuilder();
+
+        Person commander = unit.getCommander();
+        if (commander != null) {
+            details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.commander",
+                  commander.getFullTitle())).append("<br/>");
+        }
+
+        Entity entity = unit.getEntity();
+        if ((entity != null) && (entity.getCrew() != null)) {
+            details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.skills",
+                  entity.getCrew().getGunnery(), entity.getCrew().getPiloting())).append("<br/>");
+        }
+
+        int crewSize = unit.getActiveCrew().size();
+        if (crewSize > 1) {
+            details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.size", crewSize))
+                  .append("<br/>");
+        }
+
+        Color conditionColor = unit.isDamaged() ? AMBER : READY;
+        String condition = spanOpeningWithCustomColor(hex(conditionColor))
+                                 + Unit.getDamageStateName(unit.getDamageState()) + CLOSING_SPAN_TAG;
+        details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.repair.state", condition))
+              .append("<br/>");
+
+        int partsNeedingFixing = unit.getPartsNeedingFixing().size();
+        if (partsNeedingFixing > 0) {
+            details.append(spanOpeningWithCustomColor(hex(AMBER)))
+                  .append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.repair.parts",
+                        partsNeedingFixing))
+                  .append(CLOSING_SPAN_TAG).append("<br/>");
+        }
+
+        return details.toString();
+    }
+
     private static String eligibilityLabel(ReinforcementEligibilityType eligibility) {
         return switch (eligibility) {
             case REGULAR -> getTextAt(RESOURCE_BUNDLE, "regular.text");
@@ -276,25 +404,24 @@ public class DeploymentInspectorPanel extends JPanel {
     }
 
     /**
-     * Sets the dossier area to arbitrary HTML. Used by pages (such as Reinforce) that show more than the shared
-     * formation summary.
-     *
-     * @author Illiani
-     * @since 0.51.01
+     * Wraps a dossier body fragment with the persistent hex-and-environment block and sets it into the scrollable
+     * dossier area.
      */
-    public void setDossier(String html) {
-        dossierLabel.setText(html);
+    private void renderDossier(String bodyHtml) {
+        // Constrain the width so the richer roster wraps and scrolls vertically instead of overflowing sideways.
+        dossierLabel.setText("<html><body style='width:" + UIUtil.scaleForGUI(300) + "px'>"
+                                   + environmentHtml + bodyHtml + "</body></html>");
     }
 
     /**
-     * Clears the dossier back to the "nothing focused" prompt.
+     * Clears the per-force dossier back to the "nothing focused" prompt, keeping the hex-and-environment block visible.
      *
      * @author Illiani
      * @since 0.51.01
      */
     public void showEmpty() {
-        setDossier("<html><font color='" + hex(HudStyle.TEXT_MUTED) + "'>" +
-                         getTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.empty") + "</font></html>");
+        renderDossier("<font color='" + hex(HudStyle.TEXT_MUTED) + "'>" +
+                            getTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.empty") + "</font>");
     }
 
     /**
