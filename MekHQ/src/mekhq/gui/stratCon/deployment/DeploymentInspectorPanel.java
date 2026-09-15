@@ -62,7 +62,7 @@ import mekhq.campaign.unit.Unit;
  * looking at, the running list of forces staged for deployment, and the stage / commit / cancel controls.
  *
  * <p>This panel is a view. It renders what the wizard tells it to and exposes its buttons; the wizard owns the
- * {@link mekhq.campaign.digitalGM.stratCon.deployment.DeploymentContext} and decides what a click means.</p>
+ * staged state and decides what a click means.</p>
  *
  * @author Illiani
  * @since 0.51.01

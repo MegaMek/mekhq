@@ -152,26 +152,35 @@ public final class StratConDeploymentService {
     }
 
     /**
-     * Finalizes a scenario commit: assigns every deployed force to the track, sets the minefield count, and (the first
-     * time forces are committed) translates and scales the scenario's objectives.
+     * Finalizes a page's commit: assigns every deployed force to the track and, the first time forces are committed,
+     * translates and scales the scenario's objectives. Safe to call once per page that commits (the objective work is
+     * gated on scenario state).
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static void finalizeScenarioCommit(Campaign campaign, StratConTrackState track, StratConScenario scenario,
-          int minefieldCount) {
+    public static void finalizeForceDeployment(Campaign campaign, StratConTrackState track, StratConScenario scenario) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         for (int forceId : scenario.getAssignedForces()) {
             StratConGMs.forceDeployment(campaignOptions)
                   .processForceDeployment(scenario.getCoords(), forceId, campaign, track, false);
         }
 
-        scenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, minefieldCount);
-
         if (scenario.getCurrentState().ordinal() < REINFORCEMENTS_COMMITTED.ordinal()) {
             translateTemplateObjectives(scenario.getBackingScenario(), campaign);
             scaleObjectiveTimeLimits(scenario.getBackingScenario(), campaign);
         }
+    }
+
+    /**
+     * Sets the scenario's conventional minefield count. Only the Utility page changes this, so it is separate from
+     * {@link #finalizeForceDeployment} to keep the other pages from resetting it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void setMinefieldCount(StratConScenario scenario, int minefieldCount) {
+        scenario.updateMinefieldCount(Minefield.TYPE_CONVENTIONAL, minefieldCount);
     }
 
     /**
