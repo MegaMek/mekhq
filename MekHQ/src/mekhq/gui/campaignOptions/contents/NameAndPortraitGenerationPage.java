@@ -137,6 +137,7 @@ class NameAndPortraitGenerationPage {
 
         chkUseOriginFactionForNames = new CampaignOptionsCheckBox("UseOriginFactionForNames");
         chkUseOriginFactionForNames.addMouseListener(createTipPanelUpdater("UseOriginFactionForNames"));
+        chkUseOriginFactionForNames.addActionListener(event -> updateFactionNamesEnabledState());
 
         lblFactionNames = new CampaignOptionsLabel("FactionNames");
         lblFactionNames.addMouseListener(createTipPanelUpdater("FactionNames"));
@@ -304,6 +305,7 @@ class NameAndPortraitGenerationPage {
 
         chkUseOriginFactionForNames.setSelected(model.useOriginFactionForNames);
         comboFactionNames.setSelectedItem(model.factionNames);
+        updateFactionNamesEnabledState();
         chkAssignPortraitOnRoleChange.setSelected(model.assignPortraitOnRoleChange);
         chkAllowDuplicatePortraits.setSelected(model.allowDuplicatePortraits);
         chkUseGenderedPortraitsOnly.setSelected(model.useGenderedPortraitsOnly);
@@ -332,6 +334,12 @@ class NameAndPortraitGenerationPage {
             }
             chkUsePortrait[civilianIndex].setSelected(civilianSelected);
         }
+    }
+
+    private void updateFactionNamesEnabledState() {
+        boolean enabled = !chkUseOriginFactionForNames.isSelected();
+        lblFactionNames.setEnabled(enabled);
+        comboFactionNames.setEnabled(enabled);
     }
 
     /**
