@@ -45,6 +45,7 @@ import java.awt.Font;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
@@ -77,6 +78,8 @@ public class DeploymentInspectorPanel extends JPanel {
     private final transient Campaign campaign;
 
     private final JLabel dossierLabel = new JLabel();
+    private final JCheckBox offBoardCheckBox =
+          new JCheckBox(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.offBoard.label"));
     private final JLabel budgetLabel = new JLabel();
     private final JLabel stagedTitle = new JLabel();
     private final DefaultListModel<Object> stagedModel = new DefaultListModel<>();
@@ -119,10 +122,18 @@ public class DeploymentInspectorPanel extends JPanel {
         dossierScroll.getViewport().setBackground(SURFACE_DEEP);
         dossierScroll.setPreferredSize(new java.awt.Dimension(UIUtil.scaleForGUI(320), UIUtil.scaleForGUI(220)));
 
+        offBoardCheckBox.setOpaque(false);
+        offBoardCheckBox.setForeground(TEXT);
+        offBoardCheckBox.setFont(hudFont(Font.PLAIN, 0.85f, 0.0f));
+        offBoardCheckBox.setToolTipText(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.offBoard.tooltip"));
+        offBoardCheckBox.setVisible(false);
+        offBoardCheckBox.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(4), 0, 0, 0));
+
         JPanel section = new JPanel(new BorderLayout(0, UIUtil.scaleForGUI(4)));
         section.setOpaque(false);
         section.add(HudStyle.keyLabel(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.dossier.title")), BorderLayout.NORTH);
         section.add(dossierScroll, BorderLayout.CENTER);
+        section.add(offBoardCheckBox, BorderLayout.SOUTH);
         return section;
     }
 
@@ -345,6 +356,29 @@ public class DeploymentInspectorPanel extends JPanel {
 
     public void clearStagedSelection() {
         stagedList.clearSelection();
+    }
+
+    /**
+     * The "deploy off-board" checkbox, shown only for artillery-bearing formations when the client option is enabled.
+     * The wizard wires its action and owns the off-board selection state.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public JCheckBox getOffBoardCheckBox() {
+        return offBoardCheckBox;
+    }
+
+    public void setOffBoardOptionVisible(boolean visible) {
+        offBoardCheckBox.setVisible(visible);
+    }
+
+    public void setOffBoardOptionSelected(boolean selected) {
+        offBoardCheckBox.setSelected(selected);
+    }
+
+    public boolean isOffBoardOptionSelected() {
+        return offBoardCheckBox.isSelected();
     }
 
     public HudButton getStageButton() {

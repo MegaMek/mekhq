@@ -1456,6 +1456,56 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
+     * @return {@code true} if the entity mounts at least one artillery weapon - the only units that may deploy off-board
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean entityHasArtillery(Entity entity) {
+        for (WeaponMounted weapon : entity.getTotalWeaponList()) {
+            WeaponType type = weapon.getType();
+            if ((type != null) && (type.getAtClass() == CLASS_ARTILLERY)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Applies a player force's chosen off-board deployment to one of its unit entities.
+     *
+     * <p>If the unit belongs (directly, or through a parent formation) to a force the player marked to deploy off-board
+     * in the deployment wizard, and the entity carries artillery, the entity is placed off-board a short random distance
+     * and direction. Non-artillery units are left on-board, since a force cannot be split between on- and off-board
+     * deployment.</p>
+     *
+     * @param scenario the scenario being played (its off-board force selection is read)
+     * @param unit     the campaign unit being deployed
+     * @param entity   the entity generated for that unit (mutated in place when placed off-board)
+     * @param campaign the current campaign, used to resolve the unit's formation
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void applyPlayerOffBoardDeployment(@Nullable AtBDynamicScenario scenario, Unit unit, Entity entity,
+          Campaign campaign) {
+        if ((scenario == null) || (unit == null) || (entity == null) || scenario.getOffBoardForceIDs().isEmpty()) {
+            return;
+        }
+
+        Formation formation = campaign.getPlayerForce().getFormationFor(unit);
+        while (formation != null) {
+            if (scenario.isForceDeployingOffBoard(formation.getId())) {
+                if (entityHasArtillery(entity)) {
+                    deployArtilleryOffBoard(List.of(entity));
+                }
+                return;
+            }
+            formation = formation.getParentFormation();
+        }
+    }
+
+    /**
      * Retrieves the {@link StratConTrackState} associated with the given {@link AtBDynamicScenario}.
      * <p>
      * This method iterates over all {@link StratConTrackState} instances in the provided {@link AbstractContract}'s

@@ -46,10 +46,12 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -73,6 +75,7 @@ import mekhq.campaign.digitalGM.stratCon.deployment.StratConDeploymentService;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
@@ -136,6 +139,10 @@ public class StratConDeploymentWizard extends JDialog {
 
     // On the Reinforce page, the reinforcement template slot each eligible force fills (needed to commit it).
     private final transient Map<Integer, String> reinforcementTemplateByForceId = new LinkedHashMap<>();
+
+    // The player's explicit off-board choice per formation ID (artillery only). A formation absent from the map has not
+    // been touched and falls back to the client-option default. Applied to the scenario on commit.
+    private final transient Map<Integer, Boolean> offBoardChoiceByForceId = new HashMap<>();
 
     // The force or unit whose dossier is showing, and whether it is focused from the staged tray (so Stage acts as
     // Unstage) rather than from the board. A staged item never appears on the board, so these two focus sources never
@@ -242,6 +249,7 @@ public class StratConDeploymentWizard extends JDialog {
         stagedReinforcementForces.clear();
         stagedAuxiliaryUnits.clear();
         stagedUtilityUnits.clear();
+        offBoardChoiceByForceId.clear();
     }
 
     private JPanel buildCommandBar() {
@@ -370,6 +378,7 @@ public class StratConDeploymentWizard extends JDialog {
                 focusFromStagedTray();
             }
         });
+        inspector.getOffBoardCheckBox().addActionListener(event -> toggleOffBoardForFocused());
     }
 
     // region board loading
@@ -536,6 +545,7 @@ public class StratConDeploymentWizard extends JDialog {
         focusedItem = focused;
         focusedFromStagedTray = false;
         showDossier(focused, mode == DeploymentMode.REINFORCE);
+        updateOffBoardOption(focused);
         inspector.setStageButtonEnabled(true);
         inspector.setStageButtonStaged(false);
     }
@@ -556,6 +566,7 @@ public class StratConDeploymentWizard extends JDialog {
         focusedFromStagedTray = true;
         // Show the dossier for whatever the item was staged as, regardless of which page is open.
         showDossier(focused, (focused instanceof Formation formation) && stagedReinforcementForces.contains(formation));
+        updateOffBoardOption(focused);
         inspector.setStageButtonEnabled(true);
         inspector.setStageButtonStaged(true);
     }
@@ -574,6 +585,51 @@ public class StratConDeploymentWizard extends JDialog {
                 inspector.showFormation(formation);
             }
         }
+    }
+
+    /**
+     * Shows the "deploy off-board" checkbox whenever the focused item is an artillery-bearing formation on a formation
+     * page (Primary or Reinforce) of a real scenario, and reflects its current state. The checkbox is always offered
+     * for such a force; the client option only sets its default state (see {@link #effectiveOffBoard(int)}).
+     */
+    private void updateOffBoardOption(Object item) {
+        boolean applicable = offBoardApplicable(item);
+        inspector.setOffBoardOptionVisible(applicable);
+        inspector.setOffBoardOptionSelected(applicable && effectiveOffBoard(((Formation) item).getId()));
+    }
+
+    private boolean offBoardApplicable(Object item) {
+        return (scenario != null)
+                     && (item instanceof Formation formation)
+                     && ((mode == DeploymentMode.PRIMARY) || (mode == DeploymentMode.REINFORCE))
+                     && formationHasArtillery(formation);
+    }
+
+    private void toggleOffBoardForFocused() {
+        if (!(focusedItem instanceof Formation formation)) {
+            return;
+        }
+        offBoardChoiceByForceId.put(formation.getId(), inspector.isOffBoardOptionSelected());
+    }
+
+    /**
+     * @return whether the given force should deploy off-board: the player's explicit choice if they ticked the box, or
+     *       the client-option default otherwise
+     */
+    private boolean effectiveOffBoard(int forceId) {
+        return offBoardChoiceByForceId.getOrDefault(forceId,
+              MekHQ.getMHQOptions().getDefaultPlayerForcesOffBoard());
+    }
+
+    private boolean formationHasArtillery(Formation formation) {
+        for (UUID unitId : formation.getAllUnits(true)) {
+            Unit unit = campaign.getUnit(unitId);
+            if ((unit != null) && (unit.getEntity() != null)
+                      && AtBDynamicScenarioFactory.entityHasArtillery(unit.getEntity())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void toggleStageSelected() {
@@ -607,6 +663,7 @@ public class StratConDeploymentWizard extends JDialog {
         boardList.clearSelection();
         inspector.clearStagedSelection();
         inspector.showEmpty();
+        inspector.setOffBoardOptionVisible(false);
         inspector.setStageButtonEnabled(false);
     }
 
@@ -632,6 +689,7 @@ public class StratConDeploymentWizard extends JDialog {
         if (item instanceof Formation formation) {
             stagedPrimaryForces.remove(formation);
             stagedReinforcementForces.remove(formation);
+            offBoardChoiceByForceId.remove(formation.getId());
         } else if (item instanceof Unit unit) {
             stagedAuxiliaryUnits.remove(unit);
             stagedUtilityUnits.remove(unit);
@@ -735,6 +793,8 @@ public class StratConDeploymentWizard extends JDialog {
             StratConDeploymentService.finalizeForceDeployment(campaign, owner.getCurrentTrack(), scenario);
         }
 
+        applyOffBoardSelections();
+
         if (!committedReinforcements.isEmpty()) {
             SupportCarrierDeploymentDialogs.showStayingHome(campaign,
                   committedReinforcements,
@@ -742,6 +802,29 @@ public class StratConDeploymentWizard extends JDialog {
         }
 
         finishCommit();
+    }
+
+    /**
+     * Records the player's off-board choices on the scenario for every staged formation, so the units deploy off-board
+     * when the scenario is played (or auto-resolved). Only artillery units of a marked force are actually placed
+     * off-board; that check happens at play time.
+     */
+    private void applyOffBoardSelections() {
+        if ((scenario == null) || (scenario.getBackingScenario() == null)) {
+            return;
+        }
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        applyOffBoardSelections(backingScenario, stagedPrimaryForces);
+        applyOffBoardSelections(backingScenario, stagedReinforcementForces);
+    }
+
+    private void applyOffBoardSelections(AtBDynamicScenario backingScenario, List<Formation> stagedFormations) {
+        for (Formation formation : stagedFormations) {
+            // A force is only ever marked off-board when it actually has artillery, so the default-on option never
+            // pushes an infantry or mek force off the map.
+            boolean offBoard = formationHasArtillery(formation) && effectiveOffBoard(formation.getId());
+            backingScenario.setForceDeployingOffBoard(formation.getId(), offBoard);
+        }
     }
 
     private void deployPrimaryForces() {
