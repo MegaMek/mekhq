@@ -98,9 +98,8 @@ import mekhq.gui.stratCon.ScenarioWizardLanceModel;
  * arithmetic in {@link DeploymentEvaluator}.</p>
  *
  * <p>The right-click deployment entry points ({@code StratConPanel}) and the GM mapless flow
- * ({@code MaplessStratCon}) open this wizard. The legacy {@code StratConScenarioWizard} and
- * {@code TrackForceAssignmentUI} are retained but unused as a fallback until this replacement is validated in-game,
- * then removed.</p>
+ * ({@code MaplessStratCon}) open this wizard. It replaces the former {@code StratConScenarioWizard} and
+ * {@code TrackForceAssignmentUI}.</p>
  *
  * @author Illiani
  * @since 0.51.01
