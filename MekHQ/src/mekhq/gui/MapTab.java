@@ -325,6 +325,28 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
         panMap.setCampaign(getCampaign());
         panMap.addActionListener(this);
+        panMap.addPropertyChangeListener("navigationPresentation", event -> {
+            if (experimentalMap != null && experimentalMapActive) {
+                experimentalMap.refresh();
+            }
+        });
+        addHierarchyListener(event -> {
+            if ((event.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0 && !isShowing()) {
+                panMap.closeMapUtilityWindows();
+            }
+        });
+        panMap.addPropertyChangeListener("mapMode", event -> {
+            if (experimentalMap != null && experimentalMapActive) {
+                experimentalMap.refresh();
+            }
+            firePropertyChange("mapMode", event.getOldValue(), event.getNewValue());
+        });
+        panMap.addPropertyChangeListener("landmarkLayers", event -> {
+            if (experimentalMap != null && experimentalMapActive) {
+                experimentalMap.refresh();
+            }
+            firePropertyChange("landmarkLayers", event.getOldValue(), event.getNewValue());
+        });
         panMap.addPropertyChangeListener("cartographyLayers", event -> {
             if (experimentalMap != null && experimentalMapActive) {
                 experimentalMap.refresh();
@@ -447,7 +469,13 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
                 FramedCommandButton layers = createHudButton("mapHud.layers.text", "mapHud.layers.toolTipText");
                 mapLayersButton = layers;
-                layers.addActionListener(event -> panMap.toggleLayerControls(layers));
+                layers.addActionListener(event -> {
+                    if (experimentalMapActive) {
+                        panMap.toggleNativeLayerControls(layers);
+                    } else {
+                        panMap.toggleLayerControls(layers);
+                    }
+                });
         constraints = new GridBagConstraints();
                 constraints.gridx = 5;
         constraints.gridy = 0;
@@ -460,7 +488,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
           int utilityButtonSize = layers.getPreferredSize().height;
           InterstellarMapPanel.setNavigationUtilityButtonSize(information,
               new Dimension(utilityButtonSize, utilityButtonSize));
-        information.addActionListener(event -> panMap.toggleMapLegendDialog());
+        information.addActionListener(event -> panMap.toggleMapLegendDialog(information, experimentalMapActive));
         constraints = new GridBagConstraints();
         constraints.gridx = 6;
         constraints.gridy = 0;
@@ -493,6 +521,22 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         return panMap.getCartographyLayers();
     }
 
+    public InterstellarMapPanel.MapMode getMapMode() {
+        return panMap.getSelectedMapMode();
+    }
+
+    public void setMapMode(InterstellarMapPanel.MapMode mode) {
+        panMap.setMapMode(mode);
+    }
+
+    public ExperimentalMapView.LandmarkLayers getLandmarkLayers() {
+        return panMap.getLandmarkLayers();
+    }
+
+    public void setLandmarkLayers(ExperimentalMapView.LandmarkLayers layers) {
+        panMap.setLandmarkLayers(layers);
+    }
+
     public void setCartographyLayers(ExperimentalMapView.CartographyLayers layers) {
         panMap.setCartographyLayers(layers);
     }
@@ -507,15 +551,46 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
                 if (experimentalMap == null) {
                       experimentalMap = experimentalMapFactory.create(getCampaign(), panMap::getExperimentalPresentation,
                           this::selectExperimentalSystem,
+                                                    new ExperimentalMapView.NavigationActions() {
+                                                        @Override
+                                                        public boolean click(PlanetarySystem system, int modifiers, int clickCount) {
+                              if (panMap.handleNavigationClick(system, modifiers, clickCount)) {
+                                  experimentalMap.refresh();
+                                  return true;
+                              }
+                              if (system != null && clickCount >= 2) {
+                                  switchPlanetaryMap(system);
+                                  return true;
+                              }
+                              return false;
+                            }
+
+                            @Override
+                            public javax.swing.JPopupMenu createMenu(PlanetarySystem system) {
+                                return panMap.createNavigationActionsMenu(system);
+                            }
+
+                            @Override
+                            public String hover(PlanetarySystem system) {
+                                return panMap.hoverNavigationSystem(system);
+                            }
+
+                            @Override
+                            public void stopMeasuring() {
+                                panMap.stopMeasuring();
+                            }
+                          },
                           this::handleExperimentalMapFailure);
                 }
                 InterstellarMapPanel.MapCenter center = panMap.getMapCenter();
                 experimentalMap.setViewState(new ExperimentalMapView.ViewState(center.x(), center.y(),
                       panMap.getMapScale(), panMap.getSelectedSystem()));
+                panMap.closeMapUtilityWindows();
                 panMapView.remove(panMap);
                 panMapView.add(experimentalMap.component(), BorderLayout.CENTER);
             } else {
                 ExperimentalMapView.ViewState state = experimentalMap.getViewState();
+                panMap.closeMapUtilityWindows();
                 panMapView.remove(experimentalMap.component());
                 panMap.setSelectedSystem(state.selectedSystem());
                 panMap.restoreMapScale(state.scale());
@@ -527,8 +602,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
             handleExperimentalMapFailure(exception);
             return false;
         }
-        mapLayersButton.setEnabled(!experimentalMapActive);
-        mapInformationButton.setEnabled(!experimentalMapActive);
+        mapLayersButton.setEnabled(true);
+        mapInformationButton.setEnabled(true);
         mapView.setScrollMode(experimentalMapActive ? JViewport.SIMPLE_SCROLL_MODE : JViewport.BLIT_SCROLL_MODE);
         panMapView.revalidate();
         panMapView.repaint();
@@ -540,6 +615,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         LOGGER.error(exception, "Experimental map failed; reverting to Java2D");
         SwingUtilities.invokeLater(() -> {
             boolean previouslyActive = experimentalMapActive;
+            panMap.closeMapUtilityWindows();
             if (experimentalMap != null) {
                 panMapView.remove(experimentalMap.component());
                 experimentalMap = null;
@@ -838,8 +914,10 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
               MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "chkAvoidAbandonedSystems.toolTipText")));
         avoidAbandonedSystems.setSelected(getCampaign().getPlayerForce().isAvoidingEmptySystems());
         avoidAbandonedSystems.setAlignmentX(Component.LEFT_ALIGNMENT);
-        avoidAbandonedSystems.addActionListener(event ->
-              getCampaign().getPlayerForce().setIsAvoidingEmptySystems(avoidAbandonedSystems.isSelected()));
+        avoidAbandonedSystems.addActionListener(event -> {
+            getCampaign().getPlayerForce().setIsAvoidingEmptySystems(avoidAbandonedSystems.isSelected());
+            updateRouteStrip();
+        });
         options.add(avoidAbandonedSystems);
 
           JCheckBox useCommandCircuits = new ImmersiveCheckBox(
@@ -1854,6 +1932,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         if (event.getLocation() == getCampaign().getPlayerForce().getForceDetachment().getCurrentLocation()) {
             SwingUtilities.invokeLater(() -> {
                 if (experimentalMapActive) {
+                    panMap.refreshNavigationAnalysis();
                     experimentalMap.refresh();
                 }
             });

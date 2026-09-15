@@ -82,6 +82,8 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.gui.ExperimentalMapView.BoundaryDetail;
 import mekhq.gui.ExperimentalMapView.CartographyLayers;
+import mekhq.gui.ExperimentalMapView.CapitalDetail;
+import mekhq.gui.ExperimentalMapView.LandmarkLayers;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -553,6 +555,22 @@ public class MekHQMenuBar extends JMenuBar {
           if (Boolean.getBoolean("mekhq.experimental.skikoMap")) {
             JCheckBoxMenuItem skiaMap = new JCheckBoxMenuItem(getTextAt("miExperimentalSkiaMap.text"));
             skiaMap.setEnabled(false);
+            JMenu mapModeMenu = new JMenu(MHQInternationalization.getTextAt(
+                "mekhq.resources.CampaignGUI", "map.layer.heading.text"));
+            mapModeMenu.setEnabled(false);
+            ButtonGroup mapModeGroup = new ButtonGroup();
+            EnumMap<mekhq.gui.InterstellarMapPanel.MapMode, JRadioButtonMenuItem> mapModeItems =
+                new EnumMap<>(mekhq.gui.InterstellarMapPanel.MapMode.class);
+            for (var mode : mekhq.gui.InterstellarMapPanel.MapMode.values()) {
+                JRadioButtonMenuItem item = new JRadioButtonMenuItem(MHQInternationalization.getTextAt(
+                    "mekhq.resources.CampaignGUI", mode.resourceKey() + ".text"));
+                item.setToolTipText(MHQInternationalization.getTextAt(
+                    "mekhq.resources.CampaignGUI", mode.resourceKey() + ".toolTipText"));
+                item.getAccessibleContext().setAccessibleDescription(item.getToolTipText());
+                mapModeGroup.add(item);
+                mapModeMenu.add(item);
+                mapModeItems.put(mode, item);
+            }
             JCheckBoxMenuItem emptySystems = new JCheckBoxMenuItem(getTextAt("miMapEmptySystems.text"));
             emptySystems.setEnabled(false);
             JCheckBoxMenuItem territories = new JCheckBoxMenuItem(getTextAt("miMapTerritories.text"));
@@ -561,6 +579,18 @@ public class MekHQMenuBar extends JMenuBar {
             emblems.setEnabled(false);
             JMenu administrative = new JMenu(getTextAt("menuMapAdministrative.text"));
             administrative.setEnabled(false);
+            JMenu capitals = new JMenu(getTextAt("menuMapCapitals.text"));
+            capitals.setEnabled(false);
+            ButtonGroup capitalGroup = new ButtonGroup();
+            EnumMap<CapitalDetail, JRadioButtonMenuItem> capitalItems = new EnumMap<>(CapitalDetail.class);
+            for (CapitalDetail detail : CapitalDetail.values()) {
+                JRadioButtonMenuItem item = new JRadioButtonMenuItem(getTextAt("miMapCapitals." + detail + ".text"));
+                capitalGroup.add(item);
+                capitals.add(item);
+                capitalItems.put(detail, item);
+            }
+            JCheckBoxMenuItem rechargeStations = new JCheckBoxMenuItem(getTextAt("miMapRechargeStations.text"));
+            rechargeStations.setEnabled(false);
             ButtonGroup detailGroup = new ButtonGroup();
             EnumMap<BoundaryDetail, JRadioButtonMenuItem> detailItems = new EnumMap<>(BoundaryDetail.class);
             for (BoundaryDetail detail : BoundaryDetail.values()) {
@@ -571,6 +601,28 @@ public class MekHQMenuBar extends JMenuBar {
             }
             javax.swing.SwingUtilities.invokeLater(() -> {
                 var mapTab = getGui().getNavigationTab().getMapTab();
+                mapModeItems.get(mapTab.getMapMode()).setSelected(true);
+                mapModeMenu.setEnabled(true);
+                for (var entry : mapModeItems.entrySet()) {
+                    entry.getValue().addActionListener(event -> mapTab.setMapMode(entry.getKey()));
+                }
+                mapTab.addPropertyChangeListener("mapMode", event ->
+                      mapModeItems.get(mapTab.getMapMode()).setSelected(true));
+                Runnable syncLandmarks = () -> {
+                    var landmarks = mapTab.getLandmarkLayers();
+                    capitalItems.get(landmarks.capitals()).setSelected(true);
+                    rechargeStations.setSelected(landmarks.rechargeStations());
+                };
+                syncLandmarks.run();
+                capitals.setEnabled(true);
+                rechargeStations.setEnabled(true);
+                for (var entry : capitalItems.entrySet()) {
+                    entry.getValue().addActionListener(event -> mapTab.setLandmarkLayers(
+                          new LandmarkLayers(entry.getKey(), mapTab.getLandmarkLayers().rechargeStations())));
+                }
+                rechargeStations.addActionListener(event -> mapTab.setLandmarkLayers(
+                      new LandmarkLayers(mapTab.getLandmarkLayers().capitals(), rechargeStations.isSelected())));
+                mapTab.addPropertyChangeListener("landmarkLayers", event -> syncLandmarks.run());
                 Runnable syncLayers = () -> {
                     var layers = mapTab.getCartographyLayers();
                     territories.setSelected(layers.territories());
@@ -613,10 +665,13 @@ public class MekHQMenuBar extends JMenuBar {
                     event -> skiaMap.setEnabled(mapTab.isExperimentalMapAvailable()));
             });
             menuView.add(skiaMap);
+            menuView.add(mapModeMenu);
             menuView.add(emptySystems);
             menuView.add(territories);
             menuView.add(emblems);
             menuView.add(administrative);
+            menuView.add(capitals);
+            menuView.add(rechargeStations);
           }
         menuView.addSeparator();
 
