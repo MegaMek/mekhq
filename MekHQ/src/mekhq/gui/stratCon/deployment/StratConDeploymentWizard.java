@@ -97,8 +97,10 @@ import mekhq.gui.stratCon.ScenarioWizardLanceModel;
  * only the dialogs; the state changes live in the non-GUI {@link StratConDeploymentService}, and the deployment
  * arithmetic in {@link DeploymentEvaluator}.</p>
  *
- * <p>The legacy {@code StratConScenarioWizard} and {@code TrackForceAssignmentUI} remain the live path until this
- * replacement is validated in-game.</p>
+ * <p>The right-click deployment entry points ({@code StratConPanel}) and the GM mapless flow
+ * ({@code MaplessStratCon}) open this wizard. The legacy {@code StratConScenarioWizard} and
+ * {@code TrackForceAssignmentUI} are retained but unused as a fallback until this replacement is validated in-game,
+ * then removed.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -169,12 +171,14 @@ public class StratConDeploymentWizard extends JDialog {
      * @param scenario             the scenario being deployed to, or {@code null} for a bare-hex deployment
      * @param assignToScenario     {@code true} to assign to an unresolved scenario, {@code false} to deploy to the hex
      * @param restrictToSingleForce {@code true} when only one primary force may be staged (official challenges)
+     * @param initialMode          the page to open on (Primary for an initial deploy, Reinforce for managing a
+     *                             committed scenario)
      *
      * @author Illiani
      * @since 0.51.01
      */
     public void display(StratConCampaignState campaignState, @Nullable StratConScenario scenario,
-          boolean assignToScenario, boolean restrictToSingleForce) {
+          boolean assignToScenario, boolean restrictToSingleForce, DeploymentMode initialMode) {
         this.campaignState = campaignState;
         this.scenario = scenario;
         this.assignToScenario = assignToScenario;
@@ -184,8 +188,8 @@ public class StratConDeploymentWizard extends JDialog {
                                           : new ReinforcementAdvisor(campaign, campaignState, owner.getCurrentTrack());
 
         clearStaged();
-        mode = DeploymentMode.PRIMARY;
-        modeButtons.get(DeploymentMode.PRIMARY).setSelected(true);
+        mode = initialMode;
+        modeButtons.get(initialMode).setSelected(true);
         enterMode();
 
         setVisible(true);

@@ -37,7 +37,6 @@ import static java.awt.Color.BLUE;
 import static java.awt.Font.BOLD;
 import static java.lang.Math.max;
 import static megamek.utilities.ImageUtilities.addTintToBufferedImage;
-import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
 import static mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -83,14 +82,14 @@ import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.ImageType;
+import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.gui.dialog.StratConTerrainPaintDialog;
-import mekhq.gui.stratCon.StratConScenarioWizard;
-import mekhq.gui.stratCon.TrackForceAssignmentUI;
+import mekhq.gui.stratCon.deployment.StratConDeploymentWizard;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -202,20 +201,9 @@ public class StratConPanel extends JPanel implements ActionListener {
     // used to control how low the text description goes.
     private final Map<StratConCoords, Integer> numIconsInHex = new HashMap<>();
 
-    private final StratConScenarioWizard scenarioWizard;
-    private final TrackForceAssignmentUI assignmentUI;
-
     private final JLabel infoArea;
 
     private final Map<String, BufferedImage> imageCache = new HashMap<>();
-
-    public StratConScenarioWizard getStratConScenarioWizard() {
-        return scenarioWizard;
-    }
-
-    public TrackForceAssignmentUI getAssignmentUI() {
-        return assignmentUI;
-    }
 
     /**
      * Constructs a StratConPanel instance, given a parent campaign GUI and a pointer to an info area.
@@ -223,15 +211,11 @@ public class StratConPanel extends JPanel implements ActionListener {
     public StratConPanel(CampaignGUI gui, JLabel infoArea) {
         campaign = gui.getCampaign();
 
-        scenarioWizard = new StratConScenarioWizard(campaign, this);
         this.infoArea = infoArea;
         // The selected-hex info is drawn as a HUD over the (dark) map, so its default text reads white; the HTML's own
         // colored spans (recon/objective cues) still show through.
         this.infoArea.setForeground(Color.WHITE);
         this.infoArea.setOpaque(false);
-
-        assignmentUI = new TrackForceAssignmentUI(this);
-        assignmentUI.setVisible(false);
 
         MapInputHandler inputHandler = new MapInputHandler();
         addMouseListener(inputHandler);
@@ -1906,56 +1890,37 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Shows the force-assignment dialog for the selected hex. The dialog is modal, so this call blocks until the player
-     * dismisses it.
+     * Opens the redesigned deployment wizard for the currently selected hex, on the page appropriate to the scenario's
+     * state: the Primary page for a bare hex or an unresolved scenario (deploying primary forces), or the Reinforce
+     * page for a scenario whose primary forces are already committed (managing reinforcements, auxiliaries, and
+     * utility). Official challenges restrict the primary pick to a single force.
      *
-     * <p>With no scenario on the hex, forces are deployed to the coordinates directly. With an unresolved scenario on
-     * the hex, forces are assigned to that scenario (restricted to a single force for official challenges). Any other
-     * scenario state shows nothing.</p>
-     *
-     * @param scenario       the scenario currently on the selected hex, or {@code null} if there is none
-     * @param selectedCoords the hex the deployment targets
-     *
-     * @return {@code true} if the dialog was shown, meaning the deployed forces are the scenario's primary forces
+     * @param scenario the scenario on the selected hex, or {@code null} if there is none
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private boolean displayForceAssignment(@Nullable StratConScenario scenario, StratConCoords selectedCoords) {
-        if (scenario == null) {
-            assignmentUI.display(campaign, campaignState, selectedCoords, false, false);
-            assignmentUI.setVisible(true);
-            return true;
+    private void openDeploymentWizard(@Nullable StratConScenario scenario) {
+        boolean assignToScenario = false;
+        boolean restrictToSingleForce = false;
+        DeploymentMode initialMode = DeploymentMode.PRIMARY;
+
+        if (scenario != null) {
+            if (scenario.getCurrentState() == UNRESOLVED) {
+                AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+                restrictToSingleForce = backingScenario != null &&
+                                              backingScenario.getStratConScenarioType().isOfficialChallenge();
+                assignToScenario = true;
+            } else {
+                initialMode = DeploymentMode.REINFORCE;
+            }
         }
 
-        if (scenario.getCurrentState() == UNRESOLVED) {
-            AtBDynamicScenario backingScenario = scenario.getBackingScenario();
-            boolean restrictToSingleForce = backingScenario != null &&
-                                                  backingScenario.getStratConScenarioType().isOfficialChallenge();
-            assignmentUI.display(campaign, campaignState, selectedCoords, restrictToSingleForce, true);
-            assignmentUI.setVisible(true);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Opens the scenario wizard for the given scenario when its primary forces have been committed; otherwise does
-     * nothing.
-     *
-     * @param scenario       the scenario to manage, or {@code null} if there is none
-     * @param isPrimaryForce whether the forces being managed are the scenario's primary forces
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private void openScenarioWizardIfCommitted(@Nullable StratConScenario scenario, boolean isPrimaryForce) {
-        if (scenario != null && scenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
-            scenarioWizard.setCurrentScenario(scenario, currentTrack, campaignState, isPrimaryForce);
-            scenarioWizard.toFront();
-            scenarioWizard.setVisible(true);
-        }
+        new StratConDeploymentWizard(this, campaign).display(campaignState,
+              scenario,
+              assignToScenario,
+              restrictToSingleForce,
+              initialMode);
     }
 
     /**
@@ -1966,9 +1931,9 @@ public class StratConPanel extends JPanel implements ActionListener {
      *
      * <p>The supported commands are:</p>
      * <ul>
-     *   <li>{@code MANAGE_FORCES} - deploys forces to the hex (or its unresolved scenario) via
-     *       {@link #displayForceAssignment}, then opens the scenario wizard if forces were committed.</li>
-     *   <li>{@code MANAGE_SCENARIO} - opens the scenario wizard for a scenario whose primary forces are committed.</li>
+     *   <li>{@code MANAGE_FORCES} / {@code MANAGE_SCENARIO} - open the deployment wizard via
+     *       {@link #openDeploymentWizard}, on the Primary page (bare hex or unresolved scenario) or the Reinforce page
+     *       (committed scenario) as appropriate.</li>
      *   <li>{@code STICKY_FORCE} - toggles whether a force remains deployed on the track.</li>
      *   <li>{@code REMOVE_FACILITY} / {@code CAPTURE_FACILITY} / {@code ADD_FACILITY} - GM facility edits. Adding or
      *       removing a facility recomputes roads; capturing deliberately does not.</li>
@@ -1990,16 +1955,10 @@ public class StratConPanel extends JPanel implements ActionListener {
         StratConScenario selectedScenario = currentTrack.getScenario(selectedCoords);
         switch (evt.getActionCommand()) {
             case RIGHT_CLICK_COMMAND_MANAGE_FORCES:
-                boolean isPrimaryForce = displayForceAssignment(selectedScenario, selectedCoords);
-
-                // The assignment dialog is modal, so forces may have been committed (and a scenario spawned) by the
-                // time it returns; reload before deciding whether to open the wizard.
-                selectedScenario = currentTrack.getScenario(selectedCoords);
-                openScenarioWizardIfCommitted(selectedScenario, isPrimaryForce);
+                openDeploymentWizard(selectedScenario);
                 break;
             case RIGHT_CLICK_COMMAND_MANAGE_SCENARIO:
-                // A scenario may have been placed while deploying the force, so re-check.
-                openScenarioWizardIfCommitted(currentTrack.getScenario(selectedCoords), false);
+                openDeploymentWizard(currentTrack.getScenario(selectedCoords));
                 break;
             case RIGHT_CLICK_COMMAND_STICKY_FORCE:
                 JCheckBoxMenuItem source = (JCheckBoxMenuItem) evt.getSource();
