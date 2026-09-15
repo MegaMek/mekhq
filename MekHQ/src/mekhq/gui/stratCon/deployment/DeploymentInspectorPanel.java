@@ -49,6 +49,8 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionListener;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
@@ -131,6 +133,7 @@ public class DeploymentInspectorPanel extends JPanel {
         stagedList.setCellRenderer(new DeploymentItemRenderer(campaign));
         stagedList.setBackground(SURFACE_DEEP);
         stagedList.setBorder(null);
+        stagedList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
         JScrollPane stagedScroll = new JScrollPane(stagedList);
         stagedScroll.setBorder(BorderFactory.createLineBorder(BORDER, UIUtil.scaleForGUI(1)));
@@ -291,14 +294,18 @@ public class DeploymentInspectorPanel extends JPanel {
      */
     public void setStaged(List<?> stagedItems) {
         stagedModel.clear();
+        int count = 0;
         for (Object item : stagedItems) {
             stagedModel.addElement(item);
+            if (!(item instanceof DeploymentItemRenderer.SectionHeader)) {
+                count++;
+            }
         }
         stagedTitle.setForeground(HudStyle.TEXT_FAINT);
         stagedTitle.setFont(hudFont(Font.BOLD, 0.7f, 0.14f));
         stagedTitle.setText(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.staged.title",
-              stagedItems.size()).toUpperCase(java.util.Locale.ROOT));
+              count).toUpperCase(java.util.Locale.ROOT));
     }
 
     /**
@@ -313,6 +320,31 @@ public class DeploymentInspectorPanel extends JPanel {
 
     public void setStageButtonEnabled(boolean enabled) {
         stageButton.setArmed(enabled);
+    }
+
+    /**
+     * Registers a listener for selections in the staged tray, so the wizard can offer to unstage the focused item.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addStagedSelectionListener(ListSelectionListener listener) {
+        stagedList.addListSelectionListener(listener);
+    }
+
+    /**
+     * @return the item currently selected in the staged tray (a {@link Formation}, a {@link Unit}, or a
+     *       {@link DeploymentItemRenderer.SectionHeader} divider), or {@code null} if nothing is selected
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Object getSelectedStagedItem() {
+        return stagedList.getSelectedValue();
+    }
+
+    public void clearStagedSelection() {
+        stagedList.clearSelection();
     }
 
     public HudButton getStageButton() {

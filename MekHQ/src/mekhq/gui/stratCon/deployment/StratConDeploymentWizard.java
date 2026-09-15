@@ -134,6 +134,12 @@ public class StratConDeploymentWizard extends JDialog {
     // On the Reinforce page, the reinforcement template slot each eligible force fills (needed to commit it).
     private final transient Map<Integer, String> reinforcementTemplateByForceId = new LinkedHashMap<>();
 
+    // The force or unit whose dossier is showing, and whether it is focused from the staged tray (so Stage acts as
+    // Unstage) rather than from the board. A staged item never appears on the board, so these two focus sources never
+    // point at the same item.
+    private transient Object focusedItem;
+    private boolean focusedFromStagedTray;
+
     // Budget inputs for the unit pages, gathered from the scenario when its page is loaded.
     private int leadershipSkill;
     private int leadershipPointsUsed;
@@ -215,8 +221,7 @@ public class StratConDeploymentWizard extends JDialog {
         loadEligibleItems();
         applySearchFilter();
 
-        inspector.showEmpty();
-        inspector.setStageButtonEnabled(false);
+        clearFocus();
         refreshStagedTray();
         updateBudget();
         refreshCommitEnabled();
@@ -315,7 +320,7 @@ public class StratConDeploymentWizard extends JDialog {
 
         boardList.addListSelectionListener(event -> {
             if (!event.getValueIsAdjusting()) {
-                focusSelectedItem();
+                focusFromBoard();
             }
         });
     }
@@ -324,6 +329,11 @@ public class StratConDeploymentWizard extends JDialog {
         inspector.getStageButton().addActionListener(event -> toggleStageSelected());
         inspector.getCancelButton().addActionListener(event -> dispose());
         inspector.getCommitButton().addActionListener(event -> commit());
+        inspector.addStagedSelectionListener(event -> {
+            if (!event.getValueIsAdjusting()) {
+                focusFromStagedTray();
+            }
+        });
     }
 
     // region board loading
@@ -431,6 +441,12 @@ public class StratConDeploymentWizard extends JDialog {
 
         boardModel.clear();
         for (Object item : allItems) {
+            // A force or unit that is already staged (as primary, reinforcement, auxiliary, or utility) is pulled from
+            // the picker until it is unstaged, so the same force cannot be staged twice - for example as both the
+            // primary force and a reinforcement.
+            if (isStagedAnywhere(item)) {
+                continue;
+            }
             if (matchesQuery(item, query)) {
                 boardModel.addElement(item);
             }
@@ -460,18 +476,46 @@ public class StratConDeploymentWizard extends JDialog {
 
     // region focus and staging
 
-    private void focusSelectedItem() {
+    /** Focuses the board selection (a candidate to stage), clearing any staged-tray selection. */
+    private void focusFromBoard() {
         Object focused = boardList.getSelectedValue();
         if (focused == null) {
-            inspector.showEmpty();
-            inspector.setStageButtonEnabled(false);
             return;
         }
+        inspector.clearStagedSelection();
 
-        if (focused instanceof Unit unit) {
+        focusedItem = focused;
+        focusedFromStagedTray = false;
+        showDossier(focused, mode == DeploymentMode.REINFORCE);
+        inspector.setStageButtonEnabled(true);
+        inspector.setStageButtonStaged(false);
+    }
+
+    /** Focuses a staged-tray selection (a candidate to unstage), clearing any board selection. Dividers are ignored. */
+    private void focusFromStagedTray() {
+        Object focused = inspector.getSelectedStagedItem();
+        if (focused == null) {
+            return;
+        }
+        if (focused instanceof DeploymentItemRenderer.SectionHeader) {
+            inspector.clearStagedSelection();
+            return;
+        }
+        boardList.clearSelection();
+
+        focusedItem = focused;
+        focusedFromStagedTray = true;
+        // Show the dossier for whatever the item was staged as, regardless of which page is open.
+        showDossier(focused, (focused instanceof Formation formation) && stagedReinforcementForces.contains(formation));
+        inspector.setStageButtonEnabled(true);
+        inspector.setStageButtonStaged(true);
+    }
+
+    private void showDossier(Object item, boolean asReinforcement) {
+        if (item instanceof Unit unit) {
             inspector.showUnit(unit);
-        } else if (focused instanceof Formation formation) {
-            if ((mode == DeploymentMode.REINFORCE) && (reinforcementAdvisor != null)) {
+        } else if (item instanceof Formation formation) {
+            if (asReinforcement && (reinforcementAdvisor != null)) {
                 ReinforcementEligibilityType eligibility = reinforcementAdvisor.getEligibility(formation.getId());
                 // Preview the roll at no support-point spend; the actual spend is chosen in the commit dialog.
                 ReinforcementRoll roll = reinforcementAdvisor.getRoll(0, false);
@@ -481,44 +525,48 @@ public class StratConDeploymentWizard extends JDialog {
                 inspector.showFormation(formation);
             }
         }
-
-        inspector.setStageButtonEnabled(true);
-        inspector.setStageButtonStaged(isStaged(focused));
     }
 
     private void toggleStageSelected() {
-        Object focused = boardList.getSelectedValue();
-        if (focused == null) {
+        if (focusedItem == null) {
             return;
         }
 
-        if (isStaged(focused)) {
-            unstage(focused);
+        if (focusedFromStagedTray) {
+            unstage(focusedItem);
         } else {
             // Exactly one force may be the primary; any others must be deployed as reinforcements. Staging a new
             // primary force therefore replaces whatever was staged before.
             if (mode == DeploymentMode.PRIMARY) {
                 stagedPrimaryForces.clear();
             }
-            stage(focused);
+            stage(focusedItem);
         }
 
-        inspector.setStageButtonStaged(isStaged(focused));
+        // The item just moved between the board and the staged tray, so drop the focus and rebuild both views.
+        clearFocus();
+        applySearchFilter();
         refreshStagedTray();
         updateBudget();
         refreshCommitEnabled();
     }
 
-    private boolean isStaged(Object item) {
+    /** Clears the focused item and both selections, and resets the inspector to its "nothing focused" state. */
+    private void clearFocus() {
+        focusedItem = null;
+        focusedFromStagedTray = false;
+        boardList.clearSelection();
+        inspector.clearStagedSelection();
+        inspector.showEmpty();
+        inspector.setStageButtonEnabled(false);
+    }
+
+    private boolean isStagedAnywhere(Object item) {
         if (item instanceof Formation formation) {
-            return (mode == DeploymentMode.PRIMARY)
-                         ? stagedPrimaryForces.contains(formation)
-                         : stagedReinforcementForces.contains(formation);
+            return stagedPrimaryForces.contains(formation) || stagedReinforcementForces.contains(formation);
         }
         if (item instanceof Unit unit) {
-            return (mode == DeploymentMode.AUXILIARIES)
-                         ? stagedAuxiliaryUnits.contains(unit)
-                         : stagedUtilityUnits.contains(unit);
+            return stagedAuxiliaryUnits.contains(unit) || stagedUtilityUnits.contains(unit);
         }
         return false;
     }
@@ -542,12 +590,22 @@ public class StratConDeploymentWizard extends JDialog {
     }
 
     private void refreshStagedTray() {
+        // Group the staged items under captioned dividers so a staged primary force reads apart from staged
+        // reinforcements (and from auxiliary/utility units).
         List<Object> staged = new ArrayList<>();
-        staged.addAll(stagedPrimaryForces);
-        staged.addAll(stagedReinforcementForces);
-        staged.addAll(stagedAuxiliaryUnits);
-        staged.addAll(stagedUtilityUnits);
+        addStagedSection(staged, DeploymentMode.PRIMARY, stagedPrimaryForces);
+        addStagedSection(staged, DeploymentMode.REINFORCE, stagedReinforcementForces);
+        addStagedSection(staged, DeploymentMode.AUXILIARIES, stagedAuxiliaryUnits);
+        addStagedSection(staged, DeploymentMode.UTILITY, stagedUtilityUnits);
         inspector.setStaged(staged);
+    }
+
+    private static void addStagedSection(List<Object> staged, DeploymentMode section, List<?> items) {
+        if (items.isEmpty()) {
+            return;
+        }
+        staged.add(new DeploymentItemRenderer.SectionHeader(section));
+        staged.addAll(items);
     }
 
     private boolean nothingStaged() {

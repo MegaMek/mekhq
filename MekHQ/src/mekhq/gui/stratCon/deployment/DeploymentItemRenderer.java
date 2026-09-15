@@ -13,6 +13,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
@@ -23,6 +24,7 @@ import javax.swing.ListCellRenderer;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.unit.Unit;
@@ -45,11 +47,25 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
     private final JLabel nameLabel = new JLabel();
     private final JLabel subLabel = new JLabel();
 
+    // A separate cached component for section-divider rows in the staged tray (see SectionHeader).
+    private final JPanel header = new JPanel(new BorderLayout());
+    private final JLabel headerLabel = new JLabel();
+
     public DeploymentItemRenderer(Campaign campaign) {
         this.campaign = campaign;
 
         int pad = UIUtil.scaleForGUI(8);
         card.setBorder(BorderFactory.createEmptyBorder(pad, UIUtil.scaleForGUI(10), pad, UIUtil.scaleForGUI(10)));
+
+        headerLabel.setFont(hudFont(Font.BOLD, 0.7f, 0.14f));
+        headerLabel.setForeground(TEXT_FAINT);
+        header.setOpaque(true);
+        header.setBackground(SURFACE_DEEP);
+        header.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(UIUtil.scaleForGUI(1), 0, 0, 0, DIVIDER),
+              BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(10), UIUtil.scaleForGUI(10),
+                    UIUtil.scaleForGUI(4), UIUtil.scaleForGUI(10))));
+        header.add(headerLabel, BorderLayout.CENTER);
 
         nameLabel.setFont(hudFont(Font.BOLD, 1.0f, 0.02f));
         subLabel.setFont(hudFont(Font.PLAIN, 0.82f, 0.0f));
@@ -68,6 +84,11 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
     @Override
     public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
           boolean cellHasFocus) {
+        if (value instanceof SectionHeader sectionHeader) {
+            headerLabel.setText(sectionHeader.mode().getLabel().toUpperCase(Locale.ROOT));
+            return header;
+        }
+
         card.setOpaque(true);
         card.setBackground(isSelected ? SURFACE : SURFACE_DEEP);
         card.setBorder(BorderFactory.createCompoundBorder(
@@ -116,6 +137,15 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
             case MARGINALLY_OPERATIONAL, NOT_OPERATIONAL -> DANGER;
         };
     }
+
+    /**
+     * A non-selectable divider row in the staged tray, captioning the group of staged items that follows it (Primary,
+     * Reinforcements, Auxiliaries, Utility), so a staged primary force reads apart from staged reinforcements.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public record SectionHeader(DeploymentMode mode) {}
 
     /** A small hollow readiness ring drawn in the status colour. */
     private static final class Ring extends JComponent {
