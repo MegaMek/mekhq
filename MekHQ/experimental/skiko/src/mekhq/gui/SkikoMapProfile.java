@@ -1,14 +1,23 @@
 package mekhq.gui;
 
 import java.nio.file.Path;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.HashMap;
 import java.util.Map;
 
 import jdk.jfr.consumer.RecordedFrame;
+import jdk.jfr.consumer.RecordedEvent;
 import jdk.jfr.consumer.RecordingFile;
 
 public final class SkikoMapProfile {
     public static void main(String[] arguments) throws Exception {
+        if (arguments.length == 2 && arguments[1].equals("--stages")) {
+            printStages(Path.of(arguments[0]));
+            return;
+        }
         Map<String, Long> allocationSites = new HashMap<>();
         Map<String, Long> allocationTraces = new HashMap<>();
         Map<String, Long> execution = new HashMap<>();
@@ -60,5 +69,78 @@ public final class SkikoMapProfile {
         System.out.println(heading);
         values.entrySet().stream().sorted(Map.Entry.<String, Long>comparingByValue().reversed()).limit(limit)
               .forEach(entry -> System.out.printf(java.util.Locale.ROOT, "%.3f %s%n", entry.getValue() / divisor, entry.getKey()));
+    }
+
+    private static void printStages(Path path) throws Exception {
+        List<RecordedEvent> stages = new ArrayList<>();
+        List<RecordedEvent> passes = new ArrayList<>();
+        try (RecordingFile recording = new RecordingFile(path)) {
+            while (recording.hasMoreEvents()) {
+                RecordedEvent event = recording.readEvent();
+                switch (event.getEventType().getName()) {
+                    case "mekhq.SkikoStage" -> stages.add(event);
+                    case "mekhq.MapMeasuredPass" -> passes.add(event);
+                    case "jdk.DataLoss" -> throw new IllegalStateException("JFR reported data loss; reject stage timings");
+                    default -> { }
+                }
+            }
+        }
+        if (stages.isEmpty() || passes.isEmpty()) {
+            throw new IllegalStateException("Missing stage or measured-pass events");
+        }
+        stages.sort(java.util.Comparator.comparing(RecordedEvent::getStartTime));
+        passes.sort(java.util.Comparator.comparing(RecordedEvent::getStartTime));
+        Path output = path.resolveSibling("stages.csv");
+        try (var writer = Files.newBufferedWriter(output)) {
+            writer.write("repeat,scene,motion,stage,thread,start_utc,wall_ns,cpu_ns\n");
+            for (RecordedEvent pass : passes) {
+                if (!pass.getString("renderer").equals("Skia")) {
+                    continue;
+                }
+                var start = pass.getStartTime().plusMillis(100);
+                var end = pass.getEndTime().minusMillis(100);
+                Map<String, List<RecordedEvent>> grouped = new java.util.TreeMap<>();
+                for (RecordedEvent stage : stages) {
+                    if (stage.getStartTime().isBefore(start) || stage.getEndTime().isAfter(end)) {
+                        continue;
+                    }
+                    if (stage.getBoolean("failed")) {
+                        throw new IllegalStateException("Instrumented stage threw an exception");
+                    }
+                    String name = stage.getString("stage");
+                    grouped.computeIfAbsent(name, ignored -> new ArrayList<>()).add(stage);
+                    writer.write(String.format(Locale.ROOT, "%d,%s,%s,%s,%s,%s,%d,%d%n", pass.getInt("repeat"),
+                          pass.getString("scene"), pass.getString("motion"), name, stage.getThread().getJavaName(),
+                          stage.getStartTime(), stage.getDuration().toNanos(), stage.getLong("cpuNanos")));
+                }
+                    if (!grouped.keySet().equals(java.util.Set.of("org.jetbrains.skiko.SkiaLayer.draw$skiko",
+                        "org.jetbrains.skiko.context.Direct3DContextHandler.flush"))) {
+                    throw new IllegalStateException("Expected playback and flush events for each native pass: " + grouped.keySet());
+                }
+                for (var entry : grouped.entrySet()) {
+                    List<Long> walls = new ArrayList<>();
+                    long cpuTotal = 0;
+                    long wallTotal = 0;
+                    for (RecordedEvent stage : entry.getValue()) {
+                        long wall = stage.getDuration().toNanos();
+                        walls.add(wall);
+                        wallTotal += wall;
+                        long cpu = stage.getLong("cpuNanos");
+                        if (cpu < 0) {
+                            throw new IllegalStateException("Thread CPU timing unavailable");
+                        }
+                        cpuTotal += cpu;
+                    }
+                    walls.sort(Long::compareTo);
+                    int count = walls.size();
+                    System.out.printf(Locale.ROOT,
+                          "STAGE repeat=%d scene=%s name=%s count=%d wall_p50_ms=%.3f wall_p95_ms=%.3f wall_total_ms=%.3f cpu_total_ms=%.3f%n",
+                          pass.getInt("repeat"), pass.getString("scene"), entry.getKey(), count,
+                          walls.get((int) Math.ceil(count * .5) - 1) / 1e6,
+                          walls.get((int) Math.ceil(count * .95) - 1) / 1e6, wallTotal / 1e6, cpuTotal / 1e6);
+                }
+            }
+        }
+        System.out.println("STAGE_COMPLETE events=" + stages.size() + " passes=" + passes.size() + " output=" + output);
     }
 }

@@ -19,7 +19,51 @@ improved detail delivery from about 8.5 to 27-28 callbacks/sec, but native playb
 still trails Java2D in heavy-overlay cases. These results do not
 justify changing the default renderer or claiming a presented-frame FPS advantage.
 
+Add `-PskikoStageTiming` to the performance command to enable the benchmark-only
+startup Java agent. It records playback and synchronized-flush duration events in
+JFR and inspects Java2D paint/screen surfaces without changing rendering calls,
+GPU selection, or synchronization. Analyze a recording with:
+
+```powershell
+java MekHQ/experimental/skiko/src/mekhq/gui/SkikoMapProfile.java MekHQ/build/skiko-perf/<run>/renderers.jfr --stages
+```
+
+The analyzer writes `stages.csv` and rejects reported JFR data loss or missing
+expected stages. Native flush and GPU-completion waiting remain a combined metric.
+The agent uses Byte Buddy only in the experimental source set; normal launches
+do not attach it or open Java2D internals. See the performance report for overhead
+and boundary limitations.
+
 ## Compare maps in a campaign
+
+To try cached territories during camera movement, launch with
+`SKIKO_MOTION_CACHE=true` (this also enables territory caching):
+
+```powershell
+$previous = $env:SKIKO_MOTION_CACHE
+try {
+   $env:SKIKO_MOTION_CACHE = 'true'
+   .\gradlew.bat :MekHQ:runSkikoMap
+} finally {
+   $env:SKIKO_MOTION_CACHE = $previous
+}
+```
+
+Fractional pans reuse the tile while moving; mouse release or 120 ms of camera
+inactivity requests sharp vector rendering. Only territories are cached, not
+stars, labels, or HPG links. Zoom changes rebuild the tile and can still stutter.
+The 24-fixture motion smoke passes with exact settled output and automatic timer
+settling. Use `--args="--offscreen --retained-only"` with the smoke task and the
+same environment setting to run it. Desktop visual acceptance remains separate.
+
+The optional `SKIKO_RETAIN_TERRITORIES=true` environment setting enables a bounded
+native picture-shader territory cache. It reuses tiles only for device-pixel-aligned
+pans and draws direct vectors for fractional pans, without snapping the camera.
+It is disabled by default and has no validated performance gain yet. With the
+setting enabled, run `:MekHQ:runSkikoMapSmoke --args="--offscreen --retained-only"`
+to check raster fidelity, reuse/fallback selection, and disposal. The 36-fixture
+raster check passes; it is not desktop GPU pixel validation. See the performance
+report for the pinned JNI workaround and the rejected blank-cache benchmark.
 
 From the MekHQ repository root:
 
@@ -39,7 +83,7 @@ zoom. Spectral palettes, luminosity-class scaling, and logarithmic marker sizing
 share Java2D's calculations. Dated ownership rings replace contact colors as detail
 appears; disputed systems divide contacts and rings into equal faction sectors.
 Empty systems use muted contacts and optional gray rings; hidden empty route stops
-retain neutral navigation contacts. Native hit-testing, label reservations, and
+retain neutral navigation contacts. Native hit-testing and
 navigation-ring clearance account for the larger stellar footprint.
 
 Radial glows use native Skia shaders cached by spectral color, reused across camera
@@ -67,11 +111,20 @@ and selected system. The inactive map is removed from the component hierarchy;
 native surfaces are disposed when removed and recreated when needed.
 
 Labels use the same campaign-date names and ordinary-label zoom fade as Java2D.
+System culling includes 32 GUI-scaled pixels of overscan beyond the artwork radius
+on every viewport edge; the canvas clips the final drawing. The pan smoke checks
+all four edges at overview and detail zoom. Live GPU edge popping still needs
+confirmation against the reported case.
 Selected/current labels are placed first and remain visible at overview zoom;
-route-system labels follow, then ordinary labels. Native font measurements keep
-labels inside the viewport and prevent label overlap. Priority labels use a small
-background plate over ordinary stars when needed; other labels avoid star markers.
-Crowded labels with no valid placement are omitted.
+route-system labels follow, then ordinary labels. All labels stay 16 GUI-scaled
+pixels to the right of their planet, vertically centered, regardless of pan, zoom,
+selection, or hover. They clip at viewport edges without switching sides. Zoom
+visibility fades remain unchanged. Labels no longer avoid collisions or disappear
+because a placement is crowded, so they can overlap labels or map markers.
+Priority labels retain their background plate. Text measurements remain cached;
+the per-frame candidate search and label collision scans have been removed.
+The offscreen smoke checks fixed offsets during pan, zoom, and marker interactions;
+the change has not yet been performance-benchmarked.
 
 Territory fills and borders reuse the existing campaign-date territory atlas as
 vector geometry. Sovereign regions use subdued faction colors; disputed regions
@@ -122,7 +175,7 @@ Planned routes use 2 px dashed cyan lines; active routes use 3 px solid amber li
 shared clearance geometry and thin planned/thicker active strokes. Overview keeps
 only the endpoint ring. Requested planned stops receive sequential cyan badges;
 active-route stops receive amber numbers. A planned badge takes priority when both
-routes share its slot. Crowded badges are omitted, and labels avoid their bounds.
+routes share its slot. Crowded badges are omitted; fixed labels may overlap them.
 Both paths can be displayed together, and
 the existing HUD/sidebar controls still own planning, editing, and beginning transit.
 Switching renderers does not alter either route.
@@ -289,7 +342,7 @@ or continuous animation timer.
 
 This focused smoke compares every snapshot entry with the campaign calculation
 for all three hop limits, exercises anchor and route-option changes, and checks
-native marker pixels, label clearance, zoom fading, empty filtering, and renderer
+native marker pixels, fixed label anchors, zoom fading, empty filtering, and renderer
 round trips. It writes hop-shell and caution captures. Omit `--offscreen` for
 desktop compositing captures; the same checks run in the full smoke sequence.
 
@@ -336,7 +389,7 @@ pixel parity. The separate 50-ly HPG range ring remains pending.
 
 The focused check compares full dated link and station snapshots with the shared
 provider at two dates, inspects real A-D badge pixels, and checks detail limits,
-Class B pixel contribution, zoom fading, empty filtering, label clearance,
+Class B pixel contribution, zoom fading, empty filtering, fixed label anchors,
 snapshot reuse, renderer switches, and clearing on disable. It writes overview,
 station-class, and historical captures. Omit `--offscreen` for desktop captures.
 These checks also run in the full smoke sequence.
@@ -358,7 +411,7 @@ This creates a fresh in-memory campaign and opens the real campaign UI without
 loading or saving campaign files. It verifies Java2D is the default, uses the real
 menu checkbox, checks native stars and pan/zoom/selection, verifies camera and
 selection round trips, changes tabs, resizes, and checks native peer disposal.
-It checks native label bounds and collisions at detailed/overview zoom, compares
+It checks fixed native label offsets at detailed/overview zoom and viewport edges, compares
 dated names and faction colors with campaign data before and after a temporary
 date change, and verifies empty-system filter changes across renderer switches.
 Stellar checks compare isolated native core/aura pixels against Java2D's actual
@@ -372,7 +425,7 @@ Focus checks compare native rings, hover brackets, and selection animation sampl
 with Java2D's painters using its pure-stroke hint to preserve subpixel positions.
 Java2D's default stroke normalization can otherwise snap thin strokes differently.
 The checks exercise immediate hover, selected-system hover suppression, intermediate
-animation frames, repeat selection, focus/label clearance, ring/bracket zoom
+animation frames, repeat selection, fixed label anchors during focus changes, ring/bracket zoom
 crossfade, and timer cleanup across hiding and renderer switches.
 Territory checks compare sampled native interior pixels with expected faction
 tints at detailed/overview zoom and a historical date, verify snapshot/path reuse
@@ -389,7 +442,7 @@ It also plots and appends a route through MapTab, checks planned/active route
 colors in a desktop capture, exercises fleet progress updates and renderer round
 trips, and verifies clearing, cancellation, arrival, and single-system paths.
 Route checks sample rendered partial legs during reveal and activation, verify
-requested-stop numbering, native fleet pixels and label clearance, exercise a
+requested-stop numbering, native fleet pixels and fixed label anchors, exercise a
 fleet hop through in-memory campaign location events, and check overview/detail
 crossfades. Hiding and detaching during feedback must stop timers and dispose the
 fleet asset without replay on reattachment. The route slice can run independently:

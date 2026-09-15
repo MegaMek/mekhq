@@ -6,6 +6,7 @@ import java.awt.event.MouseWheelEvent;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -49,6 +50,9 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
     private long allocated;
     private long cpu;
     private long passStart;
+    private Instant passClockUtc;
+    private long passClockNano;
+    private long passClockBracket;
     private long lastCompleted;
     private long processCpuStart;
     private long gcStart;
@@ -58,6 +62,16 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
     private int mapWidth;
     private int mapHeight;
     private jdk.jfr.Recording recording;
+    private PassWindow passWindow;
+
+    @jdk.jfr.Name("mekhq.MapMeasuredPass")
+    @jdk.jfr.StackTrace(false)
+    public static final class PassWindow extends jdk.jfr.Event {
+        public int repeat;
+        public String scene;
+        public String motion;
+        public String renderer;
+    }
 
     private record Pass(int repeat, String scene, String motion, boolean nativeMap) {
         String renderer() {
@@ -86,6 +100,8 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
         threads.setThreadCpuTimeEnabled(true);
         output = Path.of("build", "skiko-perf", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")));
         Files.createDirectories(output);
+          Files.writeString(output.resolve("pass-windows.csv"),
+              "pid,repeat,scene,motion,renderer,start_utc,last_callback_utc,clock_bracket_ns\n");
         String pacing = System.getenv("SKIKO_PERF_PACING");
         if (pacing != null && !List.of("timer", "throughput").contains(pacing)) {
             throw new IllegalArgumentException("Invalid SKIKO_PERF_PACING: " + pacing);
@@ -126,6 +142,10 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
               + "\ndisplay_scale=" + scale.getScaleX() + "," + scale.getScaleY()
               + "\ndate=" + campaign.getLocalDate() + "\nanchor=" + campaign.getCurrentSystem().getId()
               + "\npid=" + ProcessHandle.current().pid()
+              + "\nstage_timing=" + Boolean.getBoolean("mekhq.skiko.stageTiming")
+              + "\nretained_territories=" + (!"false".equals(System.getenv("SKIKO_MOTION_CACHE"))
+                  || "true".equals(System.getenv("SKIKO_RETAIN_TERRITORIES")))
+              + "\nmotion_cache=" + !"false".equals(System.getenv("SKIKO_MOTION_CACHE"))
               + "\npacing=" + (throughput ? "throughput: one pending request, next EDT turn after callback" : "timer")
               + "\ntimer_ms=16\nwarmup_requests=" + WARMUP + "\nsample_requests=" + SAMPLES
               + "\nrender_order=Java2D,Skia then Skia,Java2D"
@@ -137,6 +157,7 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
 
     private void nextPass() throws Exception {
         measuring = false;
+        passWindow = null;
         pending = 0;
         java2d.setPerformanceObserver(null);
         if (skia != null) {
@@ -177,6 +198,9 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
             java2d.setPerformanceObserver(this);
         }
         requests = 0;
+        if (Boolean.getBoolean("mekhq.skiko.stageTiming")) {
+            SkikoStageAgent.armSurfaceProbe();
+        }
         coalesced = 0;
         samples.clear();
         lastTick = 0;
@@ -229,11 +253,35 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
                 }
                     Pass pass = passes.get(passIndex);
                     String info = pass.nativeMap() ? Objects.requireNonNull(find(skia, org.jetbrains.skiko.SkiaLayer.class)).getRenderInfo()
-                        : "Java2D: pipeline not identified";
+                        : Boolean.getBoolean("mekhq.skiko.stageTiming")
+                            ? "Java2D: see java2d-surfaces.txt" : "Java2D: pipeline not identified";
                     Files.writeString(output.resolve("render-info.txt"), "repeat=" + pass.repeat() + " scene=" + pass.scene()
                         + " motion=" + pass.motion() + " renderer=" + pass.renderer() + "\n" + info + "\n",
                         java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
                     System.out.println("MAP_PERF_DEVICE " + info.replace('\n', ' '));
+                if (!pass.nativeMap() && Boolean.getBoolean("mekhq.skiko.stageTiming")) {
+                    java.awt.Graphics screen = java2d.getGraphics();
+                    try {
+                        SkikoStageAgent.reportSurface("screen", screen);
+                    } finally {
+                        if (screen != null) {
+                            screen.dispose();
+                        }
+                    }
+                    Files.writeString(output.resolve("java2d-surfaces.txt"), SkikoStageAgent.surfaceInfo());
+                }
+                passWindow = new PassWindow();
+                passWindow.repeat = pass.repeat();
+                passWindow.scene = pass.scene();
+                passWindow.motion = pass.motion();
+                passWindow.renderer = pass.renderer();
+                passWindow.begin();
+                long clockBefore = System.nanoTime();
+                passClockUtc = Instant.now();
+                long clockAfter = System.nanoTime();
+                passClockNano = clockBefore + (clockAfter - clockBefore) / 2;
+                passClockBracket = clockAfter - clockBefore;
+                now = System.nanoTime();
                     measuring = true;
                 passStart = now;
                 processCpuStart = operatingSystem.getProcessCpuTime();
@@ -306,6 +354,9 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
         if (measuring && pending != 0) {
             samples.add(new Sample(completed - started, cpuUsed, bytes, completed - pending, tickGap));
             lastCompleted = completed;
+            if (requests == WARMUP + SAMPLES) {
+                passWindow.end();
+            }
         }
         boolean acknowledged = pending != 0;
         pending = 0;
@@ -321,6 +372,7 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
         }
         Pass pass = passes.get(passIndex);
         long[] paints = new long[samples.size()];
+        passWindow.commit();
         long[] cpus = new long[samples.size()];
         long[] allocations = new long[samples.size()];
         long[] latencies = new long[samples.size()];
@@ -348,6 +400,18 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
               totalAllocated / 1048576.0, percentile(latencies, .95) / 1e6, percentile(ticks, .95) / 1e6,
               slow * 100.0 / samples.size(), (operatingSystem.getProcessCpuTime() - processCpuStart) / 1e9, gcMillis() - gcStart);
         summaries.add(row);
+          if (pass.nativeMap()) {
+            String cacheInfo = "repeat=" + pass.repeat() + " scene=" + pass.scene() + " motion=" + pass.motion()
+                + " " + skia.getRetainedTerritoryInfo();
+            Files.writeString(output.resolve("retained-territories.txt"), cacheInfo + "\n",
+                java.nio.file.StandardOpenOption.CREATE, java.nio.file.StandardOpenOption.APPEND);
+            System.out.println("MAP_PERF_CACHE " + cacheInfo);
+          }
+          Files.writeString(output.resolve("pass-windows.csv"), String.format(Locale.ROOT,
+              "%d,%d,%s,%s,%s,%s,%s,%d%n", ProcessHandle.current().pid(), pass.repeat(), pass.scene(),
+              pass.motion(), pass.renderer(), passClockUtc.plusNanos(passStart - passClockNano),
+              passClockUtc.plusNanos(lastCompleted - passClockNano), passClockBracket),
+              java.nio.file.StandardOpenOption.APPEND);
         Files.write(output.resolve("summary.csv"), summaries);
         Files.write(output.resolve("frames.csv"), raw);
         System.out.println("MAP_PERF_RESULT " + row);

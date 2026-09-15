@@ -83,6 +83,7 @@ public final class SkikoMapSmoke {
     private static boolean controlsOnly;
     private static boolean reachabilityOnly;
     private static boolean hpgOnly;
+    private static boolean retainedOnly;
 
     public static void main(String... args) throws Exception {
         offscreen = List.of(args).contains("--offscreen");
@@ -91,6 +92,7 @@ public final class SkikoMapSmoke {
         controlsOnly = List.of(args).contains("--controls-only");
         reachabilityOnly = List.of(args).contains("--reachability-only");
         hpgOnly = List.of(args).contains("--hpg-only");
+        retainedOnly = List.of(args).contains("--retained-only");
         boolean performance = List.of(args).contains("--performance");
         if (GraphicsEnvironment.isHeadless()) {
             throw new IllegalStateException("The real map smoke run requires an interactive desktop");
@@ -164,6 +166,11 @@ public final class SkikoMapSmoke {
                             require(SkiaMap.getCompletedStars() > 0, "No native stars");
                             require(find(frame, InterstellarMapPanel.class) == null, "Java2D map is still attached");
                             capture(frame, "skia-map");
+                            if (retainedOnly) {
+                                ((Timer) event.getSource()).stop();
+                                checkRetainedTerritories(frame, mapTab, toggle);
+                                return;
+                            }
                             if (hpgOnly) {
                                 ((Timer) event.getSource()).stop();
                                 checkHpgNetwork(frame, app, toggle);
@@ -239,6 +246,247 @@ public final class SkikoMapSmoke {
 
     private static String mapText(String key) {
         return MHQInternationalization.getTextAt("mekhq.resources.CampaignGUI", key);
+    }
+
+    private static void checkRetainedTerritories(JFrame frame, MapTab tab, JCheckBoxMenuItem toggle) throws Exception {
+        if (!"false".equals(System.getenv("SKIKO_MOTION_CACHE"))) {
+            checkMotionTerritories(frame, tab, toggle);
+            return;
+        }
+        require("true".equals(System.getenv("SKIKO_RETAIN_TERRITORIES")), "Retained territory option is required");
+        SkiaMap map = find(frame, SkiaMap.class);
+        ViewState original = map.getViewState();
+        tab.setCartographyLayers(new ExperimentalMapView.CartographyLayers(true, false,
+              ExperimentalMapView.BoundaryDetail.OFF));
+        int fixtures = 0;
+        double worstMean = 0;
+        double worstChanged = 0;
+        for (double scale : new double[] { 0.8, 6 }) {
+            for (float displayScale : new float[] { 1, 1.75f }) {
+                double anchorHorizontal = 0;
+                double anchorVertical = 0;
+                for (double[] offset : new double[][] { { 0, 0 }, { 32, 0 }, { 80.25, 0 }, { 32, 0 },
+                    { 0, 32 }, { 0, 80.25 }, { 1, 0 }, { 220, 0 }, { -60, 0 } }) {
+                  double pan = offset[0];
+                    map.setViewState(new ViewState(original.centerX() + pan / scale,
+                      original.centerY() + offset[1] / scale, scale, original.selectedSystem()));
+                    BufferedImage reference = ImageIO.read(new ByteArrayInputStream(map.captureTerritoryPng(false, displayScale)));
+                  int previousBuilds = map.getRetainedTerritoryBuilds();
+                  int previousHits = map.getRetainedTerritoryHits();
+                  int previousFallbacks = map.getRetainedTerritoryFallbacks();
+                    BufferedImage cached = ImageIO.read(new ByteArrayInputStream(map.captureTerritoryPng(true, displayScale)));
+                  require(map.hasRetainedTerritories(), "Retained fixture lost its cache");
+                  boolean fallback = false;
+                  if (map.getRetainedTerritoryBuilds() != previousBuilds) {
+                    anchorHorizontal = pan;
+                    anchorVertical = offset[1];
+                  } else {
+                    double deviceHorizontal = (pan - anchorHorizontal) * displayScale;
+                    double deviceVertical = (offset[1] - anchorVertical) * displayScale;
+                    fallback = Math.abs(deviceHorizontal - Math.rint(deviceHorizontal)) > 0.0001
+                        || Math.abs(deviceVertical - Math.rint(deviceVertical)) > 0.0001;
+                    require(map.getRetainedTerritoryFallbacks() == previousFallbacks + (fallback ? 1 : 0),
+                        "Device-pixel alignment selected the wrong territory path");
+                    require(map.getRetainedTerritoryHits() == previousHits + (fallback ? 0 : 1),
+                        "Territory cache reuse counter did not match alignment");
+                  }
+                    long error = 0;
+                    int changed = 0;
+                    for (int vertical = 0; vertical < reference.getHeight(); vertical++) {
+                        for (int horizontal = 0; horizontal < reference.getWidth(); horizontal++) {
+                            int direct = reference.getRGB(horizontal, vertical);
+                            int retained = cached.getRGB(horizontal, vertical);
+                            int maximum = 0;
+                            for (int shift : new int[] { 0, 8, 16 }) {
+                                int difference = Math.abs((direct >> shift & 255) - (retained >> shift & 255));
+                                error += difference;
+                                maximum = Math.max(maximum, difference);
+                            }
+                            changed += maximum > 24 ? 1 : 0;
+                        }
+                    }
+                    double pixels = reference.getWidth() * reference.getHeight();
+                    double mean = error / (pixels * 3);
+                    require(!fallback || error == 0, "Fractional-pan fallback differed from direct vectors");
+                    double changedFraction = changed / pixels;
+                    worstMean = Math.max(worstMean, mean);
+                    worstChanged = Math.max(worstChanged, changedFraction);
+                    if (mean >= 0.75 || changedFraction >= 0.01) {
+                        ImageIO.write(reference, "png", output("retained-reference-failure").toFile());
+                        ImageIO.write(cached, "png", output("retained-cache-failure").toFile());
+                    }
+                    require(mean < 0.75 && changedFraction < 0.01,
+                          "Retained territory raster mismatch scale=" + scale + " display=" + displayScale
+                                + " pan=" + pan + "," + offset[1] + " mean=" + mean + " changed=" + changedFraction);
+                    fixtures++;
+                }
+            }
+        }
+        map.captureTerritoryPng(true, 1);
+        int builds = map.getRetainedTerritoryBuilds();
+        int hits = map.getRetainedTerritoryHits();
+        map.captureTerritoryPng(true, 1);
+        require(map.getRetainedTerritoryBuilds() == builds, "Unchanged camera rebuilt retained territory");
+        require(map.getRetainedTerritoryHits() == hits + 1, "Unchanged camera did not reuse retained territory");
+        require(map.getRetainedTerritoryFallbacks() > 0, "No fractional-pan fallback was exercised");
+        tab.setCartographyLayers(new ExperimentalMapView.CartographyLayers(false, false,
+              ExperimentalMapView.BoundaryDetail.OFF));
+        map.captureTerritoryPng(true, 1);
+        require(!map.hasRetainedTerritories(), "Disabling territory retained its cache");
+        tab.setCartographyLayers(new ExperimentalMapView.CartographyLayers(true, false,
+              ExperimentalMapView.BoundaryDetail.OFF));
+        map.captureTerritoryPng(true, 1);
+        require(map.hasRetainedTerritories(), "Re-enabling territory did not rebuild its cache");
+        toggle.doClick(0);
+        require(!map.hasRetainedTerritories() && SkiaMap.getActiveSurfaces() == 0
+              && SkiaMap.getActiveTerritoryPaths() == 0, "Retained resources survived native disposal");
+        System.out.printf(java.util.Locale.ROOT,
+              "RETAINED_MAP_SMOKE_COMPLETE failures=0 fixtures=%d worstMean=%.4f worstChanged=%.6f builds=%d%n",
+              fixtures, worstMean, worstChanged, builds);
+        frame.dispose();
+        System.exit(0);
+    }
+
+    private static void checkMotionTerritories(JFrame frame, MapTab tab, JCheckBoxMenuItem toggle) throws Exception {
+        SkiaMap map = find(frame, SkiaMap.class);
+        ViewState original = map.getViewState();
+        tab.setCartographyLayers(new ExperimentalMapView.CartographyLayers(true, false,
+              ExperimentalMapView.BoundaryDetail.OFF));
+        int fixtures = 0;
+        double worstMean = 0;
+        for (double scale : new double[] { 0.8, 6 }) {
+            for (float displayScale : new float[] { 1, 1.75f }) {
+                for (double pan : new double[] { 0, 32, 80.25, 32, 220, -60 }) {
+                    map.setViewState(new ViewState(original.centerX() + pan / scale,
+                          original.centerY() + pan / (2 * scale), scale, original.selectedSystem()));
+                    byte[] direct = map.captureTerritoryPng(false, displayScale);
+                    BufferedImage reference = ImageIO.read(new ByteArrayInputStream(direct));
+                    int builds = map.getRetainedTerritoryBuilds();
+                    int hits = map.getRetainedTerritoryHits();
+                    BufferedImage moving = ImageIO.read(new ByteArrayInputStream(map.captureTerritoryPng(true, displayScale)));
+                    require(map.hasRetainedTerritories(), "Motion cache was not built");
+                    require(map.getRetainedTerritoryBuilds() > builds || map.getRetainedTerritoryHits() > hits,
+                          "Moving camera neither rebuilt nor reused the tile");
+                    require(map.getRetainedTerritoryFallbacks() == 0, "Motion cache rejected fractional translation");
+                    long error = 0;
+                    for (int vertical = 0; vertical < reference.getHeight(); vertical++) {
+                        for (int horizontal = 0; horizontal < reference.getWidth(); horizontal++) {
+                            int expected = reference.getRGB(horizontal, vertical);
+                            int actual = moving.getRGB(horizontal, vertical);
+                            for (int shift = 0; shift <= 16; shift += 8) {
+                                error += Math.abs((expected >> shift & 255) - (actual >> shift & 255));
+                            }
+                        }
+                    }
+                    double mean = error / (3.0 * reference.getWidth() * reference.getHeight());
+                    worstMean = Math.max(worstMean, mean);
+                    require(mean < 3, "Motion tile content mismatch: " + mean);
+                    map.finishCameraMotion();
+                    require(java.util.Arrays.equals(direct, map.captureTerritoryPng(true, displayScale)),
+                          "Settled territory rendering differed from direct vectors");
+                    fixtures++;
+                }
+            }
+        }
+        require(map.getRetainedTerritoryHits() > 0, "Motion fixtures never reused the cache");
+          ViewState base = new ViewState(original.centerX(), original.centerY(), 6, original.selectedSystem());
+          map.setViewState(base);
+          map.captureTerritoryPng(true, 1.75f);
+          int zoomBuilds = map.getRetainedTerritoryBuilds();
+          map.setViewState(new ViewState(base.centerX(), base.centerY(), base.scale() * 1.175, base.selectedSystem()));
+          map.captureTerritoryPng(true, 1.75f);
+          require(map.getRetainedTerritoryBuilds() == zoomBuilds, "Small zoom rebuilt the territory tile");
+          map.finishCameraMotion();
+          require(java.util.Arrays.equals(map.captureTerritoryPng(false, 1.75f), map.captureTerritoryPng(true, 1.75f)),
+              "Zoom settle differed from direct vectors");
+          java.awt.Dimension originalSize = map.getSize();
+          try {
+            map.setSize(UIUtil.scaleForGUI(1800), UIUtil.scaleForGUI(1100));
+            map.setViewState(base);
+            BufferedImage large = ImageIO.read(new ByteArrayInputStream(map.captureTerritoryPng(true, 1.75f)));
+            require(map.hasRetainedTerritories() && large.getWidth() > 2048,
+                "Large viewport disabled the motion cache");
+            map.finishCameraMotion();
+            require(java.util.Arrays.equals(map.captureTerritoryPng(false, 1.75f), map.captureTerritoryPng(true, 1.75f)),
+                "Large viewport settle differed from direct vectors");
+          } finally {
+            map.setSize(originalSize);
+          }
+          tab.setCartographyLayers(new ExperimentalMapView.CartographyLayers(true, true,
+              ExperimentalMapView.BoundaryDetail.DISTRICTS));
+        javax.swing.AbstractButton layerButton = utilityButton(tab, "mapHud.layers.text");
+        layerButton.doClick(0);
+        javax.swing.AbstractButton hpg = utilityButton(utilityDialog(frame, "mapHud.layers.text"),
+              "map.overlay.hpgNetwork.text");
+        require(hpg != null, "Missing HPG overlay control");
+          if (!hpg.isSelected()) {
+            hpg.doClick(0);
+          }
+        layerButton.doClick(0);
+          map.setViewState(new ViewState(base.centerX() + 1, base.centerY(), base.scale(), base.selectedSystem()));
+          map.captureNativePng();
+          int cartographyBuilds = map.getCartographyMotionBuilds();
+          int systemBuilds = map.getSystemMotionBuilds();
+          map.setViewState(new ViewState(base.centerX() + 1.25, base.centerY() + 0.5,
+              base.scale() * 1.175, base.selectedSystem()));
+          BufferedImage movingScene = ImageIO.read(new ByteArrayInputStream(map.captureNativePng()));
+          require(map.getCartographyMotionBuilds() == cartographyBuilds && map.getSystemMotionBuilds() == systemBuilds,
+              "Small pan/zoom rebuilt the cartography or system layer");
+          map.finishCameraMotion();
+          BufferedImage settledScene = ImageIO.read(new ByteArrayInputStream(map.captureNativePng()));
+          long sceneError = 0;
+          for (int vertical = 0; vertical < movingScene.getHeight(); vertical++) {
+            for (int horizontal = 0; horizontal < movingScene.getWidth(); horizontal++) {
+                int movingPixel = movingScene.getRGB(horizontal, vertical);
+                int settledPixel = settledScene.getRGB(horizontal, vertical);
+                for (int shift = 0; shift <= 16; shift += 8) {
+                  sceneError += Math.abs((movingPixel >> shift & 255) - (settledPixel >> shift & 255));
+                }
+            }
+          }
+          double sceneMean = sceneError / (3.0 * movingScene.getWidth() * movingScene.getHeight());
+          require(sceneMean < 6, "Layered motion scene content mismatch: " + sceneMean);
+          tab.setCartographyLayers(new ExperimentalMapView.CartographyLayers(false, false,
+              ExperimentalMapView.BoundaryDetail.OFF));
+          hpg.doClick(0);
+          map.setViewState(new ViewState(base.centerX() + 2, base.centerY(), base.scale(), base.selectedSystem()));
+          map.captureNativePng();
+          require(map.getCartographyMotionBuilds() > cartographyBuilds, "Layer changes retained stale cartography");
+          System.out.printf(java.util.Locale.ROOT,
+              "MOTION_LAYER_CHECK zoom=reused oversized=retained sceneMean=%.4f invalidation=passed %s%n",
+              sceneMean, map.getRetainedTerritoryInfo());
+          int completedFixtures = fixtures;
+          double maximumMean = worstMean;
+          ViewState last = map.getViewState();
+          map.setViewState(new ViewState(last.centerX() + 0.25, last.centerY(), last.scale(), last.selectedSystem()));
+          require(map.isCameraMoving(), "Camera change did not start motion state");
+          Timer settled = new Timer(400, event -> {
+            try {
+                require(!map.isCameraMoving(), "Camera inactivity did not settle to vectors");
+                require(java.util.Arrays.equals(map.captureTerritoryPng(false, 1), map.captureTerritoryPng(true, 1)),
+                    "Timer-settled territory rendering differed from direct vectors");
+                tab.setCartographyLayers(new ExperimentalMapView.CartographyLayers(false, false,
+                    ExperimentalMapView.BoundaryDetail.OFF));
+                map.captureTerritoryPng(true, 1);
+                require(!map.hasRetainedTerritories(), "Disabling territory retained the motion cache");
+                map.setViewState(last);
+                toggle.doClick(0);
+                    require(!map.isCameraMoving() && !map.hasMotionLayers()
+                        && SkiaMap.getActiveSurfaces() == 0 && SkiaMap.getActiveTerritoryPaths() == 0,
+                    "Motion resources survived native disposal");
+                System.out.printf(java.util.Locale.ROOT,
+                    "MOTION_MAP_SMOKE_COMPLETE fixtures=%d worstMovingMean=%.4f settled=exact timer=passed %s%n",
+                    completedFixtures, maximumMean, map.getRetainedTerritoryInfo());
+                frame.dispose();
+                System.exit(0);
+            } catch (Exception exception) {
+                exception.printStackTrace();
+                frame.dispose();
+                System.exit(1);
+            }
+          });
+          settled.setRepeats(false);
+          settled.start();
     }
 
     private static javax.swing.AbstractButton utilityButton(Container parent, String key) {
@@ -503,11 +751,7 @@ public final class SkikoMapSmoke {
             }
         }
         require(colored > 8 && dark > 2, "HPG badge fill or class glyph missing: " + rating);
-        for (var marker : map.getHpgStationPlacements()) {
-            for (var label : map.getLabelPlacements()) {
-                require(!overlaps(marker.bounds(), label.bounds()), "HPG station overlaps system label");
-            }
-        }
+        checkLabelAnchors(map);
     }
 
     private static BufferedImage hpgDashRaster(java.awt.geom.Line2D.Float line, float displayScale,
@@ -771,12 +1015,8 @@ public final class SkikoMapSmoke {
                     }
                 }
             }
-            for (var label : map.getLabelPlacements()) {
-                require(!overlaps(label.bounds(), marker.bounds()), "System label overlaps reachability marker");
-                require(marker.shellBounds() == null || !overlaps(label.bounds(), marker.shellBounds()),
-                      "System label overlaps reachability shell number");
-            }
         }
+        checkLabelAnchors(map);
         require(shells.contains(hops), "Outermost requested hop shell not drawn");
         require(coloredPixels > 30, "Native reachability marker colors absent");
         if (hops == 3) {
@@ -1138,6 +1378,7 @@ public final class SkikoMapSmoke {
                         territoryBuilds[0] = current.getTerritoryBuilds();
                         checkTerritoryPixels(current);
                         checkLabels(current, true);
+                        checkPanVisibility(current, campaign);
                         capture(frame, "skia-labels-detail");
                         current.setViewState(new ViewState(original.centerX(), original.centerY(), 0.6,
                               original.selectedSystem()));
@@ -1149,6 +1390,7 @@ public final class SkikoMapSmoke {
                               "Camera movement rebuilt the territory snapshot");
                         checkTerritoryPixels(current);
                         checkLabels(current, false);
+                        checkPanVisibility(current, campaign);
                         checkVisibility(current, campaign);
                         filteredIds.addAll(current.getVisibleSystemIds());
                         capture(frame, "skia-labels-overview");
@@ -1187,7 +1429,7 @@ public final class SkikoMapSmoke {
                         checkDatedPresentation(current, campaign);
                         checkLabels(current, true);
                         ((Timer) event.getSource()).stop();
-                        System.out.println("SKIA_PRESENTATION_CHECK labels=nonoverlapping colors=dated filters=shared zoom=checked");
+                        System.out.println("SKIA_PRESENTATION_CHECK labels=fixed-offset colors=dated filters=shared zoom=checked");
                         checkStellarTransition(frame, app, toggle);
                     }
                     default -> throw new IllegalStateException("Unexpected presentation phase");
@@ -1701,23 +1943,7 @@ public final class SkikoMapSmoke {
     }
 
     private static void checkNavigationLabelClearance(SkiaMap map) {
-        List<Rect> bounds = new ArrayList<>();
-        for (var fleet : map.getFleetPlacements()) {
-            if (fleet.shipAlpha() > 0) {
-                bounds.add(fleet.bounds());
-            }
-        }
-        for (var badge : map.getRouteBadges()) {
-            bounds.add(badge.bounds());
-        }
-        for (Rect marker : bounds) {
-            for (var label : map.getLabelPlacements()) {
-                Rect other = label.bounds();
-                require(marker.getRight() <= other.getLeft() || marker.getLeft() >= other.getRight()
-                      || marker.getBottom() <= other.getTop() || marker.getTop() >= other.getBottom(),
-                      "Fleet or route badge overlaps a system label");
-            }
-        }
+        checkLabelAnchors(map);
     }
 
     private static void checkFleetPixels(SkiaMap map) throws Exception {
@@ -2119,9 +2345,7 @@ public final class SkikoMapSmoke {
 
     private static void checkLandmarkBounds(SkiaMap map) {
         List<Rect> occupied = new ArrayList<>();
-        for (var label : map.getLabelPlacements()) {
-            occupied.add(label.bounds());
-        }
+        checkLabelAnchors(map);
         for (var marker : map.getLandmarkPlacements()) {
             Rect bounds = marker.bounds();
             require(bounds.getLeft() >= 0 && bounds.getTop() >= 0 && bounds.getRight() <= map.getWidth()
@@ -2129,7 +2353,7 @@ public final class SkikoMapSmoke {
             for (Rect other : occupied) {
                 require(bounds.getRight() <= other.getLeft() || bounds.getLeft() >= other.getRight()
                       || bounds.getBottom() <= other.getTop() || bounds.getTop() >= other.getBottom(),
-                      "Landmark overlaps a label or another landmark");
+                      "Landmark overlaps another landmark");
             }
             occupied.add(bounds);
         }
@@ -2170,7 +2394,38 @@ public final class SkikoMapSmoke {
         }
     }
 
+    private static void checkPanVisibility(SkiaMap map, Campaign campaign) {
+        ViewState original = map.getViewState();
+        try {
+            for (double[] offset : new double[][] { { 32, 0 }, { -32, 0 }, { 0, 32 }, { 0, -32 },
+                  { 80.25, -60.5 }, { -80.25, 60.5 } }) {
+                map.setViewState(new ViewState(original.centerX() + offset[0] / original.scale(),
+                      original.centerY() + offset[1] / original.scale(), original.scale(), original.selectedSystem()));
+                map.captureNativePng();
+                checkVisibility(map, campaign);
+            }
+                PlanetarySystem selected = original.selectedSystem();
+                double padding = UIUtil.scaleForGUI(16);
+                for (double[] position : new double[][] { { -padding, map.getHeight() / 2.0 },
+                    { map.getWidth() + padding, map.getHeight() / 2.0 },
+                    { map.getWidth() / 2.0, -padding }, { map.getWidth() / 2.0, map.getHeight() + padding } }) {
+                    map.setViewState(new ViewState(selected.getX() - (position[0] - map.getWidth() / 2.0) / original.scale(),
+                        selected.getY() + (position[1] - map.getHeight() / 2.0) / original.scale(),
+                        original.scale(), selected));
+                    map.captureNativePng();
+                    require(map.getVisibleSystemIds().contains(selected.getId()),
+                        "System in viewport overscan was culled at " + position[0] + "," + position[1]);
+                    checkVisibility(map, campaign);
+                }
+        } finally {
+            map.setViewState(original);
+            map.captureNativePng();
+        }
+        System.out.printf(java.util.Locale.ROOT, "SKIA_PAN_VISIBILITY scale=%.2f fixtures=10 failures=0%n", original.scale());
+    }
+
     private static void checkVisibility(SkiaMap map, Campaign campaign) {
+        checkLabelAnchors(map);
         Set<String> actual = new HashSet<>(map.getVisibleSystemIds());
         ViewState state = map.getViewState();
         double size = map.getPresentation().systemStyle().sizeAt(state.scale());
@@ -2183,6 +2438,7 @@ public final class SkikoMapSmoke {
             }
             float horizontal = (float) (map.getWidth() / 2.0 + (system.getX() - state.centerX()) * state.scale());
             float vertical = (float) (map.getHeight() / 2.0 - (system.getY() - state.centerY()) * state.scale());
+            radius += UIUtil.scaleForGUI(32);
             boolean inside = (horizontal >= -radius) && (horizontal <= map.getWidth() + radius)
                   && (vertical >= -radius) && (vertical <= map.getHeight() + radius);
             boolean required = Objects.equals(system, state.selectedSystem())
@@ -2208,15 +2464,23 @@ public final class SkikoMapSmoke {
         } else {
             require(labels.size() > 2, "Ordinary labels did not appear at detailed zoom");
         }
-        for (int index = 0; index < labels.size(); index++) {
-            Rect bounds = labels.get(index).bounds();
-            require((bounds.getLeft() >= 0) && (bounds.getTop() >= 0) && (bounds.getRight() <= map.getWidth())
-                  && (bounds.getBottom() <= map.getHeight()), "Label outside viewport");
-            for (int other = index + 1; other < labels.size(); other++) {
-                Rect compared = labels.get(other).bounds();
-                require((bounds.getRight() <= compared.getLeft()) || (bounds.getLeft() >= compared.getRight())
-                      || (bounds.getBottom() <= compared.getTop()) || (bounds.getTop() >= compared.getBottom()),
-                      "Overlapping native labels");
+        checkLabelAnchors(map);
+    }
+
+    private static void checkLabelAnchors(SkiaMap map) {
+        ViewState state = map.getViewState();
+        for (var label : map.getLabelPlacements()) {
+            for (var data : map.getPresentation().systems()) {
+                if (!data.system().getId().equals(label.systemId())) {
+                    continue;
+                }
+                double horizontal = map.getWidth() / 2.0 + (data.system().getX() - state.centerX()) * state.scale();
+                double vertical = map.getHeight() / 2.0 - (data.system().getY() - state.centerY()) * state.scale();
+                require(Math.abs(label.bounds().getLeft() - horizontal - UIUtil.scaleForGUI(16)) < 0.01,
+                      "Label moved horizontally relative to its planet: " + label.text());
+                require(Math.abs((label.bounds().getTop() + label.bounds().getBottom()) / 2.0 - vertical) < 0.01,
+                      "Label moved vertically relative to its planet: " + label.text());
+                break;
             }
         }
     }
@@ -2576,15 +2840,7 @@ public final class SkikoMapSmoke {
     }
 
     private static void checkFocusLabelClearance(SkiaMap map) {
-        for (var focus : map.getFocusPlacements()) {
-            Rect bounds = focus.bounds();
-            for (var label : map.getLabelPlacements()) {
-                Rect other = label.bounds();
-                require(bounds.getRight() <= other.getLeft() || bounds.getLeft() >= other.getRight()
-                      || bounds.getBottom() <= other.getTop() || bounds.getTop() >= other.getBottom(),
-                      "Focus marker overlaps a system label");
-            }
-        }
+        checkLabelAnchors(map);
     }
 
     private static void checkTabHover(JFrame frame, MekHQ app, JCheckBoxMenuItem toggle) throws Exception {

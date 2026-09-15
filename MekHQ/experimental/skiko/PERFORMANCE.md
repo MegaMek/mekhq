@@ -15,7 +15,109 @@ effects with explicit, viewport-bounded dash segments; see the follow-up below.
 Normal rendering has only a null-observer guard; no profiling recording is started
 outside the benchmark. Swing, the default renderer, and portraits are unchanged.
 
+The latest opt-in stage instrumentation identifies Java2D's buffered-image/GDI
+surface path and measures native playback separately from synchronized flush.
+Both consume significant time; the flush wrapper is the larger measured stage.
+Exact separation of native submission work from GPU waiting remains unimplemented.
+See "Direct stage timing" below before interpreting the earlier trace hypotheses.
+
 ## Reproduce
+
+### Motion-cache prototype
+
+The opt-in `SKIKO_MOTION_CACHE=true` prototype permits fractional territory-tile
+reuse during camera movement, then requests direct vectors on mouse release or
+120 ms inactivity. It retains the aligned-only experiment as a separate option.
+Zoom still rebuilds tiles; stars, labels, and HPG links are drawn directly.
+
+Run `20260914-234553` completed 16 instrumented passes at display scale 1.75.
+For 240 acknowledged updates, native cartography detail pans took 1.359-1.403 s
+(prior direct run: 5.290-5.421 s); paired Java2D took 1.990-2.111 s. Native HPG
+pans took 4.682-4.967 s versus paired Java2D 2.184-2.479 s. These are callback
+workloads, not measured displayed FPS or guarantees of live smoothness.
+Native zoom request-to-callback p95 remained 134.8-147.4 ms for cartography and
+157.0-157.5 ms for HPG: smooth zoom is not achieved.
+
+The current motion smoke passes 24 fixtures, worst moving mean RGB error 0.9307
+(in-motion limit 3), exact settled PNG equality, automatic timer settling,
+territory disabling, and disposal. This deliberately permits in-motion resampling;
+it does not weaken the separate aligned-cache fidelity gate. Actual GPU pixels
+and live interaction still require visual acceptance. No GPU or synchronization
+settings were changed. The following sections preserve earlier experiment results.
+
+### Retained territory prototype: aligned reuse passes raster gate
+
+`SKIKO_RETAIN_TERRITORIES=true` enables an experimental bounded picture-shader
+territory cache; the default remains direct vectors. The initial cached benchmark
+`20260914-221740` is **invalid as an optimization result**: its cached territories
+were blank. Do not use its apparent throughput or stage-time reductions as evidence
+of a valid performance gain.
+
+The blank-image cause was verified in Skiko 0.150.1's
+[Picture JNI bridge](https://github.com/JetBrains/skiko/blob/v0.150.1/skiko/src/jvmMain/cpp/common/Picture.cc):
+the optional tile is constructed with `MakeLTRB(tileLeft, tileRight, tileBottom,
+tileTop)`, producing an empty rectangle for this tile. Passing no explicit tile
+uses the picture's correctly recorded cull bounds and restores visible content.
+The prototype records a zero-origin padded picture and the fixed map background,
+matching the territory layer's first-over-background compositing order.
+
+After restoring visible content, fractional-pan sampling still exceeded the
+existing fidelity limit. Cache reuse now requires integer device-pixel translation
+on both axes (with a 0.0001-pixel floating-point tolerance). Fractional translations
+draw the original vectors without discarding the cached tile or changing the
+camera position. Returning to aligned movement resumes reuse. New tiles are still
+built when the camera exceeds the padded bounds or the cache key changes.
+Both raster captures and native rendering supply their actual target scale to
+the cache key and alignment check. Diagnostics report builds, hits, and fractional
+fallbacks separately; `active=true` means a tile exists, not that every frame used it.
+
+The expanded `--offscreen --retained-only` check passes 36 fixtures at world scales
+0.8 and 6 and display scales 1 and 1.75. It covers both pan axes, fractional
+fallbacks, return to aligned reuse, and tile rebuilds. Worst mean RGB channel error
+is 0.7056 (limit 0.75); worst fraction above 24 channel levels is 0.000246 (limit
+0.01). Fallback frames match direct vectors exactly. Unchanged-camera reuse,
+territory disable/re-enable, and native disposal assertions also pass.
+
+The cache remains opt-in. The corrected-cache benchmark below shows no compelling
+benefit under the aligned-only policy. GPU cache memory behavior, full invalidation
+coverage, and desktop pixel comparison remain unverified. GPU selection and
+synchronization are unchanged.
+
+### Fixed-label panning investigation
+
+After the user reported severe live panning choppiness, runs `20260914-233958`
+(direct vectors) and `20260914-234135` (corrected retained cache) repeated
+cartography/HPG detail pans with throughput pacing and stage instrumentation.
+Both use the fixed-label implementation, 32-pixel GUI-scaled system overscan,
+1018 x 549 logical viewport, and Direct3D on Intel Graphics. Each run completed
+eight passes with 240 acknowledged callbacks per pass; stage analysis accepted
+both recordings with 2,588 stage events and eight measured windows each.
+
+| Scene | Java2D direct-run elapsed | Native direct elapsed | Native retained elapsed |
+| --- | --- | --- | --- |
+| Cartography | 2.117-2.328 s | 5.290-5.421 s | 5.240-5.285 s |
+| HPG | 2.584-2.721 s | 8.796-9.161 s | 8.325-8.585 s |
+
+Ranges are two repeats, not confidence intervals or displayed FPS. Java2D controls
+in the retained run took 1.943-2.173 s and 2.159-2.486 s respectively, so small
+between-run differences must not be attributed solely to the cache.
+
+Across four native passes, retained counters recorded 40 builds, 86 hits, and
+1,164 fractional-translation fallbacks (including warmup/setup). Roughly 90% of
+draws fell back. At 175% display scale, integer logical pans frequently fail the
+device-pixel alignment requirement on one or both axes. The fidelity-preserving
+policy therefore does not supply consistent reuse during representative movement.
+
+Direct native playback wall medians were 3.19-3.35 ms for cartography and
+8.67-9.43 ms for HPG. Synchronized-flush medians were 16.46-16.91 ms and
+23.59-24.03 ms. Retained flush medians remained 16.67-17.07 ms and 22.04-22.17 ms.
+Flush includes CPU work and synchronous GPU completion waiting; these timings
+do not isolate GPU execution. Label placement cannot explain these later native
+stage costs, though its individual CPU contribution was not isolated.
+
+No renderer changes were made in this investigation. A possible next experiment
+is fractional image reuse during drag with a sharp vector redraw on release;
+that changes the in-motion fidelity contract and is not implemented or accepted.
 
 ### Adapter identification and callback-paced mode
 
@@ -101,7 +203,7 @@ intervals between callbacks. Presentation/playback tracing is the next diagnosti
 step before selecting a retained-layer optimization. This run does not identify
 a GPU saturation or driver defect, and does not measure displayed FPS.
 
-Actual GPU/playback/display timing is **blocked, not measured**. The pinned
+Before the external capture below, GPU/playback/display timing was blocked. The pinned
 Skiko analytics interfaces expose initialization events, not per-frame present
 completion. JFR native stack sampling does not supply those durations. WPR is
 installed, but PresentMon is not on PATH. The current Windows token is neither
@@ -114,9 +216,190 @@ To finish step 1, the user must run a standalone PresentMon capture from an
 elevated terminal (or arrange Performance Log Users access). Keep the application
 and VS Code unprivileged. Correlate the capture with the benchmark PID and measured
 pass intervals, distinguishing the native map swapchain from other UI windows;
-exclude setup, warmup, and renderer switches. Per-pass trace time markers and
-capture analysis still need to be added before reporting presentation results.
+exclude setup, warmup, and renderer switches. The benchmark now writes
+`pass-windows.csv` with PID, repeat, scene, motion, renderer, measured start UTC,
+and last acknowledged callback UTC. Each pass brackets an `Instant.now()` reading
+with monotonic readings and maps callback times from their midpoint; the recorded
+`clock_bracket_ns` describes that sampling bracket, not total wall-clock accuracy.
+These are callback workload boundaries, not final-presentation boundaries. Account
+for trailing native playback/presents separately and do not silently include the
+next renderer's work. PresentMon `--date_time` output must be normalized to UTC
+before joining. Capture analysis and runtime verification of these markers remain
+pending; the instrumentation compiles with `:MekHQ:compileSkikoStressJava`.
+
+The user has prepared a separate elevated PowerShell terminal. Installed collector:
+`C:\Program Files\Intel\PresentMon\PresentMonConsoleApplication\PresentMon-2.5.1-x64.exe`.
+Its `--help` confirms `--process_name`, `--date_time`, `--v2_metrics`,
+`--no_track_input`, `--timed`, and `--terminate_after_timed` support. Start capture
+before launching the benchmark, then filter Java process rows by its recorded PID
+and swapchain. Leave GPU/display tracking enabled and retain dropped frames.
 Do not claim step 1 is complete or proceed to retained-layer conclusions yet.
+
+### First external PresentMon capture: diagnostic only
+
+Benchmark `20260914-215556` completed eight cartography/HPG detail-pan passes,
+two opposite renderer orders, 240 callbacks per pass, PID 35044. All native passes
+reported Direct3D on Intel(R) Graphics. The new pass-window timestamps were written
+for all eight passes; clock sampling brackets ranged from 6.1 to 25.1 microseconds.
+Capture `presentmon-20260914-215455.csv` contains 1,286 rows, all for that PID,
+across four DXGI swapchains consistent with the four newly created native surfaces.
+No Java2D presentation rows were captured. That absence does not identify Java2D's
+pipeline or establish that Java2D rendering is entirely CPU-based.
+
+The user reported **1,277 lost ETW events** when stopping the collector. Their
+timing is unknown; do not treat any pass as loss-free or missing display values as
+proven dropped frames. This capture is not an accepted displayed-FPS comparison.
+
+PresentMon 2.5.1's live `--date_time` conversion also applies the local offset twice:
+`PMTraceSession::Start` stores a local FILETIME and `TimestampToLocalSystemTime`
+converts it to local time again. See the pinned
+[source](https://github.com/GameTechDev/PresentMon/blob/v2.5.1/PresentData/PresentMonTraceSession.cpp).
+The verified offset for this capture is UTC-7; printed times were corrected by
+adding 14 hours to obtain UTC, not by ordinary local-to-UTC conversion alone.
+Future captures should use QPC timestamps with a bracketed QPC/UTC anchor instead.
+
+For provisional diagnosis, select frames with corrected CPU start at least 100 ms
+after measured start and CPU start plus `CPUBusy` at least 100 ms before the last
+callback. Each native interval selects exactly one swapchain. Results below are
+medians across rows, with ranges spanning the two repeats; all values are ms.
+
+| Native scene | Rows per repeat | Frame time | GPU busy | GPU latency | Present CPU wait |
+| --- | --- | --- | --- | --- | --- |
+| Cartography | 231 / 233 | 22.01-22.71 | 4.86-4.92 | 16.92-17.47 | 0.097-0.099 |
+| HPG | 234 / 234 | 33.78-34.32 | 6.58-7.04 | 27.03-27.40 | 0.112-0.113 |
+
+These metrics suggest investigating work or delay before GPU execution rather
+than assuming GPU saturation. `GPULatency` includes CPU generation/submission and
+queue delay; `CPUBusy` is not thread CPU utilization. They do not isolate native
+playback, fence waits, or vsync, and differences of medians do not form a timing
+breakdown. HPG has 2 / 3 rows with unknown display timing inside these windows.
+ETW loss and hardware-scheduling accuracy caveats prevent firm attribution. The
+same-run JFR summary invocation returned no results and adds no new evidence.
+Next: a quiet-console, QPC-correlated capture with no reported ETW loss, plus
+independent identification of Java2D's active pipeline. Step 1 remains incomplete.
+
+### QPC retry and synchronized native submission
+
+Benchmark `20260914-220441` repeated the same eight passes successfully, PID 7876,
+with Intel Direct3D unchanged. Capture `presentmon-20260914-220401.csv` used
+`--qpc_time --no_console_stats` and its companion `-clock.json` stores a bracketed
+Stopwatch QPC/UTC anchor. The user reported **308 lost ETW events** on stop, so this
+retry also fails the loss-free capture criterion. Do not infer that quiet console
+output caused the reduction or keep repeating this unchanged capture procedure.
+
+The anchor bracket is 2.0675 ms. A later independent QPC/UTC reading agreed within
+0.6514 ms. PowerShell automatically parses the JSON UTC value as `System.DateTime`;
+preserve it with `([datetimeoffset]$anchor.utc).UtcDateTime`. Passing that typed value
+through `DateTimeOffset.Parse` first coerces it to text and lost fractional seconds
+in this environment. Initial misaligned summaries from that parser error were
+discarded. No actual system clock jump was established.
+
+With the corrected anchor and the same 100 ms boundary guards, the 1,286 PID rows
+resolve to four native swapchains and no Java2D rows inside measured intervals.
+Each guarded native pass uses exactly one swapchain. Provisional medians (ms):
+
+| Native scene | Rows per repeat | Frame time | GPU busy | GPU latency | Present CPU wait |
+| --- | --- | --- | --- | --- | --- |
+| Cartography | 231 / 231 | 21.57-21.86 | 4.25-4.65 | 17.19-17.38 | 0.096-0.098 |
+| HPG | 235 / 235 | 36.79-37.58 | 8.51-8.55 | 28.26-29.06 | 0.109-0.121 |
+
+Both HPG intervals contain two unknown display rows; cartography contains none.
+Event loss prevents interpreting these as complete dropped-frame statistics or
+reporting accepted displayed FPS. Hardware scheduling accuracy is not verified.
+
+The same-run streaming JFR summary completed. Across the entire recording,
+including setup/warmup, native method sample counts on the Skiko dispatcher were
+472 in `Direct3DContextHandler.flush`, 124 in `CanvasKt._nDrawPicture`, and 3 in
+`Direct3DRedrawer.swap`. These are samples, not method durations or CPU utilization.
+Java2D samples include Marlin rasterization and software transform/blit loops;
+that identifies some CPU rendering work, not the complete active display pipeline.
+
+Pinned Skiko 0.150.1
+[native flush source](https://github.com/JetBrains/skiko/blob/v0.150.1/skiko/src/awtMain/cpp/windows/direct3DContext.cc)
+calls `context->flush(surface, ...); context->submit(GrSyncCpu::kYes);` on each
+flush. Thus this stage explicitly requests synchronous CPU/GPU completion, and
+its sampled time can include both flush work and waiting. A short PresentMon
+`CPUWait` does not rule out waiting here before the Present call. This is a concrete
+reason to instrument playback and synchronized submission separately, not proof
+that synchronization alone explains the regression. Do not change the flag
+without checking buffer lifetime and fence requirements.
+
+Recommended next measurement is direct timing of those native stages (or a trace
+with CPU stacks and GPU queues) plus Java2D pipeline identification. Keep the
+Intel baseline; no GPU preference, vsync, renderer, or dependency change was made.
+Step 1 is still incomplete, and no retained-layer optimization is selected yet.
+
+### Direct stage timing
+
+Run `20260914-221208` completed eight instrumented cartography/HPG detail-pan passes
+with 240 callbacks each at 1018 x 549 logical pixels. All native passes remained on
+Intel Direct3D. The benchmark-only Byte Buddy 1.17.7 startup agent successfully
+transformed the three intended classes. It times the existing
+`SkiaLayer.draw$skiko(Canvas)` playback wrapper and
+`Direct3DContextHandler.flush(LayerDrawScope)` synchronized native-flush wrapper;
+it does not replace calls, alter synchronization, or rebuild the native library.
+
+`mekhq.SkikoStage` duration events and `mekhq.MapMeasuredPass` intervals share JFR's
+clock. The analyzer includes only stages fully within a measured pass, with 100 ms
+guards at both ends, and rejects reported `jdk.DataLoss`, failed stages, or missing
+expected stage names. It found 2,588 stage events and eight pass intervals, with
+no reported JFR data loss. Unlike the preceding ETW captures, these are direct
+method durations, not native sample-count estimates. They still are not displayed
+FPS or a measurement of GPU execution alone.
+
+| Scene | Stage | Count per repeat | Wall p50 (ms) | Wall p95 (ms) | Aggregate wall (ms) | Aggregate thread CPU (ms) |
+| --- | --- | --- | --- | --- | --- | --- |
+| Cartography | Playback | 233 / 233 | 3.14-3.33 | 4.39-4.55 | 765-802 | 594-781 |
+| Cartography | Synchronized flush | 232 / 233 | 16.63-18.33 | 30.18-32.13 | 3843-4034 | 2906-3219 |
+| HPG | Playback | 235 / 236 | 9.38-9.69 | 11.85-12.92 | 2223-2312 | 1891-2188 |
+| HPG | Synchronized flush | 235 / 235 | 23.29-24.56 | 40.04-40.71 | 5875-6013 | 4563-4672 |
+
+Ranges span two repeats, not confidence intervals. Boundary exclusion can yield
+different counts for sequential stages; do not add medians or treat those rows as
+paired frames. Thread CPU counters have coarse Windows granularity; aggregate
+values provide supporting evidence only. Wall minus thread CPU is not GPU wait:
+it can include scheduler delays and other blocking, while driver spinning counts
+as CPU time. Instrumentation and JFR add overhead; that overhead has not been
+isolated in a controlled paired run. In particular, instrumented HPG callback
+throughput was 21.0-23.2/sec, slower than the preceding separate capture run.
+
+The actual Java2D paint graphics reported `sun.awt.image.BufImgSurfaceData` and
+`BufferedImageGraphicsConfig`; the screen graphics reported
+`sun.java2d.windows.GDIWindowSurfaceData` and `sun.awt.Win32GraphicsConfig`.
+Together with prior Marlin/software-loop samples, this identifies the observed
+Java2D map as buffered-image rendering with GDI window output, not an observed
+Java2D Direct3D swapchain. Windows desktop composition may still use the GPU;
+this does not mean the entire display path is CPU-only. Surface inspection occurs
+once per pass, outside steady-state timing. The final diagnostic code persists
+the identities to `java2d-surfaces.txt`; this persistence follow-up compiled after
+the measured run, whose identities were observed in console output.
+
+To reproduce, select `SKIKO_PERF_SCENES=cartography,hpg`,
+`SKIKO_PERF_MOTIONS=detail-pan`, and `SKIKO_PERF_PACING=throughput`, preserving and
+restoring existing environment values. From the repository root:
+
+```powershell
+.\gradlew.bat :MekHQ:runSkikoMapSmoke -PskikoStageTiming --args=--performance
+java MekHQ/experimental/skiko/src/mekhq/gui/SkikoMapProfile.java MekHQ/build/skiko-perf/<run>/renderers.jfr --stages
+```
+
+The agent is packaged by `:MekHQ:skikoStageAgent`, attached only when the Gradle
+property is present, and opens `java.desktop/sun.java2d` only in that diagnostic
+process. Byte Buddy stays in the experimental configuration. Normal runtime and
+distributions are unchanged. `stages.csv` contains per-stage timestamps, thread,
+duration, and CPU delta, grouped by native measured pass. The final analyzer was
+rerun successfully with strict stage-name and JFR-loss checks; the final source
+and agent package compiled successfully. No unit suites or publication gates ran.
+
+Conclusion: expensive work exists in both playback and synchronized flush; simply
+assuming an idle CPU waiting on a saturated GPU is not supported. Removing the
+synchronous-submit flag is not justified by these timings. An exact three-way
+split of native flush, submission, and GPU-completion waiting requires additional
+native instrumentation; the packaged Java agent cannot see inside that JNI call.
+A bounded GPU-backed retained-cartography prototype is now a reasonable next
+optimization experiment to reduce repeated drawing and flush work, with Intel
+as the target. It is not implemented here. Clean displayed-FPS comparison and
+the internal native wait split remain outstanding; step 1 is only partially complete.
 
 ### Original timer-paced comparison
 

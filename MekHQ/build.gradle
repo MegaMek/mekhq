@@ -60,7 +60,17 @@ def skikoArch = System.getProperty('os.arch') in ['aarch64', 'arm64'] ? 'arm64' 
 dependencies {
     skikoStressImplementation "org.jetbrains.skiko:skiko-awt:${skikoVersion}"
     skikoStressImplementation 'org.jetbrains.kotlin:kotlin-stdlib:2.3.20'
+    skikoStressImplementation 'net.bytebuddy:byte-buddy:1.17.7'
     skikoStressRuntimeOnly "org.jetbrains.skiko:skiko-awt-runtime-${skikoPlatform}-${skikoArch}:${skikoVersion}"
+}
+
+def skikoStageAgent = tasks.register('skikoStageAgent', Jar) {
+    dependsOn tasks.named('compileSkikoStressJava')
+    archiveClassifier = 'skiko-stage-agent'
+    from(sourceSets.skikoStress.output) {
+        include 'mekhq/gui/SkikoStageAgent*.class'
+    }
+    manifest.attributes('Premain-Class': 'mekhq.gui.SkikoStageAgent')
 }
 
 tasks.register('runSkikoStress', JavaExec) {
@@ -171,6 +181,13 @@ tasks.register('runSkikoMapSmoke', JavaExec) {
     mainClass = 'mekhq.SkikoMapSmoke'
     workingDir = projectDir
     jvmArgs application.applicationDefaultJvmArgs
+    if (providers.gradleProperty('skikoStageTiming').isPresent()) {
+        dependsOn skikoStageAgent
+        jvmArgs '--add-opens=java.desktop/sun.java2d=ALL-UNNAMED'
+        doFirst {
+            jvmArgs "-javaagent:${skikoStageAgent.get().archiveFile.get().asFile.absolutePath}"
+        }
+    }
 }
 
 // Forward mekhq.* system properties set on the Gradle daemon (e.g. via IDEA Run Config "VM options",

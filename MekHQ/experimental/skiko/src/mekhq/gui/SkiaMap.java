@@ -44,6 +44,9 @@ import org.jetbrains.skia.BlendMode;
 import org.jetbrains.skia.ColorFilter;
 import org.jetbrains.skia.Color4f;
 import org.jetbrains.skia.FilterTileMode;
+import org.jetbrains.skia.FilterMode;
+import org.jetbrains.skia.Picture;
+import org.jetbrains.skia.PictureRecorder;
 import org.jetbrains.skia.Gradient;
 import org.jetbrains.skia.Shader;
 import org.jetbrains.skia.Font;
@@ -135,6 +138,77 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
     private int renderedAdministrativeBorders;
     private int territoryBuilds;
     private int renderedTerritories;
+    private final boolean motionCache = !"false".equals(System.getenv("SKIKO_MOTION_CACHE"));
+    private final boolean retainTerritories = motionCache || "true".equals(System.getenv("SKIKO_RETAIN_TERRITORIES"));
+    private boolean cameraMoving;
+    private final Timer cameraSettleTimer = new Timer(120, event -> finishCameraMotion());
+
+    public boolean isCameraMoving() {
+        return cameraMoving;
+    }
+
+    public void finishCameraMotion() {
+        requireEdt();
+        cameraSettleTimer.stop();
+        if (cameraMoving) {
+            cameraMoving = false;
+            requestRender();
+        }
+    }
+    private Picture retainedTerritoryPicture;
+    private final SkikoMotionLayer territoryMotion = new SkikoMotionLayer();
+    private final SkikoMotionLayer cartographyMotion = new SkikoMotionLayer();
+    private final SkikoMotionLayer systemMotion = new SkikoMotionLayer();
+    private Shader retainedTerritoryShader;
+    private Paint retainedTerritoryPaint;
+    private double retainedCenterX;
+    private double retainedCenterY;
+    private double retainedScale;
+    private int retainedWidth;
+    private int retainedHeight;
+    private double retainedGuiScale;
+    private float retainedContentScale;
+    private int retainedTerritoryBuilds;
+    private int retainedTerritoryHits;
+    private int retainedTerritoryFallbacks;
+    private int territoryRecordingMargin;
+
+    public String getRetainedTerritoryInfo() {
+          return "enabled=" + retainTerritories + " builds=" + getRetainedTerritoryBuilds()
+              + " hits=" + getRetainedTerritoryHits() + " fallbacks=" + retainedTerritoryFallbacks
+              + " motionCache=" + motionCache + " moving=" + cameraMoving
+              + " active=" + hasRetainedTerritories()
+              + " cartography=[" + cartographyMotion.info() + "] systems=[" + systemMotion.info() + "]";
+    }
+
+    public int getRetainedTerritoryBuilds() {
+        return retainedTerritoryBuilds + territoryMotion.builds();
+    }
+
+    public int getRetainedTerritoryHits() {
+        return retainedTerritoryHits + territoryMotion.hits();
+    }
+
+    public int getRetainedTerritoryFallbacks() {
+        return retainedTerritoryFallbacks;
+    }
+
+    public boolean hasRetainedTerritories() {
+        return retainedTerritoryPicture != null || territoryMotion.active();
+    }
+
+    public int getCartographyMotionBuilds() {
+        return cartographyMotion.builds();
+    }
+
+    public int getSystemMotionBuilds() {
+        return systemMotion.builds();
+    }
+
+    public boolean hasMotionLayers() {
+        return territoryMotion.active() || cartographyMotion.active() || systemMotion.active();
+    }
+
     private Paint emblemPaint;
     private final Map<String, Image> emblemImages = new HashMap<>();
     private final Set<String> missingEmblems = new HashSet<>();
@@ -276,6 +350,7 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         this.navigationActions = navigationActions;
         this.failureHandler = failureHandler;
         hoverTimer.setRepeats(false);
+        cameraSettleTimer.setRepeats(false);
         selectionTimer.setCoalesce(true);
         travelTimer.setCoalesce(true);
         addHierarchyListener(event -> {
@@ -364,6 +439,29 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
 
     public record LabelPlacement(String systemId, String text, Rect bounds, float baselineX, float baselineY,
           float alpha) {
+    }
+
+    public byte[] captureTerritoryPng(boolean retained, float displayScale) {
+        requireEdt();
+        if (layer == null || failed || !Float.isFinite(displayScale) || displayScale <= 0) {
+            throw new IllegalStateException("Territory snapshot unavailable");
+        }
+        updatePresentation();
+        try (Surface surface = Surface.Companion.makeRasterN32Premul(
+              (int) Math.ceil(getWidth() * displayScale), (int) Math.ceil(getHeight() * displayScale))) {
+            Canvas canvas = surface.getCanvas();
+            canvas.clear(BACKGROUND_COLOR);
+            canvas.scale(displayScale, displayScale);
+            if (retained) {
+                drawRetainedTerritories(canvas, displayScale);
+            } else {
+                drawTerritories(canvas);
+            }
+            try (Image image = surface.makeImageSnapshot();
+                  Data data = Objects.requireNonNull(image.encodeToData(EncodedImageFormat.PNG, 100, 0))) {
+                return data.getBytes();
+            }
+        }
     }
 
     public byte[] captureNativeStarPng(SystemPresentation data, int dimension) {
@@ -468,9 +566,15 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         }
         clearHover();
         boolean selectionChanged = !Objects.equals(this.state.selectedSystem(), state.selectedSystem());
+                if (motionCache && (this.state.centerX() != state.centerX() || this.state.centerY() != state.centerY()
+                            || this.state.scale() != InterstellarMapPanel.boundedMapScale(state.scale()))) {
+                        cameraMoving = true;
+                        cameraSettleTimer.restart();
+                }
         this.state = new ViewState(state.centerX(), state.centerY(),
               InterstellarMapPanel.boundedMapScale(state.scale()), state.selectedSystem());
         if (selectionChanged) {
+            systemMotion.close();
             stopSelectionAnimation();
             if (state.selectedSystem() != null && layer != null && isShowing()) {
                 selectionStarted = System.nanoTime();
@@ -503,12 +607,31 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
     public void refresh() {
         requireEdt();
         clearHover();
+        territoryMotion.close();
+        cartographyMotion.close();
+        systemMotion.close();
         updatePresentation();
         requestRender();
     }
 
     private void updatePresentation() {
         Presentation next = presentationSupplier.get();
+                if (presentation == null || presentation.territories() != next.territories()
+                            || !presentation.layers().equals(next.layers())
+                            || presentation.navigation().hpgNetwork() != next.navigation().hpgNetwork()
+                            || presentation.labelZoomReference() != next.labelZoomReference()) {
+                        cartographyMotion.close();
+                        territoryMotion.close();
+                }
+                if (presentation == null || presentation.systems() != next.systems()
+                            || presentation.mapMode() != next.mapMode()
+                            || presentation.showEmptySystems() != next.showEmptySystems()
+                            || presentation.labelZoomReference() != next.labelZoomReference()
+                            || !presentation.systemStyle().equals(next.systemStyle())
+                            || !presentation.routeSystemIds().equals(next.routeSystemIds())
+                            || !Objects.equals(presentation.routes().currentSystem(), next.routes().currentSystem())) {
+                        systemMotion.close();
+                }
         if (presentation != null) {
             updateTravelState(presentation.routes(), next.routes());
         }
@@ -635,6 +758,8 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
     @Override
     public void removeNotify() {
         requireEdt();
+        cameraSettleTimer.stop();
+        cameraMoving = false;
         stopSelectionAnimation();
         focusPlacements = List.of();
         stopTravelAnimation();
@@ -666,6 +791,7 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
             navigationBounds.clear();
             routeLegPlacements.clear();
             clearTerritories();
+            systemMotion.close();
             clearEmblems();
             if (emblemPaint != null) {
                 emblemPaint.close();
@@ -758,20 +884,23 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
             canvas.clear(BACKGROUND_COLOR);
             canvas.scale(layer.getContentScale(), layer.getContentScale());
             updatePresentation();
-            drawTerritories(canvas);
-            drawAdministrativeBorders(canvas);
-            drawEmblems(canvas);
-            drawHpgLinks(canvas);
+            drawCartography(canvas, layer.getContentScale());
             drawJumpRadius(canvas);
             routeLegPlacements.clear();
             activeLegs = drawRouteLines(canvas, presentation.routes().active(), true);
             plannedLegs = drawRouteLines(canvas, presentation.routes().planned(), false);
+            boolean retainedSystems = motionCache && cameraMoving;
+            if (retainedSystems) {
+                systemMotion.draw(canvas, state, getWidth(), getHeight(), layer.getContentScale(),
+                      UIUtil.scaleForGUI(128), 0, this::drawSystemArtwork);
+            }
             int visibleStars = 0;
             var zoom = InterstellarMapPanel.SemanticZoomProfile.create(state.scale(), presentation.labelZoomReference());
             List<SystemPlacement> drawnSystems = new ArrayList<>();
             List<SystemPresentation> visible = new ArrayList<>();
             List<Rect> markerBounds = new ArrayList<>();
             List<String> renderedIds = new ArrayList<>();
+            float overscan = UIUtil.scaleForGUI(32);
             for (SystemPresentation data : presentation.systems()) {
                 PlanetarySystem system = data.system();
                 if (!isVisible(data)) {
@@ -779,12 +908,12 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
                 }
                 float horizontal = screenX(system);
                 float vertical = screenY(system);
-                float radius = systemArtRadius(system);
+                float radius = systemArtRadius(system) + overscan;
                 if ((horizontal < -radius) || (horizontal > getWidth() + radius)
                       || (vertical < -radius) || (vertical > getHeight() + radius)) {
                     continue;
                 }
-                    drawnSystems.add(drawStar(canvas, data, horizontal, vertical, zoom));
+                    drawnSystems.add(drawStar(retainedSystems ? null : canvas, data, horizontal, vertical, zoom));
                     visible.add(data);
                     renderedIds.add(system.getId());
                     float markerRadius = markerRadius(system);
@@ -806,7 +935,7 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
             drawFocusMarkers(canvas);
             drawHpgStations(canvas, markerBounds);
             drawLandmarks(canvas, visible, markerBounds);
-            drawLabels(canvas, visible, markerBounds);
+            drawLabels(canvas, visible);
             drawMeasurement(canvas);
             hoverBounds = null;
             if (hoverVisible && hoverPoint != null && !hoverText.isBlank()) {
@@ -828,6 +957,7 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
     }
 
     private void clearTerritories() {
+        clearRetainedTerritories();
         for (NativeTerritory territory : territories) {
             territory.path().close();
             activeTerritoryPaths--;
@@ -839,6 +969,45 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         }
         administrativeBorders.clear();
         territorySource = null;
+    }
+
+    private void drawCartography(Canvas canvas, float contentScale) {
+        prepareTerritories();
+        if (motionCache && cameraMoving) {
+            cartographyMotion.draw(canvas, state, getWidth(), getHeight(), contentScale, UIUtil.scaleForGUI(128),
+                  BACKGROUND_COLOR, (recording, margin) -> {
+                      territoryRecordingMargin = margin;
+                      try {
+                          drawTerritories(recording);
+                          drawAdministrativeBorders(recording);
+                          drawEmblems(recording);
+                          drawHpgLinks(recording);
+                      } finally {
+                          territoryRecordingMargin = 0;
+                      }
+                  });
+        } else {
+            drawRetainedTerritories(canvas, contentScale);
+            drawAdministrativeBorders(canvas);
+            drawEmblems(canvas);
+            drawHpgLinks(canvas);
+        }
+    }
+
+    private void drawSystemArtwork(Canvas canvas, int margin) {
+        var zoom = InterstellarMapPanel.SemanticZoomProfile.create(state.scale(), presentation.labelZoomReference());
+        for (SystemPresentation data : presentation.systems()) {
+            if (!isVisible(data)) {
+                continue;
+            }
+            float horizontal = screenX(data.system());
+            float vertical = screenY(data.system());
+            float radius = systemArtRadius(data.system()) + margin + UIUtil.scaleForGUI(32);
+            if (horizontal >= -radius && horizontal <= getWidth() + radius
+                  && vertical >= -radius && vertical <= getHeight() + radius) {
+                drawStar(canvas, data, horizontal, vertical, zoom);
+            }
+        }
     }
 
     private void prepareTerritories() {
@@ -890,8 +1059,10 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         }
         float scale = (float) state.scale();
         float unit = (float) UIUtil.scaleForGUI(1) / scale;
-        Rectangle2D viewport = new Rectangle2D.Double(state.centerX() - getWidth() / (2.0 * scale),
-              state.centerY() - getHeight() / (2.0 * scale), getWidth() / scale, getHeight() / scale);
+          double halfWidth = (getWidth() / 2.0 + territoryRecordingMargin) / scale;
+          double halfHeight = (getHeight() / 2.0 + territoryRecordingMargin) / scale;
+          Rectangle2D viewport = new Rectangle2D.Double(state.centerX() - halfWidth,
+              state.centerY() - halfHeight, 2 * halfWidth, 2 * halfHeight);
         try (PathEffect dash = PathEffect.Companion.makeDash(new float[] { 4 * unit, 5 * unit }, 0)) {
             canvas.save();
             try {
@@ -983,8 +1154,10 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
             int size = InterstellarMapPanel.resolveLogoSize(desired, minimum, maximum);
             float horizontal = (float) (getWidth() / 2.0 + (emblem.anchorX() - state.centerX()) * state.scale());
             float vertical = (float) (getHeight() / 2.0 - (emblem.anchorY() - state.centerY()) * state.scale());
-            if (size < minimum || horizontal + size / 2f < 0 || horizontal - size / 2f > getWidth()
-                  || vertical + size / 2f < 0 || vertical - size / 2f > getHeight()) {
+            if (size < minimum || horizontal + size / 2f < -territoryRecordingMargin
+                || horizontal - size / 2f > getWidth() + territoryRecordingMargin
+                || vertical + size / 2f < -territoryRecordingMargin
+                || vertical - size / 2f > getHeight() + territoryRecordingMargin) {
                 continue;
             }
             Image image = getEmblemImage(emblem.imagePath());
@@ -1040,6 +1213,123 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         emblemPlacements = List.copyOf(accepted);
     }
 
+    private void clearRetainedTerritories() {
+        territoryMotion.close();
+        cartographyMotion.close();
+        if (retainedTerritoryPaint != null) {
+            retainedTerritoryPaint.close();
+            retainedTerritoryPaint = null;
+        }
+        if (retainedTerritoryShader != null) {
+            retainedTerritoryShader.close();
+            retainedTerritoryShader = null;
+        }
+        if (retainedTerritoryPicture != null) {
+            retainedTerritoryPicture.close();
+            retainedTerritoryPicture = null;
+        }
+    }
+
+    private void drawRetainedTerritories(Canvas canvas, float contentScale) {
+        if (motionCache) {
+            prepareTerritories();
+            if (!presentation.layers().territories()) {
+                clearRetainedTerritories();
+            }
+            if (!cameraMoving || !presentation.layers().territories()) {
+                drawTerritories(canvas);
+            } else {
+                territoryMotion.draw(canvas, state, getWidth(), getHeight(), contentScale, UIUtil.scaleForGUI(128),
+                      BACKGROUND_COLOR, (recording, margin) -> {
+                          territoryRecordingMargin = margin;
+                          try {
+                              drawTerritories(recording);
+                          } finally {
+                              territoryRecordingMargin = 0;
+                          }
+                      });
+            }
+            return;
+        }
+        if (!retainTerritories) {
+            drawTerritories(canvas);
+            return;
+        }
+        prepareTerritories();
+        int margin = UIUtil.scaleForGUI(128);
+        double pixelWidth = Math.ceil((getWidth() + 2.0 * margin) * contentScale);
+        double pixelHeight = Math.ceil((getHeight() + 2.0 * margin) * contentScale);
+        if (!presentation.layers().territories()
+              || pixelWidth * pixelHeight > 2048.0 * 2048) {
+            clearRetainedTerritories();
+            drawTerritories(canvas);
+            return;
+        }
+        float horizontal = (float) ((retainedCenterX - state.centerX()) * state.scale());
+        float vertical = (float) ((state.centerY() - retainedCenterY) * state.scale());
+        double guiScale = UIUtil.scaleForGUI(1f);
+                  if (retainedTerritoryPicture == null || retainedScale != state.scale()
+              || retainedWidth != getWidth() || retainedHeight != getHeight()
+              || retainedGuiScale != guiScale || retainedContentScale != contentScale
+                      || Math.abs(horizontal) > margin - 2 || Math.abs(vertical) > margin - 2) {
+            clearRetainedTerritories();
+                    Rect bounds = Rect.makeXYWH(0, 0, getWidth() + 2f * margin, getHeight() + 2f * margin);
+            try (PictureRecorder recorder = new PictureRecorder()) {
+                Canvas recordingCanvas = recorder.beginRecording(bounds, null);
+                recordingCanvas.clear(BACKGROUND_COLOR);
+                recordingCanvas.translate(margin, margin);
+                territoryRecordingMargin = margin;
+                try {
+                    drawTerritories(recordingCanvas);
+                } finally {
+                    territoryRecordingMargin = 0;
+                }
+                retainedTerritoryPicture = recorder.finishRecordingAsPicture();
+                if (renderedTerritories > 0 && retainedTerritoryPicture.getApproximateOpCount() == 0) {
+                    throw new IllegalStateException("Empty retained territory recording: territories=" + renderedTerritories
+                          + " bounds=" + retainedTerritoryPicture.getCullRect());
+                }
+                Method factory = Picture.class.getMethod("makeShader-juH9G2M", FilterTileMode.class,
+                      FilterTileMode.class, FilterMode.class, float[].class, Rect.class);
+                retainedTerritoryShader = (Shader) factory.invoke(retainedTerritoryPicture,
+                        FilterTileMode.CLAMP, FilterTileMode.CLAMP, FilterMode.LINEAR, null, null);
+                retainedTerritoryPaint = new Paint();
+                retainedTerritoryPaint.setShader(retainedTerritoryShader);
+            } catch (ReflectiveOperationException exception) {
+                clearRetainedTerritories();
+                throw new IllegalStateException("Pinned Skiko picture shader API unavailable", exception);
+            }
+            retainedCenterX = state.centerX();
+            retainedCenterY = state.centerY();
+            retainedScale = state.scale();
+            retainedWidth = getWidth();
+            retainedHeight = getHeight();
+            retainedGuiScale = guiScale;
+            retainedContentScale = contentScale;
+            retainedTerritoryBuilds++;
+            horizontal = 0;
+            vertical = 0;
+        } else {
+            double deviceHorizontal = horizontal * (double) contentScale;
+            double deviceVertical = vertical * (double) contentScale;
+            if (!motionCache && (Math.abs(deviceHorizontal - Math.rint(deviceHorizontal)) > 0.0001
+                || Math.abs(deviceVertical - Math.rint(deviceVertical)) > 0.0001)) {
+                retainedTerritoryFallbacks++;
+                drawTerritories(canvas);
+                return;
+            }
+            retainedTerritoryHits++;
+        }
+        canvas.save();
+        try {
+            canvas.translate(horizontal - margin, vertical - margin);
+            canvas.drawRect(Rect.makeXYWH(margin - horizontal, margin - vertical, getWidth(), getHeight()),
+                retainedTerritoryPaint);
+        } finally {
+            canvas.restore();
+        }
+    }
+
     private void drawTerritories(Canvas canvas) {
         prepareTerritories();
         renderedTerritories = 0;
@@ -1047,8 +1337,8 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
             return;
         }
         float scale = (float) state.scale();
-        double halfWidth = getWidth() / (2.0 * scale);
-        double halfHeight = getHeight() / (2.0 * scale);
+        double halfWidth = (getWidth() / 2.0 + territoryRecordingMargin) / scale;
+        double halfHeight = (getHeight() / 2.0 + territoryRecordingMargin) / scale;
         Rectangle2D viewport = new Rectangle2D.Double(state.centerX() - halfWidth,
               state.centerY() - halfHeight, halfWidth * 2, halfHeight * 2);
         var profile = InterstellarMapPanel.TerritoryVisualProfile.create(scale);
@@ -1450,7 +1740,8 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
               presentation.labelZoomReference());
         float unit = UIUtil.scaleForGUI(1);
         List<HpgLinkPlacement> placements = new ArrayList<>();
-        var viewport = new Rectangle2D.Float(-2 * unit, -2 * unit, getWidth() + 4 * unit, getHeight() + 4 * unit);
+        float padding = 2 * unit + territoryRecordingMargin;
+        var viewport = new Rectangle2D.Float(-padding, -padding, getWidth() + 2 * padding, getHeight() + 2 * padding);
         var segment = new java.awt.geom.Line2D.Float();
           try (Paint paint = createRoutePaint(0, 1)) {
             for (var link : network.links()) {
@@ -2111,6 +2402,11 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         float auraRadius = (float) (Math.max(UIUtil.scaleForGUI(2), size * 1.65) * data.star().luminosityScale());
         float coreRadius = (float) (Math.max(UIUtil.scaleForGUI(0.65f), size * 0.3) * data.star().luminosityScale());
         boolean navigationContact = isNavigationContact(data);
+        if (canvas == null) {
+            return new SystemPlacement(data.system().getId(), systemArtRadius(data.system()),
+                  navigationContact ? 1 : contactAlpha, navigationContact ? 0 : detailAlpha,
+                  navigationContact, data.star().spectralColor(), auraRadius, coreRadius);
+        }
         starPaint.setShader(null);
         starPaint.setMode(PaintMode.FILL);
         if (navigationContact) {
@@ -2207,34 +2503,8 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         }
     }
 
-    private void drawLabels(Canvas canvas, List<SystemPresentation> visible, List<Rect> markers) {
+    private void drawLabels(Canvas canvas, List<SystemPresentation> visible) {
         List<LabelPlacement> placed = new ArrayList<>();
-        List<Rect> priorityMarkers = new ArrayList<>();
-        priorityMarkers.addAll(navigationBounds);
-        for (HpgStationPlacement station : hpgStationPlacements) {
-            priorityMarkers.add(station.bounds());
-        }
-        for (ReachabilityPlacement marker : reachabilityPlacements) {
-            priorityMarkers.add(marker.bounds());
-            if (marker.shellBounds() != null) {
-                priorityMarkers.add(marker.shellBounds());
-            }
-        }
-        if (reachabilityAnnotationBounds != null) {
-            priorityMarkers.add(reachabilityAnnotationBounds);
-        }
-        for (LandmarkPlacement landmark : landmarkPlacements) {
-            priorityMarkers.add(landmark.bounds());
-        }
-        for (SystemPresentation data : visible) {
-            if (Objects.equals(data.system(), state.selectedSystem())
-                || Objects.equals(data.system(), campaign.getCurrentSystem())
-                || Objects.equals(data.system(), hoveredSystem)) {
-                float radius = markerRadius(data.system());
-                priorityMarkers.add(Rect.makeLTRB(screenX(data.system()) - radius, screenY(data.system()) - radius,
-                      screenX(data.system()) + radius, screenY(data.system()) + radius));
-            }
-        }
         InterstellarMapPanel.SemanticZoomProfile zoom = InterstellarMapPanel.SemanticZoomProfile.create(
               state.scale(), presentation.labelZoomReference());
         for (int priority = 0; priority < 5; priority++) {
@@ -2251,7 +2521,7 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
                 if (alpha <= 0) {
                     continue;
                 }
-                LabelPlacement label = placeLabel(data, alpha, priority < 2 ? priorityMarkers : markers, placed);
+                LabelPlacement label = placeLabel(data, alpha);
                 if (label != null) {
                     placed.add(label);
                     if (priority < 2) {
@@ -2268,8 +2538,7 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         labels = List.copyOf(placed);
     }
 
-    private LabelPlacement placeLabel(SystemPresentation data, float alpha, List<Rect> markers,
-          List<LabelPlacement> placed) {
+    private LabelPlacement placeLabel(SystemPresentation data, float alpha) {
         float padding = UIUtil.scaleForGUI(2);
         String name = data.name();
         Rect ink = textMeasurements.computeIfAbsent(name, text -> labelFont.measureText(text, textPaint));
@@ -2280,41 +2549,11 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
         float height = ink.getHeight() + 2 * padding;
         float horizontal = screenX(data.system());
         float vertical = screenY(data.system());
-        float gap = Math.max(UIUtil.scaleForGUI(10), markerRadius(data.system()) + UIUtil.scaleForGUI(2));
-        for (int candidate = 0; candidate < 4; candidate++) {
-            float left = switch (candidate) {
-                case 0 -> horizontal + gap;
-                case 1 -> horizontal - gap - width;
-                default -> horizontal - width / 2;
-            };
-            float top = switch (candidate) {
-                case 2 -> vertical - gap - height;
-                case 3 -> vertical + gap;
-                default -> vertical - height / 2;
-            };
-            Rect bounds = Rect.makeLTRB(left, top, left + width, top + height);
-            if ((left < 0) || (top < 0) || (bounds.getRight() > getWidth()) || (bounds.getBottom() > getHeight())) {
-                continue;
-            }
-            boolean collision = false;
-            for (Rect marker : markers) {
-                if (overlaps(bounds, marker)) {
-                    collision = true;
-                    break;
-                }
-            }
-            for (LabelPlacement label : placed) {
-                if (overlaps(bounds, label.bounds())) {
-                    collision = true;
-                    break;
-                }
-            }
-            if (!collision) {
-                return new LabelPlacement(data.system().getId(), name, bounds,
-                      left + padding - ink.getLeft(), top + padding - ink.getTop(), alpha);
-            }
-        }
-        return null;
+        float left = horizontal + UIUtil.scaleForGUI(16);
+        float top = vertical - height / 2;
+        Rect bounds = Rect.makeLTRB(left, top, left + width, top + height);
+        return new LabelPlacement(data.system().getId(), name, bounds,
+              left + padding - ink.getLeft(), top + padding - ink.getTop(), alpha);
     }
 
     private static boolean overlaps(Rect first, Rect second) {
@@ -2362,6 +2601,7 @@ public final class SkiaMap extends JPanel implements ExperimentalMapView {
 
             @Override
             public void mouseReleased(MouseEvent event) {
+                finishCameraMotion();
                 if (event.isPopupTrigger() || SwingUtilities.isRightMouseButton(event)) {
                     if (!popupTriggered) {
                         showNavigationPopup(position(event));
