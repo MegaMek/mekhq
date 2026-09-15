@@ -148,8 +148,7 @@ class ActionCheckTest {
         assertTrue(result.isSuccess());
         assertFalse(result.hasUsedEdge());
         assertEquals(8, result.getRollResult());
-        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"warning\"><b>Passed</b></span> his <b>Action</b> " +
-                           "check with a roll of <b>8</b> vs. a target number of <b>7</b>.",
+        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"warning\"><b>Passed</b></span> his <b>Action</b> check with a roll of <b>8</b> vs. a target number of <b>7</b>. <span color='warning'><i>It'll do...</i></span>",
               result.getReport().replace(person.getId().toString(), "link")
                     .replace(ReportingUtilities.getWarningColor(), "warning"));
     }
@@ -164,8 +163,7 @@ class ActionCheckTest {
         assertFalse(result.isSuccess());
         assertFalse(result.hasUsedEdge());
         assertEquals(5, result.getRollResult());
-        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"warning\"><b>Failed</b></span> his <b>Action</b> " +
-                           "check with a roll of <b>5</b> vs. a target number of <b>7</b>.",
+        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"warning\"><b>Failed</b></span> his <b>Action</b> check with a roll of <b>5</b> vs. a target number of <b>7</b>. <span color='warning'><i>Almost...</i></span>",
               result.getReport().replace(person.getId().toString(), "link")
                     .replace(ReportingUtilities.getWarningColor(), "warning"));
     }
@@ -180,8 +178,7 @@ class ActionCheckTest {
 
         assertFalse(result.isSuccess());
         assertFalse(result.hasUsedEdge());
-        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"warning\"><b>Failed</b></span> his <b>Action</b> " +
-                           "check with a roll of <b>5</b> vs. a target number of <b>7</b>.",
+        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"warning\"><b>Failed</b></span> his <b>Action</b> check with a roll of <b>5</b> vs. a target number of <b>7</b>. <span color='warning'><i>Almost...</i></span>",
               result.getReport().replace(person.getId().toString(), "link")
                     .replace(ReportingUtilities.getWarningColor(), "warning"));
     }
@@ -211,8 +208,7 @@ class ActionCheckTest {
         assertTrue(result.hasUsedEdge());
         assertEquals(9, result.getRollResult());
         verify(person).spendEdge();
-        assertEquals("Person <span color=\"warning\"><b>Passed</b></span> her <b>Action</b> check with a roll of " +
-                           "<b>9</b> vs. a target number of <b>7</b>. Used a point of <b>Edge</b>.",
+        assertEquals("Person <span color=\"warning\"><b>Passed</b></span> her <b>Action</b> check with a roll of <b>9</b> vs. a target number of <b>7</b>. Used a point of <b>Edge</b>. <span color='warning'><i>It'll do...</i></span>",
               result.getReport().replace(ReportingUtilities.getWarningColor(), "warning"));
     }
 
@@ -231,8 +227,7 @@ class ActionCheckTest {
         assertTrue(result.hasUsedEdge());
         assertEquals(6, result.getRollResult());
         verify(person).spendEdge();
-        assertEquals("Person <span color=\"warning\"><b>Failed</b></span> his <b>Action</b> check with a roll of " +
-                           "<b>6</b> vs. a target number of <b>7</b>. Used a point of <b>Edge</b>.",
+        assertEquals("Person <span color=\"warning\"><b>Failed</b></span> his <b>Action</b> check with a roll of <b>6</b> vs. a target number of <b>7</b>. Used a point of <b>Edge</b>. <span color='warning'><i>Almost...</i></span>",
               result.getReport().replace(ReportingUtilities.getWarningColor(), "warning"));
     }
 

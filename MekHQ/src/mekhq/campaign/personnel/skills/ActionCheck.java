@@ -287,6 +287,10 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
               MARGIN_OF_SUCCESS_MIN, MARGIN_OF_SUCCESS_MAX);
         String resultsText = generateResultsText(roll.result(), marginOfSuccess, reason, rollType);
 
+        if (logResult) {
+            LOGGER.info(resultsText);
+        }
+
         return new ActionCheckResult(roll, marginOfSuccess, usedEdge, resultsText);
     }
 

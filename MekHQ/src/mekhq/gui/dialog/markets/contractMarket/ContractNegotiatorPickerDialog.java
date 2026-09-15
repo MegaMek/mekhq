@@ -377,7 +377,8 @@ public class ContractNegotiatorPickerDialog extends JDialog {
 
         SkillModifierData skillModifierData = person.getSkillModifierData();
         int skillLevel = skill.getTotalSkillLevel(skillModifierData);
-        String target = skill.toString(skillModifierData);
+        String target = skill.getSkillTargetNumber(skillModifierData, 0);
+
         return "<b>" + getTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.detail.skill.label") + "</b> "
                      + getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.detail.skill.value",
               skillLevel, target);
@@ -410,7 +411,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
             return getTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.skill.none");
         }
         SkillModifierData skillModifierData = person.getSkillModifierData();
-        String target = skill.toString(skillModifierData);
+        String target = skill.getSkillTargetNumber(skillModifierData, 0);
         return getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.skill", target);
     }
 

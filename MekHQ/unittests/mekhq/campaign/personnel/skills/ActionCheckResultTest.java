@@ -52,7 +52,7 @@ class ActionCheckResultTest {
         assertEquals(3, result.getRollResult());
         assertEquals(1, result.getMarginOfSuccess());
         assertFalse(result.hasUsedEdge());
-        assertEquals("Success.", result.getReport());
+        assertEquals("Success. <span color='#ffc800'><i>It'll do...</i></span>", result.getReport());
         assertEquals("Success. <span color='warning'><i>It'll do...</i></span>",
               result.getReport().replace(ReportingUtilities.getWarningColor(), "warning"));
     }
@@ -63,7 +63,7 @@ class ActionCheckResultTest {
         assertEquals(8, result.getRollResult());
         assertEquals(2, result.getMarginOfSuccess());
         assertTrue(result.hasUsedEdge());
-        assertEquals("Success. Used a point of <b>Edge</b>.", result.getReport());
+        assertEquals("Success. Used a point of <b>Edge</b>. <span color='#ffc800'><i>It'll do...</i></span>", result.getReport());
         assertEquals("Success. Used a point of <b>Edge</b>. <span color='warning'><i>It'll do...</i></span>",
               result.getReport().replace(ReportingUtilities.getWarningColor(), "warning"));
     }
