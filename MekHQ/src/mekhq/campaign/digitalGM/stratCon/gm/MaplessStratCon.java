@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.gm;
 
-import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
-
 import java.util.Map;
 
 import megamek.common.annotations.Nullable;
@@ -43,12 +41,9 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.gui.StratConPanel;
-import mekhq.gui.stratCon.deployment.StratConDeploymentWizard;
 
 
 /**
@@ -173,31 +168,12 @@ public class MaplessStratCon {
             return;
         }
 
-        // We're going to use these values a lot, so we're going to unpack them from the deploymentContext Record
-        StratConCampaignState campaignState = deploymentContext.campaignState;
-        StratConScenario stratConScenario = deploymentContext.stratConScenario;
-
         stratConPanel.setCurrentTrack(deploymentContext.trackState);
         stratConPanel.setSelectedCoords(deploymentContext.scenarioCoords);
 
-        AtBDynamicScenario backingScenario = stratConScenario.getBackingScenario();
-        boolean assignToScenario = false;
-        boolean restrictToSingleForce = false;
-        DeploymentMode initialMode = DeploymentMode.PRIMARY;
-        if (stratConScenario.getCurrentState().equals(UNRESOLVED)) {
-            restrictToSingleForce = backingScenario != null &&
-                                          backingScenario.getStratConScenarioType().isOfficialChallenge();
-            assignToScenario = true;
-        } else {
-            // Primary forces are already committed - open on the reinforcement/management pages.
-            initialMode = DeploymentMode.REINFORCE;
-        }
-
-        new StratConDeploymentWizard(stratConPanel, campaign).display(campaignState,
-              stratConScenario,
-              assignToScenario,
-              restrictToSingleForce,
-              initialMode);
+        // Route through the panel so the single shared deployment wizard is reused (one window at a time). The panel
+        // picks the right page (Primary vs Reinforce) from the scenario's state.
+        stratConPanel.openDeploymentWizard(deploymentContext.campaignState, deploymentContext.stratConScenario);
 
         stratConPanel.repaint();
     }

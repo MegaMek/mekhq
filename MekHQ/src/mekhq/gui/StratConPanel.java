@@ -205,6 +205,9 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     private final Map<String, BufferedImage> imageCache = new HashMap<>();
 
+    /** The single reused deployment wizard, created on first use, so only one is ever open. */
+    private StratConDeploymentWizard deploymentWizard;
+
     /**
      * Constructs a StratConPanel instance, given a parent campaign GUI and a pointer to an info area.
      */
@@ -1895,12 +1898,16 @@ public class StratConPanel extends JPanel implements ActionListener {
      * page for a scenario whose primary forces are already committed (managing reinforcements, auxiliaries, and
      * utility). Official challenges restrict the primary pick to a single force.
      *
-     * @param scenario the scenario on the selected hex, or {@code null} if there is none
+     * <p>A single wizard instance is reused, so repeatedly choosing "Manage Deployment" re-shows and re-populates the
+     * same window instead of stacking new ones.</p>
+     *
+     * @param campaignState the current StratCon campaign state
+     * @param scenario      the scenario on the selected hex, or {@code null} if there is none
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private void openDeploymentWizard(@Nullable StratConScenario scenario) {
+    public void openDeploymentWizard(StratConCampaignState campaignState, @Nullable StratConScenario scenario) {
         boolean assignToScenario = false;
         boolean restrictToSingleForce = false;
         DeploymentMode initialMode = DeploymentMode.PRIMARY;
@@ -1916,11 +1923,11 @@ public class StratConPanel extends JPanel implements ActionListener {
             }
         }
 
-        new StratConDeploymentWizard(this, campaign).display(campaignState,
-              scenario,
-              assignToScenario,
-              restrictToSingleForce,
-              initialMode);
+        if (deploymentWizard == null) {
+            deploymentWizard = new StratConDeploymentWizard(this, campaign);
+        }
+        deploymentWizard.display(campaignState, scenario, assignToScenario, restrictToSingleForce, initialMode);
+        deploymentWizard.toFront();
     }
 
     /**
@@ -1955,10 +1962,10 @@ public class StratConPanel extends JPanel implements ActionListener {
         StratConScenario selectedScenario = currentTrack.getScenario(selectedCoords);
         switch (evt.getActionCommand()) {
             case RIGHT_CLICK_COMMAND_MANAGE_FORCES:
-                openDeploymentWizard(selectedScenario);
+                openDeploymentWizard(campaignState, selectedScenario);
                 break;
             case RIGHT_CLICK_COMMAND_MANAGE_SCENARIO:
-                openDeploymentWizard(currentTrack.getScenario(selectedCoords));
+                openDeploymentWizard(campaignState, currentTrack.getScenario(selectedCoords));
                 break;
             case RIGHT_CLICK_COMMAND_STICKY_FORCE:
                 JCheckBoxMenuItem source = (JCheckBoxMenuItem) evt.getSource();
