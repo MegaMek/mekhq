@@ -68,6 +68,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -374,10 +375,32 @@ public class DeploymentInspectorPanel extends JPanel {
                   entity.getCrew().getGunnery(), entity.getCrew().getPiloting())).append("<br/>");
         }
 
+        // The commander's best scouting skill (Communications, Perception, Sensor Operations, Stealth, or Tracking),
+        // shown only when they have one - matching the personnel table's Scouting column.
+        if (commander != null) {
+            String bestScoutingSkill = ScoutingSkills.getBestScoutingSkill(commander);
+            if (bestScoutingSkill != null) {
+                int scoutingLevel = commander.getSkill(bestScoutingSkill)
+                                          .getTotalSkillLevel(commander.getSkillModifierData());
+                details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.scouting",
+                      scoutingLevel)).append("<br/>");
+            }
+        }
+
         int crewSize = unit.getActiveCrew().size();
         if (crewSize > 1) {
             details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.size", crewSize))
                   .append("<br/>");
+        }
+
+        if (entity != null) {
+            StringBuilder movement = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "deploymentWizard.inspector.movement", entity.getWalkMP(), entity.getRunMP()));
+            int jumpMP = entity.getJumpMP();
+            if (jumpMP > 0) {
+                movement.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.movement.jump", jumpMP));
+            }
+            details.append(movement).append("<br/>");
         }
 
         Color conditionColor = unit.isDamaged() ? AMBER : READY;
