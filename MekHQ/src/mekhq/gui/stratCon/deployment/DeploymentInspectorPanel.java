@@ -240,7 +240,7 @@ public class DeploymentInspectorPanel extends JPanel {
      * @since 0.51.01
      */
     public void showReinforcementFormation(Formation formation, ReinforcementEligibilityType eligibility,
-          ReinforcementRoll roll, int perForceSupportPoints) {
+          ReinforcementRoll roll, int perForceSupportPoints, int arrivalTurn) {
         StringBuilder body = new StringBuilder();
         body.append(formationSummaryHtml(formation)).append("<br/><br/>");
         body.append(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -254,7 +254,10 @@ public class DeploymentInspectorPanel extends JPanel {
               (int) Math.round(roll.successProbability() * 100))).append("<br/>");
         body.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.reinforce.cost",
-              perForceSupportPoints));
+              perForceSupportPoints)).append("<br/>");
+        body.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "deploymentWizard.reinforce.arrival",
+              arrivalTurn));
         body.append(formationRosterHtml(formation));
 
         renderDossier(body.toString());
@@ -394,10 +397,25 @@ public class DeploymentInspectorPanel extends JPanel {
         }
 
         if (entity != null) {
-            StringBuilder movement = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "deploymentWizard.inspector.movement", entity.getWalkMP(), entity.getRunMP()));
+            // Label the movement profile in the unit type's own terms: Safe/Max Thrust for aerospace, Cruise/Flank for
+            // vehicles, Walk/Run (plus Jump when present) for everything ground-pounding.
+            String movementKey;
+            boolean canJump;
+            if (entity.isAero()) {
+                movementKey = "deploymentWizard.inspector.movement.aero";
+                canJump = false;
+            } else if (entity.isVehicle()) {
+                movementKey = "deploymentWizard.inspector.movement.vehicle";
+                canJump = true;
+            } else {
+                movementKey = "deploymentWizard.inspector.movement.ground";
+                canJump = true;
+            }
+
+            StringBuilder movement = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE, movementKey,
+                  entity.getWalkMP(), entity.getRunMP()));
             int jumpMP = entity.getJumpMP();
-            if (jumpMP > 0) {
+            if (canJump && (jumpMP > 0)) {
                 movement.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.movement.jump", jumpMP));
             }
             details.append(movement).append("<br/>");

@@ -40,6 +40,7 @@ import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.getEligible
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.getEligibleLeadershipUnits;
 import static mekhq.campaign.personnel.skills.SkillType.SKILL_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
+import static mekhq.campaign.personnel.skills.SkillType.S_STRATEGY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -55,6 +56,7 @@ import javax.swing.event.DocumentListener;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
+import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -634,11 +636,33 @@ public class StratConDeploymentWizard extends JDialog {
                 // Preview the roll at no support-point spend; the actual spend is chosen in the commit dialog.
                 ReinforcementRoll roll = reinforcementAdvisor.getRoll(0, false);
                 int perForceCost = DeploymentEvaluator.reinforcementCost(0, false, 1).perForceSupportPoints();
-                inspector.showReinforcementFormation(formation, eligibility, roll, perForceCost);
+                inspector.showReinforcementFormation(formation, eligibility, roll, perForceCost,
+                      estimateReinforcementArrival(formation));
             } else {
                 inspector.showFormation(formation);
             }
         }
+    }
+
+    /**
+     * @return the estimated turn this reinforcement force would arrive on, using the same slowest-speed-over-arrival-
+     *       scale formula the scenario applies at finalization, reduced by the scenario commander's Strategy skill and
+     *       the scenario's reinforcement delay reduction
+     */
+    private int estimateReinforcementArrival(Formation formation) {
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        int turnModifier = backingScenario.getLanceCommanderSkill(S_STRATEGY, campaign)
+                                 + backingScenario.getFriendlyReinforcementDelayReduction();
+
+        List<Entity> entities = new ArrayList<>();
+        for (UUID unitId : formation.getAllUnits(true)) {
+            Unit unit = campaign.getUnit(unitId);
+            if ((unit != null) && (unit.getEntity() != null)) {
+                entities.add(unit.getEntity());
+            }
+        }
+
+        return AtBDynamicScenarioFactory.estimateReinforcementArrivalTurn(entities, turnModifier);
     }
 
     /**

@@ -5138,6 +5138,30 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
+     * Estimates the turn a manually-deployed reinforcement force would arrive on, mirroring the non-delayed branch of
+     * {@link #setDeploymentTurnsForReinforcements(LocalHangar, Scenario, List, int, boolean)}: the arrival scale divided
+     * by the force's slowest unit speed, reduced by the given turn modifier (typically the commander's Strategy skill
+     * plus the scenario's reinforcement delay reduction). Used by the deployment wizard's dossier to preview when
+     * reinforcements will arrive; the actual round is set at scenario finalization.
+     *
+     * @param entityList   the entities in the reinforcing force
+     * @param turnModifier the turn reduction to apply (commander Strategy skill plus reinforcement delay reduction)
+     *
+     * @return the estimated arrival turn, never negative
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int estimateReinforcementArrivalTurn(List<Entity> entityList, int turnModifier) {
+        int arrivalTurn = 0;
+        for (Entity entity : entityList) {
+            int speed = max(1, calculateAtBSpeed(entity));
+            arrivalTurn = max(arrivalTurn, max(0, (REINFORCEMENT_ARRIVAL_SCALE / speed) - turnModifier));
+        }
+        return arrivalTurn;
+    }
+
+    /**
      * Uses the "lance staggered deployment" algorithm to determine individual deployment turns Not actually implemented
      * currently.
      *
