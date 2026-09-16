@@ -811,7 +811,11 @@ public class StratConDeploymentWizard extends JDialog {
             if (mode == DeploymentMode.PRIMARY) {
                 stagedPrimaryForces.clear();
             }
-            stage(focusedItem);
+
+            boolean staged = stage(focusedItem);
+            if (!staged) {
+                return;
+            }
         }
 
         // If the primary force was assigned, swapped, or removed, the auxiliaries and utility choices no longer apply to
@@ -854,12 +858,48 @@ public class StratConDeploymentWizard extends JDialog {
         return false;
     }
 
-    private void stage(Object item) {
+    private boolean stage(Object item) {
+        if (!canStage(item)) {
+            return false;
+        }
+
         if (item instanceof Formation formation) {
             (mode == DeploymentMode.PRIMARY ? stagedPrimaryForces : stagedReinforcementForces).add(formation);
         } else if (item instanceof Unit unit) {
             (mode == DeploymentMode.AUXILIARIES ? stagedAuxiliaryUnits : stagedUtilityUnits).add(unit);
         }
+
+        return true;
+    }
+    private boolean canStage(Object item) {
+        if (item instanceof Unit unit) {
+            if (mode == DeploymentMode.AUXILIARIES) {
+                return canStageAuxiliary(unit);
+            }
+            if (mode == DeploymentMode.UTILITY) {
+                return canStageUtility();
+            }
+        }
+
+        return true;
+    }
+
+    private boolean canStageAuxiliary(Unit unit) {
+        if (unit.getEntity() == null) {
+            return true;
+        }
+
+        int remaining = leadershipBattleValueRemaining();
+        int battleValue = unit.getEntity().calculateBattleValue(true, true);
+        return (battleValue >= 0) && (battleValue <= remaining);
+    }
+
+    private boolean canStageUtility() {
+        return minefieldsRemaining() > 0;
+    }
+
+    private boolean stagedWithinBudget() {
+        return (leadershipBattleValueRemaining() >= 0) && (minefieldsRemaining() >= 0);
     }
 
     private void unstage(Object item) {
@@ -1010,7 +1050,10 @@ public class StratConDeploymentWizard extends JDialog {
     private void refreshCommitEnabled() {
         // A deployment is meaningless without a primary force, so commit stays disabled until one is present - either
         // staged this session, or already committed on the scenario being reinforced.
-        inspector.getCommitButton().setArmed(hasPrimary() && !nothingStaged());
+
+        // The unit-tier budgets are also enforced here as a second line of defense. This keeps Commit disabled if staged
+        // selections somehow become over budget through a future code path that bypasses stage().
+        inspector.getCommitButton().setArmed(hasPrimary() && !nothingStaged() && stagedWithinBudget());
     }
 
     /**
