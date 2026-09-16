@@ -910,15 +910,15 @@ public class StratConDeploymentWizard extends JDialog {
     }
 
     /**
-     * @return whether the given item (a formation or a loose unit) is already committed to the scenario, and so locked
-     *       against removal here - the scenario must be reset to change it
+     * @return whether the given item (a formation or a loose unit) can still be staged or unstaged here, i.e. it is
+     *       not already committed to the scenario - committed items are locked and require a scenario reset to change
      */
     private boolean isUnlocked(Object item) {
         if (item instanceof Formation formation) {
-            return deployedPrimaryForces.contains(formation) || deployedReinforcementForces.contains(formation);
+            return !(deployedPrimaryForces.contains(formation) || deployedReinforcementForces.contains(formation));
         }
         if (item instanceof Unit unit) {
-            return deployedLooseUnits.contains(unit);
+            return !deployedLooseUnits.contains(unit);
         }
         return false;
     }
