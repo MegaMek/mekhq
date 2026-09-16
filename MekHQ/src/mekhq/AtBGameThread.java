@@ -768,13 +768,37 @@ public class AtBGameThread extends GameThread {
         botClient.sendPlayerInfo();
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
 
-        var playerEntities = client.getEntitiesVector()
-                                   .stream()
-                                   .filter(entity -> entity.getOwnerId() == player.getId())
-                                   .collect(Collectors.toList());
-        botClient.sendChangeOwner(playerEntities, botClient.getLocalPlayer().getId());
+        handOverPlayerUnitsToBot(client, botClient);
         Thread.sleep(MekHQ.getMHQOptions().getStartGameBotClientDelay());
         return botClient;
+    }
+
+    /**
+     * Gives every unit the player owns to their auto-resolve bot, asking over the player's own connection.
+     *
+     * <p>The server only lets a sender give away units it already owns (MegaMek issue #8860). The request used to go
+     * out over the bot's connection, so it read as a bot taking a human's units and was refused. The units then stayed
+     * with the Commander window, which never plays a turn, and the game sat at "Preparing..." for good (issue #8989).
+     * Sent by the player, the same request is a player giving their own units to a bot, which is allowed.</p>
+     *
+     * @param playerClient the player's own client, which owns the units being handed over
+     * @param botClient    the bot that is to fight with them
+     */
+    static void handOverPlayerUnitsToBot(Client playerClient, BotClient botClient) {
+        Player player = playerClient.getLocalPlayer();
+        Player botPlayer = botClient.getLocalPlayer();
+        List<Entity> playerEntities = playerClient.getEntitiesVector()
+                                            .stream()
+                                            .filter(entity -> entity.getOwnerId() == player.getId())
+                                            .collect(Collectors.toList());
+        if (playerEntities.isEmpty()) {
+            LOGGER.warn("[AutoResolve] {} has no units to hand to {}; the bot will have nothing to command",
+                  player.getName(), botPlayer.getName());
+            return;
+        }
+        LOGGER.info("[AutoResolve] {} hands {} unit(s) to {} over the player's own connection",
+              player.getName(), playerEntities.size(), botPlayer.getName());
+        playerClient.sendChangeOwner(playerEntities, botPlayer.getId());
     }
 
     /**

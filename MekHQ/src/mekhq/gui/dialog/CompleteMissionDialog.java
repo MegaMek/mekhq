@@ -96,7 +96,7 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
     // endregion Palette
 
     private static final int CONTENT_WIDTH = 600;
-    private static final int MAX_VIEWPORT_HEIGHT = 660;
+    private static final double MAX_VIEWPORT_SCREEN_FRACTION = 0.85;
     private static final int SCROLLBAR_WIDTH = 10;
 
     // The completion statuses the player may record - the completed set of MissionStatus, in debrief order.
@@ -158,8 +158,6 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
         content.setBorder(BorderFactory.createEmptyBorder(pad, pad, pad, pad));
 
         content.add(createBriefingHeader());
-        content.add(Box.createVerticalStrut(UIUtil.scaleForGUI(16)));
-        content.add(createVerdictBanner());
         content.add(Box.createVerticalStrut(UIUtil.scaleForGUI(18)));
         content.add(createSectionHeading(getText("completeMission.section.combatRecord")));
         content.add(Box.createVerticalStrut(UIUtil.scaleForGUI(8)));
@@ -168,6 +166,8 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
         content.add(createSectionHeading(getText("completeMission.section.objectivesLedger")));
         content.add(Box.createVerticalStrut(UIUtil.scaleForGUI(8)));
         content.add(createObjectivesLedger());
+        content.add(Box.createVerticalStrut(UIUtil.scaleForGUI(18)));
+        content.add(createVerdictBanner());
         content.add(Box.createVerticalStrut(UIUtil.scaleForGUI(18)));
         content.add(createSectionHeading(getText("completeMission.section.recordOutcome")));
         content.add(Box.createVerticalStrut(UIUtil.scaleForGUI(8)));
@@ -187,7 +187,8 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
               ACCENT_BRIGHT, UIUtil.scaleForGUI(SCROLLBAR_WIDTH));
 
         int contentWidth = UIUtil.scaleForGUI(CONTENT_WIDTH);
-        int viewportHeight = Math.min(content.getPreferredSize().height, UIUtil.scaleForGUI(MAX_VIEWPORT_HEIGHT));
+        int screenHeightCap = (int) (Toolkit.getDefaultToolkit().getScreenSize().height * MAX_VIEWPORT_SCREEN_FRACTION);
+        int viewportHeight = Math.min(content.getPreferredSize().height, screenHeightCap);
         scrollPane.setPreferredSize(new Dimension(contentWidth + UIUtil.scaleForGUI(SCROLLBAR_WIDTH + 2),
               viewportHeight));
         return scrollPane;

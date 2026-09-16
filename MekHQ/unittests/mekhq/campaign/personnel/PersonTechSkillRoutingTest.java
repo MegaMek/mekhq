@@ -39,8 +39,10 @@ import static mekhq.campaign.personnel.skills.SkillType.S_TECH_MEK;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VESSEL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -163,5 +165,43 @@ class PersonTechSkillRoutingTest {
         assertNotNull(skill);
         assertEquals(S_TECH_MEK, skill.getType().getName(),
               "with the option on, the whole-unit global tech skill should be used instead of the specialist skill");
+    }
+
+    /** A Mek tech who holds only the whole-unit global skill, not the granular specialist skill. */
+    private static Person mekTechGlobalOnly() {
+        Person person = new Person("Test", "Tech", null, "MERC");
+        person.addSkill(S_TECH_MEK, 5, 0);
+        return person;
+    }
+
+    @Test
+    void byDefaultATechLackingTheSpecialistSkillIsTheWrongTypeForASpecialistPart() {
+        Person tech = mekTechGlobalOnly();
+        IPartWork part = mechanicalPartOn(mekUnitWithGlobalOnly(false));
+
+        assertFalse(tech.isRightTechTypeFor(part),
+              "with the option off, a tech without the specialist skill the part accepts is the wrong type");
+    }
+
+    @Test
+    void withGlobalTechSkillsOnlyATechWithTheGlobalSkillIsTheRightTypeForASpecialistPart() {
+        Person tech = mekTechGlobalOnly();
+        IPartWork part = mechanicalPartOn(mekUnitWithGlobalOnly(true));
+
+        assertTrue(tech.isRightTechTypeFor(part),
+              "with the option on, a tech holding the unit's global skill is the right type even for a part that " +
+                    "maps only to a specialist skill, so no wrong-tech-type warning should fire");
+    }
+
+    @Test
+    void withGlobalTechSkillsOnlyATechLackingTheGlobalSkillFallsBackToTheSpecialistCheck() {
+        // A tech with only the specialist skill and no matching global skill: the global branch does not apply, so
+        // correctness falls through to whether the part accepts a skill they hold.
+        Person tech = new Person("Test", "Tech", null, "MERC");
+        tech.addSkill(S_TECH_MECHANICAL, 5, 0);
+        IPartWork part = mechanicalPartOn(mekUnitWithGlobalOnly(true));
+
+        assertTrue(tech.isRightTechTypeFor(part),
+              "when the tech lacks the global skill, the specialist check still applies");
     }
 }
