@@ -712,16 +712,33 @@ public class AtBDynamicScenario extends AtBScenario {
             } else if (wn2.getNodeName().equalsIgnoreCase("finalized")) {
                 setFinalized(Boolean.parseBoolean(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("offBoardForceIDs")) {
-                String content = wn2.getTextContent().trim();
-                if (!content.isBlank()) {
-                    for (String value : content.split(",")) {
-                        offBoardForceIDs.add(MathUtility.parseInt(value.trim()));
-                    }
-                }
+                loadOffBoardForceIDs(wn2.getTextContent());
             }
         }
 
         super.loadFieldsFromXmlNode(wn, version, campaign);
+    }
+
+    /**
+     * Restores the off-board force IDs from their saved comma-separated form. A value that is not a number is logged
+     * and skipped, so a hand-edited or corrupted save neither aborts the scenario load nor marks force {@code 0} (the
+     * whole player TOE) as deploying off-board.
+     *
+     * @param content the tag text, for example {@code "3,7"}; blank entries are ignored
+     */
+    private void loadOffBoardForceIDs(String content) {
+        for (String value : content.split(",")) {
+            String trimmedValue = value.trim();
+            if (trimmedValue.isBlank()) {
+                continue;
+            }
+            try {
+                offBoardForceIDs.add(Integer.parseInt(trimmedValue));
+            } catch (NumberFormatException exception) {
+                logger.warn("Skipping unreadable off-board force ID '{}' while loading scenario {}",
+                      trimmedValue, getName());
+            }
+        }
     }
 
     @Override

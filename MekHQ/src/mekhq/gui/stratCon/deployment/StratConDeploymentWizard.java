@@ -528,7 +528,9 @@ public class StratConDeploymentWizard extends JDialog {
             return;
         }
 
-        allItems.addAll(getEligibleLeadershipUnits(campaign, scenario, leadershipSkill));
+        // A staged formation deploys with all of its units, so those units must not be offered again here.
+        List<Unit> eligibleUnits = getEligibleLeadershipUnits(campaign, scenario, leadershipSkill);
+        allItems.addAll(StratConDeploymentService.excludeUnitsOfFormations(eligibleUnits, stagedFormations()));
     }
 
     private void loadEligibleUtilityUnits() {
@@ -536,7 +538,9 @@ public class StratConDeploymentWizard extends JDialog {
             return;
         }
 
-        allItems.addAll(getEligibleFrontlineUnits(campaign, scenario));
+        // A staged formation deploys with all of its units, so those units must not be offered again here.
+        List<Unit> eligibleUnits = getEligibleFrontlineUnits(campaign, scenario);
+        allItems.addAll(StratConDeploymentService.excludeUnitsOfFormations(eligibleUnits, stagedFormations()));
     }
 
     /**
@@ -825,6 +829,9 @@ public class StratConDeploymentWizard extends JDialog {
             stagedUtilityUnits.clear();
         }
 
+        // A formation staged after some of its units were picked as auxiliary or utility units takes them with it.
+        dropStagedUnitsCoveredByStagedFormations();
+
         // The item just moved between the board and the staged tray, so drop the focus and rebuild both views.
         clearFocus();
         applySearchFilter();
@@ -843,6 +850,37 @@ public class StratConDeploymentWizard extends JDialog {
         inspector.showEmpty();
         inspector.setOffBoardOptionVisible(false);
         inspector.setStageButtonEnabled(false);
+    }
+
+    /** @return every formation staged this session, primary and reinforcement alike */
+    private List<Formation> stagedFormations() {
+        List<Formation> formations = new ArrayList<>(stagedPrimaryForces);
+        formations.addAll(stagedReinforcementForces);
+        return formations;
+    }
+
+    /**
+     * Removes any staged auxiliary or utility unit that sits inside a staged formation. The formation deploys with all
+     * of its units, so keeping the unit staged on its own would commit it twice.
+     */
+    private void dropStagedUnitsCoveredByStagedFormations() {
+        List<Formation> stagedFormations = stagedFormations();
+        List<Unit> remainingAuxiliaryUnits = StratConDeploymentService.excludeUnitsOfFormations(stagedAuxiliaryUnits,
+              stagedFormations);
+        List<Unit> remainingUtilityUnits = StratConDeploymentService.excludeUnitsOfFormations(stagedUtilityUnits,
+              stagedFormations);
+        if (remainingAuxiliaryUnits.size() != stagedAuxiliaryUnits.size()) {
+            LOGGER.debug("[Deployment] {} staged auxiliary unit(s) dropped: their formation is staged too",
+                  stagedAuxiliaryUnits.size() - remainingAuxiliaryUnits.size());
+            stagedAuxiliaryUnits.clear();
+            stagedAuxiliaryUnits.addAll(remainingAuxiliaryUnits);
+        }
+        if (remainingUtilityUnits.size() != stagedUtilityUnits.size()) {
+            LOGGER.debug("[Deployment] {} staged utility unit(s) dropped: their formation is staged too",
+                  stagedUtilityUnits.size() - remainingUtilityUnits.size());
+            stagedUtilityUnits.clear();
+            stagedUtilityUnits.addAll(remainingUtilityUnits);
+        }
     }
 
     private boolean isStagedAnywhere(Object item) {
@@ -1105,12 +1143,20 @@ public class StratConDeploymentWizard extends JDialog {
         if (!stagedPrimaryForces.isEmpty()) {
             deployPrimaryForces();
         }
-        if (!stagedAuxiliaryUnits.isEmpty()) {
-            StratConDeploymentService.addAuxiliaryUnits(scenario, stagedAuxiliaryUnits);
+        // Guard: a unit that also sits inside a staged formation deploys with that formation, and adding it again as a
+        // loose unit would put it in the scenario twice and charge its battle value to the leadership budget.
+        List<Formation> stagedFormations = stagedFormations();
+        List<Unit> auxiliaryUnits = StratConDeploymentService.excludeUnitsOfFormations(stagedAuxiliaryUnits,
+              stagedFormations);
+        List<Unit> utilityUnits = StratConDeploymentService.excludeUnitsOfFormations(stagedUtilityUnits,
+              stagedFormations);
+        if (!auxiliaryUnits.isEmpty()) {
+            StratConDeploymentService.addAuxiliaryUnits(scenario, auxiliaryUnits);
         }
-        if (!stagedUtilityUnits.isEmpty()) {
-            StratConDeploymentService.addUtilityUnits(scenario, stagedUtilityUnits);
-            StratConDeploymentService.setMinefieldCount(scenario, minefieldsRemaining());
+        if (!utilityUnits.isEmpty()) {
+            StratConDeploymentService.addUtilityUnits(scenario, utilityUnits);
+            StratConDeploymentService.setMinefieldCount(scenario,
+                  DeploymentEvaluator.minefieldsRemaining(defensivePoints, utilityUnits.size()));
         }
 
         // Roll reinforcements only after the primary is committed.
@@ -1120,8 +1166,8 @@ public class StratConDeploymentWizard extends JDialog {
         }
 
         boolean managedScenario = !committedReinforcements.isEmpty() ||
-                                        !stagedAuxiliaryUnits.isEmpty() ||
-                                        !stagedUtilityUnits.isEmpty();
+                                        !auxiliaryUnits.isEmpty() ||
+                                        !utilityUnits.isEmpty();
         if (managedScenario && (scenario != null)) {
             StratConDeploymentService.finalizeForceDeployment(campaign, currentTrack, scenario);
         }

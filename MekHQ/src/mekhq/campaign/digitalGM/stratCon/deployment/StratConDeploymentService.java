@@ -40,12 +40,16 @@ import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.scaleOb
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.translateTemplateObjectives;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.Minefield;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -76,6 +80,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  * @since 0.51.01
  */
 public final class StratConDeploymentService {
+    private static final MMLogger LOGGER = MMLogger.create(StratConDeploymentService.class);
+
     private StratConDeploymentService() {}
 
     /**
@@ -181,6 +187,48 @@ public final class StratConDeploymentService {
             instantReinforcements.add(unit.getId());
             scenario.addUnit(unit, ScenarioForceTemplate.PRIMARY_FORCE_TEMPLATE_ID, true);
         }
+    }
+
+    /**
+     * Drops every unit that already belongs to one of the given formations. A formation deploys as a whole, including
+     * its sub-formations, so its units must not be offered - or committed - a second time as loose auxiliary or utility
+     * units; doing so would add the unit to the scenario twice and charge its battle value to the leadership budget.
+     *
+     * @param units      the candidate loose units, in the order they should be kept
+     * @param formations the formations whose units are excluded; an empty collection excludes nothing
+     *
+     * @return a new list holding the units not covered by any of the formations, in their original order
+     */
+    public static List<Unit> excludeUnitsOfFormations(List<Unit> units, Collection<Formation> formations) {
+        Set<UUID> coveredUnitIds = unitIdsOfFormations(formations);
+        List<Unit> remainingUnits = new ArrayList<>();
+        int excludedCount = 0;
+        for (Unit unit : units) {
+            if (coveredUnitIds.contains(unit.getId())) {
+                excludedCount++;
+                continue;
+            }
+            remainingUnits.add(unit);
+        }
+
+        if (excludedCount > 0) {
+            LOGGER.debug("[Deployment] Excluded {} loose unit(s) that already deploy with a staged formation",
+                  excludedCount);
+        }
+        return remainingUnits;
+    }
+
+    /**
+     * @param formations the formations to inspect
+     *
+     * @return the IDs of every unit under the given formations, including their sub-formations of any type
+     */
+    public static Set<UUID> unitIdsOfFormations(Collection<Formation> formations) {
+        Set<UUID> unitIds = new HashSet<>();
+        for (Formation formation : formations) {
+            unitIds.addAll(formation.getAllUnits(false));
+        }
+        return unitIds;
     }
 
     /**
