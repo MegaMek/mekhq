@@ -137,6 +137,16 @@ public class StratConDeploymentWizard extends JDialog {
     private final transient List<Unit> stagedAuxiliaryUnits = new ArrayList<>();
     private final transient List<Unit> stagedUtilityUnits = new ArrayList<>();
 
+    // Forces already committed to the scenario when the wizard opened. They are shown (locked) in the staged tray so the
+    // player can see the current deployment, but cannot be removed here - the scenario must be reset to change them.
+    private final transient List<Formation> deployedPrimaryForces = new ArrayList<>();
+    private final transient List<Formation> deployedReinforcementForces = new ArrayList<>();
+
+    // Loose units (leadership/auxiliary, utility, or otherwise) already committed to the scenario as individual units
+    // rather than whole formations. Shown (locked) in the staged tray; the scenario must be reset to change them. Their
+    // original page (Auxiliaries vs Utility) is not recorded on the scenario, so they share one "deployed" grouping.
+    private final transient List<Unit> deployedLooseUnits = new ArrayList<>();
+
     // On the Reinforce page, the reinforcement template slot each eligible force fills (needed to commit it).
     private final transient Map<Integer, String> reinforcementTemplateByForceId = new LinkedHashMap<>();
 
@@ -208,11 +218,60 @@ public class StratConDeploymentWizard extends JDialog {
               owner.getCurrentTrack(), owner.getSelectedCoords());
 
         clearStaged();
+        loadExistingAssignments();
         mode = initialMode;
         modeSelector.setSelected(initialMode);
         enterMode();
 
         setVisible(true);
+    }
+
+    /**
+     * Loads the forces already committed to the scenario into the locked "deployed" lists, so the staged tray reflects
+     * the current deployment when the wizard opens. Primary forces come from the scenario's committed primary IDs; every
+     * other assigned force is shown as an already-committed reinforcement. These are display-only and cannot be unstaged
+     * here (the scenario must be reset to change them); only forces newly staged this session are committed.
+     */
+    private void loadExistingAssignments() {
+        deployedPrimaryForces.clear();
+        deployedReinforcementForces.clear();
+        deployedLooseUnits.clear();
+        // Only a confirmed deployment has locked forces. When assigning a fresh primary (an unresolved scenario), any
+        // force IDs the scenario carries are auto-assigned suggestions from generation, not a committed deployment, so
+        // they are left out - the player is choosing the primary now.
+        if ((scenario == null) || assignToScenario) {
+            return;
+        }
+
+        List<Integer> primaryForceIds = scenario.getPrimaryForceIDs();
+        for (int forceId : primaryForceIds) {
+            Formation formation = campaign.getPlayerForce().getFormation(forceId);
+            if (formation != null) {
+                deployedPrimaryForces.add(formation);
+            }
+        }
+
+        for (int forceId : scenario.getAssignedForces()) {
+            if (primaryForceIds.contains(forceId)) {
+                continue;
+            }
+            Formation formation = campaign.getPlayerForce().getFormation(forceId);
+            if (formation != null) {
+                deployedReinforcementForces.add(formation);
+            }
+        }
+
+        // Loose units deployed to the scenario as individuals (leadership/auxiliary, utility, or otherwise), not as part
+        // of a formation.
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        if (backingScenario != null) {
+            for (UUID unitId : backingScenario.getIndividualUnitIDs()) {
+                Unit unit = campaign.getUnit(unitId);
+                if (unit != null) {
+                    deployedLooseUnits.add(unit);
+                }
+            }
+        }
     }
 
     private void switchMode(DeploymentMode newMode) {
@@ -253,6 +312,9 @@ public class StratConDeploymentWizard extends JDialog {
         stagedReinforcementForces.clear();
         stagedAuxiliaryUnits.clear();
         stagedUtilityUnits.clear();
+        deployedPrimaryForces.clear();
+        deployedReinforcementForces.clear();
+        deployedLooseUnits.clear();
         offBoardChoiceByForceId.clear();
     }
 
@@ -620,10 +682,16 @@ public class StratConDeploymentWizard extends JDialog {
 
         focusedItem = focused;
         focusedFromStagedTray = true;
-        // Show the dossier for whatever the item was staged as, regardless of which page is open.
-        showDossier(focused, (focused instanceof Formation formation) && stagedReinforcementForces.contains(formation));
+        // Show the dossier for whatever the item was staged as, regardless of which page is open. Only a newly-staged
+        // reinforcement gets the prospective roll/odds/arrival preview; an already-committed force shows its plain
+        // formation dossier, since its reinforcement roll is already spent.
+        boolean asReinforcement = (focused instanceof Formation formation)
+                                        && stagedReinforcementForces.contains(formation);
+        showDossier(focused, asReinforcement);
         updateOffBoardOption(focused);
-        inspector.setStageButtonEnabled(true);
+        // Forces and units already committed to the scenario are locked: they can only be changed by resetting the
+        // deployment, so the unstage control is disabled for them.
+        inspector.setStageButtonEnabled(!isLocked(focused));
         inspector.setStageButtonStaged(true);
     }
 
@@ -680,6 +748,7 @@ public class StratConDeploymentWizard extends JDialog {
         return (scenario != null)
                      && (item instanceof Formation formation)
                      && ((mode == DeploymentMode.PRIMARY) || (mode == DeploymentMode.REINFORCE))
+                     && !isLocked(item)
                      && formationHasArtillery(formation);
     }
 
@@ -759,10 +828,13 @@ public class StratConDeploymentWizard extends JDialog {
 
     private boolean isStagedAnywhere(Object item) {
         if (item instanceof Formation formation) {
-            return stagedPrimaryForces.contains(formation) || stagedReinforcementForces.contains(formation);
+            return stagedPrimaryForces.contains(formation) || stagedReinforcementForces.contains(formation)
+                         || deployedPrimaryForces.contains(formation)
+                         || deployedReinforcementForces.contains(formation);
         }
         if (item instanceof Unit unit) {
-            return stagedAuxiliaryUnits.contains(unit) || stagedUtilityUnits.contains(unit);
+            return stagedAuxiliaryUnits.contains(unit) || stagedUtilityUnits.contains(unit)
+                         || deployedLooseUnits.contains(unit);
         }
         return false;
     }
@@ -788,14 +860,61 @@ public class StratConDeploymentWizard extends JDialog {
 
     private void refreshStagedTray() {
         // Group the staged items under captioned dividers so a staged primary force reads apart from staged
-        // reinforcements (and from auxiliary/utility units).
+        // reinforcements (and from auxiliary/utility units). Forces already committed to the scenario lead their section,
+        // ahead of anything newly staged this session.
         List<Object> staged = new ArrayList<>();
-        addStagedSection(staged, DeploymentMode.PRIMARY, stagedPrimaryForces);
-        addStagedSection(staged, DeploymentMode.REINFORCE, stagedReinforcementForces);
-        addStagedSection(staged, DeploymentMode.AUXILIARIES, stagedAuxiliaryUnits);
-        addStagedSection(staged, DeploymentMode.UTILITY, stagedUtilityUnits);
+        addStagedSection(staged, DeploymentMode.PRIMARY.getLabel(), merged(deployedPrimaryForces, stagedPrimaryForces));
+        addStagedSection(staged, DeploymentMode.REINFORCE.getLabel(),
+              merged(deployedReinforcementForces, stagedReinforcementForces));
+        addStagedSection(staged, getTextAt(RESOURCE_BUNDLE, "deploymentWizard.deployedUnits.title"), deployedLooseUnits);
+        addStagedSection(staged, DeploymentMode.AUXILIARIES.getLabel(), stagedAuxiliaryUnits);
+        addStagedSection(staged, DeploymentMode.UTILITY.getLabel(), stagedUtilityUnits);
         inspector.setStaged(staged);
         inspector.setStagedOffBoardForceIds(stagedOffBoardForceIds());
+        inspector.setStagedLockedForceIds(lockedForceIds());
+        inspector.setStagedLockedUnitIds(lockedUnitIds());
+    }
+
+    /** Concatenates the already-deployed forces (first) with the newly-staged ones for a tray section. */
+    private static List<Formation> merged(List<Formation> deployed, List<Formation> staged) {
+        List<Formation> combined = new ArrayList<>(deployed);
+        combined.addAll(staged);
+        return combined;
+    }
+
+    /** @return the IDs of forces already committed to the scenario (locked, non-removable in this session) */
+    private Set<Integer> lockedForceIds() {
+        Set<Integer> ids = new HashSet<>();
+        for (Formation formation : deployedPrimaryForces) {
+            ids.add(formation.getId());
+        }
+        for (Formation formation : deployedReinforcementForces) {
+            ids.add(formation.getId());
+        }
+        return ids;
+    }
+
+    /** @return the IDs of loose units already committed to the scenario (locked, non-removable in this session) */
+    private Set<UUID> lockedUnitIds() {
+        Set<UUID> ids = new HashSet<>();
+        for (Unit unit : deployedLooseUnits) {
+            ids.add(unit.getId());
+        }
+        return ids;
+    }
+
+    /**
+     * @return whether the given item (a formation or a loose unit) is already committed to the scenario, and so locked
+     *       against removal here - the scenario must be reset to change it
+     */
+    private boolean isLocked(Object item) {
+        if (item instanceof Formation formation) {
+            return deployedPrimaryForces.contains(formation) || deployedReinforcementForces.contains(formation);
+        }
+        if (item instanceof Unit unit) {
+            return deployedLooseUnits.contains(unit);
+        }
+        return false;
     }
 
     /**
@@ -806,7 +925,22 @@ public class StratConDeploymentWizard extends JDialog {
         Set<Integer> ids = new HashSet<>();
         collectOffBoardForceIds(ids, stagedPrimaryForces);
         collectOffBoardForceIds(ids, stagedReinforcementForces);
+        // Already-deployed forces show their committed off-board state, read straight from the scenario.
+        AtBDynamicScenario backingScenario = (scenario == null) ? null : scenario.getBackingScenario();
+        if (backingScenario != null) {
+            collectCommittedOffBoardForceIds(ids, backingScenario, deployedPrimaryForces);
+            collectCommittedOffBoardForceIds(ids, backingScenario, deployedReinforcementForces);
+        }
         return ids;
+    }
+
+    private void collectCommittedOffBoardForceIds(Set<Integer> ids, AtBDynamicScenario backingScenario,
+          List<Formation> deployedFormations) {
+        for (Formation formation : deployedFormations) {
+            if (backingScenario.isForceDeployingOffBoard(formation.getId())) {
+                ids.add(formation.getId());
+            }
+        }
     }
 
     private void collectOffBoardForceIds(Set<Integer> ids, List<Formation> stagedFormations) {
@@ -817,11 +951,11 @@ public class StratConDeploymentWizard extends JDialog {
         }
     }
 
-    private static void addStagedSection(List<Object> staged, DeploymentMode section, List<?> items) {
+    private static void addStagedSection(List<Object> staged, String label, List<?> items) {
         if (items.isEmpty()) {
             return;
         }
-        staged.add(new DeploymentItemRenderer.SectionHeader(section));
+        staged.add(new DeploymentItemRenderer.SectionHeader(label));
         staged.addAll(items);
     }
 

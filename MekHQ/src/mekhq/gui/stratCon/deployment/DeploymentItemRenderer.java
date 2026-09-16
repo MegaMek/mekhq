@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.UUID;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -28,7 +29,6 @@ import javax.swing.ListCellRenderer;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.unit.Unit;
@@ -51,10 +51,17 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
     private final JLabel nameLabel = new JLabel();
     private final JLabel roleLabel = new JLabel();
     private final JLabel offBoardLabel = new JLabel();
+    private final JLabel deployedLabel = new JLabel();
     private final JLabel subLabel = new JLabel();
 
     // Force IDs to flag as deploying off-board (used by the staged tray). Empty on the board renderer.
     private transient Set<Integer> offBoardForceIds = Collections.emptySet();
+
+    // Force IDs that are already committed to the scenario (locked in the staged tray). Empty on the board renderer.
+    private transient Set<Integer> lockedForceIds = Collections.emptySet();
+
+    // Loose unit IDs already committed to the scenario (locked in the staged tray). Empty on the board renderer.
+    private transient Set<UUID> lockedUnitIds = Collections.emptySet();
 
     // A separate cached component for section-divider rows in the staged tray (see SectionHeader).
     private final JPanel header = new JPanel(new BorderLayout());
@@ -83,17 +90,23 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
         offBoardLabel.setForeground(AMBER);
         offBoardLabel.setText(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.offBoard.tag").toUpperCase(Locale.ROOT));
         offBoardLabel.setVisible(false);
+        deployedLabel.setFont(hudFont(Font.BOLD, 0.72f, 0.12f));
+        deployedLabel.setForeground(READY);
+        deployedLabel.setText(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.deployed.tag").toUpperCase(Locale.ROOT));
+        deployedLabel.setVisible(false);
         subLabel.setFont(hudFont(Font.PLAIN, 0.82f, 0.0f));
         subLabel.setForeground(TEXT_MUTED);
 
-        // Name row: the force/unit name, its assigned combat role (formations only), and an off-board flag when staged
-        // off-board.
+        // Name row: the force/unit name, its assigned combat role (formations only), a "deployed" flag when the force is
+        // already committed to the scenario, and an off-board flag when deploying off-board.
         JPanel nameRow = new JPanel();
         nameRow.setOpaque(false);
         nameRow.setLayout(new BoxLayout(nameRow, BoxLayout.X_AXIS));
         nameRow.add(nameLabel);
         nameRow.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(8)));
         nameRow.add(roleLabel);
+        nameRow.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(8)));
+        nameRow.add(deployedLabel);
         nameRow.add(Box.createHorizontalStrut(UIUtil.scaleForGUI(8)));
         nameRow.add(offBoardLabel);
 
@@ -111,7 +124,7 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
     public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected,
           boolean cellHasFocus) {
         if (value instanceof SectionHeader sectionHeader) {
-            headerLabel.setText(sectionHeader.mode().getLabel().toUpperCase(Locale.ROOT));
+            headerLabel.setText(sectionHeader.label().toUpperCase(Locale.ROOT));
             return header;
         }
 
@@ -129,15 +142,18 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
         if (value instanceof Formation formation) {
             configureFormation(formation);
             offBoardLabel.setVisible(offBoardForceIds.contains(formation.getId()));
+            deployedLabel.setVisible(lockedForceIds.contains(formation.getId()));
         } else if (value instanceof Unit unit) {
             configureUnit(unit);
             offBoardLabel.setVisible(false);
+            deployedLabel.setVisible(lockedUnitIds.contains(unit.getId()));
         } else {
             ring.setColor(TEXT_MUTED);
             nameLabel.setText("");
             roleLabel.setText("");
             subLabel.setText("");
             offBoardLabel.setVisible(false);
+            deployedLabel.setVisible(false);
         }
         return card;
     }
@@ -151,6 +167,28 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
      */
     public void setOffBoardForceIds(Set<Integer> offBoardForceIds) {
         this.offBoardForceIds = (offBoardForceIds == null) ? Collections.emptySet() : offBoardForceIds;
+    }
+
+    /**
+     * Sets the force IDs that are already committed to the scenario, so the staged tray flags them as "deployed" (and the
+     * wizard blocks their removal). The board renderer leaves this empty.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setLockedForceIds(Set<Integer> lockedForceIds) {
+        this.lockedForceIds = (lockedForceIds == null) ? Collections.emptySet() : lockedForceIds;
+    }
+
+    /**
+     * Sets the loose unit IDs already committed to the scenario, so the staged tray marks those rows "deployed" (and the
+     * wizard blocks their removal). The board renderer leaves this empty.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setLockedUnitIds(Set<UUID> lockedUnitIds) {
+        this.lockedUnitIds = (lockedUnitIds == null) ? Collections.emptySet() : lockedUnitIds;
     }
 
     private void configureFormation(Formation formation) {
@@ -183,12 +221,13 @@ public class DeploymentItemRenderer implements ListCellRenderer<Object> {
 
     /**
      * A non-selectable divider row in the staged tray, captioning the group of staged items that follows it (Primary,
-     * Reinforcements, Auxiliaries, Utility), so a staged primary force reads apart from staged reinforcements.
+     * Reinforcements, Auxiliaries, Utility, or already-deployed loose units), so a staged primary force reads apart from
+     * staged reinforcements.
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public record SectionHeader(DeploymentMode mode) {}
+    public record SectionHeader(String label) {}
 
     /** A small hollow readiness ring drawn in the status colour. */
     private static final class Ring extends JComponent {

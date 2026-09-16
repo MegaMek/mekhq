@@ -485,6 +485,29 @@ public class DeploymentInspectorPanel extends JPanel {
         stagedList.repaint();
     }
 
+    /**
+     * Flags which staged forces are already committed to the scenario, so the staged tray marks those rows "deployed".
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setStagedLockedForceIds(Set<Integer> lockedForceIds) {
+        stagedRenderer.setLockedForceIds(lockedForceIds);
+        stagedList.repaint();
+    }
+
+    /**
+     * Flags which staged loose units are already committed to the scenario, so the staged tray marks those rows
+     * "deployed".
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setStagedLockedUnitIds(Set<UUID> lockedUnitIds) {
+        stagedRenderer.setLockedUnitIds(lockedUnitIds);
+        stagedList.repaint();
+    }
+
     public void setStaged(List<?> stagedItems) {
         stagedModel.clear();
         int count = 0;
