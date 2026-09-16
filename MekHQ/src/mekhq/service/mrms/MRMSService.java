@@ -65,6 +65,7 @@ import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -1310,6 +1311,10 @@ public class MRMSService {
                 tech = new Person("Temp", String.format("Tech (%s)", skillName), campaign);
                 tech.addSkill(skillName, partSkill.getType().getEliteLevel(), 1);
                 tech.setMinutesLeft(1);
+                // This placeholder represents an idealized, fully equipped tech for the feasibility check. When the
+                // "Techs Need a Tool Kit" campaign option is enabled, getTargetFor treats any kit-less tech as unable to
+                // work, so the placeholder must carry a tool kit, or every part would be wrongly reported as impossible.
+                tech.setRepairKitName(EquipmentKitCatalog.KIT_BASIC_TOOLKIT);
 
                 techCache.put(skillName, tech);
             }
