@@ -53,10 +53,13 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import megamek.client.ui.preferences.JWindowPreference;
+import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.annotations.Nullable;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -109,6 +112,8 @@ import mekhq.gui.stratCon.ScenarioWizardLanceModel;
  * @since 0.51.01
  */
 public class StratConDeploymentWizard extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(StratConDeploymentWizard.class);
+
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBStratCon";
 
     private final transient StratConPanel owner;
@@ -223,6 +228,7 @@ public class StratConDeploymentWizard extends JDialog {
         modeSelector.setSelected(initialMode);
         enterMode();
 
+        setPreferences(); // Must be before setVisible
         setVisible(true);
     }
 
@@ -541,7 +547,7 @@ public class StratConDeploymentWizard extends JDialog {
 
         leadershipPointsUsed = scenario.getLeadershipPointsUsed();
 
-        Formation stagedPrimary = stagedPrimaryForces.isEmpty() ? null : stagedPrimaryForces.get(0);
+        Formation stagedPrimary = stagedPrimaryForces.isEmpty() ? null : stagedPrimaryForces.getFirst();
         if (stagedPrimary == null) {
             // Reinforcing a committed scenario: fall back to the scenario's assigned commander lance.
             leadershipSkill = resolveLeadershipSkill();
@@ -691,7 +697,7 @@ public class StratConDeploymentWizard extends JDialog {
         updateOffBoardOption(focused);
         // Forces and units already committed to the scenario are locked: they can only be changed by resetting the
         // deployment, so the unstage control is disabled for them.
-        inspector.setStageButtonEnabled(!isLocked(focused));
+        inspector.setStageButtonEnabled(isUnlocked(focused));
         inspector.setStageButtonStaged(true);
     }
 
@@ -748,7 +754,7 @@ public class StratConDeploymentWizard extends JDialog {
         return (scenario != null)
                      && (item instanceof Formation formation)
                      && ((mode == DeploymentMode.PRIMARY) || (mode == DeploymentMode.REINFORCE))
-                     && !isLocked(item)
+                     && isUnlocked(item)
                      && formationHasArtillery(formation);
     }
 
@@ -907,7 +913,7 @@ public class StratConDeploymentWizard extends JDialog {
      * @return whether the given item (a formation or a loose unit) is already committed to the scenario, and so locked
      *       against removal here - the scenario must be reset to change it
      */
-    private boolean isLocked(Object item) {
+    private boolean isUnlocked(Object item) {
         if (item instanceof Formation formation) {
             return deployedPrimaryForces.contains(formation) || deployedReinforcementForces.contains(formation);
         }
@@ -1017,7 +1023,7 @@ public class StratConDeploymentWizard extends JDialog {
     }
 
     private Integer stagedPrimaryId() {
-        return stagedPrimaryForces.isEmpty() ? null : stagedPrimaryForces.get(0).getId();
+        return stagedPrimaryForces.isEmpty() ? null : stagedPrimaryForces.getFirst().getId();
     }
 
     // endregion
@@ -1295,4 +1301,20 @@ public class StratConDeploymentWizard extends JDialog {
     }
 
     // endregion
+
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void setPreferences() {
+        try {
+            PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(getClass());
+            this.setName(getClass().getSimpleName());
+            preferences.manage(new JWindowPreference(this));
+        } catch (Exception exception) {
+            LOGGER.error("Failed to set user preferences", exception);
+        }
+    }
 }
