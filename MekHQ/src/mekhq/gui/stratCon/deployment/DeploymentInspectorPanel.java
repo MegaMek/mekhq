@@ -60,6 +60,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementEligibilityType;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -373,22 +374,16 @@ public class DeploymentInspectorPanel extends JPanel {
         }
 
         Entity entity = unit.getEntity();
-        if ((entity != null) && (entity.getCrew() != null)) {
-            details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.skills",
-                  entity.getCrew().getGunnery(), entity.getCrew().getPiloting())).append("<br/>");
-        }
+        if (entity != null && entity.getCrew() != null) {
+                details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.skills",
+                      entity.getCrew().getGunnery(), entity.getCrew().getPiloting()));
 
-        // The commander's best scouting skill (Communications, Perception, Sensor Operations, Stealth, or Tracking),
-        // shown only when they have one - matching the personnel table's Scouting column.
-        if (commander != null) {
-            String bestScoutingSkill = ScoutingSkills.getBestScoutingSkill(commander);
-            if (bestScoutingSkill != null) {
-                int scoutingLevel = commander.getSkill(bestScoutingSkill)
-                                          .getTotalSkillLevel(commander.getSkillModifierData());
-                details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.scouting",
-                      scoutingLevel)).append("<br/>");
+                if (campaign.getCampaignOptions().get(CampaignOption.USE_ADVANCED_SCOUTING)) {
+                    appendScoutingSkill(unit, details);
+                }
             }
-        }
+
+        details.append("<br/>");
 
         int crewSize = unit.getActiveCrew().size();
         if (crewSize > 1) {
@@ -436,6 +431,26 @@ public class DeploymentInspectorPanel extends JPanel {
         }
 
         return details.toString();
+    }
+
+    private static void appendScoutingSkill(Unit unit, StringBuilder details) {
+        int bestScoutingSkillValue = Integer.MAX_VALUE;
+
+        for (Person person : unit.getActiveCrew()) {
+            String bestScoutingSkill = ScoutingSkills.getBestScoutingSkill(person);
+            if (bestScoutingSkill != null && person.hasSkill(bestScoutingSkill)) {
+                int scoutingValue = person.getSkill(bestScoutingSkill)
+                                          .getFinalSkillValue(person.getSkillModifierData());
+                if (scoutingValue < bestScoutingSkillValue) {
+                    bestScoutingSkillValue = scoutingValue;
+                }
+            }
+        }
+
+        if (bestScoutingSkillValue != Integer.MAX_VALUE) {
+            details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.scouting",
+                  bestScoutingSkillValue));
+        }
     }
 
     private static String eligibilityLabel(ReinforcementEligibilityType eligibility) {

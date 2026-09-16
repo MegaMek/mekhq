@@ -171,8 +171,6 @@ public class MaplessStratCon {
         stratConPanel.setCurrentTrack(deploymentContext.trackState);
         stratConPanel.setSelectedCoords(deploymentContext.scenarioCoords);
 
-        // Route through the panel so the single shared deployment wizard is reused (one window at a time). The panel
-        // picks the right page (Primary vs Reinforce) from the scenario's state.
         stratConPanel.openDeploymentWizard(deploymentContext.campaignState, deploymentContext.stratConScenario);
 
         stratConPanel.repaint();
