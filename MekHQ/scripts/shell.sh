@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Copyright (C) 2005-2025 The MegaMek Team. All Rights Reserved.
+# Copyright (C) 2005-2026 The MegaMek Team. All Rights Reserved.
 #
 # This file is part of MekHQ.
 #
@@ -31,4 +31,8 @@
 # <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
 # affiliated with Microsoft.
 
-./bin/MekHQ "$@"
+# Resolve the directory this script lives in and run from there.
+SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+cd "$SCRIPT_DIR" || exit 1
+
+exec "$SCRIPT_DIR/bin/MekHQ" "$@"
