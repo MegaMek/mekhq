@@ -39,6 +39,7 @@ import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -60,24 +61,39 @@ import javax.swing.border.EmptyBorder;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.commandGeneration.SupportCapability;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
-public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends JDialog {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.MASHTheatreTrackingCampaignOptionsChangedConfirmationDialog";
-
+/**
+ * Offers the free support vehicles that come with a capability the player has just switched on mid-campaign.
+ *
+ * <p>One dialog serves every capability. Which text is shown, and which vehicles are granted on Accept, both come
+ * from the {@link SupportCapability} it is given, so a capability is described in one place rather than in a dialog
+ * class of its own.</p>
+ *
+ * @since 0.51.01
+ */
+public class SupportCapabilityGrantDialog extends JDialog {
     private final int PADDING = scaleForGUI(10);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
     protected static final int CENTER_WIDTH = scaleForGUI(450);
 
     private ImageIcon campaignIcon;
     private final Campaign campaign;
+    private final SupportCapability capability;
 
-    public MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
+    /**
+     * Shows the offer for one capability's free vehicles.
+     *
+     * @param campaign   the campaign the vehicles would be granted to
+     * @param capability the capability the player has just switched on
+     */
+    public SupportCapabilityGrantDialog(Campaign campaign, SupportCapability capability) {
         this.campaignIcon = campaign.getCampaignFactionIcon();
         this.campaign = campaign;
+        this.capability = capability;
 
         populateDialog();
         initializeDialog();
@@ -149,8 +165,8 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         editorPane.setEditable(false);
         editorPane.setFocusable(false);
 
-        String description = getFormattedTextAt(RESOURCE_BUNDLE,
-              "MASHTheatreTrackingCampaignOptionsChangedConfirmationDialog.description",
+        String description = getFormattedTextAt(capability.resourceBundle(),
+              capability.resourceKeyPrefix() + ".description",
               spanOpeningWithCustomColor(getWarningColor()),
               CLOSING_SPAN_TAG);
         String fontStyle = "font-family: Noto Sans;";
@@ -169,14 +185,12 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.X_AXIS));
         pnlButtons.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        RoundedJButton btnCancel = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.cancel"));
-        btnCancel.addActionListener(evt -> dispose());
+        RoundedJButton btnCancel = new RoundedJButton(buttonLabel("cancel"));
+        btnCancel.addActionListener(event -> dispose());
 
-        RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
-              "MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog.confirm"));
-        btnConfirm.addActionListener(evt -> {
-            processFreeUnit(campaign, campaign.getPlayerForce().getFaction(), true);
+        RoundedJButton btnConfirm = new RoundedJButton(buttonLabel("confirm"));
+        btnConfirm.addActionListener(event -> {
+            processFreeUnits(campaign, campaign.getPlayerForce().getFaction(), true, capability);
             dispose();
         });
 
@@ -187,7 +201,30 @@ public class MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog extends
         return pnlButtons;
     }
 
-    public static void processFreeUnit(Campaign campaign, Faction faction, boolean isAutomaticallyAssignRanks) {
-        SupportUnitGenerator.generateMedicalUnits(campaign, faction, isAutomaticallyAssignRanks);
+    /**
+     * One capability's button text. The MASH dialog spells its two button keys "Theater" while its description key
+     * uses "Theatre", so the suffix is looked up against the capability's own prefix first and the American spelling
+     * second, rather than assuming either.
+     */
+    private String buttonLabel(String suffix) {
+        String label = getTextAt(capability.resourceBundle(), capability.resourceKeyPrefix() + '.' + suffix);
+        if (!isResourceKeyValid(label)) {
+            label = getTextAt(capability.resourceBundle(),
+                  capability.resourceKeyPrefix().replace("Theatre", "Theater") + '.' + suffix);
+        }
+        return label;
+    }
+
+    /**
+     * Grants the capability's free vehicles, topping the campaign up to what a command its size should field.
+     *
+     * @param campaign                  the campaign the vehicles are granted to
+     * @param faction                   the faction whose ranks the crews are given
+     * @param isAutomaticallyAssignRanks whether generated crews have ranks assigned automatically
+     * @param capability                the capability being granted
+     */
+    public static void processFreeUnits(Campaign campaign, Faction faction, boolean isAutomaticallyAssignRanks,
+          SupportCapability capability) {
+        SupportUnitGenerator.generate(capability, campaign, faction, isAutomaticallyAssignRanks);
     }
 }

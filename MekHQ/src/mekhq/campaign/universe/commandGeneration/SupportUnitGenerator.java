@@ -81,9 +81,9 @@ public final class SupportUnitGenerator {
 
     // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
     static final String SALVAGE_UNIT = "BattleMech Recovery Vehicle";
-    private static final String LOGISTICS_UNIT = "Flatbed Truck";
+    static final String LOGISTICS_UNIT = "Flatbed Truck";
     static final String MEDICAL_UNIT = "MASH Truck (Small)";
-    private static final String COMMISSARY_UNIT = "Sherpa Armored Truck (Mobile Canteen)";
+    static final String COMMISSARY_UNIT = "Sherpa Armored Truck (Mobile Canteen)";
     private static final String SECURITY_SQUAD_INNER_SPHERE = "Foot Squad (Rifle)";
     private static final String SECURITY_SQUAD_CLAN = "Clan Foot Squad (Rifle)";
     private static final String SECURITY_PLATOON_INNER_SPHERE = "Foot Platoon (Rifle)";
@@ -114,41 +114,19 @@ public final class SupportUnitGenerator {
         // utility class
     }
 
-    /** Recovery vehicles: one per formation base size, doubled for a Clan command. */
-    public static void generateSalvageUnits(Campaign campaign, Faction faction, boolean autoAssignRanks) {
-        generate(campaign, faction, autoAssignRanks, SALVAGE_UNIT, scaledCount(campaign),
-              SupportTOEFormationTypes.SALVAGE_FORMATION);
-    }
-
-    /** Flatbed logistics trucks: one per formation base size, doubled for a Clan command. */
-    public static void generateLogisticsUnits(Campaign campaign, Faction faction, boolean autoAssignRanks) {
-        generate(campaign, faction, autoAssignRanks, LOGISTICS_UNIT, scaledCount(campaign),
-              SupportTOEFormationTypes.LOGISTICS_FORMATION);
-    }
-
-    /** MASH trucks for the medical formation, scaled to treat the command's combatants. */
-    public static void generateMedicalUnits(Campaign campaign, Faction faction, boolean autoAssignRanks) {
-        generate(campaign, faction, autoAssignRanks, MEDICAL_UNIT, medicalUnitCount(campaign),
-              SupportTOEFormationTypes.MEDICAL_FORMATION);
-    }
-
-    /** Mobile canteens for the commissary formation, scaled to feed the command's personnel. */
-    public static void generateCommissaryUnits(Campaign campaign, Faction faction, boolean autoAssignRanks) {
-        generate(campaign, faction, autoAssignRanks, COMMISSARY_UNIT, commissaryUnitCount(campaign),
-              SupportTOEFormationTypes.COMMISSARY_FORMATION);
-    }
-
     /**
-     * Rifle infantry for the security formation, sized to the force it protects: a company-sized
-     * force gets a single squad, a battalion a single platoon, and a regiment or larger a full
-     * company (fielded as {@value #PLATOONS_PER_COMPANY} platoons).
+     * Grants the vehicles of one support capability, topping the command up to the capability's target count. What
+     * is fielded, how many, and which formation they are filed under all come from the capability itself.
+     *
+     * @param capability      the support capability being granted
+     * @param campaign        the campaign the vehicles are generated into
+     * @param faction         the faction whose ranks the crews are given
+     * @param autoAssignRanks whether generated crews have ranks assigned automatically
      */
-    public static void generateSecurityUnits(Campaign campaign, Faction faction, boolean autoAssignRanks) {
-        boolean isClan = campaign.getPlayerForce().isClanForce();
-        SecurityTier tier = securityTier(campaign);
-        String unitName = securityUnitName(tier, isClan);
-        int count = tier == SecurityTier.COMPANY ? PLATOONS_PER_COMPANY : 1;
-        generate(campaign, faction, autoAssignRanks, unitName, count, SupportTOEFormationTypes.SECURITY_FORMATION);
+    public static void generate(SupportCapability capability, Campaign campaign, Faction faction,
+          boolean autoAssignRanks) {
+        generate(campaign, faction, autoAssignRanks, capability.unitName(campaign), capability.targetCount(campaign),
+              capability.formationType());
     }
 
     /**
@@ -162,19 +140,12 @@ public final class SupportUnitGenerator {
      * @return the vehicles still to be generated
      */
     public static int vehiclesStillToGenerate(Campaign campaign) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int planned = 0;
-        if (campaignOptions.isUseStratCon()) {
-            planned += shortfall(campaign, LOGISTICS_UNIT, scaledCount(campaign));
-        }
-        if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
-            planned += shortfall(campaign, COMMISSARY_UNIT, commissaryUnitCount(campaign));
-        }
-        if (campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
-            planned += shortfall(campaign, SALVAGE_UNIT, scaledCount(campaign));
-        }
-        if (campaignOptions.get(CampaignOption.USE_MASH_THEATRES)) {
-            planned += shortfall(campaign, MEDICAL_UNIT, medicalUnitCount(campaign));
+        for (SupportCapability capability : SupportCapability.values()) {
+            if (!capability.needsMechanics() || !capability.isEnabled(campaign)) {
+                continue;
+            }
+            planned += shortfall(campaign, capability.unitName(campaign), capability.targetCount(campaign));
         }
         return planned;
     }

@@ -93,12 +93,14 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.commandGeneration.SupportCapability;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.contents.*;
 import mekhq.gui.campaignOptions.optionChangeDialogs.*;
+import mekhq.gui.campaignOptions.optionChangeDialogs.SupportCapabilityGrantDialog;
 
 /**
  * {@code CampaignOptionsPane} is the central panel of the Campaign Options dialog. It presents every campaign setting
@@ -981,27 +983,27 @@ public class CampaignOptionsPane extends JPanel {
 
         boolean newIsUseMASHTheatres = newOptions.useMASHTheatres();
         if (!isStartUp && newIsUseMASHTheatres && !oldIsUseMASHTheatres) { // Has tracking changed?
-            new MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(campaign);
+            new SupportCapabilityGrantDialog(campaign, SupportCapability.MEDICAL);
         }
 
         boolean newIsTrackPrisoners = newOptions.trackPrisoners();
         if (!isStartUp && newIsTrackPrisoners && !oldIsTrackPrisoners) { // Has tracking changed?
-            new PrisonerTrackingCampaignOptionsChangedConfirmationDialog(campaign);
+            new SupportCapabilityGrantDialog(campaign, SupportCapability.SECURITY);
         }
 
         boolean newIsUseFatigue = newOptions.useFatigue();
         if (!isStartUp && newIsUseFatigue && !oldIsUseFatigue) { // Has tracking changed?
-            new FatigueTrackingCampaignOptionsChangedConfirmationDialog(campaign);
+            new SupportCapabilityGrantDialog(campaign, SupportCapability.COMMISSARY);
         }
 
         boolean newIsUseAdvancedSalvage = newOptions.useAdvancedSalvage();
         if (!isStartUp && newIsUseAdvancedSalvage && !oldIsUseAdvancedSalvage) { // Has tracking changed?
-            new SalvageCampaignOptionsChangedConfirmationDialog(campaign);
+            new SupportCapabilityGrantDialog(campaign, SupportCapability.SALVAGE);
         }
 
         boolean newIsUseStratCon = newOptions.useStratCon();
         if (!isStartUp && newIsUseStratCon && !oldIsUseStratCon) { // Has tracking changed?
-            new StratConConvoyCampaignOptionsChangedConfirmationDialog(campaign);
+            new SupportCapabilityGrantDialog(campaign, SupportCapability.LOGISTICS);
         }
 
         boolean newIsUseMapless = newOptions.useMapless();
