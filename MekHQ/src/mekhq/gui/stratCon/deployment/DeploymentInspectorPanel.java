@@ -482,13 +482,6 @@ public class DeploymentInspectorPanel extends JPanel {
         renderDossier("<font color='" + hex(HudStyle.TEXT_MUTED) + "'>" +
                             getTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.empty") + "</font>");
     }
-
-    /**
-     * Replaces the staged-forces tray and updates its running count.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
     /**
      * Flags which staged forces are deploying off-board, so the staged tray shows an off-board indicator on those rows.
      *
@@ -523,6 +516,12 @@ public class DeploymentInspectorPanel extends JPanel {
         stagedList.repaint();
     }
 
+    /**
+     * Replaces the staged-forces tray and updates its running count.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
     public void setStaged(List<?> stagedItems) {
         stagedModel.clear();
         int count = 0;
