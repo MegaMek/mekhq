@@ -1014,11 +1014,12 @@ public class StratConDeploymentWizard extends JDialog {
     }
 
     /**
-     * Auxiliaries and Utility only make sense once a primary force is committed to the scenario, so their tabs are
-     * locked until a primary is assigned - either already on the scenario, or staged in this session.
+     * Reinforce, Auxiliaries, and Utility only make sense once a primary force is present, so their tabs are locked
+     * until a primary is assigned - either already committed on the scenario, or staged in this session.
      */
     private void updateTabLocks() {
         boolean hasPrimary = hasPrimary();
+        modeSelector.setModeEnabled(DeploymentMode.REINFORCE, hasPrimary);
         modeSelector.setModeEnabled(DeploymentMode.AUXILIARIES, hasPrimary);
         modeSelector.setModeEnabled(DeploymentMode.UTILITY, hasPrimary);
     }
@@ -1040,21 +1041,21 @@ public class StratConDeploymentWizard extends JDialog {
     // region commit
 
     /**
-     * Batches every staged page into one commit: any reinforcement forces are confirmed and rolled first (their dialog
-     * can abort the whole commit before anything is applied), then primary forces are deployed and auxiliary/utility
-     * units added, then the scenario is finalized once and a single staying-home summary is shown.
+     * Batches every staged page into one commit: primary forces are deployed first (which sizes the OpFor and finalizes
+     * the scenario against the real primary), then auxiliary/utility units are added, then any reinforcement forces are
+     * rolled, then the scenario is finalized once and a single staying-home summary is shown.
+     *
+     * <p>The order matters: {@code assignForceToScenario} rebuilds the scenario's primary force list from every templated
+     * force (see {@link mekhq.campaign.digitalGM.stratCon.StratConScenario#commitPrimaryForces()}), so a reinforcement
+     * committed before the primary would be swept into the primary list and skew OpFor generation. Deploying the primary
+     * first keeps the reinforcements out of that list; they only land in the delayed/instant arrival lists.</p>
      */
     private void commit() {
-        // Reinforcements carry their own confirmation dialog; the rest use the deploy nag.
+        // The primary/auxiliary/utility pages share the deploy nag; reinforcements carry their own confirmation dialog.
         boolean hasNonReinforcement = !stagedPrimaryForces.isEmpty() ||
                                             !stagedAuxiliaryUnits.isEmpty() ||
                                             !stagedUtilityUnits.isEmpty();
         if (hasNonReinforcement && !confirmDeployment()) {
-            return;
-        }
-
-        List<Formation> committedReinforcements = new ArrayList<>();
-        if (!stagedReinforcementForces.isEmpty() && !processReinforcementBatch(committedReinforcements)) {
             return;
         }
 
@@ -1069,7 +1070,13 @@ public class StratConDeploymentWizard extends JDialog {
             StratConDeploymentService.setMinefieldCount(scenario, minefieldsRemaining());
         }
 
-        boolean managedScenario = !stagedReinforcementForces.isEmpty() ||
+        // Roll reinforcements only after the primary is committed.
+        List<Formation> committedReinforcements = new ArrayList<>();
+        if (!stagedReinforcementForces.isEmpty()) {
+            processReinforcementBatch(committedReinforcements);
+        }
+
+        boolean managedScenario = !committedReinforcements.isEmpty() ||
                                         !stagedAuxiliaryUnits.isEmpty() ||
                                         !stagedUtilityUnits.isEmpty();
         if (managedScenario && (scenario != null)) {
