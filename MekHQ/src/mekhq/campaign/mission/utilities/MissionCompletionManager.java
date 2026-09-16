@@ -197,7 +197,7 @@ public class MissionCompletionManager {
      * @since 0.51.01
      */
     private boolean confirmCompletionAndResolveStatus() {
-        final CompleteMissionDialog completeMissionDialog = new CompleteMissionDialog(frame);
+        final CompleteMissionDialog completeMissionDialog = new CompleteMissionDialog(frame, campaign, mission);
         if (!completeMissionDialog.showDialog().isConfirmed()) {
             return false;
         }

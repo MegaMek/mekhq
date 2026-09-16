@@ -625,6 +625,45 @@ public final class CommandGenerator {
     }
 
     /**
+     * Grants the support vehicles that are generated with their own crew rather than inside a support team. The
+     * logistics convoy, canteen and security detail have no matching personnel section, so they are always granted
+     * here. Recovery vehicles and MASH trucks join their section inside {@link SupportPersonnelToTOE#organize},
+     * crewed from the generated staff, but only while support teams are switched on; with them off, no section is
+     * built, so those vehicles are granted here too.
+     *
+     * @param campaign the campaign the vehicles are granted to
+     */
+    static void grantStandaloneSupportVehicles(Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Faction supportFaction = campaign.getPlayerForce().getFaction();
+        boolean useSalvage = campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE);
+        boolean useMedical = campaignOptions.get(CampaignOption.USE_MASH_THEATRES);
+        if (SupportCarrierReconciler.isEnabled(campaign)) {
+            LOGGER.info("[CompanyGen][SupportUnits] support teams are on; recovery vehicles (salvage={}) and MASH"
+                              + " trucks (medical={}) join their support sections", useSalvage, useMedical);
+        } else {
+            LOGGER.info("[CompanyGen][SupportUnits] support teams are off; recovery vehicles (salvage={}) and MASH"
+                              + " trucks (medical={}) are generated standalone", useSalvage, useMedical);
+            if (useSalvage) {
+                SupportUnitGenerator.generateSalvageUnits(campaign, supportFaction, true);
+            }
+            if (useMedical) {
+                SupportUnitGenerator.generateMedicalUnits(campaign, supportFaction, true);
+            }
+        }
+
+        if (campaignOptions.isUseStratCon()) {
+            SupportUnitGenerator.generateLogisticsUnits(campaign, supportFaction, true);
+        }
+        if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
+            SupportUnitGenerator.generateCommissaryUnits(campaign, supportFaction, true);
+        }
+        if (!campaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()) {
+            SupportUnitGenerator.generateSecurityUnits(campaign, supportFaction, true);
+        }
+    }
+
+    /**
      * Stage 7e: generates support personnel (techs, doctors, administrators, plus astech and medic
      * assistants) and the standalone support vehicles a command gets for each enabled capability, and
      * organizes the support staff into the TOE. Sized to the campaign's current force composition via
@@ -665,21 +704,7 @@ public final class CommandGenerator {
                   supportResult.generatedPersons().size());
         }
 
-        // Grant the standalone support vehicles a command gets for each enabled capability that has no
-        // matching personnel section (logistics convoy, canteen, security). Salvage and medical
-        // vehicles are handled inside SupportPersonnelToTOE.organize above, where they join their
-        // section crewed from the generated staff (no double-generated personnel).
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Faction supportFaction = campaign.getPlayerForce().getFaction();
-        if (campaignOptions.isUseStratCon()) {
-            SupportUnitGenerator.generateLogisticsUnits(campaign, supportFaction, true);
-        }
-        if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
-            SupportUnitGenerator.generateCommissaryUnits(campaign, supportFaction, true);
-        }
-        if (!campaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()) {
-            SupportUnitGenerator.generateSecurityUnits(campaign, supportFaction, true);
-        }
+        grantStandaloneSupportVehicles(campaign);
 
         // Assign techs to units with MekHQ's own assigner, the one the new day and the Hangar's quick-assign
         // button use, ordered by the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight / Pilot Skill,
