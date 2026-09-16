@@ -46,9 +46,9 @@ class DeploymentEvaluatorTest {
     private static final double PROBABILITY_TOLERANCE = 1.0e-9;
 
     @Test
-    void successProbabilityAutomaticWhenTargetAtOrBelowTwo() {
-        assertEquals(1.0, DeploymentEvaluator.successProbabilityTwoD6(2), PROBABILITY_TOLERANCE);
-        assertEquals(1.0, DeploymentEvaluator.successProbabilityTwoD6(-3), PROBABILITY_TOLERANCE);
+    void naturalTwoStillFailsWhenTargetAtOrBelowTwo() {
+        assertEquals(35.0 / 36.0, DeploymentEvaluator.successProbabilityTwoD6(2), PROBABILITY_TOLERANCE);
+        assertEquals(35.0 / 36.0, DeploymentEvaluator.successProbabilityTwoD6(-3), PROBABILITY_TOLERANCE);
     }
 
     @Test

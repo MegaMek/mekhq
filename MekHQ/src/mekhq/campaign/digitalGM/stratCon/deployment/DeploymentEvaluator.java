@@ -72,26 +72,24 @@ public final class DeploymentEvaluator {
     /**
      * @param targetNumber the number the reinforcement roll must meet or beat on two six-sided dice
      *
-     * @return the probability, in {@code [0.0, 1.0]}, that a 2d6 roll is greater than or equal to {@code targetNumber}
+     * @return the probability, in {@code [0.0, 1.0]}, that a 2d6 roll is greater than or equal to {@code targetNumber}.
+     *       A natural 2 always fails, so the result never exceeds {@code 35/36} even for a target of {@code 2} or less.
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static double successProbabilityTwoD6(int targetNumber) {
-        if (targetNumber <= 2) {
-            return 35.0 / 36.0;
-        }
         if (targetNumber > 12) {
             return 0.0;
         }
 
+        // A natural 2 is an automatic failure regardless of target number, so the count starts at 3: for any target
+        // above 2 that roll already fails, and for a target of 2 or less it is the one outcome that does not succeed.
+        int lowestSuccessfulSum = Math.max(targetNumber, 3);
         int favourableOutcomes = 0;
-        for (int sum = targetNumber; sum <= 12; sum++) {
+        for (int sum = lowestSuccessfulSum; sum <= 12; sum++) {
             favourableOutcomes += TWO_D6_WAYS_BY_SUM[sum];
         }
-
-        // Natural 2 is an automatic failure regardless of target number.
-        favourableOutcomes -= TWO_D6_WAYS_BY_SUM[2];
 
         return (double) favourableOutcomes / TWO_D6_TOTAL_OUTCOMES;
     }
