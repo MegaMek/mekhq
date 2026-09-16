@@ -63,9 +63,11 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementEligibilityType;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentEvaluator;
 import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
 import mekhq.campaign.digitalGM.stratCon.deployment.ReinforcementAdvisor;
@@ -120,6 +122,10 @@ public class StratConDeploymentWizard extends JDialog {
 
     private transient StratConCampaignState campaignState;
     private transient StratConScenario scenario;
+
+    private transient StratConTrackState currentTrack;
+    private transient StratConCoords selectedCoords;
+
     private boolean assignToScenario;
     private boolean restrictToSingleForce;
 
@@ -212,14 +218,17 @@ public class StratConDeploymentWizard extends JDialog {
           boolean assignToScenario, boolean restrictToSingleForce, DeploymentMode initialMode) {
         this.campaignState = campaignState;
         this.scenario = scenario;
+        // Snapshot the deployment target now: the non-modal wizard must not follow later hex clicks on the map.
+        this.currentTrack = owner.getCurrentTrack();
+        this.selectedCoords = owner.getSelectedCoords();
         this.assignToScenario = assignToScenario;
         this.restrictToSingleForce = restrictToSingleForce;
         this.reinforcementAdvisor = (scenario == null)
                                           ? null
-                                          : new ReinforcementAdvisor(campaign, campaignState, owner.getCurrentTrack());
+                                          : new ReinforcementAdvisor(campaign, campaignState, currentTrack);
 
         inspector.setEnvironment((scenario == null) ? null : scenario.getBackingScenario(),
-              owner.getCurrentTrack(), owner.getSelectedCoords());
+              currentTrack, selectedCoords);
 
         clearStaged();
         loadExistingAssignments();
@@ -474,7 +483,7 @@ public class StratConDeploymentWizard extends JDialog {
         List<Integer> eligibleIds = StratConRulesManager.getAvailableForceIDsForManualDeployment(
               ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX,
               campaign,
-              owner.getCurrentTrack(),
+              currentTrack,
               false,
               null,
               campaignState,
@@ -498,7 +507,7 @@ public class StratConDeploymentWizard extends JDialog {
             List<Integer> templateIds = StratConRulesManager.getAvailableForceIDsForManualDeployment(
                   forceTemplate.getAllowedUnitType(),
                   campaign,
-                  owner.getCurrentTrack(),
+                  currentTrack,
                   arrivesAsReinforcements,
                   scenario,
                   campaignState,
@@ -1064,7 +1073,7 @@ public class StratConDeploymentWizard extends JDialog {
                                         !stagedAuxiliaryUnits.isEmpty() ||
                                         !stagedUtilityUnits.isEmpty();
         if (managedScenario && (scenario != null)) {
-            StratConDeploymentService.finalizeForceDeployment(campaign, owner.getCurrentTrack(), scenario);
+            StratConDeploymentService.finalizeForceDeployment(campaign, currentTrack, scenario);
         }
 
         applyOffBoardSelections();
@@ -1109,8 +1118,8 @@ public class StratConDeploymentWizard extends JDialog {
 
         StratConDeploymentService.deployPrimaryForces(campaign,
               campaignState,
-              owner.getCurrentTrack(),
-              owner.getSelectedCoords(),
+              currentTrack,
+              selectedCoords,
               assignToScenario,
               stagedForceIds);
     }
@@ -1222,7 +1231,7 @@ public class StratConDeploymentWizard extends JDialog {
           @Nullable String enemyCode) {
         List<Formation> committed = StratConDeploymentService.commitReinforcementForces(campaign,
               campaignState,
-              owner.getCurrentTrack(),
+              currentTrack,
               scenario,
               forcesByTemplate,
               targetNumber,
