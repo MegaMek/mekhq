@@ -51,6 +51,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import megamek.Version;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
@@ -663,11 +664,11 @@ public class AtBDynamicScenario extends AtBScenario {
             if (wn2.getNodeName().equalsIgnoreCase(ScenarioTemplate.ROOT_XML_ELEMENT_NAME)) {
                 setTemplate(ScenarioTemplate.Deserialize(wn2));
             } else if (wn2.getNodeName().equalsIgnoreCase("effectivePlayerUnitCountMultiplier")) {
-                setEffectivePlayerUnitCountMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                setEffectivePlayerUnitCountMultiplier(MathUtility.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("effectivePlayerBVMultiplier")) {
-                setEffectivePlayerBVMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                setEffectivePlayerBVMultiplier(MathUtility.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("friendlyReinforcementDelayReduction")) {
-                setFriendlyReinforcementDelayReduction(Integer.parseInt(wn2.getTextContent().trim()));
+                setFriendlyReinforcementDelayReduction(MathUtility.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("friendlyDelayedReinforcements")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (String value : values) {
@@ -679,11 +680,11 @@ public class AtBDynamicScenario extends AtBScenario {
                     getFriendlyInstantReinforcements().add(UUID.fromString(value));
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("hostileReinforcementDelayReduction")) {
-                setHostileReinforcementDelayReduction(Integer.parseInt(wn2.getTextContent().trim()));
+                setHostileReinforcementDelayReduction(MathUtility.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("effectiveOpForSkill")) {
                 setEffectiveOpForSkill(SkillLevel.valueOf(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("effectiveOpForQuality")) {
-                setEffectiveOpForQuality(Integer.parseInt(wn2.getTextContent().trim()));
+                setEffectiveOpForQuality(MathUtility.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAPS_ELEMENT)) {
                 for (int snsIndex = 0; snsIndex < wn2.getChildNodes().getLength(); snsIndex++) {
                     Node swapNode = wn2.getChildNodes().item(snsIndex);
@@ -714,7 +715,7 @@ public class AtBDynamicScenario extends AtBScenario {
                 String content = wn2.getTextContent().trim();
                 if (!content.isBlank()) {
                     for (String value : content.split(",")) {
-                        offBoardForceIDs.add(Integer.parseInt(value.trim()));
+                        offBoardForceIDs.add(MathUtility.parseInt(value.trim()));
                     }
                 }
             }

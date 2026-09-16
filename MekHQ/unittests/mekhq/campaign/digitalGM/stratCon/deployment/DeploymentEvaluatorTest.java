@@ -113,14 +113,14 @@ class DeploymentEvaluatorTest {
 
     @Test
     void reinforcementRollAppliesModifierAndComputesOdds() {
-        ReinforcementRoll roll = DeploymentEvaluator.reinforcementRoll(10, -4);
+        ReinforcementRoll roll = DeploymentEvaluator.reinforcementRoll(10, -4, false);
         assertEquals(6, roll.finalTargetNumber());
         assertEquals(26.0 / 36.0, roll.successProbability(), PROBABILITY_TOLERANCE);
     }
 
     @Test
     void reinforcementRollWithoutModifierUsesBaseTarget() {
-        ReinforcementRoll roll = DeploymentEvaluator.reinforcementRoll(8, 0);
+        ReinforcementRoll roll = DeploymentEvaluator.reinforcementRoll(8, 0, false);
         assertEquals(8, roll.finalTargetNumber());
         assertEquals(15.0 / 36.0, roll.successProbability(), PROBABILITY_TOLERANCE);
     }

@@ -707,8 +707,9 @@ public class StratConDeploymentWizard extends JDialog {
         } else if (item instanceof Formation formation) {
             if (asReinforcement && (reinforcementAdvisor != null)) {
                 ReinforcementEligibilityType eligibility = reinforcementAdvisor.getEligibility(formation.getId());
-                // Preview the roll at no support-point spend; the actual spend is chosen in the commit dialog.
-                ReinforcementRoll roll = reinforcementAdvisor.getRoll(0, false);
+                // Preview the roll at no support-point spent; the actual spend is chosen in the commit dialog.
+                boolean isManeuver = formation.getCombatRoleInMemory().isManeuver();
+                ReinforcementRoll roll = reinforcementAdvisor.getRoll(0, false, isManeuver);
                 int perForceCost = DeploymentEvaluator.reinforcementCost(0, false, 1).perForceSupportPoints();
                 inspector.showReinforcementFormation(formation, eligibility, roll, perForceCost,
                       estimateReinforcementArrival(formation));

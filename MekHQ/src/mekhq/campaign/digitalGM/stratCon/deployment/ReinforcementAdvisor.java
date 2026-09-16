@@ -42,6 +42,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementEligibilityType;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 
 /**
@@ -92,15 +93,16 @@ public class ReinforcementAdvisor {
     /**
      * @param chosenSupportPoints the support points the player would spend per force to improve the roll
      * @param instant             whether the reinforcements would arrive instantly
+     * @param isManeuver if the formation is set to {@link CombatRole#MANEUVER}} and therefore enjoys improved reinforcement rolls
      *
      * @return the final target number and success odds for a single force at that spend
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public ReinforcementRoll getRoll(int chosenSupportPoints, boolean instant) {
+    public ReinforcementRoll getRoll(int chosenSupportPoints, boolean instant, boolean isManeuver) {
         int modifier = DeploymentEvaluator.reinforcementCost(chosenSupportPoints, instant, 1).targetNumberModifier();
-        return DeploymentEvaluator.reinforcementRoll(baseTargetNumber, modifier);
+        return DeploymentEvaluator.reinforcementRoll(baseTargetNumber, modifier, isManeuver);
     }
 
     private int computeBaseTargetNumber() {

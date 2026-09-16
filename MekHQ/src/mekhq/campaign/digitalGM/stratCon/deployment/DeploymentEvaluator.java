@@ -36,6 +36,8 @@ import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.BASE_LEADERSHIP_BUDGET;
 
+import mekhq.campaign.mission.utilities.CombatRole;
+
 /**
  * Pure deployment arithmetic for the StratCon deployment wizard: the buried formulas that decide whether a deployment
  * succeeds and what it costs, pulled out of the wizard UI so the inspector, the board lenses, and the commit path all
@@ -77,7 +79,7 @@ public final class DeploymentEvaluator {
      */
     public static double successProbabilityTwoD6(int targetNumber) {
         if (targetNumber <= 2) {
-            return 1.0;
+            return 35.0 / 36.0;
         }
         if (targetNumber > 12) {
             return 0.0;
@@ -87,8 +89,13 @@ public final class DeploymentEvaluator {
         for (int sum = targetNumber; sum <= 12; sum++) {
             favourableOutcomes += TWO_D6_WAYS_BY_SUM[sum];
         }
+
+        // Natural 2 is an automatic failure regardless of target number.
+        favourableOutcomes -= TWO_D6_WAYS_BY_SUM[2];
+
         return (double) favourableOutcomes / TWO_D6_TOTAL_OUTCOMES;
     }
+
 
     /**
      * @param leadershipSkill the commander's leadership skill; a non-positive skill grants no budget
@@ -163,14 +170,21 @@ public final class DeploymentEvaluator {
      *
      * @param baseTargetNumber     the target number after command-liaison and contract modifiers, before support points
      * @param targetNumberModifier the (non-positive) support-point modifier, from {@link #reinforcementCost}
+     * @param isManeuver if the formation is set to {@link CombatRole#MANEUVER}} and therefore enjoys improved reinforcement rolls
      *
      * @return the final target number and its 2d6 success probability
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static ReinforcementRoll reinforcementRoll(int baseTargetNumber, int targetNumberModifier) {
+    public static ReinforcementRoll reinforcementRoll(int baseTargetNumber, int targetNumberModifier, boolean isManeuver) {
         int finalTargetNumber = baseTargetNumber + targetNumberModifier;
-        return new ReinforcementRoll(finalTargetNumber, successProbabilityTwoD6(finalTargetNumber));
+        double probability = successProbabilityTwoD6(finalTargetNumber);
+
+        if (isManeuver) {
+            probability = 1.0 - Math.pow(1.0 - probability, 2);
+        }
+
+        return new ReinforcementRoll(finalTargetNumber, probability);
     }
 }

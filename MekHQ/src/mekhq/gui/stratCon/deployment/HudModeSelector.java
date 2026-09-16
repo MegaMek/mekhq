@@ -46,8 +46,6 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.EnumMap;
@@ -154,15 +152,6 @@ public class HudModeSelector extends JPanel {
                     hovered = false;
                     refreshTitleColor();
                     repaint();
-                }
-            });
-
-            addKeyListener(new KeyAdapter() {
-                @Override
-                public void keyPressed(KeyEvent event) {
-                    if ((event.getKeyCode() == KeyEvent.VK_SPACE) || (event.getKeyCode() == KeyEvent.VK_ENTER)) {
-                        choose();
-                    }
                 }
             });
         }
