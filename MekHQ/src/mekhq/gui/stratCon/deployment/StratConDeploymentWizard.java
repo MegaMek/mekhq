@@ -34,7 +34,6 @@ package mekhq.gui.stratCon.deployment;
 
 import static mekhq.MHQConstants.CONFIRMATION_STRATCON_BATCHALL_BREACH;
 import static mekhq.MHQConstants.CONFIRMATION_STRATCON_DEPLOY;
-import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.calculateReinforcementTargetNumber;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.commanderLanceHasDefensiveAssignment;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.getEligibleFrontlineUnits;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.getEligibleLeadershipUnits;
@@ -1145,15 +1144,9 @@ public class StratConDeploymentWizard extends JDialog {
             return false;
         }
 
-        Person commandLiaison = campaign.getPlayerForce()
-                                      .getHumanResources()
-                                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                                            campaign.getPlayerForce().isClanForce(),
-                                            campaign.getLocalDate());
-        int baseTargetNumber = campaign.getCampaignOptions().get(CampaignOption.REINFORCEMENT_BASE_TARGET_NUMBER);
-        TargetRoll targetNumber = calculateReinforcementTargetNumber(commandLiaison,
-              campaignState.getContract(),
-              baseTargetNumber);
+        // The advisor was built in display() with these same inputs (command liaison, contract, base target number), and
+        // scenario is non-null past the guard above, so it is non-null here. Reuse its target roll rather than recompute.
+        TargetRoll targetNumber = reinforcementAdvisor.getBaseTargetRoll();
         int availableSupportPoints = campaignState.getSupportPoints();
 
         AbstractContract contract = scenario.getBackingContract(campaign);

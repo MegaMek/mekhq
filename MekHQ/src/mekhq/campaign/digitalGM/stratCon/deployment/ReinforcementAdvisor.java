@@ -57,13 +57,24 @@ public class ReinforcementAdvisor {
     private final Campaign campaign;
     private final StratConCampaignState campaignState;
     private final StratConTrackState track;
-    private final int baseTargetNumber;
+    private final TargetRoll baseTargetRoll;
 
     public ReinforcementAdvisor(Campaign campaign, StratConCampaignState campaignState, StratConTrackState track) {
         this.campaign = campaign;
         this.campaignState = campaignState;
         this.track = track;
-        this.baseTargetNumber = computeBaseTargetNumber();
+        this.baseTargetRoll = computeBaseTargetRoll();
+    }
+
+    /**
+     * @return the contract-modified base target roll shared by every reinforcement attempt on this contract, before any
+     *       support-point spend, with its individual modifiers preserved for display in the confirmation dialog
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public TargetRoll getBaseTargetRoll() {
+        return baseTargetRoll;
     }
 
     /**
@@ -74,7 +85,7 @@ public class ReinforcementAdvisor {
      * @since 0.51.01
      */
     public int getBaseTargetNumber() {
-        return baseTargetNumber;
+        return baseTargetRoll.getValue();
     }
 
     /**
@@ -102,10 +113,10 @@ public class ReinforcementAdvisor {
      */
     public ReinforcementRoll getRoll(int chosenSupportPoints, boolean instant, boolean isManeuver) {
         int modifier = DeploymentEvaluator.reinforcementCost(chosenSupportPoints, instant, 1).targetNumberModifier();
-        return DeploymentEvaluator.reinforcementRoll(baseTargetNumber, modifier, isManeuver);
+        return DeploymentEvaluator.reinforcementRoll(baseTargetRoll.getValue(), modifier, isManeuver);
     }
 
-    private int computeBaseTargetNumber() {
+    private TargetRoll computeBaseTargetRoll() {
         Person commandLiaison = campaign.getPlayerForce()
                                       .getHumanResources()
                                       .getSeniorAdminPerson(campaign.getCampaignOptions(),
@@ -113,7 +124,6 @@ public class ReinforcementAdvisor {
                                             campaign.getLocalDate());
         int base = campaign.getCampaignOptions().get(CampaignOption.REINFORCEMENT_BASE_TARGET_NUMBER);
         AbstractContract contract = campaignState.getContract();
-        TargetRoll targetRoll = calculateReinforcementTargetNumber(commandLiaison, contract, base);
-        return targetRoll.getValue();
+        return calculateReinforcementTargetNumber(commandLiaison, contract, base);
     }
 }
