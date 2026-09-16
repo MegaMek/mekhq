@@ -123,12 +123,17 @@ public abstract class MHQTableModel<DataModel, ColumnModel extends MHQTableColum
     }
 
     /**
-     * Sets the underlying data list for this table model. Does not automatically fire a table data changed event.
+     * Sets the underlying data list for this table model and fires a table data changed event, so that dependent
+     * components (such as a {@link javax.swing.RowSorter}) re-index against the new data. Callers should clear any
+     * active selection before invoking this when the row count may shrink: Swing restores the prior selection by
+     * mapping its model rows into the rebuilt view, and a selection that references a now-removed row throws an
+     * {@link ArrayIndexOutOfBoundsException} during that restoration.
      *
      * @param data The new list of row data objects
      */
     public void setData(List<DataModel> data) {
         this.data = data;
+        fireTableDataChanged();
     }
 
     public Map<ColumnModel, SortOrder> getDefaultSortOrder() {
