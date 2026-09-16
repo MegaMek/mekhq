@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import megamek.client.ratgenerator.CrewDescriptor;
+import megamek.common.enums.Gender;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
@@ -42,10 +43,11 @@ import mekhq.campaign.personnel.skills.SkillType;
  * Seeds a freshly-generated MekHQ {@link Person} from a MegaMek {@link CrewDescriptor} produced by the
  * Force Generator engine.
  *
- * <p>The descriptor carries name, gunnery skill, and piloting skill — the engine generates these in
- * {@code CrewDescriptor.setSkills()} from the user-selected experience level (Green / Regular / Veteran
- * / Elite) on the {@code ForceDescriptor}, with bonuses for unit rating and Clan unit type. This
- * adapter applies all three to the Person.</p>
+ * <p>The descriptor carries name, gender, gunnery skill, and piloting skill — the engine generates the
+ * skills in {@code CrewDescriptor.setSkills()} from the user-selected experience level (Green / Regular /
+ * Veteran / Elite) on the {@code ForceDescriptor}, with bonuses for unit rating and Clan unit type. This
+ * adapter applies all four to the Person. Gender travels with the name: the engine picked the name to
+ * match the gender it rolled, so a Person that keeps the descriptor's name must take its gender too.</p>
  *
  * <p>Skill translation: ratgen's {@code gunnery} and {@code piloting} fields are <em>target numbers</em>
  * (a lower value means a more skilled crew). MekHQ stores skills as a {@code (level, bonus)} pair on top
@@ -111,6 +113,7 @@ public final class CrewDescriptorAdapter {
         if (nameCarriesBloodname) {
             fullName = fullName.substring(0, fullName.length() - descriptorBloodname.length() - 1).trim();
         }
+        applyGender(descriptor, person);
         int firstSpace = fullName.indexOf(' ');
         if (firstSpace > 0 && firstSpace < fullName.length() - 1) {
             person.setGivenName(fullName.substring(0, firstSpace));
@@ -142,6 +145,38 @@ public final class CrewDescriptorAdapter {
         person.setFullName();
         LOGGER.info("[CompanyGen]         CrewDescriptorAdapter renamed person to '{}' (gunnery={} piloting={} rank={})",
               fullName, descriptor.getGunnery(), descriptor.getPiloting(), descriptor.getRank());
+    }
+
+    /**
+     * Makes the Person's gender agree with the descriptor's name. The engine rolled a gender and then generated a
+     * name for it, while MekHQ's personnel generator rolled a second, independent gender for the same seat. Copying
+     * the name without the gender left about half of all unit commanders with a name from the other list, such as a
+     * female "Bill Schindler". If the Person rolled a non-binary gender from the campaign's non-binary dice, that
+     * flavour is kept and only its underlying sex is aligned with the name.
+     *
+     * @param descriptor the descriptor whose name the Person is taking
+     * @param person     the Person being renamed
+     */
+    private static void applyGender(CrewDescriptor descriptor, Person person) {
+        Gender descriptorGender = descriptor.getGender();
+        if ((descriptorGender == null) || (descriptorGender == Gender.RANDOMIZE)) {
+            LOGGER.info("[CompanyGen]         CrewDescriptorAdapter: descriptor '{}' has no gender, keeping {}",
+                  descriptor.getName(), person.getGender());
+            return;
+        }
+        Gender previousGender = person.getGender();
+        boolean keepNonBinary = (previousGender != null) && previousGender.isGenderNeutral();
+        Gender alignedGender;
+        if (keepNonBinary) {
+            alignedGender = descriptorGender.isFemale() ? Gender.OTHER_FEMALE : Gender.OTHER_MALE;
+        } else {
+            alignedGender = descriptorGender.isFemale() ? Gender.FEMALE : Gender.MALE;
+        }
+        person.setGender(alignedGender);
+        if (alignedGender != previousGender) {
+            LOGGER.info("[CompanyGen]         CrewDescriptorAdapter: gender {} -> {} to match descriptor name '{}'",
+                  previousGender, alignedGender, descriptor.getName());
+        }
     }
 
     private static void applySkills(CrewDescriptor descriptor, Person person, Entity entity) {
