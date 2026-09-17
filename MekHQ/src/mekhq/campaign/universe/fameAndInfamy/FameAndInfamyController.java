@@ -43,7 +43,6 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import megamek.codeUtilities.MathUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.universe.factionStanding.BatchallFactions;
@@ -184,7 +183,7 @@ public class FameAndInfamyController {
      */
     @Deprecated(since = "0.50.07", forRemoval = true)
     public void setFameForFaction(String factionCode, double fame) {
-        fame = MathUtility.clamp(fame, 0.0, 5.0);
+        fame = Math.clamp(fame, 0.0, 5.0);
 
         trackingFactions.put(factionCode, fame);
     }
@@ -201,7 +200,7 @@ public class FameAndInfamyController {
 
         double currentFame = trackingFactions.get(factionCode);
         adjustment = currentFame + adjustment;
-        adjustment = MathUtility.clamp(adjustment, 0.0, 5.0);
+        adjustment = Math.clamp(adjustment, 0.0, 5.0);
 
         trackingFactions.put(factionCode, adjustment);
 
