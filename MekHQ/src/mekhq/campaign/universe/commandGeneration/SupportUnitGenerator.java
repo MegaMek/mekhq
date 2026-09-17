@@ -33,8 +33,13 @@
 package mekhq.campaign.universe.commandGeneration;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.enums.MiscTypeFlag;
@@ -42,16 +47,21 @@ import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
+import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.ranks.AutomaticRankAssigner;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.unit.CrewType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.VehicleCrewSource;
 
 /**
  * Generates the free support vehicles a command is granted for its various support capabilities, and
@@ -115,8 +125,9 @@ public final class SupportUnitGenerator {
     }
 
     /**
-     * Grants the vehicles of one support capability, topping the command up to the capability's target count. What
-     * is fielded, how many, and which formation they are filed under all come from the capability itself.
+     * Grants the vehicles of one support capability, crewed the way the campaign crews everything else: one named
+     * crew member plus the temporary crew pool where that role uses temporary crews, a full crew of individual
+     * personnel where it does not.
      *
      * @param capability      the support capability being granted
      * @param campaign        the campaign the vehicles are generated into
@@ -125,8 +136,70 @@ public final class SupportUnitGenerator {
      */
     public static void generate(SupportCapability capability, Campaign campaign, Faction faction,
           boolean autoAssignRanks) {
+        generate(capability, campaign, faction, autoAssignRanks, null);
+    }
+
+    /**
+     * Grants the vehicles of one support capability, with the crewing forced rather than taken from the campaign's
+     * temporary crew options. Used by the campaign-option dialog, where the player chooses.
+     *
+     * @param capability      the support capability being granted
+     * @param campaign        the campaign the vehicles are generated into
+     * @param faction         the faction whose ranks the crews are given
+     * @param autoAssignRanks whether generated crews have ranks assigned automatically
+     * @param crewSource      the crewing to use, or {@code null} to follow the campaign's temporary crew options
+     */
+    public static void generate(SupportCapability capability, Campaign campaign, Faction faction,
+          boolean autoAssignRanks, @Nullable VehicleCrewSource crewSource) {
         generate(campaign, faction, autoAssignRanks, capability.unitName(campaign), capability.targetCount(campaign),
-              capability.formationType());
+              capability.formationType(), crewSource);
+    }
+
+    /**
+     * Crews a freshly built support unit and reports whether it was crewed from the temporary crew pool.
+     *
+     * <p>A role that uses temporary crews gets one named crew member, which is what the pool needs before it will
+     * fill the remaining seats, exactly as the crew assembler leaves an infantry platoon during generation. Every
+     * other role gets a full crew of individual personnel.</p>
+     *
+     * @param campaign   the campaign the unit belongs to
+     * @param unit       the newly built, crewless unit
+     * @param faction    the faction the crew are drawn from
+     * @param crewSource the crewing to use, or {@code null} to follow the campaign's temporary crew options
+     *
+     * @return the role filled from the temporary crew pool, or {@code null} when the unit was fully crewed
+     */
+    static @Nullable PersonnelRole crewSupportUnit(Campaign campaign, Unit unit, Faction faction,
+          @Nullable VehicleCrewSource crewSource) {
+        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+        PersonnelRole crewRole = unit.getDriverRole();
+        boolean useTemporaryCrew;
+        if (crewSource == VehicleCrewSource.TEMPORARY_CREW) {
+            useTemporaryCrew = true;
+        } else if (crewSource == VehicleCrewSource.NEW_CREW) {
+            useTemporaryCrew = false;
+        } else {
+            useTemporaryCrew = (crewRole != null)
+                                     && humanResources.isBlobCrewEnabled(crewRole, campaign.getCampaignOptions());
+        }
+
+        if (useTemporaryCrew && (crewRole != null)) {
+            Person commander = humanResources.newPerson(campaign, crewRole);
+            humanResources.recruitPerson(campaign, commander, true, true);
+            unit.addDriver(commander);
+            unit.resetPilotAndEntity();
+            LOGGER.info("[CompanyGen][SupportUnits]     '{}' crewed with one named {} plus the temporary crew pool",
+                  unit.getName(), crewRole);
+            return crewRole;
+        }
+
+        Map<CrewType, Collection<Person>> newCrew = Utilities.genRandomCrewWithCombinedSkill(campaign, unit,
+              faction.getShortName());
+        newCrew.forEach((type, personnel) -> personnel.forEach(person -> type.getAddMethod().accept(unit, person)));
+        unit.resetPilotAndEntity();
+        LOGGER.info("[CompanyGen][SupportUnits]     '{}' crewed with {} individual personnel", unit.getName(),
+              unit.getActiveCrew().size());
+        return null;
     }
 
     /**
@@ -358,7 +431,7 @@ public final class SupportUnitGenerator {
      * unloadable entity is logged and skipped rather than aborting the whole batch.
      */
     private static void generate(Campaign campaign, Faction faction, boolean autoAssignRanks, String unitName,
-          int targetCount, SupportTOEFormationTypes formationType) {
+          int targetCount, SupportTOEFormationTypes formationType, @Nullable VehicleCrewSource crewSource) {
         int existing = countGeneratedUnitsNamed(campaign, unitName);
         int count = Math.max(0, targetCount - existing);
         if (count <= 0) {
@@ -375,11 +448,17 @@ public final class SupportUnitGenerator {
 
         boolean useRandomQuality = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES);
         List<Unit> units = new ArrayList<>();
+        Set<PersonnelRole> pooledRoles = new HashSet<>();
         for (int index = 0; index < count; index++) {
             try {
                 PartQuality quality = useRandomQuality ? UnitOrder.getRandomUnitQuality(0) : PartQuality.QUALITY_D;
-                Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), true, 0, quality);
+                // Built crewless, then crewed to match how the campaign crews everything else.
+                Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), false, 0, quality);
                 if (unit != null) {
+                    PersonnelRole pooledRole = crewSupportUnit(campaign, unit, faction, crewSource);
+                    if (pooledRole != null) {
+                        pooledRoles.add(pooledRole);
+                    }
                     if (autoAssignRanks) {
                         AutomaticRankAssigner.assignRanks(campaign, unit, faction);
                     }
@@ -392,6 +471,13 @@ public final class SupportUnitGenerator {
 
         if (!units.isEmpty()) {
             AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, units, formationType);
+        }
+        // The daily pool fill is off by default, so whatever was crewed from the pool is filled here and now.
+        for (PersonnelRole pooledRole : pooledRoles) {
+            campaign.resetTempCrewPoolForRole(pooledRole);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(), pooledRole);
         }
         LOGGER.info("[CompanyGen][SupportUnits] {}: generated {}/{} new x '{}' ({} already present, target {})",
               formationType.name(), units.size(), count, unitName, existing, targetCount);

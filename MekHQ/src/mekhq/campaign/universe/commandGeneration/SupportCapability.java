@@ -40,6 +40,7 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSection;
 
 /**
@@ -62,6 +63,7 @@ public enum SupportCapability {
           SupportUnitGenerator::scaledCount,
           SupportTOEFormationTypes.SALVAGE_FORMATION,
           SupportSection.MAINTENANCE,
+          PersonnelRole.VEHICLE_CREW_GROUND,
           true,
           "mekhq.resources.SalvageCampaignOptionsChangedConfirmationDialog",
           "SalvageCampaignOptionsChangedConfirmationDialog"),
@@ -72,6 +74,7 @@ public enum SupportCapability {
           SupportUnitGenerator::medicalUnitCount,
           SupportTOEFormationTypes.MEDICAL_FORMATION,
           SupportSection.MEDICAL,
+          PersonnelRole.VEHICLE_CREW_GROUND,
           true,
           "mekhq.resources.MASHTheatreTrackingCampaignOptionsChangedConfirmationDialog",
           "MASHTheatreTrackingCampaignOptionsChangedConfirmationDialog"),
@@ -82,6 +85,7 @@ public enum SupportCapability {
           SupportUnitGenerator::scaledCount,
           SupportTOEFormationTypes.LOGISTICS_FORMATION,
           null,
+          PersonnelRole.VEHICLE_CREW_GROUND,
           true,
           "mekhq.resources.StratConConvoyCampaignOptionsChangedConfirmationDialog",
           "StratConConvoyCampaignOptionsChangedConfirmationDialog"),
@@ -92,6 +96,7 @@ public enum SupportCapability {
           SupportUnitGenerator::commissaryUnitCount,
           SupportTOEFormationTypes.COMMISSARY_FORMATION,
           null,
+          PersonnelRole.VEHICLE_CREW_GROUND,
           true,
           "mekhq.resources.FatigueTrackingCampaignOptionsChangedConfirmationDialog",
           "FatigueTrackingCampaignOptionsChangedConfirmationDialog"),
@@ -102,6 +107,7 @@ public enum SupportCapability {
           SupportCapability::securityCount,
           SupportTOEFormationTypes.SECURITY_FORMATION,
           null,
+          PersonnelRole.SOLDIER,
           false,
           "mekhq.resources.PrisonerTrackingCampaignOptionsChangedConfirmationDialog",
           "PrisonerTrackingCampaignOptionsChangedConfirmationDialog");
@@ -111,19 +117,21 @@ public enum SupportCapability {
     private final ToIntFunction<Campaign> targetCountResolver;
     private final SupportTOEFormationTypes formationType;
     private final SupportSection crewSection;
+    private final PersonnelRole crewRole;
     private final boolean needsMechanics;
     private final String resourceBundle;
     private final String resourceKeyPrefix;
 
     SupportCapability(Predicate<CampaignOptions> enabledCheck, Function<Campaign, String> unitNameResolver,
           ToIntFunction<Campaign> targetCountResolver, SupportTOEFormationTypes formationType,
-          @Nullable SupportSection crewSection, boolean needsMechanics, String resourceBundle,
-          String resourceKeyPrefix) {
+          @Nullable SupportSection crewSection, PersonnelRole crewRole, boolean needsMechanics,
+          String resourceBundle, String resourceKeyPrefix) {
         this.enabledCheck = enabledCheck;
         this.unitNameResolver = unitNameResolver;
         this.targetCountResolver = targetCountResolver;
         this.formationType = formationType;
         this.crewSection = crewSection;
+        this.crewRole = crewRole;
         this.needsMechanics = needsMechanics;
         this.resourceBundle = resourceBundle;
         this.resourceKeyPrefix = resourceKeyPrefix;
@@ -181,6 +189,16 @@ public enum SupportCapability {
      */
     public @Nullable SupportSection crewSection() {
         return crewSection;
+    }
+
+    /**
+     * The role that crews these units, which decides whether they are crewed from the temporary crew pool: ground
+     * vehicle crew for the support vehicles, and soldiers for the security detail.
+     *
+     * @return the crew role
+     */
+    public PersonnelRole crewRole() {
+        return crewRole;
     }
 
     /**

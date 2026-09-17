@@ -53,15 +53,22 @@ import java.awt.Insets;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JEditorPane;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.SupportCapability;
+import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
+import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
+import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.VehicleCrewSource;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -69,13 +76,20 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 /**
  * Offers the free support vehicles that come with a capability the player has just switched on mid-campaign.
  *
- * <p>One dialog serves every capability. Which text is shown, and which vehicles are granted on Accept, both come
- * from the {@link SupportCapability} it is given, so a capability is described in one place rather than in a dialog
- * class of its own.</p>
+ * <p>One dialog serves every capability. Which text is shown, and which vehicles are granted on Accept, both come from
+ * the {@link SupportCapability} it is given, so a capability is described in one place rather than in a dialog class of
+ * its own.</p>
+ *
+ * <p>Two choices are offered, each only when it applies. A campaign using support teams can crew the new vehicles from
+ * the staff it already has, which puts them in the same place generation would have. A campaign using temporary crews
+ * for the crew role can take one named crew member per vehicle and fill the rest of the seats from the pool, as its
+ * infantry and vehicles are already crewed.</p>
  *
  * @since 0.51.01
  */
 public class SupportCapabilityGrantDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(SupportCapabilityGrantDialog.class);
+
     private final int PADDING = scaleForGUI(10);
     protected static final int IMAGE_WIDTH = scaleForGUI(200);
     protected static final int CENTER_WIDTH = scaleForGUI(450);
@@ -83,6 +97,9 @@ public class SupportCapabilityGrantDialog extends JDialog {
     private ImageIcon campaignIcon;
     private final Campaign campaign;
     private final SupportCapability capability;
+
+    private JCheckBox chkCrewFromExistingStaff;
+    private JCheckBox chkUseTemporaryCrews;
 
     /**
      * Shows the offer for one capability's free vehicles.
@@ -175,9 +192,52 @@ public class SupportCapabilityGrantDialog extends JDialog {
         pnlCenter.add(editorPane);
 
         pnlCenter.add(Box.createVerticalStrut(PADDING));
+        addCrewingChoices(pnlCenter);
         pnlCenter.add(createButtonPanel());
 
         return pnlCenter;
+    }
+
+    /**
+     * Adds the crewing choices that apply to this campaign. A choice the campaign cannot make is left out rather than
+     * shown disabled, so the dialog stays as short as the decision in front of the player.
+     */
+    private void addCrewingChoices(JPanel pnlCenter) {
+        if (canCrewFromExistingStaff()) {
+            chkCrewFromExistingStaff = new JCheckBox(getText("supportCapabilityGrant.crewFromExistingStaff.text"));
+            chkCrewFromExistingStaff.setToolTipText(getText("supportCapabilityGrant.crewFromExistingStaff.toolTipText"));
+            chkCrewFromExistingStaff.setAlignmentX(Component.LEFT_ALIGNMENT);
+            chkCrewFromExistingStaff.setSelected(true);
+            pnlCenter.add(chkCrewFromExistingStaff);
+        }
+
+        if (usesTemporaryCrews()) {
+            chkUseTemporaryCrews = new JCheckBox(getText("supportCapabilityGrant.useTemporaryCrews.text"));
+            chkUseTemporaryCrews.setToolTipText(getText("supportCapabilityGrant.useTemporaryCrews.toolTipText"));
+            chkUseTemporaryCrews.setAlignmentX(Component.LEFT_ALIGNMENT);
+            chkUseTemporaryCrews.setSelected(true);
+            pnlCenter.add(chkUseTemporaryCrews);
+        }
+
+        if ((chkCrewFromExistingStaff != null) || (chkUseTemporaryCrews != null)) {
+            pnlCenter.add(Box.createVerticalStrut(PADDING));
+        }
+    }
+
+    /** Whether this campaign could seat the new vehicles from staff it already has. */
+    private boolean canCrewFromExistingStaff() {
+        return (capability.crewSection() != null)
+                     && SupportCarrierReconciler.isEnabled(campaign)
+                     && (campaign.getPlayerForce().getSupportCommandFormation() != null);
+    }
+
+    /** Whether this capability's units are crewed from the temporary crew pool in this campaign. */
+    private boolean usesTemporaryCrews() {
+        PersonnelRole crewRole = capability.crewRole();
+        return (crewRole != null)
+                     && campaign.getPlayerForce()
+                              .getHumanResources()
+                              .isBlobCrewEnabled(crewRole, campaign.getCampaignOptions());
     }
 
     private JPanel createButtonPanel() {
@@ -190,7 +250,7 @@ public class SupportCapabilityGrantDialog extends JDialog {
 
         RoundedJButton btnConfirm = new RoundedJButton(buttonLabel("confirm"));
         btnConfirm.addActionListener(event -> {
-            processFreeUnits(campaign, campaign.getPlayerForce().getFaction(), true, capability);
+            grantVehicles();
             dispose();
         });
 
@@ -199,6 +259,24 @@ public class SupportCapabilityGrantDialog extends JDialog {
         pnlButtons.add(btnConfirm);
 
         return pnlButtons;
+    }
+
+    /** Grants the vehicles the way the player asked for them, and says in the log which way that was. */
+    private void grantVehicles() {
+        boolean fromExistingStaff = (chkCrewFromExistingStaff != null) && chkCrewFromExistingStaff.isSelected();
+        boolean temporaryCrews = (chkUseTemporaryCrews != null) && chkUseTemporaryCrews.isSelected();
+
+        if (fromExistingStaff) {
+            int built = SupportPersonnelToTOE.topUpCapabilityVehicles(campaign, capability,
+                  VehicleCrewSource.EXISTING_STAFF);
+            LOGGER.info("[SupportTeams] {}: granted {} vehicle(s) into the support sections, crewed from existing"
+                              + " staff", capability, built);
+            return;
+        }
+
+        VehicleCrewSource crewSource = temporaryCrews ? VehicleCrewSource.TEMPORARY_CREW : VehicleCrewSource.NEW_CREW;
+        LOGGER.info("[SupportTeams] {}: granted standalone, crewed as {}", capability, crewSource);
+        processFreeUnits(campaign, campaign.getPlayerForce().getFaction(), true, capability, crewSource);
     }
 
     /**
@@ -218,13 +296,15 @@ public class SupportCapabilityGrantDialog extends JDialog {
     /**
      * Grants the capability's free vehicles, topping the campaign up to what a command its size should field.
      *
-     * @param campaign                  the campaign the vehicles are granted to
-     * @param faction                   the faction whose ranks the crews are given
+     * @param campaign                   the campaign the vehicles are granted to
+     * @param faction                    the faction whose ranks the crews are given
      * @param isAutomaticallyAssignRanks whether generated crews have ranks assigned automatically
-     * @param capability                the capability being granted
+     * @param capability                 the capability being granted
+     * @param crewSource                 the crewing to use, or {@code null} to follow the campaign's temporary crew
+     *                                   options
      */
     public static void processFreeUnits(Campaign campaign, Faction faction, boolean isAutomaticallyAssignRanks,
-          SupportCapability capability) {
-        SupportUnitGenerator.generate(capability, campaign, faction, isAutomaticallyAssignRanks);
+          SupportCapability capability, @Nullable VehicleCrewSource crewSource) {
+        SupportUnitGenerator.generate(capability, campaign, faction, isAutomaticallyAssignRanks, crewSource);
     }
 }

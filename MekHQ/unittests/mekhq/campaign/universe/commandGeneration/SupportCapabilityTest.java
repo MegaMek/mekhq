@@ -44,6 +44,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSection;
@@ -120,6 +121,17 @@ class SupportCapabilityTest {
         assertFalse(SupportCapability.SECURITY.needsMechanics(), "the security detail is infantry");
         for (SupportCapability capability : EnumSet.complementOf(EnumSet.of(SupportCapability.SECURITY))) {
             assertTrue(capability.needsMechanics(), capability + " fields vehicles, which need mechanics");
+        }
+    }
+
+    @Test
+    @DisplayName("Each capability names the role that crews it, so the temporary crew check is made per role")
+    void crewRoleMatchesWhatTheUnitIs() {
+        assertEquals(PersonnelRole.SOLDIER, SupportCapability.SECURITY.crewRole(),
+              "the security detail is infantry");
+        for (SupportCapability capability : EnumSet.complementOf(EnumSet.of(SupportCapability.SECURITY))) {
+            assertEquals(PersonnelRole.VEHICLE_CREW_GROUND, capability.crewRole(),
+                  capability + " fields ground support vehicles");
         }
     }
 

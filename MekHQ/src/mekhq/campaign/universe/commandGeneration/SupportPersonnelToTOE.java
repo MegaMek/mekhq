@@ -593,6 +593,176 @@ public final class SupportPersonnelToTOE {
      *
      * @return a single spec for the missing vehicles, or an empty list when none are missing
      */
+    /** Where the crew of a newly granted capability vehicle comes from. */
+    public enum VehicleCrewSource {
+        /** Seated from the section's own staff, who leave the support squads they crew today. */
+        EXISTING_STAFF,
+        /** A full crew of new hires, as a vehicle bought from the market arrives. */
+        NEW_CREW,
+        /** One named crew member, with the rest of the seats drawn from the temporary crew pool. */
+        TEMPORARY_CREW
+    }
+
+    /**
+     * Adds the capability vehicles an established campaign is missing into its existing Support Command, rather than
+     * standing them up as a formation of their own.
+     *
+     * <p>Used when a player switches a capability on mid-campaign while support teams are in use, so the vehicles land
+     * where generation would have put them. They are filed under the section that crews them, in that section's
+     * vehicle company where one still exists; a campaign whose company was collapsed into its section gets them in the
+     * section itself rather than a rival company beside it.</p>
+     *
+     * @param campaign   the campaign being topped up
+     * @param capability the capability whose vehicles are granted
+     * @param crewSource where the crews come from
+     *
+     * @return the number of vehicles built
+     */
+    public static int topUpCapabilityVehicles(Campaign campaign, SupportCapability capability,
+          VehicleCrewSource crewSource) {
+        SupportSection section = capability.crewSection();
+        Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
+        if ((section == null) || (supportCommand == null)) {
+            LOGGER.info("[SupportTeams] {}: no support section or no Support Command; nothing topped up", capability);
+            return 0;
+        }
+
+        List<VehicleSpec> vehicles = vehiclesStillNeeded(campaign, capability.unitName(campaign),
+              capability.targetCount(campaign));
+        if (vehicles.isEmpty()) {
+            return 0;
+        }
+
+        boolean useClanStructure = campaign.getPlayerForce().isClanForce();
+        EchelonProfile profile = useClanStructure ? clanProfile() : innerSphereProfile();
+        Formation sectionFormation = childNamed(supportCommand, sectionLabel(section));
+        if (sectionFormation == null) {
+            sectionFormation = supportCommand;
+        }
+        String companyLabel = (section == SupportSection.MAINTENANCE) ? label("recovery") : label("fieldHospital");
+        Formation vehicleCompany = childStartingWith(sectionFormation, companyLabel);
+        if (vehicleCompany == null) {
+            vehicleCompany = createFormation(campaign, companyLabel + " " + profile.rollupLabel(),
+                  FormationType.SUPPORT, sectionFormation, profile.rollupLevel());
+        }
+
+        List<Person> pool = (crewSource == VehicleCrewSource.NEW_CREW)
+                                  ? new ArrayList<>()
+                                  : availableSectionStaff(campaign, sectionFormation, section);
+        int built = 0;
+        for (VehicleSpec vehicle : vehicles) {
+            built += addTopUpVehicles(campaign, vehicleCompany, vehicle, pool, crewSource);
+        }
+        if (crewSource == VehicleCrewSource.TEMPORARY_CREW) {
+            campaign.resetTempCrewPoolForRole(PersonnelRole.VEHICLE_CREW_GROUND);
+            campaign.getPlayerForce()
+                  .getHumanResources()
+                  .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(),
+                        PersonnelRole.VEHICLE_CREW_GROUND);
+        }
+        resizeSupportEchelons(campaign);
+        LOGGER.info("[SupportTeams] {}: topped up {} vehicle(s) into '{}', crewed from {}", capability, built,
+              vehicleCompany.getName(), crewSource);
+        return built;
+    }
+
+    /** Builds one capability vehicle's worth of top-up, crewed as the player chose. */
+    private static int addTopUpVehicles(Campaign campaign, Formation parent, VehicleSpec vehicle, List<Person> pool,
+          VehicleCrewSource crewSource) {
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(vehicle.unitName());
+        if (mekSummary == null) {
+            LOGGER.error("Cannot find capability vehicle entry for {}", vehicle.unitName());
+            return 0;
+        }
+
+        int built = 0;
+        for (int index = 0; index < vehicle.count(); index++) {
+            try {
+                boolean wantsNewCrew = crewSource == VehicleCrewSource.NEW_CREW;
+                Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), wantsNewCrew, 0);
+                if (!wantsNewCrew) {
+                    int seats = (crewSource == VehicleCrewSource.TEMPORARY_CREW) ? 1 : unit.getFullCrewSize();
+                    seatFromSection(unit, pool, seats);
+                }
+                campaign.getPlayerForce().addUnitToFormation(unit, parent.getId(), campaign);
+                built++;
+                LOGGER.info("[SupportTeams]     '{}' unitId={} crewed {}/{} from {}", vehicle.unitName(), unit.getId(),
+                      unit.getActiveCrew().size(), unit.getFullCrewSize(), crewSource);
+            } catch (Exception exception) {
+                LOGGER.error(exception, "Unable to load capability vehicle {}: {}", vehicle.unitName(),
+                      mekSummary.getSourceFile());
+            }
+        }
+        return built;
+    }
+
+    /** Seats up to {@code seats} people from the pool, taking each out of the carrier they crew today. */
+    private static void seatFromSection(Unit unit, List<Person> pool, int seats) {
+        int seated = 0;
+        while ((seated < seats) && !pool.isEmpty()) {
+            Person person = pool.remove(0);
+            Unit previous = person.getUnit();
+            if (previous != null) {
+                previous.remove(person, true);
+            }
+            if (unit.getDrivers().size() < unit.getTotalDriverNeeds()) {
+                unit.addDriver(person);
+            } else if (unit.getGunners().size() < unit.getTotalGunnerNeeds()) {
+                unit.addGunner(person);
+            } else {
+                unit.addVesselCrew(person);
+            }
+            seated++;
+        }
+    }
+
+    /** The section's people who could crew a vehicle: those carried by its support squads. */
+    private static List<Person> availableSectionStaff(Campaign campaign, Formation sectionFormation,
+          SupportSection section) {
+        List<Person> staff = new ArrayList<>();
+        for (UUID unitId : sectionFormation.getAllUnits(false)) {
+            Unit carrier = campaign.getUnit(unitId);
+            if ((carrier == null) || !carrier.isCarrier()) {
+                continue;
+            }
+            for (Person person : carrier.getCrew()) {
+                if (sectionFor(person.getPrimaryRole()) == section) {
+                    staff.add(person);
+                }
+            }
+        }
+        return staff;
+    }
+
+    /** The section's display name, as the player sees it in the order of battle. */
+    private static String sectionLabel(SupportSection section) {
+        return switch (section) {
+            case MAINTENANCE -> label("maintenance");
+            case MEDICAL -> label("medical");
+            case COMMAND -> label("command");
+        };
+    }
+
+    /** The child formation with exactly this name, or {@code null} when the section has none. */
+    private static @Nullable Formation childNamed(Formation parent, String name) {
+        for (Formation child : parent.getSubFormations()) {
+            if (name.equalsIgnoreCase(child.getName())) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+    /** The child formation whose name begins with this label, so "Recovery Company" matches "Recovery". */
+    private static @Nullable Formation childStartingWith(Formation parent, String label) {
+        for (Formation child : parent.getSubFormations()) {
+            if (child.getName().toLowerCase().startsWith(label.toLowerCase())) {
+                return child;
+            }
+        }
+        return null;
+    }
+
     /**
      * The capability vehicles this section builds and crews, each cut down to what the campaign still lacks. Which
      * capabilities those are comes from {@link SupportCapability}, the one list the whole pipeline reads.
