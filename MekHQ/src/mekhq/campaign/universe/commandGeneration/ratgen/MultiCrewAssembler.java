@@ -47,18 +47,17 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 
 /**
- * Builds the {@link Person} crew for a {@link Unit}, sized to the unit's actual seat count, and attaches
- * each Person to the unit through the appropriate {@code Unit.add*} method.
+ * Builds the {@link Person} crew for a {@link Unit}, sized to the unit's actual seat count, and attaches each Person to
+ * the unit through the appropriate {@code Unit.add*} method.
  *
  * <p>The seat count comes from MekHQ's {@code Unit.getTotalDriverNeeds()}, {@code getTotalGunnerNeeds()},
- * {@code getTotalCrewNeeds()}, and {@code canTakeNavigator()} — these wrap {@code Compute} and already
- * understand cockpit type, command consoles, tripod / superheavy variations, infantry squad size, BA
- * trooper count, etc. We don't reimplement that logic here.</p>
+ * {@code getTotalCrewNeeds()}, and {@code canTakeNavigator()} — these wrap {@code Compute} and already understand
+ * cockpit type, command consoles, tripod / superheavy variations, infantry squad size, BA trooper count, etc. We don't
+ * reimplement that logic here.</p>
  *
  * <p>Role assignment per seat is delegated to {@link PersonnelRoleResolver}. The commander (descriptor
- * from {@code ForceDescriptor.getCo()}) is the first Person; their name is overridden from the
- * descriptor when {@code overrideName} is {@code true}. All other crew are randomly named by MekHQ's standard
- * personnel generator.</p>
+ * from {@code ForceDescriptor.getCo()}) is the first Person; their name is overridden from the descriptor when
+ * {@code overrideName} is {@code true}. All other crew are randomly named by MekHQ's standard personnel generator.</p>
  */
 public final class MultiCrewAssembler {
 
@@ -69,14 +68,15 @@ public final class MultiCrewAssembler {
     }
 
     /**
-     * Generates and attaches the appropriate Persons to the given unit. The commander is always first
-     * in the returned list.
+     * Generates and attaches the appropriate Persons to the given unit. The commander is always first in the returned
+     * list.
      *
      * @param unit         the MekHQ Unit to crew; must already wrap an Entity
-     * @param commander    the commander descriptor from {@code ForceDescriptor.getCo()}; may be null
-     *                     (then the commander is fully randomly named)
+     * @param commander    the commander descriptor from {@code ForceDescriptor.getCo()}; may be null (then the
+     *                     commander is fully randomly named)
      * @param campaign     the campaign that owns the unit and supplies the personnel generator
      * @param overrideName when {@code true}, the descriptor's name replaces MekHQ's random name on the commander
+     *
      * @return the list of Persons created and attached, with the commander first
      */
     public static List<Person> assemble(Unit unit, CrewDescriptor commander, Campaign campaign,
@@ -133,8 +133,14 @@ public final class MultiCrewAssembler {
         int vesselCrewNeeds = needsVesselCrew(entity) ? unit.getTotalCrewNeeds() : 0;
         boolean needsNavigator = unit.canTakeNavigator();
         int totalSeats = driverNeeds + gunnerNeeds + vesselCrewNeeds + (needsNavigator ? 1 : 0);
-        LOGGER.info("[CompanyGen]     MultiCrewAssembler.assemble unitType={} multi-seat drivers={} gunners={} vesselCrew={} navigator={} total={}",
-              unitType, driverNeeds, gunnerNeeds, vesselCrewNeeds, needsNavigator, totalSeats);
+        LOGGER.info(
+              "[CompanyGen]     MultiCrewAssembler.assemble unitType={} multi-seat drivers={} gunners={} vesselCrew={} navigator={} total={}",
+              unitType,
+              driverNeeds,
+              gunnerNeeds,
+              vesselCrewNeeds,
+              needsNavigator,
+              totalSeats);
 
         // Drivers. Commander becomes the first driver when at least one driver seat exists.
         int namedDrivers = namedSeats(campaign, primary, driverNeeds, !crew.isEmpty());
@@ -191,26 +197,26 @@ public final class MultiCrewAssembler {
      * How many of a unit's seats in one role should be filled with named personnel.
      *
      * <p>When the campaign has Temporary Crews enabled for a role, those seats are meant to be held by
-     * unnamed crew drawn from a pool, with only one named person aboard - generating a named Person per
-     * seat produces exactly the roster the option exists to avoid. The rule is MekHQ's own
+     * unnamed crew drawn from a pool, with only one named person aboard - generating a named Person per seat produces
+     * exactly the roster the option exists to avoid. The rule is MekHQ's own
      * ({@code ForceHumanResources.isBlobCrewEnabled}) rather than a parallel one defined here.</p>
      *
      * <p>Every unit keeps at least one named crew member, so a unit whose roles are all temporary still
-     * has someone identifiable aboard: the first role to be filled contributes the commander, and later
-     * roles on the same unit contribute none.</p>
+     * has someone identifiable aboard: the first role to be filled contributes the commander, and later roles on the
+     * same unit contribute none.</p>
      *
      * <p>The vessel roles are the exception: a ship keeps one named person in each of pilots, gunners and
      * vessel crew. MekHQ only counts a ship's temporary crew in a role once a real person holds that role
-     * ({@code Unit.hasRealCrewInVesselRole}), and the pool is sized the same way, so a DropShip with a
-     * named pilot and nobody else would never be given its gunners or crew. The engineer who maintains a
-     * ship is also drawn from its named vessel crew, so without one the ship has no one to maintain it.</p>
+     * ({@code Unit.hasRealCrewInVesselRole}), and the pool is sized the same way, so a DropShip with a named pilot and
+     * nobody else would never be given its gunners or crew. The engineer who maintains a ship is also drawn from its
+     * named vessel crew, so without one the ship has no one to maintain it.</p>
      *
      * @param role             the role filling these seats
      * @param seats            how many seats the unit has in this role
      * @param unitHasNamedCrew whether a named crew member has already been attached to this unit
      *
-     * @return the number of named personnel to create, which is {@code seats} unless temporary crew is
-     *       enabled for the role
+     * @return the number of named personnel to create, which is {@code seats} unless temporary crew is enabled for the
+     *       role
      */
     private static int namedSeats(Campaign campaign, PersonnelRole role, int seats,
           boolean unitHasNamedCrew) {
@@ -218,8 +224,8 @@ public final class MultiCrewAssembler {
     }
 
     /**
-     * The rule behind {@link #namedSeats(Campaign, PersonnelRole, int, boolean)}, with the campaign's
-     * answer already taken.
+     * The rule behind {@link #namedSeats(Campaign, PersonnelRole, int, boolean)}, with the campaign's answer already
+     * taken.
      *
      * @param temporaryCrew    whether the campaign fills this role from the temporary crew pool
      * @param role             the role filling these seats
@@ -244,14 +250,14 @@ public final class MultiCrewAssembler {
     /** The roles whose temporary crew MekHQ counts only once a real person holds the role. */
     private static boolean isVesselRole(PersonnelRole role) {
         return (role == PersonnelRole.VESSEL_PILOT) || (role == PersonnelRole.VESSEL_GUNNER)
-              || (role == PersonnelRole.VESSEL_CREW);
+                     || (role == PersonnelRole.VESSEL_CREW);
     }
 
     /** Whether the campaign fills this role from the temporary crew pool. */
     private static boolean isTemporaryCrewEnabled(Campaign campaign, PersonnelRole role) {
         try {
             return campaign.getPlayerForce().getHumanResources()
-                  .isBlobCrewEnabled(role, campaign.getCampaignOptions());
+                         .isBlobCrewEnabled(role, campaign.getCampaignOptions());
         } catch (Exception exception) {
             // A campaign without human resources wired up (as in unit tests) crews normally.
             return false;
@@ -264,12 +270,14 @@ public final class MultiCrewAssembler {
         if (descriptor != null) {
             CrewDescriptorAdapter.apply(descriptor, person, entity, overrideName);
         }
+        //The crew descriptor may have applied a new gender (to match the name) so generate a new portrait just in case
+        campaign.getPlayerForce().getHumanResources().assignRandomPortraitFor(campaign.getCampaignOptions(), person);
         return person;
     }
 
     /**
-     * Vessel crew slots only apply to large craft. SmallCraft, DropShips, JumpShips, WarShips, and
-     * SpaceStations all need them; everything else is driver+gunner (or solo pilot).
+     * Vessel crew slots only apply to large craft. SmallCraft, DropShips, JumpShips, WarShips, and SpaceStations all
+     * need them; everything else is driver+gunner (or solo pilot).
      */
     private static boolean needsVesselCrew(Entity entity) {
         // SpaceStation extends Jumpship and DropShip extends SmallCraft, so two checks cover all five.
@@ -278,7 +286,7 @@ public final class MultiCrewAssembler {
         }
         int unitType = entity.getUnitType();
         return unitType == UnitType.SMALL_CRAFT || unitType == UnitType.DROPSHIP
-              || unitType == UnitType.JUMPSHIP || unitType == UnitType.WARSHIP
-              || unitType == UnitType.SPACE_STATION;
+                     || unitType == UnitType.JUMPSHIP || unitType == UnitType.WARSHIP
+                     || unitType == UnitType.SPACE_STATION;
     }
 }
