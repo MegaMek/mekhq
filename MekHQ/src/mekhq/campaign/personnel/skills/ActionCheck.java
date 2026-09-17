@@ -205,15 +205,12 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     }
 
     /**
-     * Suppresses the standard results-line logging performed by {@link #resolve(boolean, String)}.
-     *
-     * <p>Callers that assemble their own running report and merely need the roll, edge handling, and margin from this
-     * utility use this to avoid the utility logging a line that does not slot into their report.</p>
+     * Adds a results-line log performed by {@link #resolve(boolean, String)}.
      *
      * @return updated action check
      */
-    public T withoutLogging() {
-        this.logResult = false;
+    public T withLogging() {
+        this.logResult = true;
         return getThis();
     }
 

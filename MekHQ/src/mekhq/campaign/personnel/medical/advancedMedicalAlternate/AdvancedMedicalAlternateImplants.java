@@ -61,8 +61,8 @@ import java.util.List;
 
 import megamek.codeUtilities.ObjectUtility;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -212,7 +212,7 @@ public class AdvancedMedicalAlternateImplants {
               person.checkAttributes(SkillAttribute.BODY, SkillAttribute.WILLPOWER)
                     .withMiscModifier(resistanceModifier)
                     .resolve(true, getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.skillCheck.degradation"));
-        campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport(false));
+        campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport());
 
         if (!attributeCheckResult.isSuccess() && useAbilities) {
             String flaw = getAndApplyEIDegradationFlaw(person);

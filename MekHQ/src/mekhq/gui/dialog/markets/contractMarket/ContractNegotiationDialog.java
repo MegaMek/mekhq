@@ -1086,7 +1086,7 @@ public class ContractNegotiationDialog extends JDialog {
     private MarginOfSuccess reportedNegotiationCheck(Person negotiator, String reasonKey, boolean useEdge) {
         ActionCheckResult result = negotiator.checkSkill(SkillType.S_NEGOTIATION, campaign)
                                          .resolve(useEdge, getTextAt(RESOURCE_BUNDLE, reasonKey));
-        campaign.addReport(DailyReportType.SKILL_CHECKS, result.getReport(true));
+        campaign.addReport(DailyReportType.SKILL_CHECKS, result.getReport());
         return result.getReportMargin();
     }
 

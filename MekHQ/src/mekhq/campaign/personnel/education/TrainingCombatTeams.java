@@ -625,7 +625,7 @@ public class TrainingCombatTeams {
               educator.checkSkill(S_TRAINING, campaign)
                     .withMiscModifier(classSizeModifier)
                     .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "trainingCombatTeam.skillCheck"));
-        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(true));
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
 
         MarginOfSuccess reportMargin = actionCheckResult.getReportMargin();
         String personnelReport = getFormattedTextAt(RESOURCE_BUNDLE, "learnedProgress.text",
