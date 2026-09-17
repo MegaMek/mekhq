@@ -37,7 +37,6 @@ import static java.awt.Color.BLUE;
 import static java.awt.Font.BOLD;
 import static java.lang.Math.max;
 import static megamek.utilities.ImageUtilities.addTintToBufferedImage;
-import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
 import static mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -80,18 +79,17 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpac
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
-import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.ImageType;
+import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.gui.dialog.StratConTerrainPaintDialog;
-import mekhq.gui.stratCon.StratConScenarioWizard;
-import mekhq.gui.stratCon.TrackForceAssignmentUI;
+import mekhq.gui.stratCon.deployment.StratConDeploymentWizard;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -203,22 +201,12 @@ public class StratConPanel extends JPanel implements ActionListener {
     // used to control how low the text description goes.
     private final Map<StratConCoords, Integer> numIconsInHex = new HashMap<>();
 
-    private final StratConScenarioWizard scenarioWizard;
-    private final TrackForceAssignmentUI assignmentUI;
-
     private final JLabel infoArea;
 
     private final Map<String, BufferedImage> imageCache = new HashMap<>();
 
-    private boolean commitForces = false;
-
-    public StratConScenarioWizard getStratConScenarioWizard() {
-        return scenarioWizard;
-    }
-
-    public TrackForceAssignmentUI getAssignmentUI() {
-        return assignmentUI;
-    }
+    /** The single reused deployment wizard, created on first use, so only one is ever open. */
+    private StratConDeploymentWizard deploymentWizard;
 
     /**
      * Constructs a StratConPanel instance, given a parent campaign GUI and a pointer to an info area.
@@ -226,15 +214,11 @@ public class StratConPanel extends JPanel implements ActionListener {
     public StratConPanel(CampaignGUI gui, JLabel infoArea) {
         campaign = gui.getCampaign();
 
-        scenarioWizard = new StratConScenarioWizard(campaign, this);
         this.infoArea = infoArea;
         // The selected-hex info is drawn as a HUD over the (dark) map, so its default text reads white; the HTML's own
         // colored spans (recon/objective cues) still show through.
         this.infoArea.setForeground(Color.WHITE);
         this.infoArea.setOpaque(false);
-
-        assignmentUI = new TrackForceAssignmentUI(this);
-        assignmentUI.setVisible(false);
 
         MapInputHandler inputHandler = new MapInputHandler();
         addMouseListener(inputHandler);
@@ -1909,52 +1893,64 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Handles action events triggered by various StratCon-related commands from the right-click context menu. This
-     * method processes user interactions to update the game state, scenarios, facilities, and UI elements based on the
-     * selected command and inputs from the context menu.
+     * Opens the redesigned deployment wizard for the currently selected hex, on the page appropriate to the scenario's
+     * state: the Primary page for a bare hex or an unresolved scenario (deploying primary forces), or the Reinforce
+     * page for a scenario whose primary forces are already committed (managing reinforcements, auxiliaries, and
+     * utility). Official challenges restrict the primary pick to a single force.
      *
-     * <p>The supported commands and their effects are as follows:</p>
+     * <p>A single wizard instance is reused, so repeatedly choosing "Manage Deployment" re-shows and re-populates the
+     * same window instead of stacking new ones.</p>
+     *
+     * @param campaignState the current StratCon campaign state
+     * @param scenario      the scenario on the selected hex, or {@code null} if there is none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void openDeploymentWizard(StratConCampaignState campaignState, @Nullable StratConScenario scenario) {
+        boolean assignToScenario = false;
+        boolean restrictToSingleForce = false;
+        DeploymentMode initialMode = DeploymentMode.PRIMARY;
+
+        if (scenario != null) {
+            if (scenario.getCurrentState() == UNRESOLVED) {
+                AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+                restrictToSingleForce = backingScenario != null &&
+                                              backingScenario.getStratConScenarioType().isOfficialChallenge();
+                assignToScenario = true;
+            } else {
+                initialMode = DeploymentMode.REINFORCE;
+            }
+        }
+
+        if (deploymentWizard == null) {
+            deploymentWizard = new StratConDeploymentWizard(this, campaign);
+        }
+        deploymentWizard.display(campaignState, scenario, assignToScenario, restrictToSingleForce, initialMode);
+        deploymentWizard.toFront();
+    }
+
+    /**
+     * Handles action events triggered by StratCon commands from the right-click context menu, dispatching on the
+     * event's action command. Each command reads the currently selected {@link StratConCoords} and updates the
+     * {@link #currentTrack}'s scenarios, forces, facilities, or cities accordingly, then repaints. If no hex is
+     * selected, or the command matches no case, the method does nothing.
+     *
+     * <p>The supported commands are:</p>
      * <ul>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_MANAGE_FORCES}:</b> Displays the force management UI for the selected coordinates.
-     *       <ul>
-     *           <li>If no scenario exists at the selected coordinates, the force management UI is directly displayed.</li>
-     *           <li>If a scenario exists, it only displays the UI if the scenario is unresolved.</li>
-     *       </ul>
-     *   </li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_MANAGE_SCENARIO}:</b> Displays the scenario wizard with the current scenario at the
-     *       selected coordinates if the scenario's state is {@code PRIMARY_FORCES_COMMITTED}.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_REVEAL_TRACK}:</b> Toggles the "GM revealed" state for the current track and updates
-     *       the menu text to reflect the state ("Hide Track" or "Reveal Track").</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_STICKY_FORCE}:</b> Toggles the sticky force assignment for a given force ID at the
-     *       selected track. When toggled:</li>
-     *           <li>-- If selected, the force is added to the track as sticky.</li>
-     *           <li>-- If deselected, the force is removed from the track's sticky forces.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_REMOVE_FACILITY}:</b> Deletes the facility present at the selected coordinates.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_CAPTURE_FACILITY}:</b> Changes the ownership of the facility at the selected coordinates
-     *       to a different faction or player, as per the rules defined in {@link StratConRulesManager}.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_ADD_FACILITY}:</b> Adds a new facility to the selected coordinates. The facility's
-     *       properties (visibility, type, etc.) are copied from the provided source facility.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_REMOVE_SCENARIO}:</b> Deletes the currently selected scenario from the campaign.</li>
+     *   <li>{@code MANAGE_FORCES} / {@code MANAGE_SCENARIO} - open the deployment wizard via
+     *       {@link #openDeploymentWizard}, on the Primary page (bare hex or unresolved scenario) or the Reinforce page
+     *       (committed scenario) as appropriate.</li>
+     *   <li>{@code STICKY_FORCE} - toggles whether a force remains deployed on the track.</li>
+     *   <li>{@code REMOVE_FACILITY} / {@code CAPTURE_FACILITY} / {@code ADD_FACILITY} - GM facility edits. Adding or
+     *       removing a facility recomputes roads; capturing deliberately does not.</li>
+     *   <li>{@code ADD_CITY} / {@code REMOVE_CITY} - GM city edits, each recomputing roads.</li>
+     *   <li>{@code REMOVE_SCENARIO} - removes the selected scenario from the campaign.</li>
+     *   <li>{@code RESET_DEPLOYMENT} - resets the selected scenario.</li>
      * </ul>
      *
-     * @param evt the {@link ActionEvent} representing the user's action. Contains information about the triggering
-     *            source and command (e.g., which menu item was selected).
-     *
-     *            <p><b>Behavior:</b></p>
-     *            <ul>
-     *              <li>The method retrieves the {@link StratConCoords} currently selected by the user, and performs actions based on the
-     *                  provided command string in the event.</li>
-     *              <li>The scenarios, forces, and facilities of the {@link #currentTrack} are modified based on the command type, and
-     *                  updates are visually reflected in the UI.</li>
-     *              <li>If a UI-related command is processed (e.g., displaying the scenario wizard or force assignment UI), the appropriate
-     *                  UI components are updated and made visible to the user.</li>
-     *            </ul>
-     *
-     *            <p><b>General Information:</b> If no valid {@link StratConCoords} are selected at the time of the event,
-     *            the method will terminate with no further action. Certain commands (e.g., {@code RIGHT_CLICK_COMMAND_REVEAL_TRACK},
-     *            {@code RIGHT_CLICK_COMMAND_ADD_FACILITY}) require valid coordinates or source properties to execute successfully.</p>
-     *
-     *            <p>If no specific actions from the above list are matched (no corresponding `case`), the method performs no effect.</p>
+     * @param evt the triggering action event; its action command selects the branch and its source carries any
+     *            per-item data (e.g. the sticky force ID or the facility to add)
      */
     @Override
     public void actionPerformed(ActionEvent evt) {
@@ -1963,58 +1959,13 @@ public class StratConPanel extends JPanel implements ActionListener {
             return;
         }
 
-        boolean isPrimaryForce = false;
         StratConScenario selectedScenario = currentTrack.getScenario(selectedCoords);
         switch (evt.getActionCommand()) {
             case RIGHT_CLICK_COMMAND_MANAGE_FORCES:
-                if (selectedScenario == null) {
-                    assignmentUI.display(campaign, campaignState, selectedCoords, false, false);
-                    assignmentUI.setVisible(true);
-                    isPrimaryForce = true;
-                }
-
-                if (selectedScenario != null) {
-                    ScenarioState currentState = selectedScenario.getCurrentState();
-
-                    if (currentState.equals(UNRESOLVED)) {
-                        AtBDynamicScenario backingScenario = selectedScenario.getBackingScenario();
-                        boolean restrictToSingleForce = backingScenario != null &&
-                                                              backingScenario.getStratConScenarioType()
-                                                                    .isOfficialChallenge();
-                        assignmentUI.display(campaign, campaignState, selectedCoords, restrictToSingleForce, true);
-                        assignmentUI.setVisible(true);
-                        isPrimaryForce = true;
-                    }
-                }
-
-                // Let's reload the scenario in case it updated
-                selectedScenario = currentTrack.getScenario(selectedCoords);
-
-                if (selectedScenario != null && selectedScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
-                    scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
-                          currentTrack,
-                          campaignState,
-                          isPrimaryForce);
-
-                    scenarioWizard.toFront();
-                    scenarioWizard.setVisible(true);
-                }
-
-                setCommitForces(false);
+                openDeploymentWizard(campaignState, selectedScenario);
                 break;
             case RIGHT_CLICK_COMMAND_MANAGE_SCENARIO:
-                // It's possible a scenario may have been placed when deploying the force, so we
-                // need to recheck
-                selectedScenario = currentTrack.getScenario(selectedCoords);
-                if (selectedScenario != null && selectedScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
-                    scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
-                          currentTrack,
-                          campaignState,
-                          false);
-
-                    scenarioWizard.toFront();
-                    scenarioWizard.setVisible(true);
-                }
+                openDeploymentWizard(campaignState, currentTrack.getScenario(selectedCoords));
                 break;
             case RIGHT_CLICK_COMMAND_STICKY_FORCE:
                 JCheckBoxMenuItem source = (JCheckBoxMenuItem) evt.getSource();
@@ -2086,12 +2037,4 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean isCommitForces() {
-        return commitForces;
-    }
-
-    public void setCommitForces(boolean commitForces) {
-        this.commitForces = commitForces;
-    }
 }

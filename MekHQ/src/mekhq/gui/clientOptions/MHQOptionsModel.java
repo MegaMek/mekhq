@@ -210,6 +210,7 @@ class MHQOptionsModel {
     int startGameBotClientDelay;
     int startGameBotClientRetryCount;
     boolean enableAbstractCombatAutoResolve;
+    boolean defaultPlayerForcesOffBoard;
     // endregion Advanced
 
     MHQOptionsModel(MHQOptions options) {
@@ -383,6 +384,7 @@ class MHQOptionsModel {
         startGameBotClientDelay = options.getStartGameBotClientDelay();
         startGameBotClientRetryCount = options.getStartGameBotClientRetryCount();
         enableAbstractCombatAutoResolve = options.getEnableAbstractCombatAutoResolve();
+        defaultPlayerForcesOffBoard = options.getDefaultPlayerForcesOffBoard();
     }
 
     /**
@@ -568,5 +570,6 @@ class MHQOptionsModel {
         options.setStartGameBotClientDelay(startGameBotClientDelay);
         options.setStartGameBotClientRetryCount(startGameBotClientRetryCount);
         options.setEnableAbstractCombatAutoResolve(enableAbstractCombatAutoResolve);
+        options.setDefaultPlayerForcesOffBoard(defaultPlayerForcesOffBoard);
     }
 }

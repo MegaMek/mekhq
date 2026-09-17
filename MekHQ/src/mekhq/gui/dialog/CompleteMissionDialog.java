@@ -1085,14 +1085,6 @@ public class CompleteMissionDialog extends AbstractButtonDialog {
                 }
             };
             addMouseListener(mouseAdapter);
-            addKeyListener(new java.awt.event.KeyAdapter() {
-                @Override
-                public void keyPressed(KeyEvent event) {
-                    if ((event.getKeyCode() == KeyEvent.VK_SPACE) || (event.getKeyCode() == KeyEvent.VK_ENTER)) {
-                        fire();
-                    }
-                }
-            });
         }
 
         private void addActionListener(ActionListener listener) {
