@@ -53,6 +53,8 @@ import static mekhq.campaign.parts.enums.PartQuality.QUALITY_C;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_E;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_F;
+import static mekhq.campaign.personnel.skills.SkillType.S_GUN_AERO;
+import static mekhq.campaign.personnel.skills.SkillType.S_PILOT_AERO;
 import static mekhq.campaign.unit.enums.TransporterType.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -5239,17 +5241,20 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     private void updateCrew(boolean isOnlyCommandersMatter) {
-        if (entity.getCrew().getSlotCount() > 1) {
-            final String driveType = SkillType.getDrivingSkillFor(entity);
-            final String gunType = SkillType.getGunnerySkillFor(entity);
-            if (entity.getCrew().getCrewType().getPilotPos() == entity.getCrew().getCrewType().getGunnerPos()) {
+        final Crew crew = entity.getCrew();
+        final String driveType = SkillType.getDrivingSkillFor(entity);
+        final String gunType = SkillType.getGunnerySkillFor(entity);
+        final Person commander = getCommander();
+
+        if (crew.getSlotCount() > 1) {
+            if (crew.getCrewType().getPilotPos() == crew.getCrewType().getGunnerPos()) {
                 // Command console; each crew is assigned as both driver and gunner
                 int slot = 0;
                 for (Person p : gunners) {
                     if (p.hasSkill(gunType) &&
                               p.hasSkill(driveType) &&
                               p.getStatus().isActive() &&
-                              slot < entity.getCrew().getSlotCount()) {
+                              slot < crew.getSlotCount()) {
                         assignToCrewSlot(p, slot, gunType, driveType);
                         slot++;
                     }
@@ -5259,13 +5264,13 @@ public class Unit implements ITechnology, ILocatable {
                 // crew, if we don't we should fix that upstream
                 int availableTempCrew = getTotalTempCrew();
 
-                while (slot < entity.getCrew().getSlotCount()) {
+                while (slot < crew.getSlotCount()) {
                     if (availableTempCrew > 0) {
                         // Fill slot with temp crew (don't mark as missing)
-                        entity.getCrew().setMissing(false, slot);
+                        crew.setMissing(false, slot);
                         availableTempCrew--;
                     } else {
-                        entity.getCrew().setMissing(true, slot);
+                        crew.setMissing(true, slot);
                     }
                     slot++;
                 }
@@ -5277,15 +5282,15 @@ public class Unit implements ITechnology, ILocatable {
                 if (person.isPresent()) {
                     assignToCrewSlot(person.get(), 0, gunType, driveType);
                 } else {
-                    entity.getCrew().setMissing(true, 0);
+                    crew.setMissing(true, 0);
                 }
                 person = gunners.stream().filter(p -> p.hasSkill(driveType) && p.getStatus().isActive()).findFirst();
                 if (person.isPresent()) {
                     assignToCrewSlot(person.get(), 1, gunType, driveType);
                 } else {
-                    entity.getCrew().setMissing(true, 1);
+                    crew.setMissing(true, 1);
                 }
-                int techPos = entity.getCrew().getCrewType().getTechPos();
+                int techPos = crew.getCrewType().getTechPos();
                 if (techPos >= 0) {
                     Person to = techOfficer;
                     if (to != null) {
@@ -5296,7 +5301,7 @@ public class Unit implements ITechnology, ILocatable {
                     if (to != null) {
                         assignToCrewSlot(to, techPos, gunType, driveType);
                     } else {
-                        entity.getCrew().setMissing(true, techPos);
+                        crew.setMissing(true, techPos);
                     }
                 }
             }
@@ -5306,29 +5311,44 @@ public class Unit implements ITechnology, ILocatable {
             } else {
                 refreshLAMPilot();
             }
-            if (entity.getCrew().isMissing(0)) {
+            if (crew.isMissing(0)) {
                 return;
             }
-            Person commander = getCommander();
+
             if (null == commander) {
-                entity.getCrew().setMissing(true, 0);
+                crew.setMissing(true, 0);
                 return;
             }
-            entity.getCrew().setName(commander.getFullTitle(), 0);
-            entity.getCrew().setNickname(commander.getCallsign(), 0);
-            entity.getCrew().setGender(commander.getGender(), 0);
-            entity.getCrew().setClanPilot(commander.isClanPersonnel(), 0);
+            crew.setName(commander.getFullTitle(), 0);
+            crew.setNickname(commander.getCallsign(), 0);
+            crew.setGender(commander.getGender(), 0);
+            crew.setClanPilot(commander.isClanPersonnel(), 0);
             if (ArmorKitCatalog.canWearIssuedKit(entity)) {
-                entity.getCrew().setArmorKitName(commander.getArmorKitName(), 0);
+                crew.setArmorKitName(commander.getArmorKitName(), 0);
             }
-            entity.getCrew().setPortrait(commander.getPortrait().clone(), 0);
-            entity.getCrew().setExternalIdAsString(commander.getId().toString(), 0);
-            entity.getCrew().setToughness(commander.getAdjustedToughness(), 0);
+            crew.setPortrait(commander.getPortrait().clone(), 0);
+            crew.setExternalIdAsString(commander.getId().toString(), 0);
+            crew.setToughness(commander.getAdjustedToughness(), 0);
 
             if (entity instanceof Tank) {
                 ((Tank) entity).setCommanderHit(commander.getTotalInjurySeverity() > 0);
             }
-            entity.getCrew().setMissing(false, 0);
+            crew.setMissing(false, 0);
+        }
+
+        if (commander != null) {
+            boolean hasGunnerySkill = commander.hasSkill(gunType);
+            boolean hasNaturalAptitudeGunnery = hasGunnerySkill && commander.getSkill(gunType).getHasNaturalAptitude();
+            crew.setHasNaturalAptitudeGunnery(hasNaturalAptitudeGunnery);
+
+            boolean hasPilotingSkill = commander.hasSkill(driveType);
+            boolean hasNaturalAptitudePiloting = hasPilotingSkill && commander.getSkill(driveType).getHasNaturalAptitude();
+            crew.setHasNaturalAptitudePiloting(hasNaturalAptitudePiloting);
+
+            boolean isUseArtillerySkill = campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
+            boolean hasArtillerySkill = isUseArtillerySkill ? commander.hasSkill(SkillType.S_ARTILLERY) : hasNaturalAptitudeGunnery;
+            boolean hasNaturalAptitudeArtillery = hasArtillerySkill && commander.getSkill(SkillType.S_ARTILLERY).getHasNaturalAptitude();
+            crew.setHasNaturalAptitudePiloting(hasNaturalAptitudeArtillery);
         }
     }
 
@@ -5948,8 +5968,8 @@ public class Unit implements ITechnology, ILocatable {
             pilotingAero = pilot.getSkill(SkillType.S_PILOT_AERO)
                                  .getFinalSkillValue(skillModifierData, familiarityBonusPiloting);
         }
-        if (pilot.hasSkill(SkillType.S_GUN_AERO)) {
-            gunneryAero = pilot.getSkill(SkillType.S_GUN_AERO)
+        if (pilot.hasSkill(S_GUN_AERO)) {
+            gunneryAero = pilot.getSkill(S_GUN_AERO)
                                 .getFinalSkillValue(skillModifierData, familiarityBonusGunnery);
         }
         if (pilot.hasSkill(SkillType.S_ARTILLERY)) {
@@ -5972,6 +5992,12 @@ public class Unit implements ITechnology, ILocatable {
         entity.getCrew().setArtillery(Math.clamp(artillery, 0, 8), 0);
         entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
+
+        boolean hasNaturalAptitudeGunnery = pilot.getSkill(S_GUN_AERO).getHasNaturalAptitude();
+        crew.setHasNaturalAptitudeGunneryAero(hasNaturalAptitudeGunnery);
+
+        boolean hasNaturalAptitudePiloting = pilot.getSkill(S_PILOT_AERO).getHasNaturalAptitude();
+        crew.setHasNaturalAptitudePilotingAero(hasNaturalAptitudePiloting);
     }
 
     /**
