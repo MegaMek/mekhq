@@ -647,7 +647,8 @@ public class StratConRulesManager {
         final AtBDynamicScenario backingScenario = scenario.getBackingScenario();
 
         // First determine if the scenario is a Turning Point (that win/lose will affect CVP)
-        boolean isCombatChallenge = scenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge();
+        ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
+        boolean isCombatChallenge = scenarioType.isOfficialChallenge();
         boolean showNag = !MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_COMBAT_CHALLENGE);
         if (isCombatChallenge && showNag) {
             new CombatChallengeNagDialog(campaign);
@@ -656,13 +657,6 @@ public class StratConRulesManager {
         determineIfTurningPointScenario(contract, scenario, isCombatChallenge);
         if (!scenario.isTurningPoint()) {
             determineIfCrisisScenario(contract.getMoraleLevel(), backingScenario, isCombatChallenge);
-        }
-
-        // Then add any Cadre Duty units
-        if (!isCombatChallenge) {
-            if (contract.getObjectiveType().isCadreDuty()) {
-                addCadreDutyTrainees(backingScenario);
-            }
         }
 
         // Finally, finish scenario set up
@@ -684,38 +678,6 @@ public class StratConRulesManager {
             for (int forceID : scenario.getPrimaryForceIDs()) {
                 processForceDeployment(scenario.getCoords(), forceID, campaign, track, false);
             }
-        }
-    }
-
-    /**
-     * Adds a Cadre Duty trainees modifier to the given scenario based on the location of the battle.
-     *
-     * <p>
-     * This method determines the type of trainees to be added to the scenario by evaluating the map location parameter
-     * of the scenario's template. Depending on whether the battle is an air or space battle versus a ground battle, the
-     * appropriate Cadre Duty trainees scenario modifier is applied to the backing scenario.
-     * </p>
-     *
-     * <p>
-     * The logic is as follows:
-     * <ul>
-     *     <li>If the battle occurs in low atmosphere or space, the air trainees modifier is added.</li>
-     *     <li>If the battle occurs on the ground at any other map location, the ground trainees
-     *     modifier is added.</li>
-     * </ul>
-     *
-     * @param backingScenario The {@link AtBDynamicScenario} representing the current scenario to which the modifier
-     *                        will be applied.
-     */
-    private static void addCadreDutyTrainees(AtBDynamicScenario backingScenario) {
-        final ScenarioTemplate template = backingScenario.getTemplate();
-        final MapLocation mapLocation = template.mapParameters.getMapLocation();
-        boolean isAirBattle = (mapLocation == LowAtmosphere) || (mapLocation == Space);
-
-        if (isAirBattle) {
-            backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_TRAINEES_AIR));
-        } else {
-            backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_TRAINEES_GROUND));
         }
     }
 
@@ -744,14 +706,16 @@ public class StratConRulesManager {
 
         ContractCommandRights commandRights = contract.getCommandRights();
         switch (commandRights) {
-            case INTEGRATED -> {
-                scenario.setTurningPoint(true);
-                setAttachedUnitsModifier(scenario, contract);
-            }
-            case HOUSE, LIAISON -> {
+            case INTEGRATED -> scenario.setTurningPoint(true);
+            case HOUSE -> {
                 if (randomInt(3) == 0) {
                     scenario.setTurningPoint(true);
                     setAttachedUnitsModifier(scenario, contract);
+                }
+            }
+            case LIAISON -> {
+                if (randomInt(3) == 0) {
+                    scenario.setTurningPoint(true);
                 }
             }
             case INDEPENDENT -> {

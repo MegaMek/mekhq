@@ -1695,16 +1695,15 @@ public class ResolveScenarioWizardDialog extends JDialog {
             StratConRulesManager.linkedScenarioProcessing(tracker, linkedForces);
         }
 
-        if (tracker.getScenario() instanceof AtBScenario atBScenario) {
-            if (atBScenario.getStratConScenarioType().isOfficialChallenge()) {
-                MHQMorale.processCombatChallengeResults(campaign, atBScenario.getContract(campaign),
-                      atBScenario.getStatus());
-            }
-        }
-
         aborted = false;
         this.setVisible(false);
 
+        if (tracker.getScenario() instanceof AtBScenario atBScenario) {
+            if (atBScenario.getStratConScenarioType().isAffectsMorale()) {
+                MHQMorale.processMoraleChangeFromScenario(campaign, atBScenario.getContract(campaign),
+                      atBScenario.getStatus(), atBScenario.getStratConScenarioType());
+            }
+        }
     }
 
     private void cancel() {

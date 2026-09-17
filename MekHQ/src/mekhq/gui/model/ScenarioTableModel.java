@@ -187,7 +187,7 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
               stratconScenario.isStrategicObjective(),
               stratconScenario.isTurningPoint(),
               scenario.isCrisis() || scenario.getStratConScenarioType().isSpecial(),
-              scenario.getStratConScenarioType().isOfficialChallenge());
+              scenario.getStratConScenarioType().isAffectsMorale());
     }
 
     private String getScenarioSeverityText(ScenarioClassification classification) {

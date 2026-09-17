@@ -78,6 +78,7 @@ import mekhq.campaign.mission.contract.contractData.EnemyData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationEnemy;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
+import mekhq.campaign.mission.scenarios.ScenarioType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent;
 import mekhq.campaign.universe.Faction;
@@ -543,20 +544,24 @@ public class MHQMorale {
      * {@link #routedMoraleUpdate(Campaign, AbstractContract)} is invoked to handle follow-up effects such as early
      * contract end or prisoner handling.</p>
      *
-     * @param campaign       the active campaign containing contract and prisoner state
-     * @param contract       the contract whose morale is being updated
-     * @param scenarioStatus the outcome of the combat challenge scenario used to determine the forced roll
+     * @param campaign             the active campaign containing contract and prisoner state
+     * @param contract             the contract whose morale is being updated
+     * @param scenarioStatus       the outcome of the combat challenge scenario used to determine the forced roll
+     * @param stratConScenarioType the type of scenario.
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static void processCombatChallengeResults(Campaign campaign, AbstractContract contract,
-          ScenarioStatus scenarioStatus) {
+    public static void processMoraleChangeFromScenario(Campaign campaign, AbstractContract contract,
+          ScenarioStatus scenarioStatus, ScenarioType stratConScenarioType) {
+        boolean moraleCheckOnVictory = stratConScenarioType.isScenarioOutcomeAffectsMoraleOnVictory();
+        boolean moraleCheckOnDefeat = stratConScenarioType.isScenarioOutcomeAffectsMoraleOnDefeat();
+
         int forcedRoll = NO_CHANGE_TARGET_NUMBER;
 
-        if (scenarioStatus.isOverallVictory()) {
+        if (moraleCheckOnVictory && scenarioStatus.isOverallVictory()) {
             forcedRoll = WAVERING_TARGET_NUMBER;
-        } else if (scenarioStatus.isOverallDefeat()) {
+        } else if (moraleCheckOnDefeat && scenarioStatus.isOverallDefeat()) {
             forcedRoll = RALLYING_TARGET_NUMBER;
         }
 
