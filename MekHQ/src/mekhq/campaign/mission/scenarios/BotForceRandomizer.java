@@ -549,8 +549,12 @@ public class BotForceRandomizer {
         boolean hasNaturalAptitudeGunnery = hasNaturalAptitude(entitySkill);
         boolean hasNaturalAptitudePiloting = hasNaturalAptitude(entitySkill);
 
+        boolean useArtillery = campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
+        boolean hasNaturalAptitudeArtillery = useArtillery ? hasNaturalAptitude(entitySkill) : hasNaturalAptitudeGunnery;
+
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
-              skills[0], hasNaturalAptitudeGunnery, skills[1], hasNaturalAptitudePiloting, gender, faction.isClan(),
+              skills[0], hasNaturalAptitudeGunnery, hasNaturalAptitudeArtillery, skills[1],
+              hasNaturalAptitudePiloting, gender, faction.isClan(),
               extraData));
 
         en.setExternalIdAsString(UUID.randomUUID().toString());
