@@ -76,8 +76,8 @@ public enum SupportCapability {
           SupportSection.MEDICAL,
           PersonnelRole.VEHICLE_CREW_GROUND,
           true,
-          "mekhq.resources.MASHTheatreTrackingCampaignOptionsChangedConfirmationDialog",
-          "MASHTheatreTrackingCampaignOptionsChangedConfirmationDialog"),
+          "mekhq.resources.MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog",
+          "MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog"),
 
     /** Flatbed trucks for the StratCon supply convoy, generated with their own crews. */
     LOGISTICS(CampaignOptions::isUseStratCon,

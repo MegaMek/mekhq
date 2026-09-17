@@ -677,8 +677,14 @@ public final class SupportPersonnelToTOE {
 
         int built = 0;
         for (int index = 0; index < vehicle.count(); index++) {
+            boolean wantsNewCrew = crewSource == VehicleCrewSource.NEW_CREW;
+            // A vehicle nobody can crew is worse than one the command does not have, so the shortfall stops here.
+            if (!wantsNewCrew && pool.isEmpty()) {
+                LOGGER.info("[SupportTeams]     no staff left to crew another '{}'; built {} of {}",
+                      vehicle.unitName(), built, vehicle.count());
+                break;
+            }
             try {
-                boolean wantsNewCrew = crewSource == VehicleCrewSource.NEW_CREW;
                 Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), wantsNewCrew, 0);
                 if (!wantsNewCrew) {
                     int seats = (crewSource == VehicleCrewSource.TEMPORARY_CREW) ? 1 : unit.getFullCrewSize();

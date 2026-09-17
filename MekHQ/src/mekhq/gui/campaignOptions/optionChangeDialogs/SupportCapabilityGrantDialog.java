@@ -39,7 +39,6 @@ import static megamek.utilities.ImageUtilities.scaleImageIcon;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -279,18 +278,9 @@ public class SupportCapabilityGrantDialog extends JDialog {
         processFreeUnits(campaign, campaign.getPlayerForce().getFaction(), true, capability, crewSource);
     }
 
-    /**
-     * One capability's button text. The MASH dialog spells its two button keys "Theater" while its description key
-     * uses "Theatre", so the suffix is looked up against the capability's own prefix first and the American spelling
-     * second, rather than assuming either.
-     */
+    /** One capability's button text, from the bundle that capability names. */
     private String buttonLabel(String suffix) {
-        String label = getTextAt(capability.resourceBundle(), capability.resourceKeyPrefix() + '.' + suffix);
-        if (!isResourceKeyValid(label)) {
-            label = getTextAt(capability.resourceBundle(),
-                  capability.resourceKeyPrefix().replace("Theatre", "Theater") + '.' + suffix);
-        }
-        return label;
+        return getTextAt(capability.resourceBundle(), capability.resourceKeyPrefix() + '.' + suffix);
     }
 
     /**
