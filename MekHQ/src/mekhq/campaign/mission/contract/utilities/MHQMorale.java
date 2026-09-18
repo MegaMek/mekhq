@@ -546,7 +546,7 @@ public class MHQMorale {
      *
      * @param campaign             the active campaign containing contract and prisoner state
      * @param contract             the contract whose morale is being updated
-     * @param scenarioStatus       the outcome of the combat challenge scenario used to determine the forced roll
+     * @param scenarioStatus       the outcome of the scenario used to determine the forced roll
      * @param stratConScenarioType the type of scenario.
      *
      * @author Illiani
