@@ -51,13 +51,13 @@ import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.ButtonLabelTooltipPair;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A dialog that facilitates skill checks for a character.
@@ -169,7 +169,7 @@ public class SkillCheckDialog {
                     .resolve(useEdge, null);
 
         isSuccess = actionCheckResult.isSuccess();
-        return actionCheckResult.getReport(true);
+        return actionCheckResult.getReport();
     }
 
 

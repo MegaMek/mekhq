@@ -148,9 +148,8 @@ class ActionCheckTest {
         assertTrue(result.isSuccess());
         assertFalse(result.hasUsedEdge());
         assertEquals(8, result.getRollResult());
-        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"warning\"><b>Passed</b></span> his <b>Action</b> " +
-                           "check with a roll of <b>8</b> vs. a target number of <b>7</b>.",
-              result.getReport(false).replace(person.getId().toString(), "link")
+        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"warning\"><b>Passed</b></span> his <b>Action</b> check with a roll of <b>8</b> vs. a target number of <b>7</b>. <span color='warning'><i>It'll do...</i></span>",
+              result.getReport().replace(person.getId().toString(), "link")
                     .replace(ReportingUtilities.getWarningColor(), "warning"));
     }
 
@@ -164,9 +163,8 @@ class ActionCheckTest {
         assertFalse(result.isSuccess());
         assertFalse(result.hasUsedEdge());
         assertEquals(5, result.getRollResult());
-        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"warning\"><b>Failed</b></span> his <b>Action</b> " +
-                           "check with a roll of <b>5</b> vs. a target number of <b>7</b>.",
-              result.getReport(false).replace(person.getId().toString(), "link")
+        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"warning\"><b>Failed</b></span> his <b>Action</b> check with a roll of <b>5</b> vs. a target number of <b>7</b>. <span color='warning'><i>Almost...</i></span>",
+              result.getReport().replace(person.getId().toString(), "link")
                     .replace(ReportingUtilities.getWarningColor(), "warning"));
     }
 
@@ -180,9 +178,8 @@ class ActionCheckTest {
 
         assertFalse(result.isSuccess());
         assertFalse(result.hasUsedEdge());
-        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"warning\"><b>Failed</b></span> his <b>Action</b> " +
-                           "check with a roll of <b>5</b> vs. a target number of <b>7</b>.",
-              result.getReport(false).replace(person.getId().toString(), "link")
+        assertEquals("<a href='PERSON:link'>F L</a> <span color=\"warning\"><b>Failed</b></span> his <b>Action</b> check with a roll of <b>5</b> vs. a target number of <b>7</b>. <span color='warning'><i>Almost...</i></span>",
+              result.getReport().replace(person.getId().toString(), "link")
                     .replace(ReportingUtilities.getWarningColor(), "warning"));
     }
 
@@ -211,9 +208,8 @@ class ActionCheckTest {
         assertTrue(result.hasUsedEdge());
         assertEquals(9, result.getRollResult());
         verify(person).spendEdge();
-        assertEquals("Person <span color=\"warning\"><b>Passed</b></span> her <b>Action</b> check with a roll of " +
-                           "<b>9</b> vs. a target number of <b>7</b>. Used a point of <b>Edge</b>.",
-              result.getReport(false).replace(ReportingUtilities.getWarningColor(), "warning"));
+        assertEquals("Person <span color=\"warning\"><b>Passed</b></span> her <b>Action</b> check with a roll of <b>9</b> vs. a target number of <b>7</b>. Used a point of <b>Edge</b>. <span color='warning'><i>It'll do...</i></span>",
+              result.getReport().replace(ReportingUtilities.getWarningColor(), "warning"));
     }
 
     @Test
@@ -231,9 +227,8 @@ class ActionCheckTest {
         assertTrue(result.hasUsedEdge());
         assertEquals(6, result.getRollResult());
         verify(person).spendEdge();
-        assertEquals("Person <span color=\"warning\"><b>Failed</b></span> his <b>Action</b> check with a roll of " +
-                           "<b>6</b> vs. a target number of <b>7</b>. Used a point of <b>Edge</b>.",
-              result.getReport(false).replace(ReportingUtilities.getWarningColor(), "warning"));
+        assertEquals("Person <span color=\"warning\"><b>Failed</b></span> his <b>Action</b> check with a roll of <b>6</b> vs. a target number of <b>7</b>. Used a point of <b>Edge</b>. <span color='warning'><i>Almost...</i></span>",
+              result.getReport().replace(ReportingUtilities.getWarningColor(), "warning"));
     }
 
     @ParameterizedTest
@@ -285,11 +280,11 @@ class ActionCheckTest {
     }
 
     @Test
-    void testWithoutLogging_StillReturnsResult() {
+    void testWithLogging_StillReturnsResult() {
         Person person = new Person("F", "L", null, "Faction");
         TargetRoll target = new TargetRoll(7, "Base");
         ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action")
-                                          .withoutLogging();
+                                          .withLogging();
         ActionCheckResult result = resolveWithFixedRoll(check, false, 4, 5);
 
         assertTrue(result.isSuccess());
@@ -354,7 +349,7 @@ class ActionCheckTest {
         ConcreteActionCheck check = new ConcreteActionCheck(person, target, false, false, "Action");
 
         ActionCheckResult result = resolveWithFixedRoll(check, false, 4, 4);
-        String report = result.getReport(false);
+        String report = result.getReport();
 
         assertTrue(result.isSuccess());
         assertTrue(report.contains(target.getValueAsString()), "the target should read as words: " + report);
@@ -370,10 +365,10 @@ class ActionCheckTest {
         TargetRoll target = new TargetRoll(7, "Base");
 
         String withSubject = resolveWithFixedRoll(
-              new ConcreteActionCheck(person, target, false, false, "Action"), false, 5, 5).getReport(false);
+              new ConcreteActionCheck(person, target, false, false, "Action"), false, 5, 5).getReport();
         String withoutSubject = resolveWithFixedRoll(
               new ConcreteActionCheck(person, target, false, false, "Action").withoutSubject(), false, 5, 5)
-                                       .getReport(false);
+                                       .getReport();
 
         assertTrue(withSubject.contains("SUBJECT_NAME"), "the default line names the person");
         assertFalse(withoutSubject.contains("SUBJECT_NAME"), "withoutSubject must drop the person's name");

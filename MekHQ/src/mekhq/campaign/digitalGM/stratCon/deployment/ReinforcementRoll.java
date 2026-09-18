@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,28 +30,17 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.scenarios;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+package mekhq.campaign.digitalGM.stratCon.deployment;
 
 /**
- * One authored weather/condition profile: the odds of each {@link megamek.common.planetaryConditions} value for a single
- * condition {@link #type} (Light, Wind, Weather, Fog, BlowingSand or EMI), shared by every terrain listed in
- * {@link #terrain}. Loaded from {@code TerrainConditionsOddsManifest.yaml} by {@link TerrainConditionsOddsManifest}.
+ * The odds of a single reinforcement attempt: the final target number the roll must meet on two six-sided dice, and
+ * the resulting success probability. Produced by {@link DeploymentEvaluator} so the inspector can show a force's real
+ * chance of arriving before the player commits to it.
  *
- * <p>Fields are public and bound by field name so the YAML shape and the Java stay in step; the biome map type names in
- * {@link #terrain} are the keys of {@link mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest#getBiomeMapTypes()},
- * and the keys of {@link #odds} are the condition enums' external ids.</p>
+ * @param finalTargetNumber  the number the 2d6 roll must meet or beat, after support-point and contract modifiers
+ * @param successProbability the probability, in {@code [0.0, 1.0]}, of meeting that target
  *
  * @author Illiani
  * @since 0.51.01
  */
-public class TerrainConditionsOdds {
-    public String type;
-    public String name;
-    public List<String> terrain = new ArrayList<>();
-    public Map<String, Integer> odds = new HashMap<>();
-}
+public record ReinforcementRoll(int finalTargetNumber, double successProbability) {}

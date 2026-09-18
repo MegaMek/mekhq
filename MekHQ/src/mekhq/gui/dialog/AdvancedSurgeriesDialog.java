@@ -1022,7 +1022,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
                   surgeon.checkSkill(S_SURGERY, campaign)
                         .withMiscModifier(spaModifier)
                         .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.skillCheck"));
-            campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(false));
+            campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
             if (actionCheckResult.isSuccess()) {
                 successfulSurgeries.add(surgery);
                 MedicalLogger.successfulSurgery(patient, campaign.getLocalDate(), surgery.type.toString());

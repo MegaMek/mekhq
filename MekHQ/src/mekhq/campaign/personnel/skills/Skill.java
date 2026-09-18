@@ -155,7 +155,7 @@ public class Skill {
     /**
      * @return {@code true} if the progression type is "count up", {@code false} otherwise.
      */
-    private boolean isCountUp() {
+    public boolean isCountUp() {
         return type.isCountUp();
     }
 
@@ -301,6 +301,14 @@ public class Skill {
             return min(COUNT_UP_MAX_VALUE, getSkillValue() + modifiers);
         } else {
             return max(COUNT_DOWN_MIN_VALUE, getSkillValue() - modifiers);
+        }
+    }
+
+    public String getSkillTargetNumber(SkillModifierData skillModifierData, int familiarityBonus) {
+        if (isCountUp()) {
+            return "+" + getFinalSkillValue(skillModifierData, familiarityBonus);
+        } else {
+            return getFinalSkillValue(skillModifierData, familiarityBonus) + "+";
         }
     }
 

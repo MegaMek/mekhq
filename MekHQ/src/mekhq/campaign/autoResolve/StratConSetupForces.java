@@ -45,6 +45,7 @@ import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.unit.Unit;
 
@@ -202,6 +203,9 @@ public class StratConSetupForces extends ScenarioSetupForces<AtBScenario> {
         } else if (!unit.getEntity().getForceString().isBlank()) {
             // this was added mostly to make it easier to run tests
             entity.setForceString(unit.getEntity().getForceString());
+        }
+        if (scenario instanceof AtBDynamicScenario dynamicScenario) {
+            AtBDynamicScenarioFactory.applyPlayerOffBoardDeployment(dynamicScenario, unit, entity, campaign);
         }
         return entity;
     }

@@ -305,6 +305,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String START_GAME_BOT_CLIENT_DELAY = "startGameBotClientDelay";
     public static final String START_GAME_BOT_CLIENT_RETRY_COUNT = "startGameBotClientRetryCount";
     public static final String ENABLE_ABSTRACT_COMBAT_AUTO_RESOLVE = "enableAbstractCombatAutoResolve";
+    public static final String DEFAULT_PLAYER_FORCES_OFF_BOARD = "defaultPlayerForcesOffBoard";
 
     // The augmentation rules last chosen in the Command Generator, remembered so a new campaign
     // starts from the player's own answer rather than from the all-off defaults every time.
@@ -416,7 +417,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRAT_CON_URBAN_PROFILES_PATH = "./data/stratconbiomedefinitions/UrbanProfiles.yaml";
     public static final String STRAT_CON_SECTOR_SHAPE_PROFILES_PATH =
           "./data/stratconbiomedefinitions/SectorShapeProfiles.yaml";
-    public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.xml";
+    public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.yaml";
     public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.json";
     public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.json";
     public static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.json";

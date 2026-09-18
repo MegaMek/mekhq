@@ -34,6 +34,7 @@ package mekhq.campaign.personnel.medical;
 
 import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -49,8 +50,8 @@ import megamek.common.TargetRollModifier;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.Person;
@@ -226,7 +227,7 @@ public class MedicalController {
                     .withExternalModifiers(getAdditionalHealingModifiers(patient))
                     .resolve(isUseEdge, getTextAt(RESOURCE_BUNDLE, "MedicalController.report.skillCheck"));
 
-        LOGGER.debug(actionCheckResult.getReport(false));
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
 
         if (actionCheckResult.isSuccess()) {
             boolean inInfirmary = !(null == patient.getDoctorId());

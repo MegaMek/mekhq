@@ -311,7 +311,6 @@ public class Maintenance {
             // withoutSubject: this report already names the tech; getReport(false): the numeric margin is appended
             // once, below, so the utility's own margin label is suppressed to avoid printing the margin twice.
             ActionCheckResult result = new SkillCheck(maintenanceTech, maintenanceSkill.getType(), target)
-                                             .withoutLogging()
                                              .withoutSubject()
                                              .resolve(false, null);
             roll = result.getRollResult();

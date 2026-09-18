@@ -1456,6 +1456,56 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
+     * @return {@code true} if the entity mounts at least one artillery weapon - the only units that may deploy off-board
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean entityHasArtillery(Entity entity) {
+        for (WeaponMounted weapon : entity.getTotalWeaponList()) {
+            WeaponType type = weapon.getType();
+            if ((type != null) && (type.getAtClass() == CLASS_ARTILLERY)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Applies a player force's chosen off-board deployment to one of its unit entities.
+     *
+     * <p>If the unit belongs (directly, or through a parent formation) to a force the player marked to deploy off-board
+     * in the deployment wizard, and the entity carries artillery, the entity is placed off-board a short random distance
+     * and direction. Non-artillery units are left on-board, since a force cannot be split between on- and off-board
+     * deployment.</p>
+     *
+     * @param scenario the scenario being played (its off-board force selection is read)
+     * @param unit     the campaign unit being deployed
+     * @param entity   the entity generated for that unit (mutated in place when placed off-board)
+     * @param campaign the current campaign, used to resolve the unit's formation
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void applyPlayerOffBoardDeployment(@Nullable AtBDynamicScenario scenario, Unit unit, Entity entity,
+          Campaign campaign) {
+        if ((scenario == null) || (unit == null) || (entity == null) || scenario.getOffBoardForceIDs().isEmpty()) {
+            return;
+        }
+
+        Formation formation = campaign.getPlayerForce().getFormationFor(unit);
+        while (formation != null) {
+            if (scenario.isForceDeployingOffBoard(formation.getId())) {
+                if (entityHasArtillery(entity)) {
+                    deployArtilleryOffBoard(List.of(entity));
+                }
+                return;
+            }
+            formation = formation.getParentFormation();
+        }
+    }
+
+    /**
      * Retrieves the {@link StratConTrackState} associated with the given {@link AtBDynamicScenario}.
      * <p>
      * This method iterates over all {@link StratConTrackState} instances in the provided {@link AbstractContract}'s
@@ -5085,6 +5135,30 @@ public class AtBDynamicScenarioFactory {
         for (Entity entity : entityList) {
             entity.setDeployRound(actualArrivalTurn);
         }
+    }
+
+    /**
+     * Estimates the turn a manually-deployed reinforcement force would arrive on, mirroring the non-delayed branch of
+     * {@link #setDeploymentTurnsForReinforcements(LocalHangar, Scenario, List, int, boolean)}: the arrival scale divided
+     * by the force's slowest unit speed, reduced by the given turn modifier (typically the commander's Strategy skill
+     * plus the scenario's reinforcement delay reduction). Used by the deployment wizard's dossier to preview when
+     * reinforcements will arrive; the actual round is set at scenario finalization.
+     *
+     * @param entityList   the entities in the reinforcing force
+     * @param turnModifier the turn reduction to apply (commander Strategy skill plus reinforcement delay reduction)
+     *
+     * @return the estimated arrival turn, never negative
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int estimateReinforcementArrivalTurn(List<Entity> entityList, int turnModifier) {
+        int arrivalTurn = 0;
+        for (Entity entity : entityList) {
+            int speed = max(1, calculateAtBSpeed(entity));
+            arrivalTurn = max(arrivalTurn, max(0, (REINFORCEMENT_ARRIVAL_SCALE / speed) - turnModifier));
+        }
+        return arrivalTurn;
     }
 
     /**

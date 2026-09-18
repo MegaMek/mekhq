@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2024-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -30,28 +30,22 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.scenarios;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+package mekhq.campaign.digitalGM.stratCon.deployment;
 
 /**
- * One authored weather/condition profile: the odds of each {@link megamek.common.planetaryConditions} value for a single
- * condition {@link #type} (Light, Wind, Weather, Fog, BlowingSand or EMI), shared by every terrain listed in
- * {@link #terrain}. Loaded from {@code TerrainConditionsOddsManifest.yaml} by {@link TerrainConditionsOddsManifest}.
+ * The support-point cost of a paid reinforcement attempt, and the target-number modifier the spent points buy.
  *
- * <p>Fields are public and bound by field name so the YAML shape and the Java stay in step; the biome map type names in
- * {@link #terrain} are the keys of {@link mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest#getBiomeMapTypes()},
- * and the keys of {@link #odds} are the condition enums' external ids.</p>
+ * <p>Reinforcement pricing works as follows: the player chooses how many support points to spend to improve the roll;
+ * a base cost is added on top (one point for a normal arrival, two for an instant arrival); and the whole thing is
+ * multiplied by the number of forces committed, since each force is a separate attempt. Every point the player chooses
+ * to spend (as opposed to the base cost) lowers the reinforcement target number.</p>
+ *
+ * @param perForceSupportPoints the support points each committed force costs (the player's chosen spend plus the base
+ *                              cost)
+ * @param totalSupportPoints    the total support points the whole attempt costs across every committed force
+ * @param targetNumberModifier  the (non-positive) modifier the chosen spend applies to the reinforcement target number
  *
  * @author Illiani
  * @since 0.51.01
  */
-public class TerrainConditionsOdds {
-    public String type;
-    public String name;
-    public List<String> terrain = new ArrayList<>();
-    public Map<String, Integer> odds = new HashMap<>();
-}
+public record ReinforcementCost(int perForceSupportPoints, int totalSupportPoints, int targetNumberModifier) {}
