@@ -761,7 +761,7 @@ public class ImmersiveDialogCore extends JDialog {
         styleSheet.addStyleSheet(editorKit.getStyleSheet());
         styleSheet.addRule("body, div, p, span { background-color: transparent; }");
         styleSheet.addRule("body { margin: 0; padding: 0; }");
-        styleSheet.addRule("p { margin: 0 0 " + scaleForGUI(6) + "px 0; }");
+        styleSheet.addRule("p { margin: " + scaleForGUI(6) + "px 0 0 0; }");
 
         editorKit.setStyleSheet(styleSheet);
         editorPane.setEditorKit(editorKit);

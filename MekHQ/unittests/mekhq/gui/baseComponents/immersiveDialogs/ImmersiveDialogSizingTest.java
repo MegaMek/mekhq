@@ -60,7 +60,7 @@ class ImmersiveDialogSizingTest {
             assertTrue(StyleConstants.getFontSize(styleSheet.getRule("h2")) >
                              StyleConstants.getFontSize(styleSheet.getRule("p")));
             assertEquals(scaleForGUI(6) + "px",
-                  styleSheet.getRule("p").getAttribute(CSS.Attribute.MARGIN_BOTTOM).toString());
+                  styleSheet.getRule("p").getAttribute(CSS.Attribute.MARGIN_TOP).toString());
         });
     }
 
