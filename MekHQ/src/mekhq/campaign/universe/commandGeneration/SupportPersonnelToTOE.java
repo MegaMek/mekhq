@@ -580,19 +580,6 @@ public final class SupportPersonnelToTOE {
     /** A capability vehicle to place into a section, crewed from that section's staff. */
     record VehicleSpec(String unitName, int count) {}
 
-    /**
-     * The capability vehicles still to build for a section, less those the campaign already owns.
-     *
-     * <p>A freshly generated command owns none, so it gets the full count. A campaign converted to support teams
-     * may already field them - bought, or granted when the capability's option was switched on - and building the
-     * full count again would duplicate them.</p>
-     *
-     * @param campaign    the campaign whose hangar is counted
-     * @param unitName    the capability vehicle to build
-     * @param targetCount how many the command should field
-     *
-     * @return a single spec for the missing vehicles, or an empty list when none are missing
-     */
     /** Where the crew of a newly granted capability vehicle comes from. */
     public enum VehicleCrewSource {
         /** Seated from the section's own staff, who leave the support squads they crew today. */
@@ -791,6 +778,19 @@ public final class SupportPersonnelToTOE {
         return vehicles;
     }
 
+    /**
+     * The capability vehicles still to build for a section, less those the campaign already owns.
+     *
+     * <p>A freshly generated command owns none, so it gets the full count. A campaign converted to support teams
+     * may already field them - bought, or granted when the capability's option was switched on - and building the
+     * full count again would duplicate them.</p>
+     *
+     * @param campaign    the campaign whose hangar is counted
+     * @param unitName    the capability vehicle to build
+     * @param targetCount how many the command should field
+     *
+     * @return a single spec for the missing vehicles, or an empty list when none are missing
+     */
     static List<VehicleSpec> vehiclesStillNeeded(Campaign campaign, String unitName, int targetCount) {
         int missing = SupportUnitGenerator.shortfall(campaign, unitName, targetCount);
         LOGGER.info("[CompanyGen][SupportTOE] capability vehicle '{}': target {}, already owned {}, building {}",

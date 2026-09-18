@@ -100,7 +100,6 @@ import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 import mekhq.gui.campaignOptions.contents.*;
 import mekhq.gui.campaignOptions.optionChangeDialogs.*;
-import mekhq.gui.campaignOptions.optionChangeDialogs.SupportCapabilityGrantDialog;
 
 /**
  * {@code CampaignOptionsPane} is the central panel of the Campaign Options dialog. It presents every campaign setting
