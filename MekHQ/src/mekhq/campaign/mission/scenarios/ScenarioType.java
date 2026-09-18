@@ -59,6 +59,9 @@ public enum ScenarioType {
     CONVOY,
     RIOT,
     OFFICIAL_CHALLENGE,
+    AFFECTS_MORALE_BOTH_WAYS,
+    AFFECTS_MORALE_ON_VICTORY,
+    AFFECTS_MORALE_ON_DEFEAT,
     HOSTILE_FACILITY,
     MOLE_HUNT,
     PRISONER_LIBERATION;
@@ -99,6 +102,27 @@ public enum ScenarioType {
      */
     public boolean isOfficialChallenge() {
         return this == OFFICIAL_CHALLENGE;
+    }
+
+    public boolean isScenarioOutcomeAffectsMorale() {
+        return isScenarioOutcomeAffectsMoraleOnVictory() || isScenarioOutcomeAffectsMoraleOnDefeat();
+    }
+
+    public boolean isScenarioOutcomeAffectsMoraleBothWays() {
+        return this == AFFECTS_MORALE_BOTH_WAYS ||
+                     this == RIOT ||
+                     this == OFFICIAL_CHALLENGE;
+    }
+
+    public boolean isScenarioOutcomeAffectsMoraleOnVictory() {
+        return isScenarioOutcomeAffectsMoraleBothWays() ||
+                     this == AFFECTS_MORALE_ON_VICTORY;
+    }
+
+    public boolean isScenarioOutcomeAffectsMoraleOnDefeat() {
+        return isScenarioOutcomeAffectsMoraleBothWays() ||
+                     this == AFFECTS_MORALE_ON_DEFEAT ||
+                     this == PRISONER_LIBERATION;
     }
 
     public boolean isPrisonerLiberation() {
