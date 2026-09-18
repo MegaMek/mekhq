@@ -165,6 +165,113 @@ class SupportUnitGeneratorTest {
         assertEquals("Clan Foot Point (Rifle Light)", SupportUnitGenerator.securityUnitName(SecurityTier.COMPANY, true));
     }
 
+    // --- Sizing support vehicles by the force they support (issue #10088) ---
+    //
+    // Before this, salvage and logistics used a flat count: four vehicles for any Inner Sphere command and ten for
+    // any Clan one, so a lance and a battalion were given the same convoy. They are now sized by what the force
+    // needs and fielded as whole lances or Stars of a single vehicle type.
+
+    /** A Locust weighs twenty tons, which makes the arithmetic in these tests checkable by hand. */
+    private static final int LOCUST_TONNAGE = 20;
+
+    @Test
+    void anInnerSphereFormationIsALance() {
+        // The Clan side of this is a vehicle Star of ten, which the rounding cases below exercise directly: a Clan
+        // Point is two vehicles, so a Star of five Points is ten.
+        assertEquals(4, SupportUnitGenerator.supportFormationSize(MHQTestUtilities.getTestCampaign()),
+              "an Inner Sphere command fields support vehicles by the lance");
+    }
+
+    @Test
+    void aRequirementRoundsUpToWholeFormations() {
+        assertEquals(4, SupportUnitGenerator.roundUpToWholeFormations(1, 4), "one truck still fields a full lance");
+        assertEquals(4, SupportUnitGenerator.roundUpToWholeFormations(4, 4), "an exact lance is not rounded up");
+        assertEquals(8, SupportUnitGenerator.roundUpToWholeFormations(5, 4), "five trucks means two lances");
+        assertEquals(12, SupportUnitGenerator.roundUpToWholeFormations(11, 4),
+              "the battalion convoy of eleven trucks is fielded as three lances");
+        assertEquals(20, SupportUnitGenerator.roundUpToWholeFormations(11, 10),
+              "the same requirement is two Stars for a Clan command");
+    }
+
+    @Test
+    void anEmptyRequirementStillFieldsOneFormation() {
+        assertEquals(4, SupportUnitGenerator.roundUpToWholeFormations(0, 4),
+              "an enabled capability always fields at least one formation");
+        assertEquals(3, SupportUnitGenerator.roundUpToWholeFormations(3, 0),
+              "an unresolved formation size falls back on the bare requirement rather than zero");
+    }
+
+    @Test
+    void theCombatTallyIgnoresTheSupportVehiclesTheCommandAlreadyFields() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+
+        SupportUnitGenerator.CombatForceTally tally = SupportUnitGenerator.tallyCombatForce(campaign);
+
+        assertEquals(2, tally.units(), "both Meks count towards the force being supported");
+        assertEquals(2 * LOCUST_TONNAGE, tally.tonnage(), 0.001, "tonnage is what the convoy is sized against");
+    }
+
+    @Test
+    void aBiggerForceGetsMoreRecoveryVehicles() {
+        Campaign smallForce = campaignWithMeks(4);
+        Campaign largeForce = campaignWithMeks(36);
+
+        int smallCount = SupportUnitGenerator.salvageUnitCount(smallForce);
+        int largeCount = SupportUnitGenerator.salvageUnitCount(largeForce);
+
+        assertEquals(4, smallCount, "a lance needs one recovery vehicle, so it fields one lance of them");
+        assertEquals(12, largeCount,
+              "a battalion of thirty-six meets about thirty-six units, recovers about nine, and so fields three "
+                    + "lances");
+        assertTrue(largeCount > smallCount, "this is the defect: a battalion used to get a lance's worth");
+    }
+
+    @Test
+    void aBiggerForceGetsMoreCargoTrucks() {
+        // Sizes are far enough apart that the comparison holds whatever the truck's cargo bay is in the data: a
+        // lance of Locusts hauls under three tons, a regiment's worth hauls about seventy.
+        Campaign smallForce = campaignWithMeks(4);
+        Campaign largeForce = campaignWithMeks(108);
+
+        assertTrue(SupportUnitGenerator.logisticsUnitCount(largeForce)
+                         > SupportUnitGenerator.logisticsUnitCount(smallForce),
+              "a larger command hauls more supply, so it needs more trucks - this is the defect, both used to get "
+                    + "four");
+        assertEquals(4, SupportUnitGenerator.logisticsUnitCount(smallForce),
+              "a lance still fields one full lance of trucks");
+    }
+
+    @Test
+    void theCargoTruckHasAKnownCapacityToDivideBy() {
+        assertTrue(SupportUnitGenerator.cargoCapacity(SupportUnitGenerator.LOGISTICS_UNIT) > 0,
+              "the convoy is sized by dividing the haul by this, so a zero would silently field one lance for every "
+                    + "command regardless of size");
+        assertEquals(0, SupportUnitGenerator.cargoCapacity("No Such Unit At All"), 0.001,
+              "an unresolvable unit is treated as no capacity rather than throwing");
+    }
+
+    @Test
+    void everyCountIsAWholeNumberOfFormations() {
+        for (int meks : new int[] { 1, 4, 12, 36, 108 }) {
+            Campaign campaign = campaignWithMeks(meks);
+            assertEquals(0, SupportUnitGenerator.salvageUnitCount(campaign) % 4,
+                  meks + " Meks must field whole lances of recovery vehicles");
+            assertEquals(0, SupportUnitGenerator.logisticsUnitCount(campaign) % 4,
+                  meks + " Meks must field whole lances of trucks");
+        }
+    }
+
+    /** A campaign holding {@code mekCount} Locusts, so the force being supported has a known size and tonnage. */
+    private static Campaign campaignWithMeks(int mekCount) {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        for (int index = 0; index < mekCount; index++) {
+            UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+        }
+        return campaign;
+    }
+
     // --- Crewing a granted support vehicle (issue #10076) ---
     //
     // The rule is the one the crew assembler already applies to infantry during generation: a role that uses

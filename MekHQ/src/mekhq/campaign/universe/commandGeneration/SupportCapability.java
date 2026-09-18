@@ -60,7 +60,7 @@ public enum SupportCapability {
     /** Recovery vehicles, crewed by the maintenance section, granted under CamOps salvage rules. */
     SALVAGE(campaignOptions -> campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE),
           campaign -> SupportUnitGenerator.SALVAGE_UNIT,
-          SupportUnitGenerator::scaledCount,
+          SupportUnitGenerator::salvageUnitCount,
           SupportTOEFormationTypes.SALVAGE_FORMATION,
           SupportSection.MAINTENANCE,
           PersonnelRole.VEHICLE_CREW_GROUND,
@@ -82,7 +82,7 @@ public enum SupportCapability {
     /** Flatbed trucks for the StratCon supply convoy, generated with their own crews. */
     LOGISTICS(CampaignOptions::isUseStratCon,
           campaign -> SupportUnitGenerator.LOGISTICS_UNIT,
-          SupportUnitGenerator::scaledCount,
+          SupportUnitGenerator::logisticsUnitCount,
           SupportTOEFormationTypes.LOGISTICS_FORMATION,
           null,
           PersonnelRole.VEHICLE_CREW_GROUND,

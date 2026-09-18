@@ -52,6 +52,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -99,8 +100,22 @@ public final class SupportUnitGenerator {
     private static final String SECURITY_PLATOON_INNER_SPHERE = "Foot Platoon (Rifle)";
     private static final String SECURITY_PLATOON_CLAN = "Clan Foot Point (Rifle Light)";
 
-    /** Vehicles per point for the count-scaled capabilities (salvage, logistics) in a Clan command. */
+    /** Vehicles per point for the formation-sized capabilities (salvage, logistics) in a Clan command. */
     private static final int CLAN_VEHICLES_PER_POINT = 2;
+
+    /**
+     * Combat tonnage that generates one ton of a resupply drop, mirroring the tonnage divider
+     * {@link Resupply#calculateTargetCargoTonnage} uses. Taken uncapped here because a command is generated before it
+     * holds a contract, and the cap is the employer's willingness to supply rather than the command's own need.
+     */
+    private static final int COMBAT_TONNAGE_PER_CARGO_TON = 125;
+
+    /**
+     * Wrecks one recovery vehicle is expected to bring home from a scenario. The opposing force is built to the
+     * player's own budget, so a command fights roughly its own number of units, of which about a quarter can be
+     * dragged home.
+     */
+    private static final int WRECKS_PER_RECOVERY_VEHICLE = 4;
 
     /** Combat personnel in a company-sized force; at or below this the security detail is a single squad. */
     static final int COMPANY_COMBATANT_CEILING = 12;
@@ -236,10 +251,131 @@ public final class SupportUnitGenerator {
         return Math.max(0, targetCount - countGeneratedUnitsNamed(campaign, unitName));
     }
 
-    /** Formation base size, doubled for a Clan command. */
-    static int scaledCount(Campaign campaign) {
-        int count = campaign.getPlayerForce().getFaction().getFormationBaseSize();
-        return campaign.getPlayerForce().isClanForce() ? count * CLAN_VEHICLES_PER_POINT : count;
+    /**
+     * Vehicles in one support formation: a lance for an Inner Sphere command, a vehicle Star for a Clan one. A Clan
+     * vehicle Point is {@value #CLAN_VEHICLES_PER_POINT} vehicles, so a Star of five Points is ten vehicles.
+     *
+     * @param campaign the campaign whose faction sets the formation size
+     *
+     * @return the number of vehicles in one formation
+     */
+    static int supportFormationSize(Campaign campaign) {
+        int baseSize = campaign.getPlayerForce().getFaction().getFormationBaseSize();
+        return campaign.getPlayerForce().isClanForce() ? baseSize * CLAN_VEHICLES_PER_POINT : baseSize;
+    }
+
+    /**
+     * Rounds a vehicle requirement up to whole formations, because support vehicles are fielded as lances or Stars of
+     * one vehicle type rather than as a loose count. A command that needs one truck still gets a full formation, and
+     * one that needs five gets two.
+     *
+     * @param vehiclesNeeded how many vehicles the command's own need works out to
+     * @param formationSize  vehicles in one formation, from {@link #supportFormationSize}
+     *
+     * @return the vehicle count rounded up to whole formations, never fewer than one formation
+     */
+    static int roundUpToWholeFormations(int vehiclesNeeded, int formationSize) {
+        if (formationSize <= 0) {
+            return Math.max(1, vehiclesNeeded);
+        }
+        int formations = Math.max(1, (int) Math.ceil((double) vehiclesNeeded / formationSize));
+        return formations * formationSize;
+    }
+
+    /**
+     * What a command's fighting strength adds up to: the units it fields and what they weigh.
+     *
+     * @param units   combat units in the command
+     * @param tonnage their combined tonnage
+     */
+    record CombatForceTally(int units, double tonnage) {
+    }
+
+    /**
+     * Tallies the command's combat units, which is what both the convoy and the salvage formation are sized against.
+     * Support vehicles are left out so the support the command already fields never asks for support of its own, and
+     * large craft and conventional infantry are left out on the same terms {@link Resupply} uses.
+     *
+     * @param campaign the campaign to tally
+     *
+     * @return the combat unit count and tonnage
+     */
+    static CombatForceTally tallyCombatForce(Campaign campaign) {
+        int units = 0;
+        double tonnage = 0;
+        for (Unit unit : campaign.getUnits()) {
+            Entity entity = unit.getEntity();
+            if ((entity == null) || entity.isSupportVehicle() || Resupply.isProhibitedUnitType(entity, false, false)) {
+                continue;
+            }
+            units++;
+            tonnage += entity.getWeight();
+        }
+        return new CombatForceTally(units, tonnage);
+    }
+
+    /**
+     * Number of cargo trucks the command's own convoy needs to haul a resupply drop sized to its combat tonnage,
+     * rounded up to whole formations.
+     *
+     * <p>The tonnage comes from the same arithmetic {@link Resupply} uses, minus the contract cap: combat tonnage
+     * over {@value #COMBAT_TONNAGE_PER_CARGO_TON} gives the drop, and a player convoy hauls
+     * {@link Resupply#CARGO_MULTIPLIER} times that. A battalion of thirty-six Meks needs roughly sixty-three tons
+     * hauled, which is eleven Flatbed Trucks and so three lances.</p>
+     *
+     * @param campaign the campaign whose combat tonnage drives the count
+     *
+     * @return the truck count, at least one formation
+     */
+    static int logisticsUnitCount(Campaign campaign) {
+        CombatForceTally tally = tallyCombatForce(campaign);
+        double cargoToHaul = (tally.tonnage() / COMBAT_TONNAGE_PER_CARGO_TON) * Resupply.CARGO_MULTIPLIER;
+        double cargoPerTruck = cargoCapacity(LOGISTICS_UNIT);
+        int trucksNeeded = (cargoPerTruck > 0) ? (int) Math.ceil(cargoToHaul / cargoPerTruck) : 1;
+        int count = roundUpToWholeFormations(trucksNeeded, supportFormationSize(campaign));
+        LOGGER.info("[CompanyGen][SupportUnits] logistics: {} combat tons -> {} tons to haul, {} tons per truck -> "
+                    + "{} truck(s) -> {} after rounding to formations of {}",
+              tally.tonnage(), cargoToHaul, cargoPerTruck, trucksNeeded, count, supportFormationSize(campaign));
+        return count;
+    }
+
+    /**
+     * Number of recovery vehicles the command needs to bring its wrecks home, rounded up to whole formations.
+     *
+     * <p>The opposing force is generated to the player's own budget, so a command meets roughly its own number of
+     * units and about a quarter of them can be recovered. A battalion of thirty-six therefore wants nine recovery
+     * vehicles, which is three lances.</p>
+     *
+     * @param campaign the campaign whose combat units drive the count
+     *
+     * @return the recovery vehicle count, at least one formation
+     */
+    static int salvageUnitCount(Campaign campaign) {
+        CombatForceTally tally = tallyCombatForce(campaign);
+        int wrecksToRecover = (int) Math.ceil((double) tally.units() / WRECKS_PER_RECOVERY_VEHICLE);
+        int count = roundUpToWholeFormations(wrecksToRecover, supportFormationSize(campaign));
+        LOGGER.info("[CompanyGen][SupportUnits] salvage: {} combat units -> {} recovery vehicle(s) -> {} after "
+                    + "rounding to formations of {}",
+              tally.units(), wrecksToRecover, count, supportFormationSize(campaign));
+        return count;
+    }
+
+    /**
+     * Cargo a support unit can carry, in tons. A missing entry is logged and treated as no capacity, which the
+     * callers then floor at a single formation.
+     *
+     * @param unitName the unit to look up in the unit cache
+     *
+     * @return the unit's cargo bay capacity in tons, or {@code 0} when it cannot be resolved
+     */
+    static double cargoCapacity(String unitName) {
+        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
+        if (mekSummary == null) {
+            LOGGER.warn("[CompanyGen][SupportUnits] no unit entry for '{}', treating its cargo capacity as zero",
+                  unitName);
+            return 0;
+        }
+        return mekSummary.getCargoBayUnits();
     }
 
     /**
