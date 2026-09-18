@@ -755,13 +755,14 @@ public class ImmersiveDialogCore extends JDialog {
         return editorPane;
     }
 
-    private void configureHtmlEditorPane(JEditorPane editorPane) {
+    static void configureHtmlEditorPane(JEditorPane editorPane) {
+        HTMLEditorKit editorKit = new HTMLEditorKit();
         StyleSheet styleSheet = new StyleSheet();
+        styleSheet.addStyleSheet(editorKit.getStyleSheet());
         styleSheet.addRule("body, div, p, span { background-color: transparent; }");
         styleSheet.addRule("body { margin: 0; padding: 0; }");
-        styleSheet.addRule("p { margin: 0 0 0.5em 0; }");
+        styleSheet.addRule("p { margin: 0 0 " + scaleForGUI(6) + "px 0; }");
 
-        HTMLEditorKit editorKit = new HTMLEditorKit();
         editorKit.setStyleSheet(styleSheet);
         editorPane.setEditorKit(editorKit);
         editorPane.setDocument(new HTMLDocument(styleSheet));
