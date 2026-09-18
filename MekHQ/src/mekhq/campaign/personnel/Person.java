@@ -7635,6 +7635,15 @@ public class Person implements ILocatable {
             return true;
         }
 
+        // "Use global tech skills only" campaign option: part repairs are resolved with the whole-unit global
+        // technician skill (Tech/Mek, Tech/Vehicle, ...) rather than the granular specialist skill (see
+        // getSkillForWorkingOn(IPartWork)).
+        if ((unit != null)
+                  && unit.getCampaign().getCampaignOptions().get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)
+                  && (getSkillForWorkingOn(unit) != null)) {
+            return true;
+        }
+
         // Otherwise a tech is the right type for a part if they possess any of the tech skills the part accepts. Parts
         // report their most appropriate skill via isRightTechType, so this naturally favors specialist skills while
         // still allowing a "global" skill (Technician/Mek, etc.) for parts that map to no more specific skill.

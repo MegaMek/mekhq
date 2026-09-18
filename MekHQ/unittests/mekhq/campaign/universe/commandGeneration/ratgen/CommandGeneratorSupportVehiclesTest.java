@@ -41,6 +41,7 @@ import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.universe.commandGeneration.SupportCapability;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -75,9 +76,10 @@ class CommandGeneratorSupportVehiclesTest {
         try (MockedStatic<SupportUnitGenerator> generator = mockStatic(SupportUnitGenerator.class)) {
             CommandGenerator.grantStandaloneSupportVehicles(campaign);
 
-            generator.verify(() -> SupportUnitGenerator.generateSalvageUnits(eq(campaign), any(), eq(true)));
-            generator.verify(() -> SupportUnitGenerator.generateMedicalUnits(any(), any(), any(Boolean.class)),
-                  never());
+            generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.SALVAGE), eq(campaign),
+                  any(), eq(true)));
+            generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.MEDICAL), any(), any(),
+                  any(Boolean.class)), never());
         }
     }
 
@@ -88,9 +90,10 @@ class CommandGeneratorSupportVehiclesTest {
         try (MockedStatic<SupportUnitGenerator> generator = mockStatic(SupportUnitGenerator.class)) {
             CommandGenerator.grantStandaloneSupportVehicles(campaign);
 
-            generator.verify(() -> SupportUnitGenerator.generateMedicalUnits(eq(campaign), any(), eq(true)));
-            generator.verify(() -> SupportUnitGenerator.generateSalvageUnits(any(), any(), any(Boolean.class)),
-                  never());
+            generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.MEDICAL), eq(campaign),
+                  any(), eq(true)));
+            generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.SALVAGE), any(), any(),
+                  any(Boolean.class)), never());
         }
     }
 
@@ -102,10 +105,10 @@ class CommandGeneratorSupportVehiclesTest {
         try (MockedStatic<SupportUnitGenerator> generator = mockStatic(SupportUnitGenerator.class)) {
             CommandGenerator.grantStandaloneSupportVehicles(campaign);
 
-            generator.verify(() -> SupportUnitGenerator.generateSalvageUnits(any(), any(), any(Boolean.class)),
-                  never());
-            generator.verify(() -> SupportUnitGenerator.generateMedicalUnits(any(), any(), any(Boolean.class)),
-                  never());
+            generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.SALVAGE), any(), any(),
+                  any(Boolean.class)), never());
+            generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.MEDICAL), any(), any(),
+                  any(Boolean.class)), never());
         }
     }
 
@@ -116,10 +119,10 @@ class CommandGeneratorSupportVehiclesTest {
         try (MockedStatic<SupportUnitGenerator> generator = mockStatic(SupportUnitGenerator.class)) {
             CommandGenerator.grantStandaloneSupportVehicles(campaign);
 
-            generator.verify(() -> SupportUnitGenerator.generateSalvageUnits(any(), any(), any(Boolean.class)),
-                  never());
-            generator.verify(() -> SupportUnitGenerator.generateMedicalUnits(any(), any(), any(Boolean.class)),
-                  never());
+            generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.SALVAGE), any(), any(),
+                  any(Boolean.class)), never());
+            generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.MEDICAL), any(), any(),
+                  any(Boolean.class)), never());
         }
     }
 }

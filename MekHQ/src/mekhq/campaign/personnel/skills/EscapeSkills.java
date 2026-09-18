@@ -36,6 +36,7 @@ import static java.lang.Math.floor;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.units.Crew.DEATH;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_ESCAPE_ATTEMPTS;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -47,8 +48,8 @@ import java.util.List;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -168,6 +169,8 @@ public class EscapeSkills {
      */
     private static void processEscapeAttempt(Campaign campaign, Person prisoner, ActionCheckResult actionCheckResult,
           LocalDate today) {
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
+
         String report = getEscapeAttemptReport(prisoner, actionCheckResult.getReportMargin());
         if (!report.isBlank()) {
             campaign.addReport(PERSONNEL, report);

@@ -77,6 +77,7 @@ class MHQAdvancedPage extends MHQOptionsPage {
     private SettingsSpinner spinnerStartGameBotClientDelay;
     private SettingsSpinner spinnerStartGameBotClientRetryCount;
     private SettingsCheckBox chkEnableAbstractCombatAutoResolve;
+    private SettingsCheckBox chkDefaultPlayerForcesOffBoard;
 
     MHQAdvancedPage(MHQOptionsModel model, JFrame frame) {
         super(model);
@@ -157,7 +158,9 @@ class MHQAdvancedPage extends MHQOptionsPage {
 
         chkEnableAbstractCombatAutoResolve = checkBox("optionEnableAbstractCombatAutoResolve",
               model.enableAbstractCombatAutoResolve);
-        panel.addCheckBoxGrid(1, chkEnableAbstractCombatAutoResolve);
+        chkDefaultPlayerForcesOffBoard = checkBox("optionDefaultPlayerForcesOffBoard",
+              model.defaultPlayerForcesOffBoard);
+        panel.addCheckBoxGrid(1, chkEnableAbstractCombatAutoResolve, chkDefaultPlayerForcesOffBoard);
 
         Component page = buildMHQPage("MHQAdvancedPage", "lblMHQAdvancedSection.text", "lblMHQAdvancedSection.summary",
               panel);
@@ -191,5 +194,6 @@ class MHQAdvancedPage extends MHQOptionsPage {
         model.startGameBotClientDelay = (int) spinnerStartGameBotClientDelay.getValue();
         model.startGameBotClientRetryCount = (int) spinnerStartGameBotClientRetryCount.getValue();
         model.enableAbstractCombatAutoResolve = chkEnableAbstractCombatAutoResolve.isSelected();
+        model.defaultPlayerForcesOffBoard = chkDefaultPlayerForcesOffBoard.isSelected();
     }
 }

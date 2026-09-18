@@ -74,6 +74,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.BotForce;
 import mekhq.campaign.mission.scenarios.Scenario;
@@ -281,6 +282,9 @@ public class AtBGameThread extends GameThread {
                     Formation formation = campaign.getPlayerForce().getFormationFor(unit);
                     if (formation != null) {
                         entity.setForceString(formation.getFullMMName());
+                    }
+                    if (scenario instanceof AtBDynamicScenario dynamicScenario) {
+                        AtBDynamicScenarioFactory.applyPlayerOffBoardDeployment(dynamicScenario, unit, entity, campaign);
                     }
                     entities.add(entity);
 
