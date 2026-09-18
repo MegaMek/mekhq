@@ -1699,7 +1699,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         this.setVisible(false);
 
         if (tracker.getScenario() instanceof AtBScenario atBScenario) {
-            if (atBScenario.getStratConScenarioType().isAffectsMorale()) {
+            if (atBScenario.getStratConScenarioType().isScenarioOutcomeAffectsMorale()) {
                 MHQMorale.processMoraleChangeFromScenario(campaign, atBScenario.getContract(campaign),
                       atBScenario.getStatus(), atBScenario.getStratConScenarioType());
             }

@@ -104,7 +104,7 @@ public enum ScenarioType {
         return this == OFFICIAL_CHALLENGE;
     }
 
-    public boolean isAffectsMorale() {
+    public boolean isScenarioOutcomeAffectsMorale() {
         return isScenarioOutcomeAffectsMoraleOnVictory() || isScenarioOutcomeAffectsMoraleOnDefeat();
     }
 
