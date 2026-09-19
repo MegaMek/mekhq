@@ -104,6 +104,15 @@ public class ForceGeneratorTab {
     // Live source of the Setup tab's Formation Naming Method combo. The options object only receives
     // the combo's value on OK, so the preview must read the control itself to stay in sync mid-dialog.
     private Supplier<ForceNamingMethod> namingMethodSupplier;
+    /**
+     * Echelon the formation combo opens on, numbered as the force generator numbers them
+     * (constants.txt: COMPANY 4, TRINARY 5). A command is designed from the bottom up, so the dialog opens on a
+     * manageable formation rather than on the faction ruleset's own default, which is a regiment for most of the
+     * Great Houses and a division for the Federated Suns.
+     */
+    private static final int PREFERRED_ECHELON_INNER_SPHERE = 4;
+    private static final int PREFERRED_ECHELON_CLAN = 5;
+
     private Consumer<FactionRecord> factionChangeListener;
     private BooleanSupplier numberRegimentsSupplier;
     private CommandGenerationCheckBox chkGenerateMercenaryCompanyCommandLance;
@@ -169,7 +178,7 @@ public class ForceGeneratorTab {
         // the other Generate options rather than on the Setup tab.
         chkGenerateMercenaryCompanyCommandLance =
               new CommandGenerationCheckBox("GenerateMercenaryCompanyCommandLance");
-        optionsView.setOnFactionChanged(factionChangeListener);
+        optionsView.setOnFactionChanged(this::factionChanged);
         optionsView.addGenerateOption(chkGenerateMercenaryCompanyCommandLance);
         optionsView.setExportMULButtonVisible(false);
         // The role filters restrict every draw in the tree to units that can fill the ticked role, which
@@ -182,6 +191,8 @@ public class ForceGeneratorTab {
               getTextAt(getCommandGenerationResourceBundle(), "btnClearRolls.tooltip"));
         optionsView.setYearFieldEditable(false);
         if (campaign != null) {
+            // Before setCurrentYear, which populates the combos: the preference decides what they open on.
+            applyPreferredEchelon(campaign.getPlayerForce().isClanForce());
             optionsView.setCurrentYear(campaign.getGameYear());
             // Seed the faction picker from the campaign so the Force Generator opens pre-aligned to
             // the user's New Campaign choice instead of the megamek view's built-in "IS" default.
@@ -288,8 +299,34 @@ public class ForceGeneratorTab {
     public void setFactionChangeListener(@Nullable Consumer<FactionRecord> listener) {
         this.factionChangeListener = listener;
         if (viewUi != null) {
-            viewUi.getOptionsView().setOnFactionChanged(listener);
+            viewUi.getOptionsView().setOnFactionChanged(this::factionChanged);
         }
+    }
+
+    /**
+     * Keeps the opening formation size in step with the faction, then passes the change on to the dialog.
+     *
+     * <p>The two ladders are numbered alike, so the same preference reads as a company for an Inner Sphere command
+     * and a trinary for a Clan one. A faction that fields neither keeps its own default.</p>
+     *
+     * @param faction the faction now selected in the Force Generator panel, or {@code null}
+     */
+    private void factionChanged(@Nullable FactionRecord faction) {
+        applyPreferredEchelon((faction != null) && faction.isClan());
+        if (factionChangeListener != null) {
+            factionChangeListener.accept(faction);
+        }
+    }
+
+    /** Points the formation combo at a company, or a trinary for a Clan command. */
+    private void applyPreferredEchelon(boolean isClanFaction) {
+        if (viewUi == null) {
+            return;
+        }
+        int echelon = isClanFaction ? PREFERRED_ECHELON_CLAN : PREFERRED_ECHELON_INNER_SPHERE;
+        viewUi.getOptionsView().setPreferredEchelon(echelon);
+        LOGGER.info("[CompanyGen][ForceGenTab][Echelon] formation combo opens on echelon {} (clan={})", echelon,
+              isClanFaction);
     }
 
     public void setNamingMethodSupplier(@Nullable Supplier<ForceNamingMethod> supplier) {

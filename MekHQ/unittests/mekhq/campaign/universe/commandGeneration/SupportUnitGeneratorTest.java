@@ -32,9 +32,9 @@
  */
 package mekhq.campaign.universe.commandGeneration;
 
-import mekhq.campaign.ForceHumanResources;
-import mekhq.campaign.force.PlayerForce;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -43,8 +43,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator.SecurityTier;
 import org.junit.jupiter.api.BeforeAll;
@@ -65,6 +73,8 @@ class SupportUnitGeneratorTest {
     @BeforeAll
     static void initializeTypes() {
         EquipmentType.initializeTypes();
+        // Recruiting a crew member rolls their skills, which needs the skill table loaded.
+        SkillType.initializeTypes();
     }
 
     @Test
@@ -155,6 +165,75 @@ class SupportUnitGeneratorTest {
         assertEquals("Clan Foot Point (Rifle Light)", SupportUnitGenerator.securityUnitName(SecurityTier.COMPANY, true));
     }
 
+    // --- Crewing a granted support vehicle (issue #10076) ---
+    //
+    // The rule is the one the crew assembler already applies to infantry during generation: a role that uses
+    // temporary crews gets one named crew member and fills the rest of its seats from the pool, and every other role
+    // gets a full crew of individual personnel.
+
+    @Test
+    void temporaryCrewsLeaveOneNamedCrewMemberAboard() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, true);
+        Unit vehicle = supportVehicle(campaign);
+
+        PersonnelRole pooledRole = SupportUnitGenerator.crewSupportUnit(campaign, vehicle,
+              campaign.getPlayerForce().getFaction(), null);
+
+        assertEquals(PersonnelRole.VEHICLE_CREW_GROUND, pooledRole,
+              "the ground vehicle crew role is reported as filled from the pool");
+        assertEquals(1, vehicle.getActiveCrew().size(),
+              "exactly one named crew member is aboard, as the crew assembler leaves an infantry platoon");
+        assertTrue(vehicle.getFullCrewSize() > 1, "the test vehicle must have more than one seat");
+    }
+
+    @Test
+    void fullCrewsAreIndividualPersonnel() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, false);
+        Unit vehicle = supportVehicle(campaign);
+
+        PersonnelRole pooledRole = SupportUnitGenerator.crewSupportUnit(campaign, vehicle,
+              campaign.getPlayerForce().getFaction(), null);
+
+        assertNull(pooledRole, "nothing was drawn from the temporary crew pool");
+        assertEquals(vehicle.getFullCrewSize(), vehicle.getActiveCrew().size(),
+              "every seat is filled by an individual person");
+    }
+
+    @Test
+    void anExplicitChoiceOverridesTheCampaignOption() {
+        Campaign withTemporaryCrewsOff = MHQTestUtilities.getTestCampaign();
+        withTemporaryCrewsOff.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, false);
+        Unit pooled = supportVehicle(withTemporaryCrewsOff);
+
+        assertEquals(PersonnelRole.VEHICLE_CREW_GROUND,
+              SupportUnitGenerator.crewSupportUnit(withTemporaryCrewsOff, pooled,
+                    withTemporaryCrewsOff.getPlayerForce().getFaction(),
+                    SupportPersonnelToTOE.VehicleCrewSource.TEMPORARY_CREW),
+              "the player asked for temporary crews even though the campaign does not use them");
+        assertEquals(1, pooled.getActiveCrew().size(), "one named crew member aboard");
+
+        Campaign withTemporaryCrewsOn = MHQTestUtilities.getTestCampaign();
+        withTemporaryCrewsOn.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, true);
+        Unit fullyCrewed = supportVehicle(withTemporaryCrewsOn);
+
+        assertNull(SupportUnitGenerator.crewSupportUnit(withTemporaryCrewsOn, fullyCrewed,
+                    withTemporaryCrewsOn.getPlayerForce().getFaction(),
+                    SupportPersonnelToTOE.VehicleCrewSource.NEW_CREW),
+              "the player asked for individual personnel even though the campaign uses temporary crews");
+        assertEquals(fullyCrewed.getFullCrewSize(), fullyCrewed.getActiveCrew().size(),
+              "every seat is filled by an individual person");
+    }
+
+    /** A multi-seat ground support vehicle, added to the campaign without a crew. */
+    private static Unit supportVehicle(Campaign campaign) {
+        Entity entity = MHQTestUtilities.getEntityForUnitTesting("Prime Mover", true);
+        assertNotNull(entity, "Prime Mover.blk must be present in the test resources");
+        Unit unit = campaign.addNewUnit(entity, false, 0, PartQuality.QUALITY_D);
+        assertEquals(0, unit.getActiveCrew().size(), "the vehicle starts crewless");
+        return unit;
+    }
     /** Builds a campaign whose active roster holds {@code combatants} combat and {@code others} non-combat personnel. */
     private static Campaign campaignWithPersonnel(int combatants, int others) {
         List<Person> roster = new ArrayList<>();

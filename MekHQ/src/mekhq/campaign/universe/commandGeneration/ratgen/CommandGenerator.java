@@ -90,6 +90,7 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.EnhancedImagingAugmentor;
 import mekhq.campaign.universe.commandGeneration.LiftTopUp;
 import mekhq.campaign.universe.commandGeneration.ManeiDominiAugmentor;
+import mekhq.campaign.universe.commandGeneration.SupportCapability;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
@@ -634,32 +635,19 @@ public final class CommandGenerator {
      * @param campaign the campaign the vehicles are granted to
      */
     static void grantStandaloneSupportVehicles(Campaign campaign) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Faction supportFaction = campaign.getPlayerForce().getFaction();
-        boolean useSalvage = campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE);
-        boolean useMedical = campaignOptions.get(CampaignOption.USE_MASH_THEATRES);
-        if (SupportCarrierReconciler.isEnabled(campaign)) {
-            LOGGER.info("[CompanyGen][SupportUnits] support teams are on; recovery vehicles (salvage={}) and MASH"
-                              + " trucks (medical={}) join their support sections", useSalvage, useMedical);
-        } else {
-            LOGGER.info("[CompanyGen][SupportUnits] support teams are off; recovery vehicles (salvage={}) and MASH"
-                              + " trucks (medical={}) are generated standalone", useSalvage, useMedical);
-            if (useSalvage) {
-                SupportUnitGenerator.generateSalvageUnits(campaign, supportFaction, true);
+        for (SupportCapability capability : SupportCapability.values()) {
+            if (!capability.isEnabled(campaign)) {
+                LOGGER.info("[CompanyGen][SupportUnits] {}: switched off, nothing granted", capability);
+                continue;
             }
-            if (useMedical) {
-                SupportUnitGenerator.generateMedicalUnits(campaign, supportFaction, true);
+            if (capability.joinsSection(campaign)) {
+                LOGGER.info("[CompanyGen][SupportUnits] {}: joins the {} section, crewed from its own staff",
+                      capability, capability.crewSection());
+                continue;
             }
-        }
-
-        if (campaignOptions.isUseStratCon()) {
-            SupportUnitGenerator.generateLogisticsUnits(campaign, supportFaction, true);
-        }
-        if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
-            SupportUnitGenerator.generateCommissaryUnits(campaign, supportFaction, true);
-        }
-        if (!campaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()) {
-            SupportUnitGenerator.generateSecurityUnits(campaign, supportFaction, true);
+            LOGGER.info("[CompanyGen][SupportUnits] {}: generated standalone with its own crew", capability);
+            SupportUnitGenerator.generate(capability, campaign, supportFaction, true);
         }
     }
 

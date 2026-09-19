@@ -266,6 +266,10 @@ public final class PersonnelTab extends CampaignGuiTab {
         chkGroupByUnit.setToolTipText(resourceMap.getString("chkGroupByUnit.toolTipText"));
         chkGroupByUnit.addActionListener(e -> {
             getPersonnelTableModel().setGroupByUnit(chkGroupByUnit.isSelected());
+            // Grouping by unit changes the row set, so clear the selection before refreshing the data. Refreshing
+            // re-indexes the table, and Swing would otherwise try to restore a selection that may reference a
+            // now-removed row, throwing an ArrayIndexOutOfBoundsException.
+            personnelTable.clearSelection();
             getPersonnelTableModel().refreshData();
             changePersonnelView();
         });
@@ -557,21 +561,21 @@ public final class PersonnelTab extends CampaignGuiTab {
         List<Person> people = locationFilter.selectPersonnel(getCampaign());
         getPersonnelTableModel().setData(people);
 
-        boolean reselected = false;
+        // Filter the table before restoring the selection. Applying a row filter re-sorts the table, and Swing then
+        // tries to restore the prior selection by mapping its model rows into the rebuilt view; a selection that
+        // references a now-removed row throws an ArrayIndexOutOfBoundsException during that restoration. The selection
+        // is already cleared here, so we filter first and only reselect afterwards, against the fully rebuilt view.
+        filterPersonnel();
+
         for (int row = 0; row < personnelTable.getRowCount(); row++) {
             Person person = getPersonnelTableModel().getRow(personnelTable.convertRowIndexToModel(row));
             if (person != null && person.getId().equals(selectedUUID)) {
                 personnelTable.setRowSelectionInterval(row, row);
-                refreshPersonnelView();
-                reselected = true;
                 break;
             }
         }
 
-        if (!reselected) {
-            refreshPersonnelView();
-        }
-        filterPersonnel();
+        refreshPersonnelView();
     }
 
     public void refreshPersonnelView() {

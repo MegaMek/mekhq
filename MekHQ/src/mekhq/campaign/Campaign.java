@@ -45,6 +45,7 @@ import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
@@ -2375,6 +2376,8 @@ public class Campaign implements ITechManager {
                 boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE) &&
                                           person.getOptions().booleanOption(EDGE_ADMIN_APPRAISAL_FAIL);
                 ActionCheckResult appraisalResult = Appraisal.performAppraisalCheck(person, currentDay, isUseEdge);
+                addReport(SKILL_CHECKS, appraisalResult.getReport());
+
                 valueChange = Appraisal.getAppraisalCostMultiplier(appraisalResult.getMarginOfSuccess());
                 appraisalReport = Appraisal.getAppraisalReport(valueChange, appraisalResult.getReportMargin());
             }
@@ -2674,7 +2677,6 @@ public class Campaign implements ITechManager {
                                                            .booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT) &&
                                                      (tech.getCurrentEdge() > 0);
                     SkillCheck refitCheck = new SkillCheck(tech, refitSkill.getType(), target)
-                                                  .withoutLogging()
                                                   .withoutSubject()
                                                   .withEdgeRerollCondition(firstRoll -> firstRoll.result() <
                                                                                               target.getValue());
@@ -2685,7 +2687,7 @@ public class Campaign implements ITechManager {
                     ActionCheckResult refitResult = refitCheck.resolve(canUseEdge, null);
                     roll = refitResult.getRollResult();
                     report = report + getFormattedTextAt(RESOURCE_BUNDLE, "refit.check.report",
-                          target.getValueAsString(), refitResult.getReport(true)) + " ";
+                          target.getValueAsString(), refitResult.getReport()) + " ";
                 }
 
                 if (roll >= target.getValue()) {
@@ -2909,7 +2911,6 @@ public class Campaign implements ITechManager {
                                              (tech.getCurrentEdge() > 0) &&
                                              (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS);
             SkillCheck repairCheck = new SkillCheck(tech, repairSkill.getType(), target)
-                                           .withoutLogging()
                                            .withoutSubject()
                                            .withEdgeRerollCondition(firstRoll -> {
                                                int rolled = firstRoll.result();
@@ -2937,7 +2938,7 @@ public class Campaign implements ITechManager {
             ActionCheckResult repairResult = repairCheck.resolve(canUseEdge, null);
             roll = repairResult.getRollResult();
             report = report + getFormattedTextAt(RESOURCE_BUNDLE, "repair.check.report",
-                  target.getValueAsString(), repairResult.getReport(true));
+                  target.getValueAsString(), repairResult.getReport());
         }
 
         final boolean taskSucceeded = roll >= target.getValue();

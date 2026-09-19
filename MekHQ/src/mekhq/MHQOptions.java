@@ -1518,6 +1518,16 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.ENABLE_ABSTRACT_COMBAT_AUTO_RESOLVE, value);
     }
 
+    public boolean getDefaultPlayerForcesOffBoard() {
+        return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+                     .getBoolean(MHQConstants.DEFAULT_PLAYER_FORCES_OFF_BOARD, false);
+    }
+
+    public void setDefaultPlayerForcesOffBoard(final boolean value) {
+        userPreferences.node(MHQConstants.MISCELLANEOUS_NODE)
+              .putBoolean(MHQConstants.DEFAULT_PLAYER_FORCES_OFF_BOARD, value);
+    }
+
     public int getStartGameDelay() {
         return userPreferences.node(MHQConstants.MISCELLANEOUS_NODE).getInt(MHQConstants.START_GAME_DELAY, 1000);
     }
