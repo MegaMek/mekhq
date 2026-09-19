@@ -244,6 +244,24 @@ class SupportUnitGeneratorTest {
     }
 
     @Test
+    void aCombatUnitBuiltUnderSupportVehicleRulesStillCounts() {
+        // Found in a 2450 campaign log reading "0.0 combat tons" against a twelve vehicle command. Primitive
+        // combat vehicles - the LRM, SRM and AC/2 Carriers of the 2400s - are all built as SupportTank, so
+        // excluding units by construction emptied the entire fighting force. Where a unit is filed answers the
+        // question; what it is built as does not.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Unit supportBuilt = supportVehicle(campaign);
+        assertTrue(supportBuilt.getEntity().isSupportVehicle(),
+              "this test is only meaningful while the stand-in is support vehicle construction");
+
+        SupportUnitGenerator.CombatForceTally tally = SupportUnitGenerator.tallyCombatForce(campaign);
+
+        assertEquals(1, tally.units(),
+              "a combat unit built under support vehicle rules is still part of the force being supported");
+        assertTrue(tally.tonnage() > 0, "and it still weighs something, or the convoy is sized against nothing");
+    }
+
+    @Test
     void theCombatTallyIgnoresUnitsAlreadyFiledIntoASupportFormation() {
         // The unit used here is an ordinary Tank, not a support vehicle by construction, which is exactly the case
         // that matters: a BattleMek Recovery Vehicle is a plain fifty-ton Tank, so the equipment check alone does

@@ -456,11 +456,16 @@ public final class SupportUnitGenerator {
      * Tallies the command's combat units, which is what both the convoy and the salvage formation are sized against.
      * Large craft and conventional infantry are left out on the same terms {@link Resupply} uses.
      *
-     * <p>Anything already filed into a support formation is left out too, and that exclusion carries the weight
-     * here. Most support vehicles are not support vehicles by construction: a BattleMek Recovery Vehicle is an
-     * ordinary fifty-ton Tank, so {@link Entity#isSupportVehicle()} is {@code false} for it. Since the capabilities
-     * are generated one after another, counting them would let each one inflate the next: a command whose twelve
-     * recovery vehicles had already been built would size its convoy against six hundred tons of its own support.</p>
+     * <p>What a capability already fields is left out by asking where a unit is filed, not what it is built as.
+     * Construction does not answer the question in either direction. A BattleMek Recovery Vehicle is an ordinary
+     * fifty-ton Tank, so it would not be excluded; and an early command's whole fighting force is built under
+     * support vehicle rules - the primitive LRM, SRM and AC/2 Carriers of the 2400s are all {@code SupportTank} -
+     * so excluding those would leave a twelve vehicle command weighing nothing at all.</p>
+     *
+     * <p>Filing is the reliable test, because the capabilities generate one after another and each files its
+     * vehicles before the next is sized. Without it each capability inflates the next: a command whose twelve
+     * recovery vehicles had already been built would size its convoy against six hundred tons of its own
+     * support.</p>
      *
      * @param campaign the campaign to tally
      *
@@ -471,7 +476,7 @@ public final class SupportUnitGenerator {
         double tonnage = 0;
         for (Unit unit : campaign.getUnits()) {
             Entity entity = unit.getEntity();
-            if ((entity == null) || entity.isSupportVehicle() || Resupply.isProhibitedUnitType(entity, false, false)) {
+            if ((entity == null) || Resupply.isProhibitedUnitType(entity, false, false)) {
                 continue;
             }
             if (isInSupportFormation(campaign, unit)) {
