@@ -580,10 +580,9 @@ public final class SupportUnitGenerator {
     }
 
     /**
-     * Number of mobile canteens required to feed the command. Each canteen counts as a single field
-     * kitchen worth of coverage ({@link CampaignOptions#getFieldKitchenCapacity()} personnel),
-     * regardless of how many kitchen items the unit model happens to carry, so the count reads as
-     * roughly one canteen per kitchen's worth of personnel. The personnel that need feeding are
+     * Number of mobile canteens required to feed the command, counting the field kitchens the canteens actually
+     * carry. A vehicle with two kitchens feeds twice what a vehicle with one does, so a command given the
+     * two-kitchen Sherpa needs half as many canteens as the option's per-kitchen figure alone would suggest. The personnel that need feeding are
      * counted exactly as {@link Fatigue#checkFieldKitchenUsage} counts them (honouring the
      * ignore-non-combatants option). Never returns fewer than one so an enabled commissary always
      * fields at least one canteen.
@@ -596,10 +595,19 @@ public final class SupportUnitGenerator {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int personnelNeedingKitchen = Fatigue.checkFieldKitchenUsage(campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false),
               campaignOptions.get(CampaignOption.FIELD_KITCHEN_IGNORE_NON_COMBATANTS), campaign);
-        int coveragePerCanteen = campaignOptions.get(CampaignOption.FIELD_KITCHEN_CAPACITY);
+        double kitchensPerCanteen = SupportVehicleSelector.typicalCapacity(SupportCapability.COMMISSARY,
+              faction.getShortName(), campaign.getLocalDate().getYear(), null,
+              SupportVehicleSelector.Candidate::fieldKitchens);
+        if (kitchensPerCanteen <= 0) {
+            kitchensPerCanteen = 1;
+        }
+        int coveragePerCanteen = (int) Math.round(kitchensPerCanteen
+              * campaignOptions.get(CampaignOption.FIELD_KITCHEN_CAPACITY));
         int count = vehiclesForCoverage(personnelNeedingKitchen, coveragePerCanteen);
-        LOGGER.info("[CompanyGen][SupportUnits] commissary: {} personnel need feeding, {} fed per canteen -> {} canteen(s)",
-              personnelNeedingKitchen, coveragePerCanteen, count);
+        LOGGER.info("[CompanyGen][SupportUnits] commissary: {} personnel need feeding, {} kitchen(s) per canteen "
+                    + "feeding {} each -> {} fed per canteen -> {} canteen(s)",
+              personnelNeedingKitchen, kitchensPerCanteen,
+              campaignOptions.get(CampaignOption.FIELD_KITCHEN_CAPACITY), coveragePerCanteen, count);
         return count;
     }
 
