@@ -52,6 +52,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
@@ -292,8 +294,13 @@ public final class SupportUnitGenerator {
 
     /**
      * Tallies the command's combat units, which is what both the convoy and the salvage formation are sized against.
-     * Support vehicles are left out so the support the command already fields never asks for support of its own, and
-     * large craft and conventional infantry are left out on the same terms {@link Resupply} uses.
+     * Large craft and conventional infantry are left out on the same terms {@link Resupply} uses.
+     *
+     * <p>Anything already filed into a support formation is left out too, and that exclusion carries the weight
+     * here. Most support vehicles are not support vehicles by construction: a BattleMek Recovery Vehicle is an
+     * ordinary fifty-ton Tank, so {@link Entity#isSupportVehicle()} is {@code false} for it. Since the capabilities
+     * are generated one after another, counting them would let each one inflate the next: a command whose twelve
+     * recovery vehicles had already been built would size its convoy against six hundred tons of its own support.</p>
      *
      * @param campaign the campaign to tally
      *
@@ -307,10 +314,28 @@ public final class SupportUnitGenerator {
             if ((entity == null) || entity.isSupportVehicle() || Resupply.isProhibitedUnitType(entity, false, false)) {
                 continue;
             }
+            if (isInSupportFormation(campaign, unit)) {
+                continue;
+            }
             units++;
             tonnage += entity.getWeight();
         }
         return new CombatForceTally(units, tonnage);
+    }
+
+    /**
+     * Whether the unit sits in one of the command's support formations - its convoy, salvage, medical, commissary or
+     * security formation - rather than in the fighting force those exist to support. A unit in no formation at all
+     * counts as part of the force, so a tally taken before the TOE is built is never silently emptied.
+     *
+     * @param campaign the campaign holding the formations
+     * @param unit     the unit to place
+     *
+     * @return {@code true} when the unit belongs to a support formation
+     */
+    private static boolean isInSupportFormation(Campaign campaign, Unit unit) {
+        Formation formation = campaign.getPlayerForce().getFormation(unit.getFormationId());
+        return (formation != null) && !formation.isFormationType(FormationType.STANDARD);
     }
 
     /**

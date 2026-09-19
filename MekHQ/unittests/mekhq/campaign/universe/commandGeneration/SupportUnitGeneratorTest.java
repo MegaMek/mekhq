@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.commandGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -202,7 +203,7 @@ class SupportUnitGeneratorTest {
     }
 
     @Test
-    void theCombatTallyIgnoresTheSupportVehiclesTheCommandAlreadyFields() {
+    void theCombatTallyCountsTheFightingForce() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
         UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
@@ -211,6 +212,29 @@ class SupportUnitGeneratorTest {
 
         assertEquals(2, tally.units(), "both Meks count towards the force being supported");
         assertEquals(2 * LOCUST_TONNAGE, tally.tonnage(), 0.001, "tonnage is what the convoy is sized against");
+    }
+
+    @Test
+    void theCombatTallyIgnoresUnitsAlreadyFiledIntoASupportFormation() {
+        // The unit used here is an ordinary Tank, not a support vehicle by construction, which is exactly the case
+        // that matters: a BattleMek Recovery Vehicle is a plain fifty-ton Tank, so the equipment check alone does
+        // not exclude it. Without the formation check each capability inflates the next, because they are generated
+        // one after another - found in a campaign log where a command sized its convoy against its own twelve
+        // recovery vehicles and was given twelve trucks where eight were needed.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+        Unit alreadyGranted = UnitTestUtilities.addAndGetUnit(campaign,
+              UnitTestUtilities.getHeavyTrackedApcStandard());
+        assertFalse(alreadyGranted.getEntity().isSupportVehicle(),
+              "this test is only meaningful while the stand-in is not caught by the support vehicle check");
+
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, List.of(alreadyGranted),
+              SupportTOEFormationTypes.SALVAGE_FORMATION);
+        SupportUnitGenerator.CombatForceTally tally = SupportUnitGenerator.tallyCombatForce(campaign);
+
+        assertEquals(1, tally.units(), "the granted support vehicle is not part of the force being supported");
+        assertEquals(LOCUST_TONNAGE, tally.tonnage(), 0.001,
+              "its tonnage must not inflate the convoy the command is given");
     }
 
     @Test
