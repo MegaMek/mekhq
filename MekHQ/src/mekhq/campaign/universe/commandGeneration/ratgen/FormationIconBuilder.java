@@ -445,11 +445,6 @@ public final class FormationIconBuilder {
         // recovery equipment. A BattleMek Recovery Vehicle is an ordinary Tank with a cargo bay and a winch that
         // exists only in its fluff text, so the equipment count below finds nothing on the very formation this icon
         // is for.
-
-        // Asked of the formation rather than of its units, because a recovery vehicle does not have to carry
-        // recovery equipment. A BattleMek Recovery Vehicle is an ordinary Tank with a cargo bay and a winch that
-        // exists only in its fluff text, so the equipment count below finds nothing on the very formation this icon
-        // is for.
         if (formation.isFormationType(FormationType.SALVAGE)) {
             return MAINTENANCE_TYPE_FILENAME;
         }
