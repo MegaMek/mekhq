@@ -117,8 +117,11 @@ public final class SupportVehicleSelector {
         // vehicles common: they outweigh the rest of the table roughly three to one.
         MekSummary rolled = table.generateUnit(summary -> suits(capability, describe(summary)));
         if (rolled == null) {
-            LOGGER.info("[CompanyGen][SupportUnits] {}: no vehicle available to {} in {}; none will be fielded",
-                  capability, factionCode, year);
+            // Worth separating: a table with entries that none of them suit is a capability filter that is too
+            // tight, while an empty table is a faction that could field nothing of the kind in that year.
+            LOGGER.info("[CompanyGen][SupportUnits] {}: none of the {} vehicle(s) on the {} table for {} in {} "
+                        + "suit it; none will be fielded",
+                  capability, table.getNumEntries(), rolesFor(capability), factionCode, year);
             return null;
         }
         Candidate chosen = describe(rolled);
@@ -211,11 +214,11 @@ public final class SupportVehicleSelector {
         return switch (capability) {
             case SALVAGE -> EnumSet.of(MissionRole.RECOVERY);
             case LOGISTICS -> EnumSet.of(MissionRole.CARGO, MissionRole.SUPPORT);
-            // Medical and commissary vehicles are recognised by the equipment they carry, which is a stricter
-            // test than any role. Asking for the SUPPORT role as well only narrowed the field: a Clan command was
-            // left with no canteen at all because its one field kitchen vehicle was a trailer, and the untagged
-            // rest of the table was never considered.
-            default -> EnumSet.noneOf(MissionRole.class);
+            // Medical and commissary vehicles are recognised by the equipment they carry, but the table still
+            // has to be asked for SUPPORT. Asking with no role at all builds a general combat table, and
+            // adjustAvailabilityByRole drops anything carrying the SUPPORT role from one of those outright - so a
+            // wider ask returns fewer vehicles, not more, and no MASH truck or canteen survives it.
+            default -> EnumSet.of(MissionRole.SUPPORT);
         };
     }
 
