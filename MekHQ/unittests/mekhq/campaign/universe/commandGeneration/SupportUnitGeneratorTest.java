@@ -297,12 +297,11 @@ class SupportUnitGeneratorTest {
     }
 
     @Test
-    void theCargoTruckHasAKnownCapacityToDivideBy() {
-        assertTrue(SupportUnitGenerator.cargoCapacity(SupportUnitGenerator.LOGISTICS_UNIT) > 0,
-              "the convoy is sized by dividing the haul by this, so a zero would silently field one lance for every "
-                    + "command regardless of size");
-        assertEquals(0, SupportUnitGenerator.cargoCapacity("No Such Unit At All"), 0.001,
-              "an unresolvable unit is treated as no capacity rather than throwing");
+    void anUnresolvableUnitIsTreatedAsNoCapacity() {
+        // The convoy is sized by dividing the haul by a truck's capacity. The capacity now comes from the
+        // generator rather than from one named unit, but an unreadable entry must still be zero rather than throw;
+        // the caller falls back on a nominal capacity so sizing still produces a number.
+        assertEquals(0, SupportUnitGenerator.cargoCapacity("No Such Unit At All"), 0.001);
     }
 
     @Test

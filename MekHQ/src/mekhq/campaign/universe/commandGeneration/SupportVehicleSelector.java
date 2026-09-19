@@ -33,8 +33,10 @@
 package mekhq.campaign.universe.commandGeneration;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.ToDoubleFunction;
 
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.MissionRole;
@@ -155,6 +157,35 @@ public final class SupportVehicleSelector {
             }
         }
         return candidates;
+    }
+
+    /**
+     * The capacity a typical vehicle of this kind carries, used to size a capability before anything is rolled.
+     *
+     * <p>Sizing runs before selection - the mechanic count needs a vehicle count first - so it cannot ask the
+     * vehicle that will actually be fielded. The median of what the faction could field is used instead, which is
+     * steadier than the mean when one outlier like a twelve ton trailer sits in a table of six ton trucks.</p>
+     *
+     * @param capability  the capability being sized
+     * @param factionCode the faction the command is generated for
+     * @param year        the campaign year
+     * @param rating      the command's equipment rating, or {@code null} for any
+     * @param measure     the capacity to read off each candidate
+     *
+     * @return the median capacity, or {@code 0} when the faction could field none
+     */
+    public static double typicalCapacity(SupportCapability capability, @Nullable String factionCode, int year,
+          @Nullable String rating, ToDoubleFunction<Candidate> measure) {
+        List<Candidate> candidates = candidatesFor(capability, factionCode, year, rating);
+        if (candidates.isEmpty()) {
+            return 0;
+        }
+        List<Double> capacities = new ArrayList<>();
+        for (Candidate candidate : candidates) {
+            capacities.add(measure.applyAsDouble(candidate));
+        }
+        Collections.sort(capacities);
+        return capacities.get(capacities.size() / 2);
     }
 
     /** The generator table to roll on, filtered by mission role where the capability has one. */
