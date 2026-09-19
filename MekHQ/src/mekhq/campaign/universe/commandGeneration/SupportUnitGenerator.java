@@ -34,12 +34,14 @@ package mekhq.campaign.universe.commandGeneration;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.IntFunction;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.MiscMounted;
@@ -68,6 +70,8 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.VehicleCrewSource;
+import mekhq.campaign.universe.enums.Alphabet;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
 
 /**
  * Generates the free support vehicles a command is granted for its various support capabilities, and
@@ -156,8 +160,8 @@ public final class SupportUnitGenerator {
      * @param autoAssignRanks whether generated crews have ranks assigned automatically
      */
     public static void generate(SupportCapability capability, Campaign campaign, Faction faction,
-          boolean autoAssignRanks) {
-        generate(capability, campaign, faction, autoAssignRanks, null);
+          boolean autoAssignRanks, @Nullable ForceNamingMethod namingMethod) {
+        generate(capability, campaign, faction, autoAssignRanks, null, namingMethod);
     }
 
     /**
@@ -169,12 +173,15 @@ public final class SupportUnitGenerator {
      * @param faction         the faction whose ranks the crews are given
      * @param autoAssignRanks whether generated crews have ranks assigned automatically
      * @param crewSource      the crewing to use, or {@code null} to follow the campaign's temporary crew options
+     * @param namingMethod    the convention the command's formations are named with, or {@code null} for the
+     *                        default; a mid-campaign grant has none stated and takes the default
      */
     public static void generate(SupportCapability capability, Campaign campaign, Faction faction,
-          boolean autoAssignRanks, @Nullable VehicleCrewSource crewSource) {
+          boolean autoAssignRanks, @Nullable VehicleCrewSource crewSource,
+          @Nullable ForceNamingMethod namingMethod) {
         generate(capability, campaign, faction, autoAssignRanks, capability.unitName(campaign),
               capability.targetCount(campaign, faction),
-              capability.formationType(), crewSource);
+              capability.formationType(), crewSource, namingMethod);
     }
 
     /**
@@ -366,6 +373,38 @@ public final class SupportUnitGenerator {
      */
     static String subFormationPattern(Faction faction) {
         return subFormationPattern(baseFormationLevel(faction));
+    }
+
+    /**
+     * Names support sub-formations the way the command's combat formations are named, so a command whose lances are
+     * Able, Baker and Charlie does not file its trucks under Lance 1 and Lance 2.
+     *
+     * @param faction       the faction of the command being supported, which decides lance, Star or Level II
+     * @param namingMethod  the convention the command was generated with, or {@code null} for the default
+     *
+     * @return the name for the sub-formation at a given position, counting from one
+     */
+    static IntFunction<String> subFormationNamer(Faction faction, @Nullable ForceNamingMethod namingMethod) {
+        String pattern = subFormationPattern(faction);
+        ForceNamingMethod method = (namingMethod == null) ? ForceNamingMethod.CCB_1943 : namingMethod;
+        return position -> MessageFormat.format(pattern, designator(method, position));
+    }
+
+    /**
+     * The designator for the sub-formation at {@code position}, counting from one: Able, Baker, Charlie under the
+     * default convention. Positions beyond the alphabet fall back on the number, which no real command reaches.
+     *
+     * @param namingMethod the convention the command was generated with
+     * @param position     the sub-formation's position, counting from one
+     *
+     * @return the designator
+     */
+    static String designator(ForceNamingMethod namingMethod, int position) {
+        Alphabet[] alphabet = Alphabet.values();
+        if ((position < 1) || (position > alphabet.length)) {
+            return String.valueOf(position);
+        }
+        return namingMethod.getValue(alphabet[position - 1]);
     }
 
     /**
@@ -787,7 +826,8 @@ public final class SupportUnitGenerator {
      */
     private static void generate(SupportCapability capability, Campaign campaign, Faction faction,
           boolean autoAssignRanks, @Nullable String unitName, int targetCount,
-          SupportTOEFormationTypes formationType, @Nullable VehicleCrewSource crewSource) {
+          SupportTOEFormationTypes formationType, @Nullable VehicleCrewSource crewSource,
+          @Nullable ForceNamingMethod namingMethod) {
         // A named capability is infantry, counted by name as before. A rolled one has no single name to count, so
         // what it already fields is read off its formation instead.
         int existing = (unitName != null)
@@ -844,7 +884,7 @@ public final class SupportUnitGenerator {
 
         if (!units.isEmpty()) {
             AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, units, formationType,
-                  subFormationSize(faction, formationType), subFormationPattern(faction));
+                  subFormationSize(faction, formationType), subFormationNamer(faction, namingMethod));
         }
         // The daily pool fill is off by default, so whatever was crewed from the pool is filled here and now.
         for (PersonnelRole pooledRole : pooledRoles) {

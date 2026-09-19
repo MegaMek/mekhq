@@ -42,6 +42,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.IntFunction;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
@@ -60,6 +61,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator.SecurityTier;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
@@ -190,7 +192,7 @@ class SupportUnitGeneratorTest {
         assertEquals(FormationLevel.LEVEL_II_OR_CHOIR, SupportUnitGenerator.baseFormationLevel(comStar));
         assertEquals(6, SupportUnitGenerator.supportFormationSize(comStar),
               "a ComStar Level II is six vehicles, whatever the campaign's own faction is");
-        assertEquals("Level II {0}", SupportUnitGenerator.subFormationPattern(comStar),
+        assertEquals("{0} Level II", SupportUnitGenerator.subFormationPattern(comStar),
               "and it is filed as a Level II, not a lance");
     }
 
@@ -201,7 +203,7 @@ class SupportUnitGeneratorTest {
         assertEquals(FormationLevel.STAR_OR_NOVA, SupportUnitGenerator.baseFormationLevel(jadeFalcon));
         assertEquals(10, SupportUnitGenerator.supportFormationSize(jadeFalcon),
               "a Clan vehicle Point is two vehicles, so a Star of five Points is ten");
-        assertEquals("Star {0}", SupportUnitGenerator.subFormationPattern(jadeFalcon));
+        assertEquals("{0} Star", SupportUnitGenerator.subFormationPattern(jadeFalcon));
     }
 
     @Test
@@ -368,12 +370,45 @@ class SupportUnitGeneratorTest {
     }
 
     @Test
+    void supportFormationsAreNamedTheWayCombatFormationsAre() {
+        // A command whose lances are Able, Baker and Charlie filed its trucks under "Lance 1" and "Lance 2".
+        Faction innerSphere = MHQTestUtilities.getTestCampaign().getPlayerForce().getFaction();
+        IntFunction<String> namer = SupportUnitGenerator.subFormationNamer(innerSphere, ForceNamingMethod.CCB_1943);
+
+        assertEquals("Able Lance", namer.apply(1));
+        assertEquals("Baker Lance", namer.apply(2));
+        assertEquals("Charlie Lance", namer.apply(3));
+    }
+
+    @Test
+    void theChosenNamingConventionIsFollowed() {
+        Faction innerSphere = MHQTestUtilities.getTestCampaign().getPlayerForce().getFaction();
+
+        assertEquals("Alfa Lance",
+              SupportUnitGenerator.subFormationNamer(innerSphere, ForceNamingMethod.ICAO_1956).apply(1),
+              "a command generated with the ICAO convention names its support the same way, Alfa and not Alpha");
+        assertEquals("Alpha Lance",
+              SupportUnitGenerator.subFormationNamer(innerSphere, ForceNamingMethod.GREEK_ALPHABET).apply(1),
+              "and so does a Greek one");
+        assertEquals("Able Lance", SupportUnitGenerator.subFormationNamer(innerSphere, null).apply(1),
+              "a grant made mid-campaign has no convention stated and takes the default");
+    }
+
+    @Test
+    void aClanStarAndAComStarLevelIICarryTheDesignatorToo() {
+        assertEquals("Able Star",
+              SupportUnitGenerator.subFormationNamer(testFaction("CJF"), ForceNamingMethod.CCB_1943).apply(1));
+        assertEquals("Able Level II",
+              SupportUnitGenerator.subFormationNamer(testFaction("CS"), ForceNamingMethod.CCB_1943).apply(1));
+    }
+
+    @Test
     void eachFactionFamilyFilesItsOwnSmallestFormation() {
         // Driven by FormationLevel rather than by a Clan-or-not test, so ComStar and the Word of Blake file Level
         // IIs rather than being lumped in with the Inner Sphere lance.
-        assertEquals("Lance {0}", SupportUnitGenerator.subFormationPattern(FormationLevel.LANCE));
-        assertEquals("Star {0}", SupportUnitGenerator.subFormationPattern(FormationLevel.STAR_OR_NOVA));
-        assertEquals("Level II {0}", SupportUnitGenerator.subFormationPattern(FormationLevel.LEVEL_II_OR_CHOIR));
+        assertEquals("{0} Lance", SupportUnitGenerator.subFormationPattern(FormationLevel.LANCE));
+        assertEquals("{0} Star", SupportUnitGenerator.subFormationPattern(FormationLevel.STAR_OR_NOVA));
+        assertEquals("{0} Level II", SupportUnitGenerator.subFormationPattern(FormationLevel.LEVEL_II_OR_CHOIR));
     }
 
     @Test
@@ -393,7 +428,7 @@ class SupportUnitGeneratorTest {
         List<Unit> recoveryVehicles = vehiclesInHangar(campaign, 12);
 
         AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, recoveryVehicles,
-              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, "Lance {0}");
+              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, position -> "Lance " + position);
 
         List<Formation> lances = new ArrayList<>();
         for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
@@ -415,13 +450,13 @@ class SupportUnitGeneratorTest {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         List<Unit> first = vehiclesInHangar(campaign, 6);
         AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, first,
-              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, "Lance {0}");
+              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, position -> "Lance " + position);
 
         List<Unit> topUp = new ArrayList<>(vehiclesInHangar(campaign, 1));
         topUp.removeAll(first);
         assertEquals(1, topUp.size(), "the top-up must be a unit that was not already filed");
         AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, topUp,
-              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, "Lance {0}");
+              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, position -> "Lance " + position);
 
         int lances = 0;
         for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
