@@ -53,7 +53,12 @@ class SupportVehicleSelectorTest {
     private static final double BURRO_II_CARGO = 12.5;
 
     private static Candidate vehicle(double cargoTons, int mashTheatres, int fieldKitchens) {
-        return new Candidate("test vehicle", null, cargoTons, mashTheatres, fieldKitchens);
+        return new Candidate("test vehicle", null, cargoTons, mashTheatres, fieldKitchens, false);
+    }
+
+    /** The same vehicle, but as a trailer: no engine of its own, so it needs a tractor to go anywhere. */
+    private static Candidate trailer(double cargoTons, int mashTheatres, int fieldKitchens) {
+        return new Candidate("test trailer", null, cargoTons, mashTheatres, fieldKitchens, true);
     }
 
     @Test
@@ -84,6 +89,20 @@ class SupportVehicleSelectorTest {
         assertTrue(SupportVehicleSelector.suits(SupportCapability.COMMISSARY, vehicle(0, 0, 1)));
         assertFalse(SupportVehicleSelector.suits(SupportCapability.COMMISSARY, vehicle(0, 1, 0)),
               "a MASH truck is not a canteen");
+    }
+
+    @Test
+    @DisplayName("A trailer is never fielded, whatever it carries")
+    void trailersAreRejectedForEveryCapability() {
+        // A Clan command was handed a Hector Road Train trailer module as its canteen: three field kitchens that
+        // cannot leave the depot, because nothing was generated to tow them. Pairing trailers with tractors is
+        // separate work; until then they are not fielded at all.
+        assertFalse(SupportVehicleSelector.suits(SupportCapability.COMMISSARY, trailer(5.0, 0, 3)),
+              "a trailer with three kitchens still cannot move itself");
+        assertFalse(SupportVehicleSelector.suits(SupportCapability.LOGISTICS, trailer(BURRO_II_CARGO, 0, 0)));
+        assertFalse(SupportVehicleSelector.suits(SupportCapability.MEDICAL, trailer(0, 2, 0)));
+        assertFalse(SupportVehicleSelector.suits(SupportCapability.SALVAGE, trailer(0, 0, 0)),
+              "even the salvage role, which accepts anything the role returned, stops at a trailer");
     }
 
     @Test

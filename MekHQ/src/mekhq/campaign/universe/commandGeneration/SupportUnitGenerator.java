@@ -38,6 +38,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -291,8 +292,8 @@ public final class SupportUnitGenerator {
         int remaining = missing;
         while (remaining > 0) {
             int batchSize = Math.min(perBatch, remaining);
-            SupportVehicleSelector.Candidate rolled = SupportVehicleSelector.roll(capability, factionCode, year,
-                  rating);
+            SupportVehicleSelector.Candidate rolled = modelForFormation(capability, factionCode, year, rating,
+                  batchSize);
             if (rolled == null) {
                 LOGGER.info("[CompanyGen][SupportUnits] {}: nothing suitable could be rolled for {} in {};"
                             + " {} vehicle(s) will not be fielded", capability, factionCode, year, remaining);
@@ -302,6 +303,53 @@ public final class SupportUnitGenerator {
             remaining -= batchSize;
         }
         return batches;
+    }
+
+    /**
+     * The model a formation of {@code formationSize} vehicles is equipped with: one roll per vehicle, and the model
+     * that wins most of them takes the formation.
+     *
+     * <p>Rolling once and multiplying it up is what made a Clan command field ten Wayland Mobile Bases, a vehicle
+     * rated one on its table: a single lucky roll became a whole Star of a unit nobody could source in that number.
+     * Asking the table once per vehicle keeps the formation to a single model, which is how a command is actually
+     * equipped, while making a rare vehicle fill a formation only if it can beat the common ones repeatedly.</p>
+     *
+     * @param capability     the capability being fielded
+     * @param factionCode    the faction the command is generated for
+     * @param year           the campaign year
+     * @param rating         the command's equipment rating, or {@code null} for any
+     * @param formationSize  vehicles the formation holds
+     *
+     * @return the winning model, or {@code null} when nothing suitable could be rolled at all
+     */
+    @Nullable
+    private static SupportVehicleSelector.Candidate modelForFormation(SupportCapability capability,
+          @Nullable String factionCode, int year, @Nullable String rating, int formationSize) {
+        Map<String, SupportVehicleSelector.Candidate> rolledByName = new LinkedHashMap<>();
+        Map<String, Integer> wins = new LinkedHashMap<>();
+        for (int vehicle = 0; vehicle < Math.max(1, formationSize); vehicle++) {
+            SupportVehicleSelector.Candidate rolled = SupportVehicleSelector.roll(capability, factionCode, year,
+                  rating);
+            if (rolled == null) {
+                continue;
+            }
+            rolledByName.putIfAbsent(rolled.unitName(), rolled);
+            wins.merge(rolled.unitName(), 1, Integer::sum);
+        }
+        if (wins.isEmpty()) {
+            return null;
+        }
+        String winner = null;
+        int best = 0;
+        for (Map.Entry<String, Integer> entry : wins.entrySet()) {
+            if (entry.getValue() > best) {
+                best = entry.getValue();
+                winner = entry.getKey();
+            }
+        }
+        LOGGER.info("[CompanyGen][SupportUnits] {}: '{}' won {} of {} roll(s) and equips the formation (candidates "
+                    + "rolled: {})", capability, winner, best, Math.max(1, formationSize), wins);
+        return rolledByName.get(winner);
     }
 
     /**

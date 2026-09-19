@@ -87,9 +87,10 @@ public final class SupportVehicleSelector {
      * @param cargoTons     cargo bay capacity in tons
      * @param mashTheatres  MASH theatres carried
      * @param fieldKitchens field kitchens carried
+     * @param trailer       whether the vehicle is a trailer, which cannot move without a tractor
      */
     public record Candidate(String unitName, MekSummary summary, double cargoTons, int mashTheatres,
-                            int fieldKitchens) {
+                            int fieldKitchens, boolean trailer) {
     }
 
     /**
@@ -217,6 +218,12 @@ public final class SupportVehicleSelector {
 
     /** Whether the vehicle can actually do the capability's job. */
     static boolean suits(SupportCapability capability, Candidate candidate) {
+        // A trailer has no engine. Fielding one without a tractor to pull it gives a command a canteen or a cargo
+        // hold that cannot leave the depot, which is what a Clan command got when it was handed a Hector Road
+        // Train trailer module. Pairing trailers with tractors is a separate piece of work.
+        if (candidate.trailer()) {
+            return false;
+        }
         return switch (capability) {
             // The role has already filtered these, and a recovery vehicle need carry no equipment at all.
             case SALVAGE -> true;
@@ -232,17 +239,20 @@ public final class SupportVehicleSelector {
     private static Candidate describe(MekSummary summary) {
         int mashTheatres = 0;
         int fieldKitchens = 0;
+        boolean trailer = false;
         try {
             Entity entity = summary.loadEntity();
             if (entity != null) {
                 mashTheatres = countEquipment(entity, MiscType.F_MASH);
                 fieldKitchens = countEquipment(entity, MiscType.F_FIELD_KITCHEN);
+                trailer = entity.isTrailer();
             }
         } catch (Exception exception) {
             LOGGER.warn(exception, "[CompanyGen][SupportUnits] could not read equipment from '{}'",
                   summary.getName());
         }
-        return new Candidate(summary.getName(), summary, summary.getCargoBayUnits(), mashTheatres, fieldKitchens);
+        return new Candidate(summary.getName(), summary, summary.getCargoBayUnits(), mashTheatres, fieldKitchens,
+              trailer);
     }
 
     /** Counts the items on {@code entity} carrying {@code flag}. */
