@@ -104,18 +104,17 @@ public final class SupportUnitGenerator {
     private static final int CLAN_VEHICLES_PER_POINT = 2;
 
     /**
-     * Combat tonnage that generates one ton of a resupply drop, mirroring the tonnage divider
-     * {@link Resupply#calculateTargetCargoTonnage} uses. Taken uncapped here because a command is generated before it
-     * holds a contract, and the cap is the employer's willingness to supply rather than the command's own need.
+     * Combat tonnage that generates one ton of a resupply drop, the same divider
+     * {@link Resupply#calculateTargetCargoTonnage} applies before its cap and floor.
      */
     private static final int COMBAT_TONNAGE_PER_CARGO_TON = 125;
 
     /**
-     * Wrecks one recovery vehicle is expected to bring home from a scenario. The opposing force is built to the
-     * player's own budget, so a command fights roughly its own number of units, of which about a quarter can be
-     * dragged home.
+     * Combat units the command fields per recovery vehicle it is given. The opposing force is built to the player's
+     * own budget, so a command meets roughly its own number of units, of which about a quarter can be dragged home,
+     * and one recovery vehicle is counted per wreck. Used as the divisor on the combat unit count.
      */
-    private static final int WRECKS_PER_RECOVERY_VEHICLE = 4;
+    private static final int COMBAT_UNITS_PER_RECOVERY_VEHICLE = 4;
 
     /** Combat personnel in a company-sized force; at or below this the security detail is a single squad. */
     static final int COMPANY_COMBATANT_CEILING = 12;
@@ -318,10 +317,17 @@ public final class SupportUnitGenerator {
      * Number of cargo trucks the command's own convoy needs to haul a resupply drop sized to its combat tonnage,
      * rounded up to whole formations.
      *
-     * <p>The tonnage comes from the same arithmetic {@link Resupply} uses, minus the contract cap: combat tonnage
-     * over {@value #COMBAT_TONNAGE_PER_CARGO_TON} gives the drop, and a player convoy hauls
+     * <p>The tonnage uses two pieces of {@link Resupply}'s model: combat tonnage over
+     * {@value #COMBAT_TONNAGE_PER_CARGO_TON} gives the drop, and a player convoy hauls
      * {@link Resupply#CARGO_MULTIPLIER} times that. A battalion of thirty-six Meks needs roughly sixty-three tons
      * hauled, which is eleven Flatbed Trucks and so three lances.</p>
+     *
+     * <p>Three things {@link Resupply#calculateTargetCargoTonnage} does are deliberately left out. Its contract cap
+     * is the employer's willingness to supply, and a command being generated holds no contract. Its
+     * {@link Resupply#CARGO_MINIMUM_WEIGHT} floor is a floor on an employer's drop, and applying it here would hand
+     * a small command a convoy sized for someone else; the one-formation minimum already covers the bottom end. Its
+     * rounding to whole tons is skipped because this figure is divided again by the truck's capacity, so rounding
+     * first would only lose precision.</p>
      *
      * @param campaign the campaign whose combat tonnage drives the count
      *
@@ -352,7 +358,7 @@ public final class SupportUnitGenerator {
      */
     static int salvageUnitCount(Campaign campaign) {
         CombatForceTally tally = tallyCombatForce(campaign);
-        int wrecksToRecover = (int) Math.ceil((double) tally.units() / WRECKS_PER_RECOVERY_VEHICLE);
+        int wrecksToRecover = (int) Math.ceil((double) tally.units() / COMBAT_UNITS_PER_RECOVERY_VEHICLE);
         int count = roundUpToWholeFormations(wrecksToRecover, supportFormationSize(campaign));
         LOGGER.info("[CompanyGen][SupportUnits] salvage: {} combat units -> {} recovery vehicle(s) -> {} after "
                     + "rounding to formations of {}",
