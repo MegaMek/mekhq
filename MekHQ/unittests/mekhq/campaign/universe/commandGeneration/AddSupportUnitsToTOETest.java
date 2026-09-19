@@ -95,7 +95,8 @@ class AddSupportUnitsToTOETest {
                                     .newPerson(campaign, PersonnelRole.ADMINISTRATOR, PersonnelRole.NONE));
         }
 
-        SupportPersonnelToTOE.organize(campaign, administrators, false);
+        SupportPersonnelToTOE.organize(campaign, administrators, false,
+              campaign.getPlayerForce().getFaction());
 
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         assertNotNull(supportCommand, "organize must record the Support Command formation");
@@ -131,7 +132,8 @@ class AddSupportUnitsToTOETest {
             administrators.add(campaign.getPlayerForce().getHumanResources()
                                      .newPerson(campaign, PersonnelRole.ADMINISTRATOR, PersonnelRole.NONE));
         }
-        SupportPersonnelToTOE.organize(campaign, administrators, false);
+        SupportPersonnelToTOE.organize(campaign, administrators, false,
+              campaign.getPlayerForce().getFaction());
 
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         assertNotNull(supportCommand);
@@ -153,7 +155,8 @@ class AddSupportUnitsToTOETest {
                                   .newPerson(campaign, PersonnelRole.MEK_TECH, PersonnelRole.NONE));
         }
 
-        SupportPersonnelToTOE.organize(campaign, technicians, false);
+        SupportPersonnelToTOE.organize(campaign, technicians, false,
+              campaign.getPlayerForce().getFaction());
 
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         assertNotNull(supportCommand);
@@ -215,7 +218,8 @@ class AddSupportUnitsToTOETest {
                               .newPerson(campaign, PersonnelRole.MECHANIC, PersonnelRole.NONE));
         }
 
-        SupportPersonnelToTOE.organize(campaign, staff, false);
+        SupportPersonnelToTOE.organize(campaign, staff, false,
+              campaign.getPlayerForce().getFaction());
 
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         assertNotNull(supportCommand);
