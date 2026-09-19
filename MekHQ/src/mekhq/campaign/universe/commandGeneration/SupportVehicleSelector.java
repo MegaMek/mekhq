@@ -211,8 +211,11 @@ public final class SupportVehicleSelector {
         return switch (capability) {
             case SALVAGE -> EnumSet.of(MissionRole.RECOVERY);
             case LOGISTICS -> EnumSet.of(MissionRole.CARGO, MissionRole.SUPPORT);
-            // Medical and commissary vehicles are recognised by their equipment, so the table stays wide.
-            default -> EnumSet.of(MissionRole.SUPPORT);
+            // Medical and commissary vehicles are recognised by the equipment they carry, which is a stricter
+            // test than any role. Asking for the SUPPORT role as well only narrowed the field: a Clan command was
+            // left with no canteen at all because its one field kitchen vehicle was a trailer, and the untagged
+            // rest of the table was never considered.
+            default -> EnumSet.noneOf(MissionRole.class);
         };
     }
 

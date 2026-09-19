@@ -292,64 +292,60 @@ public final class SupportUnitGenerator {
         int remaining = missing;
         while (remaining > 0) {
             int batchSize = Math.min(perBatch, remaining);
-            SupportVehicleSelector.Candidate rolled = modelForFormation(capability, factionCode, year, rating,
-                  batchSize);
-            if (rolled == null) {
+            List<RolledBatch> formation = rollFormation(capability, factionCode, year, rating, batchSize);
+            if (formation.isEmpty()) {
                 LOGGER.info("[CompanyGen][SupportUnits] {}: nothing suitable could be rolled for {} in {};"
                             + " {} vehicle(s) will not be fielded", capability, factionCode, year, remaining);
                 return batches;
             }
-            batches.add(new RolledBatch(rolled.unitName(), rolled.summary(), batchSize));
+            batches.addAll(formation);
             remaining -= batchSize;
         }
         return batches;
     }
 
     /**
-     * The model a formation of {@code formationSize} vehicles is equipped with: one roll per vehicle, and the model
-     * that wins most of them takes the formation.
+     * Rolls the vehicles of one formation, one roll per seat.
      *
-     * <p>Rolling once and multiplying it up is what made a Clan command field ten Wayland Mobile Bases, a vehicle
-     * rated one on its table: a single lucky roll became a whole Star of a unit nobody could source in that number.
-     * Asking the table once per vehicle keeps the formation to a single model, which is how a command is actually
-     * equipped, while making a rare vehicle fill a formation only if it can beat the common ones repeatedly.</p>
+     * <p>A formation takes what was rolled for it rather than handing every seat to whichever model won most of
+     * them. Rolling once and multiplying it up is what gave a Clan command ten Wayland Mobile Bases, a vehicle
+     * rated one on its table; and a winner taking all is little better on a broad table, where a model winning
+     * three rolls of ten would still fill a whole Star.</p>
      *
-     * @param capability     the capability being fielded
-     * @param factionCode    the faction the command is generated for
-     * @param year           the campaign year
-     * @param rating         the command's equipment rating, or {@code null} for any
-     * @param formationSize  vehicles the formation holds
+     * <p>Rolling per seat lets the table weighting decide the mix, so a Star comes out mostly the common recovery
+     * vehicle with an occasional rarer one beside it, which is what a real formation looks like.</p>
      *
-     * @return the winning model, or {@code null} when nothing suitable could be rolled at all
+     * @param capability    the capability being fielded
+     * @param factionCode   the faction the command is generated for
+     * @param year          the campaign year
+     * @param rating        the command equipment rating, or {@code null} for any
+     * @param formationSize vehicles the formation holds
+     *
+     * @return one batch per distinct model rolled, empty when nothing suitable could be rolled at all
      */
-    @Nullable
-    private static SupportVehicleSelector.Candidate modelForFormation(SupportCapability capability,
-          @Nullable String factionCode, int year, @Nullable String rating, int formationSize) {
+    private static List<RolledBatch> rollFormation(SupportCapability capability, @Nullable String factionCode,
+          int year, @Nullable String rating, int formationSize) {
         Map<String, SupportVehicleSelector.Candidate> rolledByName = new LinkedHashMap<>();
-        Map<String, Integer> wins = new LinkedHashMap<>();
-        for (int vehicle = 0; vehicle < Math.max(1, formationSize); vehicle++) {
+        Map<String, Integer> seats = new LinkedHashMap<>();
+        for (int seat = 0; seat < Math.max(1, formationSize); seat++) {
             SupportVehicleSelector.Candidate rolled = SupportVehicleSelector.roll(capability, factionCode, year,
                   rating);
             if (rolled == null) {
                 continue;
             }
             rolledByName.putIfAbsent(rolled.unitName(), rolled);
-            wins.merge(rolled.unitName(), 1, Integer::sum);
+            seats.merge(rolled.unitName(), 1, Integer::sum);
         }
-        if (wins.isEmpty()) {
-            return null;
+        List<RolledBatch> formation = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : seats.entrySet()) {
+            formation.add(new RolledBatch(entry.getKey(), rolledByName.get(entry.getKey()).summary(),
+                  entry.getValue()));
         }
-        String winner = null;
-        int best = 0;
-        for (Map.Entry<String, Integer> entry : wins.entrySet()) {
-            if (entry.getValue() > best) {
-                best = entry.getValue();
-                winner = entry.getKey();
-            }
+        if (!formation.isEmpty()) {
+            LOGGER.info("[CompanyGen][SupportUnits] {}: formation of {} rolled as {}", capability,
+                  Math.max(1, formationSize), seats);
         }
-        LOGGER.info("[CompanyGen][SupportUnits] {}: '{}' won {} of {} roll(s) and equips the formation (candidates "
-                    + "rolled: {})", capability, winner, best, Math.max(1, formationSize), wins);
-        return rolledByName.get(winner);
+        return formation;
     }
 
     /**
