@@ -55,6 +55,7 @@ import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -254,6 +255,12 @@ public final class SupportUnitGenerator {
         return Math.max(0, targetCount - countGeneratedUnitsNamed(campaign, unitName));
     }
 
+    /** Where the support sub-formations sit: the faction's smallest formation, a lance, Star or Level II. */
+    private static final int SUPPORT_SUB_FORMATION_DEPTH = 1;
+
+    /** Holds the labels for the support formations and their sub-formations. */
+    private static final String SUPPORT_FORMATION_RESOURCE_BUNDLE = "mekhq.resources.SupportTOEFormationTypes";
+
     /**
      * Units per sub-formation when a capability is fielded as whole formations, or {@code 0} when its vehicles are
      * filed flat. Only the capabilities sized in whole formations are broken into lances or Stars; a command's two
@@ -273,18 +280,38 @@ public final class SupportUnitGenerator {
     }
 
     /**
-     * The name pattern for a support sub-formation, a lance for an Inner Sphere command and a Star for a Clan one.
-     * Carries {@code {0}} for the sub-formation's number.
+     * The name pattern for a support sub-formation, carrying {@code {0}} for its number.
+     *
+     * <p>Taken from the faction's own smallest formation rather than from a Clan-or-not test, so a ComStar or Word
+     * of Blake command files Level IIs, a Clan command Stars, and everyone else lances.</p>
      *
      * @param campaign the campaign whose faction decides the formation name
      *
      * @return the localised name pattern
      */
     static String subFormationPattern(Campaign campaign) {
-        String key = campaign.getPlayerForce().isClanForce()
-                           ? "SupportTOEFormationTypes.subFormation.star.label"
-                           : "SupportTOEFormationTypes.subFormation.lance.label";
-        return getTextAt("mekhq.resources.SupportTOEFormationTypes", key);
+        return subFormationPattern(FormationLevel.parseFromDepth(campaign, SUPPORT_SUB_FORMATION_DEPTH));
+    }
+
+    /**
+     * The name pattern for a support sub-formation at {@code level}.
+     *
+     * <p>The level's own name is not used directly because several read as alternatives - "Star or Nova", "Level II
+     * or Choir" - which suits a dropdown but not the name of a formation in the TOE. A level with no name of its own
+     * here falls back on the level's name, so a faction family added later still produces something readable.</p>
+     *
+     * @param level the faction's smallest formation
+     *
+     * @return the localised name pattern, carrying {@code {0}} for the sub-formation's number
+     */
+    static String subFormationPattern(FormationLevel level) {
+        String pattern = getTextAt(SUPPORT_FORMATION_RESOURCE_BUNDLE,
+              "SupportTOEFormationTypes.subFormation." + level.name() + ".label");
+        // A missing key comes back as a marker rather than a pattern, and a usable pattern must carry the number.
+        if (!pattern.contains("{0}")) {
+            return level + " {0}";
+        }
+        return pattern;
     }
 
     /**

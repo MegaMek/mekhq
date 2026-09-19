@@ -49,6 +49,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
@@ -320,6 +321,26 @@ class SupportUnitGeneratorTest {
               "the sub-formation name must carry its number, or every lance would be filed under one name");
         assertTrue(pattern.toLowerCase().contains("lance"),
               "an Inner Sphere command files its support vehicles as lances, was: " + pattern);
+    }
+
+    @Test
+    void eachFactionFamilyFilesItsOwnSmallestFormation() {
+        // Driven by FormationLevel rather than by a Clan-or-not test, so ComStar and the Word of Blake file Level
+        // IIs rather than being lumped in with the Inner Sphere lance.
+        assertEquals("Lance {0}", SupportUnitGenerator.subFormationPattern(FormationLevel.LANCE));
+        assertEquals("Star {0}", SupportUnitGenerator.subFormationPattern(FormationLevel.STAR_OR_NOVA));
+        assertEquals("Level II {0}", SupportUnitGenerator.subFormationPattern(FormationLevel.LEVEL_II_OR_CHOIR));
+    }
+
+    @Test
+    void aFormationLevelWithNoNameOfItsOwnStillReadsSensibly() {
+        // Only the three smallest formations are named here. Anything else must still produce a usable name rather
+        // than a missing-resource marker.
+        String pattern = SupportUnitGenerator.subFormationPattern(FormationLevel.COMPANY);
+
+        assertTrue(pattern.contains("{0}"), "the fallback still carries the number, was: " + pattern);
+        assertFalse(pattern.contains("SupportTOEFormationTypes"),
+              "a missing key must not leak a resource marker into the TOE, was: " + pattern);
     }
 
     @Test
