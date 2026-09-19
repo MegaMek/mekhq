@@ -48,6 +48,7 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
@@ -223,8 +224,8 @@ class SupportUnitGeneratorTest {
         // recovery vehicles and was given twelve trucks where eight were needed.
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
-        Unit alreadyGranted = UnitTestUtilities.addAndGetUnit(campaign,
-              UnitTestUtilities.getHeavyTrackedApcStandard());
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        Unit alreadyGranted = unitWhoseNameContains(campaign, "APC");
         assertFalse(alreadyGranted.getEntity().isSupportVehicle(),
               "this test is only meaningful while the stand-in is not caught by the support vehicle check");
 
@@ -285,6 +286,110 @@ class SupportUnitGeneratorTest {
             assertEquals(0, SupportUnitGenerator.logisticsUnitCount(campaign) % 4,
                   meks + " Meks must field whole lances of trucks");
         }
+    }
+
+    @Test
+    void recoveryVehiclesAndTrucksAreFiledAsLances() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+
+        assertEquals(4, SupportUnitGenerator.subFormationSize(campaign,
+              SupportTOEFormationTypes.SALVAGE_FORMATION), "recovery vehicles are fielded as lances");
+        assertEquals(4, SupportUnitGenerator.subFormationSize(campaign,
+              SupportTOEFormationTypes.LOGISTICS_FORMATION), "cargo trucks are fielded as lances");
+    }
+
+    @Test
+    void mashTrucksAndCanteensAreNotBrokenIntoLances() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+
+        // These are sized to exact need rather than to whole formations, so a pair of MASH trucks reads better
+        // listed together than split across lance markers.
+        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign,
+              SupportTOEFormationTypes.MEDICAL_FORMATION), "MASH trucks are filed flat");
+        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign,
+              SupportTOEFormationTypes.COMMISSARY_FORMATION), "canteens are filed flat");
+        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign,
+              SupportTOEFormationTypes.SECURITY_FORMATION), "the security detail is already platoons");
+    }
+
+    @Test
+    void anInnerSphereCommandFilesLancesAndTheNameCarriesANumber() {
+        String pattern = SupportUnitGenerator.subFormationPattern(MHQTestUtilities.getTestCampaign());
+
+        assertTrue(pattern.contains("{0}"),
+              "the sub-formation name must carry its number, or every lance would be filed under one name");
+        assertTrue(pattern.toLowerCase().contains("lance"),
+              "an Inner Sphere command files its support vehicles as lances, was: " + pattern);
+    }
+
+    @Test
+    void twelveRecoveryVehiclesBecomeThreeLancesRatherThanOneLongList() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        List<Unit> recoveryVehicles = vehiclesInHangar(campaign, 12);
+
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, recoveryVehicles,
+              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, "Lance {0}");
+
+        List<Formation> lances = new ArrayList<>();
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
+            if (formation.getName().startsWith("Lance ")) {
+                lances.add(formation);
+            }
+        }
+
+        assertEquals(3, lances.size(), "twelve vehicles are three lances, not one list of twelve");
+        for (Formation lance : lances) {
+            assertEquals(4, lance.getUnits().size(), lance.getName() + " holds a full lance of four");
+        }
+    }
+
+    @Test
+    void aTopUpFillsThePartLanceBeforeOpeningANewOne() {
+        // Regenerating support against a grown force must land in the lance that has room, not open a fourth
+        // lance beside three full ones.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        List<Unit> first = vehiclesInHangar(campaign, 6);
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, first,
+              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, "Lance {0}");
+
+        List<Unit> topUp = new ArrayList<>(vehiclesInHangar(campaign, 1));
+        topUp.removeAll(first);
+        assertEquals(1, topUp.size(), "the top-up must be a unit that was not already filed");
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, topUp,
+              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, "Lance {0}");
+
+        int lances = 0;
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
+            if (formation.getName().startsWith("Lance ")) {
+                lances++;
+            }
+        }
+        assertEquals(2, lances, "seven vehicles are two lances, the second holding three");
+    }
+
+    /**
+     * Adds {@code count} vehicles and returns every unit in the hangar.
+     *
+     * <p>Built from the hangar rather than from the return of
+     * {@link UnitTestUtilities#addAndGetUnit(Campaign, megamek.common.units.Entity)}, which hands back the first unit
+     * in the hangar rather than the one it just added. Collecting its return value gives the same unit N times, and a
+     * formation holds unit IDs, so the duplicates collapse into one.</p>
+     */
+    private static List<Unit> vehiclesInHangar(Campaign campaign, int count) {
+        for (int index = 0; index < count; index++) {
+            UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+        }
+        return new ArrayList<>(campaign.getPlayerForce().getHangar().getUnits());
+    }
+
+    /** The one unit in the hangar whose name contains {@code namePart}, so a test can name the unit it means. */
+    private static Unit unitWhoseNameContains(Campaign campaign, String namePart) {
+        for (Unit unit : campaign.getUnits()) {
+            if (unit.getName().contains(namePart)) {
+                return unit;
+            }
+        }
+        throw new AssertionError("no unit in the hangar is named like '" + namePart + "'");
     }
 
     /** A campaign holding {@code mekCount} Locusts, so the force being supported has a known size and tonnage. */

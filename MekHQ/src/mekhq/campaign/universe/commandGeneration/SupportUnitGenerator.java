@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.universe.commandGeneration;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -250,6 +252,39 @@ public final class SupportUnitGenerator {
      */
     static int shortfall(Campaign campaign, String unitName, int targetCount) {
         return Math.max(0, targetCount - countGeneratedUnitsNamed(campaign, unitName));
+    }
+
+    /**
+     * Units per sub-formation when a capability is fielded as whole formations, or {@code 0} when its vehicles are
+     * filed flat. Only the capabilities sized in whole formations are broken into lances or Stars; a command's two
+     * MASH trucks or single canteen would read worse split up than listed together.
+     *
+     * @param campaign      the campaign whose faction sets the formation size
+     * @param formationType the capability formation being filed into
+     *
+     * @return the sub-formation size, or {@code 0} for flat filing
+     */
+    static int subFormationSize(Campaign campaign, SupportTOEFormationTypes formationType) {
+        boolean fieldedAsFormations = switch (formationType) {
+            case SALVAGE_FORMATION, LOGISTICS_FORMATION -> true;
+            default -> false;
+        };
+        return fieldedAsFormations ? supportFormationSize(campaign) : 0;
+    }
+
+    /**
+     * The name pattern for a support sub-formation, a lance for an Inner Sphere command and a Star for a Clan one.
+     * Carries {@code {0}} for the sub-formation's number.
+     *
+     * @param campaign the campaign whose faction decides the formation name
+     *
+     * @return the localised name pattern
+     */
+    static String subFormationPattern(Campaign campaign) {
+        String key = campaign.getPlayerForce().isClanForce()
+                           ? "SupportTOEFormationTypes.subFormation.star.label"
+                           : "SupportTOEFormationTypes.subFormation.lance.label";
+        return getTextAt("mekhq.resources.SupportTOEFormationTypes", key);
     }
 
     /**
@@ -637,7 +672,8 @@ public final class SupportUnitGenerator {
         }
 
         if (!units.isEmpty()) {
-            AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, units, formationType);
+            AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, units, formationType,
+                  subFormationSize(campaign, formationType), subFormationPattern(campaign));
         }
         // The daily pool fill is off by default, so whatever was crewed from the pool is filled here and now.
         for (PersonnelRole pooledRole : pooledRoles) {
