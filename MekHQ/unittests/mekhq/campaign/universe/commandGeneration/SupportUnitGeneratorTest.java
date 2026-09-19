@@ -45,6 +45,7 @@ import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
+import megamek.common.universe.Factions2;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -57,6 +58,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator.SecurityTier;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -178,10 +180,35 @@ class SupportUnitGeneratorTest {
     private static final int LOCUST_TONNAGE = 20;
 
     @Test
+    void theCommandIsOrganisedAsTheFactionItIsGeneratedFor() {
+        // The command generator can be pointed at a faction other than the campaign's own - a mercenary campaign
+        // generating a ComStar command - and the ranks already follow the generated faction. The support formations
+        // must too: sizing from the campaign's faction gave a ComStar command lances of four rather than Level IIs
+        // of six, seen in a campaign log reading "formations of 4" against specifiedFaction=CS campaignFaction=MERC.
+        Faction comStar = testFaction("CS");
+
+        assertEquals(FormationLevel.LEVEL_II_OR_CHOIR, SupportUnitGenerator.baseFormationLevel(comStar));
+        assertEquals(6, SupportUnitGenerator.supportFormationSize(comStar),
+              "a ComStar Level II is six vehicles, whatever the campaign's own faction is");
+        assertEquals("Level II {0}", SupportUnitGenerator.subFormationPattern(comStar),
+              "and it is filed as a Level II, not a lance");
+    }
+
+    @Test
+    void aClanCommandFieldsVehicleStarsOfTen() {
+        Faction jadeFalcon = testFaction("CJF");
+
+        assertEquals(FormationLevel.STAR_OR_NOVA, SupportUnitGenerator.baseFormationLevel(jadeFalcon));
+        assertEquals(10, SupportUnitGenerator.supportFormationSize(jadeFalcon),
+              "a Clan vehicle Point is two vehicles, so a Star of five Points is ten");
+        assertEquals("Star {0}", SupportUnitGenerator.subFormationPattern(jadeFalcon));
+    }
+
+    @Test
     void anInnerSphereFormationIsALance() {
         // The Clan side of this is a vehicle Star of ten, which the rounding cases below exercise directly: a Clan
         // Point is two vehicles, so a Star of five Points is ten.
-        assertEquals(4, SupportUnitGenerator.supportFormationSize(MHQTestUtilities.getTestCampaign()),
+        assertEquals(4, SupportUnitGenerator.supportFormationSize(MHQTestUtilities.getTestCampaign().getPlayerForce().getFaction()),
               "an Inner Sphere command fields support vehicles by the lance");
     }
 
@@ -244,8 +271,8 @@ class SupportUnitGeneratorTest {
         Campaign smallForce = campaignWithMeks(4);
         Campaign largeForce = campaignWithMeks(36);
 
-        int smallCount = SupportUnitGenerator.salvageUnitCount(smallForce);
-        int largeCount = SupportUnitGenerator.salvageUnitCount(largeForce);
+        int smallCount = SupportUnitGenerator.salvageUnitCount(smallForce, smallForce.getPlayerForce().getFaction());
+        int largeCount = SupportUnitGenerator.salvageUnitCount(largeForce, largeForce.getPlayerForce().getFaction());
 
         assertEquals(4, smallCount, "a lance needs one recovery vehicle, so it fields one lance of them");
         assertEquals(12, largeCount,
@@ -261,11 +288,11 @@ class SupportUnitGeneratorTest {
         Campaign smallForce = campaignWithMeks(4);
         Campaign largeForce = campaignWithMeks(108);
 
-        assertTrue(SupportUnitGenerator.logisticsUnitCount(largeForce)
-                         > SupportUnitGenerator.logisticsUnitCount(smallForce),
+        assertTrue(SupportUnitGenerator.logisticsUnitCount(largeForce, largeForce.getPlayerForce().getFaction())
+                         > SupportUnitGenerator.logisticsUnitCount(smallForce, smallForce.getPlayerForce().getFaction()),
               "a larger command hauls more supply, so it needs more trucks - this is the defect, both used to get "
                     + "four");
-        assertEquals(4, SupportUnitGenerator.logisticsUnitCount(smallForce),
+        assertEquals(4, SupportUnitGenerator.logisticsUnitCount(smallForce, smallForce.getPlayerForce().getFaction()),
               "a lance still fields one full lance of trucks");
     }
 
@@ -282,9 +309,9 @@ class SupportUnitGeneratorTest {
     void everyCountIsAWholeNumberOfFormations() {
         for (int meks : new int[] { 1, 4, 12, 36, 108 }) {
             Campaign campaign = campaignWithMeks(meks);
-            assertEquals(0, SupportUnitGenerator.salvageUnitCount(campaign) % 4,
+            assertEquals(0, SupportUnitGenerator.salvageUnitCount(campaign, campaign.getPlayerForce().getFaction()) % 4,
                   meks + " Meks must field whole lances of recovery vehicles");
-            assertEquals(0, SupportUnitGenerator.logisticsUnitCount(campaign) % 4,
+            assertEquals(0, SupportUnitGenerator.logisticsUnitCount(campaign, campaign.getPlayerForce().getFaction()) % 4,
                   meks + " Meks must field whole lances of trucks");
         }
     }
@@ -293,9 +320,9 @@ class SupportUnitGeneratorTest {
     void recoveryVehiclesAndTrucksAreFiledAsLances() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
 
-        assertEquals(4, SupportUnitGenerator.subFormationSize(campaign,
+        assertEquals(4, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
               SupportTOEFormationTypes.SALVAGE_FORMATION), "recovery vehicles are fielded as lances");
-        assertEquals(4, SupportUnitGenerator.subFormationSize(campaign,
+        assertEquals(4, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
               SupportTOEFormationTypes.LOGISTICS_FORMATION), "cargo trucks are fielded as lances");
     }
 
@@ -305,17 +332,17 @@ class SupportUnitGeneratorTest {
 
         // These are sized to exact need rather than to whole formations, so a pair of MASH trucks reads better
         // listed together than split across lance markers.
-        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign,
+        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
               SupportTOEFormationTypes.MEDICAL_FORMATION), "MASH trucks are filed flat");
-        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign,
+        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
               SupportTOEFormationTypes.COMMISSARY_FORMATION), "canteens are filed flat");
-        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign,
+        assertEquals(0, SupportUnitGenerator.subFormationSize(campaign.getPlayerForce().getFaction(),
               SupportTOEFormationTypes.SECURITY_FORMATION), "the security detail is already platoons");
     }
 
     @Test
     void anInnerSphereCommandFilesLancesAndTheNameCarriesANumber() {
-        String pattern = SupportUnitGenerator.subFormationPattern(MHQTestUtilities.getTestCampaign());
+        String pattern = SupportUnitGenerator.subFormationPattern(MHQTestUtilities.getTestCampaign().getPlayerForce().getFaction());
 
         assertTrue(pattern.contains("{0}"),
               "the sub-formation name must carry its number, or every lance would be filed under one name");
@@ -411,6 +438,12 @@ class SupportUnitGeneratorTest {
             }
         }
         throw new AssertionError("no unit in the hangar is named like '" + namePart + "'");
+    }
+
+    /** The named faction from the test data, so a command can be organised as a faction the campaign is not. */
+    @SuppressWarnings("all") // get() without test; if it fails the test data is not loading and the test should fail
+    private static Faction testFaction(String code) {
+        return new Faction(new Factions2("testresources/data/universe/factions").getFaction(code).get());
     }
 
     /** A campaign holding {@code mekCount} Locusts, so the force being supported has a known size and tonnage. */

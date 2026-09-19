@@ -170,7 +170,7 @@ public final class SupportUnitGenerator {
      */
     public static void generate(SupportCapability capability, Campaign campaign, Faction faction,
           boolean autoAssignRanks, @Nullable VehicleCrewSource crewSource) {
-        generate(campaign, faction, autoAssignRanks, capability.unitName(campaign), capability.targetCount(campaign),
+        generate(campaign, faction, autoAssignRanks, capability.unitName(campaign), capability.targetCount(campaign, faction),
               capability.formationType(), crewSource);
     }
 
@@ -231,13 +231,13 @@ public final class SupportUnitGenerator {
      *
      * @return the vehicles still to be generated
      */
-    public static int vehiclesStillToGenerate(Campaign campaign) {
+    public static int vehiclesStillToGenerate(Campaign campaign, Faction faction) {
         int planned = 0;
         for (SupportCapability capability : SupportCapability.values()) {
             if (!capability.needsMechanics() || !capability.isEnabled(campaign)) {
                 continue;
             }
-            planned += shortfall(campaign, capability.unitName(campaign), capability.targetCount(campaign));
+            planned += shortfall(campaign, capability.unitName(campaign), capability.targetCount(campaign, faction));
         }
         return planned;
     }
@@ -266,17 +266,17 @@ public final class SupportUnitGenerator {
      * filed flat. Only the capabilities sized in whole formations are broken into lances or Stars; a command's two
      * MASH trucks or single canteen would read worse split up than listed together.
      *
-     * @param campaign      the campaign whose faction sets the formation size
+     * @param faction       the faction of the command being supported, which sets the formation size
      * @param formationType the capability formation being filed into
      *
      * @return the sub-formation size, or {@code 0} for flat filing
      */
-    static int subFormationSize(Campaign campaign, SupportTOEFormationTypes formationType) {
+    static int subFormationSize(Faction faction, SupportTOEFormationTypes formationType) {
         boolean fieldedAsFormations = switch (formationType) {
             case SALVAGE_FORMATION, LOGISTICS_FORMATION -> true;
             default -> false;
         };
-        return fieldedAsFormations ? supportFormationSize(campaign) : 0;
+        return fieldedAsFormations ? supportFormationSize(faction) : 0;
     }
 
     /**
@@ -285,12 +285,35 @@ public final class SupportUnitGenerator {
      * <p>Taken from the faction's own smallest formation rather than from a Clan-or-not test, so a ComStar or Word
      * of Blake command files Level IIs, a Clan command Stars, and everyone else lances.</p>
      *
-     * @param campaign the campaign whose faction decides the formation name
+     * @param faction the faction of the command being supported
      *
      * @return the localised name pattern
      */
-    static String subFormationPattern(Campaign campaign) {
-        return subFormationPattern(FormationLevel.parseFromDepth(campaign, SUPPORT_SUB_FORMATION_DEPTH));
+    static String subFormationPattern(Faction faction) {
+        return subFormationPattern(baseFormationLevel(faction));
+    }
+
+    /**
+     * The smallest formation the faction fields: a Star for the Clans, a Level II for ComStar and the Word of Blake,
+     * a lance for everyone else.
+     *
+     * <p>This mirrors {@link FormationLevel#parseFromDepth} at depth {@value #SUPPORT_SUB_FORMATION_DEPTH}, which
+     * cannot be used directly because it reads the campaign's own faction. A command generated for a faction other
+     * than the campaign's - a mercenary campaign generating a ComStar command, say - must be organised as the
+     * faction it is generated for, exactly as its ranks already are.</p>
+     *
+     * @param faction the faction of the command being supported
+     *
+     * @return the faction's smallest formation
+     */
+    static FormationLevel baseFormationLevel(Faction faction) {
+        if (faction.isClan()) {
+            return FormationLevel.STAR_OR_NOVA;
+        }
+        if (faction.isComStarOrWoB()) {
+            return FormationLevel.LEVEL_II_OR_CHOIR;
+        }
+        return FormationLevel.LANCE;
     }
 
     /**
@@ -318,13 +341,13 @@ public final class SupportUnitGenerator {
      * Vehicles in one support formation: a lance for an Inner Sphere command, a vehicle Star for a Clan one. A Clan
      * vehicle Point is {@value #CLAN_VEHICLES_PER_POINT} vehicles, so a Star of five Points is ten vehicles.
      *
-     * @param campaign the campaign whose faction sets the formation size
+     * @param faction the faction of the command being supported
      *
      * @return the number of vehicles in one formation
      */
-    static int supportFormationSize(Campaign campaign) {
-        int baseSize = campaign.getPlayerForce().getFaction().getFormationBaseSize();
-        return campaign.getPlayerForce().isClanForce() ? baseSize * CLAN_VEHICLES_PER_POINT : baseSize;
+    static int supportFormationSize(Faction faction) {
+        int baseSize = faction.getFormationBaseSize();
+        return faction.isClan() ? baseSize * CLAN_VEHICLES_PER_POINT : baseSize;
     }
 
     /**
@@ -420,15 +443,15 @@ public final class SupportUnitGenerator {
      *
      * @return the truck count, at least one formation
      */
-    static int logisticsUnitCount(Campaign campaign) {
+    static int logisticsUnitCount(Campaign campaign, Faction faction) {
         CombatForceTally tally = tallyCombatForce(campaign);
         double cargoToHaul = (tally.tonnage() / COMBAT_TONNAGE_PER_CARGO_TON) * Resupply.CARGO_MULTIPLIER;
         double cargoPerTruck = cargoCapacity(LOGISTICS_UNIT);
         int trucksNeeded = (cargoPerTruck > 0) ? (int) Math.ceil(cargoToHaul / cargoPerTruck) : 1;
-        int count = roundUpToWholeFormations(trucksNeeded, supportFormationSize(campaign));
+        int count = roundUpToWholeFormations(trucksNeeded, supportFormationSize(faction));
         LOGGER.info("[CompanyGen][SupportUnits] logistics: {} combat tons -> {} tons to haul, {} tons per truck -> "
                     + "{} truck(s) -> {} after rounding to formations of {}",
-              tally.tonnage(), cargoToHaul, cargoPerTruck, trucksNeeded, count, supportFormationSize(campaign));
+              tally.tonnage(), cargoToHaul, cargoPerTruck, trucksNeeded, count, supportFormationSize(faction));
         return count;
     }
 
@@ -443,13 +466,13 @@ public final class SupportUnitGenerator {
      *
      * @return the recovery vehicle count, at least one formation
      */
-    static int salvageUnitCount(Campaign campaign) {
+    static int salvageUnitCount(Campaign campaign, Faction faction) {
         CombatForceTally tally = tallyCombatForce(campaign);
         int wrecksToRecover = (int) Math.ceil((double) tally.units() / COMBAT_UNITS_PER_RECOVERY_VEHICLE);
-        int count = roundUpToWholeFormations(wrecksToRecover, supportFormationSize(campaign));
+        int count = roundUpToWholeFormations(wrecksToRecover, supportFormationSize(faction));
         LOGGER.info("[CompanyGen][SupportUnits] salvage: {} combat units -> {} recovery vehicle(s) -> {} after "
                     + "rounding to formations of {}",
-              tally.units(), wrecksToRecover, count, supportFormationSize(campaign));
+              tally.units(), wrecksToRecover, count, supportFormationSize(faction));
         return count;
     }
 
@@ -484,7 +507,7 @@ public final class SupportUnitGenerator {
      *
      * @return the canteen count, at least {@code 1}
      */
-    static int commissaryUnitCount(Campaign campaign) {
+    static int commissaryUnitCount(Campaign campaign, Faction faction) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int personnelNeedingKitchen = Fatigue.checkFieldKitchenUsage(campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false),
               campaignOptions.get(CampaignOption.FIELD_KITCHEN_IGNORE_NON_COMBATANTS), campaign);
@@ -508,7 +531,7 @@ public final class SupportUnitGenerator {
      *
      * @return the MASH truck count, at least {@code 1}
      */
-    static int medicalUnitCount(Campaign campaign) {
+    static int medicalUnitCount(Campaign campaign, Faction faction) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int patientsToCover = combatPersonnelCount(campaign);
         int coveragePerTruck = countEquipment(MEDICAL_UNIT, MiscType.F_MASH) * campaignOptions.get(CampaignOption.MASH_THEATRE_CAPACITY);
@@ -700,7 +723,7 @@ public final class SupportUnitGenerator {
 
         if (!units.isEmpty()) {
             AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, units, formationType,
-                  subFormationSize(campaign, formationType), subFormationPattern(campaign));
+                  subFormationSize(faction, formationType), subFormationPattern(faction));
         }
         // The daily pool fill is off by default, so whatever was crewed from the pool is filled here and now.
         for (PersonnelRole pooledRole : pooledRoles) {

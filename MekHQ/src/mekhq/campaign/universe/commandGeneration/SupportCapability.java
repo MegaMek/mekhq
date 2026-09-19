@@ -34,13 +34,14 @@ package mekhq.campaign.universe.commandGeneration;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.ToIntFunction;
+import java.util.function.ToIntBiFunction;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSection;
 
 /**
@@ -114,7 +115,7 @@ public enum SupportCapability {
 
     private final Predicate<CampaignOptions> enabledCheck;
     private final Function<Campaign, String> unitNameResolver;
-    private final ToIntFunction<Campaign> targetCountResolver;
+    private final ToIntBiFunction<Campaign, Faction> targetCountResolver;
     private final SupportTOEFormationTypes formationType;
     private final SupportSection crewSection;
     private final PersonnelRole crewRole;
@@ -123,7 +124,7 @@ public enum SupportCapability {
     private final String resourceKeyPrefix;
 
     SupportCapability(Predicate<CampaignOptions> enabledCheck, Function<Campaign, String> unitNameResolver,
-          ToIntFunction<Campaign> targetCountResolver, SupportTOEFormationTypes formationType,
+          ToIntBiFunction<Campaign, Faction> targetCountResolver, SupportTOEFormationTypes formationType,
           @Nullable SupportSection crewSection, PersonnelRole crewRole, boolean needsMechanics,
           String resourceBundle, String resourceKeyPrefix) {
         this.enabledCheck = enabledCheck;
@@ -165,11 +166,13 @@ public enum SupportCapability {
      * How many of the unit a command of this size should field, before subtracting whatever it already owns.
      *
      * @param campaign the campaign the vehicles are generated into
+     * @param faction  the faction of the command being supported, which is the campaign's own faction mid-campaign
+     *                 and the generated command's faction during command generation
      *
      * @return the target count
      */
-    public int targetCount(Campaign campaign) {
-        return targetCountResolver.applyAsInt(campaign);
+    public int targetCount(Campaign campaign, Faction faction) {
+        return targetCountResolver.applyAsInt(campaign, faction);
     }
 
     /**
@@ -250,7 +253,7 @@ public enum SupportCapability {
     }
 
     /** The security detail's unit count: a company-sized detail is fielded as repeated platoons. */
-    private static int securityCount(Campaign campaign) {
+    private static int securityCount(Campaign campaign, Faction faction) {
         return SupportUnitGenerator.securityTier(campaign) == SupportUnitGenerator.SecurityTier.COMPANY
                      ? SupportUnitGenerator.PLATOONS_PER_COMPANY
                      : 1;
