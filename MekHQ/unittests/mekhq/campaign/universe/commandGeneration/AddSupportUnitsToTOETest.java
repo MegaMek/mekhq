@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.commandGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -41,6 +42,7 @@ import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.force.FormationType;
@@ -162,6 +164,40 @@ class AddSupportUnitsToTOETest {
         assertNotNull(supportCommand);
         assertEquals(FormationLevel.COMPANY, supportCommand.getFormationLevel(),
               "a platoon plus a squad is five squads, which is a company's worth");
+    }
+
+    @Test
+    void vehiclesStillNeeded_aRolledCapabilityNeverAsksForAVehicleCalledNull() {
+        // With support teams on, salvage and medical are built here rather than standalone, and this path used to
+        // resolve the model by name. Once those capabilities stopped naming one, it asked the cache for a unit
+        // called null and a command silently lost its recovery vehicles and MASH trucks.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Faction faction = campaign.getPlayerForce().getFaction();
+        assertNull(SupportCapability.SALVAGE.unitName(campaign),
+              "this test is only meaningful while salvage rolls its vehicle rather than naming it");
+
+        List<SupportPersonnelToTOE.VehicleSpec> specs = SupportPersonnelToTOE.vehiclesStillNeeded(campaign,
+              SupportCapability.SALVAGE, faction, 4);
+
+        for (SupportPersonnelToTOE.VehicleSpec spec : specs) {
+            assertNotNull(spec.unitName(), "a spec with no unit name cannot be built from");
+            assertTrue(spec.count() > 0, "a spec must ask for at least one vehicle");
+        }
+    }
+
+    @Test
+    void vehiclesStillNeeded_aNamedCapabilityStillResolvesByName() {
+        // The security detail is infantry and still names its unit, so that path must be untouched.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Faction faction = campaign.getPlayerForce().getFaction();
+        String expected = SupportCapability.SECURITY.unitName(campaign);
+        assertNotNull(expected, "the security detail names its unit");
+
+        List<SupportPersonnelToTOE.VehicleSpec> specs = SupportPersonnelToTOE.vehiclesStillNeeded(campaign,
+              SupportCapability.SECURITY, faction, 2);
+
+        assertEquals(1, specs.size());
+        assertEquals(expected, specs.get(0).unitName());
     }
 
     @Test
