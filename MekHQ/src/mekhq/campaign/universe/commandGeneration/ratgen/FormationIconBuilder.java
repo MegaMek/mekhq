@@ -432,13 +432,26 @@ public final class FormationIconBuilder {
      *
      * @return the StratOps type filename, or {@code null} when the formation has no single clear purpose
      */
-    private static @Nullable String purposeIconFor(Formation formation, Campaign campaign) {
+    static @Nullable String purposeIconFor(Formation formation, Campaign campaign) {
         if (isHeadquarters(formation, campaign)) {
             return HEADQUARTERS_TYPE_FILENAME;
         }
 
         if (formation.isFormationType(FormationType.CONVOY)) {
             return SUPPLY_TYPE_FILENAME;
+        }
+
+        // Asked of the formation rather than of its units, because a recovery vehicle does not have to carry
+        // recovery equipment. A BattleMek Recovery Vehicle is an ordinary Tank with a cargo bay and a winch that
+        // exists only in its fluff text, so the equipment count below finds nothing on the very formation this icon
+        // is for.
+
+        // Asked of the formation rather than of its units, because a recovery vehicle does not have to carry
+        // recovery equipment. A BattleMek Recovery Vehicle is an ordinary Tank with a cargo bay and a winch that
+        // exists only in its fluff text, so the equipment count below finds nothing on the very formation this icon
+        // is for.
+        if (formation.isFormationType(FormationType.SALVAGE)) {
+            return MAINTENANCE_TYPE_FILENAME;
         }
 
         int units = 0;
