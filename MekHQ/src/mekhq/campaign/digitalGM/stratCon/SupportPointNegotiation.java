@@ -217,12 +217,13 @@ public class SupportPointNegotiation {
 
         // Add a report
         String reportKey = isInitialNegotiation ? "supportPoints.initial" : "supportPoints.biweekly";
-        campaign.addReport(GENERAL, reportKey,
+        String report = getFormattedTextAt(RESOURCE_BUNDLE, reportKey,
               contract.getHyperlinkedName(),
               spanOpeningWithCustomColor(fontColor),
               negotiatedSupportPoints,
               CLOSING_SPAN_TAG,
               maxSupportPoints);
+        campaign.addReport(GENERAL, report);
     }
 
     /**
