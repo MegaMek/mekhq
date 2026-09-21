@@ -4618,16 +4618,29 @@ public class AtBDynamicScenarioFactory {
         }
 
         if (forceTemplate.getDestinationZone() == ScenarioForceTemplate.DESTINATION_EDGE_RANDOM) {
-            // compute a random cardinal edge between 0 and 3 to avoid None
-            actualDestinationEdge = randomInt(CardinalEdge.values().length - 1);
-        } else if (forceTemplate.getDestinationZone() == ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT) {
-            actualDestinationEdge = getOppositeEdge(force.getStartingPos());
-        } else {
+            // The stored destinationZone space is CardinalEdge indices, so route this through getCardinalEdge - NOT
+            // through findCardinalEdge.
+            actualDestinationEdge = randomInt(CardinalEdge.NEAREST.getIndex());
             force.getBehaviorSettings().setDestinationEdge(CardinalEdge.getCardinalEdge(actualDestinationEdge));
-            return;
+        } else if (forceTemplate.getDestinationZone() == ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT) {
+            // getOppositeEdge works in Board.START_* space, so findCardinalEdge (via setDestinationEdge) is correct here
+            actualDestinationEdge = getOppositeEdge(force.getStartingPos());
+            force.setDestinationEdge(actualDestinationEdge);
+        } else {
+            // a plain cardinal/nearest/none destination is stored as a CardinalEdge index already
+            force.getBehaviorSettings().setDestinationEdge(CardinalEdge.getCardinalEdge(actualDestinationEdge));
         }
 
-        force.setDestinationEdge(actualDestinationEdge);
+        // Forced withdrawal routes crippled units toward the retreat edge, which defaults to NEAREST - the edge the
+        // unit currently sits closest to. For a force that has been given an explicit flee destination, such as a
+        // convoy told to escape off the edge opposite its deployment zone, that default means a lightly-armored unit
+        // crippled early in the fight turns around and leaves via its own deployment edge instead of continuing
+        // toward the intended destination. Align the retreat edge with the destination edge so crippled units keep
+        // heading the way the whole force is meant to.
+        CardinalEdge destinationEdge = force.getBehaviorSettings().getDestinationEdge();
+        if ((destinationEdge != CardinalEdge.NONE) && (destinationEdge != CardinalEdge.NEAREST)) {
+            force.getBehaviorSettings().setRetreatEdge(destinationEdge);
+        }
     }
 
     /**
