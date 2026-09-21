@@ -632,10 +632,11 @@ public final class CommandGenerator {
      * crewed from the generated staff, but only while support teams are switched on; with them off, no section is
      * built, so those vehicles are granted here too.
      *
-     * @param campaign the campaign the vehicles are granted to
+     * @param campaign       the campaign the vehicles are granted to
+     * @param supportFaction the faction the command is organised as, which during generation is the faction
+     *                       it is generated for rather than the campaign's own
      */
-    static void grantStandaloneSupportVehicles(Campaign campaign) {
-        Faction supportFaction = campaign.getPlayerForce().getFaction();
+    static void grantStandaloneSupportVehicles(Campaign campaign, Faction supportFaction) {
         for (SupportCapability capability : SupportCapability.values()) {
             if (!capability.isEnabled(campaign)) {
                 LOGGER.info("[CompanyGen][SupportUnits] {}: switched off, nothing granted", capability);
@@ -674,7 +675,8 @@ public final class CommandGenerator {
         Set<UUID> unitsBeforeSupport = snapshotHangarUnitIds(campaign);
         // The stage's own vehicles - flatbeds, canteens, recovery and MASH trucks - are generated below, after
         // the staff, but they need mechanics like any other vehicle. Count them into the demand now.
-        int vehiclesStillToCome = SupportUnitGenerator.vehiclesStillToGenerate(campaign);
+        Faction commandFaction = SupportPersonnelGenerator.resolveFaction(campaign, options);
+        int vehiclesStillToCome = SupportUnitGenerator.vehiclesStillToGenerate(campaign, commandFaction);
         SupportPersonnelGenerator.Result supportResult =
               SupportPersonnelGenerator.generate(campaign, options, vehiclesStillToCome);
 
@@ -686,13 +688,13 @@ public final class CommandGenerator {
         // on the roster instead of being organized into carriers.
         if (SupportCarrierReconciler.isEnabled(campaign)) {
             SupportPersonnelToTOE.organize(campaign, supportResult.generatedPersons(),
-                  campaign.getPlayerForce().isClanForce());
+                  commandFaction.isClan(), commandFaction);
         } else {
             LOGGER.info("[CompanyGen][SupportTOE] support teams are switched off; {} support person(s) stay unorganized",
                   supportResult.generatedPersons().size());
         }
 
-        grantStandaloneSupportVehicles(campaign);
+        grantStandaloneSupportVehicles(campaign, commandFaction);
 
         // Assign techs to units with MekHQ's own assigner, the one the new day and the Hangar's quick-assign
         // button use, ordered by the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight / Pilot Skill,

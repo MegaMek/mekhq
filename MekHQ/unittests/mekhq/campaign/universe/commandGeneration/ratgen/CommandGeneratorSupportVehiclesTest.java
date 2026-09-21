@@ -74,7 +74,7 @@ class CommandGeneratorSupportVehiclesTest {
         Campaign campaign = campaignWith(false, true, false);
 
         try (MockedStatic<SupportUnitGenerator> generator = mockStatic(SupportUnitGenerator.class)) {
-            CommandGenerator.grantStandaloneSupportVehicles(campaign);
+            CommandGenerator.grantStandaloneSupportVehicles(campaign, campaign.getPlayerForce().getFaction());
 
             generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.SALVAGE), eq(campaign),
                   any(), eq(true)));
@@ -88,7 +88,7 @@ class CommandGeneratorSupportVehiclesTest {
         Campaign campaign = campaignWith(false, false, true);
 
         try (MockedStatic<SupportUnitGenerator> generator = mockStatic(SupportUnitGenerator.class)) {
-            CommandGenerator.grantStandaloneSupportVehicles(campaign);
+            CommandGenerator.grantStandaloneSupportVehicles(campaign, campaign.getPlayerForce().getFaction());
 
             generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.MEDICAL), eq(campaign),
                   any(), eq(true)));
@@ -103,7 +103,7 @@ class CommandGeneratorSupportVehiclesTest {
         Campaign campaign = campaignWith(true, true, true);
 
         try (MockedStatic<SupportUnitGenerator> generator = mockStatic(SupportUnitGenerator.class)) {
-            CommandGenerator.grantStandaloneSupportVehicles(campaign);
+            CommandGenerator.grantStandaloneSupportVehicles(campaign, campaign.getPlayerForce().getFaction());
 
             generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.SALVAGE), any(), any(),
                   any(Boolean.class)), never());
@@ -117,7 +117,7 @@ class CommandGeneratorSupportVehiclesTest {
         Campaign campaign = campaignWith(false, false, false);
 
         try (MockedStatic<SupportUnitGenerator> generator = mockStatic(SupportUnitGenerator.class)) {
-            CommandGenerator.grantStandaloneSupportVehicles(campaign);
+            CommandGenerator.grantStandaloneSupportVehicles(campaign, campaign.getPlayerForce().getFaction());
 
             generator.verify(() -> SupportUnitGenerator.generate(eq(SupportCapability.SALVAGE), any(), any(),
                   any(Boolean.class)), never());
