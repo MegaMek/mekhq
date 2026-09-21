@@ -34,7 +34,9 @@ package mekhq.campaign.digitalGM.stratCon;
 
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -65,6 +67,7 @@ import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
+import mekhq.utilities.ReportingUtilities;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -83,6 +86,7 @@ import org.mockito.MockedStatic;
  * @since 0.51.01
  */
 public class SupportPointNegotiationTest {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBStratCon";
     private static final LocalDate TODAY = LocalDate.of(3067, 1, 1);
     private static final String CONTRACT_NAME = "Contract";
     private static final String EMPLOYER_FACTION_CODE = "LA";
@@ -160,7 +164,8 @@ public class SupportPointNegotiationTest {
         @Test
         void processesOldestContractFirstAndSharesTheAdminPool() {
             // A single admin can only service one contract; the oldest contract must win it.
-            when(humanResources.getAdmins()).thenReturn(mutableList(mockAdmin(5, true)));
+            Person admin = mockAdmin(5, true);
+            when(humanResources.getAdmins()).thenReturn(mutableList(admin));
 
             StratConCampaignState olderState = mockState(0);
             StratConCampaignState newerState = mockState(0);
@@ -174,15 +179,17 @@ public class SupportPointNegotiationTest {
 
             verify(olderState).changeSupportPoints(1);
             verify(newerState, never()).changeSupportPoints(anyInt());
-            // The newer contract, left with no admins, falls through to the no-personnel report.
-            verify(campaign).addReport(eq(GENERAL), anyString());
+            // The older contract gets its success report; the newer contract, left with no admins, falls through to
+            // the no-personnel report. Both are single-string reports, so two are logged in total.
+            verify(campaign, times(2)).addReport(eq(GENERAL), anyString());
         }
 
         @Test
         void successfulRollsAddOnePointPerSuccess() {
-            when(humanResources.getAdmins()).thenReturn(mutableList(mockAdmin(5, true),
-                  mockAdmin(4, true),
-                  mockAdmin(3, true)));
+            Person firstAdmin = mockAdmin(5, true);
+            Person secondAdmin = mockAdmin(4, true);
+            Person thirdAdmin = mockAdmin(3, true);
+            when(humanResources.getAdmins()).thenReturn(mutableList(firstAdmin, secondAdmin, thirdAdmin));
 
             StratConCampaignState state = mockState(0);
             AbstractContract contract = mockContract(TODAY, state, 99, 5);
@@ -192,13 +199,7 @@ public class SupportPointNegotiationTest {
 
             verify(state).changeSupportPoints(3);
             // Weekly negotiations report against the contract scale as the maximum.
-            verify(campaign).addReport(eq(GENERAL),
-                  eq("supportPoints.biweekly"),
-                  eq(CONTRACT_NAME),
-                  anyString(),
-                  eq(3),
-                  eq(CLOSING_SPAN_TAG),
-                  eq(5));
+            verify(campaign).addReport(GENERAL, expectedSupportPointsReport("supportPoints.biweekly", 3, 5));
         }
     }
 
@@ -221,7 +222,8 @@ public class SupportPointNegotiationTest {
 
         @Test
         void nullCampaignStateReturnsWithoutReportingOrChangingPoints() {
-            when(humanResources.getAdmins()).thenReturn(mutableList(mockAdmin(5, true)));
+            Person admin = mockAdmin(5, true);
+            when(humanResources.getAdmins()).thenReturn(mutableList(admin));
             AbstractContract contract = mockContract(TODAY, null, 5, 2);
 
             SupportPointNegotiation.negotiateInitialSupportPoints(campaign, contract);
@@ -249,7 +251,9 @@ public class SupportPointNegotiationTest {
 
         @Test
         void successfulRollsAddPointsAndReportInitialNegotiation() {
-            when(humanResources.getAdmins()).thenReturn(mutableList(mockAdmin(5, true), mockAdmin(4, true)));
+            Person firstAdmin = mockAdmin(5, true);
+            Person secondAdmin = mockAdmin(4, true);
+            when(humanResources.getAdmins()).thenReturn(mutableList(firstAdmin, secondAdmin));
 
             StratConCampaignState state = mockState(0);
             AbstractContract contract = mockContract(TODAY, state, 10, 2);
@@ -257,18 +261,14 @@ public class SupportPointNegotiationTest {
             SupportPointNegotiation.negotiateInitialSupportPoints(campaign, contract);
 
             verify(state).changeSupportPoints(2);
-            verify(campaign).addReport(eq(GENERAL),
-                  eq("supportPoints.initial"),
-                  eq(CONTRACT_NAME),
-                  anyString(),
-                  eq(2),
-                  eq(CLOSING_SPAN_TAG),
-                  eq(10));
+            verify(campaign).addReport(GENERAL, expectedSupportPointsReport("supportPoints.initial", 2, 10));
         }
 
         @Test
         void failedRollsAddNoPointsButStillReport() {
-            when(humanResources.getAdmins()).thenReturn(mutableList(mockAdmin(5, false), mockAdmin(4, false)));
+            Person firstAdmin = mockAdmin(5, false);
+            Person secondAdmin = mockAdmin(4, false);
+            when(humanResources.getAdmins()).thenReturn(mutableList(firstAdmin, secondAdmin));
 
             StratConCampaignState state = mockState(0);
             AbstractContract contract = mockContract(TODAY, state, 10, 2);
@@ -276,13 +276,7 @@ public class SupportPointNegotiationTest {
             SupportPointNegotiation.negotiateInitialSupportPoints(campaign, contract);
 
             verify(state, never()).changeSupportPoints(anyInt());
-            verify(campaign).addReport(eq(GENERAL),
-                  eq("supportPoints.initial"),
-                  eq(CONTRACT_NAME),
-                  anyString(),
-                  eq(0),
-                  eq(CLOSING_SPAN_TAG),
-                  eq(10));
+            verify(campaign).addReport(GENERAL, expectedSupportPointsReport("supportPoints.initial", 0, 10));
         }
 
         @Test
@@ -314,7 +308,8 @@ public class SupportPointNegotiationTest {
         @Test
         void initialNegotiationAddsContractStartBonusScaledByContractScale() {
             when(campaignOptions.isUseFactionStandingSupportPointsSafe()).thenReturn(true);
-            when(humanResources.getAdmins()).thenReturn(mutableList(mockAdmin(5, true)));
+            Person admin = mockAdmin(5, true);
+            when(humanResources.getAdmins()).thenReturn(mutableList(admin));
 
             StratConCampaignState state = mockState(0);
             AbstractContract contract = mockContract(TODAY, state, 100, 3);
@@ -360,6 +355,23 @@ public class SupportPointNegotiationTest {
     // endregion faction standing modifiers
 
     // region helpers
+
+    /**
+     * Reproduces the fully formatted support-point report string that production builds before handing it to
+     * {@link Campaign#addReport}, so the tests can verify the single-string report call.
+     */
+    private static String expectedSupportPointsReport(String reportKey, int negotiatedSupportPoints,
+          int maximumSupportPoints) {
+        String fontColor = (negotiatedSupportPoints > 0) ?
+                                 ReportingUtilities.getPositiveColor() :
+                                 ReportingUtilities.getNegativeColor();
+        return getFormattedTextAt(RESOURCE_BUNDLE, reportKey,
+              CONTRACT_NAME,
+              spanOpeningWithCustomColor(fontColor),
+              negotiatedSupportPoints,
+              CLOSING_SPAN_TAG,
+              maximumSupportPoints);
+    }
 
     private static List<AbstractContract> mutableList(AbstractContract... contracts) {
         return new ArrayList<>(List.of(contracts));
