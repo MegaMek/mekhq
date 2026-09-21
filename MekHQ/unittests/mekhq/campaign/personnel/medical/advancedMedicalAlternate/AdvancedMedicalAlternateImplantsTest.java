@@ -141,10 +141,11 @@ class AdvancedMedicalAlternateImplantsTest {
     @DisplayName("isHasTooManyProsthetics returns true once three high-impact prosthetics are present")
     void isHasTooManyProsthetics_threeQualifyingReturnsTrue() throws Exception {
         Person person = mock(Person.class);
-        when(person.getProstheticInjuries()).thenReturn(List.of(
+        List<Injury> prostheticInjuries = List.of(
               prostheticInjury(AlternateInjuries.ADVANCED_PROSTHETIC_ARM),
               prostheticInjury(AlternateInjuries.ADVANCED_PROSTHETIC_HAND),
-              prostheticInjury(AlternateInjuries.ADVANCED_PROSTHETIC_LEG)));
+              prostheticInjury(AlternateInjuries.ADVANCED_PROSTHETIC_LEG));
+        when(person.getProstheticInjuries()).thenReturn(prostheticInjuries);
 
         boolean result = invokePrivateStatic("isHasTooManyProsthetics",
               new Class<?>[] { Person.class }, person);
@@ -156,9 +157,10 @@ class AdvancedMedicalAlternateImplantsTest {
     @DisplayName("isHasTooManyProsthetics returns false when only two high-impact prosthetics are present")
     void isHasTooManyProsthetics_twoQualifyingReturnsFalse() throws Exception {
         Person person = mock(Person.class);
-        when(person.getProstheticInjuries()).thenReturn(List.of(
+        List<Injury> prostheticInjuries = List.of(
               prostheticInjury(AlternateInjuries.ADVANCED_PROSTHETIC_ARM),
-              prostheticInjury(AlternateInjuries.ADVANCED_PROSTHETIC_HAND)));
+              prostheticInjury(AlternateInjuries.ADVANCED_PROSTHETIC_HAND));
+        when(person.getProstheticInjuries()).thenReturn(prostheticInjuries);
 
         boolean result = invokePrivateStatic("isHasTooManyProsthetics",
               new Class<?>[] { Person.class }, person);
@@ -171,10 +173,11 @@ class AdvancedMedicalAlternateImplantsTest {
     void isHasTooManyProsthetics_lowImpactProstheticsIgnored() throws Exception {
         Person person = mock(Person.class);
         // BIONIC_EAR is STANDARD (tier 3) and therefore must not count towards the threshold.
-        when(person.getProstheticInjuries()).thenReturn(List.of(
+        List<Injury> prostheticInjuries = List.of(
               prostheticInjury(AlternateInjuries.BIONIC_EAR),
               prostheticInjury(AlternateInjuries.BIONIC_EAR),
-              prostheticInjury(AlternateInjuries.BIONIC_EAR)));
+              prostheticInjury(AlternateInjuries.BIONIC_EAR));
+        when(person.getProstheticInjuries()).thenReturn(prostheticInjuries);
 
         boolean result = invokePrivateStatic("isHasTooManyProsthetics",
               new Class<?>[] { Person.class }, person);
@@ -186,9 +189,10 @@ class AdvancedMedicalAlternateImplantsTest {
     @DisplayName("isHasTooManyProsthetics ignores injuries that do not map to a ProstheticType")
     void isHasTooManyProsthetics_nonProstheticInjuriesIgnored() throws Exception {
         Person person = mock(Person.class);
-        when(person.getProstheticInjuries()).thenReturn(List.of(
+        List<Injury> prostheticInjuries = List.of(
               prostheticInjury(AlternateInjuries.FRACTURED_RIB),
-              prostheticInjury(AlternateInjuries.ADVANCED_PROSTHETIC_ARM)));
+              prostheticInjury(AlternateInjuries.ADVANCED_PROSTHETIC_ARM));
+        when(person.getProstheticInjuries()).thenReturn(prostheticInjuries);
 
         boolean result = invokePrivateStatic("isHasTooManyProsthetics",
               new Class<?>[] { Person.class }, person);
@@ -299,7 +303,7 @@ class AdvancedMedicalAlternateImplantsTest {
         IOption armorOption = mock(IOption.class);
         IOption camoOption = mock(IOption.class);
 
-        when(person.getProstheticInjuries()).thenReturn(List.of(
+        List<Injury> prostheticInjuries = List.of(
               prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR),
               prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR),
               prostheticInjury(AlternateInjuries.DERMAL_MYOMER_LEG_ARMOR),
@@ -307,7 +311,8 @@ class AdvancedMedicalAlternateImplantsTest {
               prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_CAMO),
               prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_CAMO),
               prostheticInjury(AlternateInjuries.DERMAL_MYOMER_LEG_CAMO),
-              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_LEG_CAMO)));
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_LEG_CAMO));
+        when(person.getProstheticInjuries()).thenReturn(prostheticInjuries);
         when(person.getOptions()).thenReturn(options);
         when(options.getOption(MD_DERMAL_ARMOR)).thenReturn(armorOption);
         when(options.getOption(MD_DERMAL_CAMO_ARMOR)).thenReturn(camoOption);
@@ -326,9 +331,10 @@ class AdvancedMedicalAlternateImplantsTest {
         IOption armorOption = mock(IOption.class);
         IOption camoOption = mock(IOption.class);
 
-        when(person.getProstheticInjuries()).thenReturn(List.of(
+        List<Injury> prostheticInjuries = List.of(
               prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_ARMOR),
-              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_CAMO)));
+              prostheticInjury(AlternateInjuries.DERMAL_MYOMER_ARM_CAMO));
+        when(person.getProstheticInjuries()).thenReturn(prostheticInjuries);
         when(person.getOptions()).thenReturn(options);
         when(options.getOption(MD_DERMAL_ARMOR)).thenReturn(armorOption);
         when(options.getOption(MD_DERMAL_CAMO_ARMOR)).thenReturn(camoOption);
