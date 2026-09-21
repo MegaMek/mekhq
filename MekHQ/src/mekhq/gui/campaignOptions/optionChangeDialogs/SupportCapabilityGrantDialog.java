@@ -266,8 +266,9 @@ public class SupportCapabilityGrantDialog extends JDialog {
         boolean temporaryCrews = (chkUseTemporaryCrews != null) && chkUseTemporaryCrews.isSelected();
 
         if (fromExistingStaff) {
+            // Switched on mid-campaign, so the command is organised as the campaign's own faction.
             int built = SupportPersonnelToTOE.topUpCapabilityVehicles(campaign, capability,
-                  VehicleCrewSource.EXISTING_STAFF);
+                  VehicleCrewSource.EXISTING_STAFF, campaign.getPlayerForce().getFaction());
             LOGGER.info("[SupportTeams] {}: granted {} vehicle(s) into the support sections, crewed from existing"
                               + " staff", capability, built);
             return;
