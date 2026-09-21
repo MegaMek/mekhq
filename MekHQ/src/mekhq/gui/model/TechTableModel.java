@@ -178,7 +178,8 @@ public class TechTableModel extends DataTableModel<Person> {
         toReturn.append("<br/>");
 
         toReturn.append(String.format("%d/%d minutes left", tech.getMinutesLeft(),
-              tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION))));
+              tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
+                                                   .get(CampaignOption.TECHS_USE_ADMINISTRATION))));
 
         if (overtimeAllowed) {
             toReturn.append(String.format(" + (%d overtime)", tech.getOvertimeLeft()));
@@ -205,7 +206,7 @@ public class TechTableModel extends DataTableModel<Person> {
         if (tech.getOptions().booleanOption(PersonnelOptions.FLAW_GREMLINS)) {
             toReturn.append(", <i>Gremlins</i>");
         }
-        if (tech.getOptions().booleanOption(PersonnelOptions.FLAW_GREMLINS)) {
+        if (tech.getOptions().booleanOption(PersonnelOptions.ATOW_TECH_EMPATHY)) {
             toReturn.append(", <i>Tech Empathy</i>");
         }
 

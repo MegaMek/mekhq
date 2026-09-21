@@ -87,6 +87,7 @@ import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -834,6 +835,10 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 } else if (tech.getPrimaryRole().isVesselCrew() && (unit != null) && !unit.isSelfCrewed()) {
                     return false;
                 } else if (!tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
+                    return false;
+                }
+                if (getCampaignOptions().get(CampaignOption.TECHS_NEED_TOOL_KIT) &&
+                          !EquipmentKitCatalog.hasToolKit(tech)) {
                     return false;
                 }
                 Skill skill = tech.getSkillForWorkingOn(part);
