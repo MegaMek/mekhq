@@ -45,6 +45,7 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
@@ -56,7 +57,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.NewsDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Dialog logic for resolving a Faction Standing ultimatum event.
@@ -222,8 +222,13 @@ public class FactionStandingUltimatumDialog {
               commanderAddress);
         new NewsDialog(campaign, newsText);
 
-        // Process outcome
-        processGoingRogue(campaign, chosenFaction, commander, supporter, isViolentTransition, true);
+        processGoingRogue(campaign,
+              chosenFaction,
+              commander,
+              supporter,
+              isViolentTransition,
+              true,
+              campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING));
 
         if (rival != null && !(rival.getStatus().isDepartedUnit() || rival.getStatus().isDead())) {
             rival.changeStatus(
