@@ -890,6 +890,26 @@ public class ResolveScenarioTracker {
                     status.setDeployed(!en.wasNeverDeployed());
                     peopleStatus.put(p.getId(), status);
                 }
+
+                // Distribute remaining casualties among the blob crew
+                while (casualtiesAssigned < casualties && killOneBlobCrew(u)) {
+                    casualtiesAssigned++;
+                }
+
+                // Vehicle temp (blob) crew are not Person records, so the crit-based vehicle crew handling above never
+                // touches them. When the vehicle is lost with its crew, its temp crew are at risk too: each rolls to
+                // survive on the same odds as named vehicle crew (2d6 >= 7 survives, otherwise killed).
+                if ((en instanceof Tank) && (u.getTotalTempCrew() > 0)) {
+                    boolean crewLost = (pilot == null) || unitStatus.isTotalLoss() || isVehicleCrewLost(en);
+                    if (crewLost) {
+                        int tempCrew = u.getTotalTempCrew();
+                        for (int i = 0; i < tempCrew; i++) {
+                            if ((Compute.d6(2) < 7) && !killOneBlobCrew(u)) {
+                                break;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -925,17 +945,7 @@ public class ResolveScenarioTracker {
      */
     private CasualtyAssignment assignTempCrewCasualty(Unit unit, PersonStatus status) {
         int totalCrew = unit.getTotalCrewSize();
-
-        // Calculate total blob crew across all PersonnelRole types
-        int totalBlobCrew = 0;
-        Map<PersonnelRole, Integer> tempCrewCounts = new HashMap<>();
-        for (PersonnelRole role : PersonnelRole.values()) {
-            int count = unit.getTempCrewByPersonnelRole(role);
-            if (count > 0) {
-                tempCrewCounts.put(role, count);
-                totalBlobCrew += count;
-            }
-        }
+        int totalBlobCrew = unit.getTotalTempCrew();
 
         // Determine if blob crew is hit (proportional to blob crew / total crew)
         boolean hitBlobCrew = false;
@@ -943,20 +953,8 @@ public class ResolveScenarioTracker {
             hitBlobCrew = Compute.randomInt(totalCrew) < totalBlobCrew;
         }
 
-        if (hitBlobCrew) {
-            // Randomly select which PersonnelRole to decrement (proportional to their counts)
-            int roll = Compute.randomInt(totalBlobCrew);
-            int cumulative = 0;
-
-            for (Map.Entry<PersonnelRole, Integer> entry : tempCrewCounts.entrySet()) {
-                cumulative += entry.getValue();
-                if (roll < cumulative) {
-                    PersonnelRole role = entry.getKey();
-                    unit.setTempCrew(role, entry.getValue() - 1);
-                    killedTempCrew.merge(role, 1, Integer::sum);
-                    return CasualtyAssignment.BLOB_CREW;
-                }
-            }
+        if (hitBlobCrew && killOneBlobCrew(unit)) {
+            return CasualtyAssignment.BLOB_CREW;
         }
 
         // Casualty goes to a Person - determine if wounded or dead
@@ -967,6 +965,85 @@ public class ResolveScenarioTracker {
             status.setDead(true);
             return CasualtyAssignment.PERSON_DEAD;
         }
+    }
+
+    /**
+     * Kills a single blob (temp) crew member on the given unit, selected at random and weighted by how many temp crew
+     * occupy each {@link PersonnelRole}. The loss is recorded for death benefits, removed from the unit, and removed
+     * from the campaign temp crew pool so that it is a permanent casualty that must be re-hired.
+     *
+     * @param unit the unit to remove a temp crew member from
+     *
+     * @return {@code true} if a temp crew member was killed; {@code false} if the unit had no temp crew remaining
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean killOneBlobCrew(Unit unit) {
+        Map<PersonnelRole, Integer> tempCrewCounts = new HashMap<>();
+        int totalBlobCrew = 0;
+        for (PersonnelRole role : PersonnelRole.values()) {
+            int count = unit.getTempCrewByPersonnelRole(role);
+            if (count > 0) {
+                tempCrewCounts.put(role, count);
+                totalBlobCrew += count;
+            }
+        }
+
+        if (totalBlobCrew <= 0) {
+            return false;
+        }
+
+        // Randomly select which PersonnelRole to decrement (proportional to their counts)
+        int roll = Compute.randomInt(totalBlobCrew);
+        int cumulative = 0;
+        for (Map.Entry<PersonnelRole, Integer> entry : tempCrewCounts.entrySet()) {
+            cumulative += entry.getValue();
+            if (roll < cumulative) {
+                PersonnelRole role = entry.getKey();
+                unit.setTempCrew(role, entry.getValue() - 1);
+                // Remove the casualty from the campaign pool too. Otherwise the daily empty/fill cycle in
+                // CampaignNewDayManager silently refills the loss for free and the total temp crew count never drops.
+                campaign.decreaseTempCrewPool(role, 1);
+                killedTempCrew.merge(role, 1, Integer::sum);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Determines whether a vehicle has lost its crew, using the same criteria as the crit-based handling for named
+     * vehicle crew: the crew is gone if the crew object is missing or dead, or if any non-turret, non-body location has
+     * been breached (internal structure reduced to zero or below).
+     *
+     * @param entity the post-battle entity to inspect
+     *
+     * @return {@code true} if the vehicle's crew is considered lost; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isVehicleCrewLost(Entity entity) {
+        if (!(entity instanceof Tank)) {
+            return false;
+        }
+
+        if ((entity.getCrew() == null) || entity.getCrew().isDead()) {
+            return true;
+        }
+
+        for (int loc = 0; loc < entity.locations(); loc++) {
+            if ((loc == Tank.LOC_TURRET) || (loc == Tank.LOC_TURRET_2) || (loc == Tank.LOC_BODY)) {
+                continue;
+            }
+            if (entity.getInternal(loc) <= 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -1048,11 +1125,10 @@ public class ResolveScenarioTracker {
             boolean wounded = false;
             if (casualtiesAssigned < casualties) {
                 casualtiesAssigned++;
-                if (Compute.d6(2) >= 7) {
+                // Route through the shared assignment so casualties can fall on temp (blob) crew proportionally
+                // rather than always landing on the named crew.
+                if (assignTempCrewCasualty(ship, status) == CasualtyAssignment.PERSON_WOUNDED) {
                     wounded = true;
-                } else {
-                    status.setHits(6);
-                    status.setDead(true);
                 }
             }
 
@@ -1070,6 +1146,12 @@ public class ResolveScenarioTracker {
             status.setXP(campaign.getCampaignOptions().get(CampaignOption.SCENARIO_XP));
             status.setDeployed(!en.wasNeverDeployed());
             peopleStatus.put(p.getId(), status);
+        }
+
+        // Casualties beyond the named crew fall on the temp (blob) crew, which are not Person records and so are never
+        // visited by the loop above.
+        while (casualtiesAssigned < casualties && killOneBlobCrew(ship)) {
+            casualtiesAssigned++;
         }
 
         // Now, did the passengers take any hits?
