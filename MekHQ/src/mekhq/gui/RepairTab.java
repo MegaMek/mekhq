@@ -822,6 +822,13 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
                     return false;
                 }
+
+                // Vessel crew assigned to a unit can only perform repairs as that unit's engineer.
+                Unit assignedUnit = tech.getUnit();
+                if (tech.getPrimaryRole().isVesselCrew() && (assignedUnit != null) &&
+                          !tech.equals(assignedUnit.getEngineer())) {
+                    return false;
+                }
                 if (btnShowOnlyUnitTechs.isSelected() && (unit != null) && !tech.isRightTechProfessionFor(unit)) {
                     return false;
                 }
