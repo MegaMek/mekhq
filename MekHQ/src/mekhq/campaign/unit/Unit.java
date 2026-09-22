@@ -110,6 +110,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -3938,11 +3939,12 @@ public class Unit implements ITechnology, ILocatable {
             removePart(part);
         }
 
+        LocalWarehouse warehouse = getWarehouse();
         for (Part part : bombBinsToRemove) {
             removePart(part);
             part.setUnit(null);
-            if (campaign != null) {
-                getWarehouse().removePart(part);
+            if (warehouse != null) {
+                warehouse.removePart(part);
             }
         }
         // now check to see what is null
