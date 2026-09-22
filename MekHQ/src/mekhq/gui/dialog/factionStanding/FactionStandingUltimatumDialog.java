@@ -222,13 +222,15 @@ public class FactionStandingUltimatumDialog {
               commanderAddress);
         new NewsDialog(campaign, newsText);
 
+        boolean isTrackingFactionStanding = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
+        // A violent transition is treated as a defection
         processGoingRogue(campaign,
               chosenFaction,
               commander,
               supporter,
               isViolentTransition,
               true,
-              campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING));
+              isTrackingFactionStanding);
 
         if (rival != null && !(rival.getStatus().isDepartedUnit() || rival.getStatus().isDead())) {
             rival.changeStatus(
@@ -238,7 +240,9 @@ public class FactionStandingUltimatumDialog {
             );
         }
 
-        GoingRogue.processFactionStandingChangeForOldFaction(campaign, otherFaction);
+        if (isTrackingFactionStanding) {
+            GoingRogue.processFactionStandingChangeForOldFaction(campaign, otherFaction);
+        }
     }
 
     /**
@@ -267,8 +271,10 @@ public class FactionStandingUltimatumDialog {
         Faction oldFaction = campaign.getPlayerForce().getFaction();
         Faction newFaction = Factions.getInstance()
                                    .getFaction(isMercenary ? MERCENARY_FACTION_CODE : PIRATE_FACTION_CODE);
-        processGoingRogue(campaign, newFaction, commander, secondInCommand,
-              isViolentTransition, true, campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING));
+        boolean isTrackingFactionStanding = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
+        // A violent transition is treated as a defection
+        processGoingRogue(campaign, newFaction, commander, secondInCommand, isViolentTransition, true,
+              isTrackingFactionStanding);
 
         if (secondInCommand != null &&
                   !(secondInCommand.getStatus().isDepartedUnit() || secondInCommand.getStatus().isDead())) {
@@ -288,7 +294,9 @@ public class FactionStandingUltimatumDialog {
             );
         }
 
-        GoingRogue.processFactionStandingChangeForOldFaction(campaign, oldFaction);
+        if (isTrackingFactionStanding) {
+            GoingRogue.processFactionStandingChangeForOldFaction(campaign, oldFaction);
+        }
     }
 
     /**

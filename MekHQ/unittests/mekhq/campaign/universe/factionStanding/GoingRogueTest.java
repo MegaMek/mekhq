@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_1;
+import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_2;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_3;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -115,10 +116,10 @@ class GoingRogueTest {
         when(playerFaction.getShortName()).thenReturn(PLAYER_FACTION_CODE);
 
         FactionStandings factionStandings = mock(FactionStandings.class);
-        // The minimum of STANDING_LEVEL_3 is classified as STANDING_LEVEL_2, whose next-level target is that same
-        // value, so no bump should occur.
+        // STANDING_LEVEL_2's upper bound (which matches STANDING_LEVEL_3's minimum) is classified as STANDING_LEVEL_2,
+        // whose next-level target equals the current regard, so no bump should occur.
         when(factionStandings.getRegardForFaction(PLAYER_FACTION_CODE, false))
-              .thenReturn(STANDING_LEVEL_3.getMinimumRegard());
+              .thenReturn(STANDING_LEVEL_2.getMaximumRegard());
 
         Campaign campaign = buildCampaign(playerFaction, factionStandings);
 
