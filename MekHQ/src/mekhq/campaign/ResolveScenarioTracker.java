@@ -34,7 +34,6 @@
 package mekhq.campaign;
 
 import static java.lang.Math.ceil;
-import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.mission.scenarios.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
@@ -78,6 +77,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.log.ServiceLogger;
 import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.BotForce;
 import mekhq.campaign.mission.scenarios.Loot;
@@ -110,7 +110,6 @@ import mekhq.utilities.ReportingUtilities;
  */
 public class ResolveScenarioTracker {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ResolveScenarioTracker";
-    public static final double DAMANGED_PART_COMPENSATION_MODIFIER = 0.2;
 
     Map<UUID, Entity> entities;
     Map<UUID, List<Entity>> bayLoadedEntities;
@@ -1951,32 +1950,15 @@ public class ResolveScenarioTracker {
             }
 
             if (unitStatus.isTotalLoss()) {
-                // missing unit
-                if (blc > 0) {
-                    Money value = unitValue.multipliedBy(blc);
-                    campaign.getPlayerForce().getFinances()
-                          .credit(TransactionType.BATTLE_LOSS_COMPENSATION,
-                                getCampaign().getLocalDate(),
-                                value,
-                                "Battle loss compensation for " + unit.getName());
-                    campaign.addReport(FINANCES, value.toAmountAndSymbolString() +
-                                                       " in battle loss compensation for " +
-                                                       unit.getName() +
-                                                       " has been credited to your account.");
-                }
+                // The unit is destroyed beyond recovery: pay battle loss compensation on its purchase (or sale) value.
+                ContractSupportPayments.payBattlefieldLoss(campaign, mission, unitValue.multipliedBy(blc),
+                      unit.getName());
                 campaign.removeUnit(unit.getId());
             } else {
-                Money currentValue = unit.getValueOfAllMissingParts();
-                Money repairBLC = Money.zero();
                 campaign.clearGameData(en);
                 // FIXME: Need to implement a "fuel" part just like the "armor" part
                 if (en.isAero()) {
                     ((IAero) en).setFuelTonnage(((IAero) unitStatus.getBaseEntity()).getFuelTonnage());
-                }
-                if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
-                    Money amount = unit.getValueOfAllDamagedParts()
-                                         .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
-                    repairBLC = repairBLC.minus(amount);
                 }
                 unit.setEntity(en);
                 if (en.usesWeaponBays()) {
@@ -1984,38 +1966,14 @@ public class ResolveScenarioTracker {
                 }
                 unit.runDiagnostic(true);
                 unit.resetPilotAndEntity();
+                campaign.addReport(TECHNICAL, unit.getHyperlinkedName() + " has been recovered.");
                 if (!unit.isRepairable()) {
                     unit.setSalvage(true);
-                }
-                campaign.addReport(TECHNICAL, unit.getHyperlinkedName() + " has been recovered.");
-                // check for BLC
-                Money newValue = unit.getValueOfAllMissingParts();
-                Money blcValue = newValue.minus(currentValue);
-                String blcString = "battle loss compensation (parts) for " + unit.getName();
-                if (!unit.isRepairable()) {
-                    // if the unit is not repairable, you should get BLC for it, but we should
-                    // subtract
-                    // the value of salvageable parts
-                    blcValue = unitValue.minus(unit.getSellValue());
-                    blcString = "battle loss compensation for " + unit.getName();
-                }
-                if (campaignOptions.get(CampaignOption.PAY_FOR_REPAIRS)) {
-                    Money amount = unit.getValueOfAllDamagedParts()
-                                         .multipliedBy(DAMANGED_PART_COMPENSATION_MODIFIER);
-                    repairBLC = repairBLC.minus(amount);
-                }
-                blcValue = blcValue.plus(repairBLC);
-                if ((blc > 0) && blcValue.isPositive()) {
-                    Money finalValue = blcValue.multipliedBy(blc);
-                    getCampaign().getPlayerForce().getFinances()
-                          .credit(TransactionType.BATTLE_LOSS_COMPENSATION,
-                                getCampaign().getLocalDate(),
-                                finalValue,
-                                blcString.substring(0, 1).toUpperCase() + blcString.substring(1));
-                    campaign.addReport(FINANCES, finalValue.toAmountAndSymbolString() +
-                                                       " in " +
-                                                       blcString +
-                                                       " has been credited to your account.");
+                    // A recovered unit that cannot be repaired is a battle loss: pay compensation on its purchase (or
+                    // sale) value. Repairable units are instead covered by the straight-support reimbursement applied
+                    // as their repairs are carried out.
+                    ContractSupportPayments.payBattlefieldLoss(campaign, mission, unitValue.multipliedBy(blc),
+                          unit.getName());
                 }
             }
         }

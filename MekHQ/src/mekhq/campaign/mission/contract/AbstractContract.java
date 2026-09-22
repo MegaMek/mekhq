@@ -106,6 +106,7 @@ public abstract class AbstractContract {
 
     private @Nonnull Money salvagedByUnitValue = Money.zero();
     private @Nonnull Money salvagedByEmployerValue = Money.zero();
+    private @Nonnull Money withheldSupportPayments = Money.zero();
 
     private MissionStatus missionStatus;
     private ContractScheduleData scheduleData;
@@ -1086,6 +1087,18 @@ public abstract class AbstractContract {
 
     public void changeSalvagedByEmployerValue(Money delta) {
         salvagedByEmployerValue = salvagedByEmployerValue.plus(delta);
+    }
+
+    public @Nonnull Money getWithheldSupportPayments() {
+        return withheldSupportPayments;
+    }
+
+    public void setWithheldSupportPayments(@Nonnull Money withheldSupportPayments) {
+        this.withheldSupportPayments = withheldSupportPayments;
+    }
+
+    public void changeWithheldSupportPayments(Money delta) {
+        withheldSupportPayments = withheldSupportPayments.plus(delta);
     }
 
     public @Nonnull Money getSalvagedByUnitValue() {

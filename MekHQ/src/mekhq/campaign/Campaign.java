@@ -173,6 +173,7 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractHistoryData;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.mission.contract.utilities.ContractSettlement;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -2964,6 +2965,8 @@ public class Campaign implements ITechManager {
                       getLocalDate(),
                       cost,
                       "Repair of " + partWork.getPartName());
+                // An employer covering straight support reimburses its share of the repair cost.
+                ContractSupportPayments.reimburseStraightSupport(this, cost, partWork.getPartName());
             }
             if ((roll == 12) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 xpGained += getCampaignOptions().get(CampaignOption.SUCCESS_XP);

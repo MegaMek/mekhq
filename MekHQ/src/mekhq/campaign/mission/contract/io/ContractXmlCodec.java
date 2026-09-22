@@ -144,6 +144,10 @@ public final class ContractXmlCodec {
               indent,
               "salvagedByEmployerValue",
               contract.getSalvagedByEmployerValue());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter,
+              indent,
+              "withheldSupportPayments",
+              contract.getWithheldSupportPayments());
         // The player's chosen negotiator is a roster member, so persist only their id and re-resolve on load.
         if (contract.getPlayerNegotiator() != null) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "playerNegotiatorId",
@@ -447,6 +451,9 @@ public final class ContractXmlCodec {
               (contract, node, campaign, version) -> contract.setSalvagedByUnitValue(Money.fromXmlString(text(node))));
         readers.put("salvagedByEmployerValue",
               (contract, node, campaign, version) -> contract.setSalvagedByEmployerValue(Money.fromXmlString(text(
+                    node))));
+        readers.put("withheldSupportPayments",
+              (contract, node, campaign, version) -> contract.setWithheldSupportPayments(Money.fromXmlString(text(
                     node))));
         // The roster is not loaded yet when contracts are read, so stash the id; the loader resolves it post-load.
         readers.put("playerNegotiatorId",

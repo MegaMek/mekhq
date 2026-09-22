@@ -58,6 +58,7 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.mission.contract.contractSpecialRules.PirateLooting;
 import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.ContractEmergencyExtension;
@@ -158,6 +159,8 @@ public class MissionCompletionManager {
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
 
         payCompletionBonusAndReputation(campaign, mission, missionStatus);
+
+        ContractSupportPayments.renderWithheldSupport(campaign, mission);
 
         awardMissionExperience(campaign, campaignOptions, mission, missionStatus);
 
