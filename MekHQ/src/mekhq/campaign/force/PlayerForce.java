@@ -32,12 +32,15 @@
  */
 package mekhq.campaign.force;
 
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.DOUBLE_ALL_COSTS;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ContractMarket;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
@@ -99,6 +102,31 @@ public class PlayerForce extends AbstractForce implements SingleDetachmentForce 
      */
     public ContractMarket getContractMarket() {
         return contractMarket;
+    }
+
+    /**
+     * Returns the purchase cost multiplier imposed by the given active contracts.
+     *
+     * <p>When at least one of the supplied active contracts carries the
+     * {@link mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules#DOUBLE_ALL_COSTS} special rule,
+     * the cost of purchasing units and parts is doubled for the duration of that contract; otherwise costs are
+     * unchanged.</p>
+     *
+     * @param activeContracts the campaign's currently active contracts
+     *
+     * @return {@code 2.0} while a {@code DOUBLE_ALL_COSTS} contract is active, otherwise {@code 1.0}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public double getPurchaseCostMultiplier(Collection<AbstractContract> activeContracts) {
+        for (AbstractContract contract : activeContracts) {
+            if (contract.usesSpecialRule(DOUBLE_ALL_COSTS)) {
+                return 2.0;
+            }
+        }
+
+        return 1.0;
     }
 
     // endregion Contracts

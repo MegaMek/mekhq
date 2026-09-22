@@ -2221,8 +2221,10 @@ public class Campaign implements ITechManager {
         // SHOULD we check to see if this acquisition needs to be paid for
         if ((acquisition instanceof UnitOrder && getCampaignOptions().get(CampaignOption.PAY_FOR_UNITS)) ||
                   (acquisition instanceof Part && getCampaignOptions().get(CampaignOption.PAY_FOR_PARTS))) {
-            // CAN the acquisition actually be paid for
-            return getPlayerForce().getFunds().isGreaterOrEqualThan(acquisition.getBuyCost());
+            // CAN the acquisition actually be paid for, at the (possibly contract-doubled) purchase price
+            double contractMultiplier = getPlayerForce().getPurchaseCostMultiplier(getActiveContracts());
+            Money buyCost = acquisition.getBuyCost().multipliedBy(contractMultiplier);
+            return getPlayerForce().getFunds().isGreaterOrEqualThan(buyCost);
         }
         return true;
     }
