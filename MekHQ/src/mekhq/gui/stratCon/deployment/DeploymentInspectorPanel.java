@@ -52,6 +52,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionListener;
 
@@ -114,14 +115,31 @@ public class DeploymentInspectorPanel extends JPanel {
               BorderFactory.createMatteBorder(0, UIUtil.scaleForGUI(1), 0, 0, BORDER),
               BorderFactory.createEmptyBorder(pad, pad, pad, pad)));
 
-        add(buildDossierSection(), BorderLayout.NORTH);
-        add(buildStagedSection(), BorderLayout.CENTER);
+        add(buildTabs(), BorderLayout.CENTER);
         add(buildButtonRow(), BorderLayout.SOUTH);
 
         setStageButtonEnabled(false);
         showEmpty();
         setStaged(List.of());
         clearBudget();
+    }
+
+    /**
+     * Builds the tabbed pane that holds the dossier and the staged tray on separate tabs, so the two no longer compete
+     * for vertical space in the HUD.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JTabbedPane buildTabs() {
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.setOpaque(false);
+        tabs.setBackground(GROUND);
+        tabs.setForeground(TEXT);
+        tabs.setFont(hudFont(Font.BOLD, 0.8f, 0.08f));
+        tabs.addTab(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.dossier.title"), buildDossierSection());
+        tabs.addTab(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.staged.tab"), buildStagedSection());
+        return tabs;
     }
 
     private JPanel buildDossierSection() {
@@ -145,7 +163,8 @@ public class DeploymentInspectorPanel extends JPanel {
 
         JPanel section = new JPanel(new BorderLayout(0, UIUtil.scaleForGUI(4)));
         section.setOpaque(false);
-        section.add(HudStyle.keyLabel(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.dossier.title")), BorderLayout.NORTH);
+        int gap = UIUtil.scaleForGUI(4);
+        section.setBorder(BorderFactory.createEmptyBorder(gap, 0, 0, 0));
         section.add(dossierScroll, BorderLayout.CENTER);
         section.add(offBoardCheckBox, BorderLayout.SOUTH);
         return section;
