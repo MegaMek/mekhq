@@ -58,6 +58,7 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractSpecialRules.PirateLooting;
 import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.ContractEmergencyExtension;
 import mekhq.campaign.mission.scenarios.Scenario;
@@ -351,7 +352,7 @@ public class MissionCompletionManager {
                   ContractCharacteristics.getUnitReputationMultiplier(mission, status));
 
             if (mission.usesSpecialRule(USE_PIRATE_LOOTING)) {
-                ChaosReputation.resolveActOfPiracy(campaign,
+                PirateLooting.resolveActOfPiracy(campaign,
                       personnel,
                       mission.getScale(),
                       mission.getScenarios(),

@@ -73,6 +73,7 @@ import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractSpecialRules.PirateLooting;
 import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.ContractEmergencyExtension;
 import mekhq.campaign.mission.scenarios.Scenario;
@@ -619,7 +620,8 @@ public class MissionCompletionManagerTest {
 
             try (MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
                   ContractCharacteristics.class);
-                  MockedStatic<ChaosReputation> chaosReputation = mockStatic(ChaosReputation.class)) {
+                  MockedStatic<ChaosReputation> chaosReputation = mockStatic(ChaosReputation.class);
+                  MockedStatic<PirateLooting> pirateLooting = mockStatic(PirateLooting.class)) {
                 contractCharacteristics.when(
                       () -> ContractCharacteristics.getUnitReputationMultiplier(mission, MissionStatus.SUCCESS))
                       .thenReturn(1.5);
@@ -628,7 +630,7 @@ public class MissionCompletionManagerTest {
 
                 chaosReputation.verify(() -> ChaosReputation.processContractCompletion(campaign, MissionStatus.SUCCESS,
                       personnel, 1.5));
-                chaosReputation.verify(() -> ChaosReputation.resolveActOfPiracy(any(), any(), anyInt(),
+                pirateLooting.verify(() -> PirateLooting.resolveActOfPiracy(any(), any(), anyInt(),
                       any(), any(), anyBoolean(), any()), never());
             }
         }
@@ -656,14 +658,15 @@ public class MissionCompletionManagerTest {
 
             try (MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
                   ContractCharacteristics.class);
-                  MockedStatic<ChaosReputation> chaosReputation = mockStatic(ChaosReputation.class)) {
+                  MockedStatic<ChaosReputation> chaosReputation = mockStatic(ChaosReputation.class);
+                  MockedStatic<PirateLooting> pirateLooting = mockStatic(PirateLooting.class)) {
                 contractCharacteristics.when(
                       () -> ContractCharacteristics.getUnitReputationMultiplier(mission, MissionStatus.SUCCESS))
                       .thenReturn(1.0);
 
                 MissionCompletionManager.payCompletionBonusAndReputation(campaign, mission, MissionStatus.SUCCESS);
 
-                chaosReputation.verify(() -> ChaosReputation.resolveActOfPiracy(campaign, personnel, 4, scenarios,
+                pirateLooting.verify(() -> PirateLooting.resolveActOfPiracy(campaign, personnel, 4, scenarios,
                       null, true, "Raid"));
             }
         }
