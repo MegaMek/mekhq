@@ -627,7 +627,6 @@ public class ScenarioForceTemplate implements Comparable<ScenarioForceTemplate> 
         this.deploymentZones = deploymentZones;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setDestinationZone(int destinationZone) {
         this.destinationZone = destinationZone;
     }
