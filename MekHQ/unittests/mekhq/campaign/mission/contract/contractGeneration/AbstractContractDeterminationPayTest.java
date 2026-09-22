@@ -49,6 +49,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
@@ -180,6 +181,49 @@ class AbstractContractDeterminationPayTest {
     }
 
     // endregion combat pay (pirate raids)
+
+    // region combat pay (reduced combat pay)
+
+    private static AbstractContract contractWith(ContractObjectiveType objectiveType, boolean covertOperation,
+          boolean usesReducedCombatPay) {
+        AbstractContract contract = contractWith(objectiveType, covertOperation);
+        when(contract.usesSpecialRule(ChaosObjectiveSpecialRules.REDUCED_COMBAT_PAY)).thenReturn(usesReducedCombatPay);
+        return contract;
+    }
+
+    @Test
+    void getContractCombatPayIsQuarteredUnderReducedCombatPay() {
+        AbstractContract contract = contractWith(ContractObjectiveType.OBJECTIVE_RAID, false, true);
+
+        // FixedPay.COMBAT (250) * 0.25 = 62.5
+        assertEquals(Money.of(62.5), new FixedPay().getContractCombatPay(mock(Campaign.class), contract));
+    }
+
+    @Test
+    void getContractCombatPayIsUnaffectedWithoutReducedCombatPay() {
+        AbstractContract contract = contractWith(ContractObjectiveType.OBJECTIVE_RAID, false, false);
+
+        assertEquals(FixedPay.COMBAT, new FixedPay().getContractCombatPay(mock(Campaign.class), contract));
+    }
+
+    @Test
+    void getContractCombatPayStaysZeroForANonCovertPirateRaidEvenUnderReducedCombatPay() {
+        // A non-covert pirate raid is already zeroed by the pirate-raid rule; REDUCED_COMBAT_PAY has nothing left to
+        // quarter.
+        AbstractContract contract = contractWith(ContractObjectiveType.PIRATE_RAID, false, true);
+
+        assertEquals(Money.zero(), new FixedPay().getContractCombatPay(mock(Campaign.class), contract));
+    }
+
+    @Test
+    void getContractCombatPayQuartersACovertPirateRaidUnderReducedCombatPay() {
+        AbstractContract contract = contractWith(ContractObjectiveType.PIRATE_RAID, true, true);
+
+        // FixedPay.COMBAT (250) * 0.25 = 62.5
+        assertEquals(Money.of(62.5), new FixedPay().getContractCombatPay(mock(Campaign.class), contract));
+    }
+
+    // endregion combat pay (reduced combat pay)
 
     // region transport pay
 

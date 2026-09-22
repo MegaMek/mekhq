@@ -110,6 +110,15 @@ public class MissionCompletionManagerTest {
     private static final String NON_PIRATE_FACTION_CODE = "LA";
     private static final LocalDate TODAY = LocalDate.of(3067, 1, 1);
 
+    static {
+        // MissionStatus's and CombatRole's enum constructors read MekHQ.getMHQOptions().getLocale(); force them to
+        // class-load (and finish that one-time construction) now, before any test below opens a
+        // mockStatic(MekHQ.class) block - where an unstubbed getMHQOptions() would return null and permanently
+        // poison the class for the rest of this JVM.
+        MissionStatus.values();
+        CombatRole.values();
+    }
+
     // region getMissionExperienceAward
     @Nested
     public class GetMissionExperienceAward {
@@ -1028,6 +1037,7 @@ public class MissionCompletionManagerTest {
             when(mission.getCurrentScenarios()).thenReturn(new ArrayList<>());
             when(mission.getEmployerFactionCode()).thenReturn(NON_PIRATE_FACTION_CODE);
             when(mission.getStratConCampaignState()).thenReturn(null);
+            when(mission.getWithheldSupportPayments()).thenReturn(Money.zero());
 
             when(campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)).thenReturn(false);
             when(campaignOptions.isUseStratCon()).thenReturn(false);

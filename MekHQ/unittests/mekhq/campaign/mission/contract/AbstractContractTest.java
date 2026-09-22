@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -51,6 +52,7 @@ import java.time.LocalDate;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
+import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveData;
@@ -341,4 +343,120 @@ class AbstractContractTest {
     }
 
     // endregion identity and defaults
+
+    // region usesSpecialRule
+
+    @Test
+    void usesSpecialRuleIsTrueWhenTheObjectiveCarriesIt() {
+        AbstractContract contract = contract();
+        // PIRATE_HUNTING maps to the PIRATE_HUNT Chaos objective, which carries END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS.
+        contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.PIRATE_HUNTING,
+              ContractObjectiveType.GARRISON_DUTY));
+
+        assertTrue(contract.usesSpecialRule(ChaosObjectiveSpecialRules.END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS));
+    }
+
+    @Test
+    void usesSpecialRuleIsFalseWhenTheObjectiveDoesNotCarryIt() {
+        AbstractContract contract = contract();
+        // GARRISON_DUTY maps to the GARRISON Chaos objective, which carries no special rules.
+        contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.GARRISON_DUTY,
+              ContractObjectiveType.GARRISON_DUTY));
+
+        assertFalse(contract.usesSpecialRule(ChaosObjectiveSpecialRules.SIMULATED_DAMAGE));
+    }
+
+    @Test
+    void usesSpecialRuleIsFalseWhenThePlayerObjectiveTypeIsUnset() {
+        AbstractContract contract = contract();
+        // objectiveData itself is set, but its playerObjectiveType is null - the one null case getObjectiveType()
+        // actually tolerates; see usesSpecialRuleThrowsWhenObjectiveDataItselfIsNeverAssigned below for the case it
+        // does not.
+        contract.setObjectiveData(new ContractObjectiveData(null, ContractObjectiveType.GARRISON_DUTY));
+
+        assertFalse(contract.usesSpecialRule(ChaosObjectiveSpecialRules.SIMULATED_DAMAGE));
+    }
+
+    @Test
+    void usesSpecialRuleThrowsWhenObjectiveDataItselfIsNeverAssigned() {
+        // A freshly-constructed contract has a null objectiveData field (no default is assigned), so
+        // getObjectiveType() - which usesSpecialRule relies on - throws rather than returning null. This contradicts
+        // usesSpecialRule's own javadoc ("or the contract has no objective type assigned"), which is only true once
+        // setObjectiveData has been called at least once, even with a null playerObjectiveType.
+        AbstractContract contract = new ChaosContract();
+
+        assertThrows(NullPointerException.class,
+              () -> contract.usesSpecialRule(ChaosObjectiveSpecialRules.SIMULATED_DAMAGE));
+    }
+
+    // endregion usesSpecialRule
+
+    // region consecutive track result tally
+
+    @Test
+    void consecutiveTrackResultTallyStartsAtZero() {
+        assertEquals(0, new ChaosContract().getConsecutiveTrackResultTally());
+    }
+
+    @Test
+    void changeConsecutiveTrackResultTallyAccumulates() {
+        AbstractContract contract = contract();
+
+        contract.changeConsecutiveTrackResultTally(1);
+        contract.changeConsecutiveTrackResultTally(1);
+        contract.changeConsecutiveTrackResultTally(-1);
+
+        assertEquals(1, contract.getConsecutiveTrackResultTally());
+    }
+
+    @Test
+    void changeConsecutiveTrackResultTallyCanGoNegative() {
+        AbstractContract contract = contract();
+
+        contract.changeConsecutiveTrackResultTally(-1);
+        contract.changeConsecutiveTrackResultTally(-1);
+
+        assertEquals(-2, contract.getConsecutiveTrackResultTally());
+    }
+
+    @Test
+    void setConsecutiveTrackResultTallyOverwritesTheRunningTotal() {
+        AbstractContract contract = contract();
+        contract.changeConsecutiveTrackResultTally(5);
+
+        contract.setConsecutiveTrackResultTally(0);
+
+        assertEquals(0, contract.getConsecutiveTrackResultTally());
+    }
+
+    // endregion consecutive track result tally
+
+    // region withheld support payments
+
+    @Test
+    void withheldSupportPaymentsStartAtZero() {
+        assertTrue(new ChaosContract().getWithheldSupportPayments().isZero());
+    }
+
+    @Test
+    void changeWithheldSupportPaymentsAccumulates() {
+        AbstractContract contract = contract();
+
+        contract.changeWithheldSupportPayments(Money.of(500));
+        contract.changeWithheldSupportPayments(Money.of(250));
+
+        assertEquals(Money.of(750), contract.getWithheldSupportPayments());
+    }
+
+    @Test
+    void setWithheldSupportPaymentsOverwritesTheRunningTotal() {
+        AbstractContract contract = contract();
+        contract.changeWithheldSupportPayments(Money.of(500));
+
+        contract.setWithheldSupportPayments(Money.zero());
+
+        assertTrue(contract.getWithheldSupportPayments().isZero());
+    }
+
+    // endregion withheld support payments
 }

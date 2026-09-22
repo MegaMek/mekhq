@@ -33,24 +33,11 @@
 package mekhq.campaign.mission.contract.contractData;
 
 public enum ChaosObjectiveSpecialRules {
-    /* Player gets bonus loot after each track. */
-    USE_PIRATE_LOOTING,
-
-    /* Contract automatically ends once one side has achieved two consecutive victories */
-    END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS,
-
-    /* All costs are doubled */
-    DOUBLE_ALL_COSTS,
-
-    /* No support payments made until end of contract */
-    NO_IN_CONTRACT_SUPPORT,
-
-    /* All support payments doubled */
-    DOUBLE_SUPPORT_PAYOUTS,
-
-    /* All combat damaged removed at the end of each scenario */
-    SIMULATED_DAMAGE,
-
-    /* Combat pay is quartered */
-    REDUCED_COMBAT_PAY,
+    DOUBLE_ALL_COSTS /* All costs are doubled */,
+    DOUBLE_SUPPORT_PAYOUTS /* All support payments doubled */,
+    END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS /* Contract automatically ends once one side has achieved two consecutive victories */,
+    NO_IN_CONTRACT_SUPPORT /* No support payments made until end of contract */,
+    REDUCED_COMBAT_PAY /* Combat pay is quartered */,
+    SIMULATED_DAMAGE /* All combat damaged removed at the end of each scenario */,
+    USE_PIRATE_LOOTING /* Player gets bonus loot after each track. */
 }

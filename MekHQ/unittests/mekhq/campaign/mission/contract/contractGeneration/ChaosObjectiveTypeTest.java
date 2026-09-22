@@ -125,6 +125,15 @@ class ChaosObjectiveTypeTest {
     }
 
     @Test
+    void cadreDutyCarriesSimulatedDamageAndReducedCombatPay() {
+        assertTrue(ChaosObjectiveType.CADRE_DUTY.usesSpecialRule(ChaosObjectiveSpecialRules.SIMULATED_DAMAGE),
+              "cadre duty's combat damage is simulated, not real");
+        assertTrue(ChaosObjectiveType.CADRE_DUTY.usesSpecialRule(ChaosObjectiveSpecialRules.REDUCED_COMBAT_PAY),
+              "cadre duty pays only a quarter of the usual combat bonus");
+        assertFalse(ChaosObjectiveType.CADRE_DUTY.usesSpecialRule(ChaosObjectiveSpecialRules.DOUBLE_ALL_COSTS));
+    }
+
+    @Test
     void objectiveWithoutSpecialRulesHasNone() {
         assertTrue(ChaosObjectiveType.EXPEDITION.getSpecialRules().isEmpty(),
               "an expedition carries no special rules");
