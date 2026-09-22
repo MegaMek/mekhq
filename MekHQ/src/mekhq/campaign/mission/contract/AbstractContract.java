@@ -1077,6 +1077,19 @@ public abstract class AbstractContract {
         return (objectiveType != null) && objectiveType.getChaosObjectiveType().usesSpecialRule(specialRule);
     }
 
+    /**
+     * Lists the Chaos special rules carried by this contract's objective.
+     *
+     * @return the objective type's special rules, or an empty list when the contract has no objective type assigned
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<ChaosObjectiveSpecialRules> getSpecialRules() {
+        ContractObjectiveType objectiveType = getObjectiveType();
+        return (objectiveType == null) ? List.of() : objectiveType.getChaosObjectiveType().getSpecialRules();
+    }
+
     public @Nonnull Money getSalvagedByEmployerValue() {
         return salvagedByEmployerValue;
     }

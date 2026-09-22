@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.mission.contract.contractData;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 public enum ChaosObjectiveSpecialRules {
     DOUBLE_ALL_COSTS /* All costs are doubled */,
     DOUBLE_SUPPORT_PAYOUTS /* All support payments doubled */,
@@ -39,5 +41,35 @@ public enum ChaosObjectiveSpecialRules {
     NO_IN_CONTRACT_SUPPORT /* No support payments made until end of contract */,
     REDUCED_COMBAT_PAY /* Combat pay is quartered */,
     SIMULATED_DAMAGE /* All combat damaged removed at the end of each scenario */,
-    USE_PIRATE_LOOTING /* Player gets bonus loot after each track. */
+    USE_PIRATE_LOOTING /* Player gets bonus loot after each track. */;
+
+    private final static String RESOURCE_BUNDLE = "mekhq.resources.Mission";
+
+    private final String name;
+    private final String toolTipText;
+
+    ChaosObjectiveSpecialRules() {
+        this.name = getTextAt(RESOURCE_BUNDLE, "ChaosObjectiveSpecialRules." + name() + ".text");
+        this.toolTipText = getTextAt(RESOURCE_BUNDLE, "ChaosObjectiveSpecialRules." + name() + ".toolTipText");
+    }
+
+    /**
+     * @return the localized display name
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * @return the localized tooltip / description text
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String getToolTipText() {
+        return toolTipText;
+    }
 }
