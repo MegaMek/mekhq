@@ -785,8 +785,8 @@ public class Resupply {
      *     <li><b>Battle damage</b> - parts currently destroyed or missing on fielded units. Weighted most heavily, as
      *     each one is an immediate hole in a unit.</li>
      *     <li><b>Shopping list demand</b> - parts the player has explicitly queued to acquire.</li>
-     *     <li><b>Stock shortfall</b> - how far the on-hand and inbound supply falls below the auto-logistics target
-     *     stock level for the part.</li>
+     *     <li><b>Stock shortfall</b> - how far the on-hand, inbound, and on-order supply falls below the
+     *     auto-logistics target stock level for the part.</li>
      * </ul>
      *
      * <p>A minimum of 1 is always applied so that a fully-stocked, undamaged force still receives a representative
@@ -799,9 +799,10 @@ public class Resupply {
         int missingCount = partInUse.getMissingCount();
         int plannedCount = partInUse.getPlannedCount();
 
-        // Stock the player already holds or has inbound. The shopping list (planned) is treated as demand below
-        // rather than as supply, so it is deliberately excluded from this total.
-        int suppliedCount = partInUse.getStoreCount() + partInUse.getTransferCount();
+        // Stock the player already holds, has inbound, or has on order. This mirrors how auto-logistics measures
+        // inventory against its target, so a gap already on the shopping list is weighted once (as shopping-list
+        // demand below) rather than again as a shortfall.
+        int suppliedCount = partInUse.getStoreCount() + partInUse.getTransferCount() + plannedCount;
 
         // The auto-logistics target buffer for a fielded part, as a percentage of how many are in use.
         int targetStock = (int) Math.ceil(partInUse.getRequestedStock() / 100.0 * partInUse.getUseCount());
