@@ -55,11 +55,16 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.PointOfInterestParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorShapeProfile;
@@ -213,6 +218,10 @@ public class StratConContractInitializer {
             campaignState.addTrack(track);
         }
 
+        // Points of interest placed now count their lifespans from the day the contract starts, not the day it is
+        // signed - otherwise travel time could expire them before the player ever arrives.
+        LocalDate pointOfInterestPlacementDate = getPointOfInterestPlacementDate(contract, campaign.getLocalDate());
+
         // now seed the tracks with objectives and facilities
         if (!isUseMaplessMode) {
             for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
@@ -246,6 +255,13 @@ public class StratConContractInitializer {
                                   ForceAlignment.Opposing,
                                   true,
                                   objectiveParams.objectiveScenarioModifiers);
+                            break;
+                        case PointOfInterest:
+                            initializeTrackPointsOfInterest(campaignState.getTrack(x),
+                                  numObjects,
+                                  objectiveParams.getObjectivePointsOfInterest(),
+                                  true,
+                                  pointOfInterestPlacementDate);
                             break;
                         case AnyScenarioVictory:
                             // set up a "win X scenarios" objective
@@ -316,6 +332,23 @@ public class StratConContractInitializer {
                       ForceAlignment.Opposing,
                       false,
                       Collections.emptyList());
+            }
+
+            // non-objective points of interest
+            for (PointOfInterestParameters pointOfInterestParameters : contractDefinition.getPointsOfInterest()) {
+                int pointOfInterestCount = pointOfInterestParameters.getCount() > 0 ?
+                                                 (int) pointOfInterestParameters.getCount() :
+                                                 (int) (-pointOfInterestParameters.getCount() * contract.getScale());
+
+                trackObjects = trackObjectDistribution(pointOfInterestCount, campaignState.getTrackCount());
+
+                for (int x = 0; x < trackObjects.size(); x++) {
+                    initializeTrackPointsOfInterest(campaignState.getTrack(x),
+                          trackObjects.get(x),
+                          List.of(pointOfInterestParameters.getTypeId()),
+                          false,
+                          pointOfInterestPlacementDate);
+                }
             }
         }
 
@@ -525,20 +558,32 @@ public class StratConContractInitializer {
     /**
      * What a proposed resize would disturb, so a GM can be told before anything is moved.
      *
-     * @param facilities how many facilities would be displaced back inside the sector
-     * @param scenarios  how many scenarios would be displaced back inside the sector
-     * @param objectives how many strategic objectives sit on the ground being cut away
-     * @param forces     how many deployed forces would be recalled
-     * @param freeHexes  how many hexes inside the new bounds are free to receive a displaced occupant
+     * @param facilities                how many facilities would be displaced back inside the sector
+     * @param scenarios                 how many scenarios would be displaced back inside the sector
+     * @param pointsOfInterest          how many points of interest would be displaced back inside the sector
+     * @param occupyingPointsOfInterest how many of those points of interest occupy their hex, and so need a free hex
+     *                                  of their own
+     * @param objectives                how many strategic objectives sit on the ground being cut away
+     * @param forces                    how many deployed forces would be recalled
+     * @param freeHexes                 how many hexes inside the new bounds are free to receive a displaced occupant
      */
-    public record ResizeImpact(int facilities, int scenarios, int objectives, int forces, int freeHexes) {
+    public record ResizeImpact(int facilities, int scenarios, int pointsOfInterest, int occupyingPointsOfInterest,
+          int objectives, int forces, int freeHexes) {
         public boolean isEmpty() {
-            return (facilities == 0) && (scenarios == 0) && (objectives == 0) && (forces == 0);
+            return (facilities == 0) &&
+                         (scenarios == 0) &&
+                         (pointsOfInterest == 0) &&
+                         (objectives == 0) &&
+                         (forces == 0);
         }
 
-        /** @return how many facilities and scenarios would have to be found a new hex inside the sector. */
+        /**
+         * @return how many facilities, scenarios, and occupying points of interest would have to be found a free hex
+         *       inside the sector. Points of interest that do not occupy their hex can share one, so they are not
+         *       counted.
+         */
         public int displacedOccupants() {
-            return facilities + scenarios;
+            return facilities + scenarios + occupyingPointsOfInterest;
         }
 
         /**
@@ -563,6 +608,8 @@ public class StratConContractInitializer {
     public static ResizeImpact previewResize(StratConTrackState track, int newWidth, int newHeight) {
         int facilities = 0;
         int scenarios = 0;
+        int pointsOfInterest = 0;
+        int occupyingPointsOfInterest = 0;
         int objectives = 0;
         int forces = 0;
 
@@ -574,6 +621,14 @@ public class StratConContractInitializer {
         for (StratConCoords coords : track.getScenarios().keySet()) {
             if (isOutside(coords, newWidth, newHeight)) {
                 scenarios++;
+            }
+        }
+        for (StratConPointOfInterest pointOfInterest : track.getPointsOfInterest()) {
+            if ((pointOfInterest.getCoords() != null) && isOutside(pointOfInterest.getCoords(), newWidth, newHeight)) {
+                pointsOfInterest++;
+                if (pointOfInterest.occupiesHex()) {
+                    occupyingPointsOfInterest++;
+                }
             }
         }
         for (StratConStrategicObjective objective : track.getStrategicObjectives()) {
@@ -588,13 +643,20 @@ public class StratConContractInitializer {
             }
         }
 
-        return new ResizeImpact(facilities, scenarios, objectives, forces, freeHexes(track, newWidth, newHeight));
+        return new ResizeImpact(facilities,
+              scenarios,
+              pointsOfInterest,
+              occupyingPointsOfInterest,
+              objectives,
+              forces,
+              freeHexes(track, newWidth, newHeight));
     }
 
     /**
      * Counts the hexes that would still be able to take a relocated occupant at the proposed size, mirroring what
-     * {@link #getUnoccupiedCoords(StratConTrackState)} considers eligible: dry land, holding no scenario, no facility,
-     * and no deployed force. Anything already inside the new bounds keeps its hex, so it is counted as taken.
+     * {@link #getUnoccupiedCoords(StratConTrackState)} considers eligible: dry land that is not occupied (see
+     * {@link StratConTrackState#isHexOccupied}) and holds no deployed force. Anything already inside the new bounds
+     * keeps its hex, so it is counted as taken.
      */
     private static int freeHexes(StratConTrackState track, int newWidth, int newHeight) {
         Collection<StratConCoords> forceCoords = track.getAssignedForceCoords().values();
@@ -604,8 +666,7 @@ public class StratConContractInitializer {
             for (int y = 0; y < newHeight; y++) {
                 StratConCoords coords = new StratConCoords(x, y);
                 boolean available = !StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords)) &&
-                                          (track.getScenario(coords) == null) &&
-                                          (track.getFacility(coords) == null) &&
+                                          !track.isHexOccupied(coords) &&
                                           !forceCoords.contains(coords);
                 if (available) {
                     free++;
@@ -624,8 +685,9 @@ public class StratConContractInitializer {
      * room at the left or top would silently rewire the whole map's adjacency and tear apart coastlines, ranges, and
      * roads. Growing at the far edges leaves every existing hex on its original coordinates.</p>
      *
-     * <p>Ground outside the new bounds is discarded, but its occupants are not: facilities and scenarios are moved
-     * back inside (with their strategic objectives), and any force left standing outside is recalled. Call
+     * <p>Ground outside the new bounds is discarded, but its occupants are not: facilities, scenarios, and points of
+     * interest are moved back inside (with their strategic objectives), and any force left standing outside is
+     * recalled. Call
      * {@link #previewResize} first so the GM knows what is about to move.</p>
      *
      * @param track     the track to resize
@@ -656,8 +718,9 @@ public class StratConContractInitializer {
 
     /**
      * Moves a sector's bounds and puts its occupants back inside: ground outside the new bounds is discarded, but
-     * facilities and scenarios are relocated (carrying their strategic objectives and any forces deployed to them), and
-     * a force left standing off the map is recalled.
+     * facilities, scenarios, and occupying points of interest are relocated to free hexes (carrying their strategic
+     * objectives and any forces deployed to them), points of interest that do not occupy their hex are pulled in to the
+     * nearest edge, and a force left standing off the map is recalled.
      *
      * <p>Callers must check {@link #previewResize} first - this assumes the sector can hold what it is about to
      * displace.</p>
@@ -666,13 +729,25 @@ public class StratConContractInitializer {
         // Note who is about to be left outside before the bounds move, so they can be re-homed afterward.
         List<StratConCoords> displacedFacilities = outsideCoords(track.getFacilities().keySet(), width, height);
         List<StratConCoords> displacedScenarios = outsideCoords(track.getScenarios().keySet(), width, height);
+        List<StratConCoords> displacedOccupyingPointsOfInterest = outsideCoords(occupyingPointOfInterestCoords(track),
+              width,
+              height);
+        List<StratConPointOfInterest> displacedNonOccupyingPointsOfInterest = new ArrayList<>();
+        for (StratConPointOfInterest pointOfInterest : track.getPointsOfInterest()) {
+            StratConCoords coords = pointOfInterest.getCoords();
+            if (!pointOfInterest.occupiesHex() && (coords != null) && isOutside(coords, width, height)) {
+                displacedNonOccupyingPointsOfInterest.add(pointOfInterest);
+            }
+        }
 
         track.setWidth(width);
         track.setHeight(height);
         track.trimToBounds();
 
-        for (StratConCoords source : occupiedCoords(displacedFacilities, displacedScenarios)) {
-            StratConCoords destination = getUnoccupiedCoords(track);
+        for (StratConCoords source : occupiedCoords(displacedFacilities,
+              displacedScenarios,
+              displacedOccupyingPointsOfInterest)) {
+            StratConCoords destination = findRelocationCoords(track, source);
             if (destination == null) {
                 // The capacity check above should have prevented this; drop the occupant rather than strand it outside
                 // the sector, where it would be invisible and unreachable but still counted.
@@ -686,13 +761,126 @@ public class StratConContractInitializer {
             relocateOccupant(track, source, destination);
         }
 
+        pullInNonOccupyingPointsOfInterest(track, displacedNonOccupyingPointsOfInterest);
+
         // Forces left standing on ground that no longer exists are recalled.
         recallForcesOutsideBounds(track);
     }
 
     /**
-     * Collects the distinct hexes holding a displaced facility or scenario, facility hexes first, so that a hex shared
-     * by both is visited once.
+     * Brings points of interest that do not occupy their hex back inside a shrunken sector, onto the nearest hex at its
+     * new edge. They need no free hex of their own, so they are not scattered the way occupants are - but they are not
+     * discarded with the ground either, since any of them may carry a strategic objective.
+     *
+     * <p>If that edge hex breaks the type's placement rules (see {@link StratConPointOfInterestPlacer#canPlace}), the
+     * point of interest goes to a random hex that keeps them instead. Failing that, it stays on the edge hex - unless
+     * it is land-only and that hex is ocean, in which case it goes to any free dry hex, and is removed only if the
+     * sector has none.</p>
+     *
+     * @param track            the sector, already at its new bounds
+     * @param pointsOfInterest the points of interest left outside those bounds
+     */
+    private static void pullInNonOccupyingPointsOfInterest(StratConTrackState track,
+          List<StratConPointOfInterest> pointsOfInterest) {
+        for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {
+            StratConCoords coords = pointOfInterest.getCoords();
+            StratConCoords edgeCoords = new StratConCoords(min(coords.getX(), track.getWidth() - 1),
+                  min(coords.getY(), track.getHeight() - 1));
+            StratConCoords destination = edgeCoords;
+
+            StratConPointOfInterestDefinition definition = pointOfInterest.getDefinition();
+            if ((definition != null) && !StratConPointOfInterestPlacer.canPlace(track, definition, edgeCoords)) {
+                StratConCoords eligibleCoords = StratConPointOfInterestPlacer.findPlacementCoords(track, definition);
+                if (eligibleCoords != null) {
+                    destination = eligibleCoords;
+                } else if (isLandOnly(pointOfInterest) &&
+                                 StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(edgeCoords))) {
+                    destination = getUnoccupiedCoords(track);
+                }
+            }
+
+            if ((destination == null) || !track.movePointOfInterest(pointOfInterest.getId(), destination)) {
+                LOGGER.warn("No room to relocate point of interest {} on track {}; removing it.",
+                      pointOfInterest,
+                      track.getDisplayableName());
+                dropPointOfInterest(track, pointOfInterest);
+            }
+        }
+    }
+
+    /**
+     * Picks where to relocate the occupant of {@code source}. A point of interest that occupies the hex is sent to a
+     * hex its type's placement rules allow (see {@link StratConPointOfInterestPlacer#findPlacementCoords}), kept on
+     * dry land if a facility or scenario shares the hex and moves with it; anything else, or a point of interest with
+     * no such hex, goes to any free dry hex.
+     *
+     * @param track  the sector
+     * @param source the hex whose occupant is moving
+     *
+     * @return the hex to move it to, or {@code null} if there is none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nullable StratConCoords findRelocationCoords(StratConTrackState track, StratConCoords source) {
+        StratConPointOfInterest occupyingPointOfInterest = track.getOccupyingPointOfInterest(source);
+        StratConPointOfInterestDefinition definition = (occupyingPointOfInterest == null) ?
+                                                             null :
+                                                             occupyingPointOfInterest.getDefinition();
+
+        if (definition != null) {
+            StratConCoords eligibleCoords = StratConPointOfInterestPlacer.findPlacementCoords(track, definition);
+            boolean sharedWithFacilityOrScenario = (track.getFacility(source) != null) ||
+                                                         (track.getScenario(source) != null);
+            boolean eligibleCoordsAreOcean = (eligibleCoords != null) &&
+                                                   StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(
+                                                         eligibleCoords));
+
+            if ((eligibleCoords != null) && !(sharedWithFacilityOrScenario && eligibleCoordsAreOcean)) {
+                return eligibleCoords;
+            }
+        }
+
+        return getUnoccupiedCoords(track);
+    }
+
+    /**
+     * Removes a point of interest that no hex can receive, along with any strategic objective tied to it - as a
+     * facility that cannot be relocated takes its objective with it - so nothing is left pointing at a point of
+     * interest that is gone.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void dropPointOfInterest(StratConTrackState track, StratConPointOfInterest pointOfInterest) {
+        track.getStrategicObjectives()
+              .removeAll(StratConPointOfInterestRules.getStrategicObjectives(track, pointOfInterest));
+        track.removePointOfInterest(pointOfInterest.getId());
+    }
+
+    /** @return the hexes of every point of interest in the sector that occupies its hex. */
+    private static List<StratConCoords> occupyingPointOfInterestCoords(StratConTrackState track) {
+        List<StratConCoords> coords = new ArrayList<>();
+        for (StratConPointOfInterest pointOfInterest : track.getPointsOfInterest()) {
+            if ((pointOfInterest.getCoords() != null) && pointOfInterest.occupiesHex()) {
+                coords.add(pointOfInterest.getCoords());
+            }
+        }
+        return coords;
+    }
+
+    /**
+     * @return {@code true} if the point of interest's definition keeps it off water; one whose type is no longer
+     *       defined is not held to it
+     */
+    private static boolean isLandOnly(StratConPointOfInterest pointOfInterest) {
+        StratConPointOfInterestDefinition definition = pointOfInterest.getDefinition();
+        return (definition != null) && definition.isLandOnly();
+    }
+
+    /**
+     * Collects the distinct hexes holding a displaced facility, scenario, or occupying point of interest, facility
+     * hexes first, so that a hex shared by more than one is visited once.
      *
      * <p>A facility scenario is created on its facility's coordinates, and later completion, capture, or destruction
      * resolves the facility by looking it up from the scenario's coordinates. Relocating the facility and the scenario
@@ -700,18 +888,34 @@ public class StratConContractInitializer {
      * the two must move together, as one occupant of a single hex.</p>
      */
     private static Collection<StratConCoords> occupiedCoords(Collection<StratConCoords> facilityCoords,
-          Collection<StratConCoords> scenarioCoords) {
+          Collection<StratConCoords> scenarioCoords, Collection<StratConCoords> pointOfInterestCoords) {
         Set<StratConCoords> coords = new LinkedHashSet<>(facilityCoords);
         coords.addAll(scenarioCoords);
+        coords.addAll(pointOfInterestCoords);
         return coords;
     }
 
     /**
-     * Moves everything sitting on {@code source} - a facility, a scenario, or the facility scenario that is both - to
-     * {@code destination} as one occupant, carrying its strategic objective and any forces deployed to it. This keeps a
-     * facility and its co-located scenario on the same hex, which their capture and destruction rules depend on.
+     * Moves everything sitting on {@code source} - a facility, a scenario, the facility scenario that is both, or a
+     * point of interest that occupies its hex - to {@code destination} as one occupant, carrying its strategic
+     * objective and any forces deployed to it. This keeps a facility and its co-located scenario on the same hex, which
+     * their capture and destruction rules depend on.
+     *
+     * <p>Points of interest that do not occupy their hex stay where they are: they belong to the ground, not to the
+     * occupant.</p>
      */
     private static void relocateOccupant(StratConTrackState track, StratConCoords source, StratConCoords destination) {
+        // Move an occupying point of interest first: once a facility or scenario lands on the destination, that hex
+        // counts as occupied and the point of interest would be refused.
+        StratConPointOfInterest occupyingPointOfInterest = track.getOccupyingPointOfInterest(source);
+        if ((occupyingPointOfInterest != null) &&
+                  !track.movePointOfInterest(occupyingPointOfInterest.getId(), destination)) {
+            LOGGER.warn("Could not relocate point of interest {} to {} on track {}.",
+                  occupyingPointOfInterest,
+                  destination,
+                  track.getDisplayableName());
+        }
+
         StratConFacility facility = track.getFacility(source);
         if (facility != null) {
             track.removeFacility(source);
@@ -730,12 +934,18 @@ public class StratConContractInitializer {
     }
 
     /**
-     * Removes whatever occupies {@code source} - facility, scenario, and its strategic objective - when no free hex can
-     * receive it.
+     * Removes whatever occupies {@code source} - facility, scenario, occupying point of interest, and its strategic
+     * objective - when no free hex can receive it.
      */
     private static void dropOccupant(StratConTrackState track, StratConCoords source) {
         track.removeFacility(source);
         track.getScenarios().remove(source);
+
+        StratConPointOfInterest occupyingPointOfInterest = track.getOccupyingPointOfInterest(source);
+        if (occupyingPointOfInterest != null) {
+            dropPointOfInterest(track, occupyingPointOfInterest);
+        }
+
         removeObjectiveAt(track, source);
     }
 
@@ -894,18 +1104,20 @@ public class StratConContractInitializer {
     }
 
     /**
-     * Moves any facility or scenario that a regeneration left sitting on an ocean hex to a fresh, non-ocean unoccupied
-     * hex, carrying any strategic-objective marker along with it. Occupants are left in place if the sector has no free
-     * land to receive them.
+     * Moves any facility, scenario, or occupying point of interest that a regeneration left sitting on an ocean hex to
+     * a fresh, non-ocean unoccupied hex, carrying any strategic-objective marker along with it. Land-only points of
+     * interest that do not occupy their hex are moved ashore the same way; any others stay put, since they can sit on
+     * water. Everything is left in place if the sector has no free land to receive it.
      *
      * @param track the freshly regenerated track to clean up
      */
     private static void relocateOccupantsOffOcean(StratConTrackState track) {
         List<StratConCoords> floodedFacilities = floodedCoords(track, track.getFacilities().keySet());
         List<StratConCoords> floodedScenarios = floodedCoords(track, track.getScenarios().keySet());
+        List<StratConCoords> floodedPointsOfInterest = floodedCoords(track, occupyingPointOfInterestCoords(track));
 
-        for (StratConCoords source : occupiedCoords(floodedFacilities, floodedScenarios)) {
-            StratConCoords destination = getUnoccupiedCoords(track);
+        for (StratConCoords source : occupiedCoords(floodedFacilities, floodedScenarios, floodedPointsOfInterest)) {
+            StratConCoords destination = findRelocationCoords(track, source);
             if (destination == null) {
                 // No dry land left to receive it; leave the occupant where it is rather than destroy it.
                 break;
@@ -914,8 +1126,44 @@ public class StratConContractInitializer {
             relocateOccupant(track, source, destination);
         }
 
+        relocateLandOnlyPointsOfInterestOffOcean(track);
+
         // A force standing on ground that just flooded, with no facility or scenario to carry it ashore, is recalled.
         recallForcesOnOcean(track);
+    }
+
+    /**
+     * Moves every land-only point of interest that does not occupy its hex, and that a terrain change has left on
+     * ocean, to dry land: a hex its type's placement rules allow if there is one, else any free dry hex. Left in place
+     * if the sector has no dry land to receive it.
+     */
+    private static void relocateLandOnlyPointsOfInterestOffOcean(StratConTrackState track) {
+        List<StratConPointOfInterest> floodedPointsOfInterest = new ArrayList<>();
+        for (StratConPointOfInterest pointOfInterest : track.getPointsOfInterest()) {
+            StratConCoords coords = pointOfInterest.getCoords();
+            if (!pointOfInterest.occupiesHex() &&
+                      (coords != null) &&
+                      isLandOnly(pointOfInterest) &&
+                      StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+                floodedPointsOfInterest.add(pointOfInterest);
+            }
+        }
+
+        for (StratConPointOfInterest pointOfInterest : floodedPointsOfInterest) {
+            // Prefer a hex its type's placement rules allow; it needs no free hex of its own, only dry land.
+            StratConCoords destination = StratConPointOfInterestPlacer.findPlacementCoords(track,
+                  pointOfInterest.getDefinition());
+            if (destination == null) {
+                destination = getUnoccupiedCoords(track);
+            }
+
+            if (destination == null) {
+                // No dry land left to receive it; leave it where it is rather than destroy it.
+                continue;
+            }
+
+            track.movePointOfInterest(pointOfInterest.getId(), destination);
+        }
     }
 
     /** @return those of the given occupant hexes that a terrain change has left sitting on ocean. */
@@ -1144,7 +1392,7 @@ public class StratConContractInitializer {
 
         for (int fCount = 0; fCount < numFacilities; fCount++) {
             // Stop deliberately at capacity rather than running on until placement happens to fail.
-            if ((trackState.getFacilities().size() + trackState.getScenarios().size()) >= capacity) {
+            if (trackState.getOccupiedHexCount() >= capacity) {
                 break;
             }
 
@@ -1190,6 +1438,78 @@ public class StratConContractInitializer {
                   placed,
                   numFacilities,
                   owner);
+        }
+    }
+
+    /**
+     * The date points of interest placed at contract start count their lifespans from: the contract's start date, or
+     * today if the contract has no start date yet or has already started.
+     *
+     * @param contract the contract being set up
+     * @param today    the current campaign date
+     *
+     * @return the date to count lifespans from
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the date rule can be tested without standing up a whole contract.
+    static LocalDate getPointOfInterestPlacementDate(AbstractContract contract, LocalDate today) {
+        LocalDate startDate = contract.getStartDate();
+        return ((startDate != null) && startDate.isAfter(today)) ? startDate : today;
+    }
+
+    /**
+     * Places points of interest in a sector at contract start, each of a type drawn at random from the given type IDs
+     * and on an eligible hex chosen at random (see {@link StratConPointOfInterestPlacer}). A point of interest with
+     * nowhere eligible to go is skipped and logged, rather than stopping the rest.
+     *
+     * @param trackState         the sector to place them in
+     * @param count              how many to place
+     * @param typeIds            the point of interest type IDs to choose from
+     * @param strategicObjective whether each one is also made a strategic objective of the sector
+     * @param today              the date lifespans are counted from (see {@link #getPointOfInterestPlacementDate})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so placement can be tested without standing up a whole contract.
+    static void initializeTrackPointsOfInterest(StratConTrackState trackState, int count, List<String> typeIds,
+          boolean strategicObjective, LocalDate today) {
+        if (count <= 0) {
+            return;
+        }
+
+        if (typeIds.isEmpty()) {
+            LOGGER.warn("Sector {} was asked for {} points of interest but given no types to choose from.",
+                  trackState.getDisplayableName(),
+                  count);
+            return;
+        }
+
+        int placed = 0;
+        for (int pointOfInterestIndex = 0; pointOfInterestIndex < count; pointOfInterestIndex++) {
+            String typeId = typeIds.get(Compute.randomInt(typeIds.size()));
+            StratConPointOfInterest pointOfInterest = strategicObjective ?
+                                                            StratConPointOfInterestPlacer.placeAsStrategicObjective(
+                                                                  trackState,
+                                                                  typeId,
+                                                                  null,
+                                                                  today) :
+                                                            StratConPointOfInterestPlacer.place(trackState,
+                                                                  typeId,
+                                                                  null,
+                                                                  today);
+            if (pointOfInterest != null) {
+                placed++;
+            }
+        }
+
+        if (placed < count) {
+            LOGGER.info("Sector {} had room for {} of {} points of interest.",
+                  trackState.getDisplayableName(),
+                  placed,
+                  count);
         }
     }
 
@@ -1320,7 +1640,7 @@ public class StratConContractInitializer {
 
         for (int sCount = 0; sCount < numScenarios; sCount++) {
             // if there's no possible empty places to put down a new scenario, then move on
-            if ((trackState.getFacilities().size() + trackState.getScenarios().size()) >= trackSize) {
+            if (trackState.getOccupiedHexCount() >= trackSize) {
                 break;
             }
 
@@ -1425,6 +1745,7 @@ public class StratConContractInitializer {
      * <p>A coordinate is considered suitable when all the following are true:</p>
      * <ul>
      *     <li>There is <b>no active scenario</b> at that coordinate.</li>
+     *     <li>There is <b>no point of interest that occupies</b> that coordinate.</li>
      *     <li>The coordinate does <b>not</b> contain player-assigned forces, unless {@code
      *     allowPlayerForces} is {@code true}.</li>
      *     <li>The coordinate either contains no facility, or contains an <b>allied facility</b> and
@@ -1474,6 +1795,11 @@ public class StratConContractInitializer {
                 }
 
                 if (trackState.getScenario(coords) != null) {
+                    continue;
+                }
+
+                // A point of interest that occupies its hex keeps scenarios and facilities off it.
+                if (trackState.getOccupyingPointOfInterest(coords) != null) {
                     continue;
                 }
 

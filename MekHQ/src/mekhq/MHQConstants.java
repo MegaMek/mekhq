@@ -407,6 +407,9 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRAT_CON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.json";
     public static final String STRAT_CON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.json";
     public static final String STRAT_CON_FACILITY_PATH = "./data/stratconfacilities/";
+    public static final String STRAT_CON_POINT_OF_INTEREST_MANIFEST = "./data/stratconpointsofinterest/pointofinterestmanifest.json";
+    public static final String STRAT_CON_USER_POINT_OF_INTEREST_MANIFEST = "./data/stratconpointsofinterest/userpointofinterestmanifest.json";
+    public static final String STRAT_CON_POINT_OF_INTEREST_PATH = "./data/stratconpointsofinterest/";
     public static final String STRAT_CON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.json";
     public static final String STRAT_CON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.json";
     public static final String STRAT_CON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";

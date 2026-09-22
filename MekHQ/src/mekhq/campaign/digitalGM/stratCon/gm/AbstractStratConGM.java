@@ -45,6 +45,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.ImprovedStratConSectorGeneration;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LegacyStratConSectorGeneration;
 import mekhq.campaign.digitalGM.stratCon.strategy.NoOpFacilityStrategy;
@@ -217,6 +218,8 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 // map-based play applies facility effects here; Mapless/Singles supply a no-op strategy
                 getFacilityStrategy().applyPeriodicEffects(track, campaignState, isStartOfMonth);
 
+                processPointsOfInterest(track, campaign);
+
                 // loop through scenarios - if we haven't deployed in time,
                 // fail it and apply consequences
                 for (StratConScenario scenario : List.copyOf(track.getScenarios().values())) {
@@ -263,6 +266,21 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 }
             }
         }
+    }
+
+    /**
+     * Runs the daily point of interest step for a track: expiring those whose date has come and giving the rest their
+     * daily hook (see {@link StratConPointOfInterestRules#processNewDay}). Mapless play places no points of interest,
+     * so this finds nothing to do there; a GM may still override it to change or skip the step.
+     *
+     * @param track    the track to process
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected void processPointsOfInterest(StratConTrackState track, Campaign campaign) {
+        StratConPointOfInterestRules.processNewDay(track, campaign);
     }
 
     /**

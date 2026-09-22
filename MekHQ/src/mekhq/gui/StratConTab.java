@@ -68,9 +68,11 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConStrategicObjective;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.events.GMModeEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.StratConDeploymentEvent;
@@ -766,6 +768,39 @@ public class StratConTab extends CampaignGuiTab {
     }
 
     /**
+     * Describes a point of interest objective for the objectives list. A point of interest the player cannot see yet
+     * is not named; one they can see is described by its type's behavior, falling back to "Investigate [name]".
+     *
+     * @param pointOfInterest the point of interest the objective is tied to, or {@code null} if it is gone
+     * @param track           the sector it sits in
+     * @param visible         whether the player can see it (the phrase then starts the sentence)
+     *
+     * @return the objective phrase
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private String pointOfInterestObjectivePhrase(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+          boolean visible) {
+        if (pointOfInterest == null) {
+            return getTextAt(RESOURCE_BUNDLE, "stratConTab.objectives.pointOfInterest.gone");
+        }
+
+        if (!visible) {
+            return objectivePhrase("stratConTab.objectives.pointOfInterest.unknown", false);
+        }
+
+        String description = pointOfInterest.getBehavior().getObjectiveDescription(pointOfInterest, track);
+        if (description != null) {
+            return description;
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "stratConTab.objectives.pointOfInterest",
+              pointOfInterest.getDisplayableName());
+    }
+
+    /**
      * Builds the detailed strategic objective list for a single sector (track). Only objectives belonging to that
      * sector are shown; the contract-wide Turning Point / Victory Point reminder is intentionally not included here.
      */
@@ -779,8 +814,20 @@ public class StratConTab extends CampaignGuiTab {
         // if allied facility "maintain control of [facility name]"
         // if revealed, " on track [current track] at coordinates [coords]
         for (StratConStrategicObjective objective : track.getStrategicObjectives()) {
-            boolean coordsRevealed = track.getRevealedCoords().contains(objective.getObjectiveCoords());
-            boolean displayCoordinateData = objective.getObjectiveCoords() != null;
+            // A point of interest objective follows its point of interest rather than a fixed hex, and is "revealed"
+            // once the player can see that point of interest.
+            boolean pointOfInterestObjective = objective.getObjectiveType() == StrategicObjectiveType.PointOfInterest;
+            StratConPointOfInterest pointOfInterest = objective.getPointOfInterest(track);
+            StratConCoords objectiveLocation;
+            boolean coordsRevealed;
+            if (pointOfInterestObjective) {
+                objectiveLocation = (pointOfInterest == null) ? null : pointOfInterest.getCoords();
+                coordsRevealed = (pointOfInterest != null) && pointOfInterest.isVisibleToPlayer(track);
+            } else {
+                objectiveLocation = objective.getObjectiveCoords();
+                coordsRevealed = track.getRevealedCoords().contains(objectiveLocation);
+            }
+            boolean displayCoordinateData = objectiveLocation != null;
             boolean objectiveCompleted = objective.isObjectiveCompleted(track);
             boolean objectiveFailed = objective.isObjectiveFailed(track);
 
@@ -835,12 +882,15 @@ public class StratConTab extends CampaignGuiTab {
                           String.valueOf(objective.getDesiredObjectiveCount()),
                           track.getDisplayableName()));
                     break;
+                case PointOfInterest:
+                    sb.append(pointOfInterestObjectivePhrase(pointOfInterest, track, coordsRevealed));
+                    break;
                 default:
                     break;
             }
             if (coordsRevealed && displayCoordinateData) {
                 sb.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.objectives.location",
-                      objective.getObjectiveCoords().toBTString(), track.getDisplayableName()));
+                      objectiveLocation.toBTString(), track.getDisplayableName()));
             }
 
             sb.append("</span><br/>");

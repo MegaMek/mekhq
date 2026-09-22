@@ -149,7 +149,14 @@ public class StratConContractDefinition {
          * of hostile facilities They may either be destroyed or the player must have control of them at the
          * end-of-contract date
          */
-        FacilityDestruction
+        FacilityDestruction,
+
+        /**
+         * Dealing with a point of interest placed at contract start time, drawn from the "objectivePointsOfInterest"
+         * type IDs. What "dealing with" means is up to the point of interest's type: its behavior decides when the
+         * objective is met or has failed.
+         */
+        PointOfInterest
     }
 
     private String contractTypeName;
@@ -191,6 +198,12 @@ public class StratConContractDefinition {
      * sparingly.
      */
     private List<String> globalScenarioModifiers = new ArrayList<>();
+
+    /**
+     * Points of interest to place at contract start that are not strategic objectives. Points of interest that are
+     * objectives are placed from {@link ObjectiveParameters} instead.
+     */
+    private List<PointOfInterestParameters> pointsOfInterest = new ArrayList<>();
 
     private List<Integer> scenarioOdds;
 
@@ -318,6 +331,20 @@ public class StratConContractDefinition {
         return globalScenarioModifiers;
     }
 
+    /**
+     * @return the points of interest to place at contract start that are not strategic objectives; never {@code null}
+     */
+    public List<PointOfInterestParameters> getPointsOfInterest() {
+        if (pointsOfInterest == null) {
+            pointsOfInterest = new ArrayList<>();
+        }
+        return pointsOfInterest;
+    }
+
+    public void setPointsOfInterest(List<PointOfInterestParameters> pointsOfInterest) {
+        this.pointsOfInterest = pointsOfInterest;
+    }
+
     public void setGlobalScenarioModifiers(List<String> globalScenarioModifiers) {
         this.globalScenarioModifiers = globalScenarioModifiers;
     }
@@ -356,6 +383,14 @@ public class StratConContractDefinition {
         @XmlElement(name = "objectiveScenarioModifier")
         List<String> objectiveScenarioModifiers = new ArrayList<>();
 
+        /**
+         * Type IDs of the points of interest to choose from for this objective, one picked at random per objective.
+         * Used only by the {@link StrategicObjectiveType#PointOfInterest} objective type.
+         */
+        @XmlElementWrapper(name = "objectivePointsOfInterest")
+        @XmlElement(name = "objectivePointOfInterest")
+        List<String> objectivePointsOfInterest = new ArrayList<>();
+
         public StrategicObjectiveType getObjectiveType() {
             return objectiveType;
         }
@@ -380,9 +415,57 @@ public class StratConContractDefinition {
             return objectiveScenarioModifiers;
         }
 
+        /**
+         * @return the point of interest type IDs this objective draws from; never {@code null}
+         */
+        public List<String> getObjectivePointsOfInterest() {
+            if (objectivePointsOfInterest == null) {
+                objectivePointsOfInterest = new ArrayList<>();
+            }
+            return objectivePointsOfInterest;
+        }
+
         @Override
         public String toString() {
             return objectiveType + " (" + objectiveCount + ")";
+        }
+    }
+
+    /**
+     * How many points of interest of one type to place at contract start, outside the strategic objectives.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static class PointOfInterestParameters {
+        /** The type ID of the point of interest's definition. */
+        String typeId;
+
+        /**
+         * How many to place across the contract's sectors. 0 means none. A number less than zero indicates that the
+         * count should be scaled to the contract's size, and multiplied by that factor - as facility counts are.
+         */
+        double count;
+
+        public String getTypeId() {
+            return typeId;
+        }
+
+        public void setTypeId(String typeId) {
+            this.typeId = typeId;
+        }
+
+        public double getCount() {
+            return count;
+        }
+
+        public void setCount(double count) {
+            this.count = count;
+        }
+
+        @Override
+        public String toString() {
+            return typeId + " (" + count + ")";
         }
     }
 
