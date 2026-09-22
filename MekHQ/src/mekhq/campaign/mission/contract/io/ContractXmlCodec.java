@@ -123,6 +123,13 @@ public final class ContractXmlCodec {
                         .map(String::valueOf)
                         .collect(Collectors.joining(",")));
         }
+        if (!contract.getPointOfInterestSchedule().isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "pointOfInterestSchedule",
+                  contract.getPointOfInterestSchedule()
+                        .stream()
+                        .map(String::valueOf)
+                        .collect(Collectors.joining(",")));
+        }
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractNature", contract.getNature().name());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sharesPercent", contract.getSharesPercent());
         if (!contract.getObfuscatedIntel().isEmpty()) {
@@ -427,6 +434,9 @@ public final class ContractXmlCodec {
         readers.put("trackCount", (contract, node, campaign, version) -> contract.setTrackCount(parseInt(node)));
         readers.put("scenarioSchedule",
               (contract, node, campaign, version) -> contract.setScenarioSchedule(parseScenarioSchedule(node)));
+        // Same comma-separated per-month counts as the scenario schedule, so it shares that parser.
+        readers.put("pointOfInterestSchedule",
+              (contract, node, campaign, version) -> contract.setPointOfInterestSchedule(parseScenarioSchedule(node)));
         readers.put("contractNature",
               (contract, node, campaign, version) -> contract.setNature(ContractNature.fromString(text(node))));
         // Legacy: pre-ContractNature saves stored the designation as a standalone boolean flag.

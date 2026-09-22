@@ -65,6 +65,7 @@ import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorShapeProfile;
@@ -76,6 +77,7 @@ import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorShape;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
+import mekhq.campaign.mission.contract.contractGeneration.TrackIntensityTable;
 import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
@@ -218,10 +220,6 @@ public class StratConContractInitializer {
             campaignState.addTrack(track);
         }
 
-        // Points of interest placed now count their lifespans from the day the contract starts, not the day it is
-        // signed - otherwise travel time could expire them before the player ever arrives.
-        LocalDate pointOfInterestPlacementDate = getPointOfInterestPlacementDate(contract, campaign.getLocalDate());
-
         // now seed the tracks with objectives and facilities
         if (!isUseMaplessMode) {
             for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
@@ -257,11 +255,8 @@ public class StratConContractInitializer {
                                   objectiveParams.objectiveScenarioModifiers);
                             break;
                         case PointOfInterest:
-                            initializeTrackPointsOfInterest(campaignState.getTrack(x),
-                                  numObjects,
-                                  objectiveParams.getObjectivePointsOfInterest(),
-                                  true,
-                                  pointOfInterestPlacementDate);
+                            // Point of interest objectives are not placed up front either. They appear over the
+                            // contract's months on a schedule rolled below - see schedulePointsOfInterest.
                             break;
                         case AnyScenarioVictory:
                             // set up a "win X scenarios" objective
@@ -333,23 +328,6 @@ public class StratConContractInitializer {
                       false,
                       Collections.emptyList());
             }
-
-            // non-objective points of interest
-            for (PointOfInterestParameters pointOfInterestParameters : contractDefinition.getPointsOfInterest()) {
-                int pointOfInterestCount = pointOfInterestParameters.getCount() > 0 ?
-                                                 (int) pointOfInterestParameters.getCount() :
-                                                 (int) (-pointOfInterestParameters.getCount() * contract.getScale());
-
-                trackObjects = trackObjectDistribution(pointOfInterestCount, campaignState.getTrackCount());
-
-                for (int x = 0; x < trackObjects.size(); x++) {
-                    initializeTrackPointsOfInterest(campaignState.getTrack(x),
-                          trackObjects.get(x),
-                          List.of(pointOfInterestParameters.getTypeId()),
-                          false,
-                          pointOfInterestPlacementDate);
-                }
-            }
         }
 
         // Now that facilities exist, fold the planet-owner's facilities into each sector's road network via the GM's
@@ -360,9 +338,11 @@ public class StratConContractInitializer {
             }
         }
 
-        // Pre-roll the days on which each strategic-objective scenario appears over the contract's run.
+        // Pre-roll the days on which each strategic-objective scenario, and each point of interest, appears over the
+        // contract's run.
         if (!isUseMaplessMode) {
             scheduleStrategicScenarioSpawnDates(contract, campaignState);
+            schedulePointsOfInterest(contract, contractDefinition, campaignState);
         }
 
         // Required victory points depend on the StratCon state
@@ -398,10 +378,36 @@ public class StratConContractInitializer {
             return;
         }
 
-        int contractMonths = max(1, contract.getLengthInMonths());
+        for (LocalDate spawnDate : rollSpawnDates(startDate, schedule, contract.getLengthInMonths())) {
+            campaignState.addStrategicScenarioSpawnDate(spawnDate);
+        }
+    }
+
+    /**
+     * Turns a per-month schedule into calendar days: each item in a month gets an independent random day within that
+     * month's window, so items trickle in over the month rather than all landing on its first day.
+     *
+     * <p>Schedule entries at or beyond the contract's final month are folded into that final month's window, so a
+     * schedule longer than the contract still delivers every item (its tail lands in the last month); a schedule
+     * shorter than the contract simply leaves the later months empty.</p>
+     *
+     * @param startDate      the contract's start date, which opens its first month
+     * @param schedule       the per-month item counts
+     * @param lengthInMonths the contract's length in months
+     *
+     * @return one day per scheduled item, in schedule order
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the calendar rules can be tested directly.
+    static List<LocalDate> rollSpawnDates(LocalDate startDate, List<Integer> schedule, int lengthInMonths) {
+        List<LocalDate> spawnDates = new ArrayList<>();
+        int contractMonths = max(1, lengthInMonths);
+
         for (int entry = 0; entry < schedule.size(); entry++) {
-            int scenariosThisMonth = schedule.get(entry);
-            if (scenariosThisMonth <= 0) {
+            int itemsThisMonth = schedule.get(entry);
+            if (itemsThisMonth <= 0) {
                 continue;
             }
 
@@ -411,13 +417,181 @@ public class StratConContractInitializer {
             LocalDate windowEnd = startDate.plusMonths(month + 1L);
             int windowDays = (int) ChronoUnit.DAYS.between(windowStart, windowEnd);
 
-            for (int i = 0; i < scenariosThisMonth; i++) {
+            for (int item = 0; item < itemsThisMonth; item++) {
                 LocalDate spawnDate = (windowDays > 0) ?
                                             windowStart.plusDays(Compute.randomInt(windowDays)) :
                                             windowStart;
-                campaignState.addStrategicScenarioSpawnDate(spawnDate);
+                spawnDates.add(spawnDate);
             }
         }
+
+        return spawnDates;
+    }
+
+    /**
+     * Schedules every point of interest the contract definition asks for, both strategic objectives and ordinary ones,
+     * to appear over the contract's run instead of all at once - the way strategic-objective scenarios do.
+     *
+     * <p>The points of interest are spread across the contract's months by the Track Intensity Tables (see
+     * {@link TrackIntensityTable#rollScheduleForCount}); that per-month schedule is kept on the contract (see
+     * {@link AbstractContract#getPointOfInterestSchedule()}). Each month's points of interest then get random days
+     * within it (see {@link #rollSpawnDates}), and are stored on the campaign state for the daily StratCon lifecycle to
+     * place as their days come (see {@link #spawnScheduledPointOfInterest}). Which point of interest lands on which day
+     * is shuffled, so types are not bunched together.</p>
+     *
+     * <p>Does nothing if the contract asks for no points of interest, or has no settled start date.</p>
+     *
+     * @param contract           the contract being accepted
+     * @param contractDefinition its StratCon contract definition
+     * @param campaignState      the campaign state to store the scheduled points of interest on
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so scheduling can be tested without standing up a whole contract.
+    static void schedulePointsOfInterest(AbstractContract contract, StratConContractDefinition contractDefinition,
+          StratConCampaignState campaignState) {
+        List<StratConScheduledPointOfInterest> requestedPointsOfInterest =
+              getRequestedPointsOfInterest(contractDefinition, contract.getScale());
+        if (requestedPointsOfInterest.isEmpty()) {
+            return;
+        }
+
+        LocalDate startDate = contract.getStartDate();
+        if (startDate == null) {
+            LOGGER.warn("Contract {} has no start date, so its {} points of interest cannot be scheduled.",
+                  contract.getName(),
+                  requestedPointsOfInterest.size());
+            return;
+        }
+
+        List<Integer> schedule = TrackIntensityTable.rollScheduleForCount(contract.getLengthInMonths(),
+              requestedPointsOfInterest.size());
+        contract.setPointOfInterestSchedule(schedule);
+
+        List<LocalDate> spawnDates = rollSpawnDates(startDate, schedule, contract.getLengthInMonths());
+        Collections.shuffle(requestedPointsOfInterest);
+
+        int scheduledCount = min(requestedPointsOfInterest.size(), spawnDates.size());
+        for (int index = 0; index < scheduledCount; index++) {
+            StratConScheduledPointOfInterest scheduledPointOfInterest = requestedPointsOfInterest.get(index);
+            scheduledPointOfInterest.setSpawnDate(spawnDates.get(index));
+            campaignState.addScheduledPointOfInterest(scheduledPointOfInterest);
+        }
+    }
+
+    /**
+     * Lists every point of interest a contract definition asks for, without spawn dates: one per point of interest
+     * objective (its type drawn at random from that objective's {@code objectivePointsOfInterest}), and one per
+     * ordinary point of interest in its {@code pointsOfInterest}. Counts are worked out as the facility and objective
+     * counts are - a negative count is scaled by the contract's size.
+     *
+     * <p>An objective with no types to choose from, or an ordinary entry with no type, is skipped and logged.</p>
+     *
+     * @param contractDefinition the contract definition
+     * @param scale              the contract's scale
+     *
+     * @return the requested points of interest, in definition order
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the counting rules can be tested directly.
+    static List<StratConScheduledPointOfInterest> getRequestedPointsOfInterest(
+          StratConContractDefinition contractDefinition, int scale) {
+        List<StratConScheduledPointOfInterest> requestedPointsOfInterest = new ArrayList<>();
+
+        List<ObjectiveParameters> objectiveParameters = contractDefinition.getObjectiveParameters();
+        if (objectiveParameters != null) {
+            for (ObjectiveParameters objectiveParams : objectiveParameters) {
+                if (objectiveParams.getObjectiveType() != StrategicObjectiveType.PointOfInterest) {
+                    continue;
+                }
+
+                List<String> typeIds = objectiveParams.getObjectivePointsOfInterest();
+                if (typeIds.isEmpty()) {
+                    LOGGER.warn("A point of interest objective in contract definition {} lists no types; skipping it.",
+                          contractDefinition.getContractTypeName());
+                    continue;
+                }
+
+                // As for every other objective type, a scaled count never drops below one.
+                int objectiveCount = (objectiveParams.getObjectiveCount() > 0) ?
+                                           (int) objectiveParams.getObjectiveCount() :
+                                           (int) max(1, -objectiveParams.getObjectiveCount() * scale);
+
+                for (int objectiveIndex = 0; objectiveIndex < objectiveCount; objectiveIndex++) {
+                    String typeId = typeIds.get(Compute.randomInt(typeIds.size()));
+                    requestedPointsOfInterest.add(new StratConScheduledPointOfInterest(null, typeId, true));
+                }
+            }
+        }
+
+        for (PointOfInterestParameters pointOfInterestParameters : contractDefinition.getPointsOfInterest()) {
+            String typeId = pointOfInterestParameters.getTypeId();
+            if ((typeId == null) || typeId.isBlank()) {
+                LOGGER.warn("A point of interest entry in contract definition {} has no type; skipping it.",
+                      contractDefinition.getContractTypeName());
+                continue;
+            }
+
+            // As for non-objective facilities, a scaled count may round down to none.
+            int pointOfInterestCount = (pointOfInterestParameters.getCount() > 0) ?
+                                             (int) pointOfInterestParameters.getCount() :
+                                             (int) (-pointOfInterestParameters.getCount() * scale);
+
+            for (int pointOfInterestIndex = 0; pointOfInterestIndex < pointOfInterestCount; pointOfInterestIndex++) {
+                requestedPointsOfInterest.add(new StratConScheduledPointOfInterest(null, typeId, false));
+            }
+        }
+
+        return requestedPointsOfInterest;
+    }
+
+    /**
+     * Places a scheduled point of interest whose day has come, in one of the contract's sectors: tried in a random
+     * order until one has an eligible hex for it (see {@link StratConPointOfInterestPlacer}). Its lifespan counts from
+     * today. Does nothing in mapless mode, where there is no map to place it on.
+     *
+     * @param campaign                 the current campaign
+     * @param contract                 the contract the point of interest belongs to
+     * @param scheduledPointOfInterest the point of interest to place
+     *
+     * @return the placed point of interest, or {@code null} if no sector had room for it (logged) or there is no map
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConPointOfInterest spawnScheduledPointOfInterest(Campaign campaign,
+          AbstractContract contract, StratConScheduledPointOfInterest scheduledPointOfInterest) {
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        if ((campaignState == null) || campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+            return null;
+        }
+
+        List<StratConTrackState> tracks = new ArrayList<>(campaignState.getTracks());
+        Collections.shuffle(tracks);
+
+        for (StratConTrackState track : tracks) {
+            StratConPointOfInterest pointOfInterest = scheduledPointOfInterest.isStrategicObjective() ?
+                                                            StratConPointOfInterestPlacer.placeAsStrategicObjective(
+                                                                  track,
+                                                                  scheduledPointOfInterest.getTypeId(),
+                                                                  null,
+                                                                  campaign.getLocalDate()) :
+                                                            StratConPointOfInterestPlacer.place(track,
+                                                                  scheduledPointOfInterest.getTypeId(),
+                                                                  null,
+                                                                  campaign.getLocalDate());
+            if (pointOfInterest != null) {
+                return pointOfInterest;
+            }
+        }
+
+        LOGGER.info("No sector of contract {} had room for scheduled point of interest {}.",
+              contract.getName(),
+              scheduledPointOfInterest);
+        return null;
     }
 
     /**
@@ -1438,78 +1612,6 @@ public class StratConContractInitializer {
                   placed,
                   numFacilities,
                   owner);
-        }
-    }
-
-    /**
-     * The date points of interest placed at contract start count their lifespans from: the contract's start date, or
-     * today if the contract has no start date yet or has already started.
-     *
-     * @param contract the contract being set up
-     * @param today    the current campaign date
-     *
-     * @return the date to count lifespans from
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    // Package-private rather than private so the date rule can be tested without standing up a whole contract.
-    static LocalDate getPointOfInterestPlacementDate(AbstractContract contract, LocalDate today) {
-        LocalDate startDate = contract.getStartDate();
-        return ((startDate != null) && startDate.isAfter(today)) ? startDate : today;
-    }
-
-    /**
-     * Places points of interest in a sector at contract start, each of a type drawn at random from the given type IDs
-     * and on an eligible hex chosen at random (see {@link StratConPointOfInterestPlacer}). A point of interest with
-     * nowhere eligible to go is skipped and logged, rather than stopping the rest.
-     *
-     * @param trackState         the sector to place them in
-     * @param count              how many to place
-     * @param typeIds            the point of interest type IDs to choose from
-     * @param strategicObjective whether each one is also made a strategic objective of the sector
-     * @param today              the date lifespans are counted from (see {@link #getPointOfInterestPlacementDate})
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    // Package-private rather than private so placement can be tested without standing up a whole contract.
-    static void initializeTrackPointsOfInterest(StratConTrackState trackState, int count, List<String> typeIds,
-          boolean strategicObjective, LocalDate today) {
-        if (count <= 0) {
-            return;
-        }
-
-        if (typeIds.isEmpty()) {
-            LOGGER.warn("Sector {} was asked for {} points of interest but given no types to choose from.",
-                  trackState.getDisplayableName(),
-                  count);
-            return;
-        }
-
-        int placed = 0;
-        for (int pointOfInterestIndex = 0; pointOfInterestIndex < count; pointOfInterestIndex++) {
-            String typeId = typeIds.get(Compute.randomInt(typeIds.size()));
-            StratConPointOfInterest pointOfInterest = strategicObjective ?
-                                                            StratConPointOfInterestPlacer.placeAsStrategicObjective(
-                                                                  trackState,
-                                                                  typeId,
-                                                                  null,
-                                                                  today) :
-                                                            StratConPointOfInterestPlacer.place(trackState,
-                                                                  typeId,
-                                                                  null,
-                                                                  today);
-            if (pointOfInterest != null) {
-                placed++;
-            }
-        }
-
-        if (placed < count) {
-            LOGGER.info("Sector {} had room for {} of {} points of interest.",
-                  trackState.getDisplayableName(),
-                  placed,
-                  count);
         }
     }
 

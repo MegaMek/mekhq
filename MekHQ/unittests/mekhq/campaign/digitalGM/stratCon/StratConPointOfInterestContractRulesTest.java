@@ -35,18 +35,16 @@ package mekhq.campaign.digitalGM.stratCon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.PointOfInterestDeploymentOutcome;
-import mekhq.campaign.mission.contract.AbstractContract;
 import org.junit.jupiter.api.Test;
 
 /**
  * Tests for the contract-level rules points of interest feed into: whether a deployment rolls a random scenario, and
- * the date contract-start points of interest count their lifespans from.
+ * how a per-month schedule is spread across the calendar.
  *
  * @author Illiani
  * @since 0.51.01
@@ -111,25 +109,38 @@ class StratConPointOfInterestContractRulesTest {
         }
     }
 
-    // Contract-start placement date
+    // Spreading a schedule across the calendar
 
     @Test
-    void contractStartPointsOfInterestCountFromAFutureStartDate() {
-        AbstractContract contract = mock(AbstractContract.class);
-        when(contract.getStartDate()).thenReturn(TODAY.plusDays(30));
+    void eachScheduledItemGetsADayWithinItsMonth() {
+        List<Integer> schedule = List.of(2, 0, 3);
 
-        assertEquals(TODAY.plusDays(30),
-              StratConContractInitializer.getPointOfInterestPlacementDate(contract, TODAY));
+        List<LocalDate> spawnDates = StratConContractInitializer.rollSpawnDates(TODAY, schedule, 3);
+
+        assertEquals(5, spawnDates.size());
+        for (int index = 0; index < 2; index++) {
+            assertWithin(spawnDates.get(index), TODAY, TODAY.plusMonths(1));
+        }
+        for (int index = 2; index < 5; index++) {
+            assertWithin(spawnDates.get(index), TODAY.plusMonths(2), TODAY.plusMonths(3));
+        }
     }
 
     @Test
-    void contractStartPointsOfInterestCountFromTodayOtherwise() {
-        AbstractContract contract = mock(AbstractContract.class);
+    void scheduleMonthsPastTheContractFoldIntoItsLastMonth() {
+        // A six-month table schedule on a two-month contract: months three to six all land in month two.
+        List<Integer> schedule = List.of(0, 0, 1, 1, 1, 1);
 
-        when(contract.getStartDate()).thenReturn(null);
-        assertEquals(TODAY, StratConContractInitializer.getPointOfInterestPlacementDate(contract, TODAY));
+        List<LocalDate> spawnDates = StratConContractInitializer.rollSpawnDates(TODAY, schedule, 2);
 
-        when(contract.getStartDate()).thenReturn(TODAY.minusDays(3));
-        assertEquals(TODAY, StratConContractInitializer.getPointOfInterestPlacementDate(contract, TODAY));
+        assertEquals(4, spawnDates.size(), "nothing is dropped");
+        for (LocalDate spawnDate : spawnDates) {
+            assertWithin(spawnDate, TODAY.plusMonths(1), TODAY.plusMonths(2));
+        }
+    }
+
+    private static void assertWithin(LocalDate date, LocalDate windowStart, LocalDate windowEnd) {
+        assertFalse(date.isBefore(windowStart), date + " is before " + windowStart);
+        assertTrue(date.isBefore(windowEnd), date + " is not before " + windowEnd);
     }
 }

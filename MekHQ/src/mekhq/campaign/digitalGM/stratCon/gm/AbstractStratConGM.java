@@ -34,6 +34,7 @@ package mekhq.campaign.digitalGM.stratCon.gm;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
@@ -46,6 +47,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.ImprovedStratConSectorGeneration;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LegacyStratConSectorGeneration;
 import mekhq.campaign.digitalGM.stratCon.strategy.NoOpFacilityStrategy;
@@ -205,6 +207,9 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             // rather than all being placed at contract start.
             processScheduledStrategicScenarios(campaign, contract, campaignState, today);
 
+            // Points of interest likewise appear over the contract's run, on days rolled when it was accepted.
+            processScheduledPointsOfInterest(campaign, contract, campaignState, today);
+
             boolean hasAssignedSingleDropScenario = false;
             for (StratConTrackState track : campaignState.getTracks()) {
                 cleanupPhantomScenarios(track);
@@ -281,6 +286,41 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
      */
     protected void processPointsOfInterest(StratConTrackState track, Campaign campaign) {
         StratConPointOfInterestRules.processNewDay(track, campaign);
+    }
+
+    /**
+     * Places the points of interest whose scheduled day has arrived (scheduled by
+     * {@code StratConContractInitializer#schedulePointsOfInterest} when the contract was accepted). Every one due on or
+     * before today is placed and removed from the schedule, so a skipped day or a save loaded past a date still catches
+     * up.
+     *
+     * <p>Unlike strategic-objective scenarios, points of interest still appear while the enemy is routed: they are
+     * features of the ground, not attacks the enemy has to mount.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void processScheduledPointsOfInterest(Campaign campaign, AbstractContract contract,
+          StratConCampaignState campaignState, LocalDate today) {
+        List<StratConScheduledPointOfInterest> scheduledPointsOfInterest =
+              campaignState.getScheduledPointsOfInterest();
+        if (scheduledPointsOfInterest.isEmpty()) {
+            return;
+        }
+
+        List<StratConScheduledPointOfInterest> duePointsOfInterest = new ArrayList<>();
+        for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
+            if (scheduledPointOfInterest.isDue(today)) {
+                duePointsOfInterest.add(scheduledPointOfInterest);
+            }
+        }
+
+        // Consumed whatever happens, so a point of interest with nowhere to go is not retried every day.
+        scheduledPointsOfInterest.removeAll(duePointsOfInterest);
+
+        for (StratConScheduledPointOfInterest duePointOfInterest : duePointsOfInterest) {
+            StratConContractInitializer.spawnScheduledPointOfInterest(campaign, contract, duePointOfInterest);
+        }
     }
 
     /**

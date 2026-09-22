@@ -35,13 +35,19 @@ package mekhq.campaign.digitalGM.stratCon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.PointOfInterestParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
@@ -51,15 +57,18 @@ import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
+import mekhq.campaign.mission.contract.AbstractContract;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.ArgumentCaptor;
 
 /**
- * Tests for points of interest as strategic objectives, for placing them at contract start, and for the contract
- * definition fields that ask for them.
+ * Tests for points of interest as strategic objectives, for scheduling them over a contract and placing them as their
+ * days come, and for the contract definition fields that ask for them.
  *
  * @author Illiani
  * @since 0.51.01
@@ -197,41 +206,189 @@ class StratConPointOfInterestObjectiveTest {
               "several points of interest can share a hex, so their objectives never claim one");
     }
 
-    // Contract start
+    // Scheduling over the contract
+
+    private static ObjectiveParameters pointOfInterestObjective(double count, String... typeIds) {
+        ObjectiveParameters objectiveParameters = new ObjectiveParameters();
+        objectiveParameters.setObjectiveType(StrategicObjectiveType.PointOfInterest);
+        objectiveParameters.setObjectiveCount(count);
+        objectiveParameters.getObjectivePointsOfInterest().addAll(List.of(typeIds));
+        return objectiveParameters;
+    }
+
+    private static PointOfInterestParameters ordinaryPointOfInterest(String typeId, double count) {
+        PointOfInterestParameters pointOfInterestParameters = new PointOfInterestParameters();
+        pointOfInterestParameters.setTypeId(typeId);
+        pointOfInterestParameters.setCount(count);
+        return pointOfInterestParameters;
+    }
+
+    private static StratConContractDefinition contractDefinition(List<ObjectiveParameters> objectives,
+          List<PointOfInterestParameters> pointsOfInterest) {
+        StratConContractDefinition definition = new StratConContractDefinition();
+        definition.setObjectiveParameters(objectives);
+        definition.setPointsOfInterest(pointsOfInterest);
+        return definition;
+    }
+
+    private static int countStrategicObjectives(List<StratConScheduledPointOfInterest> pointsOfInterest) {
+        int objectives = 0;
+        for (StratConScheduledPointOfInterest pointOfInterest : pointsOfInterest) {
+            if (pointOfInterest.isStrategicObjective()) {
+                objectives++;
+            }
+        }
+        return objectives;
+    }
 
     @Test
-    void contractStartPlacesTheRequestedPointsOfInterest() {
-        StratConContractInitializer.initializeTrackPointsOfInterest(track,
-              3,
-              List.of(TYPE_ID, OTHER_TYPE_ID),
-              false,
-              TODAY);
+    void requestedPointsOfInterestIncludeObjectivesAndOrdinaryOnes() {
+        ObjectiveParameters otherObjective = new ObjectiveParameters();
+        otherObjective.setObjectiveType(StrategicObjectiveType.AnyScenarioVictory);
+        otherObjective.setObjectiveCount(4);
+        StratConContractDefinition definition = contractDefinition(
+              List.of(pointOfInterestObjective(2, TYPE_ID), otherObjective),
+              List.of(ordinaryPointOfInterest(OTHER_TYPE_ID, 3)));
 
-        assertEquals(3, track.getPointsOfInterest().size());
+        List<StratConScheduledPointOfInterest> requested =
+              StratConContractInitializer.getRequestedPointsOfInterest(definition, 1);
+
+        assertEquals(5, requested.size(), "other objective types ask for no points of interest");
+        assertEquals(2, countStrategicObjectives(requested));
+        for (StratConScheduledPointOfInterest pointOfInterest : requested) {
+            String expectedType = pointOfInterest.isStrategicObjective() ? TYPE_ID : OTHER_TYPE_ID;
+            assertEquals(expectedType, pointOfInterest.getTypeId());
+        }
+    }
+
+    @Test
+    void negativeCountsScaleWithTheContract() {
+        // An objective never scales below one; an ordinary entry may round down to none.
+        StratConContractDefinition definition = contractDefinition(
+              List.of(pointOfInterestObjective(-0.1, TYPE_ID)),
+              List.of(ordinaryPointOfInterest(OTHER_TYPE_ID, -0.5), ordinaryPointOfInterest(TYPE_ID, -0.1)));
+
+        List<StratConScheduledPointOfInterest> requested =
+              StratConContractInitializer.getRequestedPointsOfInterest(definition, 3);
+
+        assertEquals(1, countStrategicObjectives(requested), "max(1, 0.3) objectives");
+        assertEquals(2, requested.size(), "plus (int) 1.5 ordinary, plus (int) 0.3 of the other type");
+    }
+
+    @Test
+    void entriesWithoutTypesAreSkipped() {
+        StratConContractDefinition definition = contractDefinition(
+              List.of(pointOfInterestObjective(2)),
+              List.of(ordinaryPointOfInterest(" ", 2), ordinaryPointOfInterest(null, 2)));
+
+        assertTrue(StratConContractInitializer.getRequestedPointsOfInterest(definition, 1).isEmpty());
+    }
+
+    @Test
+    @SuppressWarnings("unchecked") // ArgumentCaptor cannot name a generic List type without an unchecked conversion
+    void acceptingAContractSchedulesItsPointsOfInterestAcrossItsMonths() {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getStartDate()).thenReturn(TODAY);
+        when(contract.getLengthInMonths()).thenReturn(3);
+        when(contract.getScale()).thenReturn(1);
+        StratConCampaignState campaignState = new StratConCampaignState();
+        StratConContractDefinition definition = contractDefinition(
+              List.of(pointOfInterestObjective(1, TYPE_ID)),
+              List.of(ordinaryPointOfInterest(OTHER_TYPE_ID, 4)));
+
+        StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState);
+
+        List<StratConScheduledPointOfInterest> scheduled = campaignState.getScheduledPointsOfInterest();
+        assertEquals(5, scheduled.size());
+        assertEquals(1, countStrategicObjectives(scheduled));
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertNotNull(pointOfInterest.getSpawnDate());
+            assertFalse(pointOfInterest.getSpawnDate().isBefore(TODAY));
+            assertTrue(pointOfInterest.getSpawnDate().isBefore(TODAY.plusMonths(3)));
+        }
+        assertTrue(track.getPointsOfInterest().isEmpty(), "nothing is placed up front");
+
+        ArgumentCaptor<List<Integer>> scheduleCaptor = ArgumentCaptor.forClass(List.class);
+        verify(contract).setPointOfInterestSchedule(scheduleCaptor.capture());
+        int scheduledCount = 0;
+        for (int monthlyCount : scheduleCaptor.getValue()) {
+            scheduledCount += monthlyCount;
+        }
+        assertEquals(5, scheduledCount, "the per-month schedule kept on the contract covers every point of interest");
+    }
+
+    @Test
+    void aContractWithoutAStartDateSchedulesNothing() {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getStartDate()).thenReturn(null);
+        StratConCampaignState campaignState = new StratConCampaignState();
+        StratConContractDefinition definition = contractDefinition(List.of(),
+              List.of(ordinaryPointOfInterest(TYPE_ID, 2)));
+
+        StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState);
+
+        assertTrue(campaignState.getScheduledPointsOfInterest().isEmpty());
+    }
+
+    private static Campaign spawningCampaign(boolean maplessMode) {
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(options.isUseStratConMaplessMode()).thenReturn(maplessMode);
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(campaign.getLocalDate()).thenReturn(TODAY);
+        return campaign;
+    }
+
+    private AbstractContract contractWithTrack() {
+        StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.addTrack(track);
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getStratConCampaignState()).thenReturn(campaignState);
+        return contract;
+    }
+
+    @Test
+    void aScheduledObjectiveIsPlacedWithItsObjectiveWhenItsDayComes() {
+        StratConScheduledPointOfInterest scheduled = new StratConScheduledPointOfInterest(TODAY, TYPE_ID, true);
+
+        StratConPointOfInterest placed = StratConContractInitializer.spawnScheduledPointOfInterest(
+              spawningCampaign(false),
+              contractWithTrack(),
+              scheduled);
+
+        assertNotNull(placed);
+        assertEquals(List.of(placed), track.getPointsOfInterest());
+        assertEquals(1, track.getStrategicObjectives().size());
+        assertEquals(placed.getId(), track.getStrategicObjectives().get(0).getPointOfInterestId());
+    }
+
+    @Test
+    void aScheduledOrdinaryPointOfInterestAddsNoObjective() {
+        StratConScheduledPointOfInterest scheduled = new StratConScheduledPointOfInterest(TODAY, TYPE_ID, false);
+
+        assertNotNull(StratConContractInitializer.spawnScheduledPointOfInterest(spawningCampaign(false),
+              contractWithTrack(),
+              scheduled));
         assertTrue(track.getStrategicObjectives().isEmpty());
-        for (StratConPointOfInterest pointOfInterest : track.getPointsOfInterest()) {
-            assertTrue(List.of(TYPE_ID, OTHER_TYPE_ID).contains(pointOfInterest.getTypeId()));
-        }
     }
 
     @Test
-    void contractStartCanPlacePointsOfInterestAsObjectives() {
-        StratConContractInitializer.initializeTrackPointsOfInterest(track, 2, List.of(TYPE_ID), true, TODAY);
+    void nothingIsPlacedInMaplessMode() {
+        StratConScheduledPointOfInterest scheduled = new StratConScheduledPointOfInterest(TODAY, TYPE_ID, false);
 
-        assertEquals(2, track.getPointsOfInterest().size());
-        assertEquals(2, track.getStrategicObjectives().size());
-        for (StratConStrategicObjective objective : track.getStrategicObjectives()) {
-            assertEquals(StrategicObjectiveType.PointOfInterest, objective.getObjectiveType());
-            assertNotNull(objective.getPointOfInterest(track));
-        }
-    }
-
-    @Test
-    void contractStartWithNoTypesToChooseFromPlacesNothing() {
-        StratConContractInitializer.initializeTrackPointsOfInterest(track, 2, List.of(), true, TODAY);
-
+        assertNull(StratConContractInitializer.spawnScheduledPointOfInterest(spawningCampaign(true),
+              contractWithTrack(),
+              scheduled));
         assertTrue(track.getPointsOfInterest().isEmpty());
-        assertTrue(track.getStrategicObjectives().isEmpty());
+    }
+
+    @Test
+    void scheduledPointsOfInterestAreDueOnTheirDayOrLater() {
+        StratConScheduledPointOfInterest scheduled = new StratConScheduledPointOfInterest(TODAY, TYPE_ID, false);
+
+        assertFalse(scheduled.isDue(TODAY.minusDays(1)));
+        assertTrue(scheduled.isDue(TODAY));
+        assertTrue(scheduled.isDue(TODAY.plusDays(5)), "a skipped day still catches up");
     }
 
     // Contract definitions

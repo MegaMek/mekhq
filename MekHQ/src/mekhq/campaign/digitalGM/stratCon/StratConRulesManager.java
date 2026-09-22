@@ -1237,10 +1237,14 @@ public class StratConRulesManager {
         // Under "Essential Scenarios Only", deploying into an empty hex never rolls a random encounter - only the
         // contract's Essential objective scenarios appear. Facility scenarios (below) are objective-tied and unaffected.
         boolean essentialScenariosOnly = campaignOptions.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
+        // Only a forced scenario needs to ask whether the enemy is routed: the usual roll already accounts for it, as
+        // calculateScenarioOdds returns odds no roll can meet against a routed enemy.
+        boolean enemyRouted = (pointOfInterestOutcome == PointOfInterestDeploymentOutcome.FORCE_SCENARIO) &&
+                                    contract.getMoraleLevel().isRouted();
         boolean spawnScenario = rollsRandomScenario(pointOfInterestOutcome,
               essentialScenariosOnly,
               facility != null,
-              contract.getMoraleLevel().isRouted(),
+              enemyRouted,
               targetNum);
 
         if (isNonAlliedFacility || spawnScenario) {

@@ -51,6 +51,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import org.w3c.dom.Node;
@@ -85,6 +86,7 @@ public class StratConCampaignState {
 
     private List<LocalDate> weeklyScenarios;
     private final List<LocalDate> strategicScenarioSpawnDates;
+    private final List<StratConScheduledPointOfInterest> scheduledPointsOfInterest;
 
     @XmlTransient
     public AbstractContract getContract() {
@@ -99,12 +101,14 @@ public class StratConCampaignState {
         tracks = new ArrayList<>();
         weeklyScenarios = new ArrayList<>();
         strategicScenarioSpawnDates = new ArrayList<>();
+        scheduledPointsOfInterest = new ArrayList<>();
     }
 
     public StratConCampaignState(AbstractContract contract) {
         tracks = new ArrayList<>();
         weeklyScenarios = new ArrayList<>();
         strategicScenarioSpawnDates = new ArrayList<>();
+        scheduledPointsOfInterest = new ArrayList<>();
         setContract(contract);
     }
 
@@ -150,6 +154,28 @@ public class StratConCampaignState {
 
     public void addStrategicScenarioSpawnDate(LocalDate spawnDate) {
         strategicScenarioSpawnDates.add(spawnDate);
+    }
+
+    /**
+     * @return the points of interest still to appear over the contract's run (mutable; drained as they are placed)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElementWrapper(name = "scheduledPointsOfInterest")
+    @XmlElement(name = "scheduledPointOfInterest")
+    public List<StratConScheduledPointOfInterest> getScheduledPointsOfInterest() {
+        return scheduledPointsOfInterest;
+    }
+
+    /**
+     * @param scheduledPointOfInterest a point of interest to place on its scheduled day
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addScheduledPointOfInterest(StratConScheduledPointOfInterest scheduledPointOfInterest) {
+        scheduledPointsOfInterest.add(scheduledPointOfInterest);
     }
 
     public int getSupportPoints() {

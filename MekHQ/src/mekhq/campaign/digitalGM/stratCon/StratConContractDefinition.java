@@ -152,9 +152,9 @@ public class StratConContractDefinition {
         FacilityDestruction,
 
         /**
-         * Dealing with a point of interest placed at contract start time, drawn from the "objectivePointsOfInterest"
-         * type IDs. What "dealing with" means is up to the point of interest's type: its behavior decides when the
-         * objective is met or has failed.
+         * Dealing with a point of interest drawn from the "objectivePointsOfInterest" type IDs. Like specific-scenario
+         * objectives, these appear over the contract's months rather than all at contract start. What "dealing with"
+         * means is up to the point of interest's type: its behavior decides when the objective is met or has failed.
          */
         PointOfInterest
     }
@@ -200,8 +200,8 @@ public class StratConContractDefinition {
     private List<String> globalScenarioModifiers = new ArrayList<>();
 
     /**
-     * Points of interest to place at contract start that are not strategic objectives. Points of interest that are
-     * objectives are placed from {@link ObjectiveParameters} instead.
+     * Points of interest that are not strategic objectives, to appear over the contract's months. Points of interest
+     * that are objectives come from {@link ObjectiveParameters} instead.
      */
     private List<PointOfInterestParameters> pointsOfInterest = new ArrayList<>();
 
@@ -332,7 +332,7 @@ public class StratConContractDefinition {
     }
 
     /**
-     * @return the points of interest to place at contract start that are not strategic objectives; never {@code null}
+     * @return the points of interest that are not strategic objectives; never {@code null}
      */
     public List<PointOfInterestParameters> getPointsOfInterest() {
         if (pointsOfInterest == null) {
@@ -432,7 +432,7 @@ public class StratConContractDefinition {
     }
 
     /**
-     * How many points of interest of one type to place at contract start, outside the strategic objectives.
+     * How many points of interest of one type a contract places over its run, outside the strategic objectives.
      *
      * @author Illiani
      * @since 0.51.01
