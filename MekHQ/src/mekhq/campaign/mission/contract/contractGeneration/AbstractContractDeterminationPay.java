@@ -43,6 +43,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
@@ -74,6 +75,12 @@ public abstract class AbstractContractDeterminationPay {
      * to announce itself, the only in-market tell that a contract is a false flag.
      */
     private static final double FALSE_FLAG_PAY_PREMIUM = 1.25;
+
+    /**
+     * The fraction of normal combat pay actually paid out when the contract carries the
+     * {@link ChaosObjectiveSpecialRules#REDUCED_COMBAT_PAY} special rule.
+     */
+    private static final double REDUCED_COMBAT_PAY_FRACTION = 0.25;
 
     /**
      * Returns the pay scheme the campaign has opted into: the CamOps force-value scheme when
@@ -117,9 +124,10 @@ public abstract class AbstractContractDeterminationPay {
     /**
      * The per-battle combat bonus actually owed for this contract: the active scheme's {@link #getCombatPay combat pay},
      * except an opportunistic (non-covert) pirate raid always earns zero - the band loots for itself, and only a
-     * secretly-bankrolled (covert) pirate raid is paid a combat bonus, by its hidden sponsor. Prefer this over
-     * {@link #getCombatPay} wherever a contract's real combat bonus is computed, so the rule holds on every path
-     * (generation, the GM editor, and negotiation).
+     * secretly-bankrolled (covert) pirate raid is paid a combat bonus, by its hidden sponsor. A contract carrying the
+     * {@link ChaosObjectiveSpecialRules#REDUCED_COMBAT_PAY} special rule instead has its combat pay quartered. Prefer
+     * this over {@link #getCombatPay} wherever a contract's real combat bonus is computed, so the rule holds on every
+     * path (generation, the GM editor, and negotiation).
      *
      * @author Illiani
      * @since 0.51.01
@@ -130,7 +138,12 @@ public abstract class AbstractContractDeterminationPay {
         if ((chaosObjectiveType == ChaosObjectiveType.PIRATE_RAID) && !contract.isCovertOperation()) {
             return Money.zero();
         }
-        return getCombatPay(campaign, contract);
+
+        Money combatPay = getCombatPay(campaign, contract);
+        if (contract.usesSpecialRule(ChaosObjectiveSpecialRules.REDUCED_COMBAT_PAY)) {
+            combatPay = combatPay.multipliedBy(REDUCED_COMBAT_PAY_FRACTION);
+        }
+        return combatPay;
     }
 
     /**
