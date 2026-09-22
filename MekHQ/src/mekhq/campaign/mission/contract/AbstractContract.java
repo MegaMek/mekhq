@@ -1066,13 +1066,17 @@ public abstract class AbstractContract {
      *
      * @param specialRule the special rule to test for
      *
-     * @return {@code true} when the contract's objective type uses the special rule; {@code false} when it does not or
-     *       the contract has no objective type assigned
+     * @return {@code true} when the contract's objective type uses the special rule; {@code false} when it does not,
+     *       when no objective data has been assigned, or when the objective data has no player objective type
      *
      * @author Illiani
      * @since 0.51.01
      */
     public boolean usesSpecialRule(ChaosObjectiveSpecialRules specialRule) {
+        if (objectiveData == null) {
+            return false;
+        }
+
         ContractObjectiveType objectiveType = getObjectiveType();
         return (objectiveType != null) && objectiveType.getChaosObjectiveType().usesSpecialRule(specialRule);
     }
@@ -1080,12 +1084,17 @@ public abstract class AbstractContract {
     /**
      * Lists the Chaos special rules carried by this contract's objective.
      *
-     * @return the objective type's special rules, or an empty list when the contract has no objective type assigned
+     * @return the objective type's special rules, or an empty list when no objective data has been assigned or the
+     *       objective data has no player objective type
      *
      * @author Illiani
      * @since 0.51.01
      */
     public List<ChaosObjectiveSpecialRules> getSpecialRules() {
+        if (objectiveData == null) {
+            return List.of();
+        }
+
         ContractObjectiveType objectiveType = getObjectiveType();
         return (objectiveType == null) ? List.of() : objectiveType.getChaosObjectiveType().getSpecialRules();
     }

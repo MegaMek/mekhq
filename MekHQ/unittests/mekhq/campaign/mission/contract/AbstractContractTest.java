@@ -42,7 +42,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -369,24 +368,20 @@ class AbstractContractTest {
     @Test
     void usesSpecialRuleIsFalseWhenThePlayerObjectiveTypeIsUnset() {
         AbstractContract contract = contract();
-        // objectiveData itself is set, but its playerObjectiveType is null - the one null case getObjectiveType()
-        // actually tolerates; see usesSpecialRuleThrowsWhenObjectiveDataItselfIsNeverAssigned below for the case it
-        // does not.
+        // objectiveData itself is set, but its playerObjectiveType is null.
         contract.setObjectiveData(new ContractObjectiveData(null, ContractObjectiveType.GARRISON_DUTY));
 
         assertFalse(contract.usesSpecialRule(ChaosObjectiveSpecialRules.SIMULATED_DAMAGE));
     }
 
     @Test
-    void usesSpecialRuleThrowsWhenObjectiveDataItselfIsNeverAssigned() {
-        // A freshly-constructed contract has a null objectiveData field (no default is assigned), so
-        // getObjectiveType() - which usesSpecialRule relies on - throws rather than returning null. This contradicts
-        // usesSpecialRule's own javadoc ("or the contract has no objective type assigned"), which is only true once
-        // setObjectiveData has been called at least once, even with a null playerObjectiveType.
+    void usesSpecialRuleIsFalseWhenObjectiveDataIsNeverAssigned() {
+        // A freshly-constructed contract has a null objectiveData field (no default is assigned). usesSpecialRule sits
+        // on the purchase-cost path for every active contract, so it must not throw here.
         AbstractContract contract = new ChaosContract();
 
-        assertThrows(NullPointerException.class,
-              () -> contract.usesSpecialRule(ChaosObjectiveSpecialRules.SIMULATED_DAMAGE));
+        assertFalse(contract.usesSpecialRule(ChaosObjectiveSpecialRules.SIMULATED_DAMAGE));
+        assertTrue(contract.getSpecialRules().isEmpty());
     }
 
     // endregion usesSpecialRule
