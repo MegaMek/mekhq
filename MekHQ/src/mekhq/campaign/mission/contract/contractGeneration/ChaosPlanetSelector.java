@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.contract.contractGeneration;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -40,6 +41,7 @@ import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.enums.PlanetaryType;
 
 /**
  * Picks which planet within an already-chosen target system a contract is fought over, weighting the choice the same
@@ -51,7 +53,8 @@ import mekhq.campaign.universe.Planet;
  * operations are drawn toward the valuable worlds worth conquering, garrisoning, or raiding; pirate work is instead
  * drawn toward the low-value fringe &mdash; a pirate hunt tracks raiders to the lawless backwaters they hole up on, and
  * a pirate raid seeks the weakest, least-defended world in the area &mdash; and objectives with no geographic preference
- * draw uniformly.</p>
+ * draw uniformly. Bodies with no ground to fight on (gas giants, ice giants, asteroid belts) are never chosen unless
+ * someone actually lives there.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -68,6 +71,13 @@ public final class ChaosPlanetSelector {
         NEUTRAL
     }
 
+    /**
+     * The draw weight an uninhabited body gets in a pirate hunt. Kept at the floor so that, while raiders can still be
+     * tracked to a lifeless rock, the hunt is usually fought on an inhabited world: a low-value inhabited world weighs
+     * {@code 1 + (max - strategicValue)}, which comfortably outweighs a handful of barren bodies.
+     */
+    static final int UNINHABITED_WORLD_WEIGHT = 1;
+
     private ChaosPlanetSelector() {
     }
 
@@ -76,18 +86,19 @@ public final class ChaosPlanetSelector {
      * objective prefers.
      *
      * @param candidates    the candidate planets (a system's planets)
+     * @param primaryPlanet the system's primary planet, used as the last resort when no body is otherwise eligible
      * @param objectiveType the player's objective, which sets the weighting direction
      * @param when          the date to read each world's strategic value at
      *
      * @return the chosen planet, or {@code null} if there are no candidates
      */
     public static @Nullable Planet selectTargetPlanet(final Collection<Planet> candidates,
-          final ChaosObjectiveType objectiveType, final LocalDate when) {
+          final @Nullable Planet primaryPlanet, final ChaosObjectiveType objectiveType, final LocalDate when) {
         if (candidates.isEmpty()) {
             return null;
         }
 
-        Collection<Planet> pool = eligiblePlanets(preferenceFor(objectiveType), candidates, when);
+        Collection<Planet> pool = eligiblePlanets(objectiveType, candidates, primaryPlanet, when);
 
         WeightedIntMap<Planet> weightedCandidates = new WeightedIntMap<>();
         for (Planet planet : pool) {
@@ -99,29 +110,53 @@ public final class ChaosPlanetSelector {
     }
 
     /**
-     * Narrows the candidate planets to those worth situating this kind of contract on. A contract is fought where there
-     * is something to fight over, so for most objectives only inhabited worlds are eligible &mdash; otherwise a lone
-     * inhabited world would be diluted by every lifeless rock, moon, and iceball sharing its system. A system with no
-     * inhabited world at all (a genuinely uninhabited system) falls back to all of its bodies so generation never fails
-     * for lack of a target.
+     * Narrows the candidate planets to those worth situating this kind of contract on.
      *
-     * <p>The pirate hunt is the deliberate exception: raiders hole up on exactly the uninhabited fringe worlds every
-     * other objective ignores, so its candidate pool is left untouched.</p>
+     * <p>Only bodies a ground force can actually fight on are ever considered: any inhabited world (whatever its
+     * type &mdash; a handful of canon settlements are habitats in asteroid belts or orbiting gas giants), plus
+     * uninhabited {@link PlanetaryType#TERRESTRIAL terrestrial} and {@link PlanetaryType#DWARF_TERRESTRIAL dwarf
+     * terrestrial} bodies. Uninhabited gas giants, ice giants, asteroid belts, and giant terrestrials (which in the
+     * galaxy data are overwhelmingly hydrogen-shrouded gas worlds) are never eligible.</p>
      *
-     * @param preference the objective's value preference
-     * @param candidates the system's planets
-     * @param when       the date to check habitation at
+     * <p>A contract is fought where there is something to fight over, so for most objectives only inhabited worlds
+     * are eligible &mdash; otherwise a lone inhabited world would be diluted by every lifeless rock sharing its system.
+     * The pirate hunt is the deliberate exception: raiders hole up on the uninhabited fringe every other objective
+     * ignores, so its pool keeps uninhabited ground as well (weighted down by {@link #planetWeight}).</p>
      *
-     * @return the eligible subset, or all candidates if none are inhabited (or for a low-value pirate hunt)
+     * <p>If nothing qualifies, a system with uninhabited ground falls back to that ground, and a system with none at
+     * all falls back to its primary planet, so generation never fails for lack of a target.</p>
+     *
+     * @param objectiveType the player's objective
+     * @param candidates    the system's planets
+     * @param primaryPlanet the system's primary planet, or {@code null} if unknown
+     * @param when          the date to check habitation at
+     *
+     * @return the eligible subset of the candidates, never empty when the candidates are not empty
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    static Collection<Planet> eligiblePlanets(final PlanetValuePreference preference,
-          final Collection<Planet> candidates, final LocalDate when) {
-        if (preference == PlanetValuePreference.LOW_VALUE) {
-            return candidates;
+    static Collection<Planet> eligiblePlanets(final ChaosObjectiveType objectiveType,
+          final Collection<Planet> candidates, final @Nullable Planet primaryPlanet, final LocalDate when) {
+        List<Planet> inhabitedWorlds = new ArrayList<>();
+        List<Planet> uninhabitedGround = new ArrayList<>();
+        for (Planet planet : candidates) {
+            if (isInhabited(planet, when)) {
+                inhabitedWorlds.add(planet);
+            } else if (isUninhabitedGround(planet)) {
+                uninhabitedGround.add(planet);
+            }
         }
 
-        List<Planet> inhabited = candidates.stream().filter(planet -> isInhabited(planet, when)).toList();
-        return inhabited.isEmpty() ? candidates : inhabited;
+        List<Planet> eligible = new ArrayList<>(inhabitedWorlds);
+        if (allowsUninhabitedWorlds(objectiveType) || inhabitedWorlds.isEmpty()) {
+            eligible.addAll(uninhabitedGround);
+        }
+
+        if (!eligible.isEmpty()) {
+            return eligible;
+        }
+        return (primaryPlanet != null) ? List.of(primaryPlanet) : candidates;
     }
 
     /**
@@ -129,14 +164,38 @@ public final class ChaosPlanetSelector {
      */
     static boolean isInhabited(final Planet planet, final LocalDate when) {
         Long population = planet.getPopulation(when);
-        return (population != null) && (population > 0);
+        return population > 0;
+    }
+
+    /**
+     * @return whether an uninhabited body still offers solid ground to fight on
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isUninhabitedGround(final Planet planet) {
+        return switch (planet.getPlanetType()) {
+            case TERRESTRIAL, DWARF_TERRESTRIAL -> true;
+            case ASTEROID_BELT, GIANT_TERRESTRIAL, ICE_GIANT, GAS_GIANT -> false;
+        };
+    }
+
+    /**
+     * @return whether the objective may be situated on an uninhabited world even when an inhabited one is available
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean allowsUninhabitedWorlds(final ChaosObjectiveType objectiveType) {
+        return objectiveType == ChaosObjectiveType.PIRATE_HUNT;
     }
 
     /**
      * The weight a single planet gets for a weighted draw, always at least {@code 1} so every world stays pickable.
      *
      * <p>A high-value preference weights a world by {@code 1 + strategicValue}; a low-value preference inverts that to
-     * {@code 1 + (max - strategicValue)}; a neutral preference weights every world equally.</p>
+     * {@code 1 + (max - strategicValue)} for inhabited worlds, while uninhabited bodies (only reachable by a pirate
+     * hunt) get the floor {@link #UNINHABITED_WORLD_WEIGHT}; a neutral preference weights every world equally.</p>
      *
      * @param planet        the planet to score
      * @param objectiveType the player's objective, which sets the weighting direction
@@ -148,6 +207,10 @@ public final class ChaosPlanetSelector {
         PlanetValuePreference preference = preferenceFor(objectiveType);
         if (preference == PlanetValuePreference.NEUTRAL) {
             return 1;
+        }
+
+        if (preference == PlanetValuePreference.LOW_VALUE && !isInhabited(planet, when)) {
+            return UNINHABITED_WORLD_WEIGHT;
         }
 
         int strategicValue = ChaosPlanetStrategicValue.calculate(planet, when);
