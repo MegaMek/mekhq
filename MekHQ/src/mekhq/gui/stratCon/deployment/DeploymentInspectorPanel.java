@@ -42,6 +42,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -71,6 +72,7 @@ import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -358,6 +360,12 @@ public class DeploymentInspectorPanel extends JPanel {
         summary.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.inspector.units",
               formation.getAllUnits(true).size()));
+
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
+            int averageFatigue = formationAverageFatigue(formation);
+            summary.append("<br/>").append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "deploymentWizard.inspector.averageFatigue", averageFatigue));
+        }
         return summary.toString();
     }
 
@@ -403,6 +411,12 @@ public class DeploymentInspectorPanel extends JPanel {
             }
 
         details.append("<br/>");
+
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
+            int unitFatigue = averageEffectiveFatigue(unit.getActiveCrew());
+            details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.fatigue",
+                      unitFatigue)).append("<br/>");
+        }
 
         int crewSize = unit.getActiveCrew().size();
         if (crewSize > 1) {
@@ -450,6 +464,42 @@ public class DeploymentInspectorPanel extends JPanel {
         }
 
         return details.toString();
+    }
+
+    /**
+     * Averages the effective fatigue across every unit's active crew in a formation, so the dossier can show how worn
+     * down the whole force is. Returns {@code -1} when the formation has no active crew, so the caller can omit the line.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int formationAverageFatigue(Formation formation) {
+        List<Person> allCrew = new ArrayList<>();
+        for (UUID unitId : formation.getAllUnits(true)) {
+            Unit unit = campaign.getUnit(unitId);
+            if (unit != null) {
+                allCrew.addAll(unit.getActiveCrew());
+            }
+        }
+        return averageEffectiveFatigue(allCrew);
+    }
+
+    /**
+     * Averages the effective fatigue across a set of crew members. Returns {@code -1} for an empty set, so the caller
+     * can omit the line rather than dividing by zero.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int averageEffectiveFatigue(List<Person> crew) {
+        if (crew.isEmpty()) {
+            return -1;
+        }
+        int totalFatigue = 0;
+        for (Person person : crew) {
+            totalFatigue += Fatigue.getEffectiveFatigue(person, campaign);
+        }
+        return (int) Math.round((double) totalFatigue / crew.size());
     }
 
     private static void appendScoutingSkill(Unit unit, StringBuilder details) {
