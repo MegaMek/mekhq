@@ -1,6 +1,7 @@
 package mekhq.campaign.mission.contract.contractSpecialRules;
 
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.DOUBLE_SUPPORT_PAYOUTS;
 import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.NO_IN_CONTRACT_SUPPORT;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -24,11 +25,19 @@ import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
  * from the active contract offering the most generous support (see {@link #getStraightSupportContract(Campaign)}).
  * Battle loss compensation, by contrast, is settled against the specific contract whose scenario cost the unit.</p>
  *
+ * <p>Both payouts are doubled for a contract carrying the {@link ChaosObjectiveSpecialRules#DOUBLE_SUPPORT_PAYOUTS}
+ * special rule. The doubling is applied before the withhold check, so a contract that also carries
+ * {@link ChaosObjectiveSpecialRules#NO_IN_CONTRACT_SUPPORT} withholds - and later pays out - the already-doubled
+ * amount.</p>
+ *
  * @author Illiani
  * @since 0.51.01
  */
 public final class ContractSupportPayments {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ContractSpecialRules";
+
+    /** The factor applied to every support payout of a contract carrying {@code DOUBLE_SUPPORT_PAYOUTS}. */
+    private static final double DOUBLE_SUPPORT_PAYOUT_MULTIPLIER = 2.0;
 
     private ContractSupportPayments() {
     }
@@ -38,9 +47,10 @@ public final class ContractSupportPayments {
      * maintenance charge.
      *
      * <p>The share is {@code cost * } the support multiplier of the active contract offering the most generous straight
-     * support. When that contract carries the {@link ChaosObjectiveSpecialRules#NO_IN_CONTRACT_SUPPORT} special rule the
-     * share is withheld until the contract ends; otherwise it is credited immediately. Does nothing when the cost is not
-     * positive, no contract is active, or the support multiplier is zero.</p>
+     * support, doubled when that contract carries {@link ChaosObjectiveSpecialRules#DOUBLE_SUPPORT_PAYOUTS}. When the
+     * contract carries the {@link ChaosObjectiveSpecialRules#NO_IN_CONTRACT_SUPPORT} special rule the share is withheld
+     * until the contract ends; otherwise it is credited immediately. Does nothing when the cost is not positive, no
+     * contract is active, or the support multiplier is zero.</p>
      *
      * @param campaign        the active campaign
      * @param cost            the cost the player paid, whose support share is reimbursed
@@ -64,7 +74,7 @@ public final class ContractSupportPayments {
             return;
         }
 
-        Money share = cost.multipliedBy(supportMultiplier);
+        Money share = applyDoubleSupportPayouts(contract, cost.multipliedBy(supportMultiplier));
         if (!share.isPositive()) {
             return;
         }
@@ -79,27 +89,29 @@ public final class ContractSupportPayments {
      * Settles battle loss compensation for a unit lost beyond repair, either crediting it immediately or, under the
      * {@link ChaosObjectiveSpecialRules#NO_IN_CONTRACT_SUPPORT} special rule, withholding it until the contract ends.
      *
-     * <p>Does nothing when the amount is not positive.</p>
+     * <p>The amount is doubled when the contract carries {@link ChaosObjectiveSpecialRules#DOUBLE_SUPPORT_PAYOUTS}. Does
+     * nothing when the resulting amount is not positive.</p>
      *
      * @param campaign the active campaign
      * @param contract the contract whose scenario cost the unit
-     * @param amount   the battle loss compensation owed
+     * @param amount   the battle loss compensation owed, before the {@code DOUBLE_SUPPORT_PAYOUTS} rule is applied
      * @param unitName the name of the lost unit, used in the ledger note and report
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static void payBattlefieldLoss(Campaign campaign, AbstractContract contract, Money amount, String unitName) {
-        if (!amount.isPositive()) {
+        Money payout = applyDoubleSupportPayouts(contract, amount);
+        if (!payout.isPositive()) {
             return;
         }
 
         String note = getFormattedTextAt(RESOURCE_BUNDLE, "ContractSupport.battlefieldLoss.note", unitName);
         String report = getFormattedTextAt(RESOURCE_BUNDLE,
               "ContractSupport.battlefieldLoss.report",
-              amount.toAmountAndSymbolString(),
+              payout.toAmountAndSymbolString(),
               unitName);
-        creditOrWithhold(campaign, contract, amount, note, report);
+        creditOrWithhold(campaign, contract, payout, note, report);
     }
 
     /**
@@ -155,6 +167,25 @@ public final class ContractSupportPayments {
             }
         }
         return bestContract;
+    }
+
+    /**
+     * Applies the {@link ChaosObjectiveSpecialRules#DOUBLE_SUPPORT_PAYOUTS} special rule to a support payout: the amount
+     * is doubled when the contract carries the rule and returned unchanged otherwise.
+     *
+     * @param contract the contract the payout is settled against
+     * @param amount   the support payout before the rule is applied
+     *
+     * @return the payout after the special rule, doubled when the rule is present
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Money applyDoubleSupportPayouts(AbstractContract contract, Money amount) {
+        if (contract.usesSpecialRule(DOUBLE_SUPPORT_PAYOUTS)) {
+            return amount.multipliedBy(DOUBLE_SUPPORT_PAYOUT_MULTIPLIER);
+        }
+        return amount;
     }
 
     /**
