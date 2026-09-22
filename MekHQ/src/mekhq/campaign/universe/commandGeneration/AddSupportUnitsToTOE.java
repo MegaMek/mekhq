@@ -34,8 +34,8 @@ package mekhq.campaign.universe.commandGeneration;
 
 import static mekhq.campaign.universe.commandGeneration.SupportTOEFormationTypes.HQ_FORMATION;
 
-import java.text.MessageFormat;
 import java.util.List;
+import java.util.function.IntFunction;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
@@ -141,11 +141,11 @@ public class AddSupportUnitsToTOE {
      * @param campaign            the active campaign that owns the TOE
      * @param units               the units to file; an empty list does nothing
      * @param formationTypes      the capability formation the sub-formations sit under
-     * @param subFormationSize    units per sub-formation; zero or less files them flat instead
-     * @param subFormationPattern the sub-formation name, with {@code {0}} for its number
+     * @param subFormationSize  units per sub-formation; zero or less files them flat instead
+     * @param subFormationNamer the name for the sub-formation at a given position, counting from one
      */
     public static void addSupportUnitsToTOE(Campaign campaign, List<Unit> units,
-          SupportTOEFormationTypes formationTypes, int subFormationSize, String subFormationPattern) {
+          SupportTOEFormationTypes formationTypes, int subFormationSize, IntFunction<String> subFormationNamer) {
         if (units.isEmpty()) {
             return;
         }
@@ -159,7 +159,7 @@ public class AddSupportUnitsToTOE {
               formationTypes.getType());
 
         for (Unit unit : units) {
-            Formation subFormation = nextSubFormationWithRoom(campaign, capabilityFormation, subFormationPattern,
+            Formation subFormation = nextSubFormationWithRoom(campaign, capabilityFormation, subFormationNamer,
                   subFormationSize, formationTypes.getType(), units.size());
             campaign.getPlayerForce().addUnitToFormation(unit, subFormation.getId(), campaign);
         }
@@ -171,20 +171,20 @@ public class AddSupportUnitsToTOE {
      *
      * @param campaign         the campaign whose formations are searched
      * @param parent           the capability formation the sub-formations sit under
-     * @param pattern          the sub-formation name, with {@code {0}} for its number
+     * @param namer            the name for the sub-formation at a given position, counting from one
      * @param subFormationSize units a sub-formation holds when full
      * @param type             the formation type to give a newly created sub-formation
      * @param unitsToFile      how many units are being filed, which bounds the search
      *
      * @return a sub-formation with room in it, never {@code null}
      */
-    private static Formation nextSubFormationWithRoom(Campaign campaign, Formation parent, String pattern,
-          int subFormationSize, FormationType type, int unitsToFile) {
+    private static Formation nextSubFormationWithRoom(Campaign campaign, Formation parent,
+          IntFunction<String> namer, int subFormationSize, FormationType type, int unitsToFile) {
         // Bounded rather than open ended: the units being filed cannot need more sub-formations than there are
         // units, even if every existing one is full.
         int searchLimit = unitsToFile + 1;
         for (int number = 1; number <= searchLimit; number++) {
-            String label = MessageFormat.format(pattern, number);
+            String label = namer.apply(number);
             Formation existing = findChildFormationByName(campaign, parent, label);
             if (existing == null) {
                 return findOrCreateChild(campaign, parent, label, type);
@@ -194,7 +194,7 @@ public class AddSupportUnitsToTOE {
             }
         }
         // Unreachable while the limit above holds, but a formation must be returned rather than a null.
-        return findOrCreateChild(campaign, parent, MessageFormat.format(pattern, searchLimit + 1), type);
+        return findOrCreateChild(campaign, parent, namer.apply(searchLimit + 1), type);
     }
 
     /** Finds the named child of {@code parent}, creating and attaching it when absent. */

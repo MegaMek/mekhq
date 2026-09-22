@@ -616,7 +616,7 @@ public final class SupportPersonnelToTOE {
             return 0;
         }
 
-        List<VehicleSpec> vehicles = vehiclesStillNeeded(campaign, capability.unitName(campaign),
+        List<VehicleSpec> vehicles = vehiclesStillNeeded(campaign, capability, faction,
               capability.targetCount(campaign, faction));
         if (vehicles.isEmpty()) {
             return 0;
@@ -775,7 +775,7 @@ public final class SupportPersonnelToTOE {
                   || !capability.joinsSection(campaign)) {
                 continue;
             }
-            vehicles.addAll(vehiclesStillNeeded(campaign, capability.unitName(campaign),
+            vehicles.addAll(vehiclesStillNeeded(campaign, capability, faction,
                   capability.targetCount(campaign, faction)));
         }
         return vehicles;
@@ -794,6 +794,15 @@ public final class SupportPersonnelToTOE {
      *
      * @return a single spec for the missing vehicles, or an empty list when none are missing
      */
+    /**
+     * The vehicles still needed to reach {@code targetCount} of a capability fielded under one name.
+     *
+     * @param campaign    the campaign whose hangar is counted
+     * @param unitName    the unit the capability fields
+     * @param targetCount how many the command should hold
+     *
+     * @return a single spec for the shortfall, or an empty list when there is none
+     */
     static List<VehicleSpec> vehiclesStillNeeded(Campaign campaign, String unitName, int targetCount) {
         int missing = SupportUnitGenerator.shortfall(campaign, unitName, targetCount);
         LOGGER.info("[CompanyGen][SupportTOE] capability vehicle '{}': target {}, already owned {}, building {}",
@@ -802,6 +811,31 @@ public final class SupportPersonnelToTOE {
             return List.of();
         }
         return List.of(new VehicleSpec(unitName, missing));
+    }
+
+    static List<VehicleSpec> vehiclesStillNeeded(Campaign campaign, SupportCapability capability,
+          Faction faction, int targetCount) {
+        // A named capability is infantry and is counted by name. A rolled one has no single name to count or to
+        // build from, so what it already fields is read off its formation and the shortfall is rolled.
+        String unitName = capability.unitName(campaign);
+        if (unitName != null) {
+            return vehiclesStillNeeded(campaign, unitName, targetCount);
+        }
+
+        int existing = SupportUnitGenerator.countVehiclesInFormation(campaign, capability.formationType());
+        int missing = Math.max(0, targetCount - existing);
+        LOGGER.info("[CompanyGen][SupportTOE] {}: target {}, already owned {}, building {}",
+              capability, targetCount, existing, missing);
+        if (missing <= 0) {
+            return List.of();
+        }
+
+        List<VehicleSpec> specs = new ArrayList<>();
+        for (SupportUnitGenerator.RolledBatch batch : SupportUnitGenerator.rollBatches(capability, campaign, faction,
+              missing, SupportUnitGenerator.subFormationSize(faction, capability.formationType()))) {
+            specs.add(new VehicleSpec(batch.unitName(), batch.count()));
+        }
+        return specs;
     }
 
     /**

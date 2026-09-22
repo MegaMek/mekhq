@@ -60,7 +60,7 @@ import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSe
 public enum SupportCapability {
     /** Recovery vehicles, crewed by the maintenance section, granted under CamOps salvage rules. */
     SALVAGE(campaignOptions -> campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE),
-          campaign -> SupportUnitGenerator.SALVAGE_UNIT,
+          campaign -> null,
           SupportUnitGenerator::salvageUnitCount,
           SupportTOEFormationTypes.SALVAGE_FORMATION,
           SupportSection.MAINTENANCE,
@@ -71,7 +71,7 @@ public enum SupportCapability {
 
     /** MASH trucks, crewed by the medical section, scaled to treat the command's combatants. */
     MEDICAL(campaignOptions -> campaignOptions.get(CampaignOption.USE_MASH_THEATRES),
-          campaign -> SupportUnitGenerator.MEDICAL_UNIT,
+          campaign -> null,
           SupportUnitGenerator::medicalUnitCount,
           SupportTOEFormationTypes.MEDICAL_FORMATION,
           SupportSection.MEDICAL,
@@ -82,7 +82,7 @@ public enum SupportCapability {
 
     /** Flatbed trucks for the StratCon supply convoy, generated with their own crews. */
     LOGISTICS(CampaignOptions::isUseStratCon,
-          campaign -> SupportUnitGenerator.LOGISTICS_UNIT,
+          campaign -> null,
           SupportUnitGenerator::logisticsUnitCount,
           SupportTOEFormationTypes.LOGISTICS_FORMATION,
           null,
@@ -93,7 +93,7 @@ public enum SupportCapability {
 
     /** Mobile canteens feeding the command once fatigue is tracked. */
     COMMISSARY(campaignOptions -> campaignOptions.get(CampaignOption.USE_FATIGUE),
-          campaign -> SupportUnitGenerator.COMMISSARY_UNIT,
+          campaign -> null,
           SupportUnitGenerator::commissaryUnitCount,
           SupportTOEFormationTypes.COMMISSARY_FORMATION,
           null,
@@ -158,7 +158,7 @@ public enum SupportCapability {
      *
      * @return the unit name as the unit cache holds it
      */
-    public String unitName(Campaign campaign) {
+    public @Nullable String unitName(Campaign campaign) {
         return unitNameResolver.apply(campaign);
     }
 

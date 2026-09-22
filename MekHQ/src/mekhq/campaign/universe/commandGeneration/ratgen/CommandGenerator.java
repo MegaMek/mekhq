@@ -94,6 +94,7 @@ import mekhq.campaign.universe.commandGeneration.SupportCapability;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
 
 /**
@@ -635,8 +636,11 @@ public final class CommandGenerator {
      * @param campaign       the campaign the vehicles are granted to
      * @param supportFaction the faction the command is organised as, which during generation is the faction
      *                       it is generated for rather than the campaign's own
+     * @param namingMethod   the convention the command's formations are named with, so its support formations
+     *                       read the same way its combat formations do
      */
-    static void grantStandaloneSupportVehicles(Campaign campaign, Faction supportFaction) {
+    static void grantStandaloneSupportVehicles(Campaign campaign, Faction supportFaction,
+          @Nullable ForceNamingMethod namingMethod) {
         for (SupportCapability capability : SupportCapability.values()) {
             if (!capability.isEnabled(campaign)) {
                 LOGGER.info("[CompanyGen][SupportUnits] {}: switched off, nothing granted", capability);
@@ -648,7 +652,7 @@ public final class CommandGenerator {
                 continue;
             }
             LOGGER.info("[CompanyGen][SupportUnits] {}: generated standalone with its own crew", capability);
-            SupportUnitGenerator.generate(capability, campaign, supportFaction, true);
+            SupportUnitGenerator.generate(capability, campaign, supportFaction, true, namingMethod);
         }
     }
 
@@ -694,7 +698,7 @@ public final class CommandGenerator {
                   supportResult.generatedPersons().size());
         }
 
-        grantStandaloneSupportVehicles(campaign, commandFaction);
+        grantStandaloneSupportVehicles(campaign, commandFaction, options.getForceNamingMethod());
 
         // Assign techs to units with MekHQ's own assigner, the one the new day and the Hangar's quick-assign
         // button use, ordered by the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight / Pilot Skill,
