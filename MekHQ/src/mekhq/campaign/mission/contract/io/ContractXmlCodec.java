@@ -125,6 +125,8 @@ public final class ContractXmlCodec {
         }
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractNature", contract.getNature().name());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sharesPercent", contract.getSharesPercent());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "consecutiveTrackResultTally",
+              contract.getConsecutiveTrackResultTally());
         if (!contract.getObfuscatedIntel().isEmpty()) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "obfuscatedIntel",
                   contract.getObfuscatedIntel().stream().map(Enum::name).collect(Collectors.joining(",")));
@@ -437,6 +439,8 @@ public final class ContractXmlCodec {
         });
         readers.put("sharesPercent",
               (contract, node, campaign, version) -> contract.setSharesPercent(parseInt(node)));
+        readers.put("consecutiveTrackResultTally",
+              (contract, node, campaign, version) -> contract.setConsecutiveTrackResultTally(parseInt(node)));
         readers.put("missionStatus",
               (contract, node, campaign, version) -> contract.setStatus(MissionStatus.parseFromString(text(node))));
         readers.put("salvagedByUnitValue",

@@ -120,6 +120,11 @@ public abstract class AbstractContract {
     private Person playerNegotiator;
 
     private int sharesPercent = DEFAULT_SHARES_PERCENT;
+
+    /**
+     * Running tally for the {@link ChaosObjectiveSpecialRules#END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS} special rule.
+     */
+    private int consecutiveTrackResultTally = 0;
     private final EnumSet<ObfuscatableIntel> obfuscatedIntel = EnumSet.noneOf(ObfuscatableIntel.class);
     private final EnumSet<ContractCharacteristic> characteristics = EnumSet.noneOf(ContractCharacteristic.class);
 
@@ -626,6 +631,18 @@ public abstract class AbstractContract {
 
     public void setSharesPercent(int sharesPercent) {
         this.sharesPercent = sharesPercent;
+    }
+
+    public int getConsecutiveTrackResultTally() {
+        return consecutiveTrackResultTally;
+    }
+
+    public void setConsecutiveTrackResultTally(int consecutiveTrackResultTally) {
+        this.consecutiveTrackResultTally = consecutiveTrackResultTally;
+    }
+
+    public void changeConsecutiveTrackResultTally(int delta) {
+        consecutiveTrackResultTally += delta;
     }
 
     public @Nullable StratConCampaignState getStratConCampaignState() {
