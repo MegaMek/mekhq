@@ -38,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -439,8 +438,8 @@ class ResolveScenarioTrackerTest {
 
         tracker.checkStatusOfPersonnel();
 
-        verify(campaign, times(tempCrew)).decreaseTempCrewPool(PersonnelRole.SOLDIER, 1);
-        verify(unit, times(tempCrew)).setTempCrew(eq(PersonnelRole.SOLDIER), anyInt());
+        verify(campaign).decreaseTempCrewPool(PersonnelRole.SOLDIER, tempCrew);
+        verify(unit).setTempCrew(PersonnelRole.SOLDIER, 0);
     }
 
     /**
@@ -464,7 +463,7 @@ class ResolveScenarioTrackerTest {
             tracker.checkStatusOfPersonnel();
         }
 
-        verify(campaign, times(tempCrew)).decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, 1);
+        verify(campaign).decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, tempCrew);
     }
 
     /**
@@ -536,7 +535,7 @@ class ResolveScenarioTrackerTest {
             tracker.checkStatusOfPersonnel();
         }
 
-        verify(campaign, times(tempCrew)).decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, 1);
+        verify(campaign).decreaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, tempCrew);
     }
 
     /**
@@ -582,7 +581,7 @@ class ResolveScenarioTrackerTest {
             tracker.checkStatusOfPersonnel();
         }
 
-        verify(campaign, times(fullCrewSize)).decreaseTempCrewPool(PersonnelRole.VESSEL_CREW, 1);
+        verify(campaign).decreaseTempCrewPool(PersonnelRole.VESSEL_CREW, fullCrewSize);
     }
 
     // endregion Blob (temporary) crew casualties
