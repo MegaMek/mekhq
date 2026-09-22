@@ -55,6 +55,7 @@ import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -142,7 +143,9 @@ public class RetirementDefectionTracker {
     public static int getHRStrain(Campaign campaign) {
         double personnel = 0;
 
-        for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
+        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+
+        for (Person person : humanResources.getActivePersonnel(false, false)) {
             PersonnelRole primaryRole = person.getPrimaryRole();
 
             if (primaryRole.isCivilian()) {
@@ -150,6 +153,10 @@ public class RetirementDefectionTracker {
             } else if (!(primaryRole.isAssistant() && person.getSecondaryRole().isNone())) {
                 personnel++;
             }
+        }
+
+        for (PersonnelRole role : humanResources.getTempCrewRoleKeys()) {
+            personnel += humanResources.getTempCrewPool(role);
         }
 
         return (int) round(personnel);

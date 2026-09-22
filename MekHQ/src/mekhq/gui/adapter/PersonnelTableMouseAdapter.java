@@ -4383,6 +4383,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenuHelpers.addMenuIfNonEmpty(popup, menu);
         // endregion Original Unit
 
+        // region Roleplay Menu
+        JScrollableMenu roleplayMenu = new JScrollableMenu("roleplayMenu", resources.getString("roleplayMenu.text"));
+
+        menuItem = new JMenuItem(resources.getString("makeSkillCheck.text"));
+        menuItem.setActionCommand(makeCommand(CMD_SKILL_CHECK));
+        menuItem.addActionListener(this);
+        roleplayMenu.add(menuItem);
+
+        menuItem = new JMenuItem(resources.getString("makeAttributeCheck.text"));
+        menuItem.setActionCommand(makeCommand(CMD_ATTRIBUTE_CHECK));
+        menuItem.addActionListener(this);
+        roleplayMenu.add(menuItem);
+
+        popup.add(roleplayMenu);
+        // endregion Roleplay Menu
+
         // region GM Menu
         if (getCampaign().isGM()) {
             popup.addSeparator();
@@ -4393,19 +4409,6 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             // The JScrollableMenu local type is required for the add() overrides to dispatch correctly; the WARNING
             // in JScrollableMenu's javadoc covers this.
             JScrollableMenu gmMenu = new JScrollableMenu("GMMode", resources.getString("GMMode.text"));
-
-            // lets fill the pop up menu
-            menuItem = new JMenuItem(resources.getString("makeSkillCheck.text"));
-            menuItem.setActionCommand(makeCommand(CMD_SKILL_CHECK));
-            menuItem.addActionListener(this);
-            gmMenu.add(menuItem);
-
-            menuItem = new JMenuItem(resources.getString("makeAttributeCheck.text"));
-            menuItem.setActionCommand(makeCommand(CMD_ATTRIBUTE_CHECK));
-            menuItem.addActionListener(this);
-            gmMenu.add(menuItem);
-
-            gmMenu.addSeparator();
 
             // Top-level shortcuts: highest-traffic actions stay one click away.
             menuItem = new JMenuItem(resources.getString("editPerson.text"));

@@ -3419,11 +3419,10 @@ public class StratConRulesManager {
             return false;
         }
 
-        // Check the associated combat team and its role
-        CombatTeam combatTeam;
-        combatTeam = formation.isCombatTeam() ?
-                           campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceId) :
-                           null;
+        // Check the associated combat team and its role. The combat team may be the unit's own formation or one of
+        // its parent formations, so we walk up the hierarchy to find it; otherwise units belonging to child
+        // formations of a combat team would be incorrectly treated as ineligible.
+        CombatTeam combatTeam = resolveCombatTeam(formation, campaign);
 
         if (combatTeam == null) {
             return false;
@@ -3437,6 +3436,39 @@ public class StratConRulesManager {
         AbstractContract scenarioContract = currentScenario.getBackingContract(campaign);
 
         return forceContract.equals(scenarioContract);
+    }
+
+    /**
+     * Resolves the {@link CombatTeam} that governs the supplied formation.
+     *
+     * <p>A combat team may be assigned to a formation at any point in the hierarchy. When the combat team tag sits on
+     * a parent formation, the units themselves belong to child formations that are not, in isolation, combat teams.
+     * This method therefore checks the supplied formation first and then walks up its parent formations until a
+     * formation flagged as a combat team is found, so that units in child formations are correctly attributed to the
+     * governing combat team.</p>
+     *
+     * @param formation the formation whose governing combat team should be located
+     * @param campaign  the {@link Campaign} used to resolve the combat team map
+     *
+     * @return the governing {@link CombatTeam}, or {@code null} if no combat team exists in the hierarchy
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nullable CombatTeam resolveCombatTeam(Formation formation, Campaign campaign) {
+        Hashtable<Integer, CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsMap(campaign);
+
+        if (formation.isCombatTeam()) {
+            return combatTeams.get(formation.getId());
+        }
+
+        for (Formation parentFormation : formation.getAllParents()) {
+            if (parentFormation.isCombatTeam()) {
+                return combatTeams.get(parentFormation.getId());
+            }
+        }
+
+        return null;
     }
 
     /**
