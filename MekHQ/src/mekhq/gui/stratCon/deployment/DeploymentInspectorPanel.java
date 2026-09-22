@@ -44,6 +44,7 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 import javax.swing.BorderFactory;
@@ -362,9 +363,11 @@ public class DeploymentInspectorPanel extends JPanel {
               formation.getAllUnits(true).size()));
 
         if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
-            int averageFatigue = formationAverageFatigue(formation);
-            summary.append("<br/>").append(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "deploymentWizard.inspector.averageFatigue", averageFatigue));
+            OptionalInt averageFatigue = formationAverageFatigue(formation);
+            if (averageFatigue.isPresent()) {
+                summary.append("<br/>").append(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "deploymentWizard.inspector.averageFatigue", averageFatigue.getAsInt()));
+            }
         }
         return summary.toString();
     }
@@ -413,9 +416,11 @@ public class DeploymentInspectorPanel extends JPanel {
         details.append("<br/>");
 
         if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
-            int unitFatigue = averageEffectiveFatigue(unit.getActiveCrew());
-            details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.fatigue",
-                      unitFatigue)).append("<br/>");
+            OptionalInt unitFatigue = averageEffectiveFatigue(unit.getActiveCrew());
+            if (unitFatigue.isPresent()) {
+                details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.fatigue",
+                      unitFatigue.getAsInt())).append("<br/>");
+            }
         }
 
         int crewSize = unit.getActiveCrew().size();
@@ -468,12 +473,13 @@ public class DeploymentInspectorPanel extends JPanel {
 
     /**
      * Averages the effective fatigue across every unit's active crew in a formation, so the dossier can show how worn
-     * down the whole force is. Returns {@code -1} when the formation has no active crew, so the caller can omit the line.
+     * down the whole force is. Returns an empty result when the formation has no active crew, so the caller can omit
+     * the line.
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private int formationAverageFatigue(Formation formation) {
+    private OptionalInt formationAverageFatigue(Formation formation) {
         List<Person> allCrew = new ArrayList<>();
         for (UUID unitId : formation.getAllUnits(true)) {
             Unit unit = campaign.getUnit(unitId);
@@ -485,21 +491,21 @@ public class DeploymentInspectorPanel extends JPanel {
     }
 
     /**
-     * Averages the effective fatigue across a set of crew members. Returns {@code 0} for an empty set, so the caller
-     * can omit the line rather than dividing by zero.
+     * Averages the effective fatigue across a set of crew members. Returns an empty result for an empty set, so the
+     * caller can omit the line; no numeric sentinel works because effective fatigue can be negative.
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private int averageEffectiveFatigue(List<Person> crew) {
+    private OptionalInt averageEffectiveFatigue(List<Person> crew) {
         if (crew.isEmpty()) {
-            return 0;
+            return OptionalInt.empty();
         }
         int totalFatigue = 0;
         for (Person person : crew) {
             totalFatigue += Fatigue.getEffectiveFatigue(person, campaign);
         }
-        return (int) Math.round((double) totalFatigue / crew.size());
+        return OptionalInt.of((int) Math.round((double) totalFatigue / crew.size()));
     }
 
     private static void appendScoutingSkill(Unit unit, StringBuilder details) {
