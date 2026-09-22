@@ -61,7 +61,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
@@ -70,6 +72,9 @@ import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
@@ -726,11 +731,14 @@ public class ChaosReputation {
      * @param personnel        the personnel involved (penalized in per-character mode)
      * @param scale            the loot scale factor
      * @param scenarios        the contract's scenarios, used to value component loot
+     * @param campaignState    the contract's StratCon campaign state, or {@code null} when the contract is not tracked
+     *                         by StratCon; when present, only Essential scenarios contribute component loot
      * @param actWasSuccessful whether the underlying act succeeded (affects the avoidance target number)
      * @param contractName     the contract name, used in the finance and dialog text
      */
     public static void resolveActOfPiracy(Campaign campaign, List<Person> personnel, int scale,
-          List<Scenario> scenarios, boolean actWasSuccessful, String contractName) {
+          List<Scenario> scenarios, @Nullable StratConCampaignState campaignState, boolean actWasSuccessful,
+          String contractName) {
         PlayerForce playerForce = campaign.getPlayerForce();
         Person commander = playerForce.getHumanResources().getCommander(campaign.getCampaignOptions(),
               playerForce.isClanForce(),
@@ -748,7 +756,7 @@ public class ChaosReputation {
         }
         boolean gotCaught = roll < targetNumber;
 
-        int supportPointsLoot = determinePiracySP(scale, scenarios, commander);
+        int supportPointsLoot = determinePiracySP(scale, scenarios, campaignState, commander);
         Money booty = ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(supportPointsLoot);
         creditFinancesForBooty(campaign, contractName, booty);
 
@@ -825,11 +833,14 @@ public class ChaosReputation {
      *
      * @param scale             the loot scale factor
      * @param scenarios         the contract's scenarios
+     * @param campaignState     the contract's StratCon campaign state, or {@code null} when the contract is not tracked
+     *                          by StratCon
      * @param campaignCommander the campaign commander
      *
      * @return the total looted support points
      */
-    private static int determinePiracySP(int scale, List<Scenario> scenarios, @Nullable Person campaignCommander) {
+    private static int determinePiracySP(int scale, List<Scenario> scenarios,
+          @Nullable StratConCampaignState campaignState, @Nullable Person campaignCommander) {
         int roll = d6(1);
         if (campaignCommander != null && campaignCommander.getOptions().booleanOption(PersonnelOptions.LOOT_GOBLIN)) {
             roll = min(6, roll + 1);
@@ -837,7 +848,7 @@ public class ChaosReputation {
 
         int contractLootSP = determineContractLoot(roll, scale);
 
-        int componentLootSP = determineComponentLoot(scenarios, scale);
+        int componentLootSP = determineComponentLoot(scenarios, campaignState);
 
         return contractLootSP + componentLootSP;
     }
@@ -866,35 +877,80 @@ public class ChaosReputation {
     }
 
     /**
-     * Returns the component-loot support points earned from the number of victorious scenarios, scaled by
-     * {@code scale}.
+     * Returns the component-loot support points earned from the number of victorious scenarios.
      *
-     * @param scenarios the contract's scenarios
-     * @param scale     the loot scale factor
+     * <p>When the contract is tracked by StratCon, only Essential scenarios (those tied to a StratCon strategic
+     * objective) are counted. When the contract has no StratCon campaign state, every scenario is counted.</p>
+     *
+     * @param scenarios     the contract's scenarios
+     * @param campaignState the contract's StratCon campaign state, or {@code null} when the contract is not tracked by
+     *                      StratCon
      *
      * @return the scaled component-loot support points
      */
-    private static int determineComponentLoot(List<Scenario> scenarios, int scale) {
+    private static int determineComponentLoot(List<Scenario> scenarios,
+          @Nullable StratConCampaignState campaignState) {
+        // A null set signals that the contract is not StratCon-tracked, so every scenario counts; otherwise only the
+        // Essential scenarios (those whose IDs are in the set) contribute.
+        Set<Integer> essentialScenarioIDs = getEssentialScenarioIDs(campaignState);
+
         int runningTotal = 0;
         for (Scenario scenario : scenarios) {
+            if ((essentialScenarioIDs != null) && !essentialScenarioIDs.contains(scenario.getId())) {
+                continue;
+            }
+
             if (scenario.getStatus().isVictory()) {
                 runningTotal++;
             }
         }
 
         // Hot Spots Draconis Reach, first printing, pg 126
-        int value = switch (runningTotal) {
-            case 0 -> 0;
-            case 1 -> 250;
-            case 2 -> 300;
-            case 3 -> 400;
-            case 4 -> 500;
-            case 5 -> 550;
-            case 6 -> 600;
-            default -> 650;
-        };
+        int total = 0;
+        for (int i = 0; i <= runningTotal; i++) {
+            int roll = d6(1);
+            total += switch (roll) {
+                case 0 -> 0;
+                case 1 -> 250;
+                case 2 -> 300;
+                case 3 -> 400;
+                case 4 -> 500;
+                case 5 -> 550;
+                case 6 -> 600;
+                default -> 650; // Not normally reachable
+            };
+        }
 
-        return value * scale;
+        return total;
+    }
+
+    /**
+     * Collects the backing scenario IDs of every Essential scenario - those tied to a StratCon strategic objective -
+     * across all the contract's tracks.
+     *
+     * @param campaignState the contract's StratCon campaign state, or {@code null} when the contract is not tracked by
+     *                      StratCon
+     *
+     * @return the set of Essential backing scenario IDs (empty when the contract has none), or {@code null} when there
+     *       is no StratCon campaign state, signaling that every scenario should be counted
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nullable Set<Integer> getEssentialScenarioIDs(@Nullable StratConCampaignState campaignState) {
+        if (campaignState == null) {
+            return null;
+        }
+
+        Set<Integer> essentialScenarioIDs = new HashSet<>();
+        for (StratConTrackState track : campaignState.getTracks()) {
+            for (StratConScenario stratConScenario : track.getScenarios().values()) {
+                if (stratConScenario.isStrategicObjective()) {
+                    essentialScenarioIDs.add(stratConScenario.getBackingScenarioID());
+                }
+            }
+        }
+        return essentialScenarioIDs;
     }
 
     /**

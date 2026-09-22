@@ -34,6 +34,7 @@ package mekhq.campaign.mission.utilities;
 
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
 import static mekhq.campaign.mission.scenarios.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -349,11 +350,12 @@ public class MissionCompletionManager {
             ChaosReputation.processContractCompletion(campaign, status, personnel,
                   ContractCharacteristics.getUnitReputationMultiplier(mission, status));
 
-            if (mission.getEmployerFactionCode().equals(PIRATE_FACTION_CODE)) {
+            if (mission.usesSpecialRule(USE_PIRATE_LOOTING)) {
                 ChaosReputation.resolveActOfPiracy(campaign,
                       personnel,
                       mission.getScale(),
                       mission.getScenarios(),
+                      mission.getStratConCampaignState(),
                       status.isOverallSuccess(),
                       mission.getName());
             }

@@ -1043,6 +1043,22 @@ public abstract class AbstractContract {
         return getObjectiveType().getChaosObjectiveType().isAttacker();
     }
 
+    /**
+     * Reports whether this contract's objective carries the given Chaos special rule.
+     *
+     * @param specialRule the special rule to test for
+     *
+     * @return {@code true} when the contract's objective type uses the special rule; {@code false} when it does not or
+     *       the contract has no objective type assigned
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean usesSpecialRule(ChaosObjectiveSpecialRules specialRule) {
+        ContractObjectiveType objectiveType = getObjectiveType();
+        return (objectiveType != null) && objectiveType.getChaosObjectiveType().usesSpecialRule(specialRule);
+    }
+
     public @Nonnull Money getSalvagedByEmployerValue() {
         return salvagedByEmployerValue;
     }

@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.utilities;
 
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -614,7 +615,7 @@ public class MissionCompletionManagerTest {
 
             List<Person> personnel = List.of(mock(Person.class));
             when(humanResources.getPersonnelFilteringOutDepartedAndAbsent()).thenReturn(personnel);
-            when(mission.getEmployerFactionCode()).thenReturn(NON_PIRATE_FACTION_CODE);
+            when(mission.usesSpecialRule(USE_PIRATE_LOOTING)).thenReturn(false);
 
             try (MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
                   ContractCharacteristics.class);
@@ -628,7 +629,7 @@ public class MissionCompletionManagerTest {
                 chaosReputation.verify(() -> ChaosReputation.processContractCompletion(campaign, MissionStatus.SUCCESS,
                       personnel, 1.5));
                 chaosReputation.verify(() -> ChaosReputation.resolveActOfPiracy(any(), any(), anyInt(),
-                      any(), anyBoolean(), any()), never());
+                      any(), any(), anyBoolean(), any()), never());
             }
         }
 
@@ -648,7 +649,7 @@ public class MissionCompletionManagerTest {
             List<Person> personnel = List.of(mock(Person.class));
             List<Scenario> scenarios = List.of(mock(Scenario.class));
             when(humanResources.getPersonnelFilteringOutDepartedAndAbsent()).thenReturn(personnel);
-            when(mission.getEmployerFactionCode()).thenReturn(Faction.PIRATE_FACTION_CODE);
+            when(mission.usesSpecialRule(USE_PIRATE_LOOTING)).thenReturn(true);
             when(mission.getScale()).thenReturn(4);
             when(mission.getScenarios()).thenReturn(scenarios);
             when(mission.getName()).thenReturn("Raid");
@@ -663,7 +664,7 @@ public class MissionCompletionManagerTest {
                 MissionCompletionManager.payCompletionBonusAndReputation(campaign, mission, MissionStatus.SUCCESS);
 
                 chaosReputation.verify(() -> ChaosReputation.resolveActOfPiracy(campaign, personnel, 4, scenarios,
-                      true, "Raid"));
+                      null, true, "Raid"));
             }
         }
     }
