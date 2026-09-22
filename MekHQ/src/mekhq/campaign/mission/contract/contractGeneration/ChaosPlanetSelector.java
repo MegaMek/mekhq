@@ -164,7 +164,7 @@ public final class ChaosPlanetSelector {
      */
     static boolean isInhabited(final Planet planet, final LocalDate when) {
         Long population = planet.getPopulation(when);
-        return population > 0;
+        return population != null && population > 0;
     }
 
     /**

@@ -154,9 +154,13 @@ class ChaosPlanetSelectorTest {
         return planet;
     }
 
-    /** A planet mocked with the given strategic value that also has a recorded population. */
+    /**
+     * A planet mocked with the given strategic value that also has a recorded population. The small population is
+     * itself worth one point, so the other components carry {@code strategicValue - 1}; valid for values {@code 1..17},
+     * where those components leave population empty.
+     */
     private static Planet inhabitedPlanetWithStrategicValue(final int strategicValue) {
-        Planet planet = planetWithStrategicValue(strategicValue);
+        Planet planet = planetWithStrategicValue(strategicValue - 1);
         when(planet.getPopulation(TEST_DATE)).thenReturn(1_000L);
         return planet;
     }
