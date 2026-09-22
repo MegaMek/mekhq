@@ -35,6 +35,7 @@ package mekhq.campaign;
 
 import static java.lang.Math.ceil;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.SIMULATED_DAMAGE;
 import static mekhq.campaign.mission.scenarios.Scenario.T_SPACE;
 import static mekhq.campaign.parts.enums.PartQuality.QUALITY_D;
 import static mekhq.campaign.randomEvents.prisoners.NonCombatPrisoners.getCivilianCaptives;
@@ -343,11 +344,15 @@ public class ResolveScenarioTracker {
                         }
                     }
 
-                    TestUnit newUnit = generateNewTestUnit(entity);
-                    UnitStatus unitStatus = new UnitStatus(newUnit);
-                    unitStatus.setTotalLoss(false);
-                    salvageStatus.put(newUnit.getId(), unitStatus);
-                    potentialSalvage.add(newUnit);
+                    // Under SIMULATED_DAMAGE the enemy took no lasting damage either, so nothing is left behind to
+                    // salvage.
+                    if (!voidsCombatDamage()) {
+                        TestUnit newUnit = generateNewTestUnit(entity);
+                        UnitStatus unitStatus = new UnitStatus(newUnit);
+                        unitStatus.setTotalLoss(false);
+                        salvageStatus.put(newUnit.getId(), unitStatus);
+                        potentialSalvage.add(newUnit);
+                    }
                 }
             }
             // Kill credit automatically assigned only if they can't escape
@@ -511,7 +516,9 @@ public class ResolveScenarioTracker {
                     enemyEjections.put(UUID.fromString(wreck.getCrew().getExternalIdAsString()), (EjectedCrew) wreck);
                     continue;
                 }
-                if (control) {
+                // Under SIMULATED_DAMAGE the enemy took no lasting damage either, so nothing is left behind to
+                // salvage.
+                if (control && !voidsCombatDamage()) {
                     TestUnit nu = generateNewTestUnit(wreck);
                     UnitStatus us = new UnitStatus(nu);
                     us.setTotalLoss(false);
@@ -1555,7 +1562,9 @@ public class ResolveScenarioTracker {
                     }
                     continue;
                 }
-                if (control) {
+                // Under SIMULATED_DAMAGE the enemy took no lasting damage either, so nothing is left behind to
+                // salvage.
+                if (control && !voidsCombatDamage()) {
                     TestUnit nu = generateNewTestUnit(e);
                     UnitStatus us = new UnitStatus(nu);
                     us.setTotalLoss(false);
@@ -1701,6 +1710,21 @@ public class ResolveScenarioTracker {
         return campaign.getContract(scenario.getMissionId());
     }
 
+    /**
+     * Whether this scenario's mission carries the {@code SIMULATED_DAMAGE} contract special rule, which voids every
+     * combat consequence of the scenario: neither side's units take lasting damage or losses, so there is nothing
+     * for the player to salvage.
+     *
+     * @return {@code true} when the scenario's mission uses the {@code SIMULATED_DAMAGE} special rule
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean voidsCombatDamage() {
+        AbstractContract mission = getMission();
+        return (mission != null) && mission.usesSpecialRule(SIMULATED_DAMAGE);
+    }
+
     public @jakarta.annotation.Nullable UUID getMissionId() {
         return getMission() == null ? null : getMission().getId();
     }
@@ -1790,6 +1814,8 @@ public class ResolveScenarioTracker {
 
         blc = mission.getBattlefieldLossMultiplier();
 
+        boolean voidsCombatDamage = voidsCombatDamage();
+
         // now lets update personnel
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseInjuryFatigue = campaignOptions.get(CampaignOption.USE_INJURY_FATIGUE);
@@ -1812,7 +1838,7 @@ public class ResolveScenarioTracker {
             // Medical injuries are stored separately, so writing severity back into `hits` would double-count.
             int priorHits = person.getHits();
             int newInjuryHits = 0;
-            if (status.getHits() > priorSeverity) {
+            if (!voidsCombatDamage && status.getHits() > priorSeverity) {
                 int newHits = status.getHits() - priorSeverity;
                 // Note: newInjuryHits modifies the newHits. It can increase or decrease the value.
                 newInjuryHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(person, isUseInjuryFatigue,
@@ -1839,20 +1865,22 @@ public class ResolveScenarioTracker {
                 getCampaign().addKill(k);
             }
 
-            if (status.isMissing()) {
-                if (control) {
-                    person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.MIA);
-                } else {
-                    boolean isSpace = scenario.getBoardType() == T_SPACE;
-                    capturePrisoners.attemptCaptureOfPlayerCharacter(person, status.pickedUp, isSpace);
+            if (!voidsCombatDamage) {
+                if (status.isMissing()) {
+                    if (control) {
+                        person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.MIA);
+                    } else {
+                        boolean isSpace = scenario.getBoardType() == T_SPACE;
+                        capturePrisoners.attemptCaptureOfPlayerCharacter(person, status.pickedUp, isSpace);
+                    }
+                } else if (status.isDead()) {
+                    person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
+                    getCampaign().getPlayerForce().getHumanResources().getRetirementDefectionTracker()
+                          .removeFromCampaign(person, true, false, getCampaign(), mission);
                 }
-            } else if (status.isDead()) {
-                person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
-                getCampaign().getPlayerForce().getHumanResources().getRetirementDefectionTracker()
-                      .removeFromCampaign(person, true, false, getCampaign(), mission);
             }
 
-            if (!status.isDead()) {
+            if (voidsCombatDamage || !status.isDead()) {
                 person.changeFatigue(fatigueRate);
 
                 if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
@@ -1949,7 +1977,13 @@ public class ResolveScenarioTracker {
                 unitValue = unit.getSellValue();
             }
 
-            if (unitStatus.isTotalLoss()) {
+            if (voidsCombatDamage) {
+                // The unit's own entity is left untouched - the battle's damage is never applied to it - so it comes
+                // back from the scenario exactly as it went in.
+                unit.runDiagnostic(true);
+                unit.resetPilotAndEntity();
+                campaign.addReport(TECHNICAL, unit.getHyperlinkedName() + " has been recovered.");
+            } else if (unitStatus.isTotalLoss()) {
                 // The unit is destroyed beyond recovery: pay battle loss compensation on its purchase (or sale) value.
                 ContractSupportPayments.payBattlefieldLoss(campaign, mission, unitValue.multipliedBy(blc),
                       unit.getName());
