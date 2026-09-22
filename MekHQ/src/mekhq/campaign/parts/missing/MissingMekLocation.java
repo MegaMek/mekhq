@@ -235,6 +235,14 @@ public class MissingMekLocation extends MissingPart {
             }
         }
 
+        // A location whose internal structure is gone has been blown off or destroyed. Without this guard, stale
+        // critical-slot state on a destroyed location - mounts still flagged repairable, or a LAM's unit-wide
+        // landing gear/avionics still showing as present because they survive elsewhere - would permanently and
+        // incorrectly block replacing the location.
+        if (unit.getEntity().isLocationTrulyDestroyed(loc)) {
+            return null;
+        }
+
         // There must be no usable equipment currently in the location
         // You can only salvage a location that has nothing left on it
         Set<Integer> equipmentSeen = new HashSet<>();
