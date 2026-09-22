@@ -485,7 +485,7 @@ public class DeploymentInspectorPanel extends JPanel {
     }
 
     /**
-     * Averages the effective fatigue across a set of crew members. Returns {@code -1} for an empty set, so the caller
+     * Averages the effective fatigue across a set of crew members. Returns {@code 0} for an empty set, so the caller
      * can omit the line rather than dividing by zero.
      *
      * @author Illiani
@@ -493,7 +493,7 @@ public class DeploymentInspectorPanel extends JPanel {
      */
     private int averageEffectiveFatigue(List<Person> crew) {
         if (crew.isEmpty()) {
-            return -1;
+            return 0;
         }
         int totalFatigue = 0;
         for (Person person : crew) {
