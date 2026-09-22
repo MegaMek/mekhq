@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.contract.contractGeneration;
+package mekhq.campaign.mission.contract.contractData;
 
 public enum ChaosObjectiveSpecialRules {
     /* Player gets bonus loot after each track. */

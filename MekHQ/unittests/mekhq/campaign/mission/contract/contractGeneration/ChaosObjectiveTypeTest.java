@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.EnumMap;
 import java.util.Map;
 
+import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;

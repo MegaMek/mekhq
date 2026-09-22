@@ -35,12 +35,12 @@ package mekhq.campaign.mission.contract.contractGeneration;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveSpecialRules.DOUBLE_ALL_COSTS;
-import static mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveSpecialRules.DOUBLE_SUPPORT_PAYOUTS;
-import static mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveSpecialRules.END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS;
-import static mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveSpecialRules.NO_IN_CONTRACT_SUPPORT;
-import static mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveSpecialRules.SIMULATED_DAMAGE;
-import static mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.DOUBLE_ALL_COSTS;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.DOUBLE_SUPPORT_PAYOUTS;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.NO_IN_CONTRACT_SUPPORT;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.SIMULATED_DAMAGE;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +48,7 @@ import java.util.List;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 
 public enum ChaosObjectiveType {
