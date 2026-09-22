@@ -20,12 +20,12 @@ Dave keeps MegaMek + mm-data. This handoff is the MekHQ slice only.
 
 **Phase 1 — Plumbing.** All 5 originally-planned classes plus 8 more, in
 `MekHQ/src/mekhq/campaign/universe/companyGeneration/ratgen/`: `CommandGenerator`, `ForceDescriptorWalker`,
-`CrewDescriptorAdapter`, `MultiCrewAssembler`, `PersonnelRoleResolver`, `RulesetEngineBootstrap`, `RulesetRankAssigner`,
+`CrewDescriptorAdapter`, `MultiCrewAssembler`, `RulesetEngineBootstrap`, `RulesetRankAssigner`,
 `RankAssigner`, `ForceDescriptorSnapshot`, `FormationIconBuilder`, `SupportPersonnelAssigner` + `Calculator` +
 `Generator`. `CompanyGenerationMethod.RULESET_BASED` wired through `CommandGenerationDialog`.
 
 **Phase 2 — Non-Mek + multi-crew.** `MultiCrewAssembler` handles drivers, gunners, squads, vessels.
-`PersonnelRoleResolver` covers every `UnitType`.
+Crew roles per seat come from `Unit.getDriverRole()` and `Unit.getGunnerRole()`.
 
 **Phase 3 — Regiment scale + combined-arms + faction-aware echelon.** `RulesetRankAssigner` walks the tree and assigns
 ranks via the faction's rank system. `FormationIconBuilder` classifies icons by dominant unit type with weight-class
@@ -112,7 +112,6 @@ MekHQ/src/mekhq/campaign/universe/companyGeneration/ratgen/
   RulesetEngineBootstrap.java          <- Phase 4 addRulesetDirectory() call lands here
   ForceDescriptorWalker.java           <- tree -> MekHQ Formations
   MultiCrewAssembler.java              <- per-unit-type crew assembly
-  PersonnelRoleResolver.java           <- UnitType -> PersonnelRole
   RulesetRankAssigner.java             <- rank tier per Formation depth
   FormationIconBuilder.java            <- StratOps icon picker
   SupportPersonnelGenerator.java       <- CamOps support personnel

@@ -33,16 +33,19 @@
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ratgenerator.MissionRole;
+import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * User-facing inputs for {@code Ruleset.processRoot}, serialized alongside the rest of
@@ -55,6 +58,8 @@ import mekhq.utilities.MHQXMLUtility;
  * percentages. Default-on-missing semantics keep old presets parsing cleanly.</p>
  */
 public final class ForceDescriptorSnapshot {
+
+    private static final MMLogger LOGGER = MMLogger.create(ForceDescriptorSnapshot.class);
 
     private String faction;
     private int year;
@@ -103,7 +108,10 @@ public final class ForceDescriptorSnapshot {
         this.year = year;
     }
 
-    public Integer getEchelon() {
+    /**
+     * @return the ratgen echelon, or {@code null} to leave the ruleset's own choice
+     */
+    public @Nullable Integer getEchelon() {
         return echelon;
     }
 
@@ -111,7 +119,10 @@ public final class ForceDescriptorSnapshot {
         this.echelon = echelon;
     }
 
-    public Integer getUnitType() {
+    /**
+     * @return the {@link megamek.common.units.UnitType} integer, or {@code null} to leave the ruleset's own choice
+     */
+    public @Nullable Integer getUnitType() {
         return unitType;
     }
 
@@ -119,7 +130,10 @@ public final class ForceDescriptorSnapshot {
         this.unitType = unitType;
     }
 
-    public String getRating() {
+    /**
+     * @return the equipment rating, or {@code null} to leave the ruleset's own choice
+     */
+    public @Nullable String getRating() {
         return rating;
     }
 
@@ -127,7 +141,10 @@ public final class ForceDescriptorSnapshot {
         this.rating = rating;
     }
 
-    public Integer getExperience() {
+    /**
+     * @return the experience level, or {@code null} to have it randomized
+     */
+    public @Nullable Integer getExperience() {
         return experience;
     }
 
@@ -135,7 +152,10 @@ public final class ForceDescriptorSnapshot {
         this.experience = experience;
     }
 
-    public Integer getWeightClass() {
+    /**
+     * @return the weight class, or {@code null} to leave the ruleset's own choice
+     */
+    public @Nullable Integer getWeightClass() {
         return weightClass;
     }
 
@@ -155,7 +175,10 @@ public final class ForceDescriptorSnapshot {
         this.augmented = augmented;
     }
 
-    public Integer getSizeMod() {
+    /**
+     * @return the size modifier, or {@code null} to leave the ruleset's own choice
+     */
+    public @Nullable Integer getSizeMod() {
         return sizeMod;
     }
 
@@ -287,17 +310,23 @@ public final class ForceDescriptorSnapshot {
     }
 
     /**
-     * Parses a {@code <forceDescriptorSnapshot>} element. Missing children leave defaults intact, so this
-     * is safe to call on old presets that lack the block.
+     * Parses a {@code <forceDescriptorSnapshot>} element.
+     *
+     * <p>Anything missing keeps its default, so a preset written before a setting existed still loads,
+     * and so does one written by a later version that carries settings this one has no field for.</p>
+     *
+     * @param element the element to read, or {@code null} for an all-defaults snapshot
+     *
+     * @return the snapshot the element describes
      */
-    public static ForceDescriptorSnapshot parseFromXML(Node element) {
-        ForceDescriptorSnapshot snap = new ForceDescriptorSnapshot();
+    public static ForceDescriptorSnapshot parseFromXML(@Nullable Node element) {
+        ForceDescriptorSnapshot snapshot = new ForceDescriptorSnapshot();
         if (element == null) {
-            return snap;
+            return snapshot;
         }
         NodeList children = element.getChildNodes();
-        for (int i = 0; i < children.getLength(); i++) {
-            Node child = children.item(i);
+        for (int index = 0; index < children.getLength(); index++) {
+            Node child = children.item(index);
             if (child.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }
@@ -307,43 +336,68 @@ public final class ForceDescriptorSnapshot {
                 continue;
             }
             text = text.trim();
+            SnapshotElementReader reader = READERS.get(tag);
+            if (reader == null) {
+                LOGGER.debug("[CommandGen] preset carries an element this version does not know, '{}';"
+                            + " ignored", tag);
+                continue;
+            }
             try {
-                switch (tag) {
-                    case "faction" -> snap.faction = text;
-                    case "year" -> snap.year = Integer.parseInt(text);
-                    case "echelon" -> snap.echelon = Integer.parseInt(text);
-                    case "unitType" -> snap.unitType = Integer.parseInt(text);
-                    case "rating" -> snap.rating = text;
-                    case "experience" -> snap.experience = Integer.parseInt(text);
-                    case "weightClass" -> snap.weightClass = Integer.parseInt(text);
-                    case "flags" -> {
-                        for (String token : text.split(",")) {
-                            if (!token.isBlank()) {
-                                snap.flags.add(token.trim());
-                            }
-                        }
-                    }
-                    case "augmented" -> snap.augmented = Boolean.parseBoolean(text);
-                    case "sizeMod" -> snap.sizeMod = Integer.parseInt(text);
-                    case "roles" -> {
-                        for (String token : text.split(",")) {
-                            if (!token.isBlank()) {
-                                snap.roles.add(token.trim());
-                            }
-                        }
-                    }
-                    case "dropshipPct" -> snap.dropshipPct = Double.parseDouble(text);
-                    case "jumpshipPct" -> snap.jumpshipPct = Double.parseDouble(text);
-                    case "cargoPct" -> snap.cargoPct = Double.parseDouble(text);
-                    default -> {
-                        // forward-compatible: unknown tags are ignored
-                    }
-                }
-            } catch (NumberFormatException nfe) {
-                // best-effort parse: leave the default
+                reader.read(snapshot, text);
+            } catch (NumberFormatException exception) {
+                LOGGER.warn("[CommandGen] preset element '{}' held '{}', which is not a number; the"
+                            + " setting keeps its default", tag, text);
             }
         }
-        return snap;
+        return snapshot;
+    }
+
+    /** Reads one element's text into the snapshot it belongs to. */
+    @FunctionalInterface
+    private interface SnapshotElementReader {
+        void read(ForceDescriptorSnapshot snapshot, String text);
+    }
+
+    /**
+     * One reader per element name, built once.
+     *
+     * <p>Looking the element up by name and running its reader keeps each setting's parsing in one place,
+     * and lets an element that fails to parse be reported and skipped without costing the rest of the
+     * preset. This is the shape the contract loader in {@code mekhq.campaign.mission.contract.io} uses.</p>
+     */
+    private static final Map<String, SnapshotElementReader> READERS = createReaderMap();
+
+    private static Map<String, SnapshotElementReader> createReaderMap() {
+        Map<String, SnapshotElementReader> readers = new HashMap<>();
+        readers.put("faction", (snapshot, text) -> snapshot.faction = text);
+        readers.put("year", (snapshot, text) -> snapshot.year = Integer.parseInt(text));
+        readers.put("echelon", (snapshot, text) -> snapshot.echelon = Integer.parseInt(text));
+        readers.put("unitType", (snapshot, text) -> snapshot.unitType = Integer.parseInt(text));
+        readers.put("rating", (snapshot, text) -> snapshot.rating = text);
+        readers.put("experience", (snapshot, text) -> snapshot.experience = Integer.parseInt(text));
+        readers.put("weightClass", (snapshot, text) -> snapshot.weightClass = Integer.parseInt(text));
+        readers.put("flags", (snapshot, text) -> addTokens(text, snapshot.flags));
+        readers.put("augmented", (snapshot, text) -> snapshot.augmented = Boolean.parseBoolean(text));
+        readers.put("sizeMod", (snapshot, text) -> snapshot.sizeMod = Integer.parseInt(text));
+        readers.put("roles", (snapshot, text) -> addTokens(text, snapshot.roles));
+        readers.put("dropshipPct", (snapshot, text) -> snapshot.dropshipPct = Double.parseDouble(text));
+        readers.put("jumpshipPct", (snapshot, text) -> snapshot.jumpshipPct = Double.parseDouble(text));
+        readers.put("cargoPct", (snapshot, text) -> snapshot.cargoPct = Double.parseDouble(text));
+        return Map.copyOf(readers);
+    }
+
+    /**
+     * Splits a comma-separated element into its tokens and adds them to the given set.
+     *
+     * @param text        the element's text
+     * @param destination the set to add the tokens to
+     */
+    private static void addTokens(String text, Set<String> destination) {
+        for (String token : text.split(",")) {
+            if (!token.isBlank()) {
+                destination.add(token.trim());
+            }
+        }
     }
 
     /**
@@ -376,19 +430,19 @@ public final class ForceDescriptorSnapshot {
 
     @Override
     public int hashCode() {
-        return Objects.hash(faction, 
-              year, 
-              echelon, 
-              unitType, 
-              rating, 
-              experience, 
-              weightClass, 
-              flags, 
-              augmented, 
-              sizeMod, 
-              roles, 
-              dropshipPct, 
-              jumpshipPct, 
+        return Objects.hash(faction,
+              year,
+              echelon,
+              unitType,
+              rating,
+              experience,
+              weightClass,
+              flags,
+              augmented,
+              sizeMod,
+              roles,
+              dropshipPct,
+              jumpshipPct,
               cargoPct);
     }
 }

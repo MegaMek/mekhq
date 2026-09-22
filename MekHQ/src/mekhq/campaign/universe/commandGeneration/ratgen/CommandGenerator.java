@@ -155,6 +155,9 @@ public final class CommandGenerator {
     }
 
     private static final MMLogger LOGGER = MMLogger.create(CommandGenerator.class);
+
+    /** C-Bills each die is worth when starting cash is rolled rather than taken as a percentage. */
+    private static final int RANDOM_STARTING_CASH_PER_DIE = 1_000_000;
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CommandGenerator";
 
     /** How many undercrewed units the diagnostic names before it summarises the rest. */
@@ -209,76 +212,76 @@ public final class CommandGenerator {
      * faction and year before rolling (the Command Designer seeds them from the campaign; an OpFor
      * caller seeds them from the scenario's enemy).</p>
      *
-     * @param snap     the roll inputs (faction, year, echelon, unit type, rating, experience,
+     * @param snapshot     the roll inputs (faction, year, echelon, unit type, rating, experience,
      *                 weight class, size modifier, dropship percentage)
      * @param listener progress listener for status updates, or {@code null} for none; called from
      *                 the rolling thread, so any UI work it triggers must be dispatched onto the EDT
      *
      * @return the rolled descriptor tree, its leaves carrying crewed entities
      */
-    public static ForceDescriptor rollCommand(ForceDescriptorSnapshot snap,
+    public static ForceDescriptor rollCommand(ForceDescriptorSnapshot snapshot,
           @Nullable Ruleset.ProgressListener listener) {
         if (listener != null) {
             listener.updateProgress(0.0, "Preparing generation parameters...");
         }
         LOGGER.info("[CompanyGen][Pipeline]snapshot: faction={} year={} echelon={} unitType={} rating={} experience={} weightClass={} augmented={} sizeMod={} dropshipPct={} jumpshipPct={} cargoPct={} flags={} roles={}",
-              snap.getFaction(), snap.getYear(), snap.getEchelon(), snap.getUnitType(),
-              snap.getRating(), snap.getExperience(), snap.getWeightClass(),
-              snap.isAugmented(), snap.getSizeMod(),
-              snap.getDropshipPct(), snap.getJumpshipPct(), snap.getCargoPct(),
-              snap.getFlags(), snap.getRoles());
+              snapshot.getFaction(), snapshot.getYear(), snapshot.getEchelon(), snapshot.getUnitType(),
+              snapshot.getRating(), snapshot.getExperience(), snapshot.getWeightClass(),
+              snapshot.isAugmented(), snapshot.getSizeMod(),
+              snapshot.getDropshipPct(), snapshot.getJumpshipPct(), snapshot.getCargoPct(),
+              snapshot.getFlags(), snapshot.getRoles());
 
         // 1. Bootstrap MegaMek-side state for the target year.
         LOGGER.info("[CompanyGen][Pipeline]Stage 1: bootstrap engine state");
         if (listener != null) {
             listener.updateProgress(0.0, "Loading factions and rulesets...");
         }
-        RulesetEngineBootstrap.ensureLoaded(snap.getYear());
+        RulesetEngineBootstrap.ensureLoaded(snapshot.getYear());
 
         // 2. Build a fresh ForceDescriptor from the snapshot. The Force Generator panel does this
         // server-side via buildForceDescriptor(); we mirror its inputs here so we never depend on the
         // panel being instantiated.
         LOGGER.info("[CompanyGen][Pipeline]Stage 2: build root ForceDescriptor from snapshot");
-        ForceDescriptor fd = new ForceDescriptor();
-        fd.setTopLevel(true);
-        fd.setFaction(snap.getFaction());
-        fd.setYear(snap.getYear());
-        if (snap.getEchelon() != null) {
-            fd.setEchelon(snap.getEchelon());
+        ForceDescriptor forceDescriptor = new ForceDescriptor();
+        forceDescriptor.setTopLevel(true);
+        forceDescriptor.setFaction(snapshot.getFaction());
+        forceDescriptor.setYear(snapshot.getYear());
+        if (snapshot.getEchelon() != null) {
+            forceDescriptor.setEchelon(snapshot.getEchelon());
         }
-        if (snap.getUnitType() != null) {
-            fd.setUnitType(snap.getUnitType());
+        if (snapshot.getUnitType() != null) {
+            forceDescriptor.setUnitType(snapshot.getUnitType());
         }
-        if (snap.getRating() != null) {
-            fd.setRating(snap.getRating());
+        if (snapshot.getRating() != null) {
+            forceDescriptor.setRating(snapshot.getRating());
         }
-        if (snap.getExperience() != null) {
-            fd.setExperience(snap.getExperience());
+        if (snapshot.getExperience() != null) {
+            forceDescriptor.setExperience(snapshot.getExperience());
         }
-        if (snap.getWeightClass() != null) {
-            fd.setWeightClass(snap.getWeightClass());
+        if (snapshot.getWeightClass() != null) {
+            forceDescriptor.setWeightClass(snapshot.getWeightClass());
         }
-        fd.setAugmented(snap.isAugmented());
-        if (snap.getSizeMod() != null) {
-            fd.setSizeMod(snap.getSizeMod());
+        forceDescriptor.setAugmented(snapshot.isAugmented());
+        if (snapshot.getSizeMod() != null) {
+            forceDescriptor.setSizeMod(snapshot.getSizeMod());
         }
-        fd.setDropshipPct(snap.getDropshipPct());
-        LOGGER.info("[CompanyGen][Pipeline]  built fd: faction={} year={} echelon={} unitType={} rating={} weightClass={}",
-              fd.getFaction(), fd.getYear(), fd.getEchelon(), fd.getUnitType(),
-              fd.getRating(), fd.getWeightClass());
+        forceDescriptor.setDropshipPct(snapshot.getDropshipPct());
+        LOGGER.info("[CompanyGen][Pipeline]  built forceDescriptor: faction={} year={} echelon={} unitType={} rating={} weightClass={}",
+              forceDescriptor.getFaction(), forceDescriptor.getYear(), forceDescriptor.getEchelon(), forceDescriptor.getUnitType(),
+              forceDescriptor.getRating(), forceDescriptor.getWeightClass());
 
         // 3. Run the engine. Null listener is safe per Ruleset.processRoot's internal guards.
         LOGGER.info("[CompanyGen][Pipeline]Stage 3: Ruleset.processRoot()");
         if (listener != null) {
             listener.updateProgress(0.0, "Building force structure...");
         }
-        long t0 = System.currentTimeMillis();
-        Ruleset ruleset = Ruleset.findRuleset(fd);
+        long processRootStartedAt = System.currentTimeMillis();
+        Ruleset ruleset = Ruleset.findRuleset(forceDescriptor);
         LOGGER.info("[CompanyGen][Pipeline]  Ruleset.findRuleset({}) resolved to ruleset for faction={}",
-              fd.getFaction(), ruleset.getFaction());
-        ruleset.processRoot(fd, listener);
-        LOGGER.info("[CompanyGen][Pipeline]  Ruleset.processRoot() -> {}ms", System.currentTimeMillis() - t0);
-        return fd;
+              forceDescriptor.getFaction(), ruleset.getFaction());
+        ruleset.processRoot(forceDescriptor, listener);
+        LOGGER.info("[CompanyGen][Pipeline]  Ruleset.processRoot() -> {}ms", System.currentTimeMillis() - processRootStartedAt);
+        return forceDescriptor;
     }
 
     /**
@@ -326,8 +329,8 @@ public final class CommandGenerator {
      * preview or {@link #rollCommand}), so the commit materializes the exact force the player saw.
      */
     public static Result applyToCampaign(Campaign campaign, CommandGenerationOptions options,
-          ForceDescriptor fd, Ruleset.ProgressListener listener) {
-        return applyToCampaign(campaign, options, fd, listener, true);
+          ForceDescriptor forceDescriptor, Ruleset.ProgressListener listener) {
+        return applyToCampaign(campaign, options, forceDescriptor, listener, true);
     }
 
     /**
@@ -341,7 +344,7 @@ public final class CommandGenerator {
      *                        {@code false} to commit combat only
      */
     public static Result applyToCampaign(Campaign campaign, CommandGenerationOptions options,
-          ForceDescriptor fd, Ruleset.ProgressListener listener, boolean generateSupport) {
+          ForceDescriptor forceDescriptor, Ruleset.ProgressListener listener, boolean generateSupport) {
         // Snapshot the hangar before any unit is created so the starting-cash stage can price only
         // the units this build adds (see processStartingCash).
         Set<UUID> preExistingUnitIds = snapshotHangarUnitIds(campaign);
@@ -379,7 +382,7 @@ public final class CommandGenerator {
         // Which descriptor each Formation mirrors, so the rank pass can read levels and commanders from the
         // roll rather than guessing them from depth.
         Map<Formation, ForceDescriptor> descriptorsByFormation = new IdentityHashMap<>();
-        ForceDescriptorWalker.walk(fd, campaign, root, namer, (leaf, parent) -> {
+        ForceDescriptorWalker.walk(forceDescriptor, campaign, root, namer, (leaf, parent) -> {
             long leafStart = System.nanoTime();
             String parentInfo = parent == null ? "null"
                   : ("id=" + parent.getId() + " name='" + parent.getName() + "'");
@@ -491,7 +494,7 @@ public final class CommandGenerator {
         // Fighter Complement option adds - is assigned to that ship, so the TO&E shows it aboard and the
         // scenario launcher loads it in game.
         LOGGER.info("[CompanyGen][Pipeline]Stage 7a: ship transport assignment");
-        ShipTransportAssigner.assign(fd, unitsByDescriptor);
+        ShipTransportAssigner.assign(forceDescriptor, unitsByDescriptor);
 
         // What the rolls produced, as the starting-cash stage prices it: the Spares and Finances tab shows the
         // percentage of exactly these units, so the build credits the percentage of exactly these units.
@@ -584,7 +587,7 @@ public final class CommandGenerator {
         // C3 UUIDs a campaign rebuilds from after a save. The units are the same Entity instances the
         // campaign wrapped - addNewUnit does not copy them - so wiring the descriptor wires the TOE.
         LOGGER.info("[CompanyGen][Pipeline] Stage 7g: C3 network configuration");
-        C3NetworkConfigurator.configure(fd);
+        C3NetworkConfigurator.configure(forceDescriptor);
         campaign.getPlayerForce().refreshNetworks(campaign.getGame());
 
         // 8. Spare-parts warehouse stock-up. Uses the same PartsInUseManager the daily warehouse
@@ -622,7 +625,7 @@ public final class CommandGenerator {
         }
 
         LOGGER.info("[CompanyGen][Pipeline]CommandGenerator.applyToCampaign() DONE");
-        return new Result(fd, generatedPersons, spareCosts, rolledUnitIds);
+        return new Result(forceDescriptor, generatedPersons, spareCosts, rolledUnitIds);
     }
 
     /**
@@ -857,7 +860,7 @@ public final class CommandGenerator {
         int percent = options.getStartingCashPercent();
         Money startingCash;
         if (options.isRandomizeStartingCash()) {
-            startingCash = Money.of(1_000_000)
+            startingCash = Money.of(RANDOM_STARTING_CASH_PER_DIE)
                                  .multipliedBy(Utilities.dice(options.getRandomStartingCashDiceCount(), 6));
             LOGGER.info("[CompanyGen][Pipeline]Stage 9: randomized starting cash {}d6 million -> {}",
                   options.getRandomStartingCashDiceCount(), startingCash.toAmountAndSymbolString());
