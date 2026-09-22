@@ -138,7 +138,15 @@ public class ResolveScenarioTracker {
     /* AtB */ int contractBreaches = 0;
     int bonusRolls = 0;
 
-    /* Blob crew casualties */ Map<PersonnelRole, Integer> killedTempCrew = new HashMap<>();
+    /* Blob crew casualties */
+    Map<PersonnelRole, Integer> killedTempCrew = new HashMap<>();
+
+    /**
+     * Blob crew losses rolled for the unit currently being processed, but not yet applied to it. Applying each loss
+     * individually would reset the unit and fire a change event per casualty, so they are batched and applied by
+     * {@link #applyPendingBlobCrewLosses(Unit)} once the unit's casualties have all been assigned.
+     */
+    private final Map<PersonnelRole, Integer> pendingBlobCrewLosses = new EnumMap<>(PersonnelRole.class);
 
     Campaign campaign;
     Scenario scenario;
@@ -899,17 +907,19 @@ public class ResolveScenarioTracker {
                 // Vehicle temp (blob) crew are not Person records, so the crit-based vehicle crew handling above never
                 // touches them. When the vehicle is lost with its crew, its temp crew are at risk too: each rolls to
                 // survive on the same odds as named vehicle crew (2d6 >= 7 survives, otherwise killed).
-                if ((en instanceof Tank) && (u.getTotalTempCrew() > 0)) {
+                int remainingTempCrew = getRemainingBlobCrew(u);
+                if ((en instanceof Tank) && (remainingTempCrew > 0)) {
                     boolean crewLost = (pilot == null) || unitStatus.isTotalLoss() || isVehicleCrewLost(en);
                     if (crewLost) {
-                        int tempCrew = u.getTotalTempCrew();
-                        for (int i = 0; i < tempCrew; i++) {
+                        for (int i = 0; i < remainingTempCrew; i++) {
                             if ((Compute.d6(2) < 7) && !killOneBlobCrew(u)) {
                                 break;
                             }
                         }
                     }
                 }
+
+                applyPendingBlobCrewLosses(u);
             }
         }
 
@@ -944,8 +954,9 @@ public class ResolveScenarioTracker {
      * @return The type of casualty assignment that occurred
      */
     private CasualtyAssignment assignTempCrewCasualty(Unit unit, PersonStatus status) {
-        int totalCrew = unit.getTotalCrewSize();
-        int totalBlobCrew = unit.getTotalTempCrew();
+        // Blob crew already killed but not yet applied to the unit are no longer available to take hits
+        int totalBlobCrew = getRemainingBlobCrew(unit);
+        int totalCrew = unit.getTotalCrewSize() - (unit.getTotalTempCrew() - totalBlobCrew);
 
         // Determine if blob crew is hit (proportional to blob crew / total crew)
         boolean hitBlobCrew = false;
@@ -969,8 +980,9 @@ public class ResolveScenarioTracker {
 
     /**
      * Kills a single blob (temp) crew member on the given unit, selected at random and weighted by how many temp crew
-     * occupy each {@link PersonnelRole}. The loss is recorded for death benefits, removed from the unit, and removed
-     * from the campaign temp crew pool so that it is a permanent casualty that must be re-hired.
+     * occupy each {@link PersonnelRole}. The loss is recorded for death benefits and queued in
+     * {@link #pendingBlobCrewLosses}; it is removed from the unit and the campaign temp crew pool when
+     * {@link #applyPendingBlobCrewLosses(Unit)} is called.
      *
      * @param unit the unit to remove a temp crew member from
      *
@@ -980,10 +992,11 @@ public class ResolveScenarioTracker {
      * @since 0.51.01
      */
     private boolean killOneBlobCrew(Unit unit) {
-        Map<PersonnelRole, Integer> tempCrewCounts = new HashMap<>();
+        // EnumMap so iteration order (and therefore which role a given roll selects) is deterministic
+        Map<PersonnelRole, Integer> tempCrewCounts = new EnumMap<>(PersonnelRole.class);
         int totalBlobCrew = 0;
         for (PersonnelRole role : PersonnelRole.values()) {
-            int count = unit.getTempCrewByPersonnelRole(role);
+            int count = unit.getTempCrewByPersonnelRole(role) - pendingBlobCrewLosses.getOrDefault(role, 0);
             if (count > 0) {
                 tempCrewCounts.put(role, count);
                 totalBlobCrew += count;
@@ -1001,16 +1014,53 @@ public class ResolveScenarioTracker {
             cumulative += entry.getValue();
             if (roll < cumulative) {
                 PersonnelRole role = entry.getKey();
-                unit.setTempCrew(role, entry.getValue() - 1);
-                // Remove the casualty from the campaign pool too. Otherwise the daily empty/fill cycle in
-                // CampaignNewDayManager silently refills the loss for free and the total temp crew count never drops.
-                campaign.decreaseTempCrewPool(role, 1);
+                pendingBlobCrewLosses.merge(role, 1, Integer::sum);
                 killedTempCrew.merge(role, 1, Integer::sum);
                 return true;
             }
         }
 
         return false;
+    }
+
+    /**
+     * Returns how many blob (temp) crew remain on the given unit once the losses queued in
+     * {@link #pendingBlobCrewLosses} are taken into account.
+     *
+     * @param unit the unit to count temp crew for
+     *
+     * @return the number of temp crew still available to take casualties
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int getRemainingBlobCrew(Unit unit) {
+        int pendingLosses = 0;
+        for (int count : pendingBlobCrewLosses.values()) {
+            pendingLosses += count;
+        }
+        return unit.getTotalTempCrew() - pendingLosses;
+    }
+
+    /**
+     * Applies all blob (temp) crew losses queued in {@link #pendingBlobCrewLosses} to the given unit, making a single
+     * update per {@link PersonnelRole}, then clears the queue.
+     *
+     * @param unit the unit the queued losses were rolled against
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void applyPendingBlobCrewLosses(Unit unit) {
+        for (Map.Entry<PersonnelRole, Integer> entry : pendingBlobCrewLosses.entrySet()) {
+            PersonnelRole role = entry.getKey();
+            int losses = entry.getValue();
+            unit.setTempCrew(role, unit.getTempCrewByPersonnelRole(role) - losses);
+            // Remove the casualties from the campaign pool too. Otherwise the daily empty/fill cycle in
+            // CampaignNewDayManager silently refills the losses for free and the total temp crew count never drops.
+            campaign.decreaseTempCrewPool(role, losses);
+        }
+        pendingBlobCrewLosses.clear();
     }
 
     /**
@@ -1153,6 +1203,7 @@ public class ResolveScenarioTracker {
         while (casualtiesAssigned < casualties && killOneBlobCrew(ship)) {
             casualtiesAssigned++;
         }
+        applyPendingBlobCrewLosses(ship);
 
         // Now, did the passengers take any hits?
         // We'll assume that if units in transport bays were hit, their crews and techs
@@ -1465,6 +1516,7 @@ public class ResolveScenarioTracker {
                 status.setXP(campaign.getCampaignOptions().get(CampaignOption.SCENARIO_XP));
                 oppositionPersonnel.put(person.getId(), status);
             }
+            applyPendingBlobCrewLosses(unit);
         }
     }
 
