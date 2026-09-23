@@ -60,6 +60,7 @@ public final class StratConPointOfInterestBehaviors {
 
     static {
         behaviors.put(DEFAULT_BEHAVIOR_ID, DEFAULT_BEHAVIOR);
+        behaviors.put(StratConDataCacheBehavior.BEHAVIOR_ID, new StratConDataCacheBehavior());
     }
 
     private StratConPointOfInterestBehaviors() {

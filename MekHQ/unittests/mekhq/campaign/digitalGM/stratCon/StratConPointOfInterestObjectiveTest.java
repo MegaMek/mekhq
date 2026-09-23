@@ -296,7 +296,7 @@ class StratConPointOfInterestObjectiveTest {
               List.of(pointOfInterestObjective(1, TYPE_ID)),
               List.of(ordinaryPointOfInterest(OTHER_TYPE_ID, 4)));
 
-        StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState);
+        StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState, true, true);
 
         List<StratConScheduledPointOfInterest> scheduled = campaignState.getScheduledPointsOfInterest();
         assertEquals(5, scheduled.size());
@@ -325,7 +325,7 @@ class StratConPointOfInterestObjectiveTest {
         StratConContractDefinition definition = contractDefinition(List.of(),
               List.of(ordinaryPointOfInterest(TYPE_ID, 2)));
 
-        StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState);
+        StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState, true, true);
 
         assertTrue(campaignState.getScheduledPointsOfInterest().isEmpty());
     }

@@ -1636,7 +1636,7 @@ public class StratConRulesManager {
      * @author Illiani
      * @since 0.51.01
      */
-    static boolean rollsRandomScenario(PointOfInterestDeploymentOutcome pointOfInterestOutcome,
+    public static boolean rollsRandomScenario(PointOfInterestDeploymentOutcome pointOfInterestOutcome,
           boolean essentialScenariosOnly, boolean hasFacility, boolean enemyRouted, int targetNumber) {
         if (essentialScenariosOnly || hasFacility) {
             return false;
@@ -3926,6 +3926,10 @@ public class StratConRulesManager {
 
                 processTrackForceReturnDates(track, campaign);
 
+                // Any point of interest whose fate rested on this scenario learns how it went, while the scenario is
+                // still on the track.
+                StratConPointOfInterestRules.processScenarioEnded(track, backingScenario.getId(), victory, campaign);
+
                 track.removeScenario(scenario);
 
                 break;
@@ -3979,7 +3983,8 @@ public class StratConRulesManager {
 
 
     /**
-     * Credits the contract's combat bonus to the player for winning an Essential (strategic-objective) scenario.
+     * Credits the contract's combat bonus to the player for winning an Essential (strategic-objective) scenario, or
+     * for another achievement a contract's special mechanics reward the same way (such as recovering a data cache).
      *
      * <p>Combat pay is the per-battle bonus agreed during contract negotiation; it is paid out here, once per secured
      * Essential objective, rather than as a lump sum. Does nothing when the contract carries no positive combat
@@ -3988,7 +3993,7 @@ public class StratConRulesManager {
      * @param campaign the campaign whose finances receive the bonus
      * @param contract the contract supplying the combat-pay figure
      */
-    private static void awardCombatBonus(Campaign campaign, AbstractContract contract) {
+    public static void awardCombatBonus(Campaign campaign, AbstractContract contract) {
         ContractFinanceData financeData = contract.getContractFinanceData();
         Money combatPay = (financeData == null) ? null : financeData.combatPay();
         if ((combatPay == null) || !combatPay.isPositive()) {

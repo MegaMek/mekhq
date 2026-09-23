@@ -39,12 +39,16 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConStrategicObjective;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest.PointOfInterestStatus;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * The StratCon rules that act on points of interest during play: the points where the rest of StratCon hands control
@@ -81,6 +85,93 @@ public final class StratConPointOfInterestRules {
     }
 
     /**
+     * Takes a point of interest off the map as lost - taken, destroyed, or otherwise gone before the player could deal
+     * with it - and records every strategic objective tied to it as failed. Recording the failure means the objectives
+     * stay failed however they are checked afterward.
+     *
+     * <p>Behaviors should lose points of interest through this rather than by removing them directly.</p>
+     *
+     * @param track           the sector the point of interest sits in
+     * @param pointOfInterest the point of interest to lose
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void losePointOfInterest(StratConTrackState track, StratConPointOfInterest pointOfInterest) {
+        for (StratConStrategicObjective objective : getStrategicObjectives(track, pointOfInterest)) {
+            objective.setCurrentObjectiveCount(StratConStrategicObjective.OBJECTIVE_FAILED);
+        }
+
+        track.removePointOfInterest(pointOfInterest.getId());
+    }
+
+    /**
+     * Ties a point of interest's fate to a scenario: when the scenario ends, the point of interest's
+     * {@link IStratConPointOfInterestBehavior#onLinkedScenarioEnded} hook is told how it went (see
+     * {@link #processScenarioEnded}). While it waits, the point of interest does not expire.
+     *
+     * @param pointOfInterest the point of interest
+     * @param scenario        the scenario whose outcome decides it; it must already be registered with the campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void linkScenario(StratConPointOfInterest pointOfInterest, StratConScenario scenario) {
+        pointOfInterest.setLinkedScenarioId(scenario.getBackingScenarioID());
+    }
+
+    /**
+     * Tells every point of interest in a sector waiting on the given scenario that it has ended, clearing each one's
+     * link first (see {@link IStratConPointOfInterestBehavior#onLinkedScenarioEnded}).
+     *
+     * <p>Call this when a scenario is resolved, before it is removed from the sector.</p>
+     *
+     * @param track             the sector the scenario was in
+     * @param backingScenarioId the ID of the scenario's backing scenario
+     * @param isVictory         {@code true} if the scenario was an overall victory for the player
+     * @param campaign          the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void processScenarioEnded(StratConTrackState track, int backingScenarioId, boolean isVictory,
+          Campaign campaign) {
+        // Copied, so a hook that resolves, loses, or removes its point of interest is safe.
+        for (StratConPointOfInterest pointOfInterest : new ArrayList<>(track.getPointsOfInterest())) {
+            Integer linkedScenarioId = pointOfInterest.getLinkedScenarioId();
+            if ((linkedScenarioId == null) || (linkedScenarioId != backingScenarioId)) {
+                continue;
+            }
+
+            pointOfInterest.setLinkedScenarioId(null);
+
+            if (pointOfInterest.isActive()) {
+                pointOfInterest.getBehavior().onLinkedScenarioEnded(pointOfInterest, track, isVictory, campaign);
+            }
+        }
+    }
+
+    /**
+     * @param track    a sector
+     * @param campaign the current campaign
+     *
+     * @return the active contract whose StratCon map holds that sector, or {@code null} if none does
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable AbstractContract getContract(StratConTrackState track, Campaign campaign) {
+        for (AbstractContract contract : campaign.getActiveContracts()) {
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
+            if ((campaignState != null) && campaignState.getTracks().contains(track)) {
+                return contract;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @param track           the sector the point of interest sits in
      * @param pointOfInterest the point of interest
      *
@@ -102,8 +193,10 @@ public final class StratConPointOfInterestRules {
     }
 
     /**
-     * Runs the daily point of interest step for one sector. Every active point of interest whose expiry date has come
-     * expires (see {@link #expirePointOfInterest}); every other active one gets its
+     * Runs the daily point of interest step for one sector. A point of interest whose linked scenario has left the map
+     * without being resolved - ignored, or removed by a GM - is told it ended in defeat (see
+     * {@link #processScenarioEnded}). Then every active point of interest whose expiry date has come expires (see
+     * {@link #expirePointOfInterest}), unless it is still waiting on a linked scenario; every other active one gets its
      * {@link IStratConPointOfInterestBehavior#onNewDay} hook. Resolved and expired points of interest are left alone.
      *
      * @param track    the sector to process
@@ -122,7 +215,16 @@ public final class StratConPointOfInterestRules {
                 continue;
             }
 
-            if (pointOfInterest.hasReachedExpiryDate(today)) {
+            Integer linkedScenarioId = pointOfInterest.getLinkedScenarioId();
+            if ((linkedScenarioId != null) && !track.getBackingScenariosMap().containsKey(linkedScenarioId)) {
+                processScenarioEnded(track, linkedScenarioId, false, campaign);
+
+                if ((track.getPointOfInterest(pointOfInterest.getId()) == null) || !pointOfInterest.isActive()) {
+                    continue;
+                }
+            }
+
+            if (pointOfInterest.hasReachedExpiryDate(today) && !pointOfInterest.hasLinkedScenario()) {
                 expirePointOfInterest(track, pointOfInterest, campaign);
             } else {
                 pointOfInterest.getBehavior().onNewDay(pointOfInterest, track, campaign);

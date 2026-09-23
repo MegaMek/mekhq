@@ -171,6 +171,7 @@ class StratConPage {
     private MMComboBox<StratConPlayType> comboStratConPlayType;
     private JCheckBox chkUseAdvancedScouting;
     private JCheckBox chkEssentialScenariosOnly;
+    private JCheckBox chkContractsUseSpecialMechanics;
     private JCheckBox chkNoSeedForces;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
@@ -322,6 +323,9 @@ class StratConPage {
         chkEssentialScenariosOnly = new CampaignOptionsCheckBox("EssentialScenariosOnly",
               getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkEssentialScenariosOnly.addMouseListener(createTipPanelUpdater("EssentialScenariosOnly"));
+        chkContractsUseSpecialMechanics = new CampaignOptionsCheckBox("ContractsUseSpecialMechanics",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkContractsUseSpecialMechanics.addMouseListener(createTipPanelUpdater("ContractsUseSpecialMechanics"));
         chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces",
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkNoSeedForces.addMouseListener(createTipPanelUpdater("NoSeedForces"));
@@ -520,6 +524,7 @@ class StratConPage {
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
               chkUseAdvancedScouting,
               chkEssentialScenariosOnly,
+              chkContractsUseSpecialMechanics,
               chkNoSeedForces,
               chkUseGenericBattleValue,
               chkUseVerboseBidding,
@@ -668,6 +673,7 @@ class StratConPage {
         comboStratConPlayType.setSelectedItem(model.stratConPlayType);
         chkUseAdvancedScouting.setSelected(model.useAdvancedScouting);
         chkEssentialScenariosOnly.setSelected(model.essentialScenariosOnly);
+        chkContractsUseSpecialMechanics.setSelected(model.contractsUseSpecialMechanics);
         chkNoSeedForces.setSelected(model.noSeedForces);
         chkUseGenericBattleValue.setSelected(model.useGenericBattleValue);
         chkUseVerboseBidding.setSelected(model.useVerboseBidding);
@@ -727,6 +733,7 @@ class StratConPage {
         model.stratConPlayType = comboStratConPlayType.getSelectedItem();
         model.useAdvancedScouting = chkUseAdvancedScouting.isSelected();
         model.essentialScenariosOnly = chkEssentialScenariosOnly.isSelected();
+        model.contractsUseSpecialMechanics = chkContractsUseSpecialMechanics.isSelected();
         model.noSeedForces = chkNoSeedForces.isSelected();
         model.useGenericBattleValue = chkUseGenericBattleValue.isSelected();
         model.useVerboseBidding = chkUseVerboseBidding.isSelected();

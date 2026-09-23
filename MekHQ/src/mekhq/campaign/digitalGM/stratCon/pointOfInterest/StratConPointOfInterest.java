@@ -86,6 +86,8 @@ public class StratConPointOfInterest {
     private LocalDate expiryDate;
     private String displayNameOverride;
     private String descriptionOverride;
+    // the ID of the backing scenario this point of interest's fate is waiting on, if any
+    private Integer linkedScenarioId;
     private Map<String, String> state = new HashMap<>();
 
     /**
@@ -114,7 +116,7 @@ public class StratConPointOfInterest {
 
     /**
      * Creates a point of interest from a definition, taking its starting owner from the definition's default owner and
-     * setting its expiry date from the definition's lifespan.
+     * setting its expiry date from the definition's lifespan (rolled, if the definition has a lifespan die).
      *
      * @param definition the definition of the point of interest's type
      * @param coords     the hex it sits on
@@ -130,8 +132,9 @@ public class StratConPointOfInterest {
         StratConPointOfInterest pointOfInterest = new StratConPointOfInterest(definition.getTypeId(), coords);
         pointOfInterest.setOwner(definition.getDefaultOwner());
 
-        if (definition.getLifespanDays() > 0) {
-            pointOfInterest.setExpiryDate(today.plusDays(definition.getLifespanDays()));
+        int lifespanDays = definition.rollLifespanDays();
+        if (lifespanDays > 0) {
+            pointOfInterest.setExpiryDate(today.plusDays(lifespanDays));
         }
 
         return pointOfInterest;
@@ -233,6 +236,28 @@ public class StratConPointOfInterest {
 
     public void setDescriptionOverride(@Nullable String descriptionOverride) {
         this.descriptionOverride = descriptionOverride;
+    }
+
+    /**
+     * @return the ID of the backing scenario whose outcome decides this point of interest's fate, or {@code null} if
+     *       it is not waiting on one (see
+     *       {@link StratConPointOfInterestRules#linkScenario(StratConPointOfInterest,
+     *       mekhq.campaign.digitalGM.stratCon.StratConScenario)})
+     */
+    public @Nullable Integer getLinkedScenarioId() {
+        return linkedScenarioId;
+    }
+
+    public void setLinkedScenarioId(@Nullable Integer linkedScenarioId) {
+        this.linkedScenarioId = linkedScenarioId;
+    }
+
+    /**
+     * @return {@code true} if this point of interest's fate is waiting on a scenario
+     */
+    @XmlTransient
+    public boolean hasLinkedScenario() {
+        return linkedScenarioId != null;
     }
 
     /**

@@ -89,7 +89,8 @@ public interface IStratConPointOfInterestBehavior {
     }
 
     /**
-     * Called once per day for every active point of interest, after any whose expiry date has come have expired.
+     * Called once per day for every active point of interest, after any whose expiry date has come have expired. A
+     * point of interest waiting on a linked scenario does not expire, but still gets this hook.
      *
      * @param pointOfInterest the point of interest
      * @param track           the sector it sits in
@@ -113,6 +114,25 @@ public interface IStratConPointOfInterestBehavior {
      * @since 0.51.01
      */
     default void onExpired(StratConPointOfInterest pointOfInterest, StratConTrackState track, Campaign campaign) {
+    }
+
+    /**
+     * Called when the scenario this point of interest's fate is waiting on (see
+     * {@link StratConPointOfInterestRules#linkScenario}) ends. The link is cleared before this is called.
+     *
+     * <p>A scenario that is ignored, or removed from the map without being played, ends in defeat - noticed on the
+     * next day's point of interest step.</p>
+     *
+     * @param pointOfInterest the point of interest the scenario was linked to
+     * @param track           the sector it sits in
+     * @param isVictory       {@code true} if the scenario was an overall victory for the player; a draw is not
+     * @param campaign        the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    default void onLinkedScenarioEnded(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+          boolean isVictory, Campaign campaign) {
     }
 
     /**

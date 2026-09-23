@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
@@ -69,6 +70,8 @@ public class StratConPointOfInterestDefinition {
     private ForceAlignment defaultOwner;
     // how many days a newly placed point of interest lasts; 0 or less means it never expires
     private int lifespanDays;
+    // the sides of a die rolled and added to lifespanDays when a point of interest is placed; 0 or less rolls nothing
+    private int lifespanDieSides;
     // whether an expired point of interest is removed from the map, rather than left in place marked as expired
     private boolean removeOnExpiry;
 
@@ -180,6 +183,35 @@ public class StratConPointOfInterestDefinition {
 
     public void setLifespanDays(int lifespanDays) {
         this.lifespanDays = lifespanDays;
+    }
+
+    /**
+     * @return the number of sides of a die rolled and added to {@link #getLifespanDays()} each time a point of interest
+     *       of this type is placed - so a lifespan of 0 with a 6-sided die lasts 1 to 6 days; 0 or less rolls nothing
+     */
+    public int getLifespanDieSides() {
+        return lifespanDieSides;
+    }
+
+    public void setLifespanDieSides(int lifespanDieSides) {
+        this.lifespanDieSides = lifespanDieSides;
+    }
+
+    /**
+     * Works out how many days a newly placed point of interest of this type lasts: its fixed lifespan plus, if it has
+     * a lifespan die, one roll of that die.
+     *
+     * @return the rolled lifespan in days; 0 or less means it never expires
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int rollLifespanDays() {
+        if (lifespanDieSides <= 0) {
+            return lifespanDays;
+        }
+
+        return lifespanDays + Compute.randomInt(lifespanDieSides) + 1;
     }
 
     public boolean isRemoveOnExpiry() {

@@ -61,6 +61,7 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDataCacheBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
@@ -76,6 +77,7 @@ import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorPlanner;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorShape;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
 import mekhq.campaign.mission.contract.contractGeneration.TrackIntensityTable;
 import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
@@ -341,8 +343,20 @@ public class StratConContractInitializer {
         // Pre-roll the days on which each strategic-objective scenario, and each point of interest, appears over the
         // contract's run.
         if (!isUseMaplessMode) {
-            scheduleStrategicScenarioSpawnDates(contract, campaignState);
-            schedulePointsOfInterest(contract, contractDefinition, campaignState);
+            boolean isContractsUseSpecialMechanics =
+                  campaignOptions.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS);
+
+            // A contract that uses data caches gets no Essential scenarios: the caches, and the combat bonus paid for
+            // each one recovered, take their place.
+            if (!usesDataCaches(contract, isContractsUseSpecialMechanics)) {
+                scheduleStrategicScenarioSpawnDates(contract, campaignState);
+            }
+
+            schedulePointsOfInterest(contract,
+                  contractDefinition,
+                  campaignState,
+                  campaignOptions.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE),
+                  isContractsUseSpecialMechanics);
         }
 
         // Required victory points depend on the StratCon state
@@ -439,18 +453,30 @@ public class StratConContractInitializer {
      * place as their days come (see {@link #spawnScheduledPointOfInterest}). Which point of interest lands on which day
      * is shuffled, so types are not bunched together.</p>
      *
+     * <p>When the "Contracts Use Special Mechanics" option is on, an Espionage contract ignores its definition's points
+     * of interest and schedules data caches instead (see {@link #scheduleDataCaches}). With it off, an Espionage
+     * contract schedules its definition's points of interest like any other.</p>
+     *
      * <p>Does nothing if the contract asks for no points of interest, or has no settled start date.</p>
      *
-     * @param contract           the contract being accepted
-     * @param contractDefinition its StratCon contract definition
-     * @param campaignState      the campaign state to store the scheduled points of interest on
+     * @param contract                        the contract being accepted
+     * @param contractDefinition              its StratCon contract definition
+     * @param campaignState                   the campaign state to store the scheduled points of interest on
+     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
+     * @param isContractsUseSpecialMechanics  whether the "Contracts Use Special Mechanics" option is on
      *
      * @author Illiani
      * @since 0.51.01
      */
     // Package-private rather than private so scheduling can be tested without standing up a whole contract.
     static void schedulePointsOfInterest(AbstractContract contract, StratConContractDefinition contractDefinition,
-          StratConCampaignState campaignState) {
+          StratConCampaignState campaignState, boolean isMultiplyTrackIntensityByScale,
+          boolean isContractsUseSpecialMechanics) {
+        if (usesDataCaches(contract, isContractsUseSpecialMechanics)) {
+            scheduleDataCaches(contract, campaignState, isMultiplyTrackIntensityByScale);
+            return;
+        }
+
         List<StratConScheduledPointOfInterest> requestedPointsOfInterest =
               getRequestedPointsOfInterest(contractDefinition, contract.getScale());
         if (requestedPointsOfInterest.isEmpty()) {
@@ -477,6 +503,67 @@ public class StratConContractInitializer {
             StratConScheduledPointOfInterest scheduledPointOfInterest = requestedPointsOfInterest.get(index);
             scheduledPointOfInterest.setSpawnDate(spawnDates.get(index));
             campaignState.addScheduledPointOfInterest(scheduledPointOfInterest);
+        }
+    }
+
+    /**
+     * Decides whether a contract uses the data cache special mechanic: an Espionage contract, with the "Contracts Use
+     * Special Mechanics" option on. Such a contract schedules data caches in place of its definition's points of
+     * interest (see {@link #scheduleDataCaches}), and gets no Essential scenarios - the combat bonus is paid for each
+     * cache recovered instead (see {@link StratConDataCacheBehavior}).
+     *
+     * @param contract                       the contract
+     * @param isContractsUseSpecialMechanics whether the "Contracts Use Special Mechanics" option is on
+     *
+     * @return {@code true} if the contract uses data caches
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the decision can be tested directly.
+    static boolean usesDataCaches(AbstractContract contract, boolean isContractsUseSpecialMechanics) {
+        ContractObjectiveType objectiveType = contract.getObjectiveType();
+        return isContractsUseSpecialMechanics && (objectiveType != null) && objectiveType.isEspionage();
+    }
+
+    /**
+     * Schedules an Espionage contract's data caches. On an Espionage contract every point of interest is a data cache,
+     * and every data cache is a strategic objective (see {@link StratConDataCacheBehavior}).
+     *
+     * <p>The caches are scheduled the way the contract's Essential scenarios are: a roll on the Track Intensity Tables
+     * for the contract's length and track count (see {@link TrackIntensityTable#rollSchedule}), made once per point of
+     * scale when "Multiply Track Intensity by Scale" is on and once otherwise. That roll is independent of the
+     * scenarios' own, and is kept on the contract (see {@link AbstractContract#getPointOfInterestSchedule()}). Each
+     * month's caches then get random days within it (see {@link #rollSpawnDates}).</p>
+     *
+     * <p>Does nothing if the contract has no settled start date.</p>
+     *
+     * @param contract                        the Espionage contract being accepted
+     * @param campaignState                   the campaign state to store the scheduled data caches on
+     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so scheduling can be tested without standing up a whole contract.
+    static void scheduleDataCaches(AbstractContract contract, StratConCampaignState campaignState,
+          boolean isMultiplyTrackIntensityByScale) {
+        LocalDate startDate = contract.getStartDate();
+        if (startDate == null) {
+            LOGGER.warn("Contract {} has no start date, so its data caches cannot be scheduled.", contract.getName());
+            return;
+        }
+
+        int rollCount = isMultiplyTrackIntensityByScale ? contract.getScale() : 1;
+        List<Integer> schedule = TrackIntensityTable.rollSchedule(contract.getLengthInMonths(),
+              contract.getTrackCount(),
+              rollCount);
+        contract.setPointOfInterestSchedule(schedule);
+
+        for (LocalDate spawnDate : rollSpawnDates(startDate, schedule, contract.getLengthInMonths())) {
+            campaignState.addScheduledPointOfInterest(new StratConScheduledPointOfInterest(spawnDate,
+                  StratConDataCacheBehavior.TYPE_ID,
+                  true));
         }
     }
 
