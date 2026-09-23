@@ -62,7 +62,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.UUID;
 import java.util.function.Consumer;
 
 import megamek.common.annotations.Nullable;
@@ -192,7 +191,8 @@ public class EducationController {
             roll += (person.getReasoning().getReasoningScore() / 4);
         }
         // Calculate the target number based on base target number and faculty skill
-        int targetNumber = campaignOptions.get(CampaignOption.ENTRANCE_EXAM_BASE_TARGET_NUMBER) - academy.getFacultySkill();
+        int targetNumber = campaignOptions.get(CampaignOption.ENTRANCE_EXAM_BASE_TARGET_NUMBER) -
+                                 academy.getFacultySkill();
 
         // If the roll meets the target number, the application is successful
         if (roll >= targetNumber) {
@@ -342,8 +342,11 @@ public class EducationController {
             // if the student is being homeschooled, we skip the journey to the 'academy'
             person.setEduEducationStage(EducationStage.EDUCATION);
             IPlace homeSchoolLocation = findHomeLocation(person, campaign);
-            AcademyCampusLocation homeSchoolCampus = campaign.getCampaignLocationManager().getOrCreateCampusUnderLocation(
-                  academy.getSet(), academy.getName(), homeSchoolLocation);
+            AcademyCampusLocation homeSchoolCampus = campaign.getCampaignLocationManager()
+                                                           .getOrCreateCampusUnderLocation(
+                                                                 academy.getSet(),
+                                                                 academy.getName(),
+                                                                 homeSchoolLocation);
             person.setParent(homeSchoolCampus.getPersonnel());
         } else if (academy.isLocal()) {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
@@ -670,8 +673,8 @@ public class EducationController {
     /**
      * Processes a person's journey to campus.
      *
-     * @param campaign  The campaign the person is part of.
-     * @param person    The person for whom the journey is being processed.
+     * @param campaign The campaign the person is part of.
+     * @param person   The person for whom the journey is being processed.
      */
     private static void journeyToAcademy(Campaign campaign, Person person) {
         PlanetarySystem targetSystem = campaign.getSystemById(person.getEduAcademySystem());
@@ -685,7 +688,7 @@ public class EducationController {
         campaign.addReport(PERSONNEL,
               getFormattedTextAt(BUNDLE_NAME, "arrived.text", person.getHyperlinkedFullTitle()));
 
-        AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign, 
+        AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign,
               person.getEduAcademySet(), person.getEduAcademyNameInSet(), person.getEduAcademySystem());
         if (campusLocation == null) {
             throw new IllegalStateException("Campus location must exist for system " + person.getEduAcademySystem());
@@ -917,7 +920,9 @@ public class EducationController {
                 return;
             }
             if (!currentLocation.getCurrentSystem().equals(targetSystem)) {
-                JumpPath newPath = LocationUtils.planJumpPath(currentLocation.getCurrentSystem(), targetSystem, campaign);
+                JumpPath newPath = LocationUtils.planJumpPath(currentLocation.getCurrentSystem(),
+                      targetSystem,
+                      campaign);
                 if (newPath != null) {
                     currentLocation.setJumpPath(newPath);
                     person.setEduJourneyTime(LocationUtils.computeJourneyDays(
@@ -945,15 +950,6 @@ public class EducationController {
               person.getEduAcademySystem()) : campaign.getPlayerForce().getPersonnel();
         person.setParent(arrivingAtPersonnel);
         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
-
-        for (UUID tagAlong : person.getEduTagAlongs()) {
-            Person companion = campaign.getPlayerForce().getHumanResources().getPerson(tagAlong);
-            if (companion != null) {
-                companion.setParent(arrivingAtPersonnel);
-                companion.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
-            }
-        }
-
         LocationDispatch.removeTravelNode(returnLocation, campaign.getCampaignLocationManager());
     }
 
@@ -1090,7 +1086,8 @@ public class EducationController {
             }
 
             if (roll == 0) {
-                if ((!person.isChild(campaign.getLocalDate())) || (campaign.getCampaignOptions().get(CampaignOption.ALL_AGES))) {
+                if ((!person.isChild(campaign.getLocalDate())) ||
+                          (campaign.getCampaignOptions().get(CampaignOption.ALL_AGES))) {
                     if (d6(2) >= 5) {
                         processTrainingInjury(campaign, academy, person, resources);
                     } else {
@@ -1340,7 +1337,8 @@ public class EducationController {
             // children killed when their academy is attacked unless the player has explicitly
             // opted in. While players can assign 16-year-olds to combat roles and have them killed
             // there, that doesn't have the same connotations.
-            if ((!person.isChild(campaign.getLocalDate(), true)) || (campaign.getCampaignOptions().get(CampaignOption.ALL_AGES))) {
+            if ((!person.isChild(campaign.getLocalDate(), true)) ||
+                      (campaign.getCampaignOptions().get(CampaignOption.ALL_AGES))) {
                 if (d6(2) >= 5) {
                     String reportMessage = String.format(resources.getString("eventDestruction.text"),
                           person.getHyperlinkedFullTitle(),
@@ -1798,7 +1796,8 @@ public class EducationController {
 
         if (academy.isReeducationCamp()) {
             Faction campaignFaction = campaign.getPlayerForce().getFaction();
-            boolean isUseReeducationChangesFaction = campaign.getCampaignOptions().get(CampaignOption.USE_REEDUCATION_CAMPS);
+            boolean isUseReeducationChangesFaction = campaign.getCampaignOptions()
+                                                           .get(CampaignOption.USE_REEDUCATION_CAMPS);
 
             if (isUseReeducationChangesFaction) {
                 boolean factionChangeBlocked = isFactionChangeBlocked(person, campaignFaction);

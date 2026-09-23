@@ -312,14 +312,14 @@ public class Person implements ILocatable {
     private Phenotype phenotype;
     private String bloodname;
     /**
-     * The Bloodname House this warrior was bred from. Every trueborn has one; only those who win a
-     * Trial of Bloodright earn the right to carry its name, which is what {@link #bloodname} records.
+     * The Bloodname House this warrior was bred from. Every trueborn has one; only those who win a Trial of Bloodright
+     * earn the right to carry its name, which is what {@link #bloodname} records.
      */
     private String bloodhouse;
 
     /**
-     * How this warrior's genetic legacy is used in their Clan's breeding program. Only a Bloodnamed
-     * trueborn's legacy is ever in use, and the role does not follow from the warrior's own sex.
+     * How this warrior's genetic legacy is used in their Clan's breeding program. Only a Bloodnamed trueborn's legacy
+     * is ever in use, and the role does not follow from the warrior's own sex.
      */
     private GeneticLegacyRole geneticLegacyRole;
     private Faction originFaction;
@@ -725,8 +725,8 @@ public class Person implements ILocatable {
     }
 
     /**
-     * The Bloodname House this warrior descends from, which every trueborn has whether or not they
-     * have won the right to use its name.
+     * The Bloodname House this warrior descends from, which every trueborn has whether or not they have won the right
+     * to use its name.
      *
      * <p>Unlike {@link #getBloodname()} this does not form part of the warrior's name. A warrior of the
      * Ward House is not called Ward until they win a Trial of Bloodright.</p>
@@ -752,8 +752,7 @@ public class Person implements ILocatable {
     }
 
     /**
-     * @param geneticLegacyRole the role to record; {@code null} is stored as
-     *                          {@link GeneticLegacyRole#NONE}
+     * @param geneticLegacyRole the role to record; {@code null} is stored as {@link GeneticLegacyRole#NONE}
      */
     public void setGeneticLegacyRole(final @Nullable GeneticLegacyRole geneticLegacyRole) {
         this.geneticLegacyRole = (geneticLegacyRole == null) ? GeneticLegacyRole.NONE : geneticLegacyRole;
@@ -825,9 +824,15 @@ public class Person implements ILocatable {
                 setLastRankChangeDate(null);
                 if (log) {
                     if (isPrisoner) {
-                        ServiceLogger.madePrisoner(this, campaign.getLocalDate(), campaign.getPlayerForce().getName(), "");
+                        ServiceLogger.madePrisoner(this,
+                              campaign.getLocalDate(),
+                              campaign.getPlayerForce().getName(),
+                              "");
                     } else {
-                        ServiceLogger.madeBondsman(this, campaign.getLocalDate(), campaign.getPlayerForce().getName(), "");
+                        ServiceLogger.madeBondsman(this,
+                              campaign.getLocalDate(),
+                              campaign.getPlayerForce().getName(),
+                              "");
                     }
                 }
                 break;
@@ -1345,8 +1350,8 @@ public class Person implements ILocatable {
     }
 
     /**
-     * The senior posts this person holds, abbreviated for display alongside their name - "CMO", "HT",
-     * "CA". A person may hold more than one, in which case they are comma separated.
+     * The senior posts this person holds, abbreviated for display alongside their name - "CMO", "HT", "CA". A person
+     * may hold more than one, in which case they are comma separated.
      *
      * @return the abbreviations, or an empty string if this person holds no senior post
      */
@@ -1357,9 +1362,8 @@ public class Person implements ILocatable {
     }
 
     /**
-     * The senior posts this person holds, written out in full - "Chief Medical Officer", "Head
-     * Technician", "Chief Administrator". A person may hold more than one, in which case they are
-     * comma separated.
+     * The senior posts this person holds, written out in full - "Chief Medical Officer", "Head Technician", "Chief
+     * Administrator". A person may hold more than one, in which case they are comma separated.
      *
      * @return the post names, or an empty string if this person holds no senior post
      */
@@ -1370,8 +1374,8 @@ public class Person implements ILocatable {
     }
 
     /**
-     * Joins the resource strings for whichever senior posts this person holds, in a fixed order so the
-     * display does not reorder itself between refreshes.
+     * Joins the resource strings for whichever senior posts this person holds, in a fixed order so the display does not
+     * reorder itself between refreshes.
      *
      * @param chiefMedicalOfficerKey resource key used when this person is the chief medical officer
      * @param headTechnicianKey      resource key used when this person is the head technician
@@ -1398,8 +1402,8 @@ public class Person implements ILocatable {
     }
 
     /**
-     * The department head title for this person, built from the department their primary role names -
-     * a Mek Tech becomes "Head Mek Tech".
+     * The department head title for this person, built from the department their primary role names - a Mek Tech
+     * becomes "Head Mek Tech".
      *
      * @return the derived title, or an empty string if this person heads no department
      */
@@ -1734,7 +1738,10 @@ public class Person implements ILocatable {
                     ServiceLogger.returnedFromLeave(this, campaign.getLocalDate());
                 } else if (getStatus().isStudent()) {
                     campaign.addReport(PERSONNEL, String.format(resources.getString("returnedFromEducation.report"),
-                          getHyperlinkedFullTitle(), getEduAcademyName(), getEduAcademyNameInSet(), getEduAcademyFaction()));
+                          getHyperlinkedFullTitle(),
+                          getEduAcademyName(),
+                          getEduAcademyNameInSet(),
+                          getEduAcademyFaction()));
                     ServiceLogger.returnedFromEducation(this, campaign.getLocalDate());
                 } else if (getStatus().isMissing()) {
                     campaign.addReport(PERSONNEL, String.format(resources.getString("returnedFromMissing.report"),
@@ -1913,7 +1920,7 @@ public class Person implements ILocatable {
             Person tagAlong = campaign.getPlayerForce().getHumanResources().getPerson(tagAlongId);
 
             if (tagAlong != null) {
-                tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACTIVE);
+                tagAlong.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.CAMP_FOLLOWER);
             }
         }
         this.setEduTagAlongs(new ArrayList<>());
@@ -3503,9 +3510,9 @@ public class Person implements ILocatable {
     }
 
     /**
-     * Whether this person heads the department their primary role names - the head Mek Tech, the head
-     * logistics administrator, and so on. Which department is not stored: it is whichever their primary
-     * role identifies, so the two can never disagree.
+     * Whether this person heads the department their primary role names - the head Mek Tech, the head logistics
+     * administrator, and so on. Which department is not stored: it is whichever their primary role identifies, so the
+     * two can never disagree.
      *
      * @return {@code true} if this person heads their department
      */
@@ -5215,7 +5222,9 @@ public class Person implements ILocatable {
     /** Use {@link #getSalary(CampaignOptions, boolean, LocalDate)} instead */
     @Deprecated(since = "0.51.01")
     public Money getSalary(final Campaign campaign) {
-        return getSalary(campaign.getCampaignOptions(), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
+        return getSalary(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate());
     }
 
     /**
@@ -5868,9 +5877,9 @@ public class Person implements ILocatable {
      * personnel's primary or secondary role is being queried and may also vary based on the campaign's configuration
      * settings, such as whether artillery skills are enabled.
      *
-     * @param campaignOptions  the current {@link CampaignOptions}
-     * @param secondary a boolean indicating whether to retrieve skills for the secondary ({@code true}) or primary
-     *                  ({@code false}) profession of the character
+     * @param campaignOptions the current {@link CampaignOptions}
+     * @param secondary       a boolean indicating whether to retrieve skills for the secondary ({@code true}) or
+     *                        primary ({@code false}) profession of the character
      *
      * @return a {@link List} of skill identifiers ({@link String}) associated with the personnel's role, possibly
      *       modified by campaign settings
@@ -6125,11 +6134,11 @@ public class Person implements ILocatable {
      * with those subtypes, then adds to the result only those skills that the object is known to have (i.e., those for
      * which {@code hasSkill(skillName)} returns true).</p>
      *
-     * @param skillSubTypes the list of {@link SkillSubType} to use for filtering skills
-     *
-     * @return a {@link List} of skill names that are both of the specified subtypes and known to the object
+     * @param skillSubTypes            the list of {@link SkillSubType} to use for filtering skills
      * @param treatAllTechSkillsAsTech Whether to treat all tech skills as tech skills, instead of their individual
      *                                 classifications
+     *
+     * @return a {@link List} of skill names that are both of the specified subtypes and known to the object
      *
      * @author Illiani
      * @since 0.50.06
@@ -6425,8 +6434,8 @@ public class Person implements ILocatable {
      * Every implant this person carries, across the groups that hold them.
      *
      * <p>The Manei Domini implants and enhanced imaging sit in separate option groups but are one
-     * thing to a reader and to the save file alike, so they are gathered here rather than at each of
-     * the two call sites that would otherwise have to remember both.</p>
+     * thing to a reader and to the save file alike, so they are gathered here rather than at each of the two call sites
+     * that would otherwise have to remember both.</p>
      *
      * @return the implants as a delimited list, empty if this person carries none
      */
@@ -7732,8 +7741,8 @@ public class Person implements ILocatable {
 
     /**
      * The single tool kit this technician owns, by MegaMek internal name, or {@code null} if they carry none. The kit
-     * grants a bonus to certain skill rolls (see {@code EquipmentKitCatalog}). Like an armor kit, a technician carries at
-     * most one tool kit at a time.
+     * grants a bonus to certain skill rolls (see {@code EquipmentKitCatalog}). Like an armor kit, a technician carries
+     * at most one tool kit at a time.
      *
      * @return the owned tool-kit internal name, or {@code null}
      */
@@ -9649,7 +9658,8 @@ public class Person implements ILocatable {
             // The berserker hurts themselves
             victims.add(this);
 
-            boolean isUseAltAdvancedMedical = campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL);
+            boolean isUseAltAdvancedMedical = campaign.getCampaignOptions()
+                                                    .get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL);
             for (Person victim : victims) {
                 if (useAdvancedMedical) {
                     if (isUseAltAdvancedMedical) {
