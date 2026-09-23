@@ -2600,7 +2600,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
             base.getBaseHangar().forEachUnit(unit -> {
-                unit.initializeParts(false);
+                // Must be true so that any parts initializeParts creates are registered with the quartermaster and
+                // assigned real ids. Otherwise, they'll break on the next load.
+                unit.initializeParts(true);
                 unit.runDiagnostic(false);
 
                 List<String> reports = unit.checkForOverCrewing();

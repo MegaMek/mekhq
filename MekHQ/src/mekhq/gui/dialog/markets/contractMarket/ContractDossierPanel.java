@@ -53,6 +53,7 @@ import javax.swing.*;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
 import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
 import mekhq.campaign.personnel.Person;
@@ -136,29 +137,39 @@ public class ContractDossierPanel extends JPanel {
         title.setForeground(onAccent);
         header.add(title, BorderLayout.WEST);
 
-        JPanel badges = new JPanel();
-        badges.setLayout(new BoxLayout(badges, BoxLayout.Y_AXIS));
-        badges.setOpaque(false);
+        // Every header badge sits side by side on a single row, separated by a small strut.
+        List<JLabel> badgeLabels = new ArrayList<>();
 
         // A batchall badge would reveal the enemy is a Clan, so suppress it while the opposition is hidden.
         Faction enemyFaction = contract.getEnemyFaction();
         boolean hasBatchall = !oppositionHidden && (enemyFaction != null) && enemyFaction.isClan();
         if (hasBatchall) {
-            badges.add(headerBadge(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.batchall"), onAccent));
+            badgeLabels.add(headerBadge(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.batchall"),
+                  getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.batchall.tooltip"), onAccent));
         }
         // A contract's special type (Proving Ground / Covert Operation) is mutually exclusive, so at most one of these
-        // badges shows. A separator strut precedes any badge that follows an earlier one (e.g. a batchall).
+        // badges shows.
         if (contract.isProvingGround()) {
-            if (badges.getComponentCount() > 0) {
-                badges.add(Box.createVerticalStrut(scaleForGUI(4)));
-            }
-            badges.add(headerBadge(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.provingGround"), onAccent));
+            badgeLabels.add(headerBadge(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.provingGround"),
+                  getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.provingGround.tooltip"), onAccent));
         }
         if (contract.isCovert()) {
+            badgeLabels.add(headerBadge(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.covert"),
+                  getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.covert.tooltip"), onAccent));
+        }
+        // Each special rule carried by the contract's objective gets its own badge.
+        for (ChaosObjectiveSpecialRules specialRule : contract.getSpecialRules()) {
+            badgeLabels.add(headerBadge(specialRule.getName(), specialRule.getToolTipText(), onAccent));
+        }
+
+        JPanel badges = new JPanel();
+        badges.setLayout(new BoxLayout(badges, BoxLayout.X_AXIS));
+        badges.setOpaque(false);
+        for (JLabel badgeLabel : badgeLabels) {
             if (badges.getComponentCount() > 0) {
-                badges.add(Box.createVerticalStrut(scaleForGUI(4)));
+                badges.add(Box.createHorizontalStrut(scaleForGUI(4)));
             }
-            badges.add(headerBadge(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.covert"), onAccent));
+            badges.add(badgeLabel);
         }
 
         if (badges.getComponentCount() > 0) {
@@ -171,9 +182,14 @@ public class ContractDossierPanel extends JPanel {
         return header;
     }
 
-    /** A small pill-shaped header badge (e.g. Batchall, Proving Ground) drawn in the accent-contrasting colour. */
-    private JLabel headerBadge(String text, Color onAccent) {
+    /**
+     * A small pill-shaped header badge (e.g. Batchall, Proving Ground) drawn in the accent-contrasting colour, with an
+     * explanation of what it means on hover.
+     */
+    private JLabel headerBadge(String text, String toolTipText, Color onAccent) {
         JLabel badge = new JLabel(text);
+        badge.setToolTipText("<html><p style='width:" + scaleForGUI(300) + "'>" + escape(toolTipText)
+                                   + "</p></html>");
         badge.setForeground(onAccent);
         badge.setAlignmentX(Component.RIGHT_ALIGNMENT);
         badge.setBorder(BorderFactory.createCompoundBorder(

@@ -64,8 +64,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.location.LocationUtils;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
@@ -149,9 +151,10 @@ public class Maintenance {
 
             // maybe use the money
             if (campaignOptions.get(CampaignOption.PAY_FOR_MAINTAIN)) {
+                Money maintenanceCost = unit.getMaintenanceCost();
                 if (!(campaign.getPlayerForce().getFinances().debit(TransactionType.MAINTENANCE,
                       campaign.getLocalDate(),
-                      unit.getMaintenanceCost(),
+                      maintenanceCost,
                       "Maintenance for " + unit.getName()))) {
                     campaign.addReport(TECHNICAL, "<font color='" +
                                                         getNegativeColor() +
@@ -159,6 +162,8 @@ public class Maintenance {
                                                         unit.getHyperlinkedName() +
                                                         "!</b></font>");
                     paidMaintenance = false;
+                } else {
+                    ContractSupportPayments.reimburseStraightSupport(campaign, maintenanceCost, unit.getName());
                 }
             }
             // it is time for a maintenance check

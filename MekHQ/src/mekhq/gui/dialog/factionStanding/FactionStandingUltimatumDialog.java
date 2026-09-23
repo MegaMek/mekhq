@@ -45,6 +45,7 @@ import java.util.List;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
@@ -56,7 +57,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.dialog.NewsDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Dialog logic for resolving a Faction Standing ultimatum event.
@@ -222,8 +222,15 @@ public class FactionStandingUltimatumDialog {
               commanderAddress);
         new NewsDialog(campaign, newsText);
 
-        // Process outcome
-        processGoingRogue(campaign, chosenFaction, commander, supporter, isViolentTransition, true);
+        boolean isTrackingFactionStanding = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
+        // A violent transition is treated as a defection
+        processGoingRogue(campaign,
+              chosenFaction,
+              commander,
+              supporter,
+              isViolentTransition,
+              true,
+              isTrackingFactionStanding);
 
         if (rival != null && !(rival.getStatus().isDepartedUnit() || rival.getStatus().isDead())) {
             rival.changeStatus(
@@ -233,7 +240,9 @@ public class FactionStandingUltimatumDialog {
             );
         }
 
-        GoingRogue.processFactionStandingChangeForOldFaction(campaign, otherFaction);
+        if (isTrackingFactionStanding) {
+            GoingRogue.processFactionStandingChangeForOldFaction(campaign, otherFaction);
+        }
     }
 
     /**
@@ -262,8 +271,10 @@ public class FactionStandingUltimatumDialog {
         Faction oldFaction = campaign.getPlayerForce().getFaction();
         Faction newFaction = Factions.getInstance()
                                    .getFaction(isMercenary ? MERCENARY_FACTION_CODE : PIRATE_FACTION_CODE);
-        processGoingRogue(campaign, newFaction, commander, secondInCommand,
-              isViolentTransition, true, campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING));
+        boolean isTrackingFactionStanding = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
+        // A violent transition is treated as a defection
+        processGoingRogue(campaign, newFaction, commander, secondInCommand, isViolentTransition, true,
+              isTrackingFactionStanding);
 
         if (secondInCommand != null &&
                   !(secondInCommand.getStatus().isDepartedUnit() || secondInCommand.getStatus().isDead())) {
@@ -283,7 +294,9 @@ public class FactionStandingUltimatumDialog {
             );
         }
 
-        GoingRogue.processFactionStandingChangeForOldFaction(campaign, oldFaction);
+        if (isTrackingFactionStanding) {
+            GoingRogue.processFactionStandingChangeForOldFaction(campaign, oldFaction);
+        }
     }
 
     /**

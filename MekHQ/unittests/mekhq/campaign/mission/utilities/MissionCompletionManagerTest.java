@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.utilities;
 
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -72,6 +73,7 @@ import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractSpecialRules.PirateLooting;
 import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.ContractEmergencyExtension;
 import mekhq.campaign.mission.scenarios.Scenario;
@@ -107,6 +109,15 @@ import org.mockito.MockedStatic;
 public class MissionCompletionManagerTest {
     private static final String NON_PIRATE_FACTION_CODE = "LA";
     private static final LocalDate TODAY = LocalDate.of(3067, 1, 1);
+
+    static {
+        // MissionStatus's and CombatRole's enum constructors read MekHQ.getMHQOptions().getLocale(); force them to
+        // class-load (and finish that one-time construction) now, before any test below opens a
+        // mockStatic(MekHQ.class) block - where an unstubbed getMHQOptions() would return null and permanently
+        // poison the class for the rest of this JVM.
+        MissionStatus.values();
+        CombatRole.values();
+    }
 
     // region getMissionExperienceAward
     @Nested
@@ -614,11 +625,12 @@ public class MissionCompletionManagerTest {
 
             List<Person> personnel = List.of(mock(Person.class));
             when(humanResources.getPersonnelFilteringOutDepartedAndAbsent()).thenReturn(personnel);
-            when(mission.getEmployerFactionCode()).thenReturn(NON_PIRATE_FACTION_CODE);
+            when(mission.usesSpecialRule(USE_PIRATE_LOOTING)).thenReturn(false);
 
             try (MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
                   ContractCharacteristics.class);
-                  MockedStatic<ChaosReputation> chaosReputation = mockStatic(ChaosReputation.class)) {
+                  MockedStatic<ChaosReputation> chaosReputation = mockStatic(ChaosReputation.class);
+                  MockedStatic<PirateLooting> pirateLooting = mockStatic(PirateLooting.class)) {
                 contractCharacteristics.when(
                       () -> ContractCharacteristics.getUnitReputationMultiplier(mission, MissionStatus.SUCCESS))
                       .thenReturn(1.5);
@@ -627,8 +639,8 @@ public class MissionCompletionManagerTest {
 
                 chaosReputation.verify(() -> ChaosReputation.processContractCompletion(campaign, MissionStatus.SUCCESS,
                       personnel, 1.5));
-                chaosReputation.verify(() -> ChaosReputation.resolveActOfPiracy(any(), any(), anyInt(),
-                      any(), anyBoolean(), any()), never());
+                pirateLooting.verify(() -> PirateLooting.resolveActOfPiracy(any(), any(), anyInt(),
+                      any(), any(), anyBoolean(), any()), never());
             }
         }
 
@@ -648,22 +660,23 @@ public class MissionCompletionManagerTest {
             List<Person> personnel = List.of(mock(Person.class));
             List<Scenario> scenarios = List.of(mock(Scenario.class));
             when(humanResources.getPersonnelFilteringOutDepartedAndAbsent()).thenReturn(personnel);
-            when(mission.getEmployerFactionCode()).thenReturn(Faction.PIRATE_FACTION_CODE);
+            when(mission.usesSpecialRule(USE_PIRATE_LOOTING)).thenReturn(true);
             when(mission.getScale()).thenReturn(4);
             when(mission.getScenarios()).thenReturn(scenarios);
             when(mission.getName()).thenReturn("Raid");
 
             try (MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
                   ContractCharacteristics.class);
-                  MockedStatic<ChaosReputation> chaosReputation = mockStatic(ChaosReputation.class)) {
+                  MockedStatic<ChaosReputation> chaosReputation = mockStatic(ChaosReputation.class);
+                  MockedStatic<PirateLooting> pirateLooting = mockStatic(PirateLooting.class)) {
                 contractCharacteristics.when(
                       () -> ContractCharacteristics.getUnitReputationMultiplier(mission, MissionStatus.SUCCESS))
                       .thenReturn(1.0);
 
                 MissionCompletionManager.payCompletionBonusAndReputation(campaign, mission, MissionStatus.SUCCESS);
 
-                chaosReputation.verify(() -> ChaosReputation.resolveActOfPiracy(campaign, personnel, 4, scenarios,
-                      true, "Raid"));
+                pirateLooting.verify(() -> PirateLooting.resolveActOfPiracy(campaign, personnel, 4, scenarios,
+                      null, true, "Raid"));
             }
         }
     }
@@ -1024,6 +1037,7 @@ public class MissionCompletionManagerTest {
             when(mission.getCurrentScenarios()).thenReturn(new ArrayList<>());
             when(mission.getEmployerFactionCode()).thenReturn(NON_PIRATE_FACTION_CODE);
             when(mission.getStratConCampaignState()).thenReturn(null);
+            when(mission.getWithheldSupportPayments()).thenReturn(Money.zero());
 
             when(campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)).thenReturn(false);
             when(campaignOptions.isUseStratCon()).thenReturn(false);
