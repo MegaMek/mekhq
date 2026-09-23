@@ -74,4 +74,24 @@ public class StratConPointOfInterestManifest {
             return null;
         }
     }
+
+    /**
+     * Writes this manifest to the given JSON file.
+     *
+     * @param outputFile the destination file
+     *
+     * @return {@code true} if the file was written, {@code false} if an error occurred (logged)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean serialize(File outputFile) {
+        try {
+            StratConPointOfInterestJson.toFile(this, outputFile);
+            return true;
+        } catch (Exception exception) {
+            LOGGER.error("Error serializing point of interest manifest {}", outputFile.getPath(), exception);
+            return false;
+        }
+    }
 }

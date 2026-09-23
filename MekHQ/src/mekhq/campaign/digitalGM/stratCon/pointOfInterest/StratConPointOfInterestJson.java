@@ -34,15 +34,20 @@ package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import mekhq.utilities.MMDataLicenseHeader;
 
 /**
- * JSON reading for StratCon point of interest definitions and their manifests, configured to match the facility JSON
+ * JSON reading and writing for StratCon point of interest definitions and their manifests, configured to match the facility JSON
  * files: fields are the single source of truth, unknown fields are tolerated, and a leading {@code #} license-header
  * block is skipped.
  *
@@ -61,6 +66,9 @@ final class StratConPointOfInterestJson {
         // JSON shape.
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        // Leave unset optional fields (a neutral owner, no sprite) out of written files, as the shipped files do.
+        mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         // Tolerate fields absent from older files rather than failing the whole load.
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         // Skip the leading '#' license-header comment lines that lead every data file.
@@ -70,5 +78,22 @@ final class StratConPointOfInterestJson {
 
     static <T> T fromFile(File inputFile, Class<T> type) throws IOException {
         return MAPPER.readValue(inputFile, type);
+    }
+
+    /**
+     * Writes a definition or manifest to a JSON file, led by the MegaMek Data license header (as {@code #} comment
+     * lines, which reading skips). The header carries the file's existing copyright year forward.
+     *
+     * @param value      the definition or manifest to write
+     * @param outputFile the destination file
+     *
+     * @throws IOException if the file cannot be written
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void toFile(Object value, File outputFile) throws IOException {
+        String content = MMDataLicenseHeader.licenseHeader(outputFile) + '\n' + MAPPER.writeValueAsString(value);
+        Files.writeString(outputFile.toPath(), content, StandardCharsets.UTF_8);
     }
 }

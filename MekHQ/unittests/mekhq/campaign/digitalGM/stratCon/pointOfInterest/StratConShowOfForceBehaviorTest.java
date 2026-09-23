@@ -152,7 +152,7 @@ class StratConShowOfForceBehaviorTest {
 
         AbstractContract contract = mock(AbstractContract.class);
         campaignState = new StratConCampaignState();
-        campaignState.setContractsUseSpecialMechanics(true);
+        campaignState.setContractsUseSpecialMechanics(isContractsUseSpecialMechanics);
         campaignState.addTrack(track);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
         when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.GARRISON_DUTY);
