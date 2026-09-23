@@ -546,6 +546,7 @@ public class StratConContractInitializer {
      *     <li>Pirate Raid: plunder targets (see {@link StratConPlunderTargetBehavior})</li>
      *     <li>Objective Raid: target intelligence (see {@link StratConTargetIntelligenceBehavior})</li>
      *     <li>Garrison Duty: shows of force (see {@link StratConShowOfForceBehavior})</li>
+     *     <li>Pirate Hunting: pirate captains (see {@link StratConPirateCaptainBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -640,6 +641,10 @@ public class StratConContractInitializer {
             return StratConShowOfForceBehavior.TYPE_ID;
         }
 
+        if (objectiveType.isPirateHunting()) {
+            return StratConPirateCaptainBehavior.TYPE_ID;
+        }
+
         return null;
     }
 
@@ -675,8 +680,8 @@ public class StratConContractInitializer {
     /**
      * Decides whether a special point of interest type is a strategic objective. Every one is, except high profile
      * targets - a Diversionary Raid's objective is its Escalation instead (see {@link StratConEscalation}) - target
-     * intelligence, whose objectives are the facilities it leads to, and shows of force, which only calm a Garrison
-     * Duty contract's Escalation.
+     * intelligence, whose objectives are the facilities it leads to, shows of force, which only calm a Garrison Duty
+     * contract's Escalation, and pirate captains, whose objectives are the Essential scenarios they are fought in.
      *
      * @param typeId the type ID of a special point of interest
      *
@@ -689,7 +694,8 @@ public class StratConContractInitializer {
     static boolean isSpecialPointOfInterestObjective(String typeId) {
         return !StratConHighProfileTargetBehavior.TYPE_ID.equals(typeId)
                      && !StratConTargetIntelligenceBehavior.TYPE_ID.equals(typeId)
-                     && !StratConShowOfForceBehavior.TYPE_ID.equals(typeId);
+                     && !StratConShowOfForceBehavior.TYPE_ID.equals(typeId)
+                     && !StratConPirateCaptainBehavior.TYPE_ID.equals(typeId);
     }
 
     /**

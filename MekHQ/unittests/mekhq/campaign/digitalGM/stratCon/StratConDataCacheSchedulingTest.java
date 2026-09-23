@@ -208,7 +208,7 @@ class StratConDataCacheSchedulingTest {
 
     @Test
     void otherContractTypesNeverGetDataCaches() {
-        List<StratConScheduledPointOfInterest> scheduled = schedule(contract(ContractObjectiveType.PIRATE_HUNTING, 1),
+        List<StratConScheduledPointOfInterest> scheduled = schedule(contract(ContractObjectiveType.UNDEFINED, 1),
               true,
               true);
 
@@ -332,8 +332,11 @@ class StratConDataCacheSchedulingTest {
         assertEquals(StratConShowOfForceBehavior.TYPE_ID,
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.GARRISON_DUTY, 1), true));
+        assertEquals(StratConPirateCaptainBehavior.TYPE_ID,
+              StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.PIRATE_HUNTING, 1), true));
         assertNull(StratConContractInitializer.getSpecialPointOfInterestTypeId(
-              contract(ContractObjectiveType.PIRATE_HUNTING, 1), true));
+              contract(ContractObjectiveType.UNDEFINED, 1), true));
     }
 
     @Test
@@ -355,11 +358,18 @@ class StratConDataCacheSchedulingTest {
     @ParameterizedTest
     @EnumSource(value = ContractObjectiveType.class,
           names = { "ESPIONAGE", "GUERRILLA_WARFARE", "MOLE_HUNTING", "ASSASSINATION", "OBSERVATION_RAID",
-                    "EXTRACTION_RAID", "RETAINER", "RIOT_DUTY", "SABOTAGE", "TERRORISM", "PIRATE_RAID" })
+                    "EXTRACTION_RAID", "RETAINER", "RIOT_DUTY", "SABOTAGE", "TERRORISM", "PIRATE_RAID",
+                    "PIRATE_HUNTING" })
     void specialPointsOfInterestReplaceEssentialScenarios(ContractObjectiveType objectiveType) {
         assertTrue(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), true));
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), false),
               "without special mechanics, the contract keeps its Essential scenarios");
+    }
+
+    @Test
+    void pirateCaptainsAreNotObjectivesThemselves() {
+        assertFalse(StratConContractInitializer.isSpecialPointOfInterestObjective(
+              StratConPirateCaptainBehavior.TYPE_ID), "the fight with a captain is the objective, not the captain");
     }
 
     @Test
@@ -568,7 +578,7 @@ class StratConDataCacheSchedulingTest {
     @Test
     void aContractWithoutSpecialPointsOfInterestKeepsItsEssentialScenarios() {
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
-              contract(ContractObjectiveType.PIRATE_HUNTING, 1), true));
+              contract(ContractObjectiveType.UNDEFINED, 1), true));
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract(null, 1), true));
     }
 
