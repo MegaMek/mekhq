@@ -932,6 +932,9 @@ public class StratConTab extends CampaignGuiTab {
                 case HostileFacilityControl:
                     sb.append(objectivePhrase("stratConTab.objectives.hostileFacility", coordsRevealed));
                     break;
+                case FacilityDestruction:
+                    sb.append(objectivePhrase("stratConTab.objectives.facilityDestruction", coordsRevealed));
+                    break;
                 case AlliedFacilityControl:
                     sb.append(objectivePhrase("stratConTab.objectives.alliedFacility", coordsRevealed));
 

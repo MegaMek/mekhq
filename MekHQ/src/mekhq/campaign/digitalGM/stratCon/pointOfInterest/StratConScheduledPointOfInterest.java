@@ -33,6 +33,8 @@
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.Map;
 
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState.LocalDateAdapter;
@@ -50,6 +52,8 @@ public class StratConScheduledPointOfInterest {
     private LocalDate spawnDate;
     private String typeId;
     private boolean strategicObjective;
+    // state copied onto the point of interest when it is placed, for a type that is told something at scheduling time
+    private Map<String, String> initialState = new HashMap<>();
 
     /** Used when loading saved campaigns. */
     public StratConScheduledPointOfInterest() {
@@ -109,6 +113,18 @@ public class StratConScheduledPointOfInterest {
      * @author Illiani
      * @since 0.51.01
      */
+    /**
+     * @return the state the point of interest starts with when it is placed (see
+     *       {@link StratConPointOfInterest#getState()}); empty for most types
+     */
+    public Map<String, String> getInitialState() {
+        return initialState;
+    }
+
+    public void setInitialState(Map<String, String> initialState) {
+        this.initialState = (initialState == null) ? new HashMap<>() : initialState;
+    }
+
     public boolean isDue(LocalDate today) {
         return (spawnDate != null) && !spawnDate.isAfter(today);
     }

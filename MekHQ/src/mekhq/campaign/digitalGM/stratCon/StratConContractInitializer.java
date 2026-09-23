@@ -539,6 +539,7 @@ public class StratConContractInitializer {
      *     <li>Terrorism: civilian infrastructure (see {@link StratConCivilianInfrastructureBehavior})</li>
      *     <li>Security Duty: security reviews (see {@link StratConSecurityReviewBehavior})</li>
      *     <li>Pirate Raid: plunder targets (see {@link StratConPlunderTargetBehavior})</li>
+     *     <li>Objective Raid: target intelligence (see {@link StratConTargetIntelligenceBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -625,6 +626,10 @@ public class StratConContractInitializer {
             return StratConPlunderTargetBehavior.TYPE_ID;
         }
 
+        if (objectiveType.isObjectiveRaid()) {
+            return StratConTargetIntelligenceBehavior.TYPE_ID;
+        }
+
         return null;
     }
 
@@ -632,8 +637,9 @@ public class StratConContractInitializer {
      * Decides whether a contract's special points of interest (see {@link #getSpecialPointOfInterestTypeId}) replace
      * its Essential scenarios. Most do: such a contract gets no Essential scenarios, and the combat bonus is paid for
      * each special point of interest dealt with instead. Beleaguered forces, training maneuvers, high profile targets,
-     * strategic positions, and security reviews do not - Relief Duty, Cadre Duty, Diversionary Raid, Planetary Assault,
-     * and Security Duty contracts keep their Essential scenarios alongside them.
+     * strategic positions, security reviews, and target intelligence do not - Relief Duty, Cadre Duty, Diversionary
+     * Raid, Planetary Assault, Security Duty, and Objective Raid contracts keep their Essential scenarios alongside
+     * them.
      *
      * @param contract                       the contract
      * @param isContractsUseSpecialMechanics whether the "Contracts Use Special Mechanics" option is on
@@ -651,12 +657,14 @@ public class StratConContractInitializer {
                      && !StratConTrainingManeuversBehavior.TYPE_ID.equals(specialTypeId)
                      && !StratConHighProfileTargetBehavior.TYPE_ID.equals(specialTypeId)
                      && !StratConStrategicPositionBehavior.TYPE_ID.equals(specialTypeId)
-                     && !StratConSecurityReviewBehavior.TYPE_ID.equals(specialTypeId);
+                     && !StratConSecurityReviewBehavior.TYPE_ID.equals(specialTypeId)
+                     && !StratConTargetIntelligenceBehavior.TYPE_ID.equals(specialTypeId);
     }
 
     /**
      * Decides whether a special point of interest type is a strategic objective. Every one is, except high profile
-     * targets: a Diversionary Raid's objective is its Escalation instead (see {@link StratConEscalation}).
+     * targets - a Diversionary Raid's objective is its Escalation instead (see {@link StratConEscalation}) - and target
+     * intelligence, whose objectives are the facilities it leads to.
      *
      * @param typeId the type ID of a special point of interest
      *
@@ -667,7 +675,8 @@ public class StratConContractInitializer {
      */
     // Package-private rather than private so the decision can be tested directly.
     static boolean isSpecialPointOfInterestObjective(String typeId) {
-        return !StratConHighProfileTargetBehavior.TYPE_ID.equals(typeId);
+        return !StratConHighProfileTargetBehavior.TYPE_ID.equals(typeId)
+                     && !StratConTargetIntelligenceBehavior.TYPE_ID.equals(typeId);
     }
 
     /**
@@ -708,11 +717,86 @@ public class StratConContractInitializer {
         contract.setPointOfInterestSchedule(schedule);
 
         boolean isStrategicObjective = isSpecialPointOfInterestObjective(typeId);
+        List<StratConScheduledPointOfInterest> scheduledPointsOfInterest = new ArrayList<>();
         for (LocalDate spawnDate : rollSpawnDates(startDate, schedule, contract.getLengthInMonths())) {
-            campaignState.addScheduledPointOfInterest(new StratConScheduledPointOfInterest(spawnDate,
-                  typeId,
+            scheduledPointsOfInterest.add(new StratConScheduledPointOfInterest(spawnDate, typeId,
                   isStrategicObjective));
         }
+
+        // Only so many target intelligence leads pan out into facilities: settled now, so it cannot be gamed later.
+        if (StratConTargetIntelligenceBehavior.TYPE_ID.equals(typeId)) {
+            markFacilityLeads(scheduledPointsOfInterest, max(1, contract.getScale()));
+        }
+
+        for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
+            campaignState.addScheduledPointOfInterest(scheduledPointOfInterest);
+        }
+    }
+
+    /**
+     * Marks, at random, which of a contract's scheduled target intelligence will lead to a facility (see
+     * {@link StratConTargetIntelligenceBehavior}): as many as the given count, or all of them if there are fewer.
+     *
+     * @param scheduledPointsOfInterest the contract's scheduled target intelligence
+     * @param facilityLeadCount         how many may lead to a facility: one per point of the contract's scale
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the marking can be tested directly.
+    static void markFacilityLeads(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest,
+          int facilityLeadCount) {
+        List<StratConScheduledPointOfInterest> candidates = new ArrayList<>(scheduledPointsOfInterest);
+        Collections.shuffle(candidates);
+
+        int leads = min(facilityLeadCount, candidates.size());
+        for (int index = 0; index < leads; index++) {
+            candidates.get(index)
+                  .getInitialState()
+                  .put(StratConTargetIntelligenceBehavior.FACILITY_LEAD_STATE_KEY, Boolean.TRUE.toString());
+        }
+    }
+
+    /**
+     * Places a random hostile facility at an eligible hex of a sector, reveals it, and makes destroying it a strategic
+     * objective of the sector - as the contract's own objective facilities are, but revealed. Respects the sector's
+     * facility capacity.
+     *
+     * @param track    the sector to place the facility in
+     * @param contract the contract whose map holds the sector
+     * @param campaign the current campaign
+     *
+     * @return the hex the facility was placed on, or {@code null} if the sector had no room for it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConCoords spawnObjectiveFacility(StratConTrackState track, AbstractContract contract,
+          Campaign campaign) {
+        if (track.getOccupiedHexCount() >= facilityCapacity(track)) {
+            return null;
+        }
+
+        StratConCoords coords = getUnoccupiedCoords(track);
+        if (coords == null) {
+            return null;
+        }
+
+        StratConFacility facility = StratConFacilityFactory.getRandomHostileFacility();
+        facility.setOwner(ForceAlignment.Opposing);
+        facility.setStrategicObjective(true);
+        facility.setVisible(true);
+        track.addFacility(coords, facility);
+        track.getRevealedCoords().add(coords);
+
+        StratConStrategicObjective objective = new StratConStrategicObjective();
+        objective.setObjectiveCoords(coords);
+        objective.setObjectiveType(StrategicObjectiveType.FacilityDestruction);
+        track.addStrategicObjective(objective);
+
+        // A new base belongs on the road grid if the planet's owner holds it, as any other placed base does.
+        connectFacilitiesToRoads(track, contract, campaign);
+        return coords;
     }
 
     /**
@@ -819,6 +903,8 @@ public class StratConContractInitializer {
                                                                   null,
                                                                   campaign.getLocalDate());
             if (pointOfInterest != null) {
+                // Anything the point of interest was told when it was scheduled goes with it onto the map.
+                scheduledPointOfInterest.getInitialState().forEach(pointOfInterest::setStateValue);
                 return pointOfInterest;
             }
         }
