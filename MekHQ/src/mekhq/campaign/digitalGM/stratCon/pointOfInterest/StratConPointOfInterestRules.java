@@ -106,6 +106,26 @@ public final class StratConPointOfInterestRules {
     }
 
     /**
+     * Takes a point of interest off the map as if it had never counted - a decoy, say - and removes every strategic
+     * objective tied to it, so those objectives are neither met nor failed.
+     *
+     * <p>Behaviors should withdraw points of interest through this rather than by removing them directly.</p>
+     *
+     * @param track           the sector the point of interest sits in
+     * @param pointOfInterest the point of interest to withdraw
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void withdrawPointOfInterest(StratConTrackState track, StratConPointOfInterest pointOfInterest) {
+        for (StratConStrategicObjective objective : getStrategicObjectives(track, pointOfInterest)) {
+            track.removeStrategicObjective(objective);
+        }
+
+        track.removePointOfInterest(pointOfInterest.getId());
+    }
+
+    /**
      * Ties a point of interest's fate to a scenario: when the scenario ends, the point of interest's
      * {@link IStratConPointOfInterestBehavior#onLinkedScenarioEnded} hook is told how it went (see
      * {@link #processScenarioEnded}). While it waits, the point of interest does not expire.

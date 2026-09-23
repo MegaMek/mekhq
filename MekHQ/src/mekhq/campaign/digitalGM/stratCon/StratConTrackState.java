@@ -577,6 +577,24 @@ public class StratConTrackState {
         }
     }
 
+    /**
+     * Removes a strategic objective from this track entirely, so it counts as neither met nor failed.
+     *
+     * @param strategicObjective the objective to remove
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void removeStrategicObjective(StratConStrategicObjective strategicObjective) {
+        getStrategicObjectives().remove(strategicObjective);
+        if (specificStrategicObjectives != null) {
+            StratConCoords coords = strategicObjective.getObjectiveCoords();
+            if ((coords != null) && (specificStrategicObjectives.get(coords) == strategicObjective)) {
+                specificStrategicObjectives.remove(coords);
+            }
+        }
+    }
+
     public int getTemperature() {
         return temperature;
     }

@@ -35,6 +35,7 @@ package mekhq.campaign.digitalGM.stratCon;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -50,6 +51,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.PointOfInter
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDataCacheBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConVulnerableInfrastructureBehavior;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
@@ -216,19 +218,57 @@ class StratConDataCacheSchedulingTest {
         }
     }
 
-    // Which contracts use data caches - and so get no Essential scenarios
+    // Guerrilla Warfare: vulnerable infrastructure
 
     @Test
-    void onlyEspionageContractsWithSpecialMechanicsUseDataCaches() {
-        assertTrue(StratConContractInitializer.usesDataCaches(contract(ContractObjectiveType.ESPIONAGE, 1), true));
-        assertFalse(StratConContractInitializer.usesDataCaches(contract(ContractObjectiveType.ESPIONAGE, 1), false),
-              "without special mechanics, an Espionage contract keeps its Essential scenarios");
-        assertFalse(StratConContractInitializer.usesDataCaches(contract(ContractObjectiveType.GARRISON_DUTY, 1),
-              true));
+    void aGuerrillaWarfareContractSchedulesOnlyVulnerableInfrastructureEachAnObjective() {
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.GUERRILLA_WARFARE, 1), true, true);
+
+        assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertEquals(StratConVulnerableInfrastructureBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertTrue(pointOfInterest.isStrategicObjective());
+        }
     }
 
     @Test
-    void aContractWithoutAnObjectiveTypeDoesNotUseDataCaches() {
-        assertFalse(StratConContractInitializer.usesDataCaches(contract(null, 1), true));
+    void withoutSpecialMechanicsAGuerrillaWarfareContractSchedulesItsDefinitionsPointsOfInterest() {
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.GUERRILLA_WARFARE, 1), true, false);
+
+        assertEquals(3, scheduled.size());
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertEquals(DEFINITION_TYPE_ID, pointOfInterest.getTypeId());
+        }
+    }
+
+    // Which contracts use special points of interest - and so get no Essential scenarios
+
+    @Test
+    void eachContractTypeWithSpecialMechanicsGetsItsOwnSpecialPointOfInterest() {
+        assertEquals(StratConDataCacheBehavior.TYPE_ID,
+              StratConContractInitializer.getSpecialPointOfInterestTypeId(contract(ContractObjectiveType.ESPIONAGE,
+                    1), true));
+        assertEquals(StratConVulnerableInfrastructureBehavior.TYPE_ID,
+              StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.GUERRILLA_WARFARE, 1), true));
+        assertNull(StratConContractInitializer.getSpecialPointOfInterestTypeId(
+              contract(ContractObjectiveType.GARRISON_DUTY, 1), true));
+    }
+
+    @Test
+    void withoutSpecialMechanicsNoContractGetsSpecialPointsOfInterest() {
+        assertNull(StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.ESPIONAGE, 1), false),
+              "without special mechanics, an Espionage contract keeps its Essential scenarios");
+        assertNull(StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.GUERRILLA_WARFARE, 1), false),
+              "without special mechanics, a Guerrilla Warfare contract keeps its Essential scenarios");
+    }
+
+    @Test
+    void aContractWithoutAnObjectiveTypeGetsNoSpecialPointsOfInterest() {
+        assertNull(StratConContractInitializer.getSpecialPointOfInterestTypeId(contract(null, 1), true));
     }
 }
