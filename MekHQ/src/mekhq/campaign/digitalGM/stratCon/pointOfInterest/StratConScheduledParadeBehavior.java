@@ -2,13 +2,9 @@ package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
-import mekhq.campaign.digitalGM.stratCon.StratConScenarioFactory;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
-import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.randomEvents.other.RiotScenario;
 
 /**
@@ -39,7 +35,7 @@ public class StratConScheduledParadeBehavior extends StratConAmbushPointOfIntere
     public static final String TYPE_ID = "ScheduledParade";
 
     /** The scenario template a disrupted parade is fought as. */
-    static final String SCENARIO_TEMPLATE = "Crowd Control.json";
+    static final String SCENARIO_TEMPLATE = StratConRiots.SCENARIO_TEMPLATE;
 
     @Override
     protected String getResourceKeyPrefix() {
@@ -63,10 +59,7 @@ public class StratConScheduledParadeBehavior extends StratConAmbushPointOfIntere
     }
 
     /**
-     * Sets up the riot as a riot random event does (see {@link RiotScenario}): the scenario is generated and finalized
-     * with the deploying formation present, so the opposition is sized against it, and the riot's civilian mobs are then
-     * added to its "Civilians" force. The formation is then handed back, to be assigned to the riot like any scenario
-     * found on the hex.
+     * Sets up the riot as every riot is set up (see {@link StratConRiots#placeRiot}).
      *
      * @author Illiani
      * @since 0.51.01
@@ -74,40 +67,11 @@ public class StratConScheduledParadeBehavior extends StratConAmbushPointOfIntere
     @Override
     protected @Nullable StratConScenario placeAmbush(StratConPointOfInterest pointOfInterest,
           StratConTrackState track, int formationId, AbstractContract contract, Campaign campaign) {
-        // A missing template is logged by the factory. Without it there is no riot to fight.
-        ScenarioTemplate template = StratConScenarioFactory.getSpecificScenario(SCENARIO_TEMPLATE);
-        if (template == null) {
-            return null;
-        }
-
-        // Facilities are ignored: a parade occupies its hex, so none can share it. The riot breaks out at once.
-        StratConScenario riot = StratConRulesManager.setupScenario(pointOfInterest.getCoords(),
-              formationId,
-              campaign,
-              contract,
-              track,
-              template,
-              true,
-              0);
-        if (riot == null) {
-            return null;
-        }
-
-        // Finalized as a riot's scenario is, which also generates its "Civilians" force for the mobs to join.
-        StratConRulesManager.finalizeBackingScenario(campaign, contract, track, false, riot);
-        AtBDynamicScenario backingScenario = riot.getBackingScenario();
-        RiotScenario.addRiotingMobs(campaign, contract.getEnemyFaction(), backingScenario);
-
-        // Finalizing without auto-assignment has already taken the formation out of the backing scenario; clear it from
-        // the primary forces too, so that assigning it to the riot on the hex does not list it twice.
-        riot.getPrimaryForceIDs().remove(Integer.valueOf(formationId));
-
-        StratConPointOfInterestRules.linkScenario(pointOfInterest, riot);
-        return riot;
+        return StratConRiots.placeRiot(pointOfInterest, track, formationId, contract, campaign);
     }
 
     /**
-     * A riot is announced as a riot random event's is (see {@link RiotScenario#reportRiot}).
+     * A riot is announced as every riot is (see {@link StratConRiots#announceRiot}).
      *
      * @author Illiani
      * @since 0.51.01
@@ -115,6 +79,6 @@ public class StratConScheduledParadeBehavior extends StratConAmbushPointOfIntere
     @Override
     protected void announceAmbush(StratConPointOfInterest pointOfInterest, StratConTrackState track, int formationId,
           AbstractContract contract, Campaign campaign) {
-        RiotScenario.reportRiot(campaign, contract, track, pointOfInterest.getCoords());
+        StratConRiots.announceRiot(pointOfInterest, track, contract, campaign);
     }
 }

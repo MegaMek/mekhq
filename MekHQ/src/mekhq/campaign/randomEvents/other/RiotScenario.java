@@ -32,10 +32,7 @@
  */
 package mekhq.campaign.randomEvents.other;
 
-import static java.io.File.separator;
 import static megamek.common.compute.Compute.d6;
-import static mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.getUnoccupiedCoords;
-import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateExternalScenario;
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.createEntityWithCrew;
 import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.HUGE;
 import static mekhq.campaign.randomEvents.prisoners.prisonerEvents.MobType.LARGE;
@@ -46,7 +43,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.util.ArrayList;
 import java.util.List;
 
-import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.loaders.MekSummary;
@@ -54,32 +50,23 @@ import megamek.common.loaders.MekSummaryCache;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
-import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.BotForce;
-import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
- * Builds and schedules a StratCon "Crowd Control" scenario representing a civilian riot, then injects generated
- * civilian mobs into the scenario's AI-controlled force. On success, an in-character dialog is shown to the player
- * explaining the situation from the appropriate factional voice.
+ * The pieces of a riot: generating the civilian mobs that make up a StratCon "Crowd Control" scenario's opposition, and
+ * announcing the riot to the player in an immersive, faction-aware dialog.
  *
- * <p>High-level flow:</p>
- * <ol>
- *   <li>Generate a list of civilian mob {@link Unit}s sized by random roll.</li>
- *   <li>Load the "Crowd Control" scenario template.</li>
- *   <li>Select a random StratCon track and a free coordinate on that track.</li>
- *   <li>Generate a playable scenario and attach the mobs to the "Civilians" {@link BotForce} if present.</li>
- *   <li>Present an immersive, faction-aware report to the player.</li>
- * </ol>
+ * <p>Riots break out when a responding formation's Civil Disobedience or Scheduled Parade point of interest turns
+ * violent (see {@code StratConCivilDisobedienceBehavior} and {@code StratConScheduledParadeBehavior}); this replaced
+ * the old weekly riot event on Riot Duty contracts.</p>
  *
  * @author Illiani
  * @since 0.50.10
@@ -88,30 +75,12 @@ public class RiotScenario {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.RiotScenario";
     private static final MMLogger LOGGER = MMLogger.create(RiotScenario.class);
 
-    private final Campaign campaign;
-
-    /**
-     * Constructs a new {@code RiotScenario} and immediately attempts to generate a riot scenario for the supplied
-     * contract.
-     *
-     * @param campaign the current campaign context; used for entity creation, localization, dialogs, and StratCon
-     *                 integration
-     * @param contract the active contract driving employer, faction, track selection, and scenario generation
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    public RiotScenario(Campaign campaign, AbstractContract contract) {
-        this.campaign = campaign;
-
-        List<Unit> allMobs = findMobsForRiots(campaign, contract.getEnemyFaction());
-        createRiotScenario(contract, allMobs);
+    private RiotScenario() {
     }
 
     /**
      * Generates a riot's civilian mobs and adds them to the scenario's "Civilians" {@link BotForce}, as a riot does.
-     * For other callers that set up their own "Crowd Control" scenario: call it once the scenario has been finalized,
-     * since finalizing is what creates its bot forces.
+     * Call it once the scenario has been finalized, since finalizing is what creates its bot forces.
      *
      * @param campaign        the current campaign
      * @param faction         the faction the mobs are created for
@@ -221,71 +190,6 @@ public class RiotScenario {
         }
 
         return createEntityWithCrew(faction, SkillLevel.ULTRA_GREEN, campaign, mekSummary, false);
-    }
-
-    /**
-     * Assembles and schedules the riot scenario using the "Crowd Control" template, attaches the provided mobs to the
-     * bot "Civilians" force if it exists, and notifies the player via an immersive, faction-aware dialog.
-     *
-     * <p>Failure points (template load, track/coords lookup, scenario generation) are logged and cause an early
-     * return without throwing.</p>
-     *
-     * @param contract the contract providing StratCon campaign state and employer context
-     * @param mobUnits the civilian mobs to inject into the scenario's "Civilians" {@link BotForce}; ignored if that
-     *                 force is absent
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private void createRiotScenario(AbstractContract contract, List<Unit> mobUnits) {
-        final String DIRECTORY = "data" + separator + "scenariotemplates" + separator;
-        final String SCENARIO_FILE = DIRECTORY + "Crowd Control.json";
-
-        ScenarioTemplate template = ScenarioTemplate.Deserialize(SCENARIO_FILE);
-
-        // If we've failed to deserialize the requested template, report the error and make the delivery.
-        if (template == null) {
-            LOGGER.info("Failed to deserialize {}", SCENARIO_FILE);
-            return;
-        }
-
-        // Pick a random track where the interception will take place. If we fail to get a track, we log an error and
-        // skip the scenario
-        StratConTrackState track;
-        try {
-            final StratConCampaignState campaignState = contract.getStratConCampaignState();
-            List<StratConTrackState> tracks = campaignState.getTracks();
-            track = ObjectUtility.getRandomItem(tracks);
-        } catch (NullPointerException e) {
-            LOGGER.info("Failed to fetch a track: {}", e.getMessage());
-            return;
-        }
-
-        StratConCoords coords = getUnoccupiedCoords(track);
-        if (coords == null) {
-            LOGGER.info("Failed to fetch a free set of coords");
-            return;
-        }
-
-        StratConScenario scenario = generateExternalScenario(campaign,
-              contract,
-              track,
-              coords,
-              template,
-              false,
-              false,
-              false,
-              0);
-
-        if (scenario == null) {
-            LOGGER.info("Failed to generate a scenario");
-            return;
-        }
-
-        // If we successfully generated a scenario, we need to make a couple of final adjustments and announce the
-        // situation to the player
-        addMobsToCivilians(scenario.getBackingScenario(), mobUnits);
-        reportRiot(campaign, contract, track, coords);
     }
 
     /**

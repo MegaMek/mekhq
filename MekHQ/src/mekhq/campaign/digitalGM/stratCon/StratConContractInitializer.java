@@ -534,6 +534,7 @@ public class StratConContractInitializer {
      *     <li>Extraction Raid: VIPs (see {@link StratConVIPBehavior})</li>
      *     <li>Planetary Assault: strategic positions (see {@link StratConStrategicPositionBehavior})</li>
      *     <li>Retainer: scheduled parades (see {@link StratConScheduledParadeBehavior})</li>
+     *     <li>Riot Duty: civil disobedience (see {@link StratConCivilDisobedienceBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -598,6 +599,10 @@ public class StratConContractInitializer {
 
         if (objectiveType.isRetainer()) {
             return StratConScheduledParadeBehavior.TYPE_ID;
+        }
+
+        if (objectiveType.isRiotDuty()) {
+            return StratConCivilDisobedienceBehavior.TYPE_ID;
         }
 
         return null;

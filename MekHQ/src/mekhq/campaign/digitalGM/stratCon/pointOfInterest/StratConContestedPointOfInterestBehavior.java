@@ -104,6 +104,18 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
         return true;
     }
 
+    /**
+     * @return {@code true} if a scenario can break out over this type of point of interest even while the enemy is
+     *       routed, rolled against the usual odds as if it were not; by default, it cannot - a routed enemy contests
+     *       nothing. Civil unrest, which does not answer to the enemy's morale, can.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected boolean isContestPossibleWhileRouted() {
+        return false;
+    }
+
     @Override
     public PointOfInterestDeploymentOutcome onFormationDeployed(StratConPointOfInterest pointOfInterest,
           StratConTrackState track, int formationId, Campaign campaign) {
@@ -120,7 +132,10 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
         }
 
         boolean essentialScenariosOnly = campaign.getCampaignOptions().get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
-        int targetNumber = StratConRulesManager.calculateScenarioOdds(track, contract, true);
+        int targetNumber = StratConRulesManager.calculateScenarioOdds(track,
+              contract,
+              true,
+              isContestPossibleWhileRouted());
         boolean isContested = StratConRulesManager.rollsRandomScenario(PointOfInterestDeploymentOutcome.NO_EFFECT,
               essentialScenariosOnly,
               false,
@@ -132,7 +147,8 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
             return PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO;
         }
 
-        StratConScenario scenario = placeContestingScenario(pointOfInterest, track, contract, campaign);
+        StratConScenario scenario = placeContestingScenario(pointOfInterest, track, formationId, contract,
+              campaign);
         if (scenario == null) {
             // Nothing to fight over the point of interest, so leave it in place and let the deployment carry on.
             LOGGER.error("Could not create a scenario over point of interest {}.", pointOfInterest);
@@ -140,6 +156,7 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
         }
 
         addReport(BATTLE, "contested.report", pointOfInterest, track, campaign);
+        announceContest(pointOfInterest, track, contract, campaign);
         return PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO;
     }
 
@@ -215,15 +232,38 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
     }
 
     /**
+     * Announces a scenario breaking out over the point of interest, beyond its report. By default, nothing more.
+     *
+     * @param pointOfInterest the point of interest the scenario is over
+     * @param track           the sector it sits in
+     * @param contract        the contract whose map holds the sector
+     * @param campaign        the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected void announceContest(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+          AbstractContract contract, Campaign campaign) {
+    }
+
+    /**
      * Places the scenario fought over a contested point of interest on its hex and links the point of interest to it.
+     * By default, the scenario is drawn from this type's template (see {@link #getScenarioTemplateName}) and set up
+     * without the deploying formation, which is then assigned to it like any scenario found on the hex.
+     *
+     * @param pointOfInterest the point of interest
+     * @param track           the sector it sits in
+     * @param formationId     the ID of the deploying formation
+     * @param contract        the contract whose map holds the sector
+     * @param campaign        the current campaign
      *
      * @return the scenario, or {@code null} if none could be generated
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private @Nullable StratConScenario placeContestingScenario(StratConPointOfInterest pointOfInterest,
-          StratConTrackState track, AbstractContract contract, Campaign campaign) {
+    protected @Nullable StratConScenario placeContestingScenario(StratConPointOfInterest pointOfInterest,
+          StratConTrackState track, int formationId, AbstractContract contract, Campaign campaign) {
         // A missing template is logged by the factory; a random scenario is fought instead.
         ScenarioTemplate template = StratConScenarioFactory.getSpecificScenario(getScenarioTemplateName());
 
