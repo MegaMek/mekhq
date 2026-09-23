@@ -121,8 +121,9 @@ public class StratConAmbushPointOfInterestBehavior extends AbstractStratConRolle
      * @since 0.51.01
      */
     @Override
-    protected void announceScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+    protected boolean announceScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
           int formationId, AbstractContract contract, Campaign campaign) {
         new StratConAmbushedDialog(campaign, formationId, false);
+        return true;
     }
 }

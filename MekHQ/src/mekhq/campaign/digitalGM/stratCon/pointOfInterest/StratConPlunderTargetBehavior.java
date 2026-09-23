@@ -48,9 +48,10 @@ import mekhq.campaign.mission.resupplyAndCaches.Resupply;
  *
  * <p>When any formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the target is
  * plundered: its objective is met, the contract's combat bonus is paid, the loot arrives as a size 1 Resupply, and the
- * contract's Escalation rises by 3d6. If one does, the raiders are ambushed, in a template suited to ambushing their unit
- * type; an ambushed target is spent whatever the ambush's result: it leaves the map with no loot, and its objective is
- * removed, neither met nor failed. (See {@link StratConAmbushPointOfInterestBehavior} for the rules it shares.)</p>
+ * contract's Escalation rises by 3d6. If one does, the raiders are ambushed, in a template suited to ambushing their
+ * unit type; an ambushed target is spent whatever the ambush's result: it leaves the map with no loot, and its
+ * objective is removed, neither met nor failed. (See {@link StratConAmbushPointOfInterestBehavior} for the rules it
+ * shares.)</p>
  *
  * <p>A plunder target not raided in time is gone: it expires and its objective fails (its lifespan comes from its
  * definition), except while an ambush there is still to be fought.</p>

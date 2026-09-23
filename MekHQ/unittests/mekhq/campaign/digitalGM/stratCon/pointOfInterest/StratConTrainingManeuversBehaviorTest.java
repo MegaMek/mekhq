@@ -53,11 +53,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
-import java.util.Hashtable;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
@@ -66,14 +64,12 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest.PointOfInterestStatus;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.personnel.familiarity.Familiarity;
-import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -84,9 +80,9 @@ import org.mockito.MockedStatic;
 import testUtilities.MHQTestUtilities;
 
 /**
- * Tests for training maneuvers: any formation completing them on deployment with no scenario ever breaking out, the
- * chassis familiarity the deploying combat team earns, never paying the combat bonus (their contract keeps its
- * Essential scenarios), their visibility, and their rolled lifespan.
+ * Tests for training maneuvers: any formation completing them on deployment with no scenario ever breaking out, and
+ * earning nothing more (no chassis familiarity, no combat bonus - their contract keeps its Essential scenarios), their
+ * visibility, and their rolled lifespan.
  *
  * @author Illiani
  * @since 0.51.01
@@ -100,8 +96,6 @@ class StratConTrainingManeuversBehaviorTest {
     private StratConTrackState track;
     private StratConPointOfInterest maneuvers;
     private StratConStrategicObjective objective;
-    // the deploying formation's combat team, in the campaign built by deploymentCampaign
-    private CombatTeam combatTeam;
 
     @BeforeEach
     void setUp() {
@@ -131,24 +125,18 @@ class StratConTrainingManeuversBehaviorTest {
     /**
      * A campaign where a scenario would break out on any ordinary deployment - an advancing enemy, and Essential
      * Scenarios Only off - holding one active contract with combat pay, and one player formation of the given primary
-     * unit type, with its combat team. Chassis familiarity is disabled, so awarding it changes nothing.
+     * unit type.
      */
     private Campaign deploymentCampaign(int primaryUnitType) {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         when(campaign.getLocalDate()).thenReturn(TODAY);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         Formation formation = mock(Formation.class);
         when(formation.getPrimaryUnitType(campaign)).thenReturn(primaryUnitType);
         when(campaign.getPlayerForce().getFormation(FORMATION_ID)).thenReturn(formation);
-
-        combatTeam = mock(CombatTeam.class);
-        Hashtable<Integer, CombatTeam> combatTeams = new Hashtable<>();
-        combatTeams.put(FORMATION_ID, combatTeam);
-        when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeams);
 
         AbstractContract contract = mock(AbstractContract.class);
         StratConCampaignState campaignState = new StratConCampaignState();
@@ -237,22 +225,9 @@ class StratConTrainingManeuversBehaviorTest {
     // Chassis familiarity
 
     @Test
-    void theDeployingCombatTeamEarnsChassisFamiliarity() {
+    void completingTheManeuversEarnsNoChassisFamiliarity() {
+        // A Patrol formation already earns familiarity for deploying; the maneuvers must not award it a second time.
         Campaign campaign = deploymentCampaign(MEK);
-
-        try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
-            deploy(campaign);
-
-            familiarity.verify(() -> Familiarity.assignFamiliarityToCombatTeam(campaign,
-                  combatTeam,
-                  FamiliarityGainType.D3));
-        }
-    }
-
-    @Test
-    void aFormationWithoutACombatTeamStillCompletesTheManeuvers() {
-        Campaign campaign = deploymentCampaign(MEK);
-        when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(new Hashtable<>());
 
         try (MockedStatic<Familiarity> familiarity = mockStatic(Familiarity.class)) {
             deploy(campaign);

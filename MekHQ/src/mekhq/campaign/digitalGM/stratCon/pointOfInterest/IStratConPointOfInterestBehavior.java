@@ -55,10 +55,11 @@ import mekhq.campaign.mission.contract.AbstractContract;
 public interface IStratConPointOfInterestBehavior {
     /**
      * Called once, when a contract that uses this type as its special point of interest is accepted, with every point
-     * of interest of this type the contract has scheduled. A type that settles something up front - which leads pan
-     * out, say - records it in each one's initial state (see
-     * {@link StratConScheduledPointOfInterest#getInitialState()}), which is copied onto the point of interest when it is
-     * placed. By default, nothing.
+     * of interest of this type the contract has scheduled. A type that settles something up front - which assassination
+     * targets are the real one rather than a body double, or which target intelligence leads to a facility - records it
+     * in each one's initial state (see
+     * {@link StratConScheduledPointOfInterest#getInitialState()}), which is copied onto the point of interest when it
+     * is placed. By default, nothing.
      *
      * @param scheduledPointsOfInterest the contract's scheduled points of interest of this type, not yet placed
      * @param contract                  the contract being accepted

@@ -44,10 +44,10 @@ import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * The behavior of a lead on an assassination target, placed in place of every point of interest on an Assassination
- * contract. It works much as a Mole Hunting contract's potential lead does (see {@link StratConConfiguredPointOfInterestType#POTENTIAL_LEAD}),
- * sharing the contested rules (see {@link StratConContestedPointOfInterestBehavior}), but no lead is ever a dud -
- * every one is fought as a {@value #SCENARIO_TEMPLATE} scenario - and most of the targets they turn up are body
- * doubles.
+ * contract. It works much as a Mole Hunting contract's potential lead does (see
+ * {@link StratConConfiguredPointOfInterestType#POTENTIAL_LEAD}), sharing the contested rules (see
+ * {@link StratConContestedPointOfInterestBehavior}), but no lead is ever a dud - every one is fought as a
+ * {@value #SCENARIO_TEMPLATE} scenario - and most of the targets they turn up are body doubles.
  *
  * <p>Only one lead per point of the contract's scale points to the real target, settled when the contract is accepted
  * (see {@link #REAL_TARGET_STATE_KEY}); the player cannot tell which, as every lead looks alike and is a strategic
@@ -57,8 +57,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * <p>Winning the fight against the real target meets its objective and pays the combat bonus; losing lets the target
  * escape, failing it. Winning against a body double also pays the combat bonus, but only then is the double revealed,
  * and its objective is withdrawn - neither met nor failed, as it was never the target. Losing to a double pays nothing,
- * and its objective is withdrawn all the same. A lead of either kind not followed up in time fails its objective, as the
- * player cannot know which it was.</p>
+ * and its objective is withdrawn all the same. A lead of either kind not followed up in time fails its objective, as
+ * the player cannot know which it was.</p>
  *
  * @author Illiani
  * @since 0.51.01

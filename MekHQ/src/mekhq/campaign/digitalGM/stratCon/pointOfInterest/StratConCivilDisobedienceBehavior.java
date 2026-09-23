@@ -45,13 +45,13 @@ import mekhq.campaign.mission.scenarios.ScenarioTemplate;
  * Together they replace the contract's Essential scenarios, and the riots they can turn into replace the old weekly
  * riot event.
  *
- * <p>When any formation deploys onto its hex, the usual scenario roll is made - even against a routed enemy, since civil
- * unrest does not answer to the enemy's morale. If no scenario breaks out, the disobedience is defused: its objective is
- * met and the contract's combat bonus is paid (see {@link #isCombatBonusPaid}). If one does, it has turned into a
- * riot, which breaks out at once with its rioting mobs (see {@link StratConRiots}): an overall victory puts the riot
- * down, meeting the objective and paying the bonus, and anything else - a defeat, a draw, or leaving the riot unplayed -
- * fails it. Either way it then leaves the map. (See {@link StratConContestedPointOfInterestBehavior} for the rules it
- * shares.)</p>
+ * <p>When any formation deploys onto its hex, the usual scenario roll is made - even against a routed enemy, since
+ * civil unrest does not answer to the enemy's morale. If no scenario breaks out, the disobedience is defused: its
+ * objective is met and the contract's combat bonus is paid (see {@link #isCombatBonusPaid}). If one does, it has turned
+ * into a riot, which breaks out at once with its rioting mobs (see {@link StratConRiots}): an overall victory puts the
+ * riot down, meeting the objective and paying the bonus, and anything else - a defeat, a draw, or leaving the riot
+ * unplayed - fails it. Either way it then leaves the map. (See {@link StratConContestedPointOfInterestBehavior} for the
+ * rules it shares.)</p>
  *
  * <p>Civil disobedience not responded to in time dies down: it expires and its objective fails (its lifespan comes from
  * its definition), except while a riot there is still to be put down.</p>
@@ -128,8 +128,9 @@ public class StratConCivilDisobedienceBehavior extends StratConContestedPointOfI
      * @since 0.51.01
      */
     @Override
-    protected void announceScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track, int formationId,
-          AbstractContract contract, Campaign campaign) {
+    protected boolean announceScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+          int formationId, AbstractContract contract, Campaign campaign) {
         StratConRiots.announceRiot(pointOfInterest, track, contract, campaign);
+        return true;
     }
 }

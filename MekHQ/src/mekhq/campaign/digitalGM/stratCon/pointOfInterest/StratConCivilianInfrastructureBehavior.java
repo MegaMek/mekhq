@@ -44,12 +44,13 @@ import mekhq.gui.dialog.StratConAmbushedDialog;
  * they replace the contract's Essential scenarios.
  *
  * <p>When any formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the
- * infrastructure is destroyed on the spot: its objective is met, the contract's combat bonus is paid, and the contract's
- * Escalation rises by 3d6. If one does, its defenders ambush the attackers, in a template suited to ambushing their unit
- * type (see {@link StratConAmbushPointOfInterestBehavior}): an overall victory still destroys the infrastructure,
- * meeting its objective, paying the bonus, and raising Escalation by 2d6 - 3d6 in all, with the usual +1d6 for
- * winning - while anything else - a defeat, a draw, or leaving the ambush unplayed - fails it. (See {@link StratConContestedPointOfInterestBehavior} for
- * the rules it shares, and {@link StratConEscalation}.)</p>
+ * infrastructure is destroyed on the spot: its objective is met, the contract's combat bonus is paid, and the
+ * contract's Escalation rises by 3d6. If one does, its defenders ambush the attackers, in a template suited to
+ * ambushing their unit type (see {@link AbstractStratConRolledPointOfInterestBehavior#getScenarioTemplateName()}): an
+ * overall victory still destroys the infrastructure, meeting its objective, paying the bonus, and raising Escalation by
+ * 2d6 - 3d6 in all, with the usual +1d6 for winning - while anything else - a defeat, a draw, or leaving the ambush
+ * unplayed - fails it. (See {@link StratConContestedPointOfInterestBehavior} for the rules it shares, and
+ * {@link StratConEscalation}.)</p>
  *
  * <p>Civilian infrastructure is hidden until scouted, and never expires: it waits until it is hit.</p>
  *
@@ -111,8 +112,9 @@ public class StratConCivilianInfrastructureBehavior extends StratConContestedPoi
      * @since 0.51.01
      */
     @Override
-    protected void announceScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track, int formationId,
-          AbstractContract contract, Campaign campaign) {
+    protected boolean announceScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+          int formationId, AbstractContract contract, Campaign campaign) {
         new StratConAmbushedDialog(campaign, formationId, false);
+        return true;
     }
 }

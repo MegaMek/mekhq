@@ -240,8 +240,16 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
             return PointOfInterestDeploymentOutcome.NO_EFFECT;
         }
 
-        addReport(BATTLE, getScenarioReportKeySuffix(), pointOfInterest, track, campaign);
-        announceScenario(pointOfInterest, track, formationId, contract, campaign);
+        // One popup per scenario: when the type announces it with a dialog of its own, the report goes to the daily
+        // log only. With no GUI there is no player to show a dialog to.
+        boolean isAnnouncedByDialog = (campaign.getGUI() != null)
+                                            && announceScenario(pointOfInterest, track, formationId, contract,
+              campaign);
+        if (isAnnouncedByDialog) {
+            campaign.addReport(BATTLE, formatReport(getScenarioReportKeySuffix(), pointOfInterest, track));
+        } else {
+            addReport(BATTLE, getScenarioReportKeySuffix(), pointOfInterest, track, campaign);
+        }
         return PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO;
     }
 
@@ -376,7 +384,8 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
     }
 
     /**
-     * Tells the player, beyond the daily report, that a scenario has broken out here. By default, nothing more.
+     * Tells the player, beyond the daily report, that a scenario has broken out here. By default, nothing more. Only
+     * called when the campaign has a GUI.
      *
      * @param pointOfInterest the point of interest the scenario is over
      * @param track           the sector it sits in
@@ -384,11 +393,15 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
      * @param contract        the contract whose map holds the sector
      * @param campaign        the current campaign
      *
+     * @return {@code true} if it showed the player a dialog, in which case the scenario's report goes to the daily log
+     *       without a popup of its own
+     *
      * @author Illiani
      * @since 0.51.01
      */
-    protected void announceScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+    protected boolean announceScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
           int formationId, AbstractContract contract, Campaign campaign) {
+        return false;
     }
 
     /**
@@ -456,10 +469,14 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
      */
     protected void addReport(DailyReportType reportType, String keySuffix, StratConPointOfInterest pointOfInterest,
           StratConTrackState track, Campaign campaign) {
-        StratConPointOfInterestRules.reportToPlayer(campaign, reportType, getFormattedTextAt(
-              StratConPointOfInterestRules.RESOURCE_BUNDLE,
+        StratConPointOfInterestRules.reportToPlayer(campaign, reportType, formatReport(keySuffix, pointOfInterest,
+              track));
+    }
+
+    private String formatReport(String keySuffix, StratConPointOfInterest pointOfInterest, StratConTrackState track) {
+        return getFormattedTextAt(StratConPointOfInterestRules.RESOURCE_BUNDLE,
               behaviorId + '.' + keySuffix,
               pointOfInterest.getDisplayableName(),
-              track.getDisplayableName()));
+              track.getDisplayableName());
     }
 }

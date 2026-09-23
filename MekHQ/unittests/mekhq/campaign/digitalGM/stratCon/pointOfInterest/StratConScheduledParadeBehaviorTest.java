@@ -178,6 +178,13 @@ class StratConScheduledParadeBehaviorTest {
     }
 
     @Test
+    void aParadeRiotIsNotAnAmbushJustAsCivilDisobediencesIsNot() {
+        assertFalse(new StratConScheduledParadeBehavior().isScenarioAnAmbush(),
+              "a parade riot is not a Crisis, so it carries Civil Disobedience's stakes");
+        assertFalse(new StratConCivilDisobedienceBehavior().isScenarioAnAmbush());
+    }
+
+    @Test
     void theRiotTemplateIsReadFromItsFileRatherThanTheScenarioManifest() {
         // Crowd Control is kept out of the manifest so it is never a random scenario; looking it up there finds
         // nothing, and the riot would become a random scenario with no mobs.
