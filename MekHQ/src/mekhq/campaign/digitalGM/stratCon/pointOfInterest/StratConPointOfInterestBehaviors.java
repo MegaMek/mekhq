@@ -70,6 +70,7 @@ public final class StratConPointOfInterestBehaviors {
         behaviors.put(StratConTrainingManeuversBehavior.BEHAVIOR_ID, new StratConTrainingManeuversBehavior());
         behaviors.put(StratConHighProfileTargetBehavior.BEHAVIOR_ID, new StratConHighProfileTargetBehavior());
         behaviors.put(StratConVIPBehavior.BEHAVIOR_ID, new StratConVIPBehavior());
+        behaviors.put(StratConStrategicPositionBehavior.BEHAVIOR_ID, new StratConStrategicPositionBehavior());
     }
 
     private StratConPointOfInterestBehaviors() {
