@@ -33,7 +33,10 @@
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
+import static mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.STRATCON_SECTOR_COMMAND_STRING;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -50,6 +53,8 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest.PointOfInterestStatus;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.ButtonLabelTooltipPair;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
@@ -87,6 +92,77 @@ public final class StratConPointOfInterestRules {
         if (campaign.getGUI() != null) {
             new ImmersiveDialogNotification(campaign, report, ImmersiveDialogWidth.SMALL, true);
         }
+    }
+
+    /**
+     * Has the contract's liaison tell the player about points of interest that have just appeared on the contract's
+     * map, all in one dialog. Each is listed with a link that opens its sector on the StratCon tab. Points of interest
+     * the player cannot see yet are left out, so a hidden one is not given away; if none are left, nothing is shown.
+     *
+     * <p>The dialog is not modal, so the player can follow the links while it is open. Nothing is shown when the
+     * campaign has no GUI (for example, a headless or test campaign).</p>
+     *
+     * @param campaign                 the current campaign
+     * @param contract                 the contract the points of interest belong to
+     * @param placedPointsOfInterest   the points of interest just placed on that contract's map
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void announceNewPointsOfInterest(Campaign campaign, AbstractContract contract,
+          List<StratConPointOfInterest> placedPointsOfInterest) {
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        if ((campaign.getGUI() == null) || (campaignState == null) || placedPointsOfInterest.isEmpty()) {
+            return;
+        }
+
+        List<StratConTrackState> tracks = campaignState.getTracks();
+        StringBuilder entries = new StringBuilder();
+        int announcedCount = 0;
+        for (StratConPointOfInterest pointOfInterest : placedPointsOfInterest) {
+            for (int trackIndex = 0; trackIndex < tracks.size(); trackIndex++) {
+                StratConTrackState track = tracks.get(trackIndex);
+                if ((track.getPointOfInterest(pointOfInterest.getId()) == null)
+                          || !pointOfInterest.isVisibleToPlayer(track)) {
+                    continue;
+                }
+
+                String sectorLink = String.format("<a href='%s:%s:%d'>%s</a>",
+                      STRATCON_SECTOR_COMMAND_STRING,
+                      contract.getId(),
+                      trackIndex,
+                      track.getDisplayableName());
+                entries.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "newPointOfInterest.entry",
+                      pointOfInterest.getDisplayableName(),
+                      sectorLink,
+                      pointOfInterest.getCoords().toBTString()));
+                announcedCount++;
+                break;
+            }
+        }
+
+        if (announcedCount == 0) {
+            return;
+        }
+
+        String messageKey = (announcedCount == 1) ? "newPointOfInterest.single" : "newPointOfInterest.multiple";
+        String message = getFormattedTextAt(RESOURCE_BUNDLE,
+              messageKey,
+              campaign.getCommanderAddress(),
+              entries.toString());
+
+        new ImmersiveDialogCore(campaign,
+              contract.getEmployerLiaison(),
+              null,
+              message,
+              List.of(new ButtonLabelTooltipPair(getText("Understood.text"), null)),
+              getTextAt(RESOURCE_BUNDLE, "newPointOfInterest.ooc"),
+              null,
+              false,
+              null,
+              null,
+              false);
     }
 
     /**

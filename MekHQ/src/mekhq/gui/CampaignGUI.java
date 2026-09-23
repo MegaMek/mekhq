@@ -810,6 +810,23 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
+     * Brings the StratCon tab forward on the given sector, switching the contract it is showing to the sector's
+     * contract when that contract is one the tab can show. Does nothing if the StratCon tab is not in use.
+     *
+     * @param contractId the ID of the contract whose map holds the sector
+     * @param trackIndex the sector's index within that contract's tracks
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void focusOnStratConSector(UUID contractId, int trackIndex) {
+        getStratConTab().ifPresent(stratConTab -> {
+            stratConTab.focusOnSector(contractId, trackIndex);
+            tabMain.setSelectedComponent(stratConTab);
+        });
+    }
+
+    /**
      * Shows the given system on the interstellar map and brings the navigation tab forward.
      *
      * @param system the system to focus on; ignored when {@code null}, as an unresolvable link should do nothing rather

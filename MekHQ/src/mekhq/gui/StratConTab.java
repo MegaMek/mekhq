@@ -50,6 +50,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -445,6 +446,37 @@ public class StratConTab extends CampaignGuiTab {
                   getTextAt(RESOURCE_BUNDLE, "stratConTab.promptForInt.notANumber.title"),
                   JOptionPane.ERROR_MESSAGE);
             return null;
+        }
+    }
+
+    /**
+     * Shows the given sector, first switching the contract selector to the sector's contract if it is not the one
+     * being viewed. A contract the selector does not list (for example, one in another system) is left alone, as is
+     * the current view.
+     *
+     * @param contractId the ID of the contract whose map holds the sector
+     * @param trackIndex the sector's index within that contract's tracks
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void focusOnSector(UUID contractId, int trackIndex) {
+        for (int index = 0; index < contractSelector.getItemCount(); index++) {
+            ContractItem contractItem = contractSelector.getItemAt(index);
+            if (!contractItem.contract().getId().equals(contractId)) {
+                continue;
+            }
+
+            if (contractSelector.getSelectedIndex() != index) {
+                // Fires contractSelectionHandler, which rebuilds the sector tabs for this contract.
+                contractSelector.setSelectedIndex(index);
+            }
+
+            if ((trackIndex >= 0) && (trackIndex < sectorTabs.getTabCount())) {
+                // Fires sectorSelectionHandler if this is a different sector.
+                sectorTabs.setSelectedIndex(trackIndex);
+            }
+            return;
         }
     }
 

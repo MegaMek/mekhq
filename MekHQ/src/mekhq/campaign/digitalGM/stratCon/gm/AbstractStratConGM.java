@@ -328,13 +328,18 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             return;
         }
 
+        List<StratConPointOfInterest> placedPointsOfInterest = new ArrayList<>();
         for (StratConScheduledPointOfInterest duePointOfInterest : duePointsOfInterest) {
             StratConPointOfInterest placedPointOfInterest =
                   StratConContractInitializer.spawnScheduledPointOfInterest(campaign, contract, duePointOfInterest);
             if (placedPointOfInterest != null) {
                 scheduledPointsOfInterest.remove(duePointOfInterest);
+                placedPointsOfInterest.add(placedPointOfInterest);
             }
         }
+
+        // One dialog for the whole day's arrivals on this contract, rather than one per point of interest.
+        StratConPointOfInterestRules.announceNewPointsOfInterest(campaign, contract, placedPointsOfInterest);
     }
 
     /**
