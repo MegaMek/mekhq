@@ -25,7 +25,7 @@ import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
  * Escalation: how far a raiding or guerrilla contract's hostilities have escalated, and so how hard the enemy is
  * pushing back. It belongs to the "Contracts Use Special Mechanics" option, and to contracts whose objective is a
  * {@link ChaosObjectiveType#RAID raid} or a {@link ChaosObjectiveType#GUERILLA_OPERATION guerrilla operation}, or is
- * Sabotage or Terrorism.
+ * Sabotage, Terrorism, or a Pirate Raid.
  *
  * <p>Escalation runs from 0 to 100 per point of the contract's scale, and only ever rises:</p>
  *
@@ -84,7 +84,7 @@ public final class StratConEscalation {
      * @param contract the contract
      *
      * @return {@code true} if the contract is one that tracks Escalation: a raid or a guerrilla operation, or a
-     *       Sabotage or Terrorism contract
+     *       Sabotage, Terrorism, or Pirate Raid contract
      *
      * @author Illiani
      * @since 0.51.01
@@ -95,7 +95,7 @@ public final class StratConEscalation {
             return false;
         }
 
-        if (objectiveType.isSabotage() || objectiveType.isTerrorism()) {
+        if (objectiveType.isSabotage() || objectiveType.isTerrorism() || objectiveType.isPirateRaid()) {
             return true;
         }
 

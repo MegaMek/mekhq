@@ -538,6 +538,7 @@ public class StratConContractInitializer {
      *     <li>Sabotage: sabotage targets (see {@link StratConSabotageTargetBehavior})</li>
      *     <li>Terrorism: civilian infrastructure (see {@link StratConCivilianInfrastructureBehavior})</li>
      *     <li>Security Duty: security reviews (see {@link StratConSecurityReviewBehavior})</li>
+     *     <li>Pirate Raid: plunder targets (see {@link StratConPlunderTargetBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -618,6 +619,10 @@ public class StratConContractInitializer {
 
         if (objectiveType.isSecurityDuty()) {
             return StratConSecurityReviewBehavior.TYPE_ID;
+        }
+
+        if (objectiveType.isPirateRaid()) {
+            return StratConPlunderTargetBehavior.TYPE_ID;
         }
 
         return null;

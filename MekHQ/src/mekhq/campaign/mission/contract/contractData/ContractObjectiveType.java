@@ -232,6 +232,10 @@ public enum ContractObjectiveType {
         return this == PIRATE_HUNTING;
     }
 
+    public boolean isPirateRaid() {
+        return this == PIRATE_RAID;
+    }
+
     public boolean isDiversionaryRaid() {
         return this == DIVERSIONARY_RAID;
     }
