@@ -32,9 +32,12 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
+import static java.lang.Math.max;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.util.List;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -49,10 +52,10 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * itself; but some intelligence leads to a facility, and destroying that facility is.
  *
  * <p>Which intelligence leads to a facility is settled when the contract is accepted: one per point of the contract's
- * scale, at most (see {@code StratConContractInitializer#markFacilityLeads}), so the facilities it turns up never
- * overwhelm the contract. When any formation deploys onto a lead's hex, there is no roll: a random hostile facility is
- * placed at an eligible hex elsewhere in the sector and revealed, and destroying it becomes a strategic objective of the
- * sector (see {@link StratConContractInitializer#spawnObjectiveFacility}).</p>
+ * scale, at most (see {@link #onScheduled}), so the facilities it turns up never overwhelm the contract. When any
+ * formation deploys onto a lead's hex, there is no roll: a random hostile facility is placed at an eligible hex
+ * elsewhere in the sector and revealed, and destroying it becomes a strategic objective of the sector (see
+ * {@link StratConContractInitializer#spawnObjectiveFacility}).</p>
  *
  * <p>Any other intelligence is followed up with the usual scenario roll. With no scenario, it proves worthless. With
  * one, the enemy was waiting, and the formation is ambushed in a template suited to its unit type; the intelligence is
@@ -95,6 +98,21 @@ public class StratConTargetIntelligenceBehavior extends StratConAmbushPointOfInt
     }
 
     /**
+     * Settles, when the contract is accepted, which intelligence leads to a facility: one piece per point of the
+     * contract's scale, at most, so the facilities it turns up never overwhelm the contract.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    public void onScheduled(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest,
+          AbstractContract contract) {
+        StratConScheduledPointOfInterest.markAtRandom(scheduledPointsOfInterest,
+              max(1, contract.getScale()),
+              FACILITY_LEAD_STATE_KEY);
+    }
+
+    /**
      * @param pointOfInterest a piece of target intelligence
      *
      * @return {@code true} if it was marked, when its contract was accepted, as leading to a facility
@@ -128,9 +146,10 @@ public class StratConTargetIntelligenceBehavior extends StratConAmbushPointOfInt
             return PointOfInterestDeploymentOutcome.NO_EFFECT;
         }
 
-        StratConCoords facilityCoords = StratConContractInitializer.spawnObjectiveFacility(track, contract, campaign);
+        // The lead leaves the map first, so its own hex does not count against the sector's room for the facility.
         StratConPointOfInterestRules.resolvePointOfInterest(track, pointOfInterest);
         track.removePointOfInterest(pointOfInterest.getId());
+        StratConCoords facilityCoords = StratConContractInitializer.spawnObjectiveFacility(track, contract, campaign);
 
         if (facilityCoords == null) {
             // The lead was good, but the sector has no room left for another base: nothing comes of it.

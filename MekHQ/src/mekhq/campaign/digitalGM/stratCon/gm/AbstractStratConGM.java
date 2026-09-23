@@ -43,9 +43,11 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.*;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
+import mekhq.campaign.digitalGM.stratCon.StratConReconnaissance;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.ImprovedStratConSectorGeneration;
@@ -225,6 +227,9 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
 
                 processPointsOfInterest(track, campaign);
 
+                // Ground revealed some other way than scouting - by a facility that reveals the sector - still counts.
+                StratConReconnaissance.updateObjectives(track);
+
                 // loop through scenarios - if we haven't deployed in time,
                 // fail it and apply consequences
                 for (StratConScenario scenario : List.copyOf(track.getScenarios().values())) {
@@ -292,7 +297,9 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
      * Places the points of interest whose scheduled day has arrived (scheduled by
      * {@code StratConContractInitializer#schedulePointsOfInterest} when the contract was accepted). Every one due on or
      * before today is placed and removed from the schedule, so a skipped day or a save loaded past a date still catches
-     * up.
+     * up. One that no sector has room for stays on the schedule and is tried again the next day, so that none is lost -
+     * which matters most for the ones marked, when the contract was accepted, as the real target or as leading to a
+     * facility. In mapless play, where there is no map to place them on, due points of interest are simply dropped.
      *
      * <p>Unlike strategic-objective scenarios, points of interest still appear while the enemy is routed: they are
      * features of the ground, not attacks the enemy has to mount.</p>
@@ -315,11 +322,18 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             }
         }
 
-        // Consumed whatever happens, so a point of interest with nowhere to go is not retried every day.
-        scheduledPointsOfInterest.removeAll(duePointsOfInterest);
+        // With no map, there is nowhere to place them now or later.
+        if (campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+            scheduledPointsOfInterest.removeAll(duePointsOfInterest);
+            return;
+        }
 
         for (StratConScheduledPointOfInterest duePointOfInterest : duePointsOfInterest) {
-            StratConContractInitializer.spawnScheduledPointOfInterest(campaign, contract, duePointOfInterest);
+            StratConPointOfInterest placedPointOfInterest =
+                  StratConContractInitializer.spawnScheduledPointOfInterest(campaign, contract, duePointOfInterest);
+            if (placedPointOfInterest != null) {
+                scheduledPointsOfInterest.remove(duePointOfInterest);
+            }
         }
     }
 

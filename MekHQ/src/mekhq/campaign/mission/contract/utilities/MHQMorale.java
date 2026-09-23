@@ -70,12 +70,12 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
+import mekhq.campaign.digitalGM.stratCon.StratConContractMechanics;
 import mekhq.campaign.digitalGM.stratCon.StratConEscalation;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
-import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractData.EnemyData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationEnemy;
 import mekhq.campaign.mission.scenarios.Scenario;
@@ -547,8 +547,10 @@ public class MHQMorale {
     public static boolean isScenarioOutcomeAffectingMorale(ScenarioType stratConScenarioType,
           @Nullable AbstractContract contract) {
         if (stratConScenarioType.isRiot()) {
-            ContractObjectiveType objectiveType = (contract == null) ? null : contract.getObjectiveType();
-            if ((objectiveType == null) || !objectiveType.isRiotDuty()) {
+            boolean isRiotAffectingMorale = (contract != null)
+                                                  && StratConContractMechanics.forContract(contract)
+                                                           .isRiotAffectingMorale();
+            if (!isRiotAffectingMorale) {
                 return false;
             }
         }

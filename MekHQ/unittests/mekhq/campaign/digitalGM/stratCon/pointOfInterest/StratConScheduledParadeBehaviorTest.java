@@ -174,9 +174,9 @@ class StratConScheduledParadeBehaviorTest {
 
     @Test
     void aRiotCanBreakOutWhileTheEnemyIsRouted() {
-        assertTrue(new StratConScheduledParadeBehavior().isAmbushPossibleWhileRouted(),
+        assertTrue(new StratConScheduledParadeBehavior().isScenarioPossibleWhileRouted(),
               "civil unrest does not answer to the enemy's morale");
-        assertFalse(new StratConVulnerableInfrastructureBehavior().isAmbushPossibleWhileRouted(),
+        assertFalse(new StratConVulnerableInfrastructureBehavior().isScenarioPossibleWhileRouted(),
               "a routed enemy still mounts no ordinary ambushes");
     }
 

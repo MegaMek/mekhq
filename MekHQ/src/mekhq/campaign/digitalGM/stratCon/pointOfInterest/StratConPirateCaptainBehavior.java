@@ -34,7 +34,6 @@ package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
@@ -99,27 +98,22 @@ public class StratConPirateCaptainBehavior extends StratConContestedPointOfInter
      * @since 0.51.01
      */
     @Override
-    protected void onUncontested(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+    protected void onNoScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
           AbstractContract contract, Campaign campaign) {
         StratConPointOfInterestRules.withdrawPointOfInterest(track, pointOfInterest);
         addReport(GENERAL, "slippedAway.report", pointOfInterest, track, campaign);
     }
 
     /**
-     * Places the fight with the captain, as an Essential scenario (see {@link #makeEssential}).
+     * Makes the fight with the captain an Essential scenario (see {@link #makeEssential}) before it is finalized, so
+     * finalizing treats it as one.
      *
      * @author Illiani
      * @since 0.51.01
      */
     @Override
-    protected @Nullable StratConScenario placeContestingScenario(StratConPointOfInterest pointOfInterest,
-          StratConTrackState track, int formationId, AbstractContract contract, Campaign campaign) {
-        StratConScenario scenario = super.placeContestingScenario(pointOfInterest, track, formationId, contract,
-              campaign);
-        if (scenario != null) {
-            makeEssential(scenario, track);
-        }
-        return scenario;
+    protected void prepareScenario(StratConScenario scenario, StratConTrackState track) {
+        makeEssential(scenario, track);
     }
 
     /**
@@ -127,7 +121,7 @@ public class StratConPirateCaptainBehavior extends StratConContestedPointOfInter
      * strategic objective, never a Turning Point, with a "win the scenario" objective on its hex. Winning it then meets
      * that objective and pays the combat bonus; anything else fails the objective.
      *
-     * @param scenario the fight with the captain, already on the map
+     * @param scenario the fight with the captain, set up on its hex
      * @param track    the sector it sits in
      *
      * @author Illiani

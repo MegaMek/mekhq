@@ -58,6 +58,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest.PointOfInterestStatus;
@@ -436,6 +437,25 @@ class StratConPointOfInterestRulesTest {
         assertEquals(PointOfInterestDeploymentOutcome.FORCE_SCENARIO, outcome);
         assertEquals(List.of(first.getId(), second.getId()), deployedIds,
               "only the active points of interest on the deployed hex are asked");
+    }
+
+    @Test
+    void deploymentOntoAHexThatAlreadyHoldsAScenarioAsksNoPointOfInterest() {
+        deploymentOutcome = PointOfInterestDeploymentOutcome.FORCE_SCENARIO;
+        StratConCoords coords = new StratConCoords(1, 1);
+        place(DAILY_TYPE_ID, 1, 1);
+        StratConScenario scenario = new StratConScenario();
+        scenario.setCoords(coords);
+        track.getScenarios().put(coords, scenario);
+
+        PointOfInterestDeploymentOutcome outcome = StratConPointOfInterestRules.processFormationDeployment(track,
+              coords,
+              1,
+              mock(Campaign.class));
+
+        assertEquals(PointOfInterestDeploymentOutcome.NO_EFFECT, outcome,
+              "the formation joins the scenario already there");
+        assertTrue(deployedIds.isEmpty(), "no point of interest may place a second scenario on the hex");
     }
 
     @Test

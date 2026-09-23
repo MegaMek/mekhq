@@ -39,7 +39,6 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 
 /**
  * The Recon Raid special mechanic: in place of any points of interest, every sector has a strategic objective to scout
@@ -47,9 +46,10 @@ import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
  * {@link StrategicObjectiveType#Reconnaissance}). The contract keeps its Essential scenarios alongside.
  *
  * <p>Any hex the player can see counts as scouted, however it was revealed: by deploying or scouting, by a facility
- * that reveals the sector, or by a GM. The objective's counts are worked out from the sector's map whenever it is
- * checked, so no reveal can be missed; and they only ever rise, so an objective once met stays met even if the sector's
- * fog of war is later reset.</p>
+ * that reveals the sector, or by a GM. The objective's counts are brought up to date from the sector's map (see
+ * {@link #updateObjectives}) whenever a force scouts, each day, and when a GM reveals ground - so no reveal is missed
+ * for long, while checking the objective changes nothing. They only ever rise, so an objective once met stays met even
+ * if the sector's fog of war is later reset.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -68,8 +68,8 @@ public final class StratConReconnaissance {
      * @since 0.51.01
      */
     public static boolean usesReconnaissance(AbstractContract contract, boolean isContractsUseSpecialMechanics) {
-        ContractObjectiveType objectiveType = contract.getObjectiveType();
-        return isContractsUseSpecialMechanics && (objectiveType != null) && objectiveType.isReconRaid();
+        return isContractsUseSpecialMechanics
+                     && StratConContractMechanics.forContract(contract).isUsingReconnaissance();
     }
 
     /**
@@ -86,6 +86,7 @@ public final class StratConReconnaissance {
             objective.setObjectiveType(StrategicObjectiveType.Reconnaissance);
             objective.setDesiredObjectiveCount(getRequiredHexCount(track));
             track.addStrategicObjective(objective);
+            updateObjective(objective, track);
         }
     }
 
@@ -160,6 +161,22 @@ public final class StratConReconnaissance {
      */
     public static int getRequiredHexCount(StratConTrackState track) {
         return (getLandHexCount(track) + 1) / 2;
+    }
+
+    /**
+     * Brings the sector's reconnaissance objective, if it has one, up to date with its map (see
+     * {@link #updateObjective}).
+     *
+     * @param track a sector
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void updateObjectives(StratConTrackState track) {
+        StratConStrategicObjective objective = getObjective(track);
+        if (objective != null) {
+            updateObjective(objective, track);
+        }
     }
 
     /**

@@ -178,6 +178,21 @@ class StratConPointOfInterestTest {
     }
 
     @Test
+    void aSpentPointOfInterestNoLongerOccupiesItsHex() {
+        registerTestDefinition(true);
+        StratConPointOfInterest pointOfInterest = new StratConPointOfInterest(TEST_TYPE_ID, new StratConCoords(0, 0));
+
+        pointOfInterest.setStatus(PointOfInterestStatus.RESOLVED);
+        assertFalse(pointOfInterest.occupiesHex(), "a resolved point of interest blocks nothing");
+
+        pointOfInterest.setStatus(PointOfInterestStatus.EXPIRED);
+        assertFalse(pointOfInterest.occupiesHex(), "an expired point of interest blocks nothing");
+
+        pointOfInterest.setStatus(PointOfInterestStatus.ACTIVE);
+        assertTrue(pointOfInterest.occupiesHex());
+    }
+
+    @Test
     void stateValuesAreStoredAndRemoved() {
         StratConPointOfInterest pointOfInterest = new StratConPointOfInterest(TEST_TYPE_ID, new StratConCoords(0, 0));
 

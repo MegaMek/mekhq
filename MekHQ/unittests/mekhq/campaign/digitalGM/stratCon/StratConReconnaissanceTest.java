@@ -196,11 +196,13 @@ class StratConReconnaissanceTest {
         StratConStrategicObjective objective = addObjective();
 
         revealLandHexes(REQUIRED_HEXES - 1);
+        StratConReconnaissance.updateObjectives(track);
         assertFalse(objective.isObjectiveCompleted(track));
         assertEquals(REQUIRED_HEXES - 1, objective.getCurrentObjectiveCount());
         assertFalse(objective.isObjectiveFailed(track), "short of it is not a failure");
 
         revealLandHexes(REQUIRED_HEXES);
+        StratConReconnaissance.updateObjectives(track);
         assertTrue(objective.isObjectiveCompleted(track));
     }
 
@@ -211,6 +213,7 @@ class StratConReconnaissanceTest {
         track.setGmRevealed(true);
 
         assertEquals(LAND_HEXES, StratConReconnaissance.getScoutedHexCount(track));
+        StratConReconnaissance.updateObjectives(track);
         assertTrue(objective.isObjectiveCompleted(track));
     }
 
@@ -218,9 +221,11 @@ class StratConReconnaissanceTest {
     void aMetObjectiveStaysMetWhenTheFogReturns() {
         StratConStrategicObjective objective = addObjective();
         revealLandHexes(REQUIRED_HEXES);
+        StratConReconnaissance.updateObjectives(track);
         assertTrue(objective.isObjectiveCompleted(track));
 
         track.getRevealedCoords().clear();
+        StratConReconnaissance.updateObjectives(track);
 
         assertTrue(objective.isObjectiveCompleted(track));
     }
@@ -229,12 +234,31 @@ class StratConReconnaissanceTest {
     void progressNeverFallsBack() {
         StratConStrategicObjective objective = addObjective();
         revealLandHexes(4);
-        objective.isObjectiveCompleted(track);
+        StratConReconnaissance.updateObjectives(track);
 
         track.getRevealedCoords().clear();
-        objective.isObjectiveCompleted(track);
+        StratConReconnaissance.updateObjectives(track);
 
         assertEquals(4, objective.getCurrentObjectiveCount());
+    }
+
+    @Test
+    void checkingTheObjectiveChangesNothing() {
+        StratConStrategicObjective objective = addObjective();
+        revealLandHexes(REQUIRED_HEXES);
+
+        assertFalse(objective.isObjectiveCompleted(track), "not met until the counts are brought up to date");
+        assertEquals(0, objective.getCurrentObjectiveCount());
+
+        StratConReconnaissance.updateObjectives(track);
+        assertTrue(objective.isObjectiveCompleted(track));
+    }
+
+    @Test
+    void updatingASectorWithoutTheObjectiveDoesNothing() {
+        StratConReconnaissance.updateObjectives(track);
+
+        assertNull(StratConReconnaissance.getObjective(track));
     }
 
     @Test

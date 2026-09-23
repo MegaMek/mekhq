@@ -82,7 +82,7 @@ public class StratConPotentialLeadBehavior extends StratConContestedPointOfInter
      * @since 0.51.01
      */
     @Override
-    protected void onUncontested(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+    protected void onNoScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
           AbstractContract contract, Campaign campaign) {
         StratConPointOfInterestRules.withdrawPointOfInterest(track, pointOfInterest);
         addReport(GENERAL, "dud.report", pointOfInterest, track, campaign);

@@ -48,11 +48,13 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest.PointOfInterestStatus;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -291,6 +293,7 @@ class StratConTrackStatePointOfInterestTest {
         full.setDisplayNameOverride("Named Point");
         full.setDescriptionOverride("Described point.");
         full.setStateValue("claimedBy", "7");
+        full.setLinkedScenarioId(42);
         track.addPointOfInterest(full);
 
         // neutral, never expiring, no overrides or state
@@ -312,6 +315,7 @@ class StratConTrackStatePointOfInterestTest {
         assertEquals("Named Point", reloadedFull.getDisplayNameOverride());
         assertEquals("Described point.", reloadedFull.getDescriptionOverride());
         assertEquals("7", reloadedFull.getStateValue("claimedBy"));
+        assertEquals(42, reloadedFull.getLinkedScenarioId());
 
         StratConPointOfInterest reloadedBare = reloadedTrack.getPointOfInterest(bare.getId());
         assertNotNull(reloadedBare);
@@ -321,10 +325,12 @@ class StratConTrackStatePointOfInterestTest {
         assertNull(reloadedBare.getExpiryDate());
         assertNull(reloadedBare.getDisplayNameOverride());
         assertTrue(reloadedBare.getState().isEmpty());
+        assertNull(reloadedBare.getLinkedScenarioId());
 
         assertEquals(2, reloadedTrack.getPointsOfInterest(new StratConCoords(2, 3)).size(),
               "the hex lookup is rebuilt after loading");
-        assertTrue(reloadedTrack.isHexOccupied(new StratConCoords(2, 3)));
+        assertFalse(reloadedTrack.isHexOccupied(new StratConCoords(2, 3)),
+              "a resolved point of interest no longer occupies its hex, and the other never did");
     }
 
     @Test
@@ -335,10 +341,70 @@ class StratConTrackStatePointOfInterestTest {
         assertTrue(reloadedTrack.getPointsOfInterest().isEmpty());
     }
 
+    @Test
+    void pointOfInterestObjectivesSurviveSaveAndLoad() throws Exception {
+        StratConPointOfInterest pointOfInterest = pointOfInterest(OCCUPYING_TYPE_ID, 1, 1);
+        track.addPointOfInterest(pointOfInterest);
+        StratConStrategicObjective objective = new StratConStrategicObjective();
+        objective.setObjectiveType(StrategicObjectiveType.PointOfInterest);
+        objective.setPointOfInterestId(pointOfInterest.getId());
+        objective.setDesiredObjectiveCount(1);
+        track.addStrategicObjective(objective);
+
+        StratConTrackState reloadedTrack = saveAndLoad(track);
+
+        assertEquals(1, reloadedTrack.getStrategicObjectives().size());
+        StratConStrategicObjective reloadedObjective = reloadedTrack.getStrategicObjectives().get(0);
+        assertEquals(StrategicObjectiveType.PointOfInterest, reloadedObjective.getObjectiveType());
+        assertEquals(pointOfInterest.getId(), reloadedObjective.getPointOfInterestId());
+        assertNotNull(reloadedObjective.getPointOfInterest(reloadedTrack),
+              "the objective still finds its point of interest after loading");
+    }
+
+    @Test
+    void escalationAndScheduledPointsOfInterestSurviveSaveAndLoad() throws Exception {
+        StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.addTrack(track);
+        campaignState.setEscalation(37);
+
+        StratConScheduledPointOfInterest marked = new StratConScheduledPointOfInterest(LocalDate.of(3025, 8, 1),
+              OCCUPYING_TYPE_ID,
+              true);
+        marked.getInitialState().put("realTarget", "true");
+        campaignState.addScheduledPointOfInterest(marked);
+        campaignState.addScheduledPointOfInterest(new StratConScheduledPointOfInterest(LocalDate.of(3025, 9, 15),
+              NON_OCCUPYING_TYPE_ID,
+              false));
+
+        StratConCampaignState reloadedState = saveAndLoad(campaignState);
+
+        assertEquals(37, reloadedState.getEscalation());
+
+        List<StratConScheduledPointOfInterest> reloadedSchedule = reloadedState.getScheduledPointsOfInterest();
+        assertEquals(2, reloadedSchedule.size());
+
+        StratConScheduledPointOfInterest reloadedMarked = reloadedSchedule.get(0);
+        assertEquals(LocalDate.of(3025, 8, 1), reloadedMarked.getSpawnDate());
+        assertEquals(OCCUPYING_TYPE_ID, reloadedMarked.getTypeId());
+        assertTrue(reloadedMarked.isStrategicObjective());
+        assertEquals("true", reloadedMarked.getInitialState().get("realTarget"));
+
+        StratConScheduledPointOfInterest reloadedPlain = reloadedSchedule.get(1);
+        assertEquals(LocalDate.of(3025, 9, 15), reloadedPlain.getSpawnDate());
+        assertFalse(reloadedPlain.isStrategicObjective());
+        assertTrue(reloadedPlain.getInitialState().isEmpty());
+    }
+
     private static StratConTrackState saveAndLoad(StratConTrackState track) throws Exception {
         StratConCampaignState campaignState = new StratConCampaignState();
         campaignState.addTrack(track);
 
+        StratConCampaignState reloadedState = saveAndLoad(campaignState);
+        assertEquals(1, reloadedState.getTracks().size());
+        return reloadedState.getTrack(0);
+    }
+
+    private static StratConCampaignState saveAndLoad(StratConCampaignState campaignState) throws Exception {
         StringWriter stringWriter = new StringWriter();
         try (PrintWriter printWriter = new PrintWriter(stringWriter)) {
             campaignState.Serialize(printWriter);
@@ -351,7 +417,6 @@ class StratConTrackStatePointOfInterestTest {
 
         StratConCampaignState reloadedState = StratConCampaignState.Deserialize(document.getDocumentElement());
         assertNotNull(reloadedState, "the campaign state should load back");
-        assertEquals(1, reloadedState.getTracks().size());
-        return reloadedState.getTrack(0);
+        return reloadedState;
     }
 }

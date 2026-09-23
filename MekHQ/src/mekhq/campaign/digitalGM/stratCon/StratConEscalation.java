@@ -47,10 +47,10 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.digitalGM.stratCon.StratConContractMechanics.EscalationMode;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
-import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
 
 /**
@@ -134,22 +134,7 @@ public final class StratConEscalation {
      * @since 0.51.01
      */
     public static boolean isEscalationContract(AbstractContract contract) {
-        ContractObjectiveType objectiveType = contract.getObjectiveType();
-        if ((objectiveType == null) || objectiveType.isUndefined()) {
-            return false;
-        }
-
-        if (isDeescalatingContract(contract)) {
-            return true;
-        }
-
-        if (objectiveType.isSabotage() || objectiveType.isTerrorism() || objectiveType.isPirateRaid()) {
-            return true;
-        }
-
-        ChaosObjectiveType chaosObjectiveType = objectiveType.getChaosObjectiveType();
-        return (chaosObjectiveType == ChaosObjectiveType.RAID)
-                     || (chaosObjectiveType == ChaosObjectiveType.GUERILLA_OPERATION);
+        return StratConContractMechanics.forContract(contract).escalationMode() != EscalationMode.NONE;
     }
 
     /**
@@ -162,8 +147,7 @@ public final class StratConEscalation {
      * @since 0.51.01
      */
     public static boolean isDeescalatingContract(AbstractContract contract) {
-        ContractObjectiveType objectiveType = contract.getObjectiveType();
-        return (objectiveType != null) && objectiveType.isGarrisonDuty();
+        return StratConContractMechanics.forContract(contract).escalationMode() == EscalationMode.DEESCALATING;
     }
 
     /**

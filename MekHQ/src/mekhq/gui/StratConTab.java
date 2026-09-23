@@ -606,15 +606,18 @@ public class StratConTab extends CampaignGuiTab {
     private void updateReconnaissanceBar(StratConTrackState track) {
         reconnaissancePanel.removeAll();
 
-        if ((track == null) || (StratConReconnaissance.getObjective(track) == null)) {
+        StratConStrategicObjective objective = (track == null) ? null : StratConReconnaissance.getObjective(track);
+        if (objective == null) {
             reconnaissancePanel.setVisible(false);
             return;
         }
 
+        // Shows the objective's own counts, which only ever rise, so the gauge agrees with the objective even after a
+        // GM resets the sector's fog of war.
         reconnaissancePanel.setVisible(true);
-        reconnaissancePanel.add(ContractMeterBar.reconnaissance(StratConReconnaissance.getScoutedHexCount(track),
+        reconnaissancePanel.add(ContractMeterBar.reconnaissance(objective.getCurrentObjectiveCount(),
               StratConReconnaissance.getLandHexCount(track),
-              StratConReconnaissance.getRequiredHexCount(track)), BorderLayout.CENTER);
+              objective.getDesiredObjectiveCount()), BorderLayout.CENTER);
 
         reconnaissancePanel.revalidate();
         reconnaissancePanel.repaint();

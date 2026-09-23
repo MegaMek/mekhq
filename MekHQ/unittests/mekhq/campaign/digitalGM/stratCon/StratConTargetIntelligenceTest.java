@@ -201,7 +201,10 @@ class StratConTargetIntelligenceTest {
                   false));
         }
 
-        StratConContractInitializer.markFacilityLeads(scheduled, 5);
+        AbstractContract largeContract = mock(AbstractContract.class);
+        when(largeContract.getScale()).thenReturn(5);
+
+        new StratConTargetIntelligenceBehavior().onScheduled(scheduled, largeContract);
 
         assertEquals(2, countFacilityLeads(scheduled));
     }

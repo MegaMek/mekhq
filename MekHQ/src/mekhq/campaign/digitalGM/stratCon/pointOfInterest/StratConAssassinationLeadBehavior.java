@@ -32,7 +32,10 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
+import static java.lang.Math.max;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
+
+import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
@@ -42,8 +45,9 @@ import mekhq.campaign.mission.contract.AbstractContract;
 /**
  * The behavior of a lead on an assassination target, placed in place of every point of interest on an Assassination
  * contract. It works much as a Mole Hunting contract's potential lead does (see {@link StratConPotentialLeadBehavior}),
- * but no lead is ever a dud - every one is fought as a {@value #SCENARIO_TEMPLATE} scenario - and most of the
- * targets they turn up are body doubles.
+ * sharing the contested rules (see {@link StratConContestedPointOfInterestBehavior}), but no lead is ever a dud -
+ * every one is fought as a {@value #SCENARIO_TEMPLATE} scenario - and most of the targets they turn up are body
+ * doubles.
  *
  * <p>Only one lead per point of the contract's scale points to the real target, settled when the contract is accepted
  * (see {@link #REAL_TARGET_STATE_KEY}); the player cannot tell which, as every lead looks alike and is a strategic
@@ -59,7 +63,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * @author Illiani
  * @since 0.51.01
  */
-public class StratConAssassinationLeadBehavior extends StratConPotentialLeadBehavior {
+public class StratConAssassinationLeadBehavior extends StratConContestedPointOfInterestBehavior {
     /** The behavior ID the assassination lead definition names. */
     public static final String BEHAVIOR_ID = "assassinationLead";
 
@@ -83,6 +87,21 @@ public class StratConAssassinationLeadBehavior extends StratConPotentialLeadBeha
     }
 
     /**
+     * Settles, when the contract is accepted, which leads point to the real target: one per point of the contract's
+     * scale, or all of them if there are fewer. The rest turn up body doubles.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    public void onScheduled(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest,
+          AbstractContract contract) {
+        StratConScheduledPointOfInterest.markAtRandom(scheduledPointsOfInterest,
+              max(1, contract.getScale()),
+              REAL_TARGET_STATE_KEY);
+    }
+
+    /**
      * @param pointOfInterest an assassination lead
      *
      * @return {@code true} if the lead points to the real target rather than a body double
@@ -101,13 +120,26 @@ public class StratConAssassinationLeadBehavior extends StratConPotentialLeadBeha
      * @since 0.51.01
      */
     @Override
-    protected boolean isContestCertain(StratConPointOfInterest pointOfInterest) {
+    protected boolean isScenarioCertain(StratConPointOfInterest pointOfInterest) {
         return true;
     }
 
     /**
-     * The real target is secured or lost as any potential lead is. A body double is revealed only now: it is withdrawn
-     * whatever the result, and beating it still pays the combat bonus.
+     * Never reached, since every lead fights (see {@link #isScenarioCertain}). Should it be, the lead has gone cold: it
+     * leaves the map and its objective is withdrawn, giving away nothing about which kind it was.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected void onNoScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+          AbstractContract contract, Campaign campaign) {
+        StratConPointOfInterestRules.withdrawPointOfInterest(track, pointOfInterest);
+    }
+
+    /**
+     * The real target is secured or lost as any contested point of interest is. A body double is revealed only now: it
+     * is withdrawn whatever the result, and beating it still pays the combat bonus.
      *
      * @author Illiani
      * @since 0.51.01

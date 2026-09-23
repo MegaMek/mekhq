@@ -78,6 +78,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpact;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConReconnaissance;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -361,6 +362,7 @@ public class StratConPanel extends JPanel implements ActionListener {
             }
         }
 
+        StratConReconnaissance.updateObjectives(currentTrack);
         infoArea.setText(buildSelectedHexInfo(campaign));
         repaint();
     }
@@ -616,6 +618,8 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
 
         currentTrack.setGmRevealed(!currentTrack.isGmRevealed());
+        // A GM reveal counts as scouting for a reconnaissance objective, as it always has.
+        StratConReconnaissance.updateObjectives(currentTrack);
         infoArea.setText(buildSelectedHexInfo(campaign));
         repaint();
     }
@@ -2358,7 +2362,13 @@ public class StratConPanel extends JPanel implements ActionListener {
                 }
                 break;
             case RIGHT_CLICK_COMMAND_REMOVE_POINT_OF_INTEREST:
-                currentTrack.removePointOfInterest(getPointOfInterestId(evt));
+                // Withdrawn rather than simply removed, so any objective tied to it goes too, rather than reading as
+                // failed.
+                StratConPointOfInterest pointOfInterestToRemove = currentTrack.getPointOfInterest(getPointOfInterestId(
+                      evt));
+                if (pointOfInterestToRemove != null) {
+                    StratConPointOfInterestRules.withdrawPointOfInterest(currentTrack, pointOfInterestToRemove);
+                }
                 break;
             case RIGHT_CLICK_COMMAND_RESOLVE_POINT_OF_INTEREST:
                 StratConPointOfInterest pointOfInterestToResolve = currentTrack.getPointOfInterest(

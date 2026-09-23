@@ -220,10 +220,10 @@ class StratConAssassinationLeadBehaviorTest {
     @Test
     void noLeadIsEverADud() {
         StratConAssassinationLeadBehavior behavior = new StratConAssassinationLeadBehavior();
-        assertTrue(behavior.isContestCertain(lead), "a body double always fights");
+        assertTrue(behavior.isScenarioCertain(lead), "a body double always fights");
 
         markRealTarget();
-        assertTrue(behavior.isContestCertain(lead), "the real target always fights");
+        assertTrue(behavior.isScenarioCertain(lead), "the real target always fights");
     }
 
     @Test

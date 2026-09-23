@@ -83,9 +83,9 @@ public class StratConSabotageTargetBehavior extends StratConContestedPointOfInte
      * @since 0.51.01
      */
     @Override
-    protected void onUncontested(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+    protected void onNoScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
           AbstractContract contract, Campaign campaign) {
-        securePointOfInterest(pointOfInterest, track, campaign);
+        securePointOfInterest(pointOfInterest, track, contract, campaign);
         StratConEscalation.onTargetSabotaged(campaign, contract);
     }
 

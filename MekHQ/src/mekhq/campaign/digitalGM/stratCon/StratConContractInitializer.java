@@ -61,7 +61,13 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.*;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInterestBehavior;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestBehaviors;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorShapeProfile;
@@ -72,7 +78,6 @@ import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorPlanner;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorShape;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
 import mekhq.campaign.mission.contract.contractGeneration.TrackIntensityTable;
 import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
@@ -525,29 +530,8 @@ public class StratConContractInitializer {
 
     /**
      * Decides which special point of interest, if any, a contract uses in place of its definition's own. Special points
-     * of interest belong to the "Contracts Use Special Mechanics" option, and to these contract types:
-     *
-     * <ul>
-     *     <li>Espionage: data caches (see {@link StratConDataCacheBehavior})</li>
-     *     <li>Guerrilla Warfare: vulnerable infrastructure (see {@link StratConVulnerableInfrastructureBehavior})</li>
-     *     <li>Mole Hunting: potential leads (see {@link StratConPotentialLeadBehavior})</li>
-     *     <li>Assassination: leads on the target (see {@link StratConAssassinationLeadBehavior})</li>
-     *     <li>Observation Raid: lookout points (see {@link StratConLookoutPointBehavior})</li>
-     *     <li>Relief Duty: beleaguered forces (see {@link StratConBeleagueredForcesBehavior})</li>
-     *     <li>Cadre Duty: training maneuvers (see {@link StratConTrainingManeuversBehavior})</li>
-     *     <li>Diversionary Raid: high profile targets (see {@link StratConHighProfileTargetBehavior})</li>
-     *     <li>Extraction Raid: VIPs (see {@link StratConVIPBehavior})</li>
-     *     <li>Planetary Assault: strategic positions (see {@link StratConStrategicPositionBehavior})</li>
-     *     <li>Retainer: scheduled parades (see {@link StratConScheduledParadeBehavior})</li>
-     *     <li>Riot Duty: civil disobedience (see {@link StratConCivilDisobedienceBehavior})</li>
-     *     <li>Sabotage: sabotage targets (see {@link StratConSabotageTargetBehavior})</li>
-     *     <li>Terrorism: civilian infrastructure (see {@link StratConCivilianInfrastructureBehavior})</li>
-     *     <li>Security Duty: security reviews (see {@link StratConSecurityReviewBehavior})</li>
-     *     <li>Pirate Raid: plunder targets (see {@link StratConPlunderTargetBehavior})</li>
-     *     <li>Objective Raid: target intelligence (see {@link StratConTargetIntelligenceBehavior})</li>
-     *     <li>Garrison Duty: shows of force (see {@link StratConShowOfForceBehavior})</li>
-     *     <li>Pirate Hunting: pirate captains (see {@link StratConPirateCaptainBehavior})</li>
-     * </ul>
+     * of interest belong to the "Contracts Use Special Mechanics" option; which contract types have one, and which, is
+     * set out in {@link StratConContractMechanics}.
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
      * (see {@link #scheduleSpecialPointsOfInterest}). Most also replace the contract's Essential scenarios (see
@@ -564,97 +548,19 @@ public class StratConContractInitializer {
     // Package-private rather than private so the decision can be tested directly.
     static @Nullable String getSpecialPointOfInterestTypeId(AbstractContract contract,
           boolean isContractsUseSpecialMechanics) {
-        ContractObjectiveType objectiveType = contract.getObjectiveType();
-        if (!isContractsUseSpecialMechanics || (objectiveType == null)) {
+        if (!isContractsUseSpecialMechanics) {
             return null;
         }
 
-        if (objectiveType.isEspionage()) {
-            return StratConDataCacheBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isGuerrillaWarfare()) {
-            return StratConVulnerableInfrastructureBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isMoleHunting()) {
-            return StratConPotentialLeadBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isAssassination()) {
-            return StratConAssassinationLeadBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isObservationRaid()) {
-            return StratConLookoutPointBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isReliefDuty()) {
-            return StratConBeleagueredForcesBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isCadreDuty()) {
-            return StratConTrainingManeuversBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isDiversionaryRaid()) {
-            return StratConHighProfileTargetBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isExtractionRaid()) {
-            return StratConVIPBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isPlanetaryAssault()) {
-            return StratConStrategicPositionBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isRetainer()) {
-            return StratConScheduledParadeBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isRiotDuty()) {
-            return StratConCivilDisobedienceBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isSabotage()) {
-            return StratConSabotageTargetBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isTerrorism()) {
-            return StratConCivilianInfrastructureBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isSecurityDuty()) {
-            return StratConSecurityReviewBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isPirateRaid()) {
-            return StratConPlunderTargetBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isObjectiveRaid()) {
-            return StratConTargetIntelligenceBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isGarrisonDuty()) {
-            return StratConShowOfForceBehavior.TYPE_ID;
-        }
-
-        if (objectiveType.isPirateHunting()) {
-            return StratConPirateCaptainBehavior.TYPE_ID;
-        }
-
-        return null;
+        return StratConContractMechanics.forContract(contract).pointOfInterestTypeId();
     }
 
     /**
      * Decides whether a contract's special points of interest (see {@link #getSpecialPointOfInterestTypeId}) replace
      * its Essential scenarios. Most do: such a contract gets no Essential scenarios, and the combat bonus is paid for
-     * each special point of interest dealt with instead. Beleaguered forces, training maneuvers, high profile targets,
-     * strategic positions, security reviews, and shows of force do not - Relief Duty, Cadre Duty, Planetary Assault,
-     * Security Duty, and Garrison Duty contracts keep their Essential scenarios alongside them. An Objective Raid pays
-     * its combat bonus through the objective facilities its target intelligence turns up instead.
+     * each special point of interest dealt with instead. Relief Duty, Cadre Duty, Planetary Assault, Security Duty, and
+     * Garrison Duty contracts keep their Essential scenarios alongside theirs (see
+     * {@link StratConContractMechanics#isReplacingEssentialScenarios}).
      *
      * @param contract                       the contract
      * @param isContractsUseSpecialMechanics whether the "Contracts Use Special Mechanics" option is on
@@ -666,20 +572,14 @@ public class StratConContractInitializer {
      */
     // Package-private rather than private so the decision can be tested directly.
     static boolean isReplacingEssentialScenarios(AbstractContract contract, boolean isContractsUseSpecialMechanics) {
-        String specialTypeId = getSpecialPointOfInterestTypeId(contract, isContractsUseSpecialMechanics);
-        return (specialTypeId != null)
-                     && !StratConBeleagueredForcesBehavior.TYPE_ID.equals(specialTypeId)
-                     && !StratConTrainingManeuversBehavior.TYPE_ID.equals(specialTypeId)
-                     && !StratConStrategicPositionBehavior.TYPE_ID.equals(specialTypeId)
-                     && !StratConSecurityReviewBehavior.TYPE_ID.equals(specialTypeId)
-                     && !StratConShowOfForceBehavior.TYPE_ID.equals(specialTypeId);
+        return isContractsUseSpecialMechanics
+                     && StratConContractMechanics.forContract(contract).isReplacingEssentialScenarios();
     }
 
     /**
-     * Decides whether a special point of interest type is a strategic objective. Every one is, except high profile
-     * targets - a Diversionary Raid's objective is its Escalation instead (see {@link StratConEscalation}) - target
-     * intelligence, whose objectives are the facilities it leads to, shows of force, which only calm a Garrison Duty
-     * contract's Escalation, and pirate captains, whose objectives are the Essential scenarios they are fought in.
+     * Decides whether a special point of interest type is a strategic objective (see
+     * {@link StratConContractMechanics#isPointOfInterestObjective}). A type no contract uses as its special point of
+     * interest counts as one.
      *
      * @param typeId the type ID of a special point of interest
      *
@@ -690,10 +590,8 @@ public class StratConContractInitializer {
      */
     // Package-private rather than private so the decision can be tested directly.
     static boolean isSpecialPointOfInterestObjective(String typeId) {
-        return !StratConHighProfileTargetBehavior.TYPE_ID.equals(typeId)
-                     && !StratConTargetIntelligenceBehavior.TYPE_ID.equals(typeId)
-                     && !StratConShowOfForceBehavior.TYPE_ID.equals(typeId)
-                     && !StratConPirateCaptainBehavior.TYPE_ID.equals(typeId);
+        StratConContractMechanics mechanics = StratConContractMechanics.forPointOfInterestTypeId(typeId);
+        return (mechanics == null) || mechanics.isPointOfInterestObjective();
     }
 
     /**
@@ -704,7 +602,8 @@ public class StratConContractInitializer {
      * contract's length and track count (see {@link TrackIntensityTable#rollSchedule}), made once per point of scale
      * when "Multiply Track Intensity by Scale" is on and once otherwise. That roll is independent of the scenarios' own,
      * and is kept on the contract (see {@link AbstractContract#getPointOfInterestSchedule()}). Each month's points of
-     * interest then get random days within it (see {@link #rollSpawnDates}).</p>
+     * interest then get random days within it (see {@link #rollSpawnDates}), and the type's behavior is told of the
+     * whole schedule (see {@link IStratConPointOfInterestBehavior#onScheduled}).</p>
      *
      * <p>Does nothing if the contract has no settled start date.</p>
      *
@@ -740,64 +639,17 @@ public class StratConContractInitializer {
                   isStrategicObjective));
         }
 
-        // Only so many target intelligence leads pan out into facilities: settled now, so it cannot be gamed later.
-        if (StratConTargetIntelligenceBehavior.TYPE_ID.equals(typeId)) {
-            markFacilityLeads(scheduledPointsOfInterest, max(1, contract.getScale()));
-        }
-
-        // Likewise, only so many assassination leads point to the real target; the rest turn up body doubles.
-        if (StratConAssassinationLeadBehavior.TYPE_ID.equals(typeId)) {
-            markRealTargets(scheduledPointsOfInterest, max(1, contract.getScale()));
+        // Anything a type settles up front - such as which leads pan out - is settled now, so it cannot be gamed later.
+        // The behavior is named by the contract type's mechanics rather than looked up through the data files, which
+        // are not loaded until the application launches.
+        StratConContractMechanics mechanics = StratConContractMechanics.forPointOfInterestTypeId(typeId);
+        if (mechanics != null) {
+            StratConPointOfInterestBehaviors.getBehavior(mechanics.pointOfInterestBehaviorId())
+                  .onScheduled(scheduledPointsOfInterest, contract);
         }
 
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
             campaignState.addScheduledPointOfInterest(scheduledPointOfInterest);
-        }
-    }
-
-    /**
-     * Marks, at random, which of a contract's scheduled target intelligence will lead to a facility (see
-     * {@link StratConTargetIntelligenceBehavior}): as many as the given count, or all of them if there are fewer.
-     *
-     * @param scheduledPointsOfInterest the contract's scheduled target intelligence
-     * @param facilityLeadCount         how many may lead to a facility: one per point of the contract's scale
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    // Package-private rather than private so the marking can be tested directly.
-    static void markFacilityLeads(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest,
-          int facilityLeadCount) {
-        markAtRandom(scheduledPointsOfInterest, facilityLeadCount,
-              StratConTargetIntelligenceBehavior.FACILITY_LEAD_STATE_KEY);
-    }
-
-    /**
-     * Marks, at random, which of a contract's scheduled assassination leads point to the real target rather than a body
-     * double (see {@link StratConAssassinationLeadBehavior}): as many as the given count, or all of them if there are
-     * fewer.
-     *
-     * @param scheduledPointsOfInterest the contract's scheduled assassination leads
-     * @param realTargetCount           how many point to the real target: one per point of the contract's scale
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    // Package-private rather than private so the marking can be tested directly.
-    static void markRealTargets(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest,
-          int realTargetCount) {
-        markAtRandom(scheduledPointsOfInterest, realTargetCount,
-              StratConAssassinationLeadBehavior.REAL_TARGET_STATE_KEY);
-    }
-
-    private static void markAtRandom(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest, int count,
-          String stateKey) {
-        List<StratConScheduledPointOfInterest> candidates = new ArrayList<>(scheduledPointsOfInterest);
-        Collections.shuffle(candidates);
-
-        int marked = min(count, candidates.size());
-        for (int index = 0; index < marked; index++) {
-            candidates.get(index).getInitialState().put(stateKey, Boolean.TRUE.toString());
         }
     }
 
@@ -953,7 +805,8 @@ public class StratConContractInitializer {
             }
         }
 
-        LOGGER.info("No sector of contract {} had room for scheduled point of interest {}.",
+        // Debug rather than info: the daily lifecycle retries it each day until a sector has room.
+        LOGGER.debug("No sector of contract {} had room for scheduled point of interest {}; it will be tried again.",
               contract.getName(),
               scheduledPointOfInterest);
         return null;
@@ -1392,8 +1245,10 @@ public class StratConContractInitializer {
      * @since 0.51.01
      */
     private static void dropPointOfInterest(StratConTrackState track, StratConPointOfInterest pointOfInterest) {
-        track.getStrategicObjectives()
-              .removeAll(StratConPointOfInterestRules.getStrategicObjectives(track, pointOfInterest));
+        for (StratConStrategicObjective objective : StratConPointOfInterestRules.getStrategicObjectives(track,
+              pointOfInterest)) {
+            track.removeStrategicObjective(objective);
+        }
         track.removePointOfInterest(pointOfInterest.getId());
     }
 

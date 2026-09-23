@@ -100,12 +100,12 @@ class StratConPointOfInterestContractRulesTest {
     }
 
     @Test
-    void noRandomScenarioUnderEssentialScenariosOnlyOrOnAFacility() {
+    void noRandomScenarioUnderEssentialScenariosOnlyOrOnAHeldHex() {
         for (PointOfInterestDeploymentOutcome outcome : PointOfInterestDeploymentOutcome.values()) {
             assertFalse(StratConRulesManager.rollsRandomScenario(outcome, true, false, false, CERTAIN_ODDS),
                   "Essential Scenarios Only: " + outcome);
             assertFalse(StratConRulesManager.rollsRandomScenario(outcome, false, true, false, CERTAIN_ODDS),
-                  "facility hex: " + outcome);
+                  "hex held by a facility or point of interest: " + outcome);
         }
     }
 

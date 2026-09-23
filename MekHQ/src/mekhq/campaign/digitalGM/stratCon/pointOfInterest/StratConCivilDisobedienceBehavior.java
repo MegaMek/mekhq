@@ -92,7 +92,7 @@ public class StratConCivilDisobedienceBehavior extends StratConContestedPointOfI
      * @since 0.51.01
      */
     @Override
-    protected boolean isContestPossibleWhileRouted() {
+    protected boolean isScenarioPossibleWhileRouted() {
         return true;
     }
 
@@ -103,9 +103,9 @@ public class StratConCivilDisobedienceBehavior extends StratConContestedPointOfI
      * @since 0.51.01
      */
     @Override
-    protected void onUncontested(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+    protected void onNoScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
           AbstractContract contract, Campaign campaign) {
-        securePointOfInterest(pointOfInterest, track, campaign);
+        securePointOfInterest(pointOfInterest, track, contract, campaign);
     }
 
     /**
@@ -115,7 +115,7 @@ public class StratConCivilDisobedienceBehavior extends StratConContestedPointOfI
      * @since 0.51.01
      */
     @Override
-    protected @Nullable StratConScenario placeContestingScenario(StratConPointOfInterest pointOfInterest,
+    protected @Nullable StratConScenario placeScenario(StratConPointOfInterest pointOfInterest,
           StratConTrackState track, int formationId, AbstractContract contract, Campaign campaign) {
         return StratConRiots.placeRiot(pointOfInterest, track, formationId, contract, campaign);
     }
@@ -127,7 +127,7 @@ public class StratConCivilDisobedienceBehavior extends StratConContestedPointOfI
      * @since 0.51.01
      */
     @Override
-    protected void announceContest(StratConPointOfInterest pointOfInterest, StratConTrackState track, int formationId,
+    protected void announceScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track, int formationId,
           AbstractContract contract, Campaign campaign) {
         StratConRiots.announceRiot(pointOfInterest, track, contract, campaign);
     }

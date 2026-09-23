@@ -32,10 +32,13 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
+import java.util.List;
+
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest.PointOfInterestStatus;
+import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * The rules that make one type of StratCon point of interest behave differently from another. A definition names its
@@ -50,6 +53,23 @@ import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest
  * @since 0.51.01
  */
 public interface IStratConPointOfInterestBehavior {
+    /**
+     * Called once, when a contract that uses this type as its special point of interest is accepted, with every point
+     * of interest of this type the contract has scheduled. A type that settles something up front - which leads pan
+     * out, say - records it in each one's initial state (see
+     * {@link StratConScheduledPointOfInterest#getInitialState()}), which is copied onto the point of interest when it is
+     * placed. By default, nothing.
+     *
+     * @param scheduledPointsOfInterest the contract's scheduled points of interest of this type, not yet placed
+     * @param contract                  the contract being accepted
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    default void onScheduled(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest,
+          AbstractContract contract) {
+    }
+
     /**
      * Called when a player force scouts the point of interest's hex for the first time.
      *

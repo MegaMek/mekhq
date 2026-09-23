@@ -301,7 +301,7 @@ public final class StratConPointOfInterestRules {
      * @param campaign    the current campaign
      *
      * @return the combined outcome (see {@link PointOfInterestDeploymentOutcome#combineWith}); no effect if the hex has
-     *       no active point of interest
+     *       no active point of interest, or already holds a scenario (which the formation joins instead)
      *
      * @author Illiani
      * @since 0.51.01
@@ -309,6 +309,12 @@ public final class StratConPointOfInterestRules {
     public static PointOfInterestDeploymentOutcome processFormationDeployment(StratConTrackState track,
           StratConCoords coords, int formationId, Campaign campaign) {
         PointOfInterestDeploymentOutcome combinedOutcome = PointOfInterestDeploymentOutcome.NO_EFFECT;
+
+        // A formation arriving on a hex that already holds a scenario joins that scenario; nothing here may place a
+        // second one on the same hex, which would push the first off the map.
+        if (track.getScenario(coords) != null) {
+            return combinedOutcome;
+        }
 
         // Copied, so a hook that removes its point of interest or places a scenario on the hex is safe.
         for (StratConPointOfInterest pointOfInterest : new ArrayList<>(track.getPointsOfInterest(coords))) {

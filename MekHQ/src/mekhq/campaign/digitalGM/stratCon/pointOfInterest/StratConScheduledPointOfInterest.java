@@ -32,8 +32,13 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
+import static java.lang.Math.min;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -105,15 +110,6 @@ public class StratConScheduledPointOfInterest {
     }
 
     /**
-     * @param today the current campaign date
-     *
-     * @return {@code true} if the point of interest's day has come - today or earlier, so a skipped day still catches
-     *       up
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    /**
      * @return the state the point of interest starts with when it is placed (see
      *       {@link StratConPointOfInterest#getState()}); empty for most types
      */
@@ -125,8 +121,39 @@ public class StratConScheduledPointOfInterest {
         this.initialState = (initialState == null) ? new HashMap<>() : initialState;
     }
 
+    /**
+     * @param today the current campaign date
+     *
+     * @return {@code true} if the point of interest's day has come - today or earlier, so a skipped day still catches
+     *       up
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
     public boolean isDue(LocalDate today) {
         return (spawnDate != null) && !spawnDate.isAfter(today);
+    }
+
+    /**
+     * Marks, at random, as many of the given scheduled points of interest as the count asks for - or all of them, if
+     * there are fewer - by storing {@code true} under the given key in each one's initial state.
+     *
+     * @param scheduledPointsOfInterest the scheduled points of interest to choose from
+     * @param count                     how many to mark
+     * @param stateKey                  the initial state key to mark them with
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void markAtRandom(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest, int count,
+          String stateKey) {
+        List<StratConScheduledPointOfInterest> candidates = new ArrayList<>(scheduledPointsOfInterest);
+        Collections.shuffle(candidates);
+
+        int markedCount = min(count, candidates.size());
+        for (int index = 0; index < markedCount; index++) {
+            candidates.get(index).getInitialState().put(stateKey, Boolean.TRUE.toString());
+        }
     }
 
     @Override

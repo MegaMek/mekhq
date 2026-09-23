@@ -60,6 +60,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResul
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.EnemyData;
@@ -94,15 +95,57 @@ public final class StratConDeploymentService {
     public static void deployPrimaryForces(Campaign campaign, StratConCampaignState campaignState,
           StratConTrackState track, StratConCoords coords, boolean assignToScenario, List<Integer> forceIds) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        // Formations sent together onto a point of interest arrive as one group: once one of them has dealt with it,
+        // the rest simply join that formation on the hex rather than arriving as if onto an empty one.
+        boolean hadActivePointOfInterest = hasActivePointOfInterest(track, coords);
+
         for (int forceId : forceIds) {
             if (assignToScenario) {
                 StratConGMs.forceDeployment(campaignOptions)
                       .assignForceToScenario(coords, forceId, campaign, campaignState.getContract(), track, false);
+            } else if (isJoiningResolvedPointOfInterest(hadActivePointOfInterest,
+                  hasActivePointOfInterest(track, coords),
+                  track.getScenario(coords) != null)) {
+                StratConGMs.forceDeployment(campaignOptions)
+                      .processForceDeployment(coords, forceId, campaign, track, false);
             } else {
                 StratConGMs.forceDeployment(campaignOptions)
                       .deployForceToCoords(coords, forceId, campaign, campaignState.getContract(), track, false);
             }
         }
+    }
+
+    /**
+     * Decides whether a formation, sent in a group onto a hex, should simply join the others there: the hex held an
+     * active point of interest when the group set out, an earlier formation of the group has since dealt with it, and
+     * no scenario has broken out there. Such a formation neither rolls for a scenario nor counts as deploying to an
+     * empty hex.
+     *
+     * @param hadActivePointOfInterest whether the hex held an active point of interest when the group set out
+     * @param hasActivePointOfInterest whether it still does
+     * @param hasScenario              whether the hex now holds a scenario
+     *
+     * @return {@code true} if the formation joins the group without a deployment of its own
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isJoiningResolvedPointOfInterest(boolean hadActivePointOfInterest, boolean hasActivePointOfInterest,
+          boolean hasScenario) {
+        return hadActivePointOfInterest && !hasActivePointOfInterest && !hasScenario;
+    }
+
+    /**
+     * @return {@code true} if the hex holds a point of interest that is still in play
+     */
+    private static boolean hasActivePointOfInterest(StratConTrackState track, StratConCoords coords) {
+        for (StratConPointOfInterest pointOfInterest : track.getPointsOfInterest(coords)) {
+            if (pointOfInterest.isActive()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

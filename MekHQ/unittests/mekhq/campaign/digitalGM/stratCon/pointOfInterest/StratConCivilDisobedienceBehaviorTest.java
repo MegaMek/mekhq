@@ -174,8 +174,8 @@ class StratConCivilDisobedienceBehaviorTest {
         StratConCivilDisobedienceBehavior behavior = new StratConCivilDisobedienceBehavior();
 
         assertEquals("Crowd Control.json", behavior.getScenarioTemplateName());
-        assertTrue(behavior.isContestPossibleWhileRouted(), "civil unrest does not answer to the enemy's morale");
-        assertFalse(new StratConDataCacheBehavior().isContestPossibleWhileRouted(),
+        assertTrue(behavior.isScenarioPossibleWhileRouted(), "civil unrest does not answer to the enemy's morale");
+        assertFalse(new StratConDataCacheBehavior().isScenarioPossibleWhileRouted(),
               "a routed enemy still contests nothing else");
     }
 

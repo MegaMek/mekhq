@@ -1247,9 +1247,13 @@ public class StratConRulesManager {
         // calculateScenarioOdds returns odds no roll can meet against a routed enemy.
         boolean enemyRouted = (pointOfInterestOutcome == PointOfInterestDeploymentOutcome.FORCE_SCENARIO) &&
                                     contract.getMoraleLevel().isRouted();
+        // A point of interest still holding the hex - one this formation could not follow up - keeps the usual roll
+        // off it, as a facility does; only one that asks for a scenario gets one there.
+        boolean isHeldByPointOfInterest = (pointOfInterestOutcome == PointOfInterestDeploymentOutcome.NO_EFFECT) &&
+                                                (track.getOccupyingPointOfInterest(coords) != null);
         boolean spawnScenario = rollsRandomScenario(pointOfInterestOutcome,
               essentialScenariosOnly,
-              facility != null,
+              (facility != null) || isHeldByPointOfInterest,
               enemyRouted,
               targetNum);
 
@@ -1621,6 +1625,7 @@ public class StratConRulesManager {
     public static void processForceDeployment(StratConCoords coords, int forceID, Campaign campaign,
           StratConTrackState track, boolean sticky) {
         scanNeighboringCoords(coords, forceID, campaign, track);
+        StratConReconnaissance.updateObjectives(track);
 
         // the force may be located in other places on the track - clear it out
         track.unassignFormation(forceID);
@@ -1631,14 +1636,14 @@ public class StratConRulesManager {
     /**
      * Decides whether a formation deploying onto a hex runs into a random scenario.
      *
-     * <p>No random scenario is ever rolled under "Essential Scenarios Only", or on a facility's hex (the facility's own
-     * rules decide there). Otherwise a point of interest on the hex may rule the roll out, or make it certain - but not
+     * <p>No random scenario is ever rolled under "Essential Scenarios Only", or on a hex already held - by a facility,
+     * whose own rules decide there, or by a point of interest the formation could not follow up. Otherwise a point of interest on the hex may rule the roll out, or make it certain - but not
      * against a routed enemy, which fields no scenarios at all. Without a point of interest's say, it is the usual roll
      * against the sector's scenario odds.</p>
      *
      * @param pointOfInterestOutcome what the points of interest on the hex want done to the roll
      * @param essentialScenariosOnly whether the "Essential Scenarios Only" option is on
-     * @param hasFacility            whether the hex holds a facility
+     * @param isHexHeld              whether the hex is held by a facility, or by a point of interest occupying it
      * @param enemyRouted            whether the contract's enemy is routed
      * @param targetNumber           the sector's scenario odds, out of 100
      *
@@ -1648,8 +1653,8 @@ public class StratConRulesManager {
      * @since 0.51.01
      */
     public static boolean rollsRandomScenario(PointOfInterestDeploymentOutcome pointOfInterestOutcome,
-          boolean essentialScenariosOnly, boolean hasFacility, boolean enemyRouted, int targetNumber) {
-        if (essentialScenariosOnly || hasFacility) {
+          boolean essentialScenariosOnly, boolean isHexHeld, boolean enemyRouted, int targetNumber) {
+        if (essentialScenariosOnly || isHexHeld) {
             return false;
         }
 

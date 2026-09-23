@@ -86,7 +86,7 @@ public class StratConScheduledParadeBehavior extends StratConAmbushPointOfIntere
      * @since 0.51.01
      */
     @Override
-    protected boolean isAmbushPossibleWhileRouted() {
+    protected boolean isScenarioPossibleWhileRouted() {
         return true;
     }
 
@@ -97,7 +97,7 @@ public class StratConScheduledParadeBehavior extends StratConAmbushPointOfIntere
      * @since 0.51.01
      */
     @Override
-    protected @Nullable StratConScenario placeAmbush(StratConPointOfInterest pointOfInterest,
+    protected @Nullable StratConScenario placeScenario(StratConPointOfInterest pointOfInterest,
           StratConTrackState track, int formationId, AbstractContract contract, Campaign campaign) {
         return StratConRiots.placeRiot(pointOfInterest, track, formationId, contract, campaign);
     }
@@ -109,7 +109,7 @@ public class StratConScheduledParadeBehavior extends StratConAmbushPointOfIntere
      * @since 0.51.01
      */
     @Override
-    protected void announceAmbush(StratConPointOfInterest pointOfInterest, StratConTrackState track, int formationId,
+    protected void announceScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track, int formationId,
           AbstractContract contract, Campaign campaign) {
         StratConRiots.announceRiot(pointOfInterest, track, contract, campaign);
     }

@@ -328,8 +328,9 @@ public class StratConPointOfInterest {
     }
 
     /**
-     * Whether this point of interest takes up its hex, the way a facility or scenario does. A point of interest whose
-     * type is no longer defined does not, so a removed data file cannot leave a hex blocked by something unseen.
+     * Whether this point of interest takes up its hex, the way a facility or scenario does. Only an active one can: a
+     * resolved or expired point of interest left on the map is spent, and blocks nothing. Nor does one whose type is no
+     * longer defined, so a removed data file cannot leave a hex blocked by something unseen.
      *
      * @return {@code true} if this point of interest occupies its hex
      *
@@ -337,6 +338,10 @@ public class StratConPointOfInterest {
      * @since 0.51.01
      */
     public boolean occupiesHex() {
+        if (!isActive()) {
+            return false;
+        }
+
         StratConPointOfInterestDefinition definition = getDefinition();
         return (definition != null) && definition.isOccupiesHex();
     }

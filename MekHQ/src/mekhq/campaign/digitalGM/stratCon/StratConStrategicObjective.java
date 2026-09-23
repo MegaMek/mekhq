@@ -130,11 +130,9 @@ public class StratConStrategicObjective {
             case AnyScenarioVictory, SpecificScenarioVictory, Escalation ->
                 // this is set once qualifying scenarios are completed (or, for Escalation, follows the contract's)
                   getCurrentObjectiveCount() >= getDesiredObjectiveCount();
-            case Reconnaissance -> {
-                // the counts follow the sector's map, so bring them up to date before judging
-                StratConReconnaissance.updateObjective(this, trackState);
-                yield getCurrentObjectiveCount() >= getDesiredObjectiveCount();
-            }
+            case Reconnaissance ->
+                // the counts are kept up to date with the sector's map as it is scouted (see StratConReconnaissance)
+                  getCurrentObjectiveCount() >= getDesiredObjectiveCount();
             case AlliedFacilityControl -> {
                 // this is "ok" if the facility exists and is under allied control
                 StratConFacility alliedFacility = trackState.getFacility(getObjectiveCoords());
