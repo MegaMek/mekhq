@@ -463,7 +463,7 @@ public abstract class AbstractContractGeneration {
         if (targetSystem == null) {
             return null;
         }
-        return ChaosPlanetSelector.selectTargetPlanet(targetSystem.getPlanets(),
+        return ChaosPlanetSelector.selectTargetPlanet(targetSystem.getPlanets(), targetSystem.getPrimaryPlanet(),
               contract.getObjectiveType().getChaosObjectiveType(), currentDate);
     }
 
