@@ -62,6 +62,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDataCacheBehavior;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConLookoutPointBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
@@ -518,6 +519,7 @@ public class StratConContractInitializer {
      *     <li>Espionage: data caches (see {@link StratConDataCacheBehavior})</li>
      *     <li>Guerrilla Warfare: vulnerable infrastructure (see {@link StratConVulnerableInfrastructureBehavior})</li>
      *     <li>Mole Hunting: potential leads (see {@link StratConPotentialLeadBehavior})</li>
+     *     <li>Observation Raid: lookout points (see {@link StratConLookoutPointBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -550,6 +552,10 @@ public class StratConContractInitializer {
 
         if (objectiveType.isMoleHunting()) {
             return StratConPotentialLeadBehavior.TYPE_ID;
+        }
+
+        if (objectiveType.isObservationRaid()) {
+            return StratConLookoutPointBehavior.TYPE_ID;
         }
 
         return null;

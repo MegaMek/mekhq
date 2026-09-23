@@ -50,6 +50,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectivePar
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.PointOfInterestParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDataCacheBehavior;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConLookoutPointBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPotentialLeadBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConVulnerableInfrastructureBehavior;
@@ -269,6 +270,31 @@ class StratConDataCacheSchedulingTest {
         }
     }
 
+    // Observation Raid: lookout points
+
+    @Test
+    void anObservationRaidContractSchedulesOnlyLookoutPointsEachAnObjective() {
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.OBSERVATION_RAID, 1), true, true);
+
+        assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertEquals(StratConLookoutPointBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertTrue(pointOfInterest.isStrategicObjective());
+        }
+    }
+
+    @Test
+    void withoutSpecialMechanicsAnObservationRaidContractSchedulesItsDefinitionsPointsOfInterest() {
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.OBSERVATION_RAID, 1), true, false);
+
+        assertEquals(3, scheduled.size());
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertEquals(DEFINITION_TYPE_ID, pointOfInterest.getTypeId());
+        }
+    }
+
     // Which contracts use special points of interest - and so get no Essential scenarios
 
     @Test
@@ -282,6 +308,9 @@ class StratConDataCacheSchedulingTest {
         assertEquals(StratConPotentialLeadBehavior.TYPE_ID,
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.MOLE_HUNTING, 1), true));
+        assertEquals(StratConLookoutPointBehavior.TYPE_ID,
+              StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.OBSERVATION_RAID, 1), true));
         assertNull(StratConContractInitializer.getSpecialPointOfInterestTypeId(
               contract(ContractObjectiveType.GARRISON_DUTY, 1), true));
     }
@@ -297,6 +326,9 @@ class StratConDataCacheSchedulingTest {
         assertNull(StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.MOLE_HUNTING, 1), false),
               "without special mechanics, a Mole Hunting contract keeps its Essential scenarios");
+        assertNull(StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.OBSERVATION_RAID, 1), false),
+              "without special mechanics, an Observation Raid contract keeps its Essential scenarios");
     }
 
     @Test
