@@ -42,7 +42,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * The behavior of a potential lead: a tip that may point to an enemy mole, placed in place of every point of interest
  * on a Mole Hunting contract. Every potential lead is a strategic objective.
  *
- * <p>When a ground formation deploys onto the lead's hex, the usual scenario roll is made. If no scenario breaks out,
+ * <p>When any formation deploys onto the lead's hex, the usual scenario roll is made. If no scenario breaks out,
  * the lead is a dud: it leaves the map and its objective is removed, neither met nor failed. If one does, the lead has
  * panned out, and a {@value #SCENARIO_TEMPLATE} scenario is fought over it: an overall victory meets its objective and
  * pays the contract's combat bonus, standing in for the Essential scenarios such a contract does not get; anything else

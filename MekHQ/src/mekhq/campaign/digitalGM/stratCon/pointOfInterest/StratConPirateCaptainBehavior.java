@@ -46,7 +46,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * interest on a Pirate Hunting contract. A pirate captain is not a strategic objective itself; the fight to bring one
  * down is.
  *
- * <p>When a ground formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the
+ * <p>When any formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the
  * captain has already slipped away: the point of interest leaves the map, with nothing gained or lost. If one does, the
  * captain stands and fights in a {@value #SCENARIO_TEMPLATE} scenario. That scenario is an Essential scenario - a
  * strategic objective of its own, won by winning it - so winning it pays the contract's combat bonus, as any Essential

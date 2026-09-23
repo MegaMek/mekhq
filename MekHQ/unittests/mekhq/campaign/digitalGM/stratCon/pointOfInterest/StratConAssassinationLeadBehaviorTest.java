@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
 import static megamek.common.units.UnitType.MEK;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
@@ -41,7 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -179,15 +177,6 @@ class StratConAssassinationLeadBehaviorTest {
     }
 
     // Each outcome still plays out, with its own text
-
-    @Test
-    void aFormationThatIsNotOnTheGroundCannotFollowUpALead() {
-        Campaign campaign = deploymentCampaign(AEROSPACE_FIGHTER);
-
-        assertEquals(PointOfInterestDeploymentOutcome.NO_EFFECT,
-              StratConPointOfInterestRules.processFormationDeployment(track, LEAD_COORDS, FORMATION_ID, campaign));
-        assertSame(lead, track.getPointOfInterest(lead.getId()));
-    }
 
     @Test
     void winningTheAssassinationMeetsTheObjectiveAndPaysTheCombatBonus() {

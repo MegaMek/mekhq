@@ -41,7 +41,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * interest on a Planetary Assault contract. Every strategic position is a strategic objective, alongside the contract's
  * Essential scenarios rather than in place of them.
  *
- * <p>When a ground formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the
+ * <p>When any formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the
  * position is captured on the spot. If one does, a {@value #SCENARIO_TEMPLATE} scenario is fought for it: an overall
  * victory captures it, and anything else - a defeat, a draw, or leaving the scenario unplayed - loses it. Either way the
  * position then leaves the map, and its objective is met or failed. Capturing one pays no combat bonus: the contract's

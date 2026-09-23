@@ -39,18 +39,15 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 
 /**
- * The shared rules of a point of interest that a ground formation follows up, and that a scenario of one set template
+ * The shared rules of a point of interest that any formation follows up, and that a scenario of one set template
  * may break out over.
  *
- * <p>When a ground formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the
- * type decides what happens (see {@link #onNoScenario}). If one does, a scenario of the type's template (see
+ * <p>When any formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the type
+ * decides what happens (see {@link #onNoScenario}). If one does, a scenario of the type's template (see
  * {@link #getScenarioTemplateName}) is placed on the hex and linked to the point of interest: an overall victory
  * secures it (see {@link #securePointOfInterest}), and anything else - a defeat, a draw, or leaving the scenario
  * unplayed - loses it, failing its objective. By default, securing one pays the combat bonus, standing in for the
  * Essential scenarios its contract does not get (see {@link #isCombatBonusPaid}).</p>
- *
- * <p>By default, a formation that is not a ground formation cannot follow the point of interest up (see
- * {@link #canFollowUp}).</p>
  *
  * <p>Each type's player-facing text lives in the {@code StratConRulesManager} resource bundle, under its key prefix
  * (see {@link #getResourceKeyPrefix}): {@code .objective}, {@code .contested.report}, {@code .secured.report}, and
@@ -71,17 +68,6 @@ public abstract class StratConContestedPointOfInterestBehavior extends AbstractS
      */
     @Override
     protected abstract @Nullable String getScenarioTemplateName();
-
-    /**
-     * By default, only a ground formation can follow the point of interest up (see {@link #isGroundFormation}).
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    @Override
-    protected boolean canFollowUp(int formationId, Campaign campaign) {
-        return isGroundFormation(formationId, campaign);
-    }
 
     @Override
     protected String getScenarioReportKeySuffix() {

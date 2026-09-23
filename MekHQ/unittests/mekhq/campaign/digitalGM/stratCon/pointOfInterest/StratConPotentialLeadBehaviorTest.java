@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
 import static megamek.common.units.UnitType.INFANTRY;
 import static megamek.common.units.UnitType.MEK;
 import static megamek.common.units.UnitType.TANK;
@@ -191,14 +190,6 @@ class StratConPotentialLeadBehaviorTest {
         assertTrue(objective.isObjectiveFailed(track));
     }
 
-    private void assertUntouched() {
-        assertSame(lead, track.getPointOfInterest(lead.getId()));
-        assertTrue(lead.isActive());
-        assertFalse(lead.hasLinkedScenario());
-        assertTrue(track.getStrategicObjectives().contains(objective));
-        assertFalse(objective.isObjectiveResolved(track));
-    }
-
     // Registration
 
     @Test
@@ -237,14 +228,6 @@ class StratConPotentialLeadBehaviorTest {
 
         assertEquals(PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO, deploy(campaign));
         assertDud();
-    }
-
-    @Test
-    void aFormationThatIsNotOnTheGroundCannotFollowUpALead() {
-        Campaign campaign = deploymentCampaign(AEROSPACE_FIGHTER, ContractMoraleLevel.STALEMATE, true);
-
-        assertEquals(PointOfInterestDeploymentOutcome.NO_EFFECT, deploy(campaign));
-        assertUntouched();
     }
 
     @Test

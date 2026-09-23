@@ -75,17 +75,6 @@ public class StratConSecurityReviewBehavior extends StratConContestedPointOfInte
     }
 
     /**
-     * Any formation can carry out a security review.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    @Override
-    protected boolean canFollowUp(int formationId, Campaign campaign) {
-        return true;
-    }
-
-    /**
      * Passing a security review pays no combat bonus: a Security Duty contract keeps its Essential scenarios, which
      * still pay it.
      *

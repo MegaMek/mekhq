@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
 import static megamek.common.units.UnitType.MEK;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
@@ -41,7 +40,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -213,15 +211,6 @@ class StratConSabotageTargetBehaviorTest {
         verify(finances).credit(eq(TransactionType.CONTRACT_PAYMENT), eq(TODAY), eq(COMBAT_PAY), anyString());
         assertEscalationBetween(3, 18);
         assertGeneralReportIsValid(campaign);
-    }
-
-    @Test
-    void aFormationThatIsNotOnTheGroundCannotSabotageTheTarget() {
-        Campaign campaign = deploymentCampaign(AEROSPACE_FIGHTER);
-
-        assertEquals(PointOfInterestDeploymentOutcome.NO_EFFECT, deploy(campaign));
-        assertSame(target, track.getPointOfInterest(target.getId()));
-        assertEquals(0, campaignState.getEscalation());
     }
 
     @Test

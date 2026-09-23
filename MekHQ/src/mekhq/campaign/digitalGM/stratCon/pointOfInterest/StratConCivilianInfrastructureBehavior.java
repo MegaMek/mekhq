@@ -87,17 +87,6 @@ public class StratConCivilianInfrastructureBehavior extends StratConContestedPoi
     }
 
     /**
-     * Any formation can attack civilian infrastructure.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    @Override
-    protected boolean canFollowUp(int formationId, Campaign campaign) {
-        return true;
-    }
-
-    /**
      * With no scenario breaking out, the infrastructure is destroyed at once, raising Escalation by 3d6.
      *
      * @author Illiani

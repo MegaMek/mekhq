@@ -40,7 +40,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * The behavior of a data cache: intelligence the player must recover, placed in place of every point of interest on an
  * Espionage contract. Every data cache is a strategic objective.
  *
- * <p>When a ground formation deploys onto the cache's hex, the usual scenario roll is made. If no scenario breaks out,
+ * <p>When any formation deploys onto the cache's hex, the usual scenario roll is made. If no scenario breaks out,
  * the cache is secured on the spot. If one does, it is a {@value #SCENARIO_TEMPLATE} scenario fought over the cache:
  * an overall victory secures it, and anything else - a defeat, a draw, or leaving the scenario unplayed - loses it.
  * Either way the cache then leaves the map, and its objective is met or failed. Securing a cache pays the contract's

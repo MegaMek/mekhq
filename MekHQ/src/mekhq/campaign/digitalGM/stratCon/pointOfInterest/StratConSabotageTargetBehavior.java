@@ -42,7 +42,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * player to sabotage, placed in place of every point of interest on a Sabotage contract. Every sabotage target is a
  * strategic objective, and together they replace the contract's Essential scenarios.
  *
- * <p>When a ground formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the
+ * <p>When any formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the
  * target is sabotaged quietly: its objective is met, the contract's combat bonus is paid, and the contract's Escalation
  * rises by 3d6. If one does, the saboteurs are caught in the act and must fight a {@value #SCENARIO_TEMPLATE}
  * scenario: an overall victory still sabotages the target, meeting its objective and paying the bonus, and anything

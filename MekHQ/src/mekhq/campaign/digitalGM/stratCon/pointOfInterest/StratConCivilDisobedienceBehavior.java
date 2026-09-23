@@ -75,17 +75,6 @@ public class StratConCivilDisobedienceBehavior extends StratConContestedPointOfI
     }
 
     /**
-     * Any formation can respond to civil disobedience.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    @Override
-    protected boolean canFollowUp(int formationId, Campaign campaign) {
-        return true;
-    }
-
-    /**
      * Civil disobedience can turn into a riot whatever state the enemy is in.
      *
      * @author Illiani

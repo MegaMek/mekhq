@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import static megamek.common.units.UnitType.CONV_FIGHTER;
 import static megamek.common.units.UnitType.MEK;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
@@ -48,18 +47,17 @@ import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConScenarioFactory;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.enums.DailyReportType;
-import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 
 /**
  * The shared rules of a point of interest that a deploying formation follows up with the usual scenario roll.
  *
- * <p>When a formation that can follow it up (see {@link #canFollowUp}) deploys onto its hex, the usual scenario roll
- * is made (or skipped, if a scenario is certain - see {@link #isScenarioCertain}). If no scenario breaks out, the type
- * decides what happens (see {@link #onNoScenario}). If one does, a scenario is placed on the hex and linked to the
- * point of interest (see {@link #placeScenario}), and the deploying formation is then assigned to it like any scenario
- * found on the hex. How the linked scenario's end is handled is left to the type (see
+ * <p>When any formation deploys onto its hex, the usual scenario roll is made (or skipped, if a scenario is certain -
+ * see {@link #isScenarioCertain}). If no scenario breaks out, the type decides what happens (see
+ * {@link #onNoScenario}). If one does, a scenario is placed on the hex and linked to the point of interest (see
+ * {@link #placeScenario}), and the deploying formation is then assigned to it like any scenario found on the hex. How
+ * the linked scenario's end is handled is left to the type (see
  * {@link IStratConPointOfInterestBehavior#onLinkedScenarioEnded}).</p>
  *
  * <p>A formation joining a scenario already linked here does not roll again.</p>
@@ -134,22 +132,6 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
     }
 
     /**
-     * Decides whether a formation can follow this type of point of interest up. One that cannot deploys as it would
-     * onto any other occupied hex. By default, any formation can.
-     *
-     * @param formationId the ID of the deploying formation
-     * @param campaign    the current campaign
-     *
-     * @return {@code true} if the formation can follow the point of interest up
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    protected boolean canFollowUp(int formationId, Campaign campaign) {
-        return true;
-    }
-
-    /**
      * @return {@code true} if dealing with this type of point of interest pays the contract's combat bonus; by default,
      *       it does. A type whose contract keeps its Essential scenarios leaves the bonus to them.
      *
@@ -190,7 +172,7 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
     @Override
     public PointOfInterestDeploymentOutcome onFormationDeployed(StratConPointOfInterest pointOfInterest,
           StratConTrackState track, int formationId, Campaign campaign) {
-        if (pointOfInterest.hasLinkedScenario() || !canFollowUp(formationId, campaign)) {
+        if (pointOfInterest.hasLinkedScenario()) {
             return PointOfInterestDeploymentOutcome.NO_EFFECT;
         }
 
@@ -400,20 +382,5 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
               getResourceKeyPrefix() + '.' + keySuffix,
               pointOfInterest.getDisplayableName(),
               track.getDisplayableName()));
-    }
-
-    /**
-     * @param formationId the ID of the formation
-     * @param campaign    the current campaign
-     *
-     * @return {@code true} if the formation fights on the ground: its primary unit type is not an aerospace or larger
-     *       craft
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    protected static boolean isGroundFormation(int formationId, Campaign campaign) {
-        Formation formation = campaign.getPlayerForce().getFormation(formationId);
-        return (formation != null) && (formation.getPrimaryUnitType(campaign) < CONV_FIGHTER);
     }
 }

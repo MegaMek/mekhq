@@ -75,17 +75,6 @@ public class StratConBeleagueredForcesBehavior extends StratConContestedPointOfI
     }
 
     /**
-     * Any formation can relieve beleaguered forces.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    @Override
-    protected boolean canFollowUp(int formationId, Campaign campaign) {
-        return true;
-    }
-
-    /**
      * Relieving beleaguered forces pays no combat bonus: a Relief Duty contract keeps its Essential scenarios, which
      * still pay it.
      *

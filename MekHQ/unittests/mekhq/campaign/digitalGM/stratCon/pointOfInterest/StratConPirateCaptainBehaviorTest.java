@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
 import static megamek.common.units.UnitType.MEK;
 import static megamek.common.units.UnitType.TANK;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
@@ -207,15 +206,6 @@ class StratConPirateCaptainBehaviorTest {
         assertTrue(track.getStrategicObjectives().isEmpty(), "nothing is failed");
         generalReport(campaign);
         verify(finances, never()).credit(any(), any(), any(), anyString());
-    }
-
-    @Test
-    void aFormationThatIsNotOnTheGroundCannotRunACaptainDown() {
-        Campaign campaign = deploymentCampaign(AEROSPACE_FIGHTER);
-
-        assertEquals(PointOfInterestDeploymentOutcome.NO_EFFECT, deploy(campaign));
-        assertSame(captain, track.getPointOfInterest(captain.getId()));
-        assertTrue(captain.isActive());
     }
 
     // The fight with the captain

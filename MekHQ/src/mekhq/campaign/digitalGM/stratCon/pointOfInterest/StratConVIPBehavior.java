@@ -40,7 +40,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * The behavior of a VIP: someone the player must extract, placed in place of every point of interest on an Extraction
  * Raid contract. Every VIP is a strategic objective.
  *
- * <p>When a ground formation deploys onto the VIP's hex, the usual scenario roll is made. If no scenario breaks out, the
+ * <p>When any formation deploys onto the VIP's hex, the usual scenario roll is made. If no scenario breaks out, the
  * VIP is extracted on the spot. If one does, a {@value #SCENARIO_TEMPLATE} scenario is fought to get them out: an
  * overall victory extracts them, and anything else - a defeat, a draw, or leaving the scenario unplayed - loses them.
  * Either way the VIP then leaves the map, and their objective is met or failed. Extracting one pays the contract's

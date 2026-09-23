@@ -208,8 +208,8 @@ class StratConDataCacheBehaviorTest {
     // Deployment
 
     @ParameterizedTest
-    @ValueSource(ints = { MEK, TANK, INFANTRY, VTOL })
-    void aGroundFormationSecuresTheCacheWhenNoScenarioBreaksOut(int primaryUnitType) {
+    @ValueSource(ints = { MEK, TANK, INFANTRY, VTOL, CONV_FIGHTER, AEROSPACE_FIGHTER, DROPSHIP })
+    void anyFormationSecuresTheCacheWhenNoScenarioBreaksOut(int primaryUnitType) {
         // Essential Scenarios Only rules out the random scenario, so no scenario can break out.
         Campaign campaign = deploymentCampaign(primaryUnitType, ContractMoraleLevel.STALEMATE, true);
 
@@ -224,25 +224,6 @@ class StratConDataCacheBehaviorTest {
 
         assertEquals(PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO, deploy(campaign));
         assertSecured();
-    }
-
-    @ParameterizedTest
-    @ValueSource(ints = { CONV_FIGHTER, AEROSPACE_FIGHTER, DROPSHIP })
-    void aFormationThatIsNotOnTheGroundCannotRecoverTheCache(int primaryUnitType) {
-        Campaign campaign = deploymentCampaign(primaryUnitType, ContractMoraleLevel.STALEMATE, true);
-
-        assertEquals(PointOfInterestDeploymentOutcome.NO_EFFECT, deploy(campaign));
-        assertUntouched();
-        verify(campaign, never()).addReport(any(), anyString());
-    }
-
-    @Test
-    void aMissingFormationCannotRecoverTheCache() {
-        Campaign campaign = deploymentCampaign(MEK, ContractMoraleLevel.STALEMATE, true);
-        when(campaign.getPlayerForce().getFormation(FORMATION_ID)).thenReturn(null);
-
-        assertEquals(PointOfInterestDeploymentOutcome.NO_EFFECT, deploy(campaign));
-        assertUntouched();
     }
 
     @Test
