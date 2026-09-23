@@ -1638,9 +1638,10 @@ public class StratConRulesManager {
      * Decides whether a formation deploying onto a hex runs into a random scenario.
      *
      * <p>No random scenario is ever rolled under "Essential Scenarios Only", or on a hex already held - by a facility,
-     * whose own rules decide there, or by a point of interest the formation could not follow up. Otherwise a point of interest on the hex may rule the roll out, or make it certain - but not
-     * against a routed enemy, which fields no scenarios at all. Without a point of interest's say, it is the usual roll
-     * against the sector's scenario odds.</p>
+     * whose own rules decide there, or by a point of interest the formation could not follow up. Otherwise a point of
+     * interest on the hex may rule the roll out, or make it certain - but not against a routed enemy, which fields no
+     * scenarios at all. Without a point of interest's say, it is the usual roll against the sector's scenario
+     * odds.</p>
      *
      * @param pointOfInterestOutcome what the points of interest on the hex want done to the roll
      * @param essentialScenariosOnly whether the "Essential Scenarios Only" option is on

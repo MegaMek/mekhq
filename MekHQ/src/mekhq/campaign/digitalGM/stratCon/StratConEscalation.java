@@ -39,6 +39,7 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
+import static mekhq.utilities.ReportingUtilities.getPositiveColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -81,6 +82,8 @@ import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
  *
  * <p>Each ordinary morale check then rolls a die with as many sides as the contract's maximum Escalation. A roll no
  * higher than the current Escalation raises the enemy's morale by one level, on top of whatever the check itself did.
+ * On a Garrison Duty contract the roll cuts both ways: a roll above the current Escalation lowers the enemy's morale by
+ * one level instead, so a garrison that calms the region wears the enemy down rather than merely holding it steady.
  * </p>
  *
  * <p>A Diversionary Raid's strategic objective is to raise Escalation to 50 per point of scale before the contract ends
@@ -315,7 +318,11 @@ public final class StratConEscalation {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void onEmptyHexDeployment(Campaign campaign, AbstractContract contract) {
+    public static void onEmptyHexDeployment(Campaign campaign, @Nullable AbstractContract contract) {
+        if (contract == null) {
+            return;
+        }
+
         if (isDeescalatingContract(contract)) {
             decreaseEscalation(campaign, contract, EMPTY_HEX_DEPLOYMENT_ESCALATION);
         } else {
@@ -336,8 +343,12 @@ public final class StratConEscalation {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void onScenarioCompleted(Campaign campaign, AbstractContract contract, boolean isVictory,
+    public static void onScenarioCompleted(Campaign campaign, @Nullable AbstractContract contract, boolean isVictory,
           boolean isHostileFacilityScenario) {
+        if (contract == null) {
+            return;
+        }
+
         if (isDeescalatingContract(contract)) {
             if (isVictory) {
                 decreaseEscalationByDice(campaign, contract, SCENARIO_WON_DICE);
@@ -371,7 +382,7 @@ public final class StratConEscalation {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void onHighProfileTargetStruck(Campaign campaign, AbstractContract contract) {
+    public static void onHighProfileTargetStruck(Campaign campaign, @Nullable AbstractContract contract) {
         increaseEscalationByDice(campaign, contract, HIGH_PROFILE_TARGET_STRUCK_DICE);
     }
 
@@ -381,7 +392,7 @@ public final class StratConEscalation {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void onTargetSabotaged(Campaign campaign, AbstractContract contract) {
+    public static void onTargetSabotaged(Campaign campaign, @Nullable AbstractContract contract) {
         increaseEscalationByDice(campaign, contract, TARGET_SABOTAGED_DICE);
     }
 
@@ -402,7 +413,7 @@ public final class StratConEscalation {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void onCivilianInfrastructureDestroyed(Campaign campaign, AbstractContract contract) {
+    public static void onCivilianInfrastructureDestroyed(Campaign campaign, @Nullable AbstractContract contract) {
         increaseEscalationByDice(campaign, contract, CIVILIAN_INFRASTRUCTURE_DESTROYED_DICE);
     }
 
@@ -423,7 +434,7 @@ public final class StratConEscalation {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void onTargetPlundered(Campaign campaign, AbstractContract contract) {
+    public static void onTargetPlundered(Campaign campaign, @Nullable AbstractContract contract) {
         increaseEscalationByDice(campaign, contract, TARGET_PLUNDERED_DICE);
     }
 
@@ -433,13 +444,14 @@ public final class StratConEscalation {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void onShowOfForce(Campaign campaign, AbstractContract contract) {
+    public static void onShowOfForce(Campaign campaign, @Nullable AbstractContract contract) {
         decreaseEscalationByDice(campaign, contract, SHOW_OF_FORCE_DICE);
     }
 
     /**
      * Rolls Escalation's part of a morale check: a die with as many sides as the contract's maximum Escalation. A roll
-     * no higher than the current Escalation raises the enemy's morale by one level.
+     * no higher than the current Escalation raises the enemy's morale by one level. On a Garrison Duty contract, a
+     * higher roll lowers it by one level (see {@link #applyMoraleRoll}).
      *
      * @param campaign the current campaign
      * @param contract the contract whose morale is being checked
@@ -460,7 +472,9 @@ public final class StratConEscalation {
 
     /**
      * Applies an Escalation morale roll: if it is no higher than the current Escalation, the enemy's morale rises by
-     * one level.
+     * one level. Otherwise it is left alone - except on a Garrison Duty contract, where it falls by one level instead:
+     * the calmer the region, the likelier the enemy is to lose heart. A fall may rout the enemy; the morale check
+     * handles the rout afterwards, as it does for its own results.
      *
      * @param contract the contract whose morale is being checked; it must have a StratCon state
      * @param roll     the roll, from 1 to the contract's maximum Escalation
@@ -475,16 +489,31 @@ public final class StratConEscalation {
         int escalation = contract.getStratConCampaignState().getEscalation();
         int maximumEscalation = getMaximumEscalation(contract);
 
+        boolean isDeescalating = isDeescalatingContract(contract);
         boolean isMoraleRaised = roll <= escalation;
+        // Only a garrison's roll cuts both ways; elsewhere a miss simply leaves morale alone.
+        boolean isMoraleLowered = !isMoraleRaised && isDeescalating;
+
+        String reportKey;
+        String reportColor;
         if (isMoraleRaised) {
             contract.changeMorale(getRaisedMoraleLevel(contract.getMoraleLevel()));
+            reportKey = "StratConEscalation.moraleRaised";
+            reportColor = getNegativeColor();
+        } else if (isMoraleLowered) {
+            contract.changeMorale(getLoweredMoraleLevel(contract.getMoraleLevel()));
+            reportKey = "StratConEscalation.moraleLowered";
+            reportColor = getPositiveColor();
+        } else {
+            reportKey = "StratConEscalation.moraleUnchanged";
+            reportColor = getWarningColor();
         }
 
         // A garrison's Escalation is unrest rather than fighting, so it has its own wording.
-        String keySuffix = isDeescalatingContract(contract) ? ".garrison.report" : ".report";
+        String keySuffix = isDeescalating ? ".garrison.report" : ".report";
         return getFormattedTextAt(RESOURCE_BUNDLE,
-              (isMoraleRaised ? "StratConEscalation.moraleRaised" : "StratConEscalation.moraleUnchanged") + keySuffix,
-              spanOpeningWithCustomColor(isMoraleRaised ? getNegativeColor() : getWarningColor()),
+              reportKey + keySuffix,
+              spanOpeningWithCustomColor(reportColor),
               CLOSING_SPAN_TAG,
               roll,
               escalation,
@@ -502,6 +531,18 @@ public final class StratConEscalation {
     static ContractMoraleLevel getRaisedMoraleLevel(ContractMoraleLevel moraleLevel) {
         ContractMoraleLevel[] moraleLevels = ContractMoraleLevel.values();
         return moraleLevels[min(moraleLevel.ordinal() + 1, moraleLevels.length - 1)];
+    }
+
+    /**
+     * @param moraleLevel a morale level
+     *
+     * @return the next morale level down, or the same level if it is already the lowest
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static ContractMoraleLevel getLoweredMoraleLevel(ContractMoraleLevel moraleLevel) {
+        return ContractMoraleLevel.values()[max(moraleLevel.ordinal() - 1, 0)];
     }
 
     /**

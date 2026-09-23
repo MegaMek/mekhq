@@ -388,16 +388,32 @@ class StratConEscalationTest {
     }
 
     @Test
-    void aGarrisonsMoraleRollHasItsOwnWording() {
+    void aGarrisonsMoraleRollRaisesMoraleAtOrBelowEscalation() {
         AbstractContract contract = contract(ContractObjectiveType.GARRISON_DUTY);
         campaignState.setEscalation(40);
 
-        String raised = StratConEscalation.applyMoraleRoll(contract, 40);
-        String unchanged = StratConEscalation.applyMoraleRoll(contract, 41);
+        String report = StratConEscalation.applyMoraleRoll(contract, 40);
 
         verify(contract).changeMorale(ContractMoraleLevel.ADVANCING);
-        assertTrue(isResourceKeyValid(raised), "missing resource key: " + raised);
-        assertTrue(isResourceKeyValid(unchanged), "missing resource key: " + unchanged);
+        assertTrue(isResourceKeyValid(report), "missing resource key: " + report);
+    }
+
+    @Test
+    void aGarrisonsMoraleRollLowersMoraleAboveEscalation() {
+        AbstractContract contract = contract(ContractObjectiveType.GARRISON_DUTY);
+        campaignState.setEscalation(40);
+
+        String report = StratConEscalation.applyMoraleRoll(contract, 41);
+
+        verify(contract).changeMorale(ContractMoraleLevel.WEAKENED);
+        assertTrue(isResourceKeyValid(report), "missing resource key: " + report);
+    }
+
+    @Test
+    void moraleFallsOneLevelAndNoFurtherThanRouted() {
+        assertEquals(ContractMoraleLevel.WEAKENED,
+              StratConEscalation.getLoweredMoraleLevel(ContractMoraleLevel.STALEMATE));
+        assertEquals(ContractMoraleLevel.ROUTED, StratConEscalation.getLoweredMoraleLevel(ContractMoraleLevel.ROUTED));
     }
 
     // The Diversionary Raid objective

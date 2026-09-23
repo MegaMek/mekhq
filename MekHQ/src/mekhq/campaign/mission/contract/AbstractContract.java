@@ -1162,9 +1162,22 @@ public abstract class AbstractContract {
         return getObjectiveType().isGarrisonType() && getMoraleLevel().isRouted();
     }
 
+    /**
+     * Sets the contract's start date, and its end date from its length. Moving the start also moves StratCon's
+     * pre-rolled schedule by the same number of days (see {@link StratConCampaignState#shiftScheduledDates}), since
+     * that schedule was rolled from the old start: otherwise, when the start slips to the arrival day, every date
+     * before it would fire at once on arrival and the contract's last weeks would be left short.
+     *
+     * @param localDate the new start date
+     */
     public void setStartAndEndDate(LocalDate localDate) {
+        LocalDate previousStartDate = getStartDate();
         setScheduleData(scheduleData.withStartDate(localDate)
                               .withEndDate(localDate.plusMonths(getLengthInMonths())));
+
+        if ((previousStartDate != null) && (stratConCampaignState != null)) {
+            stratConCampaignState.shiftScheduledDates(ChronoUnit.DAYS.between(previousStartDate, localDate));
+        }
     }
 
     /**

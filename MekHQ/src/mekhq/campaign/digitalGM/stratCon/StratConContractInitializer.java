@@ -627,7 +627,8 @@ public class StratConContractInitializer {
             return;
         }
 
-        int rollCount = isMultiplyTrackIntensityByScale ? contract.getScale() : 1;
+        // A scale-0 contract (auto-scaled from an empty hangar) still rolls once, or it would have no objectives.
+        int rollCount = isMultiplyTrackIntensityByScale ? max(1, contract.getScale()) : 1;
         List<Integer> schedule = TrackIntensityTable.rollSchedule(contract.getLengthInMonths(),
               contract.getTrackCount(),
               rollCount);

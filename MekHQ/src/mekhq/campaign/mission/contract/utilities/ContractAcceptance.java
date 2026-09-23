@@ -54,8 +54,9 @@ import mekhq.gui.dialog.nagDialogs.ContractSpecialMechanicsNagDialog;
  *
  * <p>Acceptance runs as an ordered pipeline: confirm with the player, take the offer off the market and register it as
  * a mission, seed StratCon (unless opted out), pay the employer's transport reimbursement, then start the contract
- * (mothballing and transit), announce it, and brief the player on any special mechanics it brings. The player is not shown transit/mothball prompts here - those choices were
- * already captured by the market dialog's checkboxes and are passed in.</p>
+ * (mothballing and transit), announce it, and brief the player on any special mechanics it brings. The player is not
+ * shown transit/mothball prompts here - those choices were already captured by the market dialog's checkboxes and are
+ * passed in.</p>
  *
  * @author Illiani
  * @since 0.51.01

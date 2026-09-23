@@ -183,6 +183,30 @@ public class StratConCampaignState {
         scheduledPointsOfInterest.add(scheduledPointOfInterest);
     }
 
+    /**
+     * Moves every date still to come in the contract's pre-rolled schedule - its strategic-objective scenarios and its
+     * points of interest - by the given number of days. Used when the contract's start date moves, so the schedule
+     * keeps its place within the contract.
+     *
+     * @param days how many days to move them; negative moves them earlier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void shiftScheduledDates(long days) {
+        if (days == 0) {
+            return;
+        }
+
+        strategicScenarioSpawnDates.replaceAll(spawnDate -> spawnDate.plusDays(days));
+        for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
+            LocalDate spawnDate = scheduledPointOfInterest.getSpawnDate();
+            if (spawnDate != null) {
+                scheduledPointOfInterest.setSpawnDate(spawnDate.plusDays(days));
+            }
+        }
+    }
+
     public int getSupportPoints() {
         return supportPoints;
     }
