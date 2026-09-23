@@ -306,6 +306,7 @@ public class ContractMeterBar extends JPanel {
      * @param escalation        the contract's current Escalation
      * @param maximumEscalation the contract's maximum Escalation
      * @param target            the Escalation the contract's objective asks for, or {@code null} if it has none
+     * @param isDeescalating    whether the contract's Escalation starts at its maximum and only falls (Garrison Duty)
      *
      * @return the configured gauge
      *
@@ -313,7 +314,7 @@ public class ContractMeterBar extends JPanel {
      * @since 0.51.01
      */
     public static @Nonnull ContractMeterBar escalation(final int escalation, final int maximumEscalation,
-          final @Nullable Integer target) {
+          final @Nullable Integer target, final boolean isDeescalating) {
         final int maximum = Math.max(1, maximumEscalation);
         final int clamped = Math.clamp(escalation, 0, maximum);
         final Color markerColor = markerColor();
@@ -326,11 +327,16 @@ public class ContractMeterBar extends JPanel {
         markers.add(new Marker(clamped, Integer.toString(clamped), CURRENT_MARKER_COLOR, MarkerStyle.SOLID, true,
               true));
 
-        final String tooltip = (target == null) ?
-                                     getFormattedTextAt(RESOURCE_BUNDLE, "contractEscalationBar.tooltip", clamped,
-                                           maximum) :
-                                     getFormattedTextAt(RESOURCE_BUNDLE, "contractEscalationBar.tooltip.target",
-                                           clamped, maximum, target);
+        final String tooltip;
+        if (target != null) {
+            tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractEscalationBar.tooltip.target", clamped, maximum,
+                  target);
+        } else {
+            tooltip = getFormattedTextAt(RESOURCE_BUNDLE,
+                  isDeescalating ? "contractEscalationBar.tooltip.garrison" : "contractEscalationBar.tooltip",
+                  clamped,
+                  maximum);
+        }
         return new ContractMeterBar(getTextAt(RESOURCE_BUNDLE, "contractEscalationBar.title.text"), 0, maximum,
               new Color[] { GREEN, GOLD, DEEP_RED }, GREEN.darker(), DEEP_RED.darker(), markers, tooltip);
     }

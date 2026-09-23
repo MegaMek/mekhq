@@ -25,9 +25,10 @@ import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
  * Escalation: how far a raiding or guerrilla contract's hostilities have escalated, and so how hard the enemy is
  * pushing back. It belongs to the "Contracts Use Special Mechanics" option, and to contracts whose objective is a
  * {@link ChaosObjectiveType#RAID raid} or a {@link ChaosObjectiveType#GUERILLA_OPERATION guerrilla operation}, or is
- * Sabotage, Terrorism, or a Pirate Raid.
+ * Sabotage, Terrorism, or a Pirate Raid. Garrison Duty contracts track it too, but the other way around (see below).
  *
- * <p>Escalation runs from 0 to 100 per point of the contract's scale, and only ever rises:</p>
+ * <p>Escalation runs from 0 to 100 per point of the contract's scale. On most contracts it starts at 0 and only ever
+ * rises:</p>
  *
  * <ul>
  *     <li>deploying a force to an empty hex, with no scenario resulting: +1</li>
@@ -35,6 +36,16 @@ import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
  *     <li>fighting at a hostile facility: +2d6, or +3d6 if the fight is won (in place of the +1d6 for winning)</li>
  *     <li>striking a high profile target: +3d6 (see
  *     {@link mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConHighProfileTargetBehavior})</li>
+ * </ul>
+ *
+ * <p>On a Garrison Duty contract, Escalation is the unrest the garrison must calm. It starts at its maximum and only
+ * ever falls - nothing raises it:</p>
+ *
+ * <ul>
+ *     <li>deploying a force to an empty hex, with no scenario resulting: -1</li>
+ *     <li>winning a scenario: -1d6</li>
+ *     <li>making a show of force: -3d6 (see
+ *     {@link mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConShowOfForceBehavior})</li>
  * </ul>
  *
  * <p>Each ordinary morale check then rolls a die with as many sides as the contract's maximum Escalation. A roll no
@@ -56,7 +67,8 @@ public final class StratConEscalation {
     /** The Escalation a Diversionary Raid must reach, per point of the contract's scale. */
     public static final int DIVERSIONARY_RAID_TARGET_PER_SCALE = 50;
 
-    /** The Escalation a deployment to an empty hex adds, when no scenario results. */
+    /** The Escalation a deployment to an empty hex adds (or, on a Garrison Duty contract, removes), when no scenario
+     * results. */
     public static final int EMPTY_HEX_DEPLOYMENT_ESCALATION = 1;
 
     private StratConEscalation() {
@@ -84,7 +96,7 @@ public final class StratConEscalation {
      * @param contract the contract
      *
      * @return {@code true} if the contract is one that tracks Escalation: a raid or a guerrilla operation, or a
-     *       Sabotage, Terrorism, or Pirate Raid contract
+     *       Sabotage, Terrorism, Pirate Raid, or Garrison Duty contract
      *
      * @author Illiani
      * @since 0.51.01
@@ -95,6 +107,10 @@ public final class StratConEscalation {
             return false;
         }
 
+        if (isDeescalatingContract(contract)) {
+            return true;
+        }
+
         if (objectiveType.isSabotage() || objectiveType.isTerrorism() || objectiveType.isPirateRaid()) {
             return true;
         }
@@ -102,6 +118,36 @@ public final class StratConEscalation {
         ChaosObjectiveType chaosObjectiveType = objectiveType.getChaosObjectiveType();
         return (chaosObjectiveType == ChaosObjectiveType.RAID)
                      || (chaosObjectiveType == ChaosObjectiveType.GUERILLA_OPERATION);
+    }
+
+    /**
+     * @param contract the contract
+     *
+     * @return {@code true} if the contract's Escalation runs the other way around: it starts at its maximum and only
+     *       ever falls. That is a Garrison Duty contract, whose garrison must calm the unrest around it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isDeescalatingContract(AbstractContract contract) {
+        ContractObjectiveType objectiveType = contract.getObjectiveType();
+        return (objectiveType != null) && objectiveType.isGarrisonDuty();
+    }
+
+    /**
+     * Starts a newly accepted Garrison Duty contract's Escalation at its maximum (see
+     * {@link #isDeescalatingContract}). Does nothing for any other contract, whose Escalation starts at 0.
+     *
+     * @param contract      the contract being accepted
+     * @param campaignState its StratCon state
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void startEscalation(AbstractContract contract, StratConCampaignState campaignState) {
+        if (isDeescalatingContract(contract)) {
+            campaignState.setEscalation(getMaximumEscalation(contract));
+        }
     }
 
     /**
@@ -130,7 +176,8 @@ public final class StratConEscalation {
 
     /**
      * Raises the contract's Escalation, capped at its maximum, and brings any Escalation objectives up to date. Does
-     * nothing if the contract does not track Escalation (see {@link #isEscalationUsed}).
+     * nothing if the contract does not track Escalation (see {@link #isEscalationUsed}), or if its Escalation only ever
+     * falls (see {@link #isDeescalatingContract}).
      *
      * @param campaign the current campaign
      * @param contract the contract
@@ -140,7 +187,7 @@ public final class StratConEscalation {
      * @since 0.51.01
      */
     public static void increaseEscalation(Campaign campaign, @Nullable AbstractContract contract, int amount) {
-        if ((amount <= 0) || !isEscalationUsed(campaign, contract)) {
+        if ((amount <= 0) || !isEscalationUsed(campaign, contract) || isDeescalatingContract(contract)) {
             return;
         }
 
@@ -150,6 +197,31 @@ public final class StratConEscalation {
 
         // Escalation often rises after the event that prompted it has already refreshed the display - a deployment's
         // event fires before its outcome is known - so announce the change itself.
+        MekHQ.triggerEvent(new MissionChangedEvent(contract));
+    }
+
+    /**
+     * Lowers a Garrison Duty contract's Escalation, to no less than 0. Does nothing if the contract does not track
+     * Escalation (see {@link #isEscalationUsed}), or if its Escalation only ever rises (see
+     * {@link #isDeescalatingContract}).
+     *
+     * @param campaign the current campaign
+     * @param contract the contract
+     * @param amount   how much to lower it by; nothing happens if this is not positive
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void decreaseEscalation(Campaign campaign, @Nullable AbstractContract contract, int amount) {
+        if ((amount <= 0) || !isEscalationUsed(campaign, contract) || !isDeescalatingContract(contract)) {
+            return;
+        }
+
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        campaignState.setEscalation(max(0, campaignState.getEscalation() - amount));
+        updateEscalationObjectives(campaignState);
+
+        // As with a rise, the event that prompted the fall has usually already refreshed the display.
         MekHQ.triggerEvent(new MissionChangedEvent(contract));
     }
 
@@ -171,18 +243,23 @@ public final class StratConEscalation {
 
     /**
      * A force has deployed to an empty hex - one with no scenario, facility, or point of interest - and no scenario
-     * resulted: +1 Escalation.
+     * resulted: +1 Escalation, or -1 on a Garrison Duty contract.
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static void onEmptyHexDeployment(Campaign campaign, AbstractContract contract) {
-        increaseEscalation(campaign, contract, EMPTY_HEX_DEPLOYMENT_ESCALATION);
+        if (isDeescalatingContract(contract)) {
+            decreaseEscalation(campaign, contract, EMPTY_HEX_DEPLOYMENT_ESCALATION);
+        } else {
+            increaseEscalation(campaign, contract, EMPTY_HEX_DEPLOYMENT_ESCALATION);
+        }
     }
 
     /**
      * A scenario has been resolved: +1d6 Escalation for a win; or, for a fight at a hostile facility, +2d6, or +3d6 if
-     * it was won.
+     * it was won. On a Garrison Duty contract, a win - wherever it was fought - lowers Escalation by 1d6 instead, and a
+     * loss does nothing.
      *
      * @param campaign                  the current campaign
      * @param contract                  the contract the scenario belongs to
@@ -194,6 +271,13 @@ public final class StratConEscalation {
      */
     public static void onScenarioCompleted(Campaign campaign, AbstractContract contract, boolean isVictory,
           boolean isHostileFacilityScenario) {
+        if (isDeescalatingContract(contract)) {
+            if (isVictory) {
+                decreaseEscalation(campaign, contract, d6(1));
+            }
+            return;
+        }
+
         increaseEscalation(campaign, contract, getScenarioEscalation(isVictory, isHostileFacilityScenario));
     }
 
@@ -251,6 +335,16 @@ public final class StratConEscalation {
     }
 
     /**
+     * A show of force has been made without an ambush: -3d6 Escalation on a Garrison Duty contract.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void onShowOfForce(Campaign campaign, AbstractContract contract) {
+        decreaseEscalation(campaign, contract, d6(3));
+    }
+
+    /**
      * Rolls Escalation's part of a morale check: a die with as many sides as the contract's maximum Escalation. A roll
      * no higher than the current Escalation raises the enemy's morale by one level.
      *
@@ -293,8 +387,10 @@ public final class StratConEscalation {
             contract.changeMorale(getRaisedMoraleLevel(contract.getMoraleLevel()));
         }
 
+        // A garrison's Escalation is unrest rather than fighting, so it has its own wording.
+        String keySuffix = isDeescalatingContract(contract) ? ".garrison.report" : ".report";
         return getFormattedTextAt(RESOURCE_BUNDLE,
-              isMoraleRaised ? "StratConEscalation.moraleRaised.report" : "StratConEscalation.moraleUnchanged.report",
+              (isMoraleRaised ? "StratConEscalation.moraleRaised" : "StratConEscalation.moraleUnchanged") + keySuffix,
               spanOpeningWithCustomColor(isMoraleRaised ? getNegativeColor() : getWarningColor()),
               CLOSING_SPAN_TAG,
               roll,

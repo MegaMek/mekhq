@@ -640,7 +640,8 @@ public class StratConTab extends CampaignGuiTab {
         escalationPanel.setVisible(true);
         escalationPanel.add(ContractMeterBar.escalation(campaignState.getEscalation(),
               StratConEscalation.getMaximumEscalation(currentContract),
-              StratConEscalation.getEscalationTarget(campaignState)), BorderLayout.CENTER);
+              StratConEscalation.getEscalationTarget(campaignState),
+              StratConEscalation.isDeescalatingContract(currentContract)), BorderLayout.CENTER);
 
         escalationPanel.revalidate();
         escalationPanel.repaint();

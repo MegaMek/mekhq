@@ -208,7 +208,7 @@ class StratConDataCacheSchedulingTest {
 
     @Test
     void otherContractTypesNeverGetDataCaches() {
-        List<StratConScheduledPointOfInterest> scheduled = schedule(contract(ContractObjectiveType.GARRISON_DUTY, 1),
+        List<StratConScheduledPointOfInterest> scheduled = schedule(contract(ContractObjectiveType.PIRATE_HUNTING, 1),
               true,
               true);
 
@@ -329,8 +329,11 @@ class StratConDataCacheSchedulingTest {
         assertEquals(StratConBeleagueredForcesBehavior.TYPE_ID,
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.RELIEF_DUTY, 1), true));
+        assertEquals(StratConShowOfForceBehavior.TYPE_ID,
+              StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.GARRISON_DUTY, 1), true));
         assertNull(StratConContractInitializer.getSpecialPointOfInterestTypeId(
-              contract(ContractObjectiveType.GARRISON_DUTY, 1), true));
+              contract(ContractObjectiveType.PIRATE_HUNTING, 1), true));
     }
 
     @Test
@@ -357,6 +360,14 @@ class StratConDataCacheSchedulingTest {
         assertTrue(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), true));
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), false),
               "without special mechanics, the contract keeps its Essential scenarios");
+    }
+
+    @Test
+    void showsOfForceKeepEssentialScenariosAndAreNotObjectives() {
+        assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
+              contract(ContractObjectiveType.GARRISON_DUTY, 1), true));
+        assertFalse(StratConContractInitializer.isSpecialPointOfInterestObjective(StratConShowOfForceBehavior.TYPE_ID),
+              "a show of force only calms Escalation");
     }
 
     @Test
@@ -557,7 +568,7 @@ class StratConDataCacheSchedulingTest {
     @Test
     void aContractWithoutSpecialPointsOfInterestKeepsItsEssentialScenarios() {
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
-              contract(ContractObjectiveType.GARRISON_DUTY, 1), true));
+              contract(ContractObjectiveType.PIRATE_HUNTING, 1), true));
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract(null, 1), true));
     }
 

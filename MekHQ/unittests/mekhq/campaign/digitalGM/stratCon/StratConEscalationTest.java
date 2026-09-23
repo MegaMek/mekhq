@@ -22,10 +22,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 /**
- * Tests for Escalation: which contracts track it, its maximum, what raises it and by how much, its part in the morale
- * check, and the Diversionary Raid's Escalation objective.
+ * Tests for Escalation: which contracts track it, its maximum, what raises it and by how much, a Garrison Duty
+ * contract's Escalation starting at its maximum and only falling, its part in the morale check, and the Diversionary
+ * Raid's Escalation objective.
  *
  * @author Illiani
  * @since 0.51.01
@@ -75,14 +77,14 @@ class StratConEscalationTest {
     @ParameterizedTest
     @EnumSource(value = ContractObjectiveType.class,
           names = { "DIVERSIONARY_RAID", "EXTRACTION_RAID", "OBJECTIVE_RAID", "OBSERVATION_RAID", "RECON_RAID",
-                    "GUERRILLA_WARFARE", "ASSASSINATION", "SABOTAGE", "TERRORISM", "PIRATE_RAID" })
-    void raidsGuerrillaOperationsSabotageTerrorismAndPirateRaidsTrackEscalation(ContractObjectiveType objectiveType) {
+                    "GUERRILLA_WARFARE", "ASSASSINATION", "SABOTAGE", "TERRORISM", "PIRATE_RAID", "GARRISON_DUTY" })
+    void raidsGuerrillaOperationsSabotageTerrorismPirateRaidsAndGarrisonsTrackEscalation(ContractObjectiveType objectiveType) {
         assertTrue(StratConEscalation.isEscalationContract(contract(objectiveType)));
         assertTrue(StratConEscalation.isEscalationUsed(campaign(true), contract(objectiveType)));
     }
 
     @ParameterizedTest
-    @EnumSource(value = ContractObjectiveType.class, names = { "GARRISON_DUTY", "ESPIONAGE", "UNDEFINED" })
+    @EnumSource(value = ContractObjectiveType.class, names = { "PIRATE_HUNTING", "ESPIONAGE", "UNDEFINED" })
     void otherContractsDoNotTrackEscalation(ContractObjectiveType objectiveType) {
         assertFalse(StratConEscalation.isEscalationContract(contract(objectiveType)));
     }
@@ -135,7 +137,7 @@ class StratConEscalationTest {
     @Test
     void escalationDoesNotRiseOnContractsThatDoNotTrackIt() {
         StratConEscalation.increaseEscalation(campaign(false), contract(ContractObjectiveType.RECON_RAID), 5);
-        StratConEscalation.increaseEscalation(campaign(true), contract(ContractObjectiveType.GARRISON_DUTY), 5);
+        StratConEscalation.increaseEscalation(campaign(true), contract(ContractObjectiveType.ESPIONAGE), 5);
 
         assertEquals(0, campaignState.getEscalation());
     }
@@ -229,6 +231,114 @@ class StratConEscalationTest {
     @Test
     void contractsThatDoNotTrackEscalationRollNothing() {
         assertNull(StratConEscalation.rollForMorale(campaign(false), contract(ContractObjectiveType.RECON_RAID)));
+    }
+
+    // Garrison Duty: Escalation starts at its maximum and only falls
+
+    @Test
+    void onlyGarrisonDutyDeescalates() {
+        assertTrue(StratConEscalation.isDeescalatingContract(contract(ContractObjectiveType.GARRISON_DUTY)));
+        assertFalse(StratConEscalation.isDeescalatingContract(contract(ContractObjectiveType.RECON_RAID)));
+        assertFalse(StratConEscalation.isDeescalatingContract(contract(null)));
+    }
+
+    @Test
+    void aGarrisonStartsAtMaximumEscalation() {
+        StratConEscalation.startEscalation(contract(ContractObjectiveType.GARRISON_DUTY), campaignState);
+
+        assertEquals(100 * SCALE, campaignState.getEscalation());
+    }
+
+    @Test
+    void otherContractsStartAtNoEscalation() {
+        StratConEscalation.startEscalation(contract(ContractObjectiveType.RECON_RAID), campaignState);
+
+        assertEquals(0, campaignState.getEscalation());
+    }
+
+    @Test
+    void nothingRaisesAGarrisonsEscalation() {
+        AbstractContract contract = contract(ContractObjectiveType.GARRISON_DUTY);
+        campaignState.setEscalation(50);
+
+        StratConEscalation.increaseEscalation(campaign(true), contract, 20);
+        StratConEscalation.onHighProfileTargetStruck(campaign(true), contract);
+
+        assertEquals(50, campaignState.getEscalation());
+    }
+
+    @Test
+    void deployingToAnEmptyHexLowersAGarrisonsEscalationByOne() {
+        campaignState.setEscalation(50);
+
+        StratConEscalation.onEmptyHexDeployment(campaign(true), contract(ContractObjectiveType.GARRISON_DUTY));
+
+        assertEquals(49, campaignState.getEscalation());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void winningAScenarioLowersAGarrisonsEscalationByOneDie(boolean isHostileFacilityScenario) {
+        campaignState.setEscalation(50);
+
+        StratConEscalation.onScenarioCompleted(campaign(true), contract(ContractObjectiveType.GARRISON_DUTY), true,
+              isHostileFacilityScenario);
+
+        int escalation = campaignState.getEscalation();
+        assertTrue((escalation >= 44) && (escalation <= 49), "-1d6 Escalation, got " + escalation);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = { false, true })
+    void losingAScenarioLeavesAGarrisonsEscalationAlone(boolean isHostileFacilityScenario) {
+        campaignState.setEscalation(50);
+
+        StratConEscalation.onScenarioCompleted(campaign(true), contract(ContractObjectiveType.GARRISON_DUTY), false,
+              isHostileFacilityScenario);
+
+        assertEquals(50, campaignState.getEscalation());
+    }
+
+    @Test
+    void aShowOfForceLowersAGarrisonsEscalationByThreeToEighteen() {
+        campaignState.setEscalation(50);
+
+        StratConEscalation.onShowOfForce(campaign(true), contract(ContractObjectiveType.GARRISON_DUTY));
+
+        int escalation = campaignState.getEscalation();
+        assertTrue((escalation >= 32) && (escalation <= 47), "-3d6 Escalation, got " + escalation);
+    }
+
+    @Test
+    void aGarrisonsEscalationStopsAtZero() {
+        campaignState.setEscalation(2);
+
+        StratConEscalation.decreaseEscalation(campaign(true), contract(ContractObjectiveType.GARRISON_DUTY), 10);
+
+        assertEquals(0, campaignState.getEscalation());
+    }
+
+    @Test
+    void onlyAGarrisonsEscalationFalls() {
+        campaignState.setEscalation(50);
+
+        StratConEscalation.decreaseEscalation(campaign(true), contract(ContractObjectiveType.RECON_RAID), 10);
+        StratConEscalation.decreaseEscalation(campaign(false), contract(ContractObjectiveType.GARRISON_DUTY), 10);
+
+        assertEquals(50, campaignState.getEscalation());
+    }
+
+    @Test
+    void aGarrisonsMoraleRollHasItsOwnWording() {
+        AbstractContract contract = contract(ContractObjectiveType.GARRISON_DUTY);
+        campaignState.setEscalation(40);
+
+        String raised = StratConEscalation.applyMoraleRoll(contract, 40);
+        String unchanged = StratConEscalation.applyMoraleRoll(contract, 41);
+
+        verify(contract).changeMorale(ContractMoraleLevel.ADVANCING);
+        assertTrue(isResourceKeyValid(raised), "missing resource key: " + raised);
+        assertTrue(isResourceKeyValid(unchanged), "missing resource key: " + unchanged);
     }
 
     // The Diversionary Raid objective

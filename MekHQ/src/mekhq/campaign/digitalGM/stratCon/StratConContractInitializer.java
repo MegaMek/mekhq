@@ -358,6 +358,11 @@ public class StratConContractInitializer {
                 StratConEscalation.addDiversionaryRaidObjective(contract, campaignState);
             }
 
+            // A Garrison Duty contract starts with its Escalation - the unrest the garrison must calm - at its maximum.
+            if (isContractsUseSpecialMechanics) {
+                StratConEscalation.startEscalation(contract, campaignState);
+            }
+
             // A Recon Raid's sectors must each be scouted, alongside its Essential scenarios.
             if (StratConReconnaissance.usesReconnaissance(contract, isContractsUseSpecialMechanics)) {
                 StratConReconnaissance.addReconnaissanceObjectives(campaignState);
@@ -540,6 +545,7 @@ public class StratConContractInitializer {
      *     <li>Security Duty: security reviews (see {@link StratConSecurityReviewBehavior})</li>
      *     <li>Pirate Raid: plunder targets (see {@link StratConPlunderTargetBehavior})</li>
      *     <li>Objective Raid: target intelligence (see {@link StratConTargetIntelligenceBehavior})</li>
+     *     <li>Garrison Duty: shows of force (see {@link StratConShowOfForceBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -630,6 +636,10 @@ public class StratConContractInitializer {
             return StratConTargetIntelligenceBehavior.TYPE_ID;
         }
 
+        if (objectiveType.isGarrisonDuty()) {
+            return StratConShowOfForceBehavior.TYPE_ID;
+        }
+
         return null;
     }
 
@@ -637,9 +647,9 @@ public class StratConContractInitializer {
      * Decides whether a contract's special points of interest (see {@link #getSpecialPointOfInterestTypeId}) replace
      * its Essential scenarios. Most do: such a contract gets no Essential scenarios, and the combat bonus is paid for
      * each special point of interest dealt with instead. Beleaguered forces, training maneuvers, high profile targets,
-     * strategic positions, security reviews, and target intelligence do not - Relief Duty, Cadre Duty, Diversionary
-     * Raid, Planetary Assault, Security Duty, and Objective Raid contracts keep their Essential scenarios alongside
-     * them.
+     * strategic positions, security reviews, target intelligence, and shows of force do not - Relief Duty, Cadre Duty,
+     * Diversionary Raid, Planetary Assault, Security Duty, Objective Raid, and Garrison Duty contracts keep their
+     * Essential scenarios alongside them.
      *
      * @param contract                       the contract
      * @param isContractsUseSpecialMechanics whether the "Contracts Use Special Mechanics" option is on
@@ -658,13 +668,15 @@ public class StratConContractInitializer {
                      && !StratConHighProfileTargetBehavior.TYPE_ID.equals(specialTypeId)
                      && !StratConStrategicPositionBehavior.TYPE_ID.equals(specialTypeId)
                      && !StratConSecurityReviewBehavior.TYPE_ID.equals(specialTypeId)
-                     && !StratConTargetIntelligenceBehavior.TYPE_ID.equals(specialTypeId);
+                     && !StratConTargetIntelligenceBehavior.TYPE_ID.equals(specialTypeId)
+                     && !StratConShowOfForceBehavior.TYPE_ID.equals(specialTypeId);
     }
 
     /**
      * Decides whether a special point of interest type is a strategic objective. Every one is, except high profile
-     * targets - a Diversionary Raid's objective is its Escalation instead (see {@link StratConEscalation}) - and target
-     * intelligence, whose objectives are the facilities it leads to.
+     * targets - a Diversionary Raid's objective is its Escalation instead (see {@link StratConEscalation}) - target
+     * intelligence, whose objectives are the facilities it leads to, and shows of force, which only calm a Garrison
+     * Duty contract's Escalation.
      *
      * @param typeId the type ID of a special point of interest
      *
@@ -676,7 +688,8 @@ public class StratConContractInitializer {
     // Package-private rather than private so the decision can be tested directly.
     static boolean isSpecialPointOfInterestObjective(String typeId) {
         return !StratConHighProfileTargetBehavior.TYPE_ID.equals(typeId)
-                     && !StratConTargetIntelligenceBehavior.TYPE_ID.equals(typeId);
+                     && !StratConTargetIntelligenceBehavior.TYPE_ID.equals(typeId)
+                     && !StratConShowOfForceBehavior.TYPE_ID.equals(typeId);
     }
 
     /**
