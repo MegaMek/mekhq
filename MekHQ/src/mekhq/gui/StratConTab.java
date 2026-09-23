@@ -70,6 +70,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConEscalation;
+import mekhq.campaign.digitalGM.stratCon.StratConReconnaissance;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConStrategicObjective;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -123,6 +124,7 @@ public class StratConTab extends CampaignGuiTab {
     private JPanel supportPointsPanel;
     private JPanel victoryPointsPanel;
     private JPanel escalationPanel;
+    private JPanel reconnaissancePanel;
     private JScrollPane expandedObjectivePanel;
     private boolean objectivesCollapsed = false;
 
@@ -248,12 +250,13 @@ public class StratConTab extends CampaignGuiTab {
         // drawn on the map (see StratConPanel).
 
         // Bars stack at the top: threat, deployment time, support points, victory points, and - for contracts that
-        // track it - Escalation.
+        // track them - Escalation and the selected sector's reconnaissance.
         threatLevelPanel = addBarPanel(constraints, gridY++);
         deploymentTimePanel = addBarPanel(constraints, gridY++);
         supportPointsPanel = addBarPanel(constraints, gridY++);
         victoryPointsPanel = addBarPanel(constraints, gridY++);
         escalationPanel = addBarPanel(constraints, gridY++);
+        reconnaissancePanel = addBarPanel(constraints, gridY++);
 
         // Add the objectives panel below the bars. Its height tracks the objective content (see applyObjectiveText) so
         // it is only as tall as it needs to be; the scroll pane remains as a safety net for unusually long lists.
@@ -565,6 +568,7 @@ public class StratConTab extends CampaignGuiTab {
         updateSupportPointsBar();
         updateVictoryPointsBar(campaignState);
         updateEscalationBar(campaignState);
+        updateReconnaissanceBar(currentSectorTrack);
 
         if (currentSectorTrack != null) {
             applyObjectiveText(getStrategicObjectiveText(campaignState, currentSectorTrack));
@@ -586,6 +590,34 @@ public class StratConTab extends CampaignGuiTab {
         supportPointsPanel.setVisible(false);
         victoryPointsPanel.setVisible(false);
         escalationPanel.setVisible(false);
+        reconnaissancePanel.setVisible(false);
+    }
+
+    /**
+     * Refreshes the reconnaissance bar shown below the Escalation bar: how much of the selected sector's land has been
+     * scouted, for sectors with a reconnaissance objective (see {@link StratConReconnaissance}); hidden for every other
+     * sector.
+     *
+     * @param track the currently selected sector's track, or {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void updateReconnaissanceBar(StratConTrackState track) {
+        reconnaissancePanel.removeAll();
+
+        if ((track == null) || (StratConReconnaissance.getObjective(track) == null)) {
+            reconnaissancePanel.setVisible(false);
+            return;
+        }
+
+        reconnaissancePanel.setVisible(true);
+        reconnaissancePanel.add(ContractMeterBar.reconnaissance(StratConReconnaissance.getScoutedHexCount(track),
+              StratConReconnaissance.getLandHexCount(track),
+              StratConReconnaissance.getRequiredHexCount(track)), BorderLayout.CENTER);
+
+        reconnaissancePanel.revalidate();
+        reconnaissancePanel.repaint();
     }
 
     /**
@@ -921,6 +953,12 @@ public class StratConTab extends CampaignGuiTab {
                     sb.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.objectives.escalation",
                           String.valueOf(objective.getCurrentObjectiveCount()),
                           String.valueOf(objective.getDesiredObjectiveCount())));
+                    break;
+                case Reconnaissance:
+                    sb.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.objectives.reconnaissance",
+                          String.valueOf(objective.getCurrentObjectiveCount()),
+                          String.valueOf(objective.getDesiredObjectiveCount()),
+                          track.getDisplayableName()));
                     break;
                 default:
                     break;

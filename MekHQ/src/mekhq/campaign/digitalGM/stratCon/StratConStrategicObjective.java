@@ -104,7 +104,7 @@ public class StratConStrategicObjective {
 
     public boolean isObjectiveFailed(StratConTrackState trackState) {
         return switch (getObjectiveType()) {
-            case AnyScenarioVictory, SpecificScenarioVictory, Escalation ->
+            case AnyScenarioVictory, SpecificScenarioVictory, Escalation, Reconnaissance ->
                 // you can fail this if the scenario goes away somehow
                   getCurrentObjectiveCount() == OBJECTIVE_FAILED;
             case AlliedFacilityControl, HostileFacilityControl -> {
@@ -130,6 +130,11 @@ public class StratConStrategicObjective {
             case AnyScenarioVictory, SpecificScenarioVictory, Escalation ->
                 // this is set once qualifying scenarios are completed (or, for Escalation, follows the contract's)
                   getCurrentObjectiveCount() >= getDesiredObjectiveCount();
+            case Reconnaissance -> {
+                // the counts follow the sector's map, so bring them up to date before judging
+                StratConReconnaissance.updateObjective(this, trackState);
+                yield getCurrentObjectiveCount() >= getDesiredObjectiveCount();
+            }
             case AlliedFacilityControl -> {
                 // this is "ok" if the facility exists and is under allied control
                 StratConFacility alliedFacility = trackState.getFacility(getObjectiveCoords());

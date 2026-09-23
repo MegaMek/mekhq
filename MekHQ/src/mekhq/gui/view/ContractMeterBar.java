@@ -336,6 +336,37 @@ public class ContractMeterBar extends JPanel {
     }
 
     /**
+     * Creates a reconnaissance gauge of how much of a sector's land has been scouted, running from 0 to its land hexes.
+     * More scouting is better, so it runs red to green, with a tick at the count its objective requires.
+     *
+     * @param scoutedHexes  the sector's land hexes scouted so far
+     * @param landHexes     the sector's land (non-ocean) hexes
+     * @param requiredHexes the land hexes the sector's objective requires to be scouted
+     *
+     * @return the configured gauge
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nonnull ContractMeterBar reconnaissance(final int scoutedHexes, final int landHexes,
+          final int requiredHexes) {
+        final int maximum = Math.max(1, landHexes);
+        final int clamped = Math.clamp(scoutedHexes, 0, maximum);
+        final Color markerColor = markerColor();
+        final List<Marker> markers = new ArrayList<>(4);
+        markers.add(new Marker(maximum, Integer.toString(landHexes), markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(0, "0", markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(requiredHexes, Integer.toString(requiredHexes), markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(clamped, Integer.toString(clamped), CURRENT_MARKER_COLOR, MarkerStyle.SOLID, true,
+              true));
+
+        final String tooltip = getFormattedTextAt(RESOURCE_BUNDLE, "contractReconnaissanceBar.tooltip", clamped,
+              landHexes, requiredHexes);
+        return new ContractMeterBar(getTextAt(RESOURCE_BUNDLE, "contractReconnaissanceBar.title.text"), 0, maximum,
+              new Color[] { DEEP_RED, GOLD, GREEN }, DEEP_RED.darker(), GREEN.darker(), markers, tooltip);
+    }
+
+    /**
      * Creates a deployment-time gauge running from 0 to 10, where a longer deployment is worse, so the gradient is
      * reversed (green on the left, red on the right). The marker is positioned within the 0..10 track but labelled with
      * the actual day count.

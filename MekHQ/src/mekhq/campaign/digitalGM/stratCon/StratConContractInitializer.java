@@ -357,6 +357,11 @@ public class StratConContractInitializer {
             if (isContractsUseSpecialMechanics && contract.getObjectiveType().isDiversionaryRaid()) {
                 StratConEscalation.addDiversionaryRaidObjective(contract, campaignState);
             }
+
+            // A Recon Raid's sectors must each be scouted, alongside its Essential scenarios.
+            if (StratConReconnaissance.usesReconnaissance(contract, isContractsUseSpecialMechanics)) {
+                StratConReconnaissance.addReconnaissanceObjectives(campaignState);
+            }
         }
 
         // Required victory points depend on the StratCon state
@@ -455,8 +460,8 @@ public class StratConContractInitializer {
      *
      * <p>When the "Contracts Use Special Mechanics" option is on, a contract type with a special point of interest (see
      * {@link #getSpecialPointOfInterestTypeId}) ignores its definition's points of interest and schedules its special
-     * ones instead (see {@link #scheduleSpecialPointsOfInterest}). With it off, every contract schedules its
-     * definition's points of interest.</p>
+     * ones instead (see {@link #scheduleSpecialPointsOfInterest}), and a Recon Raid schedules none at all (see
+     * {@link StratConReconnaissance}). With it off, every contract schedules its definition's points of interest.</p>
      *
      * <p>Does nothing if the contract asks for no points of interest, or has no settled start date.</p>
      *
@@ -473,6 +478,11 @@ public class StratConContractInitializer {
     static void schedulePointsOfInterest(AbstractContract contract, StratConContractDefinition contractDefinition,
           StratConCampaignState campaignState, boolean isMultiplyTrackIntensityByScale,
           boolean isContractsUseSpecialMechanics) {
+        // A Recon Raid using special mechanics has no points of interest at all: its sectors are scouted instead.
+        if (StratConReconnaissance.usesReconnaissance(contract, isContractsUseSpecialMechanics)) {
+            return;
+        }
+
         String specialTypeId = getSpecialPointOfInterestTypeId(contract, isContractsUseSpecialMechanics);
         if (specialTypeId != null) {
             scheduleSpecialPointsOfInterest(contract, campaignState, isMultiplyTrackIntensityByScale, specialTypeId);

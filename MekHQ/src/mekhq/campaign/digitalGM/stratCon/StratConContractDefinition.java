@@ -163,7 +163,14 @@ public class StratConContractDefinition {
          * {@link StratConEscalation}). Added in code, not by contract definitions; its current count follows the
          * contract's Escalation.
          */
-        Escalation
+        Escalation,
+
+        /**
+         * Scouting at least half of a sector's land (non-ocean) hexes before the contract ends (see
+         * {@link StratConReconnaissance}). Added in code, one per sector, not by contract definitions; its counts follow
+         * the sector's map, and once met it stays met.
+         */
+        Reconnaissance
     }
 
     private String contractTypeName;
