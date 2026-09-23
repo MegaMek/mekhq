@@ -71,6 +71,7 @@ public final class StratConPointOfInterestBehaviors {
         behaviors.put(StratConHighProfileTargetBehavior.BEHAVIOR_ID, new StratConHighProfileTargetBehavior());
         behaviors.put(StratConVIPBehavior.BEHAVIOR_ID, new StratConVIPBehavior());
         behaviors.put(StratConStrategicPositionBehavior.BEHAVIOR_ID, new StratConStrategicPositionBehavior());
+        behaviors.put(StratConScheduledParadeBehavior.BEHAVIOR_ID, new StratConScheduledParadeBehavior());
     }
 
     private StratConPointOfInterestBehaviors() {

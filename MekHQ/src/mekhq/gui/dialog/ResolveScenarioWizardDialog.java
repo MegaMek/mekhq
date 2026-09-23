@@ -85,6 +85,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.utilities.MHQMorale;
 import mekhq.campaign.mission.contract.utilities.SalvageUtilities;
 import mekhq.campaign.mission.scenarios.AtBScenario;
@@ -1699,8 +1700,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
         this.setVisible(false);
 
         if (tracker.getScenario() instanceof AtBScenario atBScenario) {
-            if (atBScenario.getStratConScenarioType().isScenarioOutcomeAffectsMorale()) {
-                MHQMorale.processMoraleChangeFromScenario(campaign, atBScenario.getContract(campaign),
+            AbstractContract contract = atBScenario.getContract(campaign);
+            if (MHQMorale.isScenarioOutcomeAffectingMorale(atBScenario.getStratConScenarioType(), contract)) {
+                MHQMorale.processMoraleChangeFromScenario(campaign, contract,
                       atBScenario.getStatus(), atBScenario.getStratConScenarioType());
             }
         }

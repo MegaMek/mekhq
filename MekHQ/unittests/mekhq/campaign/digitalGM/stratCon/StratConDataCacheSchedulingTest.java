@@ -352,7 +352,7 @@ class StratConDataCacheSchedulingTest {
     @ParameterizedTest
     @EnumSource(value = ContractObjectiveType.class,
           names = { "ESPIONAGE", "GUERRILLA_WARFARE", "MOLE_HUNTING", "ASSASSINATION", "OBSERVATION_RAID",
-                    "EXTRACTION_RAID" })
+                    "EXTRACTION_RAID", "RETAINER" })
     void specialPointsOfInterestReplaceEssentialScenarios(ContractObjectiveType objectiveType) {
         assertTrue(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), true));
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), false),
@@ -386,6 +386,22 @@ class StratConDataCacheSchedulingTest {
         assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(StratConVIPBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertTrue(pointOfInterest.isStrategicObjective());
+        }
+    }
+
+    @Test
+    void aRetainerContractSchedulesOnlyScheduledParadesEachAnObjective() {
+        assertEquals(StratConScheduledParadeBehavior.TYPE_ID,
+              StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.RETAINER, 1), true));
+
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.RETAINER, 1), true, true);
+
+        assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertEquals(StratConScheduledParadeBehavior.TYPE_ID, pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
         }
     }

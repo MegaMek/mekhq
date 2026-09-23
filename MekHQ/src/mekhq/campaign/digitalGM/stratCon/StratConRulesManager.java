@@ -3805,7 +3805,27 @@ public class StratConRulesManager {
      */
     public static int calculateScenarioOdds(StratConTrackState track, AbstractContract contract,
           boolean isReinforcements) {
-        if (contract.getMoraleLevel().isRouted()) {
+        return calculateScenarioOdds(track, contract, isReinforcements, false);
+    }
+
+    /**
+     * Calculates the scenario odds as {@link #calculateScenarioOdds(StratConTrackState, AbstractContract, boolean)}
+     * does, optionally ignoring a rout: for scenarios that break out whatever state the enemy is in, such as civil
+     * unrest.
+     *
+     * @param track            the sector
+     * @param contract         the contract
+     * @param isReinforcements whether morale modifiers apply
+     * @param isIgnoringRout   whether a routed enemy still leaves the usual odds, rather than none at all
+     *
+     * @return the scenario odds; {@code -1} against a routed enemy unless the rout is ignored
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int calculateScenarioOdds(StratConTrackState track, AbstractContract contract,
+          boolean isReinforcements, boolean isIgnoringRout) {
+        if (contract.getMoraleLevel().isRouted() && !isIgnoringRout) {
             return -1;
         }
 

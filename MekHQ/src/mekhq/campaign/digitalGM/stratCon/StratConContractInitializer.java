@@ -523,6 +523,7 @@ public class StratConContractInitializer {
      *     <li>Diversionary Raid: high profile targets (see {@link StratConHighProfileTargetBehavior})</li>
      *     <li>Extraction Raid: VIPs (see {@link StratConVIPBehavior})</li>
      *     <li>Planetary Assault: strategic positions (see {@link StratConStrategicPositionBehavior})</li>
+     *     <li>Retainer: scheduled parades (see {@link StratConScheduledParadeBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -583,6 +584,10 @@ public class StratConContractInitializer {
 
         if (objectiveType.isPlanetaryAssault()) {
             return StratConStrategicPositionBehavior.TYPE_ID;
+        }
+
+        if (objectiveType.isRetainer()) {
+            return StratConScheduledParadeBehavior.TYPE_ID;
         }
 
         return null;

@@ -75,6 +75,18 @@ public abstract class StratConAmbushPointOfInterestBehavior implements IStratCon
     }
 
     /**
+     * @return {@code true} if an ambush can break out here even while the enemy is routed, rolled against the usual
+     *       odds as if it were not; by default, it cannot - a routed enemy mounts no ambushes. Civil unrest, which does
+     *       not answer to the enemy's morale, can.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected boolean isAmbushPossibleWhileRouted() {
+        return false;
+    }
+
+    /**
      * Any formation deploying onto the point of interest rolls for a scenario the usual way. With no scenario, the
      * point of interest is secured at once; with one, an ambush is placed on its hex and linked to it, and the deploying
      * formation is then assigned to it like any scenario found on the hex. Either way, no other random scenario is
@@ -101,7 +113,10 @@ public abstract class StratConAmbushPointOfInterestBehavior implements IStratCon
         }
 
         boolean essentialScenariosOnly = campaign.getCampaignOptions().get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
-        int targetNumber = StratConRulesManager.calculateScenarioOdds(track, contract, true);
+        int targetNumber = StratConRulesManager.calculateScenarioOdds(track,
+              contract,
+              true,
+              isAmbushPossibleWhileRouted());
         boolean isAmbush = StratConRulesManager.rollsRandomScenario(PointOfInterestDeploymentOutcome.NO_EFFECT,
               essentialScenariosOnly,
               false,
@@ -121,7 +136,7 @@ public abstract class StratConAmbushPointOfInterestBehavior implements IStratCon
         }
 
         addReport(BATTLE, "ambush.report", pointOfInterest, track, campaign);
-        new StratConAmbushedDialog(campaign, formationId, false);
+        announceAmbush(pointOfInterest, track, formationId, contract, campaign);
         return PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO;
     }
 
@@ -166,6 +181,23 @@ public abstract class StratConAmbushPointOfInterestBehavior implements IStratCon
     }
 
     /**
+     * Tells the player an ambush has been sprung here. By default, the ambushed dialog, as for any other ambush.
+     *
+     * @param pointOfInterest the point of interest the ambush is at
+     * @param track           the sector it sits in
+     * @param formationId     the ID of the ambushed formation
+     * @param contract        the contract whose map holds the sector
+     * @param campaign        the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected void announceAmbush(StratConPointOfInterest pointOfInterest, StratConTrackState track, int formationId,
+          AbstractContract contract, Campaign campaign) {
+        new StratConAmbushedDialog(campaign, formationId, false);
+    }
+
+    /**
      * Places the ambush on the point of interest's hex and links the point of interest to it. The ambush is drawn from
      * this type's own template, if it has one (see {@link #getScenarioTemplateName}), or else from the templates suited
      * to ambushing the deploying formation's unit type; and - like any ambush - is a Crisis and never a Turning Point.
@@ -176,7 +208,7 @@ public abstract class StratConAmbushPointOfInterestBehavior implements IStratCon
      * @author Illiani
      * @since 0.51.01
      */
-    private @Nullable StratConScenario placeAmbush(StratConPointOfInterest pointOfInterest,
+    protected @Nullable StratConScenario placeAmbush(StratConPointOfInterest pointOfInterest,
           StratConTrackState track, int formationId, AbstractContract contract, Campaign campaign) {
         // With no usable template, a random scenario springs the ambush instead; a missing named one is logged.
         String templateName = getScenarioTemplateName();

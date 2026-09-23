@@ -86,7 +86,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  */
 public class RiotScenario {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.RiotScenario";
-    private final MMLogger LOGGER = MMLogger.create(RiotScenario.class);
+    private static final MMLogger LOGGER = MMLogger.create(RiotScenario.class);
 
     private final Campaign campaign;
 
@@ -104,8 +104,37 @@ public class RiotScenario {
     public RiotScenario(Campaign campaign, AbstractContract contract) {
         this.campaign = campaign;
 
-        List<Unit> allMobs = findMobsForRiots(contract.getEnemyFaction());
+        List<Unit> allMobs = findMobsForRiots(campaign, contract.getEnemyFaction());
         createRiotScenario(contract, allMobs);
+    }
+
+    /**
+     * Generates a riot's civilian mobs and adds them to the scenario's "Civilians" {@link BotForce}, as a riot does.
+     * For other callers that set up their own "Crowd Control" scenario: call it once the scenario has been finalized,
+     * since finalizing is what creates its bot forces.
+     *
+     * @param campaign        the current campaign
+     * @param faction         the faction the mobs are created for
+     * @param backingScenario the finalized "Crowd Control" scenario
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void addRiotingMobs(Campaign campaign, Faction faction, AtBScenario backingScenario) {
+        addMobsToCivilians(backingScenario, findMobsForRiots(campaign, faction));
+    }
+
+    /**
+     * Adds the given mobs to every "Civilians" {@link BotForce} of the scenario.
+     */
+    private static void addMobsToCivilians(AtBScenario backingScenario, List<Unit> mobUnits) {
+        for (BotForce botForce : backingScenario.getBotForces()) {
+            if (botForce.getName().contains("Civilians")) {
+                for (Unit mobUnit : mobUnits) {
+                    botForce.addEntity(mobUnit.getEntity());
+                }
+            }
+        }
     }
 
     /**
@@ -115,19 +144,20 @@ public class RiotScenario {
      * <p>If a mob entity cannot be created at any point, the method logs the issue and returns whatever has been
      * built so far.</p>
      *
-     * @param faction the faction used when creating crewed entities (skill, tags, and other factional details)
+     * @param campaign the campaign the mob units belong to
+     * @param faction  the faction used when creating crewed entities (skill, tags, and other factional details)
      *
      * @return a possibly empty, never {@code null} list of mob units
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private List<Unit> findMobsForRiots(Faction faction) {
+    private static List<Unit> findMobsForRiots(Campaign campaign, Faction faction) {
         List<Unit> mobs = new ArrayList<>();
 
         int mobCount = d6(2);
         for (int i = 1; i <= mobCount; i++) {
-            Entity mobEntity = createMobEntity(faction);
+            Entity mobEntity = createMobEntity(campaign, faction);
 
             if (mobEntity == null) {
                 LOGGER.info("Failed to create mob");
@@ -143,28 +173,29 @@ public class RiotScenario {
     /**
      * Chooses a mob size band by random roll and creates a corresponding civilian {@link Entity}.
      *
-     * @param faction the faction context for the created entity
+     * @param campaign the campaign the mob belongs to
+     * @param faction  the faction context for the created entity
      *
      * @return the created mob entity, or {@code null} if creation failed
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private @Nullable Entity createMobEntity(Faction faction) {
+    private static @Nullable Entity createMobEntity(Campaign campaign, Faction faction) {
         int size = d6(5);
         if (size <= SMALL.getMaximum()) {
-            return createMob(faction, SMALL.getName());
+            return createMob(campaign, faction, SMALL.getName());
         }
 
         if (size <= MEDIUM.getMaximum()) {
-            return createMob(faction, MEDIUM.getName());
+            return createMob(campaign, faction, MEDIUM.getName());
         }
 
         if (size <= LARGE.getMaximum()) {
-            return createMob(faction, LARGE.getName());
+            return createMob(campaign, faction, LARGE.getName());
         }
 
-        return createMob(faction, HUGE.getName());
+        return createMob(campaign, faction, HUGE.getName());
     }
 
     /**
@@ -173,15 +204,16 @@ public class RiotScenario {
      *
      * <p>Logs and returns {@code null} if the requested summary cannot be found.</p>
      *
-     * @param faction the faction used to initialize crew and tags
-     * @param mobName the MekSummary/variant name to spawn
+     * @param campaign the campaign the mob belongs to
+     * @param faction  the faction used to initialize crew and tags
+     * @param mobName  the MekSummary/variant name to spawn
      *
      * @return a crewed entity ready for scenario use, or {@code null} on lookup/creation failure
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public @Nullable Entity createMob(Faction faction, String mobName) {
+    public static @Nullable Entity createMob(Campaign campaign, Faction faction, String mobName) {
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek(mobName);
         if (mekSummary == null) {
             LOGGER.error("Cannot find entry for {}", mobName);
@@ -252,16 +284,25 @@ public class RiotScenario {
 
         // If we successfully generated a scenario, we need to make a couple of final adjustments and announce the
         // situation to the player
-        AtBScenario backingScenario = scenario.getBackingScenario();
-        for (BotForce botForce : backingScenario.getBotForces()) {
-            if (botForce.getName().contains("Civilians")) {
-                for (Unit mobUnit : mobUnits) {
-                    botForce.addEntity(mobUnit.getEntity());
-                }
-            }
-        }
+        addMobsToCivilians(scenario.getBackingScenario(), mobUnits);
+        reportRiot(campaign, contract, track, coords);
+    }
 
-        // Trigger a dialog to inform the user that an interception has taken place
+    /**
+     * Tells the player, in an immersive, faction-aware dialog from the employer's liaison, that a riot has broken out
+     * at the given hex.
+     *
+     * @param campaign the current campaign
+     * @param contract the contract the riot belongs to
+     * @param track    the sector the riot is in
+     * @param coords   the hex the riot is at
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void reportRiot(Campaign campaign, AbstractContract contract, StratConTrackState track,
+          StratConCoords coords) {
+        // Trigger a dialog to inform the user that a riot has broken out
         String commanderAddress = campaign.getCommanderAddress();
         String key;
         if (campaign.getPlayerForce().isClanForce()) {
