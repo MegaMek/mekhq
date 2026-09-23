@@ -214,6 +214,27 @@ public final class StratConEscalation {
     }
 
     /**
+     * A sabotage target has been sabotaged without the saboteurs being caught: +3d6 Escalation.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void onTargetSabotaged(Campaign campaign, AbstractContract contract) {
+        increaseEscalation(campaign, contract, d6(3));
+    }
+
+    /**
+     * Saboteurs were caught at a sabotage target and fought, whatever the result: +2d6 Escalation. A won fight adds
+     * the usual +1d6 for winning on top, for +3d6 in all - the same as a quiet success.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void onSaboteursCaught(Campaign campaign, AbstractContract contract) {
+        increaseEscalation(campaign, contract, d6(2));
+    }
+
+    /**
      * Rolls Escalation's part of a morale check: a die with as many sides as the contract's maximum Escalation. A roll
      * no higher than the current Escalation raises the enemy's morale by one level.
      *
