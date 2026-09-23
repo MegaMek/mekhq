@@ -50,6 +50,7 @@ import java.util.Set;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -61,7 +62,6 @@ import mekhq.gui.dialog.factionStanding.factionJudgment.FactionCensureGoingRogue
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentDialog;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentNewsArticle;
 import mekhq.gui.dialog.factionStanding.factionJudgment.FactionJudgmentSceneDialog;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Handles the "going rogue" event for a campaign, where a force defects or leaves its current faction.
@@ -158,8 +158,8 @@ public class GoingRogue {
               commander,
               second,
               isDefection,
-              isUsingFactionStandings,
-              isUltimatum);
+              isUltimatum,
+              isUsingFactionStandings);
     }
 
     /**
