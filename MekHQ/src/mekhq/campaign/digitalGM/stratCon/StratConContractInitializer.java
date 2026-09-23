@@ -652,9 +652,9 @@ public class StratConContractInitializer {
      * Decides whether a contract's special points of interest (see {@link #getSpecialPointOfInterestTypeId}) replace
      * its Essential scenarios. Most do: such a contract gets no Essential scenarios, and the combat bonus is paid for
      * each special point of interest dealt with instead. Beleaguered forces, training maneuvers, high profile targets,
-     * strategic positions, security reviews, target intelligence, and shows of force do not - Relief Duty, Cadre Duty,
-     * Diversionary Raid, Planetary Assault, Security Duty, Objective Raid, and Garrison Duty contracts keep their
-     * Essential scenarios alongside them.
+     * strategic positions, security reviews, and shows of force do not - Relief Duty, Cadre Duty, Planetary Assault,
+     * Security Duty, and Garrison Duty contracts keep their Essential scenarios alongside them. An Objective Raid pays
+     * its combat bonus through the objective facilities its target intelligence turns up instead.
      *
      * @param contract                       the contract
      * @param isContractsUseSpecialMechanics whether the "Contracts Use Special Mechanics" option is on
@@ -670,10 +670,8 @@ public class StratConContractInitializer {
         return (specialTypeId != null)
                      && !StratConBeleagueredForcesBehavior.TYPE_ID.equals(specialTypeId)
                      && !StratConTrainingManeuversBehavior.TYPE_ID.equals(specialTypeId)
-                     && !StratConHighProfileTargetBehavior.TYPE_ID.equals(specialTypeId)
                      && !StratConStrategicPositionBehavior.TYPE_ID.equals(specialTypeId)
                      && !StratConSecurityReviewBehavior.TYPE_ID.equals(specialTypeId)
-                     && !StratConTargetIntelligenceBehavior.TYPE_ID.equals(specialTypeId)
                      && !StratConShowOfForceBehavior.TYPE_ID.equals(specialTypeId);
     }
 

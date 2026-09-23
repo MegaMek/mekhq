@@ -13,8 +13,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * The behavior of target intelligence: a lead on the enemy's installations, placed in place of every point of interest
- * on an Objective Raid contract. Target intelligence is not a strategic objective itself, and the contract keeps its
- * Essential scenarios; but some intelligence leads to a facility, and destroying that facility is.
+ * on an Objective Raid contract, which gets no Essential scenarios. Target intelligence is not a strategic objective
+ * itself; but some intelligence leads to a facility, and destroying that facility is.
  *
  * <p>Which intelligence leads to a facility is settled when the contract is accepted: one per point of the contract's
  * scale, at most (see {@code StratConContractInitializer#markFacilityLeads}), so the facilities it turns up never
@@ -51,7 +51,8 @@ public class StratConTargetIntelligenceBehavior extends StratConAmbushPointOfInt
     }
 
     /**
-     * Target intelligence pays no combat bonus: an Objective Raid keeps its Essential scenarios, which still pay it.
+     * Target intelligence pays no combat bonus of its own: a fight won at an objective facility it turns up pays it, as
+     * any strategic-objective facility's scenario does.
      *
      * @author Illiani
      * @since 0.51.01

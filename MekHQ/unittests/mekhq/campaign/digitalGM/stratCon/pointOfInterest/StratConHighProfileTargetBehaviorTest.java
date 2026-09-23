@@ -11,11 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,6 +30,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest.PointOfInterestStatus;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
@@ -47,7 +46,7 @@ import testUtilities.MHQTestUtilities;
 
 /**
  * Tests for the high profile target: striking it when no scenario breaks out (by any formation, for 3d6 Escalation
- * but no combat bonus - its contract keeps its Essential scenarios), its ambush being fought as a Decoy Engagement and
+ * and the combat bonus - its contract gets no Essential scenarios), its ambush being fought as a Decoy Engagement and
  * spending the target whatever the result, its visibility, and its rolled lifespan. High profile targets are not
  * strategic objectives: a Diversionary Raid's objective is its Escalation.
  *
@@ -185,13 +184,13 @@ class StratConHighProfileTargetBehaviorTest {
     }
 
     @Test
-    void hittingTheTargetPaysNoCombatBonus() {
+    void hittingTheTargetPaysTheCombatBonus() {
         Campaign campaign = deploymentCampaign(MEK);
         Finances finances = campaign.getPlayerForce().getFinances();
 
         deploy(campaign);
 
-        verify(finances, never()).credit(any(), any(), any(), anyString());
+        verify(finances).credit(eq(TransactionType.CONTRACT_PAYMENT), eq(TODAY), eq(Money.of(25000)), anyString());
     }
 
     // Escalation

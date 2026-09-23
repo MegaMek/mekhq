@@ -136,10 +136,10 @@ class StratConTargetIntelligenceTest {
     // Scheduling
 
     @Test
-    void anObjectiveRaidSchedulesTargetIntelligenceAndKeepsItsEssentialScenarios() {
+    void anObjectiveRaidSchedulesTargetIntelligenceInPlaceOfItsEssentialScenarios() {
         assertEquals(StratConTargetIntelligenceBehavior.TYPE_ID,
               StratConContractInitializer.getSpecialPointOfInterestTypeId(contract, true));
-        assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract, true));
+        assertTrue(StratConContractInitializer.isReplacingEssentialScenarios(contract, true));
         assertFalse(StratConContractInitializer.isSpecialPointOfInterestObjective(
               StratConTargetIntelligenceBehavior.TYPE_ID), "the intelligence is not itself an objective");
     }

@@ -359,7 +359,7 @@ class StratConDataCacheSchedulingTest {
     @EnumSource(value = ContractObjectiveType.class,
           names = { "ESPIONAGE", "GUERRILLA_WARFARE", "MOLE_HUNTING", "ASSASSINATION", "OBSERVATION_RAID",
                     "EXTRACTION_RAID", "RETAINER", "RIOT_DUTY", "SABOTAGE", "TERRORISM", "PIRATE_RAID",
-                    "PIRATE_HUNTING" })
+                    "PIRATE_HUNTING", "DIVERSIONARY_RAID", "OBJECTIVE_RAID" })
     void specialPointsOfInterestReplaceEssentialScenarios(ContractObjectiveType objectiveType) {
         assertTrue(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), true));
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), false),
@@ -551,11 +551,11 @@ class StratConDataCacheSchedulingTest {
     }
 
     @Test
-    void highProfileTargetsDoNotReplaceEssentialScenarios() {
+    void highProfileTargetsReplaceEssentialScenarios() {
         assertEquals(StratConHighProfileTargetBehavior.TYPE_ID,
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.DIVERSIONARY_RAID, 1), true));
-        assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
+        assertTrue(StratConContractInitializer.isReplacingEssentialScenarios(
               contract(ContractObjectiveType.DIVERSIONARY_RAID, 1), true));
     }
 

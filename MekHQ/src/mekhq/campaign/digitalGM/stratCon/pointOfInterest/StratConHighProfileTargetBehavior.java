@@ -15,8 +15,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * <p>When any formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the target is
  * struck on the spot, raising the contract's Escalation by 3d6. If one does, the enemy was waiting, and the deploying
  * formation is ambushed in a {@value #SCENARIO_TEMPLATE} scenario; an ambushed target is spent whatever the ambush's
- * result, and leaves the map. Striking one pays no combat bonus: the contract's Essential scenarios still pay it. (See
- * {@link StratConAmbushPointOfInterestBehavior} for the rules it shares.)</p>
+ * result, and leaves the map. Striking one pays the combat bonus, standing in for the Essential scenarios a
+ * Diversionary Raid does not get. (See {@link StratConAmbushPointOfInterestBehavior} for the rules it shares.)</p>
  *
  * <p>A high profile target not struck in time is gone: it expires (its lifespan comes from its definition), except
  * while an ambush there is still to be fought.</p>
@@ -42,18 +42,6 @@ public class StratConHighProfileTargetBehavior extends StratConAmbushPointOfInte
     @Override
     protected @Nullable String getScenarioTemplateName() {
         return SCENARIO_TEMPLATE;
-    }
-
-    /**
-     * Striking a high profile target pays no combat bonus: a Diversionary Raid contract keeps its Essential scenarios,
-     * which still pay it.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    @Override
-    protected boolean isCombatBonusPaid() {
-        return false;
     }
 
     /**
