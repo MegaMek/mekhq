@@ -85,6 +85,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
+import mekhq.campaign.mission.contract.contractSpecialRules.TwoConsecutiveTracks;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.utilities.MHQMorale;
 import mekhq.campaign.mission.contract.utilities.SalvageUtilities;
@@ -1685,6 +1686,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
 
                 objectiveProcessor.processObjective(campaign, objective, qualifyingUnitCount, override, tracker, false);
             }
+        }
+
+        // Runs before processScenarioCompletion so the Essential (strategic-objective) lookup can still resolve the
+        // scenario against its StratCon track, which processScenarioCompletion removes it from.
+        if (tracker.getScenario() instanceof AtBScenario preCompletionScenario) {
+            TwoConsecutiveTracks.processScenarioResolution(campaign,
+                  preCompletionScenario.getContract(campaign), preCompletionScenario);
         }
 
         StratConRulesManager.processScenarioCompletion(tracker);

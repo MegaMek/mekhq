@@ -42,7 +42,9 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 import javax.swing.BorderFactory;
@@ -52,6 +54,7 @@ import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionListener;
 
@@ -70,6 +73,7 @@ import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
+import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -114,14 +118,31 @@ public class DeploymentInspectorPanel extends JPanel {
               BorderFactory.createMatteBorder(0, UIUtil.scaleForGUI(1), 0, 0, BORDER),
               BorderFactory.createEmptyBorder(pad, pad, pad, pad)));
 
-        add(buildDossierSection(), BorderLayout.NORTH);
-        add(buildStagedSection(), BorderLayout.CENTER);
+        add(buildTabs(), BorderLayout.CENTER);
         add(buildButtonRow(), BorderLayout.SOUTH);
 
         setStageButtonEnabled(false);
         showEmpty();
         setStaged(List.of());
         clearBudget();
+    }
+
+    /**
+     * Builds the tabbed pane that holds the dossier and the staged tray on separate tabs, so the two no longer compete
+     * for vertical space in the HUD.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JTabbedPane buildTabs() {
+        JTabbedPane tabs = new JTabbedPane();
+        tabs.setOpaque(false);
+        tabs.setBackground(GROUND);
+        tabs.setForeground(TEXT);
+        tabs.setFont(hudFont(Font.BOLD, 0.8f, 0.08f));
+        tabs.addTab(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.dossier.title"), buildDossierSection());
+        tabs.addTab(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.staged.tab"), buildStagedSection());
+        return tabs;
     }
 
     private JPanel buildDossierSection() {
@@ -145,7 +166,8 @@ public class DeploymentInspectorPanel extends JPanel {
 
         JPanel section = new JPanel(new BorderLayout(0, UIUtil.scaleForGUI(4)));
         section.setOpaque(false);
-        section.add(HudStyle.keyLabel(getTextAt(RESOURCE_BUNDLE, "deploymentWizard.dossier.title")), BorderLayout.NORTH);
+        int gap = UIUtil.scaleForGUI(4);
+        section.setBorder(BorderFactory.createEmptyBorder(gap, 0, 0, 0));
         section.add(dossierScroll, BorderLayout.CENTER);
         section.add(offBoardCheckBox, BorderLayout.SOUTH);
         return section;
@@ -339,6 +361,14 @@ public class DeploymentInspectorPanel extends JPanel {
         summary.append(getFormattedTextAt(RESOURCE_BUNDLE,
               "deploymentWizard.inspector.units",
               formation.getAllUnits(true).size()));
+
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
+            OptionalInt averageFatigue = formationAverageFatigue(formation);
+            if (averageFatigue.isPresent()) {
+                summary.append("<br/>").append(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "deploymentWizard.inspector.averageFatigue", averageFatigue.getAsInt()));
+            }
+        }
         return summary.toString();
     }
 
@@ -384,6 +414,14 @@ public class DeploymentInspectorPanel extends JPanel {
             }
 
         details.append("<br/>");
+
+        if (campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE)) {
+            OptionalInt unitFatigue = averageEffectiveFatigue(unit.getActiveCrew());
+            if (unitFatigue.isPresent()) {
+                details.append(getFormattedTextAt(RESOURCE_BUNDLE, "deploymentWizard.inspector.crew.fatigue",
+                      unitFatigue.getAsInt())).append("<br/>");
+            }
+        }
 
         int crewSize = unit.getActiveCrew().size();
         if (crewSize > 1) {
@@ -431,6 +469,43 @@ public class DeploymentInspectorPanel extends JPanel {
         }
 
         return details.toString();
+    }
+
+    /**
+     * Averages the effective fatigue across every unit's active crew in a formation, so the dossier can show how worn
+     * down the whole force is. Returns an empty result when the formation has no active crew, so the caller can omit
+     * the line.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private OptionalInt formationAverageFatigue(Formation formation) {
+        List<Person> allCrew = new ArrayList<>();
+        for (UUID unitId : formation.getAllUnits(true)) {
+            Unit unit = campaign.getUnit(unitId);
+            if (unit != null) {
+                allCrew.addAll(unit.getActiveCrew());
+            }
+        }
+        return averageEffectiveFatigue(allCrew);
+    }
+
+    /**
+     * Averages the effective fatigue across a set of crew members. Returns an empty result for an empty set, so the
+     * caller can omit the line; no numeric sentinel works because effective fatigue can be negative.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private OptionalInt averageEffectiveFatigue(List<Person> crew) {
+        if (crew.isEmpty()) {
+            return OptionalInt.empty();
+        }
+        int totalFatigue = 0;
+        for (Person person : crew) {
+            totalFatigue += Fatigue.getEffectiveFatigue(person, campaign);
+        }
+        return OptionalInt.of((int) Math.round((double) totalFatigue / crew.size()));
     }
 
     private static void appendScoutingSkill(Unit unit, StringBuilder details) {
