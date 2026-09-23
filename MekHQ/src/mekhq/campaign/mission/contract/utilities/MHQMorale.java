@@ -70,6 +70,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
+import mekhq.campaign.digitalGM.stratCon.StratConEscalation;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
@@ -715,6 +716,14 @@ public class MHQMorale {
               campaignOptions.get(CampaignOption.MORALE_VICTORY_EFFECT),
               campaignOptions.get(CampaignOption.MORALE_DECISIVE_DEFEAT_EFFECT),
               campaignOptions.get(CampaignOption.MORALE_DEFEAT_EFFECT));
+
+        // Escalation may raise morale a further level. It is rolled before the rout is handled, so it can pull an enemy
+        // this check routed back from the brink.
+        String escalationReport = StratConEscalation.rollForMorale(campaign, contract);
+        if (escalationReport != null) {
+            moraleReport += "<br><br>" + escalationReport;
+        }
+
         String flavorText = MHQMorale.getFormattedTitle()
                                   + "<h2 style='text-align:center;'>" + contract.getName() + "</h2>"
                                   + MoraleBar.getMoraleDisplay(contract).tooltip();

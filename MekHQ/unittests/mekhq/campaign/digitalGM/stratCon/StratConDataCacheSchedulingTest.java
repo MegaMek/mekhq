@@ -52,9 +52,11 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObj
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConAssassinationLeadBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConBeleagueredForcesBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDataCacheBehavior;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConHighProfileTargetBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConLookoutPointBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPotentialLeadBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConTrainingManeuversBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConVulnerableInfrastructureBehavior;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
@@ -368,6 +370,57 @@ class StratConDataCacheSchedulingTest {
     void beleagueredForcesDoNotReplaceEssentialScenarios() {
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
               contract(ContractObjectiveType.RELIEF_DUTY, 1), true));
+    }
+
+    @Test
+    void trainingManeuversDoNotReplaceEssentialScenarios() {
+        assertEquals(StratConTrainingManeuversBehavior.TYPE_ID,
+              StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.CADRE_DUTY, 1), true));
+        assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
+              contract(ContractObjectiveType.CADRE_DUTY, 1), true));
+    }
+
+    @Test
+    void highProfileTargetsDoNotReplaceEssentialScenarios() {
+        assertEquals(StratConHighProfileTargetBehavior.TYPE_ID,
+              StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.DIVERSIONARY_RAID, 1), true));
+        assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
+              contract(ContractObjectiveType.DIVERSIONARY_RAID, 1), true));
+    }
+
+    @Test
+    void aDiversionaryRaidContractSchedulesOnlyHighProfileTargetsNoneAnObjective() {
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.DIVERSIONARY_RAID, 1), true, true);
+
+        assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertEquals(StratConHighProfileTargetBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertFalse(pointOfInterest.isStrategicObjective(), "a Diversionary Raid's objective is its Escalation");
+        }
+    }
+
+    @Test
+    void everySpecialPointOfInterestButHighProfileTargetsIsAnObjective() {
+        assertFalse(StratConContractInitializer.isSpecialPointOfInterestObjective(
+              StratConHighProfileTargetBehavior.TYPE_ID));
+        assertTrue(StratConContractInitializer.isSpecialPointOfInterestObjective(StratConDataCacheBehavior.TYPE_ID));
+        assertTrue(StratConContractInitializer.isSpecialPointOfInterestObjective(
+              StratConBeleagueredForcesBehavior.TYPE_ID));
+    }
+
+    @Test
+    void aCadreDutyContractSchedulesOnlyTrainingManeuversEachAnObjective() {
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.CADRE_DUTY, 1), true, true);
+
+        assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertEquals(StratConTrainingManeuversBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertTrue(pointOfInterest.isStrategicObjective());
+        }
     }
 
     @Test

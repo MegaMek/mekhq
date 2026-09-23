@@ -68,6 +68,7 @@ public final class StratConPointOfInterestBehaviors {
         behaviors.put(StratConLookoutPointBehavior.BEHAVIOR_ID, new StratConLookoutPointBehavior());
         behaviors.put(StratConBeleagueredForcesBehavior.BEHAVIOR_ID, new StratConBeleagueredForcesBehavior());
         behaviors.put(StratConTrainingManeuversBehavior.BEHAVIOR_ID, new StratConTrainingManeuversBehavior());
+        behaviors.put(StratConHighProfileTargetBehavior.BEHAVIOR_ID, new StratConHighProfileTargetBehavior());
     }
 
     private StratConPointOfInterestBehaviors() {

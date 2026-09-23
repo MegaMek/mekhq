@@ -1198,6 +1198,12 @@ public class StratConRulesManager {
         // processForceDeployment, which reveals the hex.
         boolean deployedToUnexploredHex = !track.getRevealedCoords().contains(coords);
 
+        // Whether the hex holds nothing at all - no scenario, facility, or point of interest - for Escalation. Captured
+        // before the points of interest react to the deployment, since one may take itself off the map.
+        boolean deployedToEmptyHex = (track.getScenario(coords) == null)
+                                           && (track.getFacility(coords) == null)
+                                           && track.getPointsOfInterest(coords).isEmpty();
+
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around the coords,
         // depending on force role
@@ -1335,6 +1341,11 @@ public class StratConRulesManager {
         // If we didn't trip a scenario or facility, Training forces should deploy 'sticky'
         if (isTraining) {
             track.addStickyForce(forceID);
+        }
+
+        // A deployment to an empty hex that met no scenario escalates the contract's hostilities.
+        if (deployedToEmptyHex) {
+            StratConEscalation.onEmptyHexDeployment(campaign, contract);
         }
     }
 
@@ -3914,6 +3925,14 @@ public class StratConRulesManager {
                 if (victory && scenario.isStrategicObjective()) {
                     awardCombatBonus(campaign, mission);
                 }
+
+                // Winning, or fighting at a hostile facility, escalates the contract's hostilities. The template, not
+                // the hex, marks a facility fight: a destroyed facility is already gone from the map by now.
+                AtBDynamicScenario dynamicScenario = scenario.getBackingScenario();
+                boolean isHostileFacilityScenario = (dynamicScenario != null)
+                                                          && (dynamicScenario.getTemplate() != null)
+                                                          && dynamicScenario.getTemplate().isHostileFacility();
+                StratConEscalation.onScenarioCompleted(campaign, mission, victory, isHostileFacilityScenario);
 
                 if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
                     switchFacilityOwner(facility);

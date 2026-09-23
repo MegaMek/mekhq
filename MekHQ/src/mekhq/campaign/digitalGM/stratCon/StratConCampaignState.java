@@ -73,6 +73,8 @@ public class StratConCampaignState {
     // these are all state variables that affect the current Stratcon Campaign
     private int supportPoints;
     private int victoryPoints;
+    // how far the contract's hostilities have escalated; see StratConEscalation
+    private int escalation;
     private String briefingText;
     @XmlElement(required = true, defaultValue = "false")
     private boolean allowEarlyVictory;
@@ -212,6 +214,22 @@ public class StratConCampaignState {
 
     public void changeVictoryPoints(int delta) {
         victoryPoints += delta;
+    }
+
+    /**
+     * @return how far the contract's hostilities have escalated, from 0 up to the contract's maximum (see
+     *       {@link StratConEscalation}); 0 for contracts that do not track Escalation
+     */
+    public int getEscalation() {
+        return escalation;
+    }
+
+    /**
+     * Sets the contract's Escalation directly. Play should raise it through {@link StratConEscalation}, which caps it
+     * and keeps any Escalation objectives up to date.
+     */
+    public void setEscalation(int escalation) {
+        this.escalation = escalation;
     }
 
     public String getBriefingText() {

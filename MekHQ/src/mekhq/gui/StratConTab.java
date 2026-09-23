@@ -69,6 +69,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConEscalation;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConStrategicObjective;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -121,6 +122,7 @@ public class StratConTab extends CampaignGuiTab {
     private JPanel deploymentTimePanel;
     private JPanel supportPointsPanel;
     private JPanel victoryPointsPanel;
+    private JPanel escalationPanel;
     private JScrollPane expandedObjectivePanel;
     private boolean objectivesCollapsed = false;
 
@@ -245,11 +247,13 @@ public class StratConTab extends CampaignGuiTab {
         // "Edit SP (GM)" / "Edit CVP (GM)" bottom-bar buttons; the sector environment and selected-hex stats are HUDs
         // drawn on the map (see StratConPanel).
 
-        // Bars stack at the top: threat, deployment time, support points, victory points.
+        // Bars stack at the top: threat, deployment time, support points, victory points, and - for contracts that
+        // track it - Escalation.
         threatLevelPanel = addBarPanel(constraints, gridY++);
         deploymentTimePanel = addBarPanel(constraints, gridY++);
         supportPointsPanel = addBarPanel(constraints, gridY++);
         victoryPointsPanel = addBarPanel(constraints, gridY++);
+        escalationPanel = addBarPanel(constraints, gridY++);
 
         // Add the objectives panel below the bars. Its height tracks the objective content (see applyObjectiveText) so
         // it is only as tall as it needs to be; the scroll pane remains as a safety net for unusually long lists.
@@ -560,6 +564,7 @@ public class StratConTab extends CampaignGuiTab {
         updateDeploymentTimeBar(currentSectorTrack);
         updateSupportPointsBar();
         updateVictoryPointsBar(campaignState);
+        updateEscalationBar(campaignState);
 
         if (currentSectorTrack != null) {
             applyObjectiveText(getStrategicObjectiveText(campaignState, currentSectorTrack));
@@ -580,6 +585,33 @@ public class StratConTab extends CampaignGuiTab {
         deploymentTimePanel.setVisible(false);
         supportPointsPanel.setVisible(false);
         victoryPointsPanel.setVisible(false);
+        escalationPanel.setVisible(false);
+    }
+
+    /**
+     * Refreshes the Escalation bar shown below the victory-point bar, for contracts that track Escalation (see
+     * {@link StratConEscalation}); hidden for every other contract.
+     *
+     * @param campaignState the StratCon state of the currently selected contract
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void updateEscalationBar(StratConCampaignState campaignState) {
+        escalationPanel.removeAll();
+
+        if (!StratConEscalation.isEscalationUsed(getCampaignGui().getCampaign(), currentContract)) {
+            escalationPanel.setVisible(false);
+            return;
+        }
+
+        escalationPanel.setVisible(true);
+        escalationPanel.add(ContractMeterBar.escalation(campaignState.getEscalation(),
+              StratConEscalation.getMaximumEscalation(currentContract),
+              StratConEscalation.getEscalationTarget(campaignState)), BorderLayout.CENTER);
+
+        escalationPanel.revalidate();
+        escalationPanel.repaint();
     }
 
     /**
@@ -884,6 +916,11 @@ public class StratConTab extends CampaignGuiTab {
                     break;
                 case PointOfInterest:
                     sb.append(pointOfInterestObjectivePhrase(pointOfInterest, track, coordsRevealed));
+                    break;
+                case Escalation:
+                    sb.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.objectives.escalation",
+                          String.valueOf(objective.getCurrentObjectiveCount()),
+                          String.valueOf(objective.getDesiredObjectiveCount())));
                     break;
                 default:
                     break;

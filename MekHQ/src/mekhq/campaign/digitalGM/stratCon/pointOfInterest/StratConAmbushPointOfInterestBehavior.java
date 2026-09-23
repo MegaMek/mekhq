@@ -25,8 +25,9 @@ import mekhq.gui.dialog.StratConAmbushedDialog;
  * of interest is a strategic objective.
  *
  * <p>When any formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the point of
- * interest is secured on the spot: its objective is met and the contract's combat bonus is paid, standing in for the
- * Essential scenarios such a contract does not get. If one does, the deploying formation is ambushed. An ambushed point
+ * interest is secured on the spot: its objective is met and, by default, the contract's combat bonus is paid, standing
+ * in for the Essential scenarios such a contract does not get (see {@link #isCombatBonusPaid}). If one does, the
+ * deploying formation is ambushed (see {@link #getScenarioTemplateName}). An ambushed point
  * of interest is spent whatever the ambush's result: it leaves the map and its objective is removed, neither met nor
  * failed.</p>
  *
@@ -49,6 +50,29 @@ public abstract class StratConAmbushPointOfInterestBehavior implements IStratCon
      * @since 0.51.01
      */
     protected abstract String getResourceKeyPrefix();
+
+    /**
+     * @return the file name of the scenario template the ambush is always drawn from, such as
+     *       {@code Decoy Engagement.json}; or, by default, {@code null} to draw it from the templates suited to
+     *       ambushing the deploying formation's unit type
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected @Nullable String getScenarioTemplateName() {
+        return null;
+    }
+
+    /**
+     * @return {@code true} if securing this type of point of interest pays the contract's combat bonus; by default, it
+     *       does. A type whose contract keeps its Essential scenarios leaves the bonus to them.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected boolean isCombatBonusPaid() {
+        return true;
+    }
 
     /**
      * Any formation deploying onto the point of interest rolls for a scenario the usual way. With no scenario, the
@@ -143,21 +167,27 @@ public abstract class StratConAmbushPointOfInterestBehavior implements IStratCon
 
     /**
      * Places the ambush on the point of interest's hex and links the point of interest to it. The ambush is drawn from
-     * the templates suited to ambushing the deploying formation's unit type, and - like any ambush - is a Crisis and
-     * never a Turning Point. It is not Essential.
+     * this type's own template, if it has one (see {@link #getScenarioTemplateName}), or else from the templates suited
+     * to ambushing the deploying formation's unit type; and - like any ambush - is a Crisis and never a Turning Point.
+     * It is not Essential.
      *
      * @return the ambush, or {@code null} if none could be generated
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private static @Nullable StratConScenario placeAmbush(StratConPointOfInterest pointOfInterest,
+    private @Nullable StratConScenario placeAmbush(StratConPointOfInterest pointOfInterest,
           StratConTrackState track, int formationId, AbstractContract contract, Campaign campaign) {
-        Formation formation = campaign.getPlayerForce().getFormation(formationId);
-        int unitType = (formation == null) ? MEK : formation.getPrimaryUnitType(campaign);
-
-        // With no ambush template for the unit type, a random scenario springs the ambush instead.
-        ScenarioTemplate template = StratConScenarioFactory.getRandomScenario(unitType, true, false);
+        // With no usable template, a random scenario springs the ambush instead; a missing named one is logged.
+        String templateName = getScenarioTemplateName();
+        ScenarioTemplate template;
+        if (templateName != null) {
+            template = StratConScenarioFactory.getSpecificScenario(templateName);
+        } else {
+            Formation formation = campaign.getPlayerForce().getFormation(formationId);
+            int unitType = (formation == null) ? MEK : formation.getPrimaryUnitType(campaign);
+            template = StratConScenarioFactory.getRandomScenario(unitType, true, false);
+        }
 
         // Facilities are ignored: these points of interest occupy their hex, so none can share it.
         StratConScenario ambush = StratConRulesManager.setupScenario(pointOfInterest.getCoords(),
@@ -180,8 +210,8 @@ public abstract class StratConAmbushPointOfInterestBehavior implements IStratCon
     }
 
     /**
-     * Secures the point of interest: resolves it, which meets its objective, takes it off the map, and pays the
-     * contract's combat bonus.
+     * Secures the point of interest: resolves it, which meets its objective, takes it off the map, and - if this type
+     * pays it (see {@link #isCombatBonusPaid}) - pays the contract's combat bonus.
      *
      * @author Illiani
      * @since 0.51.01
@@ -191,6 +221,27 @@ public abstract class StratConAmbushPointOfInterestBehavior implements IStratCon
         StratConPointOfInterestRules.resolvePointOfInterest(track, pointOfInterest);
         track.removePointOfInterest(pointOfInterest.getId());
         addReport(GENERAL, "secured.report", pointOfInterest, track, campaign);
-        StratConRulesManager.awardCombatBonus(campaign, contract);
+
+        if (isCombatBonusPaid()) {
+            StratConRulesManager.awardCombatBonus(campaign, contract);
+        }
+
+        onSecured(pointOfInterest, track, contract, campaign);
+    }
+
+    /**
+     * Called once the point of interest has been secured without an ambush, after its objective is met and any combat
+     * bonus paid, for anything else a type's success brings. By default, nothing.
+     *
+     * @param pointOfInterest the point of interest just secured; already off the map
+     * @param track           the sector it sat in
+     * @param contract        the contract whose map holds the sector
+     * @param campaign        the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected void onSecured(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+          AbstractContract contract, Campaign campaign) {
     }
 }

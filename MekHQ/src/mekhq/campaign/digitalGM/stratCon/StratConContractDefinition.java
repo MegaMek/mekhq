@@ -156,7 +156,14 @@ public class StratConContractDefinition {
          * objectives, these appear over the contract's months rather than all at contract start. What "dealing with"
          * means is up to the point of interest's type: its behavior decides when the objective is met or has failed.
          */
-        PointOfInterest
+        PointOfInterest,
+
+        /**
+         * Raising the contract's Escalation to the objective's desired count before the contract ends (see
+         * {@link StratConEscalation}). Added in code, not by contract definitions; its current count follows the
+         * contract's Escalation.
+         */
+        Escalation
     }
 
     private String contractTypeName;

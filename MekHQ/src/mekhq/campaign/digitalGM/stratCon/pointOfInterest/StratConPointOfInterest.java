@@ -255,7 +255,8 @@ public class StratConPointOfInterest {
     /**
      * @return {@code true} if this point of interest's fate is waiting on a scenario
      */
-    @XmlTransient
+    // Deliberately not annotated @XmlTransient: JAXB rejects that annotation on anything but a getter or setter, and
+    // does not treat a has- method as a property anyway.
     public boolean hasLinkedScenario() {
         return linkedScenarioId != null;
     }

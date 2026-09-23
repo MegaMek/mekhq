@@ -104,7 +104,7 @@ public class StratConStrategicObjective {
 
     public boolean isObjectiveFailed(StratConTrackState trackState) {
         return switch (getObjectiveType()) {
-            case AnyScenarioVictory, SpecificScenarioVictory ->
+            case AnyScenarioVictory, SpecificScenarioVictory, Escalation ->
                 // you can fail this if the scenario goes away somehow
                   getCurrentObjectiveCount() == OBJECTIVE_FAILED;
             case AlliedFacilityControl, HostileFacilityControl -> {
@@ -127,8 +127,8 @@ public class StratConStrategicObjective {
      */
     public boolean isObjectiveCompleted(StratConTrackState trackState) {
         return switch (getObjectiveType()) {
-            case AnyScenarioVictory, SpecificScenarioVictory ->
-                // this is set once qualifying scenarios are completed
+            case AnyScenarioVictory, SpecificScenarioVictory, Escalation ->
+                // this is set once qualifying scenarios are completed (or, for Escalation, follows the contract's)
                   getCurrentObjectiveCount() >= getDesiredObjectiveCount();
             case AlliedFacilityControl -> {
                 // this is "ok" if the facility exists and is under allied control

@@ -299,6 +299,43 @@ public class ContractMeterBar extends JPanel {
     }
 
     /**
+     * Creates an Escalation gauge running from 0 to the contract's maximum Escalation. Escalation raises the enemy's
+     * morale, so, like the threat gauge, it runs green to red. A contract whose objective is to reach an Escalation
+     * target shows that target as a further tick.
+     *
+     * @param escalation        the contract's current Escalation
+     * @param maximumEscalation the contract's maximum Escalation
+     * @param target            the Escalation the contract's objective asks for, or {@code null} if it has none
+     *
+     * @return the configured gauge
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nonnull ContractMeterBar escalation(final int escalation, final int maximumEscalation,
+          final @Nullable Integer target) {
+        final int maximum = Math.max(1, maximumEscalation);
+        final int clamped = Math.clamp(escalation, 0, maximum);
+        final Color markerColor = markerColor();
+        final List<Marker> markers = new ArrayList<>(4);
+        markers.add(new Marker(maximum, Integer.toString(maximum), markerColor, MarkerStyle.TICK, false));
+        markers.add(new Marker(0, "0", markerColor, MarkerStyle.TICK, false));
+        if (target != null) {
+            markers.add(new Marker(target, Integer.toString(target), markerColor, MarkerStyle.TICK, false));
+        }
+        markers.add(new Marker(clamped, Integer.toString(clamped), CURRENT_MARKER_COLOR, MarkerStyle.SOLID, true,
+              true));
+
+        final String tooltip = (target == null) ?
+                                     getFormattedTextAt(RESOURCE_BUNDLE, "contractEscalationBar.tooltip", clamped,
+                                           maximum) :
+                                     getFormattedTextAt(RESOURCE_BUNDLE, "contractEscalationBar.tooltip.target",
+                                           clamped, maximum, target);
+        return new ContractMeterBar(getTextAt(RESOURCE_BUNDLE, "contractEscalationBar.title.text"), 0, maximum,
+              new Color[] { GREEN, GOLD, DEEP_RED }, GREEN.darker(), DEEP_RED.darker(), markers, tooltip);
+    }
+
+    /**
      * Creates a deployment-time gauge running from 0 to 10, where a longer deployment is worse, so the gradient is
      * reversed (green on the left, red on the right). The marker is positioned within the 0..10 track but labelled with
      * the actual day count.

@@ -352,6 +352,11 @@ public class StratConContractInitializer {
                   campaignState,
                   campaignOptions.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE),
                   isContractsUseSpecialMechanics);
+
+            // A Diversionary Raid's strategic objective is to escalate the fighting, rather than to hit any one target.
+            if (isContractsUseSpecialMechanics && contract.getObjectiveType().isDiversionaryRaid()) {
+                StratConEscalation.addDiversionaryRaidObjective(contract, campaignState);
+            }
         }
 
         // Required victory points depend on the StratCon state
@@ -515,6 +520,7 @@ public class StratConContractInitializer {
      *     <li>Observation Raid: lookout points (see {@link StratConLookoutPointBehavior})</li>
      *     <li>Relief Duty: beleaguered forces (see {@link StratConBeleagueredForcesBehavior})</li>
      *     <li>Cadre Duty: training maneuvers (see {@link StratConTrainingManeuversBehavior})</li>
+     *     <li>Diversionary Raid: high profile targets (see {@link StratConHighProfileTargetBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -565,14 +571,19 @@ public class StratConContractInitializer {
             return StratConTrainingManeuversBehavior.TYPE_ID;
         }
 
+        if (objectiveType.isDiversionaryRaid()) {
+            return StratConHighProfileTargetBehavior.TYPE_ID;
+        }
+
         return null;
     }
 
     /**
      * Decides whether a contract's special points of interest (see {@link #getSpecialPointOfInterestTypeId}) replace
      * its Essential scenarios. Most do: such a contract gets no Essential scenarios, and the combat bonus is paid for
-     * each special point of interest dealt with instead. Beleaguered forces and training maneuvers do not - Relief Duty
-     * and Cadre Duty contracts keep their Essential scenarios alongside them.
+     * each special point of interest dealt with instead. Beleaguered forces, training maneuvers, and high profile
+     * targets do not - Relief Duty, Cadre Duty, and Diversionary Raid contracts keep their Essential scenarios alongside
+     * them.
      *
      * @param contract                       the contract
      * @param isContractsUseSpecialMechanics whether the "Contracts Use Special Mechanics" option is on
@@ -587,12 +598,29 @@ public class StratConContractInitializer {
         String specialTypeId = getSpecialPointOfInterestTypeId(contract, isContractsUseSpecialMechanics);
         return (specialTypeId != null)
                      && !StratConBeleagueredForcesBehavior.TYPE_ID.equals(specialTypeId)
-                     && !StratConTrainingManeuversBehavior.TYPE_ID.equals(specialTypeId);
+                     && !StratConTrainingManeuversBehavior.TYPE_ID.equals(specialTypeId)
+                     && !StratConHighProfileTargetBehavior.TYPE_ID.equals(specialTypeId);
     }
 
     /**
-     * Schedules a contract's special points of interest (see {@link #getSpecialPointOfInterestTypeId}). Every one is a
-     * strategic objective.
+     * Decides whether a special point of interest type is a strategic objective. Every one is, except high profile
+     * targets: a Diversionary Raid's objective is its Escalation instead (see {@link StratConEscalation}).
+     *
+     * @param typeId the type ID of a special point of interest
+     *
+     * @return {@code true} if each point of interest of the type is a strategic objective
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the decision can be tested directly.
+    static boolean isSpecialPointOfInterestObjective(String typeId) {
+        return !StratConHighProfileTargetBehavior.TYPE_ID.equals(typeId);
+    }
+
+    /**
+     * Schedules a contract's special points of interest (see {@link #getSpecialPointOfInterestTypeId}). Each is a
+     * strategic objective if its type is one (see {@link #isSpecialPointOfInterestObjective}).
      *
      * <p>They are scheduled the way the contract's Essential scenarios are: a roll on the Track Intensity Tables for the
      * contract's length and track count (see {@link TrackIntensityTable#rollSchedule}), made once per point of scale
@@ -627,8 +655,11 @@ public class StratConContractInitializer {
               rollCount);
         contract.setPointOfInterestSchedule(schedule);
 
+        boolean isStrategicObjective = isSpecialPointOfInterestObjective(typeId);
         for (LocalDate spawnDate : rollSpawnDates(startDate, schedule, contract.getLengthInMonths())) {
-            campaignState.addScheduledPointOfInterest(new StratConScheduledPointOfInterest(spawnDate, typeId, true));
+            campaignState.addScheduledPointOfInterest(new StratConScheduledPointOfInterest(spawnDate,
+                  typeId,
+                  isStrategicObjective));
         }
     }
 
