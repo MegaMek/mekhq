@@ -125,6 +125,8 @@ public final class ContractXmlCodec {
         }
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "contractNature", contract.getNature().name());
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sharesPercent", contract.getSharesPercent());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "consecutiveTrackResultTally",
+              contract.getConsecutiveTrackResultTally());
         if (!contract.getObfuscatedIntel().isEmpty()) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "obfuscatedIntel",
                   contract.getObfuscatedIntel().stream().map(Enum::name).collect(Collectors.joining(",")));
@@ -142,6 +144,10 @@ public final class ContractXmlCodec {
               indent,
               "salvagedByEmployerValue",
               contract.getSalvagedByEmployerValue());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter,
+              indent,
+              "withheldSupportPayments",
+              contract.getWithheldSupportPayments());
         // The player's chosen negotiator is a roster member, so persist only their id and re-resolve on load.
         if (contract.getPlayerNegotiator() != null) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "playerNegotiatorId",
@@ -437,12 +443,17 @@ public final class ContractXmlCodec {
         });
         readers.put("sharesPercent",
               (contract, node, campaign, version) -> contract.setSharesPercent(parseInt(node)));
+        readers.put("consecutiveTrackResultTally",
+              (contract, node, campaign, version) -> contract.setConsecutiveTrackResultTally(parseInt(node)));
         readers.put("missionStatus",
               (contract, node, campaign, version) -> contract.setStatus(MissionStatus.parseFromString(text(node))));
         readers.put("salvagedByUnitValue",
               (contract, node, campaign, version) -> contract.setSalvagedByUnitValue(Money.fromXmlString(text(node))));
         readers.put("salvagedByEmployerValue",
               (contract, node, campaign, version) -> contract.setSalvagedByEmployerValue(Money.fromXmlString(text(
+                    node))));
+        readers.put("withheldSupportPayments",
+              (contract, node, campaign, version) -> contract.setWithheldSupportPayments(Money.fromXmlString(text(
                     node))));
         // The roster is not loaded yet when contracts are read, so stash the id; the loader resolves it post-load.
         readers.put("playerNegotiatorId",

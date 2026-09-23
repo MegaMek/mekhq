@@ -34,6 +34,7 @@ package mekhq.campaign.mission.utilities;
 
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
 import static mekhq.campaign.mission.scenarios.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
@@ -57,6 +58,8 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
+import mekhq.campaign.mission.contract.contractSpecialRules.PirateLooting;
 import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.ContractEmergencyExtension;
 import mekhq.campaign.mission.scenarios.Scenario;
@@ -156,6 +159,8 @@ public class MissionCompletionManager {
         MekHQ.triggerEvent(new MissionCompletedEvent(mission));
 
         payCompletionBonusAndReputation(campaign, mission, missionStatus);
+
+        ContractSupportPayments.renderWithheldSupport(campaign, mission);
 
         awardMissionExperience(campaign, campaignOptions, mission, missionStatus);
 
@@ -349,11 +354,12 @@ public class MissionCompletionManager {
             ChaosReputation.processContractCompletion(campaign, status, personnel,
                   ContractCharacteristics.getUnitReputationMultiplier(mission, status));
 
-            if (mission.getEmployerFactionCode().equals(PIRATE_FACTION_CODE)) {
-                ChaosReputation.resolveActOfPiracy(campaign,
+            if (mission.usesSpecialRule(USE_PIRATE_LOOTING)) {
+                PirateLooting.resolveActOfPiracy(campaign,
                       personnel,
                       mission.getScale(),
                       mission.getScenarios(),
+                      mission.getStratConCampaignState(),
                       status.isOverallSuccess(),
                       mission.getName());
             }

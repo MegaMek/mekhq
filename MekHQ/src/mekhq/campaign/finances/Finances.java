@@ -66,6 +66,7 @@ import mekhq.campaign.events.transactions.TransactionCreditEvent;
 import mekhq.campaign.events.transactions.TransactionDebitEvent;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.personnel.Person;
 import mekhq.io.FileType;
 import mekhq.utilities.MHQXMLUtility;
@@ -401,6 +402,8 @@ public class Finances {
                           resourceMap.getString("PeacetimeCosts.title"))) {
                         campaign.addReport(FINANCES, String.format(resourceMap.getString("PeacetimeCosts.text"),
                               peacetimeCost.toAmountAndSymbolString()));
+                        ContractSupportPayments.reimburseStraightSupport(campaign, peacetimeCost,
+                              resourceMap.getString("PeacetimeCosts.title"));
                     } else {
                         addReportInsufficientFunds(campaign, resourceMap.getString("OperatingCosts.text"));
                     }
@@ -415,6 +418,8 @@ public class Finances {
                           resourceMap.getString("PeacetimeCostsParts.title"))) {
                         campaign.addReport(FINANCES, String.format(resourceMap.getString("PeacetimeCostsParts.text"),
                               sparePartsCost.toAmountAndSymbolString()));
+                        ContractSupportPayments.reimburseStraightSupport(campaign, sparePartsCost,
+                              resourceMap.getString("PeacetimeCostsParts.title"));
                     } else {
                         addReportInsufficientFunds(campaign, resourceMap.getString("SpareParts.text"));
                     }
@@ -426,6 +431,8 @@ public class Finances {
                         campaign.addReport(FINANCES,
                               String.format(resourceMap.getString("PeacetimeCostsAmmunition.text"),
                                     ammoCost.toAmountAndSymbolString()));
+                        ContractSupportPayments.reimburseStraightSupport(campaign, ammoCost,
+                              resourceMap.getString("PeacetimeCostsAmmunition.title"));
                     } else {
                         addReportInsufficientFunds(campaign, resourceMap.getString("TrainingMunitions.text"));
                     }
@@ -436,6 +443,8 @@ public class Finances {
                           resourceMap.getString("PeacetimeCostsFuel.title"))) {
                         campaign.addReport(FINANCES, String.format(resourceMap.getString("PeacetimeCostsFuel.text"),
                               fuelCost.toAmountAndSymbolString()));
+                        ContractSupportPayments.reimburseStraightSupport(campaign, fuelCost,
+                              resourceMap.getString("PeacetimeCostsFuel.title"));
                     } else {
                         addReportInsufficientFunds(campaign, resourceMap.getString("Fuel.text"));
                     }

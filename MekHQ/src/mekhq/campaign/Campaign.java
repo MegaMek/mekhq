@@ -173,6 +173,7 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractHistoryData;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.mission.contract.utilities.ContractSettlement;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -2221,8 +2222,10 @@ public class Campaign implements ITechManager {
         // SHOULD we check to see if this acquisition needs to be paid for
         if ((acquisition instanceof UnitOrder && getCampaignOptions().get(CampaignOption.PAY_FOR_UNITS)) ||
                   (acquisition instanceof Part && getCampaignOptions().get(CampaignOption.PAY_FOR_PARTS))) {
-            // CAN the acquisition actually be paid for
-            return getPlayerForce().getFunds().isGreaterOrEqualThan(acquisition.getBuyCost());
+            // CAN the acquisition actually be paid for, at the (possibly contract-doubled) purchase price
+            double contractMultiplier = getPlayerForce().getPurchaseCostMultiplier(getActiveContracts());
+            Money buyCost = acquisition.getBuyCost().multipliedBy(contractMultiplier);
+            return getPlayerForce().getFunds().isGreaterOrEqualThan(buyCost);
         }
         return true;
     }
@@ -2962,6 +2965,8 @@ public class Campaign implements ITechManager {
                       getLocalDate(),
                       cost,
                       "Repair of " + partWork.getPartName());
+                // An employer covering straight support reimburses its share of the repair cost.
+                ContractSupportPayments.reimburseStraightSupport(this, cost, partWork.getPartName());
             }
             if ((roll == 12) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 xpGained += getCampaignOptions().get(CampaignOption.SUCCESS_XP);
