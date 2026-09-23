@@ -89,6 +89,7 @@ import megamek.common.enums.Faction;
 import megamek.common.enums.TechBase;
 import megamek.common.enums.TechRating;
 import megamek.common.equipment.*;
+import megamek.common.equipment.enums.BombType;
 import megamek.common.equipment.enums.FuelType;
 import megamek.common.game.Game;
 import megamek.common.icons.Camouflage;
@@ -109,6 +110,7 @@ import mekhq.MHQStaticDirectoryManager;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
@@ -3526,6 +3528,7 @@ public class Unit implements ITechnology, ILocatable {
 
         ArrayList<Part> partsToAdd = new ArrayList<>();
         ArrayList<Part> partsToRemove = new ArrayList<>();
+        ArrayList<Part> bombBinsToRemove = new ArrayList<>();
 
         Part gyro = null;
         Part engine = null;
@@ -3694,9 +3697,17 @@ public class Unit implements ITechnology, ILocatable {
                     partsToRemove.add(part);
                 }
             } else if (part instanceof AmmoBin) {
-                ammoParts.put(((AmmoBin) part).getEquipmentNum(), part);
+                if (((AmmoBin) part).getType() instanceof BombType) {
+                    bombBinsToRemove.add(part);
+                } else {
+                    ammoParts.put(((AmmoBin) part).getEquipmentNum(), part);
+                }
             } else if (part instanceof MissingAmmoBin) {
-                ammoParts.put(((MissingAmmoBin) part).getEquipmentNum(), part);
+                if (((MissingAmmoBin) part).getType() instanceof BombType) {
+                    bombBinsToRemove.add(part);
+                } else {
+                    ammoParts.put(((MissingAmmoBin) part).getEquipmentNum(), part);
+                }
             } else if (part instanceof HeatSink) {
                 heatSinks.put(((HeatSink) part).getEquipmentNum(), part);
             } else if (part instanceof MissingHeatSink) {
@@ -3927,6 +3938,15 @@ public class Unit implements ITechnology, ILocatable {
         for (Part part : partsToRemove) {
             removePart(part);
         }
+
+        LocalWarehouse warehouse = getWarehouse();
+        for (Part part : bombBinsToRemove) {
+            removePart(part);
+            part.setUnit(null);
+            if (warehouse != null) {
+                warehouse.removePart(part);
+            }
+        }
         // now check to see what is null
         for (int i = 0; i < locations.length; i++) {
             if (entity.getOInternal(i) == IArmorState.ARMOR_NA) {
@@ -4077,6 +4097,10 @@ public class Unit implements ITechnology, ILocatable {
             }
             // We want to ignore weapon groups so that we don't get phantom weapons
             if (m.isWeaponGroup()) {
+                continue;
+            }
+
+            if (m.isBombMounted() || (m.getType() instanceof BombType)) {
                 continue;
             }
             // Anti-Mek attacks aren't actual parts
