@@ -1,6 +1,5 @@
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import static megamek.common.units.UnitType.MEK;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -12,12 +11,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
-import mekhq.campaign.digitalGM.stratCon.StratConScenarioFactory;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.enums.DailyReportType;
-import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.gui.dialog.StratConAmbushedDialog;
 
 /**
@@ -210,35 +206,8 @@ public abstract class StratConAmbushPointOfInterestBehavior implements IStratCon
      */
     protected @Nullable StratConScenario placeAmbush(StratConPointOfInterest pointOfInterest,
           StratConTrackState track, int formationId, AbstractContract contract, Campaign campaign) {
-        // With no usable template, a random scenario springs the ambush instead; a missing named one is logged.
-        String templateName = getScenarioTemplateName();
-        ScenarioTemplate template;
-        if (templateName != null) {
-            template = StratConScenarioFactory.getSpecificScenario(templateName);
-        } else {
-            Formation formation = campaign.getPlayerForce().getFormation(formationId);
-            int unitType = (formation == null) ? MEK : formation.getPrimaryUnitType(campaign);
-            template = StratConScenarioFactory.getRandomScenario(unitType, true, false);
-        }
-
-        // Facilities are ignored: these points of interest occupy their hex, so none can share it.
-        StratConScenario ambush = StratConRulesManager.setupScenario(pointOfInterest.getCoords(),
-              null,
-              campaign,
-              contract,
-              track,
-              template,
-              true,
-              null);
-        if (ambush == null) {
-            return null;
-        }
-
-        ambush.getBackingScenario().setIsCrisis(true);
-        ambush.setTurningPoint(false);
-        track.addScenario(ambush);
-        StratConPointOfInterestRules.linkScenario(pointOfInterest, ambush);
-        return ambush;
+        return StratConAmbushes.placeAmbush(pointOfInterest, track, formationId, contract, campaign,
+              getScenarioTemplateName());
     }
 
     /**

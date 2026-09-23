@@ -536,6 +536,7 @@ public class StratConContractInitializer {
      *     <li>Retainer: scheduled parades (see {@link StratConScheduledParadeBehavior})</li>
      *     <li>Riot Duty: civil disobedience (see {@link StratConCivilDisobedienceBehavior})</li>
      *     <li>Sabotage: sabotage targets (see {@link StratConSabotageTargetBehavior})</li>
+     *     <li>Terrorism: civilian infrastructure (see {@link StratConCivilianInfrastructureBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -608,6 +609,10 @@ public class StratConContractInitializer {
 
         if (objectiveType.isSabotage()) {
             return StratConSabotageTargetBehavior.TYPE_ID;
+        }
+
+        if (objectiveType.isTerrorism()) {
+            return StratConCivilianInfrastructureBehavior.TYPE_ID;
         }
 
         return null;

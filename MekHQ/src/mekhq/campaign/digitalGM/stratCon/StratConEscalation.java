@@ -154,6 +154,22 @@ public final class StratConEscalation {
     }
 
     /**
+     * Raises the contract's Escalation by a number of d6 (see {@link #increaseEscalation}).
+     *
+     * @param campaign the current campaign
+     * @param contract the contract
+     * @param dice     how many d6 to roll; nothing happens if this is not positive
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void increaseEscalationByDice(Campaign campaign, @Nullable AbstractContract contract, int dice) {
+        if (dice > 0) {
+            increaseEscalation(campaign, contract, d6(dice));
+        }
+    }
+
+    /**
      * A force has deployed to an empty hex - one with no scenario, facility, or point of interest - and no scenario
      * resulted: +1 Escalation.
      *

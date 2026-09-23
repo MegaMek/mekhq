@@ -47,12 +47,13 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
 
     /**
      * @return the file name of the scenario template fought over this type of point of interest, such as
-     *       {@code Recon Evasion.json}
+     *       {@code Recon Evasion.json}; or {@code null} for the deploying formation to be ambushed instead, in a template
+     *       suited to ambushing its unit type (see {@link StratConAmbushes#placeAmbush})
      *
      * @author Illiani
      * @since 0.51.01
      */
-    protected abstract String getScenarioTemplateName();
+    protected abstract @Nullable String getScenarioTemplateName();
 
     /**
      * @return the prefix of this type's keys in the {@code StratConRulesManager} resource bundle, such as
@@ -156,7 +157,7 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
         }
 
         addReport(BATTLE, "contested.report", pointOfInterest, track, campaign);
-        announceContest(pointOfInterest, track, contract, campaign);
+        announceContest(pointOfInterest, track, formationId, contract, campaign);
         return PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO;
     }
 
@@ -236,20 +237,22 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
      *
      * @param pointOfInterest the point of interest the scenario is over
      * @param track           the sector it sits in
+     * @param formationId     the ID of the deploying formation
      * @param contract        the contract whose map holds the sector
      * @param campaign        the current campaign
      *
      * @author Illiani
      * @since 0.51.01
      */
-    protected void announceContest(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+    protected void announceContest(StratConPointOfInterest pointOfInterest, StratConTrackState track, int formationId,
           AbstractContract contract, Campaign campaign) {
     }
 
     /**
      * Places the scenario fought over a contested point of interest on its hex and links the point of interest to it.
      * By default, the scenario is drawn from this type's template (see {@link #getScenarioTemplateName}) and set up
-     * without the deploying formation, which is then assigned to it like any scenario found on the hex.
+     * without the deploying formation, which is then assigned to it like any scenario found on the hex; with no
+     * template, the formation is ambushed instead.
      *
      * @param pointOfInterest the point of interest
      * @param track           the sector it sits in
@@ -264,8 +267,13 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
      */
     protected @Nullable StratConScenario placeContestingScenario(StratConPointOfInterest pointOfInterest,
           StratConTrackState track, int formationId, AbstractContract contract, Campaign campaign) {
+        String templateName = getScenarioTemplateName();
+        if (templateName == null) {
+            return StratConAmbushes.placeAmbush(pointOfInterest, track, formationId, contract, campaign, null);
+        }
+
         // A missing template is logged by the factory; a random scenario is fought instead.
-        ScenarioTemplate template = StratConScenarioFactory.getSpecificScenario(getScenarioTemplateName());
+        ScenarioTemplate template = StratConScenarioFactory.getSpecificScenario(templateName);
 
         // Facilities are ignored: these points of interest occupy their hex, so none can share it.
         StratConScenario scenario = StratConRulesManager.setupScenario(pointOfInterest.getCoords(),

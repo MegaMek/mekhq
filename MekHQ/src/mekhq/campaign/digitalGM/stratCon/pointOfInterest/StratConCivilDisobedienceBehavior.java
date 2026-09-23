@@ -95,7 +95,7 @@ public class StratConCivilDisobedienceBehavior extends StratConContestedPointOfI
      * @since 0.51.01
      */
     @Override
-    protected void announceContest(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+    protected void announceContest(StratConPointOfInterest pointOfInterest, StratConTrackState track, int formationId,
           AbstractContract contract, Campaign campaign) {
         StratConRiots.announceRiot(pointOfInterest, track, contract, campaign);
     }
