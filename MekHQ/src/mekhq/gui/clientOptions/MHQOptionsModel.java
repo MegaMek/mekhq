@@ -41,6 +41,8 @@ import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.gui.dialog.nagDialogs.ContractSpecialMechanicsNagDialog;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
@@ -375,6 +377,10 @@ class MHQOptionsModel {
         for (String key : NAG_IGNORE_KEYS) {
             nagIgnores.put(key, options.getNagDialogIgnore(key));
         }
+        for (ContractObjectiveType objectiveType : ContractSpecialMechanicsNagDialog.getBriefedContractTypes()) {
+            String key = ContractSpecialMechanicsNagDialog.getNagKey(objectiveType);
+            nagIgnores.put(key, options.getNagDialogIgnore(key));
+        }
 
         // Advanced
         userDir = PreferenceManager.getClientPreferences().getUserDir();
@@ -558,6 +564,10 @@ class MHQOptionsModel {
 
         // Reminders & Confirmations
         for (String key : NAG_IGNORE_KEYS) {
+            options.setNagDialogIgnore(key, nagIgnores.get(key));
+        }
+        for (ContractObjectiveType objectiveType : ContractSpecialMechanicsNagDialog.getBriefedContractTypes()) {
+            String key = ContractSpecialMechanicsNagDialog.getNagKey(objectiveType);
             options.setNagDialogIgnore(key, nagIgnores.get(key));
         }
 
