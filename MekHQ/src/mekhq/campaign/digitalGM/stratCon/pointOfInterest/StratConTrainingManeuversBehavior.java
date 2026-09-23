@@ -78,7 +78,8 @@ public class StratConTrainingManeuversBehavior implements IStratConPointOfIntere
         StratConPointOfInterestRules.resolvePointOfInterest(track, pointOfInterest);
         track.removePointOfInterest(pointOfInterest.getId());
 
-        campaign.addReport(GENERAL, getFormattedTextAt(StratConPointOfInterestRules.RESOURCE_BUNDLE,
+        StratConPointOfInterestRules.reportToPlayer(campaign, GENERAL, getFormattedTextAt(
+              StratConPointOfInterestRules.RESOURCE_BUNDLE,
               BEHAVIOR_ID + ".completed.report",
               pointOfInterest.getDisplayableName(),
               track.getDisplayableName()));

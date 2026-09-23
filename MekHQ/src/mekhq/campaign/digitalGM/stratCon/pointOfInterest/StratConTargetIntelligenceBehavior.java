@@ -159,7 +159,8 @@ public class StratConTargetIntelligenceBehavior extends StratConAmbushPointOfInt
             // The lead was good, but the sector has no room left for another base: nothing comes of it.
             addReport(GENERAL, "noRoom.report", pointOfInterest, track, campaign);
         } else {
-            campaign.addReport(BATTLE, getFormattedTextAt(StratConPointOfInterestRules.RESOURCE_BUNDLE,
+            StratConPointOfInterestRules.reportToPlayer(campaign, BATTLE, getFormattedTextAt(
+                  StratConPointOfInterestRules.RESOURCE_BUNDLE,
                   getBehaviorId() + ".facility.report",
                   pointOfInterest.getDisplayableName(),
                   track.getDisplayableName(),

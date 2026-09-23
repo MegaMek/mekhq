@@ -441,7 +441,8 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
      */
     protected void addReport(DailyReportType reportType, String keySuffix, StratConPointOfInterest pointOfInterest,
           StratConTrackState track, Campaign campaign) {
-        campaign.addReport(reportType, getFormattedTextAt(StratConPointOfInterestRules.RESOURCE_BUNDLE,
+        StratConPointOfInterestRules.reportToPlayer(campaign, reportType, getFormattedTextAt(
+              StratConPointOfInterestRules.RESOURCE_BUNDLE,
               behaviorId + '.' + keySuffix,
               pointOfInterest.getDisplayableName(),
               track.getDisplayableName()));

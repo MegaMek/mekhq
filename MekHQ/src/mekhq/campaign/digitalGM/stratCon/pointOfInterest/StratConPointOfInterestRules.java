@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -48,7 +48,10 @@ import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConStrategicObjective;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest.PointOfInterestStatus;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
 /**
  * The StratCon rules that act on points of interest during play: the points where the rest of StratCon hands control
@@ -62,6 +65,28 @@ public final class StratConPointOfInterestRules {
     static final String RESOURCE_BUNDLE = "mekhq.resources.StratConPointOfInterest";
 
     private StratConPointOfInterestRules() {
+    }
+
+    /**
+     * Tells the player what has just happened at a point of interest: adds the report to the daily report and, when
+     * the campaign is being played through the GUI, also shows it as a small notification dialog so it is not missed.
+     *
+     * <p>Every point of interest report should go through this rather than straight to the daily report.</p>
+     *
+     * @param campaign   the current campaign
+     * @param reportType the daily report tab the report belongs on
+     * @param report     the report text
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void reportToPlayer(Campaign campaign, DailyReportType reportType, String report) {
+        campaign.addReport(reportType, report);
+
+        // No GUI means no player watching (for example, a headless or test campaign), so the daily report is enough.
+        if (campaign.getGUI() != null) {
+            new ImmersiveDialogNotification(campaign, report, ImmersiveDialogWidth.SMALL, true);
+        }
     }
 
     /**
@@ -303,7 +328,8 @@ public final class StratConPointOfInterestRules {
         }
 
         if (visibleToPlayer) {
-            campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE,
+            // Expiry is routine upkeep rather than something the player just did, so it stays out of their way.
+            campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE,
                   "pointOfInterest.expired.report",
                   pointOfInterest.getDisplayableName(),
                   track.getDisplayableName()));

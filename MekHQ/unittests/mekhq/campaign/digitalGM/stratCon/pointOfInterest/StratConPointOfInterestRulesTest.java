@@ -32,7 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -402,14 +402,14 @@ class StratConPointOfInterestRulesTest {
         hidden.setExpiryDate(TODAY);
 
         StratConPointOfInterestRules.processNewDay(track, campaign);
-        verify(campaign, never()).addReport(eq(GENERAL), anyString());
+        verify(campaign, never()).addReport(eq(BATTLE), anyString());
 
         StratConPointOfInterest seen = place(DAILY_TYPE_ID, 2, 2);
         seen.setRevealed(true);
         seen.setExpiryDate(TODAY);
 
         StratConPointOfInterestRules.processNewDay(track, campaign);
-        verify(campaign).addReport(eq(GENERAL), anyString());
+        verify(campaign).addReport(eq(BATTLE), anyString());
     }
 
     // Deployment
