@@ -476,6 +476,27 @@ class StratConDataCacheSchedulingTest {
     }
 
     @Test
+    void securityReviewsDoNotReplaceEssentialScenarios() {
+        assertEquals(StratConSecurityReviewBehavior.TYPE_ID,
+              StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.SECURITY_DUTY, 1), true));
+        assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
+              contract(ContractObjectiveType.SECURITY_DUTY, 1), true));
+    }
+
+    @Test
+    void aSecurityDutyContractSchedulesOnlySecurityReviewsEachAnObjective() {
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.SECURITY_DUTY, 1), true, true);
+
+        assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertEquals(StratConSecurityReviewBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertTrue(pointOfInterest.isStrategicObjective());
+        }
+    }
+
+    @Test
     void highProfileTargetsDoNotReplaceEssentialScenarios() {
         assertEquals(StratConHighProfileTargetBehavior.TYPE_ID,
               StratConContractInitializer.getSpecialPointOfInterestTypeId(

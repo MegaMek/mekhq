@@ -537,6 +537,7 @@ public class StratConContractInitializer {
      *     <li>Riot Duty: civil disobedience (see {@link StratConCivilDisobedienceBehavior})</li>
      *     <li>Sabotage: sabotage targets (see {@link StratConSabotageTargetBehavior})</li>
      *     <li>Terrorism: civilian infrastructure (see {@link StratConCivilianInfrastructureBehavior})</li>
+     *     <li>Security Duty: security reviews (see {@link StratConSecurityReviewBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -615,6 +616,10 @@ public class StratConContractInitializer {
             return StratConCivilianInfrastructureBehavior.TYPE_ID;
         }
 
+        if (objectiveType.isSecurityDuty()) {
+            return StratConSecurityReviewBehavior.TYPE_ID;
+        }
+
         return null;
     }
 
@@ -622,8 +627,8 @@ public class StratConContractInitializer {
      * Decides whether a contract's special points of interest (see {@link #getSpecialPointOfInterestTypeId}) replace
      * its Essential scenarios. Most do: such a contract gets no Essential scenarios, and the combat bonus is paid for
      * each special point of interest dealt with instead. Beleaguered forces, training maneuvers, high profile targets,
-     * and strategic positions do not - Relief Duty, Cadre Duty, Diversionary Raid, and Planetary Assault contracts keep
-     * their Essential scenarios alongside them.
+     * strategic positions, and security reviews do not - Relief Duty, Cadre Duty, Diversionary Raid, Planetary Assault,
+     * and Security Duty contracts keep their Essential scenarios alongside them.
      *
      * @param contract                       the contract
      * @param isContractsUseSpecialMechanics whether the "Contracts Use Special Mechanics" option is on
@@ -640,7 +645,8 @@ public class StratConContractInitializer {
                      && !StratConBeleagueredForcesBehavior.TYPE_ID.equals(specialTypeId)
                      && !StratConTrainingManeuversBehavior.TYPE_ID.equals(specialTypeId)
                      && !StratConHighProfileTargetBehavior.TYPE_ID.equals(specialTypeId)
-                     && !StratConStrategicPositionBehavior.TYPE_ID.equals(specialTypeId);
+                     && !StratConStrategicPositionBehavior.TYPE_ID.equals(specialTypeId)
+                     && !StratConSecurityReviewBehavior.TYPE_ID.equals(specialTypeId);
     }
 
     /**

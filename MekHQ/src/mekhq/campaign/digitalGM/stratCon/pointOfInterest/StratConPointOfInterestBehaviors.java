@@ -76,6 +76,7 @@ public final class StratConPointOfInterestBehaviors {
         behaviors.put(StratConSabotageTargetBehavior.BEHAVIOR_ID, new StratConSabotageTargetBehavior());
         behaviors.put(StratConCivilianInfrastructureBehavior.BEHAVIOR_ID,
               new StratConCivilianInfrastructureBehavior());
+        behaviors.put(StratConSecurityReviewBehavior.BEHAVIOR_ID, new StratConSecurityReviewBehavior());
     }
 
     private StratConPointOfInterestBehaviors() {
