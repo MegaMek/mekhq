@@ -49,6 +49,7 @@ import java.util.List;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.PointOfInterestParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConAssassinationLeadBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConBeleagueredForcesBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDataCacheBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConLookoutPointBehavior;
@@ -325,6 +326,9 @@ class StratConDataCacheSchedulingTest {
         assertEquals(StratConPotentialLeadBehavior.TYPE_ID,
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.MOLE_HUNTING, 1), true));
+        assertEquals(StratConAssassinationLeadBehavior.TYPE_ID,
+              StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.ASSASSINATION, 1), true));
         assertEquals(StratConLookoutPointBehavior.TYPE_ID,
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.OBSERVATION_RAID, 1), true));
@@ -353,7 +357,7 @@ class StratConDataCacheSchedulingTest {
 
     @ParameterizedTest
     @EnumSource(value = ContractObjectiveType.class,
-          names = { "ESPIONAGE", "GUERRILLA_WARFARE", "MOLE_HUNTING", "OBSERVATION_RAID" })
+          names = { "ESPIONAGE", "GUERRILLA_WARFARE", "MOLE_HUNTING", "ASSASSINATION", "OBSERVATION_RAID" })
     void specialPointsOfInterestReplaceEssentialScenarios(ContractObjectiveType objectiveType) {
         assertTrue(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), true));
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), false),

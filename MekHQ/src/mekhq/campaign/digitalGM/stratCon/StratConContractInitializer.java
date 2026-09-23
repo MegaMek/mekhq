@@ -511,6 +511,7 @@ public class StratConContractInitializer {
      *     <li>Espionage: data caches (see {@link StratConDataCacheBehavior})</li>
      *     <li>Guerrilla Warfare: vulnerable infrastructure (see {@link StratConVulnerableInfrastructureBehavior})</li>
      *     <li>Mole Hunting: potential leads (see {@link StratConPotentialLeadBehavior})</li>
+     *     <li>Assassination: leads on the target (see {@link StratConAssassinationLeadBehavior})</li>
      *     <li>Observation Raid: lookout points (see {@link StratConLookoutPointBehavior})</li>
      *     <li>Relief Duty: beleaguered forces (see {@link StratConBeleagueredForcesBehavior})</li>
      * </ul>
@@ -545,6 +546,10 @@ public class StratConContractInitializer {
 
         if (objectiveType.isMoleHunting()) {
             return StratConPotentialLeadBehavior.TYPE_ID;
+        }
+
+        if (objectiveType.isAssassination()) {
+            return StratConAssassinationLeadBehavior.TYPE_ID;
         }
 
         if (objectiveType.isObservationRaid()) {
