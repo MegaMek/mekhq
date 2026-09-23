@@ -366,16 +366,16 @@ public final class ForceDescriptorSnapshot {
         Map<String, SnapshotElementReader> readers = new HashMap<>();
         readers.put("faction", (snapshot, text) -> snapshot.faction = text);
         readers.put("year", (snapshot, text) -> snapshot.year = parseInteger("year", text, snapshot.year));
-        readers.put("echelon", (snapshot, text) -> snapshot.echelon = parseInteger("echelon", text, snapshot.echelon));
-        readers.put("unitType", (snapshot, text) -> snapshot.unitType = parseInteger("unitType", text, snapshot.unitType));
+        readers.put("echelon", (snapshot, text) -> snapshot.echelon = parseOptionalInteger("echelon", text, snapshot.echelon));
+        readers.put("unitType", (snapshot, text) -> snapshot.unitType = parseOptionalInteger("unitType", text, snapshot.unitType));
         readers.put("rating", (snapshot, text) -> snapshot.rating = text);
-        readers.put("experience", (snapshot, text) -> snapshot.experience = parseInteger("experience", text,
+        readers.put("experience", (snapshot, text) -> snapshot.experience = parseOptionalInteger("experience", text,
               snapshot.experience));
-        readers.put("weightClass", (snapshot, text) -> snapshot.weightClass = parseInteger("weightClass", text,
+        readers.put("weightClass", (snapshot, text) -> snapshot.weightClass = parseOptionalInteger("weightClass", text,
               snapshot.weightClass));
         readers.put("flags", (snapshot, text) -> addTokens(text, snapshot.flags));
         readers.put("augmented", (snapshot, text) -> snapshot.augmented = Boolean.parseBoolean(text));
-        readers.put("sizeMod", (snapshot, text) -> snapshot.sizeMod = parseInteger("sizeMod", text, snapshot.sizeMod));
+        readers.put("sizeMod", (snapshot, text) -> snapshot.sizeMod = parseOptionalInteger("sizeMod", text, snapshot.sizeMod));
         readers.put("roles", (snapshot, text) -> addTokens(text, snapshot.roles));
         readers.put("dropshipPct", (snapshot, text) -> snapshot.dropshipPct = parseDouble("dropshipPct", text,
               snapshot.dropshipPct));
@@ -386,7 +386,8 @@ public final class ForceDescriptorSnapshot {
     }
 
     /**
-     * Reads a whole number, keeping the current value where the text is not one.
+     * Reads a whole number into a setting that may be unset, keeping the current value where the text is
+     * not a number.
      *
      * <p>Each parse catches its own failure, so one bad setting costs only that setting and is named in
      * the log.</p>
@@ -397,7 +398,7 @@ public final class ForceDescriptorSnapshot {
      *
      * @return the parsed number, or {@code currentValue} where the text is not a number
      */
-    private static @Nullable Integer parseInteger(String elementName, String text, @Nullable Integer currentValue) {
+    private static @Nullable Integer parseOptionalInteger(String elementName, String text, @Nullable Integer currentValue) {
         try {
             return Integer.parseInt(text);
         } catch (NumberFormatException exception) {
