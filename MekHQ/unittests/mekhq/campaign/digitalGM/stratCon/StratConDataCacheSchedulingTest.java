@@ -49,15 +49,7 @@ import java.util.List;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.PointOfInterestParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConAssassinationLeadBehavior;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConBeleagueredForcesBehavior;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDataCacheBehavior;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConHighProfileTargetBehavior;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConLookoutPointBehavior;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPotentialLeadBehavior;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConTrainingManeuversBehavior;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConVulnerableInfrastructureBehavior;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.*;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
@@ -359,7 +351,8 @@ class StratConDataCacheSchedulingTest {
 
     @ParameterizedTest
     @EnumSource(value = ContractObjectiveType.class,
-          names = { "ESPIONAGE", "GUERRILLA_WARFARE", "MOLE_HUNTING", "ASSASSINATION", "OBSERVATION_RAID" })
+          names = { "ESPIONAGE", "GUERRILLA_WARFARE", "MOLE_HUNTING", "ASSASSINATION", "OBSERVATION_RAID",
+                    "EXTRACTION_RAID" })
     void specialPointsOfInterestReplaceEssentialScenarios(ContractObjectiveType objectiveType) {
         assertTrue(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), true));
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), false),
@@ -379,6 +372,22 @@ class StratConDataCacheSchedulingTest {
                     contract(ContractObjectiveType.CADRE_DUTY, 1), true));
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
               contract(ContractObjectiveType.CADRE_DUTY, 1), true));
+    }
+
+    @Test
+    void anExtractionRaidContractSchedulesOnlyVIPsEachAnObjective() {
+        assertEquals(StratConVIPBehavior.TYPE_ID,
+              StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.EXTRACTION_RAID, 1), true));
+
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.EXTRACTION_RAID, 1), true, true);
+
+        assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertEquals(StratConVIPBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertTrue(pointOfInterest.isStrategicObjective());
+        }
     }
 
     @Test

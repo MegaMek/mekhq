@@ -521,6 +521,7 @@ public class StratConContractInitializer {
      *     <li>Relief Duty: beleaguered forces (see {@link StratConBeleagueredForcesBehavior})</li>
      *     <li>Cadre Duty: training maneuvers (see {@link StratConTrainingManeuversBehavior})</li>
      *     <li>Diversionary Raid: high profile targets (see {@link StratConHighProfileTargetBehavior})</li>
+     *     <li>Extraction Raid: VIPs (see {@link StratConVIPBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -573,6 +574,10 @@ public class StratConContractInitializer {
 
         if (objectiveType.isDiversionaryRaid()) {
             return StratConHighProfileTargetBehavior.TYPE_ID;
+        }
+
+        if (objectiveType.isExtractionRaid()) {
+            return StratConVIPBehavior.TYPE_ID;
         }
 
         return null;
