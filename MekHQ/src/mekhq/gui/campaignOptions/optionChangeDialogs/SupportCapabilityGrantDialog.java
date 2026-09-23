@@ -296,6 +296,8 @@ public class SupportCapabilityGrantDialog extends JDialog {
      */
     public static void processFreeUnits(Campaign campaign, Faction faction, boolean isAutomaticallyAssignRanks,
           SupportCapability capability, @Nullable VehicleCrewSource crewSource) {
-        SupportUnitGenerator.generate(capability, campaign, faction, isAutomaticallyAssignRanks, crewSource);
+        // Granted mid-campaign, so no generation convention was stated; the default naming is used.
+        SupportUnitGenerator.generate(capability, campaign, faction, isAutomaticallyAssignRanks, crewSource,
+              null);
     }
 }

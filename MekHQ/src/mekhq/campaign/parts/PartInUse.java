@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2016-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -54,6 +54,7 @@ public class PartInUse {
     private double tonnagePerItem;
     private int transferCount;
     private int plannedCount;
+    private int missingCount;
     private Money cost = Money.zero();
     private final List<Part> spares = new ArrayList<>();
     private double requestedStock;
@@ -204,6 +205,30 @@ public class PartInUse {
     @Deprecated(since = "0.51.0", forRemoval = true)
     public void incPlannedCount() {
         ++plannedCount;
+    }
+
+    /**
+     * Returns how many of this part are currently destroyed or missing on fielded units and awaiting replacement.
+     *
+     * <p>This is a subset of {@link #getUseCount()}: a missing part contributes to both the use count (the unit still
+     * has the slot) and this count (the slot is currently empty). It lets consumers distinguish immediate battle
+     * damage from parts that are installed and working.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getMissingCount() {
+        return missingCount;
+    }
+
+    /**
+     * Sets how many of this part are currently destroyed or missing on fielded units.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setMissingCount(int missingCount) {
+        this.missingCount = missingCount;
     }
 
     public Money getCost() {

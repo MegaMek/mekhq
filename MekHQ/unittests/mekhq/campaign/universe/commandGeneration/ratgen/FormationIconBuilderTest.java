@@ -81,7 +81,7 @@ class FormationIconBuilderTest {
                         + "vehicle does not");
         }
         AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, vehicles,
-              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, "Lance {0}");
+              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, position -> "Lance " + position);
 
         Formation recoveryOperations = formationNamed(campaign,
               SupportTOEFormationTypes.SALVAGE_FORMATION.getLabel());
@@ -95,7 +95,7 @@ class FormationIconBuilderTest {
     void theLancesUnderItCarryItAsWell() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, vehiclesInHangar(campaign, 4),
-              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, "Lance {0}");
+              SupportTOEFormationTypes.SALVAGE_FORMATION, 4, position -> "Lance " + position);
 
         Formation lance = formationNamed(campaign, "Lance 1");
 
@@ -108,7 +108,7 @@ class FormationIconBuilderTest {
     void theConvoyStillCarriesTheSupplyIcon() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, vehiclesInHangar(campaign, 4),
-              SupportTOEFormationTypes.LOGISTICS_FORMATION, 4, "Lance {0}");
+              SupportTOEFormationTypes.LOGISTICS_FORMATION, 4, position -> "Lance " + position);
 
         Formation logistics = formationNamed(campaign,
               SupportTOEFormationTypes.LOGISTICS_FORMATION.getLabel());

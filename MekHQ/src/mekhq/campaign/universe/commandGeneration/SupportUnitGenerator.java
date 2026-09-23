@@ -34,12 +34,15 @@ package mekhq.campaign.universe.commandGeneration;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.IntFunction;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.equipment.MiscMounted;
@@ -68,6 +71,8 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.VehicleCrewSource;
+import mekhq.campaign.universe.enums.Alphabet;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
 
 /**
  * Generates the free support vehicles a command is granted for its various support capabilities, and
@@ -95,15 +100,17 @@ import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.VehicleCr
 public final class SupportUnitGenerator {
     private static final MMLogger LOGGER = MMLogger.create(SupportUnitGenerator.class);
 
-    // CHECKSTYLE IGNORE ForbiddenWords FOR 1 LINES
-    static final String SALVAGE_UNIT = "BattleMech Recovery Vehicle";
-    static final String LOGISTICS_UNIT = "Flatbed Truck";
-    static final String MEDICAL_UNIT = "MASH Truck (Small)";
-    static final String COMMISSARY_UNIT = "Sherpa Armored Truck (Mobile Canteen)";
     private static final String SECURITY_SQUAD_INNER_SPHERE = "Foot Squad (Rifle)";
     private static final String SECURITY_SQUAD_CLAN = "Clan Foot Squad (Rifle)";
     private static final String SECURITY_PLATOON_INNER_SPHERE = "Foot Platoon (Rifle)";
     private static final String SECURITY_PLATOON_CLAN = "Clan Foot Point (Rifle Light)";
+
+    /**
+     * Cargo tons assumed per truck when the faction could field no cargo vehicle at all in this year, which only
+     * happens before any exists. Sizing still produces a number so the rest of the pipeline has one; the roll then
+     * fields nothing, which is the correct outcome.
+     */
+    private static final double FALLBACK_CARGO_TONS_PER_TRUCK = 6.0;
 
     /** Vehicles per point for the formation-sized capabilities (salvage, logistics) in a Clan command. */
     private static final int CLAN_VEHICLES_PER_POINT = 2;
@@ -154,8 +161,8 @@ public final class SupportUnitGenerator {
      * @param autoAssignRanks whether generated crews have ranks assigned automatically
      */
     public static void generate(SupportCapability capability, Campaign campaign, Faction faction,
-          boolean autoAssignRanks) {
-        generate(capability, campaign, faction, autoAssignRanks, null);
+          boolean autoAssignRanks, @Nullable ForceNamingMethod namingMethod) {
+        generate(capability, campaign, faction, autoAssignRanks, null, namingMethod);
     }
 
     /**
@@ -167,11 +174,15 @@ public final class SupportUnitGenerator {
      * @param faction         the faction whose ranks the crews are given
      * @param autoAssignRanks whether generated crews have ranks assigned automatically
      * @param crewSource      the crewing to use, or {@code null} to follow the campaign's temporary crew options
+     * @param namingMethod    the convention the command's formations are named with, or {@code null} for the
+     *                        default; a mid-campaign grant has none stated and takes the default
      */
     public static void generate(SupportCapability capability, Campaign campaign, Faction faction,
-          boolean autoAssignRanks, @Nullable VehicleCrewSource crewSource) {
-        generate(campaign, faction, autoAssignRanks, capability.unitName(campaign), capability.targetCount(campaign, faction),
-              capability.formationType(), crewSource);
+          boolean autoAssignRanks, @Nullable VehicleCrewSource crewSource,
+          @Nullable ForceNamingMethod namingMethod) {
+        generate(capability, campaign, faction, autoAssignRanks, capability.unitName(campaign),
+              capability.targetCount(campaign, faction),
+              capability.formationType(), crewSource, namingMethod);
     }
 
     /**
@@ -243,6 +254,101 @@ public final class SupportUnitGenerator {
     }
 
     /**
+     * One rolled model and how many of it to build, so a formation is filled with a single kind of vehicle.
+     *
+     * @param unitName the rolled unit's name
+     * @param summary  the cache entry to build it from
+     * @param count    how many to build
+     */
+    public record RolledBatch(String unitName, MekSummary summary, int count) {
+    }
+
+    /**
+     * Fills a shortfall of {@code missing} vehicles by rolling one model per formation.
+     *
+     * <p>A lance is four of the same vehicle rather than four different ones, which is how a command would actually
+     * be equipped, and rolling per formation rather than once per capability lets a larger command field a mixed
+     * convoy - three lances of Flatbeds and one of Burros, say.</p>
+     *
+     * @param capability     the capability being fielded
+     * @param campaign       the campaign, for the year to roll in
+     * @param faction        the faction the command is organised as
+     * @param missing        how many vehicles are still needed
+     * @param formationSize  vehicles per formation, or {@code 0} to roll a single model for the lot
+     *
+     * @return one batch per formation, empty when nothing suitable could be rolled
+     */
+    static List<RolledBatch> rollBatches(SupportCapability capability, Campaign campaign, Faction faction,
+          int missing, int formationSize) {
+        List<RolledBatch> batches = new ArrayList<>();
+        if (missing <= 0) {
+            return batches;
+        }
+        String factionCode = faction.getShortName();
+        int year = campaign.getLocalDate().getYear();
+        String rating = null;
+
+        int perBatch = (formationSize > 0) ? formationSize : missing;
+        int remaining = missing;
+        while (remaining > 0) {
+            int batchSize = Math.min(perBatch, remaining);
+            List<RolledBatch> formation = rollFormation(capability, factionCode, year, rating, batchSize);
+            if (formation.isEmpty()) {
+                LOGGER.info("[CompanyGen][SupportUnits] {}: nothing suitable could be rolled for {} in {};"
+                            + " {} vehicle(s) will not be fielded", capability, factionCode, year, remaining);
+                return batches;
+            }
+            batches.addAll(formation);
+            remaining -= batchSize;
+        }
+        return batches;
+    }
+
+    /**
+     * Rolls the vehicles of one formation, one roll per seat.
+     *
+     * <p>A formation takes what was rolled for it rather than handing every seat to whichever model won most of
+     * them. Rolling once and multiplying it up is what gave a Clan command ten Wayland Mobile Bases, a vehicle
+     * rated one on its table; and a winner taking all is little better on a broad table, where a model winning
+     * three rolls of ten would still fill a whole Star.</p>
+     *
+     * <p>Rolling per seat lets the table weighting decide the mix, so a Star comes out mostly the common recovery
+     * vehicle with an occasional rarer one beside it, which is what a real formation looks like.</p>
+     *
+     * @param capability    the capability being fielded
+     * @param factionCode   the faction the command is generated for
+     * @param year          the campaign year
+     * @param rating        the command equipment rating, or {@code null} for any
+     * @param formationSize vehicles the formation holds
+     *
+     * @return one batch per distinct model rolled, empty when nothing suitable could be rolled at all
+     */
+    private static List<RolledBatch> rollFormation(SupportCapability capability, @Nullable String factionCode,
+          int year, @Nullable String rating, int formationSize) {
+        Map<String, SupportVehicleSelector.Candidate> rolledByName = new LinkedHashMap<>();
+        Map<String, Integer> seats = new LinkedHashMap<>();
+        for (int seat = 0; seat < Math.max(1, formationSize); seat++) {
+            SupportVehicleSelector.Candidate rolled = SupportVehicleSelector.roll(capability, factionCode, year,
+                  rating);
+            if (rolled == null) {
+                continue;
+            }
+            rolledByName.putIfAbsent(rolled.unitName(), rolled);
+            seats.merge(rolled.unitName(), 1, Integer::sum);
+        }
+        List<RolledBatch> formation = new ArrayList<>();
+        for (Map.Entry<String, Integer> entry : seats.entrySet()) {
+            formation.add(new RolledBatch(entry.getKey(), rolledByName.get(entry.getKey()).summary(),
+                  entry.getValue()));
+        }
+        if (!formation.isEmpty()) {
+            LOGGER.info("[CompanyGen][SupportUnits] {}: formation of {} rolled as {}", capability,
+                  Math.max(1, formationSize), seats);
+        }
+        return formation;
+    }
+
+    /**
      * How many more of {@code unitName} the campaign needs to reach {@code targetCount}, never negative.
      *
      * @param campaign    the campaign whose hangar is counted
@@ -251,8 +357,28 @@ public final class SupportUnitGenerator {
      *
      * @return the number still missing
      */
-    static int shortfall(Campaign campaign, String unitName, int targetCount) {
+    static int shortfall(Campaign campaign, @Nullable String unitName, int targetCount) {
         return Math.max(0, targetCount - countGeneratedUnitsNamed(campaign, unitName));
+    }
+
+    /**
+     * What a capability already fields, counted by its TOE formation rather than by unit name.
+     *
+     * <p>A capability's vehicles are rolled, so they no longer share a name to count: a convoy can be three lances
+     * of Flatbeds and one of Burros. What they do share is the formation they are filed into.</p>
+     *
+     * @param campaign      the campaign to inspect
+     * @param formationType the capability's formation
+     *
+     * @return the vehicles already filed there
+     */
+    static int countVehiclesInFormation(Campaign campaign, SupportTOEFormationTypes formationType) {
+        for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
+            if (formation.getName().equalsIgnoreCase(formationType.getLabel())) {
+                return formation.getAllUnits(false).size();
+            }
+        }
+        return 0;
     }
 
     /** Where the support sub-formations sit: the faction's smallest formation, a lance, Star or Level II. */
@@ -291,6 +417,38 @@ public final class SupportUnitGenerator {
      */
     static String subFormationPattern(Faction faction) {
         return subFormationPattern(baseFormationLevel(faction));
+    }
+
+    /**
+     * Names support sub-formations the way the command's combat formations are named, so a command whose lances are
+     * Able, Baker and Charlie does not file its trucks under Lance 1 and Lance 2.
+     *
+     * @param faction       the faction of the command being supported, which decides lance, Star or Level II
+     * @param namingMethod  the convention the command was generated with, or {@code null} for the default
+     *
+     * @return the name for the sub-formation at a given position, counting from one
+     */
+    static IntFunction<String> subFormationNamer(Faction faction, @Nullable ForceNamingMethod namingMethod) {
+        String pattern = subFormationPattern(faction);
+        ForceNamingMethod method = (namingMethod == null) ? ForceNamingMethod.CCB_1943 : namingMethod;
+        return position -> MessageFormat.format(pattern, designator(method, position));
+    }
+
+    /**
+     * The designator for the sub-formation at {@code position}, counting from one: Able, Baker, Charlie under the
+     * default convention. Positions beyond the alphabet fall back on the number, which no real command reaches.
+     *
+     * @param namingMethod the convention the command was generated with
+     * @param position     the sub-formation's position, counting from one
+     *
+     * @return the designator
+     */
+    static String designator(ForceNamingMethod namingMethod, int position) {
+        Alphabet[] alphabet = Alphabet.values();
+        if ((position < 1) || (position > alphabet.length)) {
+            return String.valueOf(position);
+        }
+        return namingMethod.getValue(alphabet[position - 1]);
     }
 
     /**
@@ -381,11 +539,16 @@ public final class SupportUnitGenerator {
      * Tallies the command's combat units, which is what both the convoy and the salvage formation are sized against.
      * Large craft and conventional infantry are left out on the same terms {@link Resupply} uses.
      *
-     * <p>Anything already filed into a support formation is left out too, and that exclusion carries the weight
-     * here. Most support vehicles are not support vehicles by construction: a BattleMek Recovery Vehicle is an
-     * ordinary fifty-ton Tank, so {@link Entity#isSupportVehicle()} is {@code false} for it. Since the capabilities
-     * are generated one after another, counting them would let each one inflate the next: a command whose twelve
-     * recovery vehicles had already been built would size its convoy against six hundred tons of its own support.</p>
+     * <p>What a capability already fields is left out by asking where a unit is filed, not what it is built as.
+     * Construction does not answer the question in either direction. A BattleMek Recovery Vehicle is an ordinary
+     * fifty-ton Tank, so it would not be excluded; and an early command's whole fighting force is built under
+     * support vehicle rules - the primitive LRM, SRM and AC/2 Carriers of the 2400s are all {@code SupportTank} -
+     * so excluding those would leave a twelve vehicle command weighing nothing at all.</p>
+     *
+     * <p>Filing is the reliable test, because the capabilities generate one after another and each files its
+     * vehicles before the next is sized. Without it each capability inflates the next: a command whose twelve
+     * recovery vehicles had already been built would size its convoy against six hundred tons of its own
+     * support.</p>
      *
      * @param campaign the campaign to tally
      *
@@ -396,7 +559,7 @@ public final class SupportUnitGenerator {
         double tonnage = 0;
         for (Unit unit : campaign.getUnits()) {
             Entity entity = unit.getEntity();
-            if ((entity == null) || entity.isSupportVehicle() || Resupply.isProhibitedUnitType(entity, false, false)) {
+            if ((entity == null) || Resupply.isProhibitedUnitType(entity, false, false)) {
                 continue;
             }
             if (isInSupportFormation(campaign, unit)) {
@@ -446,7 +609,12 @@ public final class SupportUnitGenerator {
     static int logisticsUnitCount(Campaign campaign, Faction faction) {
         CombatForceTally tally = tallyCombatForce(campaign);
         double cargoToHaul = (tally.tonnage() / COMBAT_TONNAGE_PER_CARGO_TON) * Resupply.CARGO_MULTIPLIER;
-        double cargoPerTruck = cargoCapacity(LOGISTICS_UNIT);
+        double cargoPerTruck = SupportVehicleSelector.typicalCapacity(SupportCapability.LOGISTICS,
+              faction.getShortName(), campaign.getLocalDate().getYear(), null,
+              SupportVehicleSelector.Candidate::cargoTons);
+        if (cargoPerTruck <= 0) {
+            cargoPerTruck = FALLBACK_CARGO_TONS_PER_TRUCK;
+        }
         int trucksNeeded = (cargoPerTruck > 0) ? (int) Math.ceil(cargoToHaul / cargoPerTruck) : 1;
         int count = roundUpToWholeFormations(trucksNeeded, supportFormationSize(faction));
         LOGGER.info("[CompanyGen][SupportUnits] logistics: {} combat tons -> {} tons to haul, {} tons per truck -> "
@@ -495,10 +663,9 @@ public final class SupportUnitGenerator {
     }
 
     /**
-     * Number of mobile canteens required to feed the command. Each canteen counts as a single field
-     * kitchen worth of coverage ({@link CampaignOptions#getFieldKitchenCapacity()} personnel),
-     * regardless of how many kitchen items the unit model happens to carry, so the count reads as
-     * roughly one canteen per kitchen's worth of personnel. The personnel that need feeding are
+     * Number of mobile canteens required to feed the command, counting the field kitchens the canteens actually
+     * carry. A vehicle with two kitchens feeds twice what a vehicle with one does, so a command given the
+     * two-kitchen Sherpa needs half as many canteens as the option's per-kitchen figure alone would suggest. The personnel that need feeding are
      * counted exactly as {@link Fatigue#checkFieldKitchenUsage} counts them (honouring the
      * ignore-non-combatants option). Never returns fewer than one so an enabled commissary always
      * fields at least one canteen.
@@ -511,10 +678,19 @@ public final class SupportUnitGenerator {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int personnelNeedingKitchen = Fatigue.checkFieldKitchenUsage(campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false),
               campaignOptions.get(CampaignOption.FIELD_KITCHEN_IGNORE_NON_COMBATANTS), campaign);
-        int coveragePerCanteen = campaignOptions.get(CampaignOption.FIELD_KITCHEN_CAPACITY);
+        double kitchensPerCanteen = SupportVehicleSelector.typicalCapacity(SupportCapability.COMMISSARY,
+              faction.getShortName(), campaign.getLocalDate().getYear(), null,
+              SupportVehicleSelector.Candidate::fieldKitchens);
+        if (kitchensPerCanteen <= 0) {
+            kitchensPerCanteen = 1;
+        }
+        int coveragePerCanteen = (int) Math.round(kitchensPerCanteen
+              * campaignOptions.get(CampaignOption.FIELD_KITCHEN_CAPACITY));
         int count = vehiclesForCoverage(personnelNeedingKitchen, coveragePerCanteen);
-        LOGGER.info("[CompanyGen][SupportUnits] commissary: {} personnel need feeding, {} fed per canteen -> {} canteen(s)",
-              personnelNeedingKitchen, coveragePerCanteen, count);
+        LOGGER.info("[CompanyGen][SupportUnits] commissary: {} personnel need feeding, {} kitchen(s) per canteen "
+                    + "feeding {} each -> {} fed per canteen -> {} canteen(s)",
+              personnelNeedingKitchen, kitchensPerCanteen,
+              campaignOptions.get(CampaignOption.FIELD_KITCHEN_CAPACITY), coveragePerCanteen, count);
         return count;
     }
 
@@ -534,7 +710,14 @@ public final class SupportUnitGenerator {
     static int medicalUnitCount(Campaign campaign, Faction faction) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int patientsToCover = combatPersonnelCount(campaign);
-        int coveragePerTruck = countEquipment(MEDICAL_UNIT, MiscType.F_MASH) * campaignOptions.get(CampaignOption.MASH_THEATRE_CAPACITY);
+        double theatresPerTruck = SupportVehicleSelector.typicalCapacity(SupportCapability.MEDICAL,
+              faction.getShortName(), campaign.getLocalDate().getYear(), null,
+              SupportVehicleSelector.Candidate::mashTheatres);
+        if (theatresPerTruck <= 0) {
+            theatresPerTruck = 1;
+        }
+        int coveragePerTruck = (int) Math.round(theatresPerTruck
+              * campaignOptions.get(CampaignOption.MASH_THEATRE_CAPACITY));
         int count = vehiclesForCoverage(patientsToCover, coveragePerTruck);
         LOGGER.info("[CompanyGen][SupportUnits] medical: {} combatants to cover, {} patients per MASH truck -> {} truck(s)",
               patientsToCover, coveragePerTruck, count);
@@ -665,7 +848,10 @@ public final class SupportUnitGenerator {
      *
      * @return the number of matching units currently in the campaign
      */
-    static int countGeneratedUnitsNamed(Campaign campaign, String unitName) {
+    static int countGeneratedUnitsNamed(Campaign campaign, @Nullable String unitName) {
+        if (unitName == null) {
+            return 0;
+        }
         int matches = 0;
         for (Unit unit : campaign.getUnits()) {
             Entity entity = unit.getEntity();
@@ -682,30 +868,47 @@ public final class SupportUnitGenerator {
      * crewed, optionally rank-assigned, and filed into {@code formationType}. A missing unit entry or an
      * unloadable entity is logged and skipped rather than aborting the whole batch.
      */
-    private static void generate(Campaign campaign, Faction faction, boolean autoAssignRanks, String unitName,
-          int targetCount, SupportTOEFormationTypes formationType, @Nullable VehicleCrewSource crewSource) {
-        int existing = countGeneratedUnitsNamed(campaign, unitName);
+    private static void generate(SupportCapability capability, Campaign campaign, Faction faction,
+          boolean autoAssignRanks, @Nullable String unitName, int targetCount,
+          SupportTOEFormationTypes formationType, @Nullable VehicleCrewSource crewSource,
+          @Nullable ForceNamingMethod namingMethod) {
+        // A named capability is infantry, counted by name as before. A rolled one has no single name to count, so
+        // what it already fields is read off its formation instead.
+        int existing = (unitName != null)
+              ? countGeneratedUnitsNamed(campaign, unitName)
+              : countVehiclesInFormation(campaign, formationType);
         int count = Math.max(0, targetCount - existing);
         if (count <= 0) {
-            LOGGER.info("[CompanyGen][SupportUnits] {}: target {} x '{}' already met ({} present) -> generating 0",
-                  formationType.name(), targetCount, unitName, existing);
+            LOGGER.info("[CompanyGen][SupportUnits] {}: target {} already met ({} present) -> generating 0",
+                  formationType.name(), targetCount, existing);
             return;
         }
 
-        MekSummary mekSummary = MekSummaryCache.getInstance().getMek(unitName);
-        if (mekSummary == null) {
-            LOGGER.error("Cannot find entry for {}", unitName);
-            return;
+        List<RolledBatch> batches;
+        if (unitName != null) {
+            MekSummary named = MekSummaryCache.getInstance().getMek(unitName);
+            if (named == null) {
+                LOGGER.error("Cannot find entry for {}", unitName);
+                return;
+            }
+            batches = List.of(new RolledBatch(unitName, named, count));
+        } else {
+            batches = rollBatches(capability, campaign, faction, count,
+                  subFormationSize(faction, formationType));
+            if (batches.isEmpty()) {
+                return;
+            }
         }
 
         boolean useRandomQuality = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_UNIT_QUALITIES);
         List<Unit> units = new ArrayList<>();
         Set<PersonnelRole> pooledRoles = new HashSet<>();
-        for (int index = 0; index < count; index++) {
+        for (RolledBatch batch : batches) {
+            for (int index = 0; index < batch.count(); index++) {
             try {
                 PartQuality quality = useRandomQuality ? UnitOrder.getRandomUnitQuality(0) : PartQuality.QUALITY_D;
                 // Built crewless, then crewed to match how the campaign crews everything else.
-                Unit unit = campaign.addNewUnit(mekSummary.loadEntity(), false, 0, quality);
+                Unit unit = campaign.addNewUnit(batch.summary().loadEntity(), false, 0, quality);
                 if (unit != null) {
                     PersonnelRole pooledRole = crewSupportUnit(campaign, unit, faction, crewSource);
                     if (pooledRole != null) {
@@ -717,13 +920,15 @@ public final class SupportUnitGenerator {
                     units.add(unit);
                 }
             } catch (Exception exception) {
-                LOGGER.error(exception, "Unable to load entity {}: {}", unitName, mekSummary.getSourceFile());
+                LOGGER.error(exception, "Unable to load entity {}: {}", batch.unitName(),
+                      batch.summary().getSourceFile());
+            }
             }
         }
 
         if (!units.isEmpty()) {
             AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, units, formationType,
-                  subFormationSize(faction, formationType), subFormationPattern(faction));
+                  subFormationSize(faction, formationType), subFormationNamer(faction, namingMethod));
         }
         // The daily pool fill is off by default, so whatever was crewed from the pool is filled here and now.
         for (PersonnelRole pooledRole : pooledRoles) {
@@ -732,7 +937,14 @@ public final class SupportUnitGenerator {
                   .getHumanResources()
                   .distributeTempCrewPoolToUnits(campaign, campaign.getCampaignOptions(), pooledRole);
         }
-        LOGGER.info("[CompanyGen][SupportUnits] {}: generated {}/{} new x '{}' ({} already present, target {})",
-              formationType.name(), units.size(), count, unitName, existing, targetCount);
+        StringBuilder built = new StringBuilder();
+        for (RolledBatch batch : batches) {
+            if (!built.isEmpty()) {
+                built.append(" + ");
+            }
+            built.append(batch.count()).append(" x '").append(batch.unitName()).append("'");
+        }
+        LOGGER.info("[CompanyGen][SupportUnits] {}: generated {}/{} new ({}) ({} already present, target {})",
+              formationType.name(), units.size(), count, built, existing, targetCount);
     }
 }

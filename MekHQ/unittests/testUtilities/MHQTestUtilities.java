@@ -32,6 +32,7 @@
  */
 package testUtilities;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -151,11 +152,17 @@ public final class MHQTestUtilities {
      * {@link PlayerForce}. This prevents {@link NullPointerException}s in production code that routes through
      * {@code getPlayerForce().getX()}, while still allowing callers to layer additional stubbing on the returned mock.
      *
+     * <p>{@link PlayerForce#getPurchaseCostMultiplier} defaults to {@code 1.0} (no active contract carries
+     * {@code DOUBLE_ALL_COSTS}) since it returns a primitive {@code double}, which deep-stubbing cannot default
+     * sensibly on its own; a test exercising that special rule can override this stub.</p>
+     *
      * @return a {@link Campaign} mock with a non-null, deep-stubbed {@link PlayerForce}
      */
     public static Campaign mockCampaign() {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getPlayerForce()).thenReturn(mock(PlayerForce.class, RETURNS_DEEP_STUBS));
+        PlayerForce playerForce = mock(PlayerForce.class, RETURNS_DEEP_STUBS);
+        when(playerForce.getPurchaseCostMultiplier(any())).thenReturn(1.0);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
         return campaign;
     }
 
