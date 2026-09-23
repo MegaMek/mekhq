@@ -75,8 +75,8 @@ class StratConEscalationTest {
     @ParameterizedTest
     @EnumSource(value = ContractObjectiveType.class,
           names = { "DIVERSIONARY_RAID", "EXTRACTION_RAID", "OBJECTIVE_RAID", "OBSERVATION_RAID", "RECON_RAID",
-                    "GUERRILLA_WARFARE", "ASSASSINATION" })
-    void raidsAndGuerrillaOperationsTrackEscalation(ContractObjectiveType objectiveType) {
+                    "GUERRILLA_WARFARE", "ASSASSINATION", "SABOTAGE", "TERRORISM" })
+    void raidsGuerrillaOperationsSabotageAndTerrorismTrackEscalation(ContractObjectiveType objectiveType) {
         assertTrue(StratConEscalation.isEscalationContract(contract(objectiveType)));
         assertTrue(StratConEscalation.isEscalationUsed(campaign(true), contract(objectiveType)));
     }
