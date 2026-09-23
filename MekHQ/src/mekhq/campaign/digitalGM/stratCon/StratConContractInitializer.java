@@ -66,6 +66,7 @@ import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPotentialLeadBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConVulnerableInfrastructureBehavior;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
@@ -516,6 +517,7 @@ public class StratConContractInitializer {
      * <ul>
      *     <li>Espionage: data caches (see {@link StratConDataCacheBehavior})</li>
      *     <li>Guerrilla Warfare: vulnerable infrastructure (see {@link StratConVulnerableInfrastructureBehavior})</li>
+     *     <li>Mole Hunting: potential leads (see {@link StratConPotentialLeadBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -544,6 +546,10 @@ public class StratConContractInitializer {
 
         if (objectiveType.isGuerrillaWarfare()) {
             return StratConVulnerableInfrastructureBehavior.TYPE_ID;
+        }
+
+        if (objectiveType.isMoleHunting()) {
+            return StratConPotentialLeadBehavior.TYPE_ID;
         }
 
         return null;

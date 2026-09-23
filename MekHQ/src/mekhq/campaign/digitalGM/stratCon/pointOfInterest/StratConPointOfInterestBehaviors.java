@@ -63,6 +63,7 @@ public final class StratConPointOfInterestBehaviors {
         behaviors.put(StratConDataCacheBehavior.BEHAVIOR_ID, new StratConDataCacheBehavior());
         behaviors.put(StratConVulnerableInfrastructureBehavior.BEHAVIOR_ID,
               new StratConVulnerableInfrastructureBehavior());
+        behaviors.put(StratConPotentialLeadBehavior.BEHAVIOR_ID, new StratConPotentialLeadBehavior());
     }
 
     private StratConPointOfInterestBehaviors() {
