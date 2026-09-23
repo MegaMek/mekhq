@@ -43,6 +43,7 @@ import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
@@ -341,6 +342,8 @@ public class FileDialogs {
     private static final String SCENARIO_MODIFIER_DIRECTORY = developerDataDirectory("scenariomodifiers");
     private static final String CONTRACT_DEFINITION_DIRECTORY = developerDataDirectory("stratconcontractdefinitions");
     private static final String STRAT_CON_FACILITY_DIRECTORY = developerDataDirectory("stratconfacilities");
+    private static final String STRAT_CON_POINT_OF_INTEREST_DIRECTORY = developerDataDirectory(
+          "stratconpointsofinterest");
 
     /**
      * Resolves a data subdirectory for the StratCon/scenario Developer Tools editors. In a source checkout the
@@ -430,6 +433,43 @@ public class FileDialogs {
             fileName = prefix + display.replaceAll("[^A-Za-z0-9]", "");
         }
         return GUI.fileDialogSave(frame, "Save StratCon Facility", FileType.JSON, STRAT_CON_FACILITY_DIRECTORY,
+              fileName + ".json");
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a StratCon point of interest definition file to open.
+     *
+     * @return the file selected, if any
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Optional<File> openStratConPointOfInterest(JFrame frame) {
+        return GUI.fileDialogOpen(frame,
+              "Load StratCon Point of Interest",
+              FileType.JSON,
+              STRAT_CON_POINT_OF_INTEREST_DIRECTORY);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a StratCon point of interest definition file to save
+     * to. The suggested file name is the type ID, as the shipped files are named (e.g. {@code DataCache.json}).
+     *
+     * @return the file selected, if any
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Optional<File> saveStratConPointOfInterest(JFrame frame,
+          StratConPointOfInterestDefinition definition) {
+        String typeId = definition.getTypeId();
+        String fileName = ((typeId == null) || typeId.isBlank()) ?
+                                "pointOfInterest" :
+                                typeId.replaceAll("[^A-Za-z0-9]", "");
+        return GUI.fileDialogSave(frame,
+              "Save StratCon Point of Interest",
+              FileType.JSON,
+              STRAT_CON_POINT_OF_INTEREST_DIRECTORY,
               fileName + ".json");
     }
 

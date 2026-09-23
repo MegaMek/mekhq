@@ -32,7 +32,10 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import megamek.common.annotations.Nullable;
@@ -135,5 +138,17 @@ public final class StratConPointOfInterestBehaviors {
         }
 
         return behaviors.getOrDefault(behaviorId, DEFAULT_BEHAVIOR);
+    }
+
+    /**
+     * @return the ID of every registered behavior, the default among them, sorted alphabetically
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<String> getBehaviorIds() {
+        List<String> behaviorIds = new ArrayList<>(behaviors.keySet());
+        Collections.sort(behaviorIds);
+        return behaviorIds;
     }
 }

@@ -111,6 +111,26 @@ public class StratConPointOfInterestDefinition {
         }
     }
 
+    /**
+     * Writes this definition to the given JSON file, for the developer tools' point of interest editor.
+     *
+     * @param outputFile the destination file
+     *
+     * @return {@code true} if the file was written, {@code false} if an error occurred (logged)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean serialize(File outputFile) {
+        try {
+            StratConPointOfInterestJson.toFile(this, outputFile);
+            return true;
+        } catch (Exception exception) {
+            LOGGER.error("Error serializing point of interest definition {}", outputFile.getPath(), exception);
+            return false;
+        }
+    }
+
     public String getTypeId() {
         return typeId;
     }

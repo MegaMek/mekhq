@@ -36,9 +36,13 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.Component;
+import java.util.List;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
+
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
 
 /**
  * Shared UI helpers for the Developer Tools editor dialogs.
@@ -72,5 +76,23 @@ final class DeveloperToolsUI {
         } else if (control instanceof JComponent component) {
             component.setToolTipText(tooltip);
         }
+    }
+
+    /**
+     * Lists the type IDs of every known point of interest definition, from the data files and from code, so editors
+     * can offer them as choices.
+     *
+     * @return the known type IDs, in the registry's order
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static String[] getKnownPointOfInterestTypeIds() {
+        List<StratConPointOfInterestDefinition> definitions = StratConPointOfInterestDefinitions.getAllDefinitions();
+        String[] typeIds = new String[definitions.size()];
+        for (int index = 0; index < definitions.size(); index++) {
+            typeIds[index] = definitions.get(index).getTypeId();
+        }
+        return typeIds;
     }
 }
