@@ -27,11 +27,12 @@ import mekhq.campaign.mission.scenarios.ScenarioTemplate;
  * type decides what happens (see {@link #onUncontested}). If one does, a scenario of the type's template (see
  * {@link #getScenarioTemplateName}) is placed on the hex and linked to the point of interest: an overall victory
  * secures it (see {@link #securePointOfInterest}), and anything else - a defeat, a draw, or leaving the scenario
- * unplayed - loses it, failing its objective. The scenario is not Essential: contracts using these points of interest
- * have no Essential scenarios, and securing one pays the combat bonus instead.</p>
+ * unplayed - loses it, failing its objective. The scenario is not Essential. By default, securing one pays the
+ * combat bonus, standing in for the Essential scenarios its contract does not get (see {@link #isCombatBonusPaid}).</p>
  *
- * <p>A formation that is not a ground formation cannot follow the point of interest up, and deploys as it would onto
- * any other hex. Nor does a formation joining a scenario already fought over it roll again.</p>
+ * <p>By default, a formation that is not a ground formation cannot follow the point of interest up, and deploys as it
+ * would onto any other hex (see {@link #canFollowUp}). Nor does a formation joining a scenario already fought over it
+ * roll again.</p>
  *
  * <p>Each type's player-facing text lives in the {@code StratConRulesManager} resource bundle, under its key prefix
  * (see {@link #getResourceKeyPrefix}): {@code .objective}, {@code .contested.report}, {@code .secured.report}, and
@@ -76,10 +77,37 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
     protected abstract void onUncontested(StratConPointOfInterest pointOfInterest, StratConTrackState track,
           AbstractContract contract, Campaign campaign);
 
+    /**
+     * Decides whether a formation can follow this type of point of interest up. By default, only a ground formation
+     * can (see {@link #isGroundFormation}).
+     *
+     * @param formationId the ID of the deploying formation
+     * @param campaign    the current campaign
+     *
+     * @return {@code true} if the formation can follow the point of interest up
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected boolean canFollowUp(int formationId, Campaign campaign) {
+        return isGroundFormation(formationId, campaign);
+    }
+
+    /**
+     * @return {@code true} if securing this type of point of interest pays the contract's combat bonus; by default, it
+     *       does. A type whose contract keeps its Essential scenarios leaves the bonus to them.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected boolean isCombatBonusPaid() {
+        return true;
+    }
+
     @Override
     public PointOfInterestDeploymentOutcome onFormationDeployed(StratConPointOfInterest pointOfInterest,
           StratConTrackState track, int formationId, Campaign campaign) {
-        if (pointOfInterest.hasLinkedScenario() || !isGroundFormation(formationId, campaign)) {
+        if (pointOfInterest.hasLinkedScenario() || !canFollowUp(formationId, campaign)) {
             return PointOfInterestDeploymentOutcome.NO_EFFECT;
         }
 
@@ -134,8 +162,9 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
     }
 
     /**
-     * Secures the point of interest: resolves it, which meets its objective, takes it off the map, and pays the
-     * contract's combat bonus - the reward an Essential scenario would otherwise have given.
+     * Secures the point of interest: resolves it, which meets its objective, takes it off the map, and - if this type
+     * pays it (see {@link #isCombatBonusPaid}) - pays the contract's combat bonus, the reward an Essential scenario
+     * would otherwise have given.
      *
      * @param pointOfInterest the point of interest to secure
      * @param track           the sector it sits in
@@ -149,6 +178,10 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
         StratConPointOfInterestRules.resolvePointOfInterest(track, pointOfInterest);
         track.removePointOfInterest(pointOfInterest.getId());
         addReport(GENERAL, "secured.report", pointOfInterest, track, campaign);
+
+        if (!isCombatBonusPaid()) {
+            return;
+        }
 
         AbstractContract contract = StratConPointOfInterestRules.getContract(track, campaign);
         if (contract == null) {
@@ -219,7 +252,7 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
      * @author Illiani
      * @since 0.51.01
      */
-    private static boolean isGroundFormation(int formationId, Campaign campaign) {
+    protected static boolean isGroundFormation(int formationId, Campaign campaign) {
         Formation formation = campaign.getPlayerForce().getFormation(formationId);
         return (formation != null) && (formation.getPrimaryUnitType(campaign) < CONV_FIGHTER);
     }

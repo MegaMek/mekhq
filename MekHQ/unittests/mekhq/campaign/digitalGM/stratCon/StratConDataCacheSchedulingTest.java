@@ -49,6 +49,7 @@ import java.util.List;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.PointOfInterestParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConBeleagueredForcesBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDataCacheBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConLookoutPointBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPotentialLeadBehavior;
@@ -57,6 +58,8 @@ import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConVulnerableInfra
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.ArgumentCaptor;
 
 /**
@@ -295,7 +298,21 @@ class StratConDataCacheSchedulingTest {
         }
     }
 
-    // Which contracts use special points of interest - and so get no Essential scenarios
+    // Relief Duty: beleaguered forces
+
+    @Test
+    void aReliefDutyContractSchedulesOnlyBeleagueredForcesEachAnObjective() {
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.RELIEF_DUTY, 1), true, true);
+
+        assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertEquals(StratConBeleagueredForcesBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertTrue(pointOfInterest.isStrategicObjective());
+        }
+    }
+
+    // Which contracts use special points of interest, and which of those replace Essential scenarios
 
     @Test
     void eachContractTypeWithSpecialMechanicsGetsItsOwnSpecialPointOfInterest() {
@@ -311,6 +328,9 @@ class StratConDataCacheSchedulingTest {
         assertEquals(StratConLookoutPointBehavior.TYPE_ID,
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.OBSERVATION_RAID, 1), true));
+        assertEquals(StratConBeleagueredForcesBehavior.TYPE_ID,
+              StratConContractInitializer.getSpecialPointOfInterestTypeId(
+                    contract(ContractObjectiveType.RELIEF_DUTY, 1), true));
         assertNull(StratConContractInitializer.getSpecialPointOfInterestTypeId(
               contract(ContractObjectiveType.GARRISON_DUTY, 1), true));
     }
@@ -329,6 +349,28 @@ class StratConDataCacheSchedulingTest {
         assertNull(StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.OBSERVATION_RAID, 1), false),
               "without special mechanics, an Observation Raid contract keeps its Essential scenarios");
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ContractObjectiveType.class,
+          names = { "ESPIONAGE", "GUERRILLA_WARFARE", "MOLE_HUNTING", "OBSERVATION_RAID" })
+    void specialPointsOfInterestReplaceEssentialScenarios(ContractObjectiveType objectiveType) {
+        assertTrue(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), true));
+        assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract(objectiveType, 1), false),
+              "without special mechanics, the contract keeps its Essential scenarios");
+    }
+
+    @Test
+    void beleagueredForcesDoNotReplaceEssentialScenarios() {
+        assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
+              contract(ContractObjectiveType.RELIEF_DUTY, 1), true));
+    }
+
+    @Test
+    void aContractWithoutSpecialPointsOfInterestKeepsItsEssentialScenarios() {
+        assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
+              contract(ContractObjectiveType.GARRISON_DUTY, 1), true));
+        assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract(null, 1), true));
     }
 
     @Test

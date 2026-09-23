@@ -61,15 +61,7 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDataCacheBehavior;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConLookoutPointBehavior;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPotentialLeadBehavior;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConVulnerableInfrastructureBehavior;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.*;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LatitudeBand;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.PlanetProfile;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.SectorShapeProfile;
@@ -349,9 +341,9 @@ public class StratConContractInitializer {
             boolean isContractsUseSpecialMechanics =
                   campaignOptions.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS);
 
-            // A contract with special points of interest gets no Essential scenarios: those points of interest, and the
-            // combat bonus paid for each one dealt with, take their place.
-            if (getSpecialPointOfInterestTypeId(contract, isContractsUseSpecialMechanics) == null) {
+            // Most contracts with special points of interest get no Essential scenarios: those points of interest, and
+            // the combat bonus paid for each one dealt with, take their place.
+            if (!isReplacingEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
                 scheduleStrategicScenarioSpawnDates(contract, campaignState);
             }
 
@@ -520,11 +512,12 @@ public class StratConContractInitializer {
      *     <li>Guerrilla Warfare: vulnerable infrastructure (see {@link StratConVulnerableInfrastructureBehavior})</li>
      *     <li>Mole Hunting: potential leads (see {@link StratConPotentialLeadBehavior})</li>
      *     <li>Observation Raid: lookout points (see {@link StratConLookoutPointBehavior})</li>
+     *     <li>Relief Duty: beleaguered forces (see {@link StratConBeleagueredForcesBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
-     * (see {@link #scheduleSpecialPointsOfInterest}), and gets no Essential scenarios - the combat bonus is paid for each
-     * special point of interest dealt with instead.</p>
+     * (see {@link #scheduleSpecialPointsOfInterest}). Most also replace the contract's Essential scenarios (see
+     * {@link #isReplacingEssentialScenarios}).</p>
      *
      * @param contract                       the contract
      * @param isContractsUseSpecialMechanics whether the "Contracts Use Special Mechanics" option is on
@@ -558,7 +551,31 @@ public class StratConContractInitializer {
             return StratConLookoutPointBehavior.TYPE_ID;
         }
 
+        if (objectiveType.isReliefDuty()) {
+            return StratConBeleagueredForcesBehavior.TYPE_ID;
+        }
+
         return null;
+    }
+
+    /**
+     * Decides whether a contract's special points of interest (see {@link #getSpecialPointOfInterestTypeId}) replace
+     * its Essential scenarios. Most do: such a contract gets no Essential scenarios, and the combat bonus is paid for
+     * each special point of interest dealt with instead. Beleaguered forces do not - a Relief Duty contract keeps its
+     * Essential scenarios alongside them.
+     *
+     * @param contract                       the contract
+     * @param isContractsUseSpecialMechanics whether the "Contracts Use Special Mechanics" option is on
+     *
+     * @return {@code true} if the contract gets no Essential scenarios
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the decision can be tested directly.
+    static boolean isReplacingEssentialScenarios(AbstractContract contract, boolean isContractsUseSpecialMechanics) {
+        String specialTypeId = getSpecialPointOfInterestTypeId(contract, isContractsUseSpecialMechanics);
+        return (specialTypeId != null) && !StratConBeleagueredForcesBehavior.TYPE_ID.equals(specialTypeId);
     }
 
     /**
