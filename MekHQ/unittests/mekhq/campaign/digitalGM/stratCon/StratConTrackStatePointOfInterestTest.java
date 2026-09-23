@@ -366,6 +366,7 @@ class StratConTrackStatePointOfInterestTest {
         StratConCampaignState campaignState = new StratConCampaignState();
         campaignState.addTrack(track);
         campaignState.setEscalation(37);
+        campaignState.setContractsUseSpecialMechanics(true);
 
         StratConScheduledPointOfInterest marked = new StratConScheduledPointOfInterest(LocalDate.of(3025, 8, 1),
               OCCUPYING_TYPE_ID,
@@ -379,6 +380,8 @@ class StratConTrackStatePointOfInterestTest {
         StratConCampaignState reloadedState = saveAndLoad(campaignState);
 
         assertEquals(37, reloadedState.getEscalation());
+        assertTrue(reloadedState.isContractsUseSpecialMechanics(),
+              "the special-mechanics snapshot taken at acceptance survives loading");
 
         List<StratConScheduledPointOfInterest> reloadedSchedule = reloadedState.getScheduledPointsOfInterest();
         assertEquals(2, reloadedSchedule.size());

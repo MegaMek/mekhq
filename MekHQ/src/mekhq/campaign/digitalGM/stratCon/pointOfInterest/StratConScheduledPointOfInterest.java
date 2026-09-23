@@ -36,12 +36,12 @@ import static java.lang.Math.min;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import megamek.common.compute.Compute;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState.LocalDateAdapter;
 
 /**
@@ -54,6 +54,11 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState.LocalDateAdapter;
  * @since 0.51.01
  */
 public class StratConScheduledPointOfInterest {
+    /**
+     * How many days past its day a point of interest that no sector has room for is still tried, before it is dropped.
+     */
+    public static final int MAXIMUM_PLACEMENT_DELAY_DAYS = 30;
+
     private LocalDate spawnDate;
     private String typeId;
     private boolean strategicObjective;
@@ -135,6 +140,19 @@ public class StratConScheduledPointOfInterest {
     }
 
     /**
+     * @param today the current campaign date
+     *
+     * @return {@code true} if the point of interest is more than {@link #MAXIMUM_PLACEMENT_DELAY_DAYS} days past its
+     *       day, so the daily lifecycle should stop trying to place it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isPlacementAbandoned(LocalDate today) {
+        return (spawnDate != null) && spawnDate.plusDays(MAXIMUM_PLACEMENT_DELAY_DAYS).isBefore(today);
+    }
+
+    /**
      * Marks, at random, as many of the given scheduled points of interest as the count asks for - or all of them, if
      * there are fewer - by storing {@code true} under the given key in each one's initial state.
      *
@@ -148,11 +166,11 @@ public class StratConScheduledPointOfInterest {
     static void markAtRandom(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest, int count,
           String stateKey) {
         List<StratConScheduledPointOfInterest> candidates = new ArrayList<>(scheduledPointsOfInterest);
-        Collections.shuffle(candidates);
 
         int markedCount = min(count, candidates.size());
         for (int index = 0; index < markedCount; index++) {
-            candidates.get(index).getInitialState().put(stateKey, Boolean.TRUE.toString());
+            StratConScheduledPointOfInterest candidate = candidates.remove(Compute.randomInt(candidates.size()));
+            candidate.getInitialState().put(stateKey, Boolean.TRUE.toString());
         }
     }
 

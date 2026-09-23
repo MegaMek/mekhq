@@ -230,6 +230,8 @@ public class StratConCampaignState {
     /**
      * Sets the contract's Escalation directly. Play should raise it through {@link StratConEscalation}, which caps it
      * and keeps any Escalation objectives up to date.
+     *
+     * @param escalation the new Escalation
      */
     public void setEscalation(int escalation) {
         this.escalation = escalation;
@@ -251,6 +253,15 @@ public class StratConCampaignState {
         return contractsUseSpecialMechanics;
     }
 
+    /**
+     * Records whether the contract uses its type's special mechanics. Set once, when the contract is accepted (see
+     * {@link #isContractsUseSpecialMechanics()}).
+     *
+     * @param contractsUseSpecialMechanics {@code true} if the contract uses its type's special mechanics
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
     public void setContractsUseSpecialMechanics(boolean contractsUseSpecialMechanics) {
         this.contractsUseSpecialMechanics = contractsUseSpecialMechanics;
     }
@@ -372,8 +383,10 @@ public class StratConCampaignState {
      *   <li>The base contract allows early termination</li>
      *   <li>There is at least one strategic objective defined</li>
      *   <li>All strategic objectives across all tracks have been resolved (completed or failed)</li>
-     *   <li>No strategic-objective scenario or strategic-objective point of interest is still waiting to appear</li>
+     *   <li>No strategic-objective point of interest is still waiting to appear</li>
      * </ul>
+     *
+     * <p>Strategic-objective scenarios still waiting to appear do not hold the contract open.</p>
      *
      * @return {@code true} if the contract can be ended early, {@code false} otherwise
      *
@@ -386,7 +399,7 @@ public class StratConCampaignState {
         }
 
         // Objectives still to come are not on the map yet, so they would otherwise not count against ending early.
-        if (hasScheduledStrategicObjectives()) {
+        if (hasScheduledStrategicObjectivePointsOfInterest()) {
             return false;
         }
 
@@ -406,17 +419,12 @@ public class StratConCampaignState {
     }
 
     /**
-     * @return {@code true} if a strategic-objective scenario, or a point of interest that will be a strategic objective,
-     *       is still scheduled to appear
+     * @return {@code true} if a point of interest that will be a strategic objective is still scheduled to appear
      *
      * @author Illiani
      * @since 0.51.01
      */
-    boolean hasScheduledStrategicObjectives() {
-        if (!strategicScenarioSpawnDates.isEmpty()) {
-            return true;
-        }
-
+    boolean hasScheduledStrategicObjectivePointsOfInterest() {
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
             if (scheduledPointOfInterest.isStrategicObjective()) {
                 return true;

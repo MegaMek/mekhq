@@ -37,6 +37,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -48,6 +49,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.ImprovedStratConSectorGeneration;
@@ -87,6 +89,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * @since 0.51.01
  */
 public abstract class AbstractStratConGM extends AbstractDigitalGM {
+    private static final MMLogger LOGGER = MMLogger.create(AbstractStratConGM.class);
+
     private final IScenarioGenerationStrategy scenarioGeneration = new StratConScenarioGenerationStrategy();
     private final IScenarioLifecycleStrategy scenarioLifecycle = new StratConScenarioLifecycleStrategy();
     private final IFacilityStrategy facility = new StratConFacilityStrategy();
@@ -299,7 +303,11 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
      * before today is placed and removed from the schedule, so a skipped day or a save loaded past a date still catches
      * up. One that no sector has room for stays on the schedule and is tried again the next day, so that none is lost -
      * which matters most for the ones marked, when the contract was accepted, as the real target or as leading to a
-     * facility. In mapless play, where there is no map to place them on, due points of interest are simply dropped.
+     * facility. It is not tried forever, though: once it is more than
+     * {@link StratConScheduledPointOfInterest#MAXIMUM_PLACEMENT_DELAY_DAYS} days late it is dropped, so a sector that
+     * never frees up cannot hold the contract open (see {@link StratConCampaignState#canEndContractEarly()}). One whose
+     * type is no longer defined (its data renamed or removed) can never be placed, so it is dropped at once. In mapless
+     * play, where there is no map to place them on, due points of interest are simply dropped.
      *
      * <p>Unlike strategic-objective scenarios, points of interest still appear while the enemy is routed: they are
      * features of the ground, not attacks the enemy has to mount.</p>
@@ -329,13 +337,39 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
         }
 
         List<StratConPointOfInterest> placedPointsOfInterest = new ArrayList<>();
+        int unplacedCount = 0;
         for (StratConScheduledPointOfInterest duePointOfInterest : duePointsOfInterest) {
+            // Its type is gone from the data, so no day will ever place it; warned once, as it is dropped here.
+            if (StratConPointOfInterestDefinitions.getDefinition(duePointOfInterest.getTypeId()) == null) {
+                LOGGER.warn("Dropping scheduled point of interest {} on contract {}: its type is not defined.",
+                      duePointOfInterest,
+                      contract.getName());
+                scheduledPointsOfInterest.remove(duePointOfInterest);
+                continue;
+            }
+
             StratConPointOfInterest placedPointOfInterest =
                   StratConContractInitializer.spawnScheduledPointOfInterest(campaign, contract, duePointOfInterest);
             if (placedPointOfInterest != null) {
                 scheduledPointsOfInterest.remove(duePointOfInterest);
                 placedPointsOfInterest.add(placedPointOfInterest);
+            } else if (duePointOfInterest.isPlacementAbandoned(today)) {
+                LOGGER.info("Dropping scheduled point of interest {} on contract {}: no sector had room for it within"
+                            + " {} days.",
+                      duePointOfInterest,
+                      contract.getName(),
+                      StratConScheduledPointOfInterest.MAXIMUM_PLACEMENT_DELAY_DAYS);
+                scheduledPointsOfInterest.remove(duePointOfInterest);
+            } else {
+                unplacedCount++;
             }
+        }
+
+        // One line a day for whatever is still waiting, rather than one per point of interest per sector.
+        if (unplacedCount > 0) {
+            LOGGER.info("{} scheduled point(s) of interest on contract {} found no room today and will be tried again.",
+                  unplacedCount,
+                  contract.getName());
         }
 
         // One dialog for the whole day's arrivals on this contract, rather than one per point of interest.

@@ -520,11 +520,11 @@ public class StratConContractInitializer {
               requestedPointsOfInterest.size());
 
         List<LocalDate> spawnDates = rollSpawnDates(startDate, schedule, contract.getLengthInMonths());
-        Collections.shuffle(requestedPointsOfInterest);
 
         int scheduledCount = min(requestedPointsOfInterest.size(), spawnDates.size());
         for (int index = 0; index < scheduledCount; index++) {
-            StratConScheduledPointOfInterest scheduledPointOfInterest = requestedPointsOfInterest.get(index);
+            StratConScheduledPointOfInterest scheduledPointOfInterest =
+                  requestedPointsOfInterest.remove(Compute.randomInt(requestedPointsOfInterest.size()));
             scheduledPointOfInterest.setSpawnDate(spawnDates.get(index));
             campaignState.addScheduledPointOfInterest(scheduledPointOfInterest);
         }
@@ -786,10 +786,10 @@ public class StratConContractInitializer {
             return null;
         }
 
+        // Sectors are tried in random order.
         List<StratConTrackState> tracks = new ArrayList<>(campaignState.getTracks());
-        Collections.shuffle(tracks);
-
-        for (StratConTrackState track : tracks) {
+        while (!tracks.isEmpty()) {
+            StratConTrackState track = tracks.remove(Compute.randomInt(tracks.size()));
             StratConPointOfInterest pointOfInterest = scheduledPointOfInterest.isStrategicObjective() ?
                                                             StratConPointOfInterestPlacer.placeAsStrategicObjective(
                                                                   track,

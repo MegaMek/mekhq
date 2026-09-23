@@ -43,7 +43,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests when a contract may be ended early: every objective on the map resolved, and none still waiting to appear.
+ * Tests when a contract may be ended early: every objective on the map resolved, and no objective point of interest
+ * still waiting to appear.
  *
  * @author Illiani
  * @since 0.51.01
@@ -88,9 +89,9 @@ class StratConCampaignStateEarlyEndTest {
     }
 
     @Test
-    void anEssentialScenarioStillToAppearKeepsTheContractRunning() {
+    void anEssentialScenarioStillToAppearDoesNot() {
         campaignState.addStrategicScenarioSpawnDate(LATER);
 
-        assertFalse(campaignState.canEndContractEarly());
+        assertTrue(campaignState.canEndContractEarly(), "only objectives already on the map count, as before");
     }
 }

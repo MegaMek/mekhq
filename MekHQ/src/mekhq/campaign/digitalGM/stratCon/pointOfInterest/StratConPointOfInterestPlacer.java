@@ -86,7 +86,7 @@ public final class StratConPointOfInterestPlacer {
           @Nullable StratConCoords coords, LocalDate today) {
         StratConPointOfInterestDefinition definition = StratConPointOfInterestDefinitions.getDefinition(typeId);
         if (definition == null) {
-            LOGGER.warn("Cannot place a point of interest of unknown type {} on track {}.",
+            LOGGER.debug("Cannot place a point of interest of unknown type {} on track {}.",
                   typeId,
                   track.getDisplayableName());
             return null;
@@ -94,7 +94,7 @@ public final class StratConPointOfInterestPlacer {
 
         StratConCoords destination = (coords == null) ? findPlacementCoords(track, definition) : coords;
         if ((destination == null) || !canPlace(track, definition, destination)) {
-            LOGGER.info("No eligible hex for a point of interest of type {} on track {}.",
+            LOGGER.debug("No eligible hex for a point of interest of type {} on track {}.",
                   typeId,
                   track.getDisplayableName());
             return null;

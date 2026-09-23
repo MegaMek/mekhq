@@ -260,6 +260,7 @@ public enum ContractObjectiveType {
         return this == ESPIONAGE;
     }
 
+    @Deprecated(since = "0.51.0", forRemoval = true)
     public boolean isMoleHunting() {
         return this == MOLE_HUNTING;
     }
