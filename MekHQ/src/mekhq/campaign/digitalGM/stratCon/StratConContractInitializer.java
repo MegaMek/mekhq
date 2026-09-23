@@ -514,6 +514,7 @@ public class StratConContractInitializer {
      *     <li>Assassination: leads on the target (see {@link StratConAssassinationLeadBehavior})</li>
      *     <li>Observation Raid: lookout points (see {@link StratConLookoutPointBehavior})</li>
      *     <li>Relief Duty: beleaguered forces (see {@link StratConBeleagueredForcesBehavior})</li>
+     *     <li>Cadre Duty: training maneuvers (see {@link StratConTrainingManeuversBehavior})</li>
      * </ul>
      *
      * <p>A contract with special points of interest schedules them in place of its definition's points of interest
@@ -560,14 +561,18 @@ public class StratConContractInitializer {
             return StratConBeleagueredForcesBehavior.TYPE_ID;
         }
 
+        if (objectiveType.isCadreDuty()) {
+            return StratConTrainingManeuversBehavior.TYPE_ID;
+        }
+
         return null;
     }
 
     /**
      * Decides whether a contract's special points of interest (see {@link #getSpecialPointOfInterestTypeId}) replace
      * its Essential scenarios. Most do: such a contract gets no Essential scenarios, and the combat bonus is paid for
-     * each special point of interest dealt with instead. Beleaguered forces do not - a Relief Duty contract keeps its
-     * Essential scenarios alongside them.
+     * each special point of interest dealt with instead. Beleaguered forces and training maneuvers do not - Relief Duty
+     * and Cadre Duty contracts keep their Essential scenarios alongside them.
      *
      * @param contract                       the contract
      * @param isContractsUseSpecialMechanics whether the "Contracts Use Special Mechanics" option is on
@@ -580,7 +585,9 @@ public class StratConContractInitializer {
     // Package-private rather than private so the decision can be tested directly.
     static boolean isReplacingEssentialScenarios(AbstractContract contract, boolean isContractsUseSpecialMechanics) {
         String specialTypeId = getSpecialPointOfInterestTypeId(contract, isContractsUseSpecialMechanics);
-        return (specialTypeId != null) && !StratConBeleagueredForcesBehavior.TYPE_ID.equals(specialTypeId);
+        return (specialTypeId != null)
+                     && !StratConBeleagueredForcesBehavior.TYPE_ID.equals(specialTypeId)
+                     && !StratConTrainingManeuversBehavior.TYPE_ID.equals(specialTypeId);
     }
 
     /**
