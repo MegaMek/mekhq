@@ -48,6 +48,7 @@ import javax.swing.*;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestBehaviors;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestManifest;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.FileDialogs;
@@ -56,8 +57,9 @@ import mekhq.gui.FileDialogs;
  * A developer tool for editing StratCon point of interest definition files (JSON). Exposes the persisted fields with
  * New / Load / Save / Add to Manifest, mirroring the facility editor.
  *
- * <p>Saved files are not loaded into the running game's registry; the game reads them on its next start, once they
- * are in the manifest.</p>
+ * <p>Saving a file, or adding it to the manifest, reloads the running game's definitions (see
+ * {@link StratConPointOfInterestDefinitions#reloadDefinitions()}), so a change to a file the game reads takes effect
+ * at once.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -292,13 +294,15 @@ public class StratConPointOfInterestEditorDialog extends JDialog {
             }
             currentFile = file;
             updateManifestButtonState();
+            StratConPointOfInterestDefinitions.reloadDefinitions();
         });
     }
 
     /**
      * Registers the current definition's file name in the point of interest manifest that sits alongside it, so the
-     * game will load it. Reads the sibling {@code pointofinterestmanifest.json} (creating a fresh one only if there is none; one that exists but cannot be read is left unchanged),
-     * appends the file name if it is not already listed, and writes the manifest back.
+     * game will load it. Reads the sibling {@code pointofinterestmanifest.json} (creating a fresh one only if there is
+     * none; one that exists but cannot be read is left unchanged), appends the file name if it is not already listed,
+     * and writes the manifest back.
      *
      * @author Illiani
      * @since 0.51.01
@@ -340,6 +344,7 @@ public class StratConPointOfInterestEditorDialog extends JDialog {
 
         manifest.pointOfInterestFileNames.add(fileName);
         if (manifest.serialize(manifestFile)) {
+            StratConPointOfInterestDefinitions.reloadDefinitions();
             JOptionPane.showMessageDialog(this,
                   getFormattedTextAt(RESOURCE_BUNDLE, "pointOfInterestDefinitionEditor.manifest.added.message",
                         fileName),

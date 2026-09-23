@@ -34,9 +34,9 @@ package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -59,7 +59,8 @@ public final class StratConPointOfInterestBehaviors {
     private static final IStratConPointOfInterestBehavior DEFAULT_BEHAVIOR = new IStratConPointOfInterestBehavior() {
     };
 
-    private static final Map<String, IStratConPointOfInterestBehavior> behaviors = new HashMap<>();
+    // Concurrent, as outside code may register behaviors while the game is looking them up.
+    private static final Map<String, IStratConPointOfInterestBehavior> behaviors = new ConcurrentHashMap<>();
 
     static {
         behaviors.put(DEFAULT_BEHAVIOR_ID, DEFAULT_BEHAVIOR);
@@ -96,7 +97,8 @@ public final class StratConPointOfInterestBehaviors {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void registerBehavior(String behaviorId, IStratConPointOfInterestBehavior behavior) {
+    public static void registerBehavior(@Nullable String behaviorId,
+          @Nullable IStratConPointOfInterestBehavior behavior) {
         if ((behaviorId == null) || behaviorId.isBlank() || (behavior == null)) {
             LOGGER.warn("Ignoring a point of interest behavior registered without an ID or implementation.");
             return;

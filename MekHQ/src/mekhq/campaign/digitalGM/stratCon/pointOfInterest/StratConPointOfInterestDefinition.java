@@ -36,6 +36,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
@@ -81,6 +83,8 @@ public class StratConPointOfInterestDefinition {
 
     // placement rules, used when a contract or external code places a point of interest without chosen coordinates
     private boolean landOnly = true;
+    // The JSON mapper sets fields directly, bypassing the setter's null guard, so an explicit null becomes empty here.
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<String> allowedTerrainCategories = new ArrayList<>();
     private boolean avoidCities;
 

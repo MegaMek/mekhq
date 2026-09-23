@@ -70,6 +70,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -174,6 +175,19 @@ class StratConScheduledParadeBehaviorTest {
     @Test
     void aDisruptedParadeIsFoughtAsCrowdControl() {
         assertEquals("Crowd Control.json", new StratConScheduledParadeBehavior().getScenarioTemplateName());
+    }
+
+    @Test
+    void theRiotTemplateIsReadFromItsFileRatherThanTheScenarioManifest() {
+        // Crowd Control is kept out of the manifest so it is never a random scenario; looking it up there finds
+        // nothing, and the riot would become a random scenario with no mobs.
+        StratConScheduledParadeBehavior behavior = new StratConScheduledParadeBehavior();
+        ScenarioTemplate template = behavior.loadScenarioTemplate(behavior.getScenarioTemplateName());
+
+        assertNotNull(template, "Crowd Control is read from the scenario templates directory");
+        assertEquals("Crowd Control", template.name);
+        assertNotNull(new StratConCivilDisobedienceBehavior().loadScenarioTemplate(StratConRiots.SCENARIO_TEMPLATE),
+              "civil disobedience riots read the same file");
     }
 
     @Test

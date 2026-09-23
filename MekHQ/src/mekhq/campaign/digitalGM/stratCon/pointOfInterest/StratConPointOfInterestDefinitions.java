@@ -60,9 +60,11 @@ import mekhq.MHQConstants;
 public final class StratConPointOfInterestDefinitions {
     private static final MMLogger LOGGER = MMLogger.create(StratConPointOfInterestDefinitions.class);
 
-    // insertion-ordered so menus listing the definitions keep the manifest's order
-    private static final Map<String, StratConPointOfInterestDefinition> fileDefinitions = new LinkedHashMap<>();
-    private static final Map<String, StratConPointOfInterestDefinition> registeredDefinitions = new LinkedHashMap<>();
+    // Both maps are replaced whole, never changed in place: a reload or registration builds a new map and swaps it in,
+    // so a lookup running at the same time sees either the old definitions or the new ones, never an empty map.
+    // Insertion-ordered so menus listing the definitions keep the manifest's order.
+    private static volatile Map<String, StratConPointOfInterestDefinition> fileDefinitions = Map.of();
+    private static volatile Map<String, StratConPointOfInterestDefinition> registeredDefinitions = Map.of();
 
     static {
         reloadDefinitions();
@@ -72,7 +74,9 @@ public final class StratConPointOfInterestDefinitions {
     }
 
     /**
-     * Clears and re-reads every data file definition. Definitions registered from code are kept.
+     * Re-reads every data file definition, replacing the old ones in one step. Definitions registered from code are
+     * kept. Called at start-up, and after the point of interest editor saves a file, so the change takes effect at
+     * once. Under test this also undoes {@link #loadForTest}, as the default paths hold no data there.
      *
      * @author Illiani
      * @since 0.51.01
@@ -99,27 +103,35 @@ public final class StratConPointOfInterestDefinitions {
         reloadDefinitions(manifestPath, null, pointOfInterestPath);
     }
 
-    private static void reloadDefinitions(String manifestPath, @Nullable String userManifestPath,
+    private static synchronized void reloadDefinitions(String manifestPath, @Nullable String userManifestPath,
           String pointOfInterestPath) {
-        fileDefinitions.clear();
+        Map<String, StratConPointOfInterestDefinition> loadedDefinitions = new LinkedHashMap<>();
 
         StratConPointOfInterestManifest manifest = StratConPointOfInterestManifest.deserialize(manifestPath);
         if (manifest != null) {
-            loadDefinitionsFromManifest(manifest, pointOfInterestPath);
+            loadDefinitionsFromManifest(manifest, pointOfInterestPath, loadedDefinitions);
         }
 
         if (userManifestPath != null) {
             StratConPointOfInterestManifest userManifest = StratConPointOfInterestManifest.deserialize(
                   userManifestPath);
             if (userManifest != null) {
-                loadDefinitionsFromManifest(userManifest, pointOfInterestPath);
+                loadDefinitionsFromManifest(userManifest, pointOfInterestPath, loadedDefinitions);
             }
         }
+
+        fileDefinitions = Collections.unmodifiableMap(loadedDefinitions);
     }
 
     private static void loadDefinitionsFromManifest(StratConPointOfInterestManifest manifest,
-          String pointOfInterestPath) {
+          String pointOfInterestPath, Map<String, StratConPointOfInterestDefinition> loadedDefinitions) {
         for (String fileName : manifest.pointOfInterestFileNames) {
+            // A null or blank entry would otherwise fail inside the static initializer and break the whole class.
+            if (isBlank(fileName)) {
+                LOGGER.warn("Skipping a blank entry in the point of interest manifest.");
+                continue;
+            }
+
             String filePath = Paths.get(pointOfInterestPath, fileName.trim()).toString();
             StratConPointOfInterestDefinition definition = StratConPointOfInterestDefinition.deserialize(filePath);
 
@@ -132,13 +144,13 @@ public final class StratConPointOfInterestDefinitions {
                 continue;
             }
 
-            if (fileDefinitions.containsKey(definition.getTypeId())) {
+            if (loadedDefinitions.containsKey(definition.getTypeId())) {
                 LOGGER.warn("Point of interest definition {} reuses type ID {}; it replaces the earlier definition.",
                       filePath,
                       definition.getTypeId());
             }
 
-            fileDefinitions.put(definition.getTypeId(), definition);
+            loadedDefinitions.put(definition.getTypeId(), definition);
         }
     }
 
@@ -152,7 +164,7 @@ public final class StratConPointOfInterestDefinitions {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void registerDefinition(StratConPointOfInterestDefinition definition) {
+    public static synchronized void registerDefinition(@Nullable StratConPointOfInterestDefinition definition) {
         if ((definition == null) || isBlank(definition.getTypeId())) {
             LOGGER.warn("Ignoring a point of interest definition registered without a type ID.");
             return;
@@ -163,7 +175,9 @@ public final class StratConPointOfInterestDefinitions {
                   definition.getTypeId());
         }
 
-        registeredDefinitions.put(definition.getTypeId(), definition);
+        Map<String, StratConPointOfInterestDefinition> updatedDefinitions = new LinkedHashMap<>(registeredDefinitions);
+        updatedDefinitions.put(definition.getTypeId(), definition);
+        registeredDefinitions = Collections.unmodifiableMap(updatedDefinitions);
     }
 
     /**
@@ -174,8 +188,10 @@ public final class StratConPointOfInterestDefinitions {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void unregisterDefinition(String typeId) {
-        registeredDefinitions.remove(typeId);
+    public static synchronized void unregisterDefinition(String typeId) {
+        Map<String, StratConPointOfInterestDefinition> updatedDefinitions = new LinkedHashMap<>(registeredDefinitions);
+        updatedDefinitions.remove(typeId);
+        registeredDefinitions = Collections.unmodifiableMap(updatedDefinitions);
     }
 
     /**
@@ -207,15 +223,17 @@ public final class StratConPointOfInterestDefinitions {
      * @since 0.51.01
      */
     public static List<StratConPointOfInterestDefinition> getAllDefinitions() {
+        Map<String, StratConPointOfInterestDefinition> currentFileDefinitions = fileDefinitions;
+        Map<String, StratConPointOfInterestDefinition> currentRegisteredDefinitions = registeredDefinitions;
         List<StratConPointOfInterestDefinition> allDefinitions = new ArrayList<>();
 
-        for (StratConPointOfInterestDefinition fileDefinition : fileDefinitions.values()) {
-            if (!registeredDefinitions.containsKey(fileDefinition.getTypeId())) {
+        for (StratConPointOfInterestDefinition fileDefinition : currentFileDefinitions.values()) {
+            if (!currentRegisteredDefinitions.containsKey(fileDefinition.getTypeId())) {
                 allDefinitions.add(fileDefinition);
             }
         }
 
-        allDefinitions.addAll(registeredDefinitions.values());
+        allDefinitions.addAll(currentRegisteredDefinitions.values());
         return Collections.unmodifiableList(allDefinitions);
     }
 

@@ -32,10 +32,12 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.randomEvents.other.RiotScenario;
 
 /**
@@ -87,6 +89,18 @@ public class StratConScheduledParadeBehavior extends StratConAmbushPointOfIntere
     @Override
     protected boolean isScenarioPossibleWhileRouted() {
         return true;
+    }
+
+    /**
+     * Riots are fought as "Crowd Control", which is not in the scenario manifest, so it is read from its file (see
+     * {@link StratConRiots#loadScenarioTemplate}).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected @Nullable ScenarioTemplate loadScenarioTemplate(String templateName) {
+        return StratConRiots.loadScenarioTemplate();
     }
 
     /**

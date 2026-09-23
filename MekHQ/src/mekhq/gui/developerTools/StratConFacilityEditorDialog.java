@@ -274,8 +274,9 @@ public class StratConFacilityEditorDialog extends JDialog {
 
     /**
      * Registers the current facility's file name in the facility manifest that sits alongside it, so the game will load
-     * it. Reads the sibling {@code facilitymanifest.json} (creating a fresh one only if there is none; one that exists but cannot be read is left unchanged), appends the file name if it
-     * is not already listed, and writes the manifest back.
+     * it. Reads the sibling {@code facilitymanifest.json} (creating a fresh one only if there is none; one that exists
+     * but cannot be read is left unchanged), appends the file name if it is not already listed, and writes the
+     * manifest back.
      */
     private void addToManifest() {
         if (currentFile == null) {

@@ -32,10 +32,13 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
+import megamek.common.annotations.Nullable;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.randomEvents.other.RiotScenario;
 
 /**
@@ -55,6 +58,19 @@ final class StratConRiots {
     static final int DAYS_UNTIL_DEPLOYMENT = 0;
 
     private StratConRiots() {
+    }
+
+    /**
+     * Loads the riot template straight from its file. It is deliberately not in the scenario manifest, which would put
+     * it in the random scenario pool, so it cannot be looked up there.
+     *
+     * @return the template, or {@code null} if the file could not be read
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable ScenarioTemplate loadScenarioTemplate() {
+        return ScenarioTemplate.Deserialize(MHQConstants.STRAT_CON_SCENARIO_TEMPLATE_PATH + SCENARIO_TEMPLATE);
     }
 
     /**

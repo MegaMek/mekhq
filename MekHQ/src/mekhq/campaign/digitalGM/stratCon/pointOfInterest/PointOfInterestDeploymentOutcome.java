@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
+import megamek.common.annotations.Nullable;
+
 /**
  * What a point of interest does to the random scenario roll when a player formation deploys onto its hex (see
  * {@link IStratConPointOfInterestBehavior#onFormationDeployed}).
@@ -64,14 +66,14 @@ public enum PointOfInterestDeploymentOutcome {
     }
 
     /**
-     * @param other another point of interest's outcome for the same deployment
+     * @param other another point of interest's outcome for the same deployment; {@code null} is treated as no outcome
      *
      * @return the outcome that wins: {@link #SUPPRESS_SCENARIO} over {@link #FORCE_SCENARIO} over {@link #NO_EFFECT}
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public PointOfInterestDeploymentOutcome combineWith(PointOfInterestDeploymentOutcome other) {
+    public PointOfInterestDeploymentOutcome combineWith(@Nullable PointOfInterestDeploymentOutcome other) {
         if ((other == null) || (priority >= other.priority)) {
             return this;
         }

@@ -369,7 +369,8 @@ public class StratConPointOfInterest {
 
     /**
      * Whether the player can see this point of interest whatever its own revealed flag says: its hex is scouted, the
-     * whole sector is revealed, it is allied, or its type is not hidden. Hiding it again has no effect while this holds.
+     * whole sector is revealed, it is allied, or its type is not hidden. Hiding it again has no effect while this
+     * holds.
      *
      * @param track the sector this point of interest sits in
      *

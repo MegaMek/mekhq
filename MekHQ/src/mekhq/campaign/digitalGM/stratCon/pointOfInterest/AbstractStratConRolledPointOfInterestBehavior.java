@@ -142,6 +142,21 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
     }
 
     /**
+     * Loads the named scenario template. By default it comes from the StratCon scenario manifest; a type whose template
+     * is deliberately kept out of that manifest (so it never turns up as a random scenario) loads it another way.
+     *
+     * @param templateName the file name of the template, as {@link #getScenarioTemplateName()} gives it
+     *
+     * @return the template, or {@code null} if it could not be found
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected @Nullable ScenarioTemplate loadScenarioTemplate(String templateName) {
+        return StratConScenarioFactory.getSpecificScenario(templateName);
+    }
+
+    /**
      * @return {@code true} if the scenario that breaks out here is an ambush: a Crisis, and never a Turning Point. By
      *       default, only a scenario drawn from the ambush templates (see {@link #getScenarioTemplateName}) is.
      *
@@ -281,7 +296,7 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
         // factory.
         ScenarioTemplate template;
         if (scenarioTemplateName != null) {
-            template = StratConScenarioFactory.getSpecificScenario(scenarioTemplateName);
+            template = loadScenarioTemplate(scenarioTemplateName);
         } else {
             Formation formation = campaign.getPlayerForce().getFormation(formationId);
             int unitType = (formation == null) ? MEK : formation.getPrimaryUnitType(campaign);

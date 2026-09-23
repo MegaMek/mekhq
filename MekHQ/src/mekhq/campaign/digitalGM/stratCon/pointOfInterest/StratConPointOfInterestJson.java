@@ -47,9 +47,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import mekhq.utilities.MMDataLicenseHeader;
 
 /**
- * JSON reading and writing for StratCon point of interest definitions and their manifests, configured to match the facility JSON
- * files: fields are the single source of truth, unknown fields are tolerated, and a leading {@code #} license-header
- * block is skipped.
+ * JSON reading and writing for StratCon point of interest definitions and their manifests, configured to match the
+ * facility JSON files: fields are the single source of truth, unknown fields are tolerated, and a leading {@code #}
+ * license-header block is skipped.
  *
  * @author Illiani
  * @since 0.51.01
