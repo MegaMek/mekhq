@@ -274,7 +274,7 @@ public class StratConFacilityEditorDialog extends JDialog {
 
     /**
      * Registers the current facility's file name in the facility manifest that sits alongside it, so the game will load
-     * it. Reads the sibling {@code facilitymanifest.json} (creating a fresh one if absent), appends the file name if it
+     * it. Reads the sibling {@code facilitymanifest.json} (creating a fresh one only if there is none; one that exists but cannot be read is left unchanged), appends the file name if it
      * is not already listed, and writes the manifest back.
      */
     private void addToManifest() {
@@ -285,8 +285,19 @@ public class StratConFacilityEditorDialog extends JDialog {
         String fileName = currentFile.getName();
         File manifestFile = new File(currentFile.getParentFile(), FACILITY_MANIFEST_FILE_NAME);
 
-        StratConFacilityManifest manifest = StratConFacilityManifest.deserialize(manifestFile.getPath());
-        if (manifest == null) {
+        // Start a fresh manifest only when there is none. One that exists but will not load is left alone: writing a
+        // new one over it would silently drop every other entry.
+        StratConFacilityManifest manifest;
+        if (manifestFile.exists()) {
+            manifest = StratConFacilityManifest.deserialize(manifestFile.getPath());
+            if (manifest == null) {
+                JOptionPane.showMessageDialog(this,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "facilityEditor.manifest.loadError.message",
+                            manifestFile.getPath()),
+                      getTextAt(RESOURCE_BUNDLE, "facilityEditor.manifest.title"), JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } else {
             manifest = new StratConFacilityManifest();
         }
 

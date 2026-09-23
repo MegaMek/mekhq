@@ -811,7 +811,8 @@ public class CampaignGUI extends JPanel {
 
     /**
      * Brings the StratCon tab forward on the given sector, switching the contract it is showing to the sector's
-     * contract when that contract is one the tab can show. Does nothing if the StratCon tab is not in use.
+     * contract when that contract is one the tab can show. Does nothing if the StratCon tab is not in use, or if it does
+     * not list the contract.
      *
      * @param contractId the ID of the contract whose map holds the sector
      * @param trackIndex the sector's index within that contract's tracks
@@ -821,8 +822,14 @@ public class CampaignGUI extends JPanel {
      */
     public void focusOnStratConSector(UUID contractId, int trackIndex) {
         getStratConTab().ifPresent(stratConTab -> {
-            stratConTab.focusOnSector(contractId, trackIndex);
-            tabMain.setSelectedComponent(stratConTab);
+            // Only switch tabs when the sector can be shown; otherwise the link would open whatever contract is showing.
+            if (stratConTab.focusOnSector(contractId, trackIndex)) {
+                tabMain.setSelectedComponent(stratConTab);
+            } else {
+                logger.debug("StratCon tab does not list contract {}; not following the link to sector {}.",
+                      contractId,
+                      trackIndex);
+            }
         });
     }
 

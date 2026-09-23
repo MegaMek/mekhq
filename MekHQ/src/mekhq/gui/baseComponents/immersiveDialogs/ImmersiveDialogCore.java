@@ -681,8 +681,8 @@ public class ImmersiveDialogCore extends JDialog {
                 final UUID contractId = UUID.fromString(entryKey);
                 final int trackIndex = Integer.parseInt(splitReference[2]);
                 campaignGUI.focusOnStratConSector(contractId, trackIndex);
-            } catch (Exception e) {
-                LOGGER.error("Failed to parse StratCon sector reference: {}", reference, e);
+            } catch (Exception exception) {
+                LOGGER.error("Failed to parse StratCon sector reference: {}", reference, exception);
             }
         }
     }

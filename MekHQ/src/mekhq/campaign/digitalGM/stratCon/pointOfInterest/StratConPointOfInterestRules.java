@@ -480,10 +480,26 @@ public final class StratConPointOfInterestRules {
         List<StratConPointOfInterest> pointsOfInterestOnHex = new ArrayList<>(track.getPointsOfInterest(coords));
 
         for (StratConPointOfInterest pointOfInterest : pointsOfInterestOnHex) {
-            if (!pointOfInterest.isRevealed()) {
-                pointOfInterest.setRevealed(true);
-                pointOfInterest.getBehavior().onRevealed(pointOfInterest, track, campaign);
-            }
+            revealPointOfInterest(track, pointOfInterest, campaign);
+        }
+    }
+
+    /**
+     * Reveals a single point of interest and calls its {@link IStratConPointOfInterestBehavior#onRevealed} hook, unless
+     * it has already been revealed. Used by scouting and by the GM tools, so both act the same way.
+     *
+     * @param track           the sector the point of interest sits in
+     * @param pointOfInterest the point of interest to reveal
+     * @param campaign        the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void revealPointOfInterest(StratConTrackState track, StratConPointOfInterest pointOfInterest,
+          Campaign campaign) {
+        if (!pointOfInterest.isRevealed()) {
+            pointOfInterest.setRevealed(true);
+            pointOfInterest.getBehavior().onRevealed(pointOfInterest, track, campaign);
         }
     }
 

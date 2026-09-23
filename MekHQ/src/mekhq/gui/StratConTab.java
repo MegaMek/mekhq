@@ -457,10 +457,13 @@ public class StratConTab extends CampaignGuiTab {
      * @param contractId the ID of the contract whose map holds the sector
      * @param trackIndex the sector's index within that contract's tracks
      *
+     * @return {@code true} if the selector lists the contract and it is now shown; {@code false} if it is not listed
+     *       (for example, one that has not started yet), in which case nothing changes
+     *
      * @author Illiani
      * @since 0.51.01
      */
-    public void focusOnSector(UUID contractId, int trackIndex) {
+    public boolean focusOnSector(UUID contractId, int trackIndex) {
         for (int index = 0; index < contractSelector.getItemCount(); index++) {
             ContractItem contractItem = contractSelector.getItemAt(index);
             if (!contractItem.contract().getId().equals(contractId)) {
@@ -476,8 +479,10 @@ public class StratConTab extends CampaignGuiTab {
                 // Fires sectorSelectionHandler if this is a different sector.
                 sectorTabs.setSelectedIndex(trackIndex);
             }
-            return;
+            return true;
         }
+
+        return false;
     }
 
     /**

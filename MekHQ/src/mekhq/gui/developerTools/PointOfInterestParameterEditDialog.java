@@ -42,6 +42,7 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
@@ -125,13 +126,21 @@ class PointOfInterestParameterEditDialog extends JDialog {
     private JPanel buildButtons() {
         JPanel bar = new JPanel();
         JButton btnSave = new JButton(getTextAt(RESOURCE_BUNDLE, "button.save"));
-        btnSave.addActionListener(e -> {
+        btnSave.addActionListener(event -> {
+            // An empty type ID would save as null and list as "null", so it is refused, as the definition editor does.
+            if (getTrimmedTypeId().isEmpty()) {
+                JOptionPane.showMessageDialog(this,
+                      getTextAt(RESOURCE_BUNDLE, "pointOfInterestDefinitionEditor.missingTypeId.message"),
+                      getTextAt(RESOURCE_BUNDLE, "pointOfInterestEditor.title"), JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
             writeInto();
             saved = true;
             dispose();
         });
         JButton btnCancel = new JButton(getTextAt(RESOURCE_BUNDLE, "button.cancel"));
-        btnCancel.addActionListener(e -> dispose());
+        btnCancel.addActionListener(event -> dispose());
         bar.add(btnSave);
         bar.add(btnCancel);
         return bar;
@@ -142,10 +151,13 @@ class PointOfInterestParameterEditDialog extends JDialog {
         spnCount.setValue(pointOfInterest.getCount());
     }
 
-    private void writeInto() {
+    private String getTrimmedTypeId() {
         Object typeId = cboTypeId.getSelectedItem();
-        String trimmedTypeId = (typeId == null) ? "" : typeId.toString().trim();
-        pointOfInterest.setTypeId(trimmedTypeId.isEmpty() ? null : trimmedTypeId);
+        return (typeId == null) ? "" : typeId.toString().trim();
+    }
+
+    private void writeInto() {
+        pointOfInterest.setTypeId(getTrimmedTypeId());
         pointOfInterest.setCount((double) spnCount.getValue());
     }
 }

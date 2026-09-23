@@ -185,21 +185,21 @@ public class StratConPointOfInterestEditorDialog extends JDialog {
     private JPanel buildButtonBar() {
         JPanel bar = new JPanel();
         JButton btnNew = new JButton(getTextAt(RESOURCE_BUNDLE, "button.new"));
-        btnNew.addActionListener(e -> {
+        btnNew.addActionListener(event -> {
             definition = new StratConPointOfInterestDefinition();
             currentFile = null;
             load(definition);
             updateManifestButtonState();
         });
         JButton btnLoad = new JButton(getTextAt(RESOURCE_BUNDLE, "button.load"));
-        btnLoad.addActionListener(e -> loadFromFile());
+        btnLoad.addActionListener(event -> loadFromFile());
         JButton btnSave = new JButton(getTextAt(RESOURCE_BUNDLE, "button.save"));
-        btnSave.addActionListener(e -> saveToFile());
-        btnAddToManifest.addActionListener(e -> addToManifest());
+        btnSave.addActionListener(event -> saveToFile());
+        btnAddToManifest.addActionListener(event -> addToManifest());
         btnAddToManifest.setToolTipText(getTextAt(RESOURCE_BUNDLE,
               "pointOfInterestDefinitionEditor.addToManifest.tooltip"));
         JButton btnClose = new JButton(getTextAt(RESOURCE_BUNDLE, "button.close"));
-        btnClose.addActionListener(e -> dispose());
+        btnClose.addActionListener(event -> dispose());
         bar.add(btnNew);
         bar.add(btnLoad);
         bar.add(btnSave);
@@ -297,7 +297,7 @@ public class StratConPointOfInterestEditorDialog extends JDialog {
 
     /**
      * Registers the current definition's file name in the point of interest manifest that sits alongside it, so the
-     * game will load it. Reads the sibling {@code pointofinterestmanifest.json} (creating a fresh one if absent),
+     * game will load it. Reads the sibling {@code pointofinterestmanifest.json} (creating a fresh one only if there is none; one that exists but cannot be read is left unchanged),
      * appends the file name if it is not already listed, and writes the manifest back.
      *
      * @author Illiani
@@ -312,9 +312,20 @@ public class StratConPointOfInterestEditorDialog extends JDialog {
         File manifestFile = new File(currentFile.getParentFile(), POINT_OF_INTEREST_MANIFEST_FILE_NAME);
         String manifestTitle = getTextAt(RESOURCE_BUNDLE, "pointOfInterestDefinitionEditor.manifest.title");
 
-        StratConPointOfInterestManifest manifest = StratConPointOfInterestManifest.deserialize(
-              manifestFile.getPath());
-        if (manifest == null) {
+        // Start a fresh manifest only when there is none. One that exists but will not load is left alone: writing a
+        // new one over it would silently drop every other entry.
+        StratConPointOfInterestManifest manifest;
+        if (manifestFile.exists()) {
+            manifest = StratConPointOfInterestManifest.deserialize(manifestFile.getPath());
+            if (manifest == null) {
+                JOptionPane.showMessageDialog(this,
+                      getFormattedTextAt(RESOURCE_BUNDLE,
+                            "pointOfInterestDefinitionEditor.manifest.loadError.message",
+                            manifestFile.getPath()),
+                      manifestTitle, JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+        } else {
             manifest = new StratConPointOfInterestManifest();
         }
 

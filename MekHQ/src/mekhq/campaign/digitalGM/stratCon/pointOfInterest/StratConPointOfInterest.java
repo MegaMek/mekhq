@@ -364,7 +364,22 @@ public class StratConPointOfInterest {
      * @since 0.51.01
      */
     public boolean isVisibleToPlayer(StratConTrackState track) {
-        if (revealed || isOwnerAlliedToPlayer() || track.isGmRevealed() || track.hasActiveTrackReveal()) {
+        return revealed || isVisibleWithoutBeingRevealed(track);
+    }
+
+    /**
+     * Whether the player can see this point of interest whatever its own revealed flag says: its hex is scouted, the
+     * whole sector is revealed, it is allied, or its type is not hidden. Hiding it again has no effect while this holds.
+     *
+     * @param track the sector this point of interest sits in
+     *
+     * @return {@code true} if the player can see it even when it has not been revealed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isVisibleWithoutBeingRevealed(StratConTrackState track) {
+        if (isOwnerAlliedToPlayer() || track.isGmRevealed() || track.hasActiveTrackReveal()) {
             return true;
         }
 

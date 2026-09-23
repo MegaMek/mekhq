@@ -79,7 +79,7 @@ class ObjectiveParameterEditDialog extends JDialog {
         setLayout(new BorderLayout());
         add(buildForm(), BorderLayout.CENTER);
         add(buildButtons(), BorderLayout.SOUTH);
-        cboType.addActionListener(e -> {
+        cboType.addActionListener(event -> {
             syncCountEnablement();
             syncPointOfInterestEnablement();
         });
@@ -148,7 +148,7 @@ class ObjectiveParameterEditDialog extends JDialog {
      */
     private JPanel buildPointOfInterestField() {
         txtPointsOfInterest.setLineWrap(false);
-        btnAddPointOfInterest.addActionListener(e -> appendKnownPointOfInterest());
+        btnAddPointOfInterest.addActionListener(event -> appendKnownPointOfInterest());
 
         JPanel pickerRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         pickerRow.add(cboKnownPointOfInterest);

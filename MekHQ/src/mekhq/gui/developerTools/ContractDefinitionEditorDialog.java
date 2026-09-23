@@ -46,6 +46,7 @@ import java.util.Map;
 import javax.swing.*;
 
 import megamek.codeUtilities.MathUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
@@ -177,16 +178,16 @@ public class ContractDefinitionEditorDialog extends JDialog {
 
         JPanel pointOfInterestButtons = new JPanel();
         JButton btnAdd = new JButton(getTextAt(RESOURCE_BUNDLE, "button.add"));
-        btnAdd.addActionListener(e -> editPointOfInterest(null));
+        btnAdd.addActionListener(event -> editPointOfInterest(null));
         JButton btnEdit = new JButton(getTextAt(RESOURCE_BUNDLE, "button.edit"));
-        btnEdit.addActionListener(e -> {
+        btnEdit.addActionListener(event -> {
             PointOfInterestParameters selected = lstPointsOfInterest.getSelectedValue();
             if (selected != null) {
                 editPointOfInterest(selected);
             }
         });
         JButton btnRemove = new JButton(getTextAt(RESOURCE_BUNDLE, "button.remove"));
-        btnRemove.addActionListener(e -> {
+        btnRemove.addActionListener(event -> {
             int selectedIndex = lstPointsOfInterest.getSelectedIndex();
             if (selectedIndex >= 0) {
                 pointOfInterestModel.remove(selectedIndex);
@@ -383,7 +384,7 @@ public class ContractDefinitionEditorDialog extends JDialog {
      * @author Illiani
      * @since 0.51.01
      */
-    private void editPointOfInterest(PointOfInterestParameters existing) {
+    private void editPointOfInterest(@Nullable PointOfInterestParameters existing) {
         PointOfInterestParameters target = (existing != null) ? existing : new PointOfInterestParameters();
         boolean saved = new PointOfInterestParameterEditDialog(this, target).showDialog();
         if (saved && (existing == null)) {

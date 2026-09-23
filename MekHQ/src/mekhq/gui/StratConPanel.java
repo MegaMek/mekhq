@@ -93,6 +93,7 @@ import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
+import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
@@ -830,9 +831,15 @@ public class StratConPanel extends JPanel implements ActionListener {
               "stratConTab.contextMenu.pointOfInterest",
               pointOfInterest.getDisplayableName()));
 
+        // While the player can see it for another reason (scouted hex, revealed sector, allied, not hidden), the
+        // toggle would change nothing on the map, so it is shown ticked and disabled instead.
+        boolean isAlwaysVisible = pointOfInterest.isVisibleWithoutBeingRevealed(currentTrack);
         JCheckBoxMenuItem revealedItem = new JCheckBoxMenuItem(getTextAt(RESOURCE_BUNDLE,
-              "stratConTab.contextMenu.pointOfInterest.revealed"));
-        revealedItem.setSelected(pointOfInterest.isRevealed());
+              isAlwaysVisible ?
+                    "stratConTab.contextMenu.pointOfInterest.revealed.alwaysVisible" :
+                    "stratConTab.contextMenu.pointOfInterest.revealed"));
+        revealedItem.setSelected(isAlwaysVisible || pointOfInterest.isRevealed());
+        revealedItem.setEnabled(!isAlwaysVisible);
         revealedItem.setActionCommand(RIGHT_CLICK_COMMAND_TOGGLE_POINT_OF_INTEREST_REVEALED);
         revealedItem.putClientProperty(RIGHT_CLICK_PROPERTY_POINT_OF_INTEREST_ID, pointOfInterest.getId());
         revealedItem.addActionListener(this);
@@ -2298,6 +2305,8 @@ public class StratConPanel extends JPanel implements ActionListener {
             return;
         }
 
+        boolean isPointOfInterestEdited = false;
+
         StratConScenario selectedScenario = currentTrack.getScenario(selectedCoords);
         switch (evt.getActionCommand()) {
             case RIGHT_CLICK_COMMAND_MANAGE_FORCES:
@@ -2360,6 +2369,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                           selectedCoords,
                           currentTrack.getDisplayableName());
                 }
+                isPointOfInterestEdited = true;
                 break;
             case RIGHT_CLICK_COMMAND_REMOVE_POINT_OF_INTEREST:
                 // Withdrawn rather than simply removed, so any objective tied to it goes too, rather than reading as
@@ -2368,6 +2378,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                       evt));
                 if (pointOfInterestToRemove != null) {
                     StratConPointOfInterestRules.withdrawPointOfInterest(currentTrack, pointOfInterestToRemove);
+                    isPointOfInterestEdited = true;
                 }
                 break;
             case RIGHT_CLICK_COMMAND_RESOLVE_POINT_OF_INTEREST:
@@ -2375,13 +2386,22 @@ public class StratConPanel extends JPanel implements ActionListener {
                       getPointOfInterestId(evt));
                 if (pointOfInterestToResolve != null) {
                     StratConPointOfInterestRules.resolvePointOfInterest(currentTrack, pointOfInterestToResolve);
+                    isPointOfInterestEdited = true;
                 }
                 break;
             case RIGHT_CLICK_COMMAND_TOGGLE_POINT_OF_INTEREST_REVEALED:
                 StratConPointOfInterest pointOfInterestToReveal = currentTrack.getPointOfInterest(getPointOfInterestId(
                       evt));
                 if (pointOfInterestToReveal != null) {
-                    pointOfInterestToReveal.setRevealed(((JCheckBoxMenuItem) evt.getSource()).isSelected());
+                    // Revealed through the rules, as scouting does, so the type's reveal hook fires either way.
+                    if (((JCheckBoxMenuItem) evt.getSource()).isSelected()) {
+                        StratConPointOfInterestRules.revealPointOfInterest(currentTrack,
+                              pointOfInterestToReveal,
+                              campaign);
+                    } else {
+                        pointOfInterestToReveal.setRevealed(false);
+                    }
+                    isPointOfInterestEdited = true;
                 }
                 break;
             case RIGHT_CLICK_COMMAND_SET_POINT_OF_INTEREST_OWNER:
@@ -2391,6 +2411,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                     JMenuItem ownerSource = (JMenuItem) evt.getSource();
                     pointOfInterestToChange.setOwner((ForceAlignment) ownerSource.getClientProperty(
                           RIGHT_CLICK_PROPERTY_POINT_OF_INTEREST_OWNER));
+                    isPointOfInterestEdited = true;
                 }
                 break;
             case RIGHT_CLICK_COMMAND_REMOVE_SCENARIO:
@@ -2407,6 +2428,12 @@ public class StratConPanel extends JPanel implements ActionListener {
                     scenarioToReset.resetScenario(campaign);
                 }
                 break;
+        }
+
+        // A point of interest edit can meet, fail or withdraw an objective, so the objective list, sector tabs and
+        // meter bars need refreshing, not just the map.
+        if (isPointOfInterestEdited && (campaignState != null)) {
+            MekHQ.triggerEvent(new MissionChangedEvent(campaignState.getContract()));
         }
 
         repaint();
