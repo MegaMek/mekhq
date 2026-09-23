@@ -342,12 +342,7 @@ public final class ForceDescriptorSnapshot {
                             + " ignored", tag);
                 continue;
             }
-            try {
-                reader.read(snapshot, text);
-            } catch (NumberFormatException exception) {
-                LOGGER.warn("[CommandGen] preset element '{}' held '{}', which is not a number; the"
-                            + " setting keeps its default", tag, text);
-            }
+            reader.read(snapshot, text);
         }
         return snapshot;
     }
@@ -370,20 +365,87 @@ public final class ForceDescriptorSnapshot {
     private static Map<String, SnapshotElementReader> createReaderMap() {
         Map<String, SnapshotElementReader> readers = new HashMap<>();
         readers.put("faction", (snapshot, text) -> snapshot.faction = text);
-        readers.put("year", (snapshot, text) -> snapshot.year = Integer.parseInt(text));
-        readers.put("echelon", (snapshot, text) -> snapshot.echelon = Integer.parseInt(text));
-        readers.put("unitType", (snapshot, text) -> snapshot.unitType = Integer.parseInt(text));
+        readers.put("year", (snapshot, text) -> snapshot.year = parseInteger("year", text, snapshot.year));
+        readers.put("echelon", (snapshot, text) -> snapshot.echelon = parseInteger("echelon", text, snapshot.echelon));
+        readers.put("unitType", (snapshot, text) -> snapshot.unitType = parseInteger("unitType", text, snapshot.unitType));
         readers.put("rating", (snapshot, text) -> snapshot.rating = text);
-        readers.put("experience", (snapshot, text) -> snapshot.experience = Integer.parseInt(text));
-        readers.put("weightClass", (snapshot, text) -> snapshot.weightClass = Integer.parseInt(text));
+        readers.put("experience", (snapshot, text) -> snapshot.experience = parseInteger("experience", text,
+              snapshot.experience));
+        readers.put("weightClass", (snapshot, text) -> snapshot.weightClass = parseInteger("weightClass", text,
+              snapshot.weightClass));
         readers.put("flags", (snapshot, text) -> addTokens(text, snapshot.flags));
         readers.put("augmented", (snapshot, text) -> snapshot.augmented = Boolean.parseBoolean(text));
-        readers.put("sizeMod", (snapshot, text) -> snapshot.sizeMod = Integer.parseInt(text));
+        readers.put("sizeMod", (snapshot, text) -> snapshot.sizeMod = parseInteger("sizeMod", text, snapshot.sizeMod));
         readers.put("roles", (snapshot, text) -> addTokens(text, snapshot.roles));
-        readers.put("dropshipPct", (snapshot, text) -> snapshot.dropshipPct = Double.parseDouble(text));
-        readers.put("jumpshipPct", (snapshot, text) -> snapshot.jumpshipPct = Double.parseDouble(text));
-        readers.put("cargoPct", (snapshot, text) -> snapshot.cargoPct = Double.parseDouble(text));
+        readers.put("dropshipPct", (snapshot, text) -> snapshot.dropshipPct = parseDouble("dropshipPct", text,
+              snapshot.dropshipPct));
+        readers.put("jumpshipPct", (snapshot, text) -> snapshot.jumpshipPct = parseDouble("jumpshipPct", text,
+              snapshot.jumpshipPct));
+        readers.put("cargoPct", (snapshot, text) -> snapshot.cargoPct = parseDouble("cargoPct", text, snapshot.cargoPct));
         return Map.copyOf(readers);
+    }
+
+    /**
+     * Reads a whole number, keeping the current value where the text is not one.
+     *
+     * <p>Each parse catches its own failure, so one bad setting costs only that setting and is named in
+     * the log.</p>
+     *
+     * @param elementName  the element being read, named in the log on failure
+     * @param text         the element's text
+     * @param currentValue the value to keep on failure, or {@code null} where the setting is unset
+     *
+     * @return the parsed number, or {@code currentValue} where the text is not a number
+     */
+    private static @Nullable Integer parseInteger(String elementName, String text, @Nullable Integer currentValue) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException exception) {
+            logUnreadableNumber(elementName, text);
+            return currentValue;
+        }
+    }
+
+    /**
+     * Reads a whole number into a setting that always holds one, keeping the current value where the text
+     * is not a number.
+     *
+     * @param elementName  the element being read, named in the log on failure
+     * @param text         the element's text
+     * @param currentValue the value to keep on failure
+     *
+     * @return the parsed number, or {@code currentValue} where the text is not a number
+     */
+    private static int parseInteger(String elementName, String text, int currentValue) {
+        try {
+            return Integer.parseInt(text);
+        } catch (NumberFormatException exception) {
+            logUnreadableNumber(elementName, text);
+            return currentValue;
+        }
+    }
+
+    /**
+     * Reads a decimal number, keeping the current value where the text is not one.
+     *
+     * @param elementName  the element being read, named in the log on failure
+     * @param text         the element's text
+     * @param currentValue the value to keep on failure
+     *
+     * @return the parsed number, or {@code currentValue} where the text is not a number
+     */
+    private static double parseDouble(String elementName, String text, double currentValue) {
+        try {
+            return Double.parseDouble(text);
+        } catch (NumberFormatException exception) {
+            logUnreadableNumber(elementName, text);
+            return currentValue;
+        }
+    }
+
+    private static void logUnreadableNumber(String elementName, String text) {
+        LOGGER.warn("[CommandGen] preset element '{}' held '{}', which is not a number; the setting keeps its"
+              + " default", elementName, text);
     }
 
     /**
