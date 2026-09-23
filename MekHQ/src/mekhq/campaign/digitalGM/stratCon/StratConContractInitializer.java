@@ -65,6 +65,7 @@ import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInteres
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestBehaviors;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
@@ -345,6 +346,9 @@ public class StratConContractInitializer {
         if (!isUseMaplessMode) {
             boolean isContractsUseSpecialMechanics =
                   campaignOptions.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS);
+            // Fixed for the contract's life, so the rules acting on what is set up below match it even if the option
+            // is changed mid-contract. Left false in mapless play, where none of it is set up.
+            campaignState.setContractsUseSpecialMechanics(isContractsUseSpecialMechanics);
 
             // Most contracts with special points of interest get no Essential scenarios: those points of interest, and
             // the combat bonus paid for each one dealt with, take their place.
@@ -462,9 +466,8 @@ public class StratConContractInitializer {
      * to appear over the contract's run instead of all at once - the way strategic-objective scenarios do.
      *
      * <p>The points of interest are spread across the contract's months by the Track Intensity Tables (see
-     * {@link TrackIntensityTable#rollScheduleForCount}); that per-month schedule is kept on the contract (see
-     * {@link AbstractContract#getPointOfInterestSchedule()}). Each month's points of interest then get random days
-     * within it (see {@link #rollSpawnDates}), and are stored on the campaign state for the daily StratCon lifecycle to
+     * {@link TrackIntensityTable#rollScheduleForCount}). Each month's points of interest then get random days within
+     * it (see {@link #rollSpawnDates}), and are stored on the campaign state for the daily StratCon lifecycle to
      * place as their days come (see {@link #spawnScheduledPointOfInterest}). Which point of interest lands on which day
      * is shuffled, so types are not bunched together.</p>
      *
@@ -515,7 +518,6 @@ public class StratConContractInitializer {
 
         List<Integer> schedule = TrackIntensityTable.rollScheduleForCount(contract.getLengthInMonths(),
               requestedPointsOfInterest.size());
-        contract.setPointOfInterestSchedule(schedule);
 
         List<LocalDate> spawnDates = rollSpawnDates(startDate, schedule, contract.getLengthInMonths());
         Collections.shuffle(requestedPointsOfInterest);
@@ -600,10 +602,9 @@ public class StratConContractInitializer {
      *
      * <p>They are scheduled the way the contract's Essential scenarios are: a roll on the Track Intensity Tables for the
      * contract's length and track count (see {@link TrackIntensityTable#rollSchedule}), made once per point of scale
-     * when "Multiply Track Intensity by Scale" is on and once otherwise. That roll is independent of the scenarios' own,
-     * and is kept on the contract (see {@link AbstractContract#getPointOfInterestSchedule()}). Each month's points of
-     * interest then get random days within it (see {@link #rollSpawnDates}), and the type's behavior is told of the
-     * whole schedule (see {@link IStratConPointOfInterestBehavior#onScheduled}).</p>
+     * when "Multiply Track Intensity by Scale" is on and once otherwise. That roll is independent of the scenarios' own.
+     * Each month's points of interest then get random days within it (see {@link #rollSpawnDates}), and the type's
+     * behavior is told of the whole schedule (see {@link IStratConPointOfInterestBehavior#onScheduled}).</p>
      *
      * <p>Does nothing if the contract has no settled start date.</p>
      *
@@ -630,7 +631,6 @@ public class StratConContractInitializer {
         List<Integer> schedule = TrackIntensityTable.rollSchedule(contract.getLengthInMonths(),
               contract.getTrackCount(),
               rollCount);
-        contract.setPointOfInterestSchedule(schedule);
 
         boolean isStrategicObjective = isSpecialPointOfInterestObjective(typeId);
         List<StratConScheduledPointOfInterest> scheduledPointsOfInterest = new ArrayList<>();
@@ -640,11 +640,13 @@ public class StratConContractInitializer {
         }
 
         // Anything a type settles up front - such as which leads pan out - is settled now, so it cannot be gamed later.
-        // The behavior is named by the contract type's mechanics rather than looked up through the data files, which
-        // are not loaded until the application launches.
-        StratConContractMechanics mechanics = StratConContractMechanics.forPointOfInterestTypeId(typeId);
-        if (mechanics != null) {
-            StratConPointOfInterestBehaviors.getBehavior(mechanics.pointOfInterestBehaviorId())
+        // The behavior is found through the type's definition, as a placed point of interest's is, so the two agree.
+        StratConPointOfInterestDefinition definition = StratConPointOfInterestDefinitions.getDefinition(typeId);
+        if (definition == null) {
+            LOGGER.warn("Point of interest type {} is not defined, so nothing is settled for it when contract {} is "
+                              + "accepted.", typeId, contract.getName());
+        } else {
+            StratConPointOfInterestBehaviors.getBehavior(definition.getBehaviorId())
                   .onScheduled(scheduledPointsOfInterest, contract);
         }
 

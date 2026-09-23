@@ -128,9 +128,6 @@ public abstract class AbstractContract {
     // scenario-generation parameters, bundled together. Immutable like the other data records, so the scalar setters
     // below replace it with a one-field-changed copy.
     private ContractIntensityData intensityData = new ContractIntensityData();
-    // How the contract's StratCon points of interest are spread across its months, rolled on acceptance from the Track
-    // Intensity Tables as the scenario schedule is (see StratConContractInitializer).
-    private List<Integer> pointOfInterestSchedule = List.of();
     private ContractNature nature = ContractNature.NORMAL;
 
     private final List<Scenario> scenarios = new ArrayList<>();
@@ -671,30 +668,6 @@ public abstract class AbstractContract {
 
     public void setScenarioSchedule(List<Integer> scenarioSchedule) {
         intensityData = intensityData.withMonthlyTrackCounts(scenarioSchedule);
-    }
-
-    /**
-     * @return how this contract's StratCon points of interest are spread across the months it runs, rolled from the
-     *       Track Intensity Tables when the contract is accepted, as per-month counts. Never {@code null}; empty until
-     *       the contract has been accepted, or if it places no points of interest.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public List<Integer> getPointOfInterestSchedule() {
-        return pointOfInterestSchedule;
-    }
-
-    /**
-     * @param pointOfInterestSchedule the per-month point of interest counts; {@code null} clears the schedule
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public void setPointOfInterestSchedule(@Nullable List<Integer> pointOfInterestSchedule) {
-        this.pointOfInterestSchedule = (pointOfInterestSchedule == null) ?
-                                             List.of() :
-                                             List.copyOf(pointOfInterestSchedule);
     }
 
     /** @return this contract's special designation ({@link ContractNature#NORMAL} if it has none) */

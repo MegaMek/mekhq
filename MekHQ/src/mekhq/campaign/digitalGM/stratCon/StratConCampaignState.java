@@ -75,6 +75,9 @@ public class StratConCampaignState {
     private int victoryPoints;
     // how far the contract's hostilities have escalated; see StratConEscalation
     private int escalation;
+    // whether "Contracts Use Special Mechanics" was on when the contract was accepted; see
+    // isContractsUseSpecialMechanics
+    private boolean contractsUseSpecialMechanics;
     private String briefingText;
     @XmlElement(required = true, defaultValue = "false")
     private boolean allowEarlyVictory;
@@ -232,6 +235,26 @@ public class StratConCampaignState {
         this.escalation = escalation;
     }
 
+    /**
+     * Whether the contract runs its type's special mechanics (see {@link StratConContractMechanics}). This is the
+     * "Contracts Use Special Mechanics" option as it stood when the contract was accepted, and is always {@code false}
+     * in mapless play, where those mechanics are not set up. Rules read this rather than the option itself: what a
+     * contract was set up with (its Essential scenarios, its points of interest, its Escalation) cannot change with the
+     * option mid-contract, so neither can the rules that act on them.
+     *
+     * @return {@code true} if the contract uses its type's special mechanics
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isContractsUseSpecialMechanics() {
+        return contractsUseSpecialMechanics;
+    }
+
+    public void setContractsUseSpecialMechanics(boolean contractsUseSpecialMechanics) {
+        this.contractsUseSpecialMechanics = contractsUseSpecialMechanics;
+    }
+
     public String getBriefingText() {
         return briefingText;
     }
@@ -349,6 +372,7 @@ public class StratConCampaignState {
      *   <li>The base contract allows early termination</li>
      *   <li>There is at least one strategic objective defined</li>
      *   <li>All strategic objectives across all tracks have been resolved (completed or failed)</li>
+     *   <li>No strategic-objective scenario or strategic-objective point of interest is still waiting to appear</li>
      * </ul>
      *
      * @return {@code true} if the contract can be ended early, {@code false} otherwise
@@ -358,6 +382,11 @@ public class StratConCampaignState {
      */
     public boolean canEndContractEarly() {
         if (!allowEarlyVictory()) {
+            return false;
+        }
+
+        // Objectives still to come are not on the map yet, so they would otherwise not count against ending early.
+        if (hasScheduledStrategicObjectives()) {
             return false;
         }
 
@@ -374,6 +403,27 @@ public class StratConCampaignState {
         }
 
         return hasObjectives;
+    }
+
+    /**
+     * @return {@code true} if a strategic-objective scenario, or a point of interest that will be a strategic objective,
+     *       is still scheduled to appear
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean hasScheduledStrategicObjectives() {
+        if (!strategicScenarioSpawnDates.isEmpty()) {
+            return true;
+        }
+
+        for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
+            if (scheduledPointOfInterest.isStrategicObjective()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

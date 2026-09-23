@@ -35,6 +35,7 @@ package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 import static megamek.common.units.UnitType.INFANTRY;
 import static megamek.common.units.UnitType.MEK;
 import static megamek.common.units.UnitType.TANK;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.POTENTIAL_LEAD;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -55,7 +56,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
@@ -70,6 +70,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -106,7 +107,7 @@ class StratConPotentialLeadBehaviorTest {
     void setUp() {
         StratConPointOfInterestDefinition definition = new StratConPointOfInterestDefinition();
         definition.setTypeId(TYPE_ID);
-        definition.setBehaviorId(StratConPotentialLeadBehavior.BEHAVIOR_ID);
+        definition.setBehaviorId(POTENTIAL_LEAD.getBehaviorId());
         definition.setOccupiesHex(true);
         definition.setHiddenUntilScouted(false);
         definition.setLifespanDieSides(6);
@@ -129,15 +130,18 @@ class StratConPotentialLeadBehaviorTest {
 
     /**
      * A campaign holding one active contract whose map holds the test sector, and one player formation of the given
-     * primary unit type. With Essential Scenarios Only on, no scenario can break out, so every lead is a dud.
+     * primary unit type. With odds no roll can meet, no scenario can break out, so every lead is a dud.
      */
     private Campaign deploymentCampaign(int primaryUnitType, ContractMoraleLevel moraleLevel,
-          boolean essentialScenariosOnly) {
+          boolean isScenarioRuledOut) {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         when(campaign.getLocalDate()).thenReturn(TODAY);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY)).thenReturn(essentialScenariosOnly);
+        if (isScenarioRuledOut) {
+            // Odds no roll can meet, so no scenario can break out.
+            track.setScenarioOdds(-100);
+        }
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         Formation formation = mock(Formation.class);
@@ -146,8 +150,10 @@ class StratConPotentialLeadBehaviorTest {
 
         contract = mock(AbstractContract.class);
         StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.setContractsUseSpecialMechanics(true);
         campaignState.addTrack(track);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
+        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.MOLE_HUNTING);
         when(contract.getMoraleLevel()).thenReturn(moraleLevel);
         when(campaign.getActiveContracts()).thenReturn(List.of(contract));
         return campaign;
@@ -194,9 +200,9 @@ class StratConPotentialLeadBehaviorTest {
 
     @Test
     void thePotentialLeadBehaviorIsRegisteredUnderItsId() {
-        assertInstanceOf(StratConPotentialLeadBehavior.class,
-              StratConPointOfInterestBehaviors.getBehavior(StratConPotentialLeadBehavior.BEHAVIOR_ID));
-        assertInstanceOf(StratConPotentialLeadBehavior.class, lead.getBehavior());
+        assertInstanceOf(StratConContestedPointOfInterestBehavior.class,
+              StratConPointOfInterestBehaviors.getBehavior(POTENTIAL_LEAD.getBehaviorId()));
+        assertInstanceOf(StratConContestedPointOfInterestBehavior.class, lead.getBehavior());
     }
 
     @Test

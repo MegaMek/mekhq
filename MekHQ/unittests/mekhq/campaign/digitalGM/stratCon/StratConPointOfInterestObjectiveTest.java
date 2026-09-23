@@ -38,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.File;
@@ -64,7 +63,6 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.ArgumentCaptor;
 
 /**
  * Tests for points of interest as strategic objectives, for scheduling them over a contract and placing them as their
@@ -285,7 +283,6 @@ class StratConPointOfInterestObjectiveTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked") // ArgumentCaptor cannot name a generic List type without an unchecked conversion
     void acceptingAContractSchedulesItsPointsOfInterestAcrossItsMonths() {
         AbstractContract contract = mock(AbstractContract.class);
         when(contract.getStartDate()).thenReturn(TODAY);
@@ -308,13 +305,6 @@ class StratConPointOfInterestObjectiveTest {
         }
         assertTrue(track.getPointsOfInterest().isEmpty(), "nothing is placed up front");
 
-        ArgumentCaptor<List<Integer>> scheduleCaptor = ArgumentCaptor.forClass(List.class);
-        verify(contract).setPointOfInterestSchedule(scheduleCaptor.capture());
-        int scheduledCount = 0;
-        for (int monthlyCount : scheduleCaptor.getValue()) {
-            scheduledCount += monthlyCount;
-        }
-        assertEquals(5, scheduledCount, "the per-month schedule kept on the contract covers every point of interest");
     }
 
     @Test

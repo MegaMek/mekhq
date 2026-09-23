@@ -68,12 +68,14 @@ public class StratConPlunderTargetBehavior extends StratConAmbushPointOfInterest
     /** The size of the Resupply a plundered target's loot arrives as. */
     static final int LOOT_SIZE = 1;
 
-    /** The Escalation dice plundering a target adds. */
-    static final int PLUNDERED_ESCALATION_DICE = 3;
-
-    @Override
-    protected String getResourceKeyPrefix() {
-        return "StratConPlunderTargetBehavior";
+    /**
+     * Raiders caught at a plunder target are ambushed in a template suited to their unit type.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConPlunderTargetBehavior() {
+        super(BEHAVIOR_ID, null);
     }
 
     /**
@@ -86,6 +88,6 @@ public class StratConPlunderTargetBehavior extends StratConAmbushPointOfInterest
     protected void onSecured(StratConPointOfInterest pointOfInterest, StratConTrackState track,
           AbstractContract contract, Campaign campaign) {
         performResupply(new Resupply(campaign, contract, RESUPPLY_LOOT), contract, LOOT_SIZE);
-        StratConEscalation.increaseEscalationByDice(campaign, contract, PLUNDERED_ESCALATION_DICE);
+        StratConEscalation.onTargetPlundered(campaign, contract);
     }
 }

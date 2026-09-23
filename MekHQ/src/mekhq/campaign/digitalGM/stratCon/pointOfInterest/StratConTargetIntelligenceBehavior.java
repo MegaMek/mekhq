@@ -69,7 +69,6 @@ import mekhq.campaign.mission.contract.AbstractContract;
  */
 public class StratConTargetIntelligenceBehavior extends StratConAmbushPointOfInterestBehavior {
     private static final MMLogger LOGGER = MMLogger.create(StratConTargetIntelligenceBehavior.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.StratConRulesManager";
 
     /** The behavior ID the target intelligence definition names. */
     public static final String BEHAVIOR_ID = "targetIntelligence";
@@ -80,9 +79,14 @@ public class StratConTargetIntelligenceBehavior extends StratConAmbushPointOfInt
     /** The state key marking target intelligence that leads to a facility; its value is {@code true}. */
     public static final String FACILITY_LEAD_STATE_KEY = "facilityLead";
 
-    @Override
-    protected String getResourceKeyPrefix() {
-        return "StratConTargetIntelligenceBehavior";
+    /**
+     * Intelligence that is bait springs an ambush in a template suited to the deploying formation's unit type.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConTargetIntelligenceBehavior() {
+        super(BEHAVIOR_ID, null);
     }
 
     /**
@@ -93,7 +97,7 @@ public class StratConTargetIntelligenceBehavior extends StratConAmbushPointOfInt
      * @since 0.51.01
      */
     @Override
-    protected boolean isCombatBonusPaid() {
+    protected boolean isCombatBonusPaid(AbstractContract contract) {
         return false;
     }
 
@@ -155,8 +159,8 @@ public class StratConTargetIntelligenceBehavior extends StratConAmbushPointOfInt
             // The lead was good, but the sector has no room left for another base: nothing comes of it.
             addReport(GENERAL, "noRoom.report", pointOfInterest, track, campaign);
         } else {
-            campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE,
-                  getResourceKeyPrefix() + ".facility.report",
+            campaign.addReport(BATTLE, getFormattedTextAt(StratConPointOfInterestRules.RESOURCE_BUNDLE,
+                  getBehaviorId() + ".facility.report",
                   pointOfInterest.getDisplayableName(),
                   track.getDisplayableName(),
                   facilityCoords.toBTString()));

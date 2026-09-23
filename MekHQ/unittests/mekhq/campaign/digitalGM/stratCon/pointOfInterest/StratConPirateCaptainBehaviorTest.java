@@ -55,7 +55,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
@@ -70,6 +69,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -126,7 +126,7 @@ class StratConPirateCaptainBehaviorTest {
 
     /**
      * A campaign holding one active contract - with combat pay - whose map holds the test sector, and one player
-     * formation of the given primary unit type. With Essential Scenarios Only on, no scenario can break out, so every
+     * formation of the given primary unit type. With odds no roll can meet, no scenario can break out, so every
      * captain has slipped away.
      */
     private Campaign deploymentCampaign(int primaryUnitType) {
@@ -134,7 +134,8 @@ class StratConPirateCaptainBehaviorTest {
         when(campaign.getLocalDate()).thenReturn(TODAY);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY)).thenReturn(true);
+        // Odds no roll can meet, so no scenario can break out.
+        track.setScenarioOdds(-100);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         Formation formation = mock(Formation.class);
@@ -143,8 +144,10 @@ class StratConPirateCaptainBehaviorTest {
 
         AbstractContract contract = mock(AbstractContract.class);
         StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.setContractsUseSpecialMechanics(true);
         campaignState.addTrack(track);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
+        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.PIRATE_HUNTING);
         when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.STALEMATE);
         when(contract.getContractFinanceData()).thenReturn(new ContractFinanceData(Money.zero(),
               Money.zero(),

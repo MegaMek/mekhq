@@ -47,12 +47,15 @@ import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
  * Escalation, whether its sectors must be scouted, and whether riots move its enemy's morale.
  *
  * <p>Look a contract type up with {@link #forObjectiveType} or {@link #forContract}. Most of these mechanics also
- * depend on the "Contracts Use Special Mechanics" option; that check stays with the callers, since this describes the
- * contract type, not the campaign.</p>
+ * depend on the "Contracts Use Special Mechanics" option, as fixed on the contract when it was accepted (see
+ * {@link StratConCampaignState#isContractsUseSpecialMechanics}); that check stays with the callers, since this
+ * describes the contract type, not the campaign.</p>
+ *
+ * <p>The special point of interest's behavior is not recorded here: it is whatever that type's definition names, as
+ * for any point of interest.</p>
  *
  * @param pointOfInterestTypeId        the type ID of the contract's special point of interest, or {@code null} if it
  *                                     has none
- * @param pointOfInterestBehaviorId    the behavior ID of that point of interest, or {@code null} if it has none
  * @param isReplacingEssentialScenarios whether its special points of interest replace the contract's Essential
  *                                     scenarios, the combat bonus being paid for each one dealt with instead
  * @param isPointOfInterestObjective   whether each special point of interest is a strategic objective
@@ -65,9 +68,8 @@ import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
  * @since 0.51.01
  */
 public record StratConContractMechanics(@Nullable String pointOfInterestTypeId,
-      @Nullable String pointOfInterestBehaviorId, boolean isReplacingEssentialScenarios,
-      boolean isPointOfInterestObjective, EscalationMode escalationMode, boolean isUsingReconnaissance,
-      boolean isRiotAffectingMorale) {
+      boolean isReplacingEssentialScenarios, boolean isPointOfInterestObjective, EscalationMode escalationMode,
+      boolean isUsingReconnaissance, boolean isRiotAffectingMorale) {
 
     /**
      * How a contract tracks Escalation (see {@link StratConEscalation}).
@@ -86,7 +88,6 @@ public record StratConContractMechanics(@Nullable String pointOfInterestTypeId,
 
     /** A contract type with no special mechanics of its own. */
     private static final StratConContractMechanics NO_MECHANICS = new StratConContractMechanics(null,
-          null,
           false,
           false,
           EscalationMode.NONE,
@@ -148,6 +149,26 @@ public record StratConContractMechanics(@Nullable String pointOfInterestTypeId,
     }
 
     /**
+     * Decides whether a contract was set up without its Essential scenarios, its special points of interest taking
+     * their place: it uses its type's special mechanics (see
+     * {@link StratConCampaignState#isContractsUseSpecialMechanics}), and its type's special points of interest replace
+     * Essential scenarios. Dealing with such a point of interest pays the combat bonus those scenarios would have.
+     *
+     * @param contract a contract
+     *
+     * @return {@code true} if the contract has no Essential scenarios of its own
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean areEssentialScenariosReplaced(AbstractContract contract) {
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        return (campaignState != null)
+                     && campaignState.isContractsUseSpecialMechanics()
+                     && forContract(contract).isReplacingEssentialScenarios();
+    }
+
+    /**
      * @return {@code true} if the contract type has a special point of interest
      *
      * @author Illiani
@@ -163,7 +184,6 @@ public record StratConContractMechanics(@Nullable String pointOfInterestTypeId,
         // Every contract type starts with its Escalation mode and nothing else; those with more are filled in below.
         for (ContractObjectiveType objectiveType : ContractObjectiveType.values()) {
             mechanics.put(objectiveType, new StratConContractMechanics(null,
-                  null,
                   false,
                   false,
                   getEscalationMode(objectiveType),
@@ -171,61 +191,58 @@ public record StratConContractMechanics(@Nullable String pointOfInterestTypeId,
                   false));
         }
 
-        // Special points of interest. Arguments: type ID, behavior ID, replaces Essential scenarios, is an objective.
+        // Special points of interest. Arguments: type ID, replaces Essential scenarios, is an objective.
         addPointOfInterest(mechanics, ContractObjectiveType.ESPIONAGE,
-              StratConDataCacheBehavior.TYPE_ID, StratConDataCacheBehavior.BEHAVIOR_ID, true, true);
+              StratConConfiguredPointOfInterestType.DATA_CACHE.getTypeId(), true, true);
         addPointOfInterest(mechanics, ContractObjectiveType.GUERRILLA_WARFARE,
-              StratConVulnerableInfrastructureBehavior.TYPE_ID, StratConVulnerableInfrastructureBehavior.BEHAVIOR_ID,
-              true, true);
+              StratConConfiguredPointOfInterestType.VULNERABLE_INFRASTRUCTURE.getTypeId(), true, true);
         addPointOfInterest(mechanics, ContractObjectiveType.MOLE_HUNTING,
-              StratConPotentialLeadBehavior.TYPE_ID, StratConPotentialLeadBehavior.BEHAVIOR_ID, true, true);
+              StratConConfiguredPointOfInterestType.POTENTIAL_LEAD.getTypeId(), true, true);
         addPointOfInterest(mechanics, ContractObjectiveType.ASSASSINATION,
-              StratConAssassinationLeadBehavior.TYPE_ID, StratConAssassinationLeadBehavior.BEHAVIOR_ID, true, true);
+              StratConAssassinationLeadBehavior.TYPE_ID, true, true);
         addPointOfInterest(mechanics, ContractObjectiveType.OBSERVATION_RAID,
-              StratConLookoutPointBehavior.TYPE_ID, StratConLookoutPointBehavior.BEHAVIOR_ID, true, true);
+              StratConConfiguredPointOfInterestType.LOOKOUT_POINT.getTypeId(), true, true);
         // Relief Duty keeps its Essential scenarios alongside its beleaguered forces.
         addPointOfInterest(mechanics, ContractObjectiveType.RELIEF_DUTY,
-              StratConBeleagueredForcesBehavior.TYPE_ID, StratConBeleagueredForcesBehavior.BEHAVIOR_ID, false, true);
+              StratConConfiguredPointOfInterestType.BELEAGUERED_FORCES.getTypeId(), false, true);
         // Cadre Duty keeps its Essential scenarios alongside its training maneuvers.
         addPointOfInterest(mechanics, ContractObjectiveType.CADRE_DUTY,
-              StratConTrainingManeuversBehavior.TYPE_ID, StratConTrainingManeuversBehavior.BEHAVIOR_ID, false, true);
+              StratConTrainingManeuversBehavior.TYPE_ID, false, true);
         // A Diversionary Raid's objective is its Escalation, not its high profile targets.
         addPointOfInterest(mechanics, ContractObjectiveType.DIVERSIONARY_RAID,
-              StratConHighProfileTargetBehavior.TYPE_ID, StratConHighProfileTargetBehavior.BEHAVIOR_ID, true, false);
+              StratConHighProfileTargetBehavior.TYPE_ID, true, false);
         addPointOfInterest(mechanics, ContractObjectiveType.EXTRACTION_RAID,
-              StratConVIPBehavior.TYPE_ID, StratConVIPBehavior.BEHAVIOR_ID, true, true);
+              StratConConfiguredPointOfInterestType.VIP.getTypeId(), true, true);
         // Planetary Assault keeps its Essential scenarios alongside its strategic positions.
         addPointOfInterest(mechanics, ContractObjectiveType.PLANETARY_ASSAULT,
-              StratConStrategicPositionBehavior.TYPE_ID, StratConStrategicPositionBehavior.BEHAVIOR_ID, false, true);
+              StratConConfiguredPointOfInterestType.STRATEGIC_POSITION.getTypeId(), false, true);
         addPointOfInterest(mechanics, ContractObjectiveType.RETAINER,
-              StratConScheduledParadeBehavior.TYPE_ID, StratConScheduledParadeBehavior.BEHAVIOR_ID, true, true);
+              StratConScheduledParadeBehavior.TYPE_ID, true, true);
         addPointOfInterest(mechanics, ContractObjectiveType.RIOT_DUTY,
-              StratConCivilDisobedienceBehavior.TYPE_ID, StratConCivilDisobedienceBehavior.BEHAVIOR_ID, true, true);
+              StratConCivilDisobedienceBehavior.TYPE_ID, true, true);
         addPointOfInterest(mechanics, ContractObjectiveType.SABOTAGE,
-              StratConSabotageTargetBehavior.TYPE_ID, StratConSabotageTargetBehavior.BEHAVIOR_ID, true, true);
+              StratConSabotageTargetBehavior.TYPE_ID, true, true);
         addPointOfInterest(mechanics, ContractObjectiveType.TERRORISM,
-              StratConCivilianInfrastructureBehavior.TYPE_ID, StratConCivilianInfrastructureBehavior.BEHAVIOR_ID,
-              true, true);
+              StratConCivilianInfrastructureBehavior.TYPE_ID, true, true);
         // Security Duty keeps its Essential scenarios alongside its security reviews.
         addPointOfInterest(mechanics, ContractObjectiveType.SECURITY_DUTY,
-              StratConSecurityReviewBehavior.TYPE_ID, StratConSecurityReviewBehavior.BEHAVIOR_ID, false, true);
+              StratConConfiguredPointOfInterestType.SECURITY_REVIEW.getTypeId(), false, true);
         addPointOfInterest(mechanics, ContractObjectiveType.PIRATE_RAID,
-              StratConPlunderTargetBehavior.TYPE_ID, StratConPlunderTargetBehavior.BEHAVIOR_ID, true, true);
+              StratConPlunderTargetBehavior.TYPE_ID, true, true);
         // Target intelligence's objectives are the facilities it leads to; an Objective Raid's combat bonus comes from
         // fighting at those.
         addPointOfInterest(mechanics, ContractObjectiveType.OBJECTIVE_RAID,
-              StratConTargetIntelligenceBehavior.TYPE_ID, StratConTargetIntelligenceBehavior.BEHAVIOR_ID, true, false);
+              StratConTargetIntelligenceBehavior.TYPE_ID, true, false);
         // Garrison Duty keeps its Essential scenarios; shows of force only calm its Escalation.
         addPointOfInterest(mechanics, ContractObjectiveType.GARRISON_DUTY,
-              StratConShowOfForceBehavior.TYPE_ID, StratConShowOfForceBehavior.BEHAVIOR_ID, false, false);
+              StratConShowOfForceBehavior.TYPE_ID, false, false);
         // A pirate captain's objective is the Essential scenario it is fought in.
         addPointOfInterest(mechanics, ContractObjectiveType.PIRATE_HUNTING,
-              StratConPirateCaptainBehavior.TYPE_ID, StratConPirateCaptainBehavior.BEHAVIOR_ID, true, false);
+              StratConPirateCaptainBehavior.TYPE_ID, true, false);
 
         // A Recon Raid has no special point of interest: its sectors must be scouted instead.
         StratConContractMechanics reconRaid = mechanics.get(ContractObjectiveType.RECON_RAID);
         mechanics.put(ContractObjectiveType.RECON_RAID, new StratConContractMechanics(null,
-              null,
               false,
               false,
               reconRaid.escalationMode(),
@@ -235,7 +252,6 @@ public record StratConContractMechanics(@Nullable String pointOfInterestTypeId,
         // Quelling riots is the work of a Riot Duty contract, so only there does a riot's outcome move morale.
         StratConContractMechanics riotDuty = mechanics.get(ContractObjectiveType.RIOT_DUTY);
         mechanics.put(ContractObjectiveType.RIOT_DUTY, new StratConContractMechanics(riotDuty.pointOfInterestTypeId(),
-              riotDuty.pointOfInterestBehaviorId(),
               riotDuty.isReplacingEssentialScenarios(),
               riotDuty.isPointOfInterestObjective(),
               riotDuty.escalationMode(),
@@ -246,11 +262,10 @@ public record StratConContractMechanics(@Nullable String pointOfInterestTypeId,
     }
 
     private static void addPointOfInterest(Map<ContractObjectiveType, StratConContractMechanics> mechanics,
-          ContractObjectiveType objectiveType, String pointOfInterestTypeId, String pointOfInterestBehaviorId,
-          boolean isReplacingEssentialScenarios, boolean isPointOfInterestObjective) {
+          ContractObjectiveType objectiveType, String pointOfInterestTypeId, boolean isReplacingEssentialScenarios,
+          boolean isPointOfInterestObjective) {
         StratConContractMechanics existing = mechanics.get(objectiveType);
         mechanics.put(objectiveType, new StratConContractMechanics(pointOfInterestTypeId,
-              pointOfInterestBehaviorId,
               isReplacingEssentialScenarios,
               isPointOfInterestObjective,
               existing.escalationMode(),

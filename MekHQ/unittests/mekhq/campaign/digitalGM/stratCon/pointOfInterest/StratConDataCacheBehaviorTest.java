@@ -39,6 +39,7 @@ import static megamek.common.units.UnitType.INFANTRY;
 import static megamek.common.units.UnitType.MEK;
 import static megamek.common.units.UnitType.TANK;
 import static megamek.common.units.UnitType.VTOL;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.DATA_CACHE;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -60,7 +61,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
@@ -75,6 +75,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -111,7 +112,7 @@ class StratConDataCacheBehaviorTest {
     void setUp() {
         StratConPointOfInterestDefinition definition = new StratConPointOfInterestDefinition();
         definition.setTypeId(TYPE_ID);
-        definition.setBehaviorId(StratConDataCacheBehavior.BEHAVIOR_ID);
+        definition.setBehaviorId(DATA_CACHE.getBehaviorId());
         definition.setOccupiesHex(true);
         definition.setHiddenUntilScouted(true);
         definition.setLifespanDieSides(6);
@@ -137,12 +138,15 @@ class StratConDataCacheBehaviorTest {
      * primary unit type.
      */
     private Campaign deploymentCampaign(int primaryUnitType, ContractMoraleLevel moraleLevel,
-          boolean essentialScenariosOnly) {
+          boolean isScenarioRuledOut) {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         when(campaign.getLocalDate()).thenReturn(TODAY);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY)).thenReturn(essentialScenariosOnly);
+        if (isScenarioRuledOut) {
+            // Odds no roll can meet, so no scenario can break out.
+            track.setScenarioOdds(-100);
+        }
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         Formation formation = mock(Formation.class);
@@ -151,8 +155,10 @@ class StratConDataCacheBehaviorTest {
 
         contract = mock(AbstractContract.class);
         StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.setContractsUseSpecialMechanics(true);
         campaignState.addTrack(track);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
+        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.ESPIONAGE);
         when(contract.getMoraleLevel()).thenReturn(moraleLevel);
         when(campaign.getActiveContracts()).thenReturn(List.of(contract));
         return campaign;
@@ -192,9 +198,9 @@ class StratConDataCacheBehaviorTest {
 
     @Test
     void theDataCacheBehaviorIsRegisteredUnderItsId() {
-        assertInstanceOf(StratConDataCacheBehavior.class,
-              StratConPointOfInterestBehaviors.getBehavior(StratConDataCacheBehavior.BEHAVIOR_ID));
-        assertInstanceOf(StratConDataCacheBehavior.class, dataCache.getBehavior());
+        assertInstanceOf(StratConContestedPointOfInterestBehavior.class,
+              StratConPointOfInterestBehaviors.getBehavior(DATA_CACHE.getBehaviorId()));
+        assertInstanceOf(StratConContestedPointOfInterestBehavior.class, dataCache.getBehavior());
     }
 
     @Test
@@ -210,7 +216,7 @@ class StratConDataCacheBehaviorTest {
     @ParameterizedTest
     @ValueSource(ints = { MEK, TANK, INFANTRY, VTOL, CONV_FIGHTER, AEROSPACE_FIGHTER, DROPSHIP })
     void anyFormationSecuresTheCacheWhenNoScenarioBreaksOut(int primaryUnitType) {
-        // Essential Scenarios Only rules out the random scenario, so no scenario can break out.
+        // No scenario can break out.
         Campaign campaign = deploymentCampaign(primaryUnitType, ContractMoraleLevel.STALEMATE, true);
 
         assertEquals(PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO, deploy(campaign));

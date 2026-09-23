@@ -59,8 +59,6 @@ import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
  * @since 0.51.01
  */
 public class StratConTrainingManeuversBehavior implements IStratConPointOfInterestBehavior {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.StratConRulesManager";
-
     /** The behavior ID the training maneuvers definition names. */
     public static final String BEHAVIOR_ID = "trainingManeuvers";
 
@@ -80,8 +78,8 @@ public class StratConTrainingManeuversBehavior implements IStratConPointOfIntere
         StratConPointOfInterestRules.resolvePointOfInterest(track, pointOfInterest);
         track.removePointOfInterest(pointOfInterest.getId());
 
-        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE,
-              "StratConTrainingManeuversBehavior.completed.report",
+        campaign.addReport(GENERAL, getFormattedTextAt(StratConPointOfInterestRules.RESOURCE_BUNDLE,
+              BEHAVIOR_ID + ".completed.report",
               pointOfInterest.getDisplayableName(),
               track.getDisplayableName()));
 
@@ -96,6 +94,6 @@ public class StratConTrainingManeuversBehavior implements IStratConPointOfIntere
     @Override
     public @Nullable String getObjectiveDescription(StratConPointOfInterest pointOfInterest,
           StratConTrackState track) {
-        return getTextAt(RESOURCE_BUNDLE, "StratConTrainingManeuversBehavior.objective");
+        return getTextAt(StratConPointOfInterestRules.RESOURCE_BUNDLE, BEHAVIOR_ID + ".objective");
     }
 }

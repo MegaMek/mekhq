@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.BELEAGUERED_FORCES;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.DATA_CACHE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -39,16 +41,20 @@ import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import mekhq.campaign.digitalGM.stratCon.StratConContractMechanics.EscalationMode;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInterestBehavior;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConBeleagueredForcesBehavior;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDataCacheBehavior;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestBehaviors;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConShowOfForceBehavior;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -84,17 +90,31 @@ class StratConContractMechanicsTest {
     @ParameterizedTest
     @EnumSource(value = ContractObjectiveType.class, names = { "UNDEFINED", "RECON_RAID" },
           mode = EnumSource.Mode.EXCLUDE)
-    void everyOtherContractTypeHasASpecialPointOfInterestWithARegisteredBehavior(
+    void everyOtherContractTypeHasADefinedSpecialPointOfInterestWithARegisteredBehavior(
           ContractObjectiveType objectiveType) {
         StratConContractMechanics mechanics = StratConContractMechanics.forObjectiveType(objectiveType);
 
         assertTrue(mechanics.hasSpecialPointOfInterest(), objectiveType + " should have a special point of interest");
-        assertNotNull(mechanics.pointOfInterestBehaviorId());
+
+        // The behavior is whatever the type's data file names, so the type must be defined there.
+        StratConPointOfInterestDefinition definition = StratConPointOfInterestDefinitions.getDefinition(
+              mechanics.pointOfInterestTypeId());
+        assertNotNull(definition, mechanics.pointOfInterestTypeId() + " has no data file definition");
 
         IStratConPointOfInterestBehavior behavior =
-              StratConPointOfInterestBehaviors.getBehavior(mechanics.pointOfInterestBehaviorId());
+              StratConPointOfInterestBehaviors.getBehavior(definition.getBehaviorId());
         assertNotSame(StratConPointOfInterestBehaviors.getBehavior(null), behavior,
-              objectiveType + " names a behavior that is not registered");
+              objectiveType + "'s point of interest names a behavior that is not registered");
+    }
+
+    @ParameterizedTest
+    @EnumSource(StratConConfiguredPointOfInterestType.class)
+    void everyConfiguredTypeIsDefinedWithItsOwnBehavior(StratConConfiguredPointOfInterestType configuredType) {
+        StratConPointOfInterestDefinition definition = StratConPointOfInterestDefinitions.getDefinition(
+              configuredType.getTypeId());
+
+        assertNotNull(definition, configuredType.getTypeId() + " has no data file definition");
+        assertEquals(configuredType.getBehaviorId(), definition.getBehaviorId());
     }
 
     @Test
@@ -113,7 +133,9 @@ class StratConContractMechanicsTest {
         StratConContractMechanics espionage = StratConContractMechanics.forObjectiveType(
               ContractObjectiveType.ESPIONAGE);
 
-        assertSame(espionage, StratConContractMechanics.forPointOfInterestTypeId(StratConDataCacheBehavior.TYPE_ID));
+        assertSame(espionage,
+              StratConContractMechanics.forPointOfInterestTypeId(
+                    DATA_CACHE.getTypeId()));
         assertNull(StratConContractMechanics.forPointOfInterestTypeId("NotASpecialPointOfInterest"));
         assertNull(StratConContractMechanics.forPointOfInterestTypeId(null));
     }
@@ -136,6 +158,35 @@ class StratConContractMechanicsTest {
                          .isReplacingEssentialScenarios());
     }
 
+    private static AbstractContract contract(ContractObjectiveType objectiveType,
+          boolean isContractsUseSpecialMechanics) {
+        StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.setContractsUseSpecialMechanics(isContractsUseSpecialMechanics);
+
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getObjectiveType()).thenReturn(objectiveType);
+        when(contract.getStratConCampaignState()).thenReturn(campaignState);
+        return contract;
+    }
+
+    @Test
+    void essentialScenariosAreReplacedOnlyWhenTheContractUsesItsSpecialMechanics() {
+        assertTrue(StratConContractMechanics.areEssentialScenariosReplaced(
+              contract(ContractObjectiveType.ESPIONAGE, true)));
+        assertFalse(StratConContractMechanics.areEssentialScenariosReplaced(
+              contract(ContractObjectiveType.ESPIONAGE, false)), "without special mechanics, Essentials stay");
+        assertFalse(StratConContractMechanics.areEssentialScenariosReplaced(
+              contract(ContractObjectiveType.RELIEF_DUTY, true)), "Relief Duty keeps its Essentials");
+    }
+
+    @Test
+    void aContractWithoutAStratConStateKeepsItsEssentialScenarios() {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.ESPIONAGE);
+
+        assertFalse(StratConContractMechanics.areEssentialScenariosReplaced(contract));
+    }
+
     @Test
     void specialPointsOfInterestThatAreNotObjectives() {
         for (ContractObjectiveType objectiveType : new ContractObjectiveType[] {
@@ -147,7 +198,7 @@ class StratConContractMechanicsTest {
 
         assertTrue(StratConContractMechanics.forObjectiveType(ContractObjectiveType.RELIEF_DUTY)
                          .isPointOfInterestObjective());
-        assertEquals(StratConBeleagueredForcesBehavior.TYPE_ID,
+        assertEquals(BELEAGUERED_FORCES.getTypeId(),
               StratConContractMechanics.forObjectiveType(ContractObjectiveType.RELIEF_DUTY).pointOfInterestTypeId());
         assertEquals(StratConShowOfForceBehavior.TYPE_ID,
               StratConContractMechanics.forObjectiveType(ContractObjectiveType.GARRISON_DUTY).pointOfInterestTypeId());

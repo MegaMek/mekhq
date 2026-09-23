@@ -52,7 +52,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
@@ -131,12 +130,12 @@ class StratConTargetIntelligenceTest {
     }
 
     /**
-     * A campaign with real options - Essential Scenarios Only on, so no scenario can break out - holding the test
-     * contract.
+     * A campaign with real options holding the test contract, whose sector's scenario odds no roll can meet, so no
+     * scenario can break out.
      */
     private Campaign campaign() {
         CampaignOptions options = new CampaignOptions();
-        options.set(CampaignOption.ESSENTIAL_SCENARIOS_ONLY, true);
+        track.setScenarioOdds(-100);
 
         Campaign campaign = mock(Campaign.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
@@ -182,8 +181,17 @@ class StratConTargetIntelligenceTest {
         when(contract.getTrackCount()).thenReturn(3);
         StratConCampaignState scheduleState = new StratConCampaignState();
 
-        StratConContractInitializer.scheduleSpecialPointsOfInterest(contract, scheduleState, true,
-              StratConTargetIntelligenceBehavior.TYPE_ID);
+        // The behavior told of the schedule is the one the type's definition names.
+        StratConPointOfInterestDefinition realDefinition = new StratConPointOfInterestDefinition();
+        realDefinition.setTypeId(StratConTargetIntelligenceBehavior.TYPE_ID);
+        realDefinition.setBehaviorId(StratConTargetIntelligenceBehavior.BEHAVIOR_ID);
+        StratConPointOfInterestDefinitions.registerDefinition(realDefinition);
+        try {
+            StratConContractInitializer.scheduleSpecialPointsOfInterest(contract, scheduleState, true,
+                  StratConTargetIntelligenceBehavior.TYPE_ID);
+        } finally {
+            StratConPointOfInterestDefinitions.unregisterDefinition(StratConTargetIntelligenceBehavior.TYPE_ID);
+        }
 
         List<StratConScheduledPointOfInterest> scheduled = scheduleState.getScheduledPointsOfInterest();
         assertEquals(9, scheduled.size());

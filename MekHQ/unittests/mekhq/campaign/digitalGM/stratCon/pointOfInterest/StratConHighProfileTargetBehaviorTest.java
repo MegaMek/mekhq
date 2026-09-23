@@ -34,6 +34,7 @@ package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
 import static megamek.common.units.UnitType.MEK;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.VULNERABLE_INFRASTRUCTURE;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -127,7 +128,7 @@ class StratConHighProfileTargetBehaviorTest {
 
     /**
      * A campaign holding one active Diversionary Raid - with combat pay - whose map holds the test sector, and one player
-     * formation of the given primary unit type. With Essential Scenarios Only on, no scenario can break out, so there is
+     * formation of the given primary unit type. With odds no roll can meet, no scenario can break out, so there is
      * never an ambush.
      */
     private Campaign deploymentCampaign(int primaryUnitType) {
@@ -139,7 +140,8 @@ class StratConHighProfileTargetBehaviorTest {
         when(campaign.getLocalDate()).thenReturn(TODAY);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY)).thenReturn(true);
+        // Odds no roll can meet, so no scenario can break out.
+        track.setScenarioOdds(-100);
         when(options.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS)).thenReturn(isContractsUseSpecialMechanics);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
@@ -149,6 +151,7 @@ class StratConHighProfileTargetBehaviorTest {
 
         AbstractContract contract = mock(AbstractContract.class);
         campaignState = new StratConCampaignState();
+        campaignState.setContractsUseSpecialMechanics(true);
         campaignState.addTrack(track);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
         when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.DIVERSIONARY_RAID);
@@ -197,7 +200,7 @@ class StratConHighProfileTargetBehaviorTest {
     @Test
     void theAmbushIsFoughtAsADecoyEngagement() {
         assertEquals("Decoy Engagement.json", new StratConHighProfileTargetBehavior().getScenarioTemplateName());
-        assertNull(new StratConVulnerableInfrastructureBehavior().getScenarioTemplateName(),
+        assertNull(VULNERABLE_INFRASTRUCTURE.createBehavior().getScenarioTemplateName(),
               "other ambush types still draw a template suited to the ambushed unit");
     }
 

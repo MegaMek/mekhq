@@ -58,7 +58,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * @since 0.51.01
  */
 public final class StratConPointOfInterestRules {
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.StratConRulesManager";
+    /** The resource bundle holding every point of interest type's player-facing text, keyed by behavior ID. */
+    static final String RESOURCE_BUNDLE = "mekhq.resources.StratConPointOfInterest";
 
     private StratConPointOfInterestRules() {
     }
@@ -192,6 +193,25 @@ public final class StratConPointOfInterestRules {
     }
 
     /**
+     * @param track  a sector
+     * @param coords a hex in it
+     *
+     * @return {@code true} if the hex holds a point of interest that is still in play
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean hasActivePointOfInterest(StratConTrackState track, StratConCoords coords) {
+        for (StratConPointOfInterest pointOfInterest : track.getPointsOfInterest(coords)) {
+            if (pointOfInterest.isActive()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @param track           the sector the point of interest sits in
      * @param pointOfInterest the point of interest
      *
@@ -284,7 +304,7 @@ public final class StratConPointOfInterestRules {
 
         if (visibleToPlayer) {
             campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE,
-                  "StratConPointOfInterestRules.expired.report",
+                  "pointOfInterest.expired.report",
                   pointOfInterest.getDisplayableName(),
                   track.getDisplayableName()));
         }
@@ -318,6 +338,12 @@ public final class StratConPointOfInterestRules {
 
         // Copied, so a hook that removes its point of interest or places a scenario on the hex is safe.
         for (StratConPointOfInterest pointOfInterest : new ArrayList<>(track.getPointsOfInterest(coords))) {
+            // One point of interest earlier in this pass may have placed a scenario here; the formation joins that,
+            // and no other may place a second.
+            if (track.getScenario(coords) != null) {
+                break;
+            }
+
             if (!pointOfInterest.isActive()) {
                 continue;
             }

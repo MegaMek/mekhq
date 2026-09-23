@@ -66,14 +66,14 @@ public class StratConSabotageTargetBehavior extends StratConContestedPointOfInte
     /** The scenario template fought when saboteurs are caught. */
     static final String SCENARIO_TEMPLATE = "Covert Strike.json";
 
-    @Override
-    protected String getScenarioTemplateName() {
-        return SCENARIO_TEMPLATE;
-    }
-
-    @Override
-    protected String getResourceKeyPrefix() {
-        return "StratConSabotageTargetBehavior";
+    /**
+     * Caught saboteurs fight a {@value #SCENARIO_TEMPLATE} scenario; uncaught, they sabotage the target.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConSabotageTargetBehavior() {
+        super(BEHAVIOR_ID, SCENARIO_TEMPLATE, NoScenarioOutcome.SECURE);
     }
 
     /**
@@ -85,7 +85,7 @@ public class StratConSabotageTargetBehavior extends StratConContestedPointOfInte
     @Override
     protected void onNoScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
           AbstractContract contract, Campaign campaign) {
-        securePointOfInterest(pointOfInterest, track, contract, campaign);
+        super.onNoScenario(pointOfInterest, track, contract, campaign);
         StratConEscalation.onTargetSabotaged(campaign, contract);
     }
 

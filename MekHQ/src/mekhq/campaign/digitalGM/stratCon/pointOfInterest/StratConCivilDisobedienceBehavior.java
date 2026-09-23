@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -46,10 +45,11 @@ import mekhq.campaign.mission.contract.AbstractContract;
  *
  * <p>When any formation deploys onto its hex, the usual scenario roll is made - even against a routed enemy, since civil
  * unrest does not answer to the enemy's morale. If no scenario breaks out, the disobedience is defused: its objective is
- * met and the contract's combat bonus is paid. If one does, it has turned into a riot, set up as every riot is (see
- * {@link StratConRiots}): an overall victory puts the riot down, meeting the objective and paying the bonus, and
- * anything else - a defeat, a draw, or leaving the riot unplayed - fails it. Either way it then leaves the map. (See
- * {@link StratConContestedPointOfInterestBehavior} for the rules it shares.)</p>
+ * met and the contract's combat bonus is paid (see {@link #isCombatBonusPaid}). If one does, it has turned into a
+ * riot, which breaks out at once with its rioting mobs (see {@link StratConRiots}): an overall victory puts the riot
+ * down, meeting the objective and paying the bonus, and anything else - a defeat, a draw, or leaving the riot unplayed -
+ * fails it. Either way it then leaves the map. (See {@link StratConContestedPointOfInterestBehavior} for the rules it
+ * shares.)</p>
  *
  * <p>Civil disobedience not responded to in time dies down: it expires and its objective fails (its lifespan comes from
  * its definition), except while a riot there is still to be put down.</p>
@@ -64,14 +64,14 @@ public class StratConCivilDisobedienceBehavior extends StratConContestedPointOfI
     /** The type ID of the civil disobedience definition. */
     public static final String TYPE_ID = "CivilDisobedience";
 
-    @Override
-    protected String getScenarioTemplateName() {
-        return StratConRiots.SCENARIO_TEMPLATE;
-    }
-
-    @Override
-    protected String getResourceKeyPrefix() {
-        return "StratConCivilDisobedienceBehavior";
+    /**
+     * Civil disobedience turns into a riot, fought as every riot is; with no riot, it is defused.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConCivilDisobedienceBehavior() {
+        super(BEHAVIOR_ID, StratConRiots.SCENARIO_TEMPLATE, NoScenarioOutcome.SECURE);
     }
 
     /**
@@ -86,27 +86,25 @@ public class StratConCivilDisobedienceBehavior extends StratConContestedPointOfI
     }
 
     /**
-     * With no riot breaking out, the disobedience is defused at once.
+     * A riot breaks out at once.
      *
      * @author Illiani
      * @since 0.51.01
      */
     @Override
-    protected void onNoScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
-          AbstractContract contract, Campaign campaign) {
-        securePointOfInterest(pointOfInterest, track, contract, campaign);
+    protected Integer getDaysUntilDeployment() {
+        return StratConRiots.DAYS_UNTIL_DEPLOYMENT;
     }
 
     /**
-     * Sets up the riot as every riot is set up (see {@link StratConRiots#placeRiot}).
+     * Adds the rioting mobs, as every riot has (see {@link StratConRiots#addRiotingMobs}).
      *
      * @author Illiani
      * @since 0.51.01
      */
     @Override
-    protected @Nullable StratConScenario placeScenario(StratConPointOfInterest pointOfInterest,
-          StratConTrackState track, int formationId, AbstractContract contract, Campaign campaign) {
-        return StratConRiots.placeRiot(pointOfInterest, track, formationId, contract, campaign);
+    protected void onScenarioFinalized(StratConScenario scenario, AbstractContract contract, Campaign campaign) {
+        StratConRiots.addRiotingMobs(scenario, contract, campaign);
     }
 
     /**

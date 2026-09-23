@@ -34,6 +34,7 @@ package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
 import static megamek.common.units.UnitType.MEK;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.VULNERABLE_INFRASTRUCTURE;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,7 +55,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
@@ -69,6 +69,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -124,7 +125,7 @@ class StratConScheduledParadeBehaviorTest {
 
     /**
      * A campaign holding one active contract - with combat pay - whose map holds the test sector, and one player
-     * formation of the given primary unit type. With Essential Scenarios Only on, no scenario can break out, so the
+     * formation of the given primary unit type. With odds no roll can meet, no scenario can break out, so the
      * parade is never disrupted.
      */
     private Campaign deploymentCampaign(int primaryUnitType) {
@@ -132,7 +133,8 @@ class StratConScheduledParadeBehaviorTest {
         when(campaign.getLocalDate()).thenReturn(TODAY);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY)).thenReturn(true);
+        // Odds no roll can meet, so no scenario can break out.
+        track.setScenarioOdds(-100);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         Formation formation = mock(Formation.class);
@@ -141,8 +143,10 @@ class StratConScheduledParadeBehaviorTest {
 
         AbstractContract contract = mock(AbstractContract.class);
         StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.setContractsUseSpecialMechanics(true);
         campaignState.addTrack(track);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
+        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.RETAINER);
         when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.STALEMATE);
         when(contract.getContractFinanceData()).thenReturn(new ContractFinanceData(Money.zero(),
               Money.zero(),
@@ -176,7 +180,7 @@ class StratConScheduledParadeBehaviorTest {
     void aRiotCanBreakOutWhileTheEnemyIsRouted() {
         assertTrue(new StratConScheduledParadeBehavior().isScenarioPossibleWhileRouted(),
               "civil unrest does not answer to the enemy's morale");
-        assertFalse(new StratConVulnerableInfrastructureBehavior().isScenarioPossibleWhileRouted(),
+        assertFalse(VULNERABLE_INFRASTRUCTURE.createBehavior().isScenarioPossibleWhileRouted(),
               "a routed enemy still mounts no ordinary ambushes");
     }
 

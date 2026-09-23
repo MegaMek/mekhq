@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import static megamek.common.units.UnitType.MEK;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.POTENTIAL_LEAD;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,7 +54,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
@@ -66,6 +66,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -122,7 +123,8 @@ class StratConAssassinationLeadBehaviorTest {
         when(campaign.getLocalDate()).thenReturn(TODAY);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY)).thenReturn(true);
+        // Odds no roll can meet, so no scenario can break out.
+        track.setScenarioOdds(-100);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         Formation formation = mock(Formation.class);
@@ -131,8 +133,10 @@ class StratConAssassinationLeadBehaviorTest {
 
         AbstractContract contract = mock(AbstractContract.class);
         StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.setContractsUseSpecialMechanics(true);
         campaignState.addTrack(track);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
+        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.ASSASSINATION);
         when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.STALEMATE);
         when(contract.getContractFinanceData()).thenReturn(new ContractFinanceData(Money.zero(),
               Money.zero(),
@@ -164,7 +168,7 @@ class StratConAssassinationLeadBehaviorTest {
         StratConAssassinationLeadBehavior behavior = new StratConAssassinationLeadBehavior();
 
         assertEquals("Assassination.json", behavior.getScenarioTemplateName());
-        assertFalse(new StratConPotentialLeadBehavior().getScenarioTemplateName()
+        assertFalse(POTENTIAL_LEAD.createBehavior().getScenarioTemplateName()
                           .equals(behavior.getScenarioTemplateName()), "not a Mole Hunt");
     }
 

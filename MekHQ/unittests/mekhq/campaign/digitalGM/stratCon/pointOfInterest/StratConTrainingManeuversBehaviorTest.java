@@ -71,6 +71,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import org.junit.jupiter.api.AfterEach;
@@ -137,7 +138,6 @@ class StratConTrainingManeuversBehaviorTest {
         when(campaign.getLocalDate()).thenReturn(TODAY);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY)).thenReturn(false);
         when(options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE)).thenReturn(Familiarity.DISABLED);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
@@ -152,8 +152,10 @@ class StratConTrainingManeuversBehaviorTest {
 
         AbstractContract contract = mock(AbstractContract.class);
         StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.setContractsUseSpecialMechanics(true);
         campaignState.addTrack(track);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
+        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.CADRE_DUTY);
         when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.OVERWHELMING);
         when(contract.getContractFinanceData()).thenReturn(new ContractFinanceData(Money.zero(),
               Money.zero(),

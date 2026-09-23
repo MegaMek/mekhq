@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConEscalation;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -48,7 +47,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * struck on the spot, raising the contract's Escalation by 3d6. If one does, the enemy was waiting, and the deploying
  * formation is ambushed in a {@value #SCENARIO_TEMPLATE} scenario; an ambushed target is spent whatever the ambush's
  * result, and leaves the map. Striking one pays the combat bonus, standing in for the Essential scenarios a
- * Diversionary Raid does not get. (See {@link StratConAmbushPointOfInterestBehavior} for the rules it shares.)</p>
+ * Diversionary Raid does not get (see {@link #isCombatBonusPaid}). (See
+ * {@link StratConAmbushPointOfInterestBehavior} for the rules it shares.)</p>
  *
  * <p>A high profile target not struck in time is gone: it expires (its lifespan comes from its definition), except
  * while an ambush there is still to be fought.</p>
@@ -66,14 +66,14 @@ public class StratConHighProfileTargetBehavior extends StratConAmbushPointOfInte
     /** The scenario template the ambush at a high profile target is fought as. */
     static final String SCENARIO_TEMPLATE = "Decoy Engagement.json";
 
-    @Override
-    protected String getResourceKeyPrefix() {
-        return "StratConHighProfileTargetBehavior";
-    }
-
-    @Override
-    protected @Nullable String getScenarioTemplateName() {
-        return SCENARIO_TEMPLATE;
+    /**
+     * The ambush at a high profile target is fought as a {@value #SCENARIO_TEMPLATE} scenario.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConHighProfileTargetBehavior() {
+        super(BEHAVIOR_ID, SCENARIO_TEMPLATE);
     }
 
     /**

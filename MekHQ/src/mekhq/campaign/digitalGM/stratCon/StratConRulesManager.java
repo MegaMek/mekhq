@@ -1198,11 +1198,12 @@ public class StratConRulesManager {
         // processForceDeployment, which reveals the hex.
         boolean deployedToUnexploredHex = !track.getRevealedCoords().contains(coords);
 
-        // Whether the hex holds nothing at all - no scenario, facility, or point of interest - for Escalation. Captured
-        // before the points of interest react to the deployment, since one may take itself off the map.
+        // Whether the hex holds nothing at all - no scenario, facility, or point of interest still in play - for
+        // Escalation. Captured before the points of interest react to the deployment, since one may take itself off
+        // the map.
         boolean deployedToEmptyHex = (track.getScenario(coords) == null)
                                            && (track.getFacility(coords) == null)
-                                           && track.getPointsOfInterest(coords).isEmpty();
+                                           && !StratConPointOfInterestRules.hasActivePointOfInterest(track, coords);
 
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around the coords,

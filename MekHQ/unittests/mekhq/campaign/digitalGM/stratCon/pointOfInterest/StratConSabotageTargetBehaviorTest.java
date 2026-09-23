@@ -123,7 +123,7 @@ class StratConSabotageTargetBehaviorTest {
 
     /**
      * A campaign with special mechanics on, holding one active Sabotage contract - with combat pay - whose map holds the
-     * test sector, and one player formation of the given primary unit type. With Essential Scenarios Only on, no
+     * test sector, and one player formation of the given primary unit type. With odds no roll can meet, no
      * scenario can break out, so the saboteurs are never caught.
      */
     private Campaign deploymentCampaign(int primaryUnitType) {
@@ -131,7 +131,8 @@ class StratConSabotageTargetBehaviorTest {
         when(campaign.getLocalDate()).thenReturn(TODAY);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY)).thenReturn(true);
+        // Odds no roll can meet, so no scenario can break out.
+        track.setScenarioOdds(-100);
         when(options.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS)).thenReturn(true);
         when(campaign.getCampaignOptions()).thenReturn(options);
 
@@ -141,6 +142,7 @@ class StratConSabotageTargetBehaviorTest {
 
         AbstractContract contract = mock(AbstractContract.class);
         campaignState = new StratConCampaignState();
+        campaignState.setContractsUseSpecialMechanics(true);
         campaignState.addTrack(track);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
         when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.SABOTAGE);

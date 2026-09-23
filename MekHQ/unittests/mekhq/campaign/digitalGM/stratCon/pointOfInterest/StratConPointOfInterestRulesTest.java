@@ -93,6 +93,8 @@ class StratConPointOfInterestRulesTest {
     private final List<String> deployedIds = new ArrayList<>();
     private PointOfInterestStatus statusToSetOnExpiry;
     private PointOfInterestDeploymentOutcome deploymentOutcome = PointOfInterestDeploymentOutcome.NO_EFFECT;
+    // whether the daily test behavior places a scenario on its hex when a formation deploys there
+    private boolean isPlacingScenarioOnDeployment;
 
     private final List<String> revealedIds = new ArrayList<>();
     private StratConTrackState track;
@@ -144,6 +146,11 @@ class StratConPointOfInterestRulesTest {
             public PointOfInterestDeploymentOutcome onFormationDeployed(StratConPointOfInterest pointOfInterest,
                   StratConTrackState track, int formationId, Campaign campaign) {
                 deployedIds.add(pointOfInterest.getId());
+                if (isPlacingScenarioOnDeployment) {
+                    StratConScenario scenario = new StratConScenario();
+                    scenario.setCoords(pointOfInterest.getCoords());
+                    track.getScenarios().put(pointOfInterest.getCoords(), scenario);
+                }
                 return deploymentOutcome;
             }
         });
@@ -456,6 +463,32 @@ class StratConPointOfInterestRulesTest {
         assertEquals(PointOfInterestDeploymentOutcome.NO_EFFECT, outcome,
               "the formation joins the scenario already there");
         assertTrue(deployedIds.isEmpty(), "no point of interest may place a second scenario on the hex");
+    }
+
+    @Test
+    void onceAPointOfInterestPlacesAScenarioNoOtherOnTheHexIsAsked() {
+        deploymentOutcome = PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO;
+        isPlacingScenarioOnDeployment = true;
+        StratConPointOfInterest first = place(DAILY_TYPE_ID, 1, 1);
+        place(DAILY_TYPE_ID, 1, 1);
+
+        StratConPointOfInterestRules.processFormationDeployment(track, new StratConCoords(1, 1), 1,
+              mock(Campaign.class));
+
+        assertEquals(List.of(first.getId()), deployedIds, "a second scenario would push the first off the map");
+    }
+
+    @Test
+    void onlyAPointOfInterestStillInPlayCountsAsActiveOnItsHex() {
+        StratConCoords coords = new StratConCoords(1, 1);
+        StratConPointOfInterest spent = place(DAILY_TYPE_ID, 1, 1);
+        spent.setStatus(PointOfInterestStatus.RESOLVED);
+
+        assertFalse(StratConPointOfInterestRules.hasActivePointOfInterest(track, coords));
+
+        place(DAILY_TYPE_ID, 1, 1);
+        assertTrue(StratConPointOfInterestRules.hasActivePointOfInterest(track, coords));
+        assertFalse(StratConPointOfInterestRules.hasActivePointOfInterest(track, new StratConCoords(2, 2)));
     }
 
     @Test

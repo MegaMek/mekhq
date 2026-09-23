@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
@@ -62,8 +63,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
 /**
- * Tests how a rolled point of interest places the scenario that breaks out over it: set up on its hex, readied, then
- * finalized like any scenario placed ahead of the formation that will fight it, and linked to the point of interest.
+ * Tests how a rolled point of interest places the scenario that breaks out over it: set up on its hex with the
+ * deploying formation as its seed, readied, finalized without that formation, given anything its type adds, and linked
+ * to the point of interest.
  *
  * @author Illiani
  * @since 0.51.01
@@ -82,17 +84,13 @@ class AbstractStratConRolledPointOfInterestBehaviorTest {
     private AtBDynamicScenario backingScenario;
     private ScenarioTemplate template;
 
-    /** A rolled point of interest that records when its scenario is readied. */
+    /** A rolled point of interest that records when its scenario is readied and finalized. */
     private final class TestBehavior extends AbstractStratConRolledPointOfInterestBehavior {
         private final boolean isAmbush;
 
         private TestBehavior(boolean isAmbush) {
+            super("unitTestRolledBehavior", TEMPLATE_NAME);
             this.isAmbush = isAmbush;
-        }
-
-        @Override
-        protected String getResourceKeyPrefix() {
-            return "UnitTestRolledBehavior";
         }
 
         @Override
@@ -106,11 +104,6 @@ class AbstractStratConRolledPointOfInterestBehaviorTest {
         }
 
         @Override
-        protected String getScenarioTemplateName() {
-            return TEMPLATE_NAME;
-        }
-
-        @Override
         protected boolean isScenarioAnAmbush() {
             return isAmbush;
         }
@@ -118,6 +111,11 @@ class AbstractStratConRolledPointOfInterestBehaviorTest {
         @Override
         protected void prepareScenario(StratConScenario scenario, StratConTrackState track) {
             events.add("prepare");
+        }
+
+        @Override
+        protected void onScenarioFinalized(StratConScenario scenario, AbstractContract contract, Campaign campaign) {
+            events.add("finalized");
         }
     }
 
@@ -134,6 +132,8 @@ class AbstractStratConRolledPointOfInterestBehaviorTest {
         backingScenario = mock(AtBDynamicScenario.class);
         when(scenario.getBackingScenario()).thenReturn(backingScenario);
         when(scenario.getBackingScenarioID()).thenReturn(BACKING_SCENARIO_ID);
+        // Set up with the deploying formation as its seed, as generateScenario does.
+        when(scenario.getPrimaryForceIDs()).thenReturn(new ArrayList<>(List.of(FORMATION_ID)));
         template = new ScenarioTemplate();
     }
 
@@ -142,7 +142,7 @@ class AbstractStratConRolledPointOfInterestBehaviorTest {
               MockedStatic<StratConScenarioFactory> factory = mockStatic(StratConScenarioFactory.class)) {
             factory.when(() -> StratConScenarioFactory.getSpecificScenario(TEMPLATE_NAME)).thenReturn(template);
             rules.when(() -> StratConRulesManager.setupScenario(eq(pointOfInterest.getCoords()),
-                  isNull(),
+                  eq(FORMATION_ID),
                   eq(campaign),
                   eq(contract),
                   eq(track),
@@ -174,8 +174,20 @@ class AbstractStratConRolledPointOfInterestBehaviorTest {
         StratConScenario placed = placeWithMockedRules(new TestBehavior(false), true);
 
         assertSame(scenario, placed);
-        assertEquals(List.of("prepare", "finalize"), events, "readied before finalizing, so finalizing sees it");
+        assertEquals(List.of("prepare", "finalize", "finalized"),
+              events,
+              "readied before finalizing, so finalizing sees it; added to once finalized");
         assertEquals(BACKING_SCENARIO_ID, pointOfInterest.getLinkedScenarioId());
+    }
+
+    @Test
+    void theDeployingFormationSeedsTheScenarioThenIsHandedBack() {
+        // Seeding it sizes the opposition against the formation (the setupScenario stub only matches the formation's
+        // ID); it is then taken out of the primary forces, to be assigned like any scenario found on the hex.
+        StratConScenario placed = placeWithMockedRules(new TestBehavior(false), true);
+
+        assertSame(scenario, placed, "set up with the deploying formation");
+        assertFalse(scenario.getPrimaryForceIDs().contains(FORMATION_ID));
     }
 
     @Test

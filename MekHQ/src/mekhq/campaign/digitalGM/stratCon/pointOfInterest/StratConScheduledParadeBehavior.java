@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -69,14 +68,14 @@ public class StratConScheduledParadeBehavior extends StratConAmbushPointOfIntere
     /** The scenario template a disrupted parade is fought as. */
     static final String SCENARIO_TEMPLATE = StratConRiots.SCENARIO_TEMPLATE;
 
-    @Override
-    protected String getResourceKeyPrefix() {
-        return "StratConScheduledParadeBehavior";
-    }
-
-    @Override
-    protected @Nullable String getScenarioTemplateName() {
-        return SCENARIO_TEMPLATE;
+    /**
+     * A disrupted parade is fought as every riot is.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConScheduledParadeBehavior() {
+        super(BEHAVIOR_ID, SCENARIO_TEMPLATE);
     }
 
     /**
@@ -91,15 +90,25 @@ public class StratConScheduledParadeBehavior extends StratConAmbushPointOfIntere
     }
 
     /**
-     * Sets up the riot as every riot is set up (see {@link StratConRiots#placeRiot}).
+     * A riot breaks out at once.
      *
      * @author Illiani
      * @since 0.51.01
      */
     @Override
-    protected @Nullable StratConScenario placeScenario(StratConPointOfInterest pointOfInterest,
-          StratConTrackState track, int formationId, AbstractContract contract, Campaign campaign) {
-        return StratConRiots.placeRiot(pointOfInterest, track, formationId, contract, campaign);
+    protected Integer getDaysUntilDeployment() {
+        return StratConRiots.DAYS_UNTIL_DEPLOYMENT;
+    }
+
+    /**
+     * Adds the rioting mobs, as every riot has (see {@link StratConRiots#addRiotingMobs}).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected void onScenarioFinalized(StratConScenario scenario, AbstractContract contract, Campaign campaign) {
+        StratConRiots.addRiotingMobs(scenario, contract, campaign);
     }
 
     /**

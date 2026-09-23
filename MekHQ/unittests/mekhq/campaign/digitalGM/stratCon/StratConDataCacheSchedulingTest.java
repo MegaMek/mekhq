@@ -32,15 +32,20 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.BELEAGUERED_FORCES;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.DATA_CACHE;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.LOOKOUT_POINT;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.POTENTIAL_LEAD;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.SECURITY_REVIEW;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.STRATEGIC_POSITION;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.VIP;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.VULNERABLE_INFRASTRUCTURE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -55,7 +60,6 @@ import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.ArgumentCaptor;
 
 /**
  * Tests for scheduling data caches on Espionage contracts: the "Contracts Use Special Mechanics" option, the roll on
@@ -113,7 +117,7 @@ class StratConDataCacheSchedulingTest {
     }
 
     private static boolean isDataCache(StratConScheduledPointOfInterest pointOfInterest) {
-        return StratConDataCacheBehavior.TYPE_ID.equals(pointOfInterest.getTypeId());
+        return DATA_CACHE.getTypeId().equals(pointOfInterest.getTypeId());
     }
 
     @Test
@@ -148,23 +152,12 @@ class StratConDataCacheSchedulingTest {
     }
 
     @Test
-    @SuppressWarnings("unchecked") // ArgumentCaptor cannot name a generic List type without an unchecked conversion
-    void theRolledScheduleIsKeptOnTheContractAndMatchesTheCaches() {
-        AbstractContract contract = contract(ContractObjectiveType.ESPIONAGE, 3);
+    void theRolledScheduleSetsHowManyCachesThereAre() {
+        List<StratConScheduledPointOfInterest> scheduled = schedule(contract(ContractObjectiveType.ESPIONAGE, 3),
+              true,
+              true);
 
-        List<StratConScheduledPointOfInterest> scheduled = schedule(contract, true, true);
-
-        ArgumentCaptor<List<Integer>> scheduleCaptor = ArgumentCaptor.forClass(List.class);
-        verify(contract).setPointOfInterestSchedule(scheduleCaptor.capture());
-        List<Integer> monthlyCounts = scheduleCaptor.getValue();
-        assertEquals(LENGTH_IN_MONTHS, monthlyCounts.size(), "a three-month contract uses the three-month table");
-
-        int scheduledCount = 0;
-        for (int monthlyCount : monthlyCounts) {
-            scheduledCount += monthlyCount;
-        }
-        assertEquals(scheduledCount, scheduled.size(), "one cache per slot in the rolled schedule");
-        assertEquals(3 * SCALE, scheduledCount, "each roll of a three-track column places three");
+        assertEquals(3 * SCALE, scheduled.size(), "each roll of a three-track column places three");
     }
 
     @Test
@@ -191,7 +184,6 @@ class StratConDataCacheSchedulingTest {
         when(contract.getStartDate()).thenReturn(null);
 
         assertTrue(schedule(contract, true, true).isEmpty());
-        verify(contract, never()).setPointOfInterestSchedule(any());
     }
 
     @Test
@@ -227,7 +219,7 @@ class StratConDataCacheSchedulingTest {
 
         assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
-            assertEquals(StratConVulnerableInfrastructureBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertEquals(VULNERABLE_INFRASTRUCTURE.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
         }
     }
@@ -252,7 +244,7 @@ class StratConDataCacheSchedulingTest {
 
         assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
-            assertEquals(StratConPotentialLeadBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertEquals(POTENTIAL_LEAD.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
         }
     }
@@ -277,7 +269,7 @@ class StratConDataCacheSchedulingTest {
 
         assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
-            assertEquals(StratConLookoutPointBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertEquals(LOOKOUT_POINT.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
         }
     }
@@ -302,7 +294,7 @@ class StratConDataCacheSchedulingTest {
 
         assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
-            assertEquals(StratConBeleagueredForcesBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertEquals(BELEAGUERED_FORCES.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
         }
     }
@@ -311,22 +303,22 @@ class StratConDataCacheSchedulingTest {
 
     @Test
     void eachContractTypeWithSpecialMechanicsGetsItsOwnSpecialPointOfInterest() {
-        assertEquals(StratConDataCacheBehavior.TYPE_ID,
+        assertEquals(DATA_CACHE.getTypeId(),
               StratConContractInitializer.getSpecialPointOfInterestTypeId(contract(ContractObjectiveType.ESPIONAGE,
                     1), true));
-        assertEquals(StratConVulnerableInfrastructureBehavior.TYPE_ID,
+        assertEquals(VULNERABLE_INFRASTRUCTURE.getTypeId(),
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.GUERRILLA_WARFARE, 1), true));
-        assertEquals(StratConPotentialLeadBehavior.TYPE_ID,
+        assertEquals(POTENTIAL_LEAD.getTypeId(),
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.MOLE_HUNTING, 1), true));
         assertEquals(StratConAssassinationLeadBehavior.TYPE_ID,
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.ASSASSINATION, 1), true));
-        assertEquals(StratConLookoutPointBehavior.TYPE_ID,
+        assertEquals(LOOKOUT_POINT.getTypeId(),
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.OBSERVATION_RAID, 1), true));
-        assertEquals(StratConBeleagueredForcesBehavior.TYPE_ID,
+        assertEquals(BELEAGUERED_FORCES.getTypeId(),
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.RELIEF_DUTY, 1), true));
         assertEquals(StratConShowOfForceBehavior.TYPE_ID,
@@ -368,9 +360,17 @@ class StratConDataCacheSchedulingTest {
 
     @Test
     void oneAssassinationLeadPerPointOfScalePointsToTheRealTarget() {
-        List<StratConScheduledPointOfInterest> scheduled = schedule(contract(ContractObjectiveType.ASSASSINATION, 1),
-              true,
-              true);
+        // The behavior told of the schedule is the one the type's definition names.
+        StratConPointOfInterestDefinition realDefinition = new StratConPointOfInterestDefinition();
+        realDefinition.setTypeId(StratConAssassinationLeadBehavior.TYPE_ID);
+        realDefinition.setBehaviorId(StratConAssassinationLeadBehavior.BEHAVIOR_ID);
+        StratConPointOfInterestDefinitions.registerDefinition(realDefinition);
+        List<StratConScheduledPointOfInterest> scheduled;
+        try {
+            scheduled = schedule(contract(ContractObjectiveType.ASSASSINATION, 1), true, true);
+        } finally {
+            StratConPointOfInterestDefinitions.unregisterDefinition(StratConAssassinationLeadBehavior.TYPE_ID);
+        }
 
         int realTargets = 0;
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
@@ -381,6 +381,21 @@ class StratConDataCacheSchedulingTest {
             }
         }
         assertEquals(Math.min(SCALE, scheduled.size()), realTargets);
+    }
+
+    @Test
+    void aSpecialTypeWithoutADefinitionIsStillScheduledButNothingIsSettledForIt() {
+        StratConCampaignState scheduleState = new StratConCampaignState();
+
+        StratConContractInitializer.scheduleSpecialPointsOfInterest(contract(ContractObjectiveType.ASSASSINATION, 1),
+              scheduleState,
+              true,
+              "UnitTestUndefinedSpecialType");
+
+        assertFalse(scheduleState.getScheduledPointsOfInterest().isEmpty());
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduleState.getScheduledPointsOfInterest()) {
+            assertTrue(pointOfInterest.getInitialState().isEmpty());
+        }
     }
 
     @Test
@@ -414,7 +429,7 @@ class StratConDataCacheSchedulingTest {
 
     @Test
     void anExtractionRaidContractSchedulesOnlyVIPsEachAnObjective() {
-        assertEquals(StratConVIPBehavior.TYPE_ID,
+        assertEquals(VIP.getTypeId(),
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.EXTRACTION_RAID, 1), true));
 
@@ -423,7 +438,7 @@ class StratConDataCacheSchedulingTest {
 
         assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
-            assertEquals(StratConVIPBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertEquals(VIP.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
         }
     }
@@ -510,7 +525,7 @@ class StratConDataCacheSchedulingTest {
 
     @Test
     void strategicPositionsDoNotReplaceEssentialScenarios() {
-        assertEquals(StratConStrategicPositionBehavior.TYPE_ID,
+        assertEquals(STRATEGIC_POSITION.getTypeId(),
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.PLANETARY_ASSAULT, 1), true));
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
@@ -524,14 +539,14 @@ class StratConDataCacheSchedulingTest {
 
         assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
-            assertEquals(StratConStrategicPositionBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertEquals(STRATEGIC_POSITION.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
         }
     }
 
     @Test
     void securityReviewsDoNotReplaceEssentialScenarios() {
-        assertEquals(StratConSecurityReviewBehavior.TYPE_ID,
+        assertEquals(SECURITY_REVIEW.getTypeId(),
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
                     contract(ContractObjectiveType.SECURITY_DUTY, 1), true));
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(
@@ -545,7 +560,7 @@ class StratConDataCacheSchedulingTest {
 
         assertEquals(SCALE, scheduled.size(), "rolled like data caches: once per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
-            assertEquals(StratConSecurityReviewBehavior.TYPE_ID, pointOfInterest.getTypeId());
+            assertEquals(SECURITY_REVIEW.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
         }
     }
@@ -575,9 +590,9 @@ class StratConDataCacheSchedulingTest {
     void everySpecialPointOfInterestButHighProfileTargetsIsAnObjective() {
         assertFalse(StratConContractInitializer.isSpecialPointOfInterestObjective(
               StratConHighProfileTargetBehavior.TYPE_ID));
-        assertTrue(StratConContractInitializer.isSpecialPointOfInterestObjective(StratConDataCacheBehavior.TYPE_ID));
+        assertTrue(StratConContractInitializer.isSpecialPointOfInterestObjective(DATA_CACHE.getTypeId()));
         assertTrue(StratConContractInitializer.isSpecialPointOfInterestObjective(
-              StratConBeleagueredForcesBehavior.TYPE_ID));
+              BELEAGUERED_FORCES.getTypeId()));
     }
 
     @Test

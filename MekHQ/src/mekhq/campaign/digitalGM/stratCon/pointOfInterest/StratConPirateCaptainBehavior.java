@@ -32,9 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
-import static mekhq.campaign.enums.DailyReportType.GENERAL;
-
-import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConStrategicObjective;
@@ -70,14 +67,15 @@ public class StratConPirateCaptainBehavior extends StratConContestedPointOfInter
     /** The scenario template a pirate captain is fought in. */
     static final String SCENARIO_TEMPLATE = "Decapitation Strike.json";
 
-    @Override
-    protected String getScenarioTemplateName() {
-        return SCENARIO_TEMPLATE;
-    }
-
-    @Override
-    protected String getResourceKeyPrefix() {
-        return "StratConPirateCaptainBehavior";
+    /**
+     * A cornered captain fights a {@value #SCENARIO_TEMPLATE} scenario; one not cornered has already slipped away, and
+     * leaves the map with nothing gained or lost.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConPirateCaptainBehavior() {
+        super(BEHAVIOR_ID, SCENARIO_TEMPLATE, NoScenarioOutcome.WITHDRAW);
     }
 
     /**
@@ -87,21 +85,8 @@ public class StratConPirateCaptainBehavior extends StratConContestedPointOfInter
      * @since 0.51.01
      */
     @Override
-    protected boolean isCombatBonusPaid() {
+    protected boolean isCombatBonusPaid(AbstractContract contract) {
         return false;
-    }
-
-    /**
-     * With no scenario breaking out, the captain has already slipped away: the point of interest leaves the map.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    @Override
-    protected void onNoScenario(StratConPointOfInterest pointOfInterest, StratConTrackState track,
-          AbstractContract contract, Campaign campaign) {
-        StratConPointOfInterestRules.withdrawPointOfInterest(track, pointOfInterest);
-        addReport(GENERAL, "slippedAway.report", pointOfInterest, track, campaign);
     }
 
     /**

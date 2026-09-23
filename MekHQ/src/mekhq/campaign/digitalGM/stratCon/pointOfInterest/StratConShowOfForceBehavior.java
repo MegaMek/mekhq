@@ -47,8 +47,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * force goes off without a hitch, lowering the contract's Escalation by 3d6. If one does, the enemy has used the
  * spectacle as cover, and the deploying formation is ambushed in a scenario suited to its unit type; an ambushed show
  * of force is spent whatever the ambush's result, calms nothing, and leaves the map. Making one pays no combat bonus:
- * the contract's Essential scenarios still pay it. (See {@link StratConAmbushPointOfInterestBehavior} for the rules it
- * shares.)</p>
+ * the contract's Essential scenarios still pay it (see {@link #isCombatBonusPaid}). (See
+ * {@link StratConAmbushPointOfInterestBehavior} for the rules it shares.)</p>
  *
  * <p>A show of force not made in time is gone: it expires (its lifespan comes from its definition), except while an
  * ambush there is still to be fought.</p>
@@ -63,21 +63,14 @@ public class StratConShowOfForceBehavior extends StratConAmbushPointOfInterestBe
     /** The type ID of the show of force definition. */
     public static final String TYPE_ID = "ShowOfForce";
 
-    @Override
-    protected String getResourceKeyPrefix() {
-        return "StratConShowOfForceBehavior";
-    }
-
     /**
-     * Making a show of force pays no combat bonus: a Garrison Duty contract keeps its Essential scenarios, which still
-     * pay it.
+     * The enemy ambushes a show of force in a template suited to the deploying formation's unit type.
      *
      * @author Illiani
      * @since 0.51.01
      */
-    @Override
-    protected boolean isCombatBonusPaid() {
-        return false;
+    public StratConShowOfForceBehavior() {
+        super(BEHAVIOR_ID, null);
     }
 
     /**

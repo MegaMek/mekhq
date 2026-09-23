@@ -41,12 +41,13 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.digitalGM.stratCon.StratConContractMechanics;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConScenarioFactory;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 
@@ -62,8 +63,8 @@ import mekhq.campaign.mission.scenarios.ScenarioTemplate;
  *
  * <p>A formation joining a scenario already linked here does not roll again.</p>
  *
- * <p>Each type's player-facing text lives in the {@code StratConRulesManager} resource bundle, under its key prefix
- * (see {@link #getResourceKeyPrefix}): at least {@code .objective}, {@code .secured.report}, and the report named by
+ * <p>Each type's player-facing text lives in the {@code StratConPointOfInterest} resource bundle, under its behavior
+ * ID (see {@link #getBehaviorId}): at least {@code .objective}, {@code .secured.report}, and the report named by
  * {@link #getScenarioReportKeySuffix}, each report taking the point of interest's name and its sector's name.</p>
  *
  * <p>The two families built on this are {@link StratConContestedPointOfInterestBehavior} and
@@ -74,19 +75,39 @@ import mekhq.campaign.mission.scenarios.ScenarioTemplate;
  */
 public abstract class AbstractStratConRolledPointOfInterestBehavior implements IStratConPointOfInterestBehavior {
     private static final MMLogger LOGGER = MMLogger.create(AbstractStratConRolledPointOfInterestBehavior.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.StratConRulesManager";
+
+    private final String behaviorId;
+    // null for an ambush suited to the deploying formation's unit type
+    private final String scenarioTemplateName;
 
     /**
-     * @return the prefix of this type's keys in the {@code StratConRulesManager} resource bundle, such as
-     *       {@code StratConDataCacheBehavior}
+     * @param behaviorId           the ID this behavior is registered under, which also prefixes its keys in the
+     *                             {@code StratConPointOfInterest} resource bundle
+     * @param scenarioTemplateName the file name of the scenario template fought here, such as
+     *                             {@code Recon Evasion.json}; or {@code null} for the deploying formation to be
+     *                             ambushed in a template suited to ambushing its unit type
      *
      * @author Illiani
      * @since 0.51.01
      */
-    protected abstract String getResourceKeyPrefix();
+    protected AbstractStratConRolledPointOfInterestBehavior(String behaviorId, @Nullable String scenarioTemplateName) {
+        this.behaviorId = behaviorId;
+        this.scenarioTemplateName = scenarioTemplateName;
+    }
 
     /**
-     * @return the key, after this type's prefix, of the report made when a scenario breaks out here, such as
+     * @return the ID this behavior is registered under, such as {@code dataCache}; its keys in the
+     *       {@code StratConPointOfInterest} resource bundle start with it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String getBehaviorId() {
+        return behaviorId;
+    }
+
+    /**
+     * @return the key, after this type's behavior ID, of the report made when a scenario breaks out here, such as
      *       {@code contested.report}
      *
      * @author Illiani
@@ -110,14 +131,14 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
 
     /**
      * @return the file name of the scenario template fought over this type of point of interest, such as
-     *       {@code Recon Evasion.json}; or, by default, {@code null} for the deploying formation to be ambushed in a
-     *       template suited to ambushing its unit type
+     *       {@code Recon Evasion.json}; or {@code null} for the deploying formation to be ambushed in a template suited
+     *       to ambushing its unit type
      *
      * @author Illiani
      * @since 0.51.01
      */
-    protected @Nullable String getScenarioTemplateName() {
-        return null;
+    public @Nullable String getScenarioTemplateName() {
+        return scenarioTemplateName;
     }
 
     /**
@@ -132,14 +153,20 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
     }
 
     /**
-     * @return {@code true} if dealing with this type of point of interest pays the contract's combat bonus; by default,
-     *       it does. A type whose contract keeps its Essential scenarios leaves the bonus to them.
+     * Decides whether dealing with this point of interest pays the contract's combat bonus. By default, it does exactly
+     * when the contract's special points of interest replaced its Essential scenarios (see
+     * {@link StratConContractMechanics#areEssentialScenariosReplaced}): the bonus those scenarios would have paid is
+     * paid here instead. A contract that keeps its Essential scenarios leaves the bonus to them.
+     *
+     * @param contract the contract whose map holds the point of interest
+     *
+     * @return {@code true} if the combat bonus is paid
      *
      * @author Illiani
      * @since 0.51.01
      */
-    protected boolean isCombatBonusPaid() {
-        return true;
+    protected boolean isCombatBonusPaid(AbstractContract contract) {
+        return StratConContractMechanics.areEssentialScenariosReplaced(contract);
     }
 
     /**
@@ -185,7 +212,7 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
         }
 
         boolean isScenarioBreakingOut = isScenarioCertain(pointOfInterest)
-                                              || rollForScenario(track, contract, campaign);
+                                              || rollForScenario(track, contract);
         if (!isScenarioBreakingOut) {
             onNoScenario(pointOfInterest, track, contract, campaign);
             return PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO;
@@ -203,14 +230,18 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
         return PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO;
     }
 
-    private boolean rollForScenario(StratConTrackState track, AbstractContract contract, Campaign campaign) {
-        boolean essentialScenariosOnly = campaign.getCampaignOptions().get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
+    /**
+     * Rolls the usual scenario odds. "Essential Scenarios Only" does not rule this roll out: these scenarios are the
+     * contract's own objective fights, standing in for the Essential scenarios most such contracts do not get, rather
+     * than random encounters.
+     */
+    private boolean rollForScenario(StratConTrackState track, AbstractContract contract) {
         int targetNumber = StratConRulesManager.calculateScenarioOdds(track,
               contract,
               true,
               isScenarioPossibleWhileRouted());
         return StratConRulesManager.rollsRandomScenario(PointOfInterestDeploymentOutcome.NO_EFFECT,
-              essentialScenariosOnly,
+              false,
               false,
               false,
               targetNumber);
@@ -219,17 +250,18 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
     @Override
     public @Nullable String getObjectiveDescription(StratConPointOfInterest pointOfInterest,
           StratConTrackState track) {
-        return getTextAt(RESOURCE_BUNDLE, getResourceKeyPrefix() + ".objective");
+        return getTextAt(StratConPointOfInterestRules.RESOURCE_BUNDLE, behaviorId + ".objective");
     }
 
     /**
      * Places the scenario that breaks out over the point of interest on its hex, and links the point of interest to it.
      *
-     * <p>By default, the scenario is drawn from this type's template (see {@link #getScenarioTemplateName}), or from
-     * the templates suited to ambushing the deploying formation's unit type if there is none. It is set up without the
-     * deploying formation, readied by {@link #prepareScenario}, and finalized as any scenario placed ahead of the
-     * formation that will fight it is. An ambush (see {@link #isScenarioAnAmbush}) is then made a Crisis and never a
-     * Turning Point.</p>
+     * <p>The scenario is drawn from this type's template (see {@link #getScenarioTemplateName}), or from the templates
+     * suited to ambushing the deploying formation's unit type if there is none. It is set up with the deploying
+     * formation present, so its opposition is sized against that formation, readied by {@link #prepareScenario}, and
+     * finalized without the formation, which is then assigned to it like any scenario found on the hex. Anything a
+     * type adds once the scenario is finalized is added by {@link #onScenarioFinalized}. An ambush (see
+     * {@link #isScenarioAnAmbush}) is then made a Crisis and never a Turning Point.</p>
      *
      * @param pointOfInterest the point of interest
      * @param track           the sector it sits in
@@ -242,38 +274,44 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
      * @author Illiani
      * @since 0.51.01
      */
-    protected @Nullable StratConScenario placeScenario(StratConPointOfInterest pointOfInterest,
+    // Package-private rather than private so placement can be tested without building a scenario from a template.
+    @Nullable StratConScenario placeScenario(StratConPointOfInterest pointOfInterest,
           StratConTrackState track, int formationId, AbstractContract contract, Campaign campaign) {
         // With no usable template, a random scenario is fought instead; a missing named template is logged by the
         // factory.
-        String templateName = getScenarioTemplateName();
         ScenarioTemplate template;
-        if (templateName != null) {
-            template = StratConScenarioFactory.getSpecificScenario(templateName);
+        if (scenarioTemplateName != null) {
+            template = StratConScenarioFactory.getSpecificScenario(scenarioTemplateName);
         } else {
             Formation formation = campaign.getPlayerForce().getFormation(formationId);
             int unitType = (formation == null) ? MEK : formation.getPrimaryUnitType(campaign);
             template = StratConScenarioFactory.getRandomScenario(unitType, true, false);
         }
 
+        // Set up with the deploying formation as its seed, as every other StratCon scenario is: the opposition is
+        // generated when the scenario is finalized, and is sized against the player forces in it at that moment.
         // Facilities are ignored: these points of interest occupy their hex, so none can share it.
         StratConScenario scenario = StratConRulesManager.setupScenario(pointOfInterest.getCoords(),
-              null,
+              formationId,
               campaign,
               contract,
               track,
               template,
               true,
-              null);
+              getDaysUntilDeployment());
         if (scenario == null) {
             return null;
         }
 
         prepareScenario(scenario, track);
 
-        // Finalized without auto-assignment, which also puts it on the track; the deploying formation is assigned to it
-        // afterward, like any scenario found on the hex.
+        // Finalized without auto-assignment, which also puts it on the track and takes the formation back out of the
+        // backing scenario. Clear it from the primary forces too, so that assigning it to the scenario found on the hex
+        // - as the deployment does next - does not list it twice.
         StratConRulesManager.finalizeBackingScenario(campaign, contract, track, false, scenario);
+        scenario.getPrimaryForceIDs().remove(Integer.valueOf(formationId));
+
+        onScenarioFinalized(scenario, contract, campaign);
 
         if (isScenarioAnAmbush()) {
             scenario.getBackingScenario().setIsCrisis(true);
@@ -298,6 +336,31 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
     }
 
     /**
+     * @return how many days until the scenario placed here deploys, or {@code null} for the sector's usual deployment
+     *       time; by default, the usual time
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected @Nullable Integer getDaysUntilDeployment() {
+        return null;
+    }
+
+    /**
+     * Adds anything a type needs to a scenario placed here, once it has been finalized - for example, the civilian mobs
+     * of a riot, whose force only exists once the scenario is finalized. By default, nothing.
+     *
+     * @param scenario the scenario, finalized and on the track, but not yet linked to the point of interest
+     * @param contract the contract whose map holds the sector
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected void onScenarioFinalized(StratConScenario scenario, AbstractContract contract, Campaign campaign) {
+    }
+
+    /**
      * Tells the player, beyond the daily report, that a scenario has broken out here. By default, nothing more.
      *
      * @param pointOfInterest the point of interest the scenario is over
@@ -315,8 +378,8 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
 
     /**
      * Secures the point of interest: resolves it, which meets any objective tied to it, takes it off the map, and - if
-     * this type pays it (see {@link #isCombatBonusPaid}) - pays the contract's combat bonus. Then gives the type its
-     * {@link #onSecured} hook.
+     * the bonus is paid here (see {@link #isCombatBonusPaid}) - pays the contract's combat bonus. Then gives the type
+     * its {@link #onSecured} hook.
      *
      * @param pointOfInterest the point of interest to secure
      * @param track           the sector it sits in
@@ -341,7 +404,7 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
             return;
         }
 
-        if (isCombatBonusPaid()) {
+        if (isCombatBonusPaid(contract)) {
             StratConRulesManager.awardCombatBonus(campaign, contract);
         }
 
@@ -368,7 +431,7 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
      * Adds one of this type's reports to the daily report.
      *
      * @param reportType      the daily report tab it belongs on
-     * @param keySuffix       the key after this type's prefix, such as {@code secured.report}
+     * @param keySuffix       the key after this type's behavior ID, such as {@code secured.report}
      * @param pointOfInterest the point of interest the report is about
      * @param track           the sector it sits in
      * @param campaign        the current campaign
@@ -378,8 +441,8 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
      */
     protected void addReport(DailyReportType reportType, String keySuffix, StratConPointOfInterest pointOfInterest,
           StratConTrackState track, Campaign campaign) {
-        campaign.addReport(reportType, getFormattedTextAt(RESOURCE_BUNDLE,
-              getResourceKeyPrefix() + '.' + keySuffix,
+        campaign.addReport(reportType, getFormattedTextAt(StratConPointOfInterestRules.RESOURCE_BUNDLE,
+              behaviorId + '.' + keySuffix,
               pointOfInterest.getDisplayableName(),
               track.getDisplayableName()));
     }

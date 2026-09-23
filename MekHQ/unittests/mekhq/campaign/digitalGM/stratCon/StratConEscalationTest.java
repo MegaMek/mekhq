@@ -44,7 +44,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -78,10 +77,20 @@ class StratConEscalationTest {
         campaignState.addTrack(track);
     }
 
-    private static Campaign campaign(boolean isContractsUseSpecialMechanics) {
+    /**
+     * A campaign whose test contract was accepted with "Contracts Use Special Mechanics" on or off, as fixed on its
+     * StratCon state.
+     */
+    private Campaign campaign(boolean isContractsUseSpecialMechanics) {
+        return campaign(isContractsUseSpecialMechanics, false);
+    }
+
+    private Campaign campaign(boolean isContractsUseSpecialMechanics, boolean isMapless) {
+        campaignState.setContractsUseSpecialMechanics(isContractsUseSpecialMechanics);
+
         Campaign campaign = mock(Campaign.class);
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS)).thenReturn(isContractsUseSpecialMechanics);
+        when(options.isUseStratConMaplessMode()).thenReturn(isMapless);
         when(campaign.getCampaignOptions()).thenReturn(options);
         return campaign;
     }
@@ -124,6 +133,24 @@ class StratConEscalationTest {
     @Test
     void escalationBelongsToTheSpecialMechanicsOption() {
         assertFalse(StratConEscalation.isEscalationUsed(campaign(false),
+              contract(ContractObjectiveType.DIVERSIONARY_RAID)));
+    }
+
+    @Test
+    void escalationFollowsTheOptionAsItWasWhenTheContractWasAccepted() {
+        // The campaign's option is never read: only the contract's own record of it counts, so changing the option
+        // mid-contract changes nothing.
+        Campaign campaign = campaign(true);
+        AbstractContract contract = contract(ContractObjectiveType.DIVERSIONARY_RAID);
+        assertTrue(StratConEscalation.isEscalationUsed(campaign, contract));
+
+        campaignState.setContractsUseSpecialMechanics(false);
+        assertFalse(StratConEscalation.isEscalationUsed(campaign, contract));
+    }
+
+    @Test
+    void escalationIsNeverUsedInMaplessPlay() {
+        assertFalse(StratConEscalation.isEscalationUsed(campaign(true, true),
               contract(ContractObjectiveType.DIVERSIONARY_RAID)));
     }
 

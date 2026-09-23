@@ -44,7 +44,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
  * The behavior of a lead on an assassination target, placed in place of every point of interest on an Assassination
- * contract. It works much as a Mole Hunting contract's potential lead does (see {@link StratConPotentialLeadBehavior}),
+ * contract. It works much as a Mole Hunting contract's potential lead does (see {@link StratConConfiguredPointOfInterestType#POTENTIAL_LEAD}),
  * sharing the contested rules (see {@link StratConContestedPointOfInterestBehavior}), but no lead is ever a dud -
  * every one is fought as a {@value #SCENARIO_TEMPLATE} scenario - and most of the targets they turn up are body
  * doubles.
@@ -76,14 +76,14 @@ public class StratConAssassinationLeadBehavior extends StratConContestedPointOfI
     /** The scenario template fought over a lead that pans out. */
     static final String SCENARIO_TEMPLATE = "Assassination.json";
 
-    @Override
-    protected String getScenarioTemplateName() {
-        return SCENARIO_TEMPLATE;
-    }
-
-    @Override
-    protected String getResourceKeyPrefix() {
-        return "StratConAssassinationLeadBehavior";
+    /**
+     * Every lead is fought as a {@value #SCENARIO_TEMPLATE} scenario.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConAssassinationLeadBehavior() {
+        super(BEHAVIOR_ID, SCENARIO_TEMPLATE, NoScenarioOutcome.WITHDRAW);
     }
 
     /**
@@ -160,7 +160,7 @@ public class StratConAssassinationLeadBehavior extends StratConContestedPointOfI
 
         addReport(GENERAL, "bodyDouble.report", pointOfInterest, track, campaign);
         AbstractContract contract = StratConPointOfInterestRules.getContract(track, campaign);
-        if (contract != null) {
+        if ((contract != null) && isCombatBonusPaid(contract)) {
             StratConRulesManager.awardCombatBonus(campaign, contract);
         }
     }

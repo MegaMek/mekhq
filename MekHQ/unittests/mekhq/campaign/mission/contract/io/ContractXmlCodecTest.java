@@ -122,8 +122,6 @@ class ContractXmlCodecTest {
         // A non-empty scenario schedule so the codec's scenarioSchedule tag is exercised by the round-trip and
         // idempotency checks; the six per-month entries sum to the track count, matching a six-month contract.
         contract.setScenarioSchedule(List.of(0, 1, 0, 1, 0, 0));
-        // Likewise a non-empty point of interest schedule, so its pointOfInterestSchedule tag is exercised too.
-        contract.setPointOfInterestSchedule(List.of(1, 0, 2, 0, 1, 0));
 
         contract.setEmployerData(new EmployerData(ChaosEmployerType.LOCAL_PLANETARY_GOVERNMENT,
               "LA",
@@ -349,8 +347,6 @@ class ContractXmlCodecTest {
         assertEquals(expected.getScale(), actual.getScale(), "scale");
         assertEquals(expected.getTrackCount(), actual.getTrackCount(), "trackCount");
         assertEquals(expected.getScenarioSchedule(), actual.getScenarioSchedule(), "scenarioSchedule");
-        assertEquals(expected.getPointOfInterestSchedule(), actual.getPointOfInterestSchedule(),
-              "pointOfInterestSchedule");
         assertEquals(expected.getNature(), actual.getNature(), "nature");
         assertTrue(actual.isProvingGround(), "provingGround");
         assertEquals(expected.getSharesPercent(), actual.getSharesPercent(), "sharesPercent");

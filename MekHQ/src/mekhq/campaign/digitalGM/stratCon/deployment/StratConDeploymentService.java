@@ -60,7 +60,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResul
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.EnemyData;
@@ -97,14 +97,14 @@ public final class StratConDeploymentService {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         // Formations sent together onto a point of interest arrive as one group: once one of them has dealt with it,
         // the rest simply join that formation on the hex rather than arriving as if onto an empty one.
-        boolean hadActivePointOfInterest = hasActivePointOfInterest(track, coords);
+        boolean hadActivePointOfInterest = StratConPointOfInterestRules.hasActivePointOfInterest(track, coords);
 
         for (int forceId : forceIds) {
             if (assignToScenario) {
                 StratConGMs.forceDeployment(campaignOptions)
                       .assignForceToScenario(coords, forceId, campaign, campaignState.getContract(), track, false);
             } else if (isJoiningResolvedPointOfInterest(hadActivePointOfInterest,
-                  hasActivePointOfInterest(track, coords),
+                  StratConPointOfInterestRules.hasActivePointOfInterest(track, coords),
                   track.getScenario(coords) != null)) {
                 StratConGMs.forceDeployment(campaignOptions)
                       .processForceDeployment(coords, forceId, campaign, track, false);
@@ -133,19 +133,6 @@ public final class StratConDeploymentService {
     static boolean isJoiningResolvedPointOfInterest(boolean hadActivePointOfInterest, boolean hasActivePointOfInterest,
           boolean hasScenario) {
         return hadActivePointOfInterest && !hasActivePointOfInterest && !hasScenario;
-    }
-
-    /**
-     * @return {@code true} if the hex holds a point of interest that is still in play
-     */
-    private static boolean hasActivePointOfInterest(StratConTrackState track, StratConCoords coords) {
-        for (StratConPointOfInterest pointOfInterest : track.getPointsOfInterest(coords)) {
-            if (pointOfInterest.isActive()) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     /**

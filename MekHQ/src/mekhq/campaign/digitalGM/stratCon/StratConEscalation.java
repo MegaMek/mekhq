@@ -45,7 +45,6 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import megamek.common.annotations.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConContractMechanics.EscalationMode;
 import mekhq.campaign.events.missions.MissionChangedEvent;
@@ -103,6 +102,38 @@ public final class StratConEscalation {
      * results. */
     public static final int EMPTY_HEX_DEPLOYMENT_ESCALATION = 1;
 
+    /** The Escalation dice a won scenario adds (or, on a Garrison Duty contract, removes). */
+    static final int SCENARIO_WON_DICE = 1;
+
+    /** The Escalation dice a fight at a hostile facility adds when it is lost. */
+    static final int HOSTILE_FACILITY_LOST_DICE = 2;
+
+    /**
+     * The Escalation dice a fight at a hostile facility adds when it is won, in place of {@link #SCENARIO_WON_DICE}.
+     */
+    static final int HOSTILE_FACILITY_WON_DICE = 3;
+
+    /** The Escalation dice striking a high profile target adds. */
+    static final int HIGH_PROFILE_TARGET_STRUCK_DICE = 3;
+
+    /** The Escalation dice sabotaging a target without being caught adds. */
+    static final int TARGET_SABOTAGED_DICE = 3;
+
+    /** The Escalation dice saboteurs being caught adds, whatever the fight's result. */
+    static final int SABOTEURS_CAUGHT_DICE = 2;
+
+    /** The Escalation dice destroying civilian infrastructure without a fight adds. */
+    static final int CIVILIAN_INFRASTRUCTURE_DESTROYED_DICE = 3;
+
+    /** The Escalation dice winning the ambush at civilian infrastructure adds, on top of {@link #SCENARIO_WON_DICE}. */
+    static final int CIVILIAN_INFRASTRUCTURE_AMBUSH_WON_DICE = 2;
+
+    /** The Escalation dice plundering a target adds. */
+    static final int TARGET_PLUNDERED_DICE = 3;
+
+    /** The Escalation dice making a show of force removes, on a Garrison Duty contract. */
+    static final int SHOW_OF_FORCE_DICE = 3;
+
     private StratConEscalation() {
     }
 
@@ -110,17 +141,21 @@ public final class StratConEscalation {
      * @param campaign the current campaign
      * @param contract the contract, or {@code null}
      *
-     * @return {@code true} if the contract tracks Escalation: the "Contracts Use Special Mechanics" option is on, the
-     *       contract is one that escalates (see {@link #isEscalationContract}), and it has a StratCon state
+     * @return {@code true} if the contract tracks Escalation: it has a StratCon state that uses its type's special
+     *       mechanics (see {@link StratConCampaignState#isContractsUseSpecialMechanics}), it is one that escalates (see
+     *       {@link #isEscalationContract}), and play is not mapless, where Escalation is never set up
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static boolean isEscalationUsed(Campaign campaign, @Nullable AbstractContract contract) {
-        return (contract != null)
-                     && (contract.getStratConCampaignState() != null)
-                     && Boolean.TRUE.equals(campaign.getCampaignOptions()
-                                                  .get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS))
+        if ((contract == null) || campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+            return false;
+        }
+
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        return (campaignState != null)
+                     && campaignState.isContractsUseSpecialMechanics()
                      && isEscalationContract(contract);
     }
 
@@ -258,6 +293,22 @@ public final class StratConEscalation {
     }
 
     /**
+     * Lowers a Garrison Duty contract's Escalation by a number of d6 (see {@link #decreaseEscalation}).
+     *
+     * @param campaign the current campaign
+     * @param contract the contract
+     * @param dice     how many d6 to roll; nothing happens if this is not positive
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void decreaseEscalationByDice(Campaign campaign, @Nullable AbstractContract contract, int dice) {
+        if (dice > 0) {
+            decreaseEscalation(campaign, contract, d6(dice));
+        }
+    }
+
+    /**
      * A force has deployed to an empty hex - one with no scenario, facility, or point of interest - and no scenario
      * resulted: +1 Escalation, or -1 on a Garrison Duty contract.
      *
@@ -289,12 +340,12 @@ public final class StratConEscalation {
           boolean isHostileFacilityScenario) {
         if (isDeescalatingContract(contract)) {
             if (isVictory) {
-                decreaseEscalation(campaign, contract, d6(1));
+                decreaseEscalationByDice(campaign, contract, SCENARIO_WON_DICE);
             }
             return;
         }
 
-        increaseEscalation(campaign, contract, getScenarioEscalation(isVictory, isHostileFacilityScenario));
+        increaseEscalationByDice(campaign, contract, getScenarioEscalationDice(isVictory, isHostileFacilityScenario));
     }
 
     /**
@@ -308,15 +359,10 @@ public final class StratConEscalation {
      */
     static int getScenarioEscalationDice(boolean isVictory, boolean isHostileFacilityScenario) {
         if (isHostileFacilityScenario) {
-            return isVictory ? 3 : 2;
+            return isVictory ? HOSTILE_FACILITY_WON_DICE : HOSTILE_FACILITY_LOST_DICE;
         }
 
-        return isVictory ? 1 : 0;
-    }
-
-    private static int getScenarioEscalation(boolean isVictory, boolean isHostileFacilityScenario) {
-        int dice = getScenarioEscalationDice(isVictory, isHostileFacilityScenario);
-        return (dice > 0) ? d6(dice) : 0;
+        return isVictory ? SCENARIO_WON_DICE : 0;
     }
 
     /**
@@ -326,7 +372,7 @@ public final class StratConEscalation {
      * @since 0.51.01
      */
     public static void onHighProfileTargetStruck(Campaign campaign, AbstractContract contract) {
-        increaseEscalation(campaign, contract, d6(3));
+        increaseEscalationByDice(campaign, contract, HIGH_PROFILE_TARGET_STRUCK_DICE);
     }
 
     /**
@@ -336,7 +382,7 @@ public final class StratConEscalation {
      * @since 0.51.01
      */
     public static void onTargetSabotaged(Campaign campaign, AbstractContract contract) {
-        increaseEscalation(campaign, contract, d6(3));
+        increaseEscalationByDice(campaign, contract, TARGET_SABOTAGED_DICE);
     }
 
     /**
@@ -346,8 +392,39 @@ public final class StratConEscalation {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void onSaboteursCaught(Campaign campaign, AbstractContract contract) {
-        increaseEscalation(campaign, contract, d6(2));
+    public static void onSaboteursCaught(Campaign campaign, @Nullable AbstractContract contract) {
+        increaseEscalationByDice(campaign, contract, SABOTEURS_CAUGHT_DICE);
+    }
+
+    /**
+     * Civilian infrastructure has been destroyed without an ambush: +3d6 Escalation.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void onCivilianInfrastructureDestroyed(Campaign campaign, AbstractContract contract) {
+        increaseEscalationByDice(campaign, contract, CIVILIAN_INFRASTRUCTURE_DESTROYED_DICE);
+    }
+
+    /**
+     * The ambush at civilian infrastructure has been won, destroying it: +2d6 Escalation. The usual +1d6 for winning
+     * comes on top, for +3d6 in all - the same as destroying it without a fight.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void onCivilianInfrastructureAmbushWon(Campaign campaign, @Nullable AbstractContract contract) {
+        increaseEscalationByDice(campaign, contract, CIVILIAN_INFRASTRUCTURE_AMBUSH_WON_DICE);
+    }
+
+    /**
+     * A target has been plundered without an ambush: +3d6 Escalation.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void onTargetPlundered(Campaign campaign, AbstractContract contract) {
+        increaseEscalationByDice(campaign, contract, TARGET_PLUNDERED_DICE);
     }
 
     /**
@@ -357,7 +434,7 @@ public final class StratConEscalation {
      * @since 0.51.01
      */
     public static void onShowOfForce(Campaign campaign, AbstractContract contract) {
-        decreaseEscalation(campaign, contract, d6(3));
+        decreaseEscalationByDice(campaign, contract, SHOW_OF_FORCE_DICE);
     }
 
     /**

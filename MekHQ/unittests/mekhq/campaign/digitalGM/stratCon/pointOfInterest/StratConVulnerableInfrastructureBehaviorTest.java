@@ -36,6 +36,7 @@ import static megamek.common.units.UnitType.AEROSPACE_FIGHTER;
 import static megamek.common.units.UnitType.DROPSHIP;
 import static megamek.common.units.UnitType.INFANTRY;
 import static megamek.common.units.UnitType.MEK;
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConConfiguredPointOfInterestType.VULNERABLE_INFRASTRUCTURE;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -57,7 +58,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
@@ -72,6 +72,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -108,7 +109,7 @@ class StratConVulnerableInfrastructureBehaviorTest {
     void setUp() {
         StratConPointOfInterestDefinition definition = new StratConPointOfInterestDefinition();
         definition.setTypeId(TYPE_ID);
-        definition.setBehaviorId(StratConVulnerableInfrastructureBehavior.BEHAVIOR_ID);
+        definition.setBehaviorId(VULNERABLE_INFRASTRUCTURE.getBehaviorId());
         definition.setOccupiesHex(true);
         definition.setHiddenUntilScouted(true);
         StratConPointOfInterestDefinitions.registerDefinition(definition);
@@ -129,16 +130,19 @@ class StratConVulnerableInfrastructureBehaviorTest {
 
     /**
      * A campaign holding one active contract whose map holds the test sector, and one player formation of the given
-     * primary unit type. With Essential Scenarios Only on, no scenario can break out, so the infrastructure is never a
+     * primary unit type. With odds no roll can meet, no scenario can break out, so the infrastructure is never a
      * trap.
      */
     private Campaign deploymentCampaign(int primaryUnitType, ContractMoraleLevel moraleLevel,
-          boolean essentialScenariosOnly) {
+          boolean isScenarioRuledOut) {
         Campaign campaign = MHQTestUtilities.mockCampaign();
         when(campaign.getLocalDate()).thenReturn(TODAY);
 
         CampaignOptions options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY)).thenReturn(essentialScenariosOnly);
+        if (isScenarioRuledOut) {
+            // Odds no roll can meet, so no scenario can break out.
+            track.setScenarioOdds(-100);
+        }
         when(campaign.getCampaignOptions()).thenReturn(options);
 
         Formation formation = mock(Formation.class);
@@ -147,8 +151,10 @@ class StratConVulnerableInfrastructureBehaviorTest {
 
         contract = mock(AbstractContract.class);
         StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.setContractsUseSpecialMechanics(true);
         campaignState.addTrack(track);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
+        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.GUERRILLA_WARFARE);
         when(contract.getMoraleLevel()).thenReturn(moraleLevel);
         when(campaign.getActiveContracts()).thenReturn(List.of(contract));
         return campaign;
@@ -184,9 +190,9 @@ class StratConVulnerableInfrastructureBehaviorTest {
 
     @Test
     void theVulnerableInfrastructureBehaviorIsRegisteredUnderItsId() {
-        assertInstanceOf(StratConVulnerableInfrastructureBehavior.class,
-              StratConPointOfInterestBehaviors.getBehavior(StratConVulnerableInfrastructureBehavior.BEHAVIOR_ID));
-        assertInstanceOf(StratConVulnerableInfrastructureBehavior.class, infrastructure.getBehavior());
+        assertInstanceOf(StratConAmbushPointOfInterestBehavior.class,
+              StratConPointOfInterestBehaviors.getBehavior(VULNERABLE_INFRASTRUCTURE.getBehaviorId()));
+        assertInstanceOf(StratConAmbushPointOfInterestBehavior.class, infrastructure.getBehavior());
     }
 
     @Test

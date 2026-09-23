@@ -34,30 +34,44 @@ package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.gui.dialog.StratConAmbushedDialog;
 
 /**
- * The shared rules of a point of interest that any formation can act on, but that may hide an ambush.
+ * The rules of a point of interest that any formation can act on, but that may hide an ambush. Types that need nothing
+ * more are instances of this class, set up by {@link StratConConfiguredPointOfInterestType}; types with rules of their
+ * own extend it.
  *
  * <p>When any formation deploys onto its hex, the usual scenario roll is made. If no scenario breaks out, the point of
- * interest is secured on the spot: its objective is met and, by default, the contract's combat bonus is paid, standing
- * in for the Essential scenarios such a contract does not get (see {@link #isCombatBonusPaid}). If one does, the
- * deploying formation is ambushed (see {@link #getScenarioTemplateName}) - a Crisis, and never a Turning Point. An
- * ambushed point of interest is spent whatever the ambush's result: it leaves the map and its objective is removed,
- * neither met nor failed.</p>
+ * interest is secured on the spot: its objective is met and the contract's combat bonus is paid when its Essential
+ * scenarios were replaced (see {@link #isCombatBonusPaid}). If one does, the deploying formation is ambushed (see
+ * {@link #getScenarioTemplateName}) - a Crisis, and never a Turning Point. An ambushed point of interest is spent
+ * whatever the ambush's result: it leaves the map and its objective is removed, neither met nor failed.</p>
  *
- * <p>Each type's player-facing text lives in the {@code StratConRulesManager} resource bundle, under its key prefix
- * (see {@link #getResourceKeyPrefix}): {@code .objective}, {@code .secured.report}, {@code .ambush.report}, and
+ * <p>Each type's player-facing text lives in the {@code StratConPointOfInterest} resource bundle, under its behavior
+ * ID (see {@link #getBehaviorId}): {@code .objective}, {@code .secured.report}, {@code .ambush.report}, and
  * {@code .ambushSpent.report}, each report taking the point of interest's name and its sector's name. (See
  * {@link AbstractStratConRolledPointOfInterestBehavior} for the rules it shares.)</p>
  *
  * @author Illiani
  * @since 0.51.01
  */
-public abstract class StratConAmbushPointOfInterestBehavior extends AbstractStratConRolledPointOfInterestBehavior {
+public class StratConAmbushPointOfInterestBehavior extends AbstractStratConRolledPointOfInterestBehavior {
+    /**
+     * @param behaviorId           the ID this behavior is registered under, which also prefixes its resource keys
+     * @param scenarioTemplateName the file name of the scenario template the ambush is fought in, or {@code null} for
+     *                             one suited to ambushing the deploying formation's unit type
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConAmbushPointOfInterestBehavior(String behaviorId, @Nullable String scenarioTemplateName) {
+        super(behaviorId, scenarioTemplateName);
+    }
+
     /**
      * Whatever template it is drawn from, the scenario here is always an ambush.
      *

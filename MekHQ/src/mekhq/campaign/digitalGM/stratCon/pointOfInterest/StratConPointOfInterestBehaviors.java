@@ -60,23 +60,20 @@ public final class StratConPointOfInterestBehaviors {
 
     static {
         behaviors.put(DEFAULT_BEHAVIOR_ID, DEFAULT_BEHAVIOR);
-        behaviors.put(StratConDataCacheBehavior.BEHAVIOR_ID, new StratConDataCacheBehavior());
-        behaviors.put(StratConVulnerableInfrastructureBehavior.BEHAVIOR_ID,
-              new StratConVulnerableInfrastructureBehavior());
-        behaviors.put(StratConPotentialLeadBehavior.BEHAVIOR_ID, new StratConPotentialLeadBehavior());
+
+        // Types whose rules are wholly their family's have no class of their own.
+        for (StratConConfiguredPointOfInterestType configuredType : StratConConfiguredPointOfInterestType.values()) {
+            behaviors.put(configuredType.getBehaviorId(), configuredType.createBehavior());
+        }
+
         behaviors.put(StratConAssassinationLeadBehavior.BEHAVIOR_ID, new StratConAssassinationLeadBehavior());
-        behaviors.put(StratConLookoutPointBehavior.BEHAVIOR_ID, new StratConLookoutPointBehavior());
-        behaviors.put(StratConBeleagueredForcesBehavior.BEHAVIOR_ID, new StratConBeleagueredForcesBehavior());
         behaviors.put(StratConTrainingManeuversBehavior.BEHAVIOR_ID, new StratConTrainingManeuversBehavior());
         behaviors.put(StratConHighProfileTargetBehavior.BEHAVIOR_ID, new StratConHighProfileTargetBehavior());
-        behaviors.put(StratConVIPBehavior.BEHAVIOR_ID, new StratConVIPBehavior());
-        behaviors.put(StratConStrategicPositionBehavior.BEHAVIOR_ID, new StratConStrategicPositionBehavior());
         behaviors.put(StratConScheduledParadeBehavior.BEHAVIOR_ID, new StratConScheduledParadeBehavior());
         behaviors.put(StratConCivilDisobedienceBehavior.BEHAVIOR_ID, new StratConCivilDisobedienceBehavior());
         behaviors.put(StratConSabotageTargetBehavior.BEHAVIOR_ID, new StratConSabotageTargetBehavior());
         behaviors.put(StratConCivilianInfrastructureBehavior.BEHAVIOR_ID,
               new StratConCivilianInfrastructureBehavior());
-        behaviors.put(StratConSecurityReviewBehavior.BEHAVIOR_ID, new StratConSecurityReviewBehavior());
         behaviors.put(StratConPlunderTargetBehavior.BEHAVIOR_ID, new StratConPlunderTargetBehavior());
         behaviors.put(StratConTargetIntelligenceBehavior.BEHAVIOR_ID, new StratConTargetIntelligenceBehavior());
         behaviors.put(StratConShowOfForceBehavior.BEHAVIOR_ID, new StratConShowOfForceBehavior());
