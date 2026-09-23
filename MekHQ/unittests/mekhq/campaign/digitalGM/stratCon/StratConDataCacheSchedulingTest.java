@@ -367,6 +367,23 @@ class StratConDataCacheSchedulingTest {
     }
 
     @Test
+    void oneAssassinationLeadPerPointOfScalePointsToTheRealTarget() {
+        List<StratConScheduledPointOfInterest> scheduled = schedule(contract(ContractObjectiveType.ASSASSINATION, 1),
+              true,
+              true);
+
+        int realTargets = 0;
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertTrue(pointOfInterest.isStrategicObjective(), "every lead looks alike, so every one is an objective");
+            if ("true".equals(pointOfInterest.getInitialState()
+                                    .get(StratConAssassinationLeadBehavior.REAL_TARGET_STATE_KEY))) {
+                realTargets++;
+            }
+        }
+        assertEquals(Math.min(SCALE, scheduled.size()), realTargets);
+    }
+
+    @Test
     void pirateCaptainsAreNotObjectivesThemselves() {
         assertFalse(StratConContractInitializer.isSpecialPointOfInterestObjective(
               StratConPirateCaptainBehavior.TYPE_ID), "the fight with a captain is the objective, not the captain");

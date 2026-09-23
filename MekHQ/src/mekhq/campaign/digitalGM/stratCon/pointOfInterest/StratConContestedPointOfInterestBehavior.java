@@ -117,6 +117,21 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
         return false;
     }
 
+    /**
+     * Decides whether a scenario is certain to break out over this point of interest, skipping the roll. By default, it
+     * never is.
+     *
+     * @param pointOfInterest the point of interest being followed up
+     *
+     * @return {@code true} if the scenario breaks out without a roll
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected boolean isContestCertain(StratConPointOfInterest pointOfInterest) {
+        return false;
+    }
+
     @Override
     public PointOfInterestDeploymentOutcome onFormationDeployed(StratConPointOfInterest pointOfInterest,
           StratConTrackState track, int formationId, Campaign campaign) {
@@ -132,16 +147,7 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
             return PointOfInterestDeploymentOutcome.NO_EFFECT;
         }
 
-        boolean essentialScenariosOnly = campaign.getCampaignOptions().get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
-        int targetNumber = StratConRulesManager.calculateScenarioOdds(track,
-              contract,
-              true,
-              isContestPossibleWhileRouted());
-        boolean isContested = StratConRulesManager.rollsRandomScenario(PointOfInterestDeploymentOutcome.NO_EFFECT,
-              essentialScenariosOnly,
-              false,
-              false,
-              targetNumber);
+        boolean isContested = isContestCertain(pointOfInterest) || rollForContest(track, contract, campaign);
 
         if (!isContested) {
             onUncontested(pointOfInterest, track, contract, campaign);
@@ -159,6 +165,19 @@ public abstract class StratConContestedPointOfInterestBehavior implements IStrat
         addReport(BATTLE, "contested.report", pointOfInterest, track, campaign);
         announceContest(pointOfInterest, track, formationId, contract, campaign);
         return PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO;
+    }
+
+    private boolean rollForContest(StratConTrackState track, AbstractContract contract, Campaign campaign) {
+        boolean essentialScenariosOnly = campaign.getCampaignOptions().get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
+        int targetNumber = StratConRulesManager.calculateScenarioOdds(track,
+              contract,
+              true,
+              isContestPossibleWhileRouted());
+        return StratConRulesManager.rollsRandomScenario(PointOfInterestDeploymentOutcome.NO_EFFECT,
+              essentialScenariosOnly,
+              false,
+              false,
+              targetNumber);
     }
 
     @Override

@@ -11,9 +11,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -41,9 +43,9 @@ import org.mockito.ArgumentCaptor;
 import testUtilities.MHQTestUtilities;
 
 /**
- * Tests for the assassination lead, which works just as a potential lead does (see
- * {@link StratConPotentialLeadBehaviorTest} for the rules they share): these cover what differs - its scenario and its
- * text - and that each of its outcomes still plays out.
+ * Tests for the assassination lead, which shares a potential lead's rules (see
+ * {@link StratConPotentialLeadBehaviorTest}) but is never a dud and mostly turns up body doubles: these cover its
+ * scenario, its text, the real target's fight, and a body double's.
  *
  * @author Illiani
  * @since 0.51.01
@@ -83,8 +85,7 @@ class StratConAssassinationLeadBehaviorTest {
 
     /**
      * A campaign holding one active contract - with combat pay - whose map holds the test sector, and one player
-     * formation of the given primary unit type. With Essential Scenarios Only on, no scenario can break out, so every
-     * lead is a dud.
+     * formation of the given primary unit type.
      */
     private Campaign deploymentCampaign(int primaryUnitType) {
         Campaign campaign = MHQTestUtilities.mockCampaign();
@@ -148,18 +149,6 @@ class StratConAssassinationLeadBehaviorTest {
     // Each outcome still plays out, with its own text
 
     @Test
-    void aLeadWithNoScenarioIsADud() {
-        Campaign campaign = deploymentCampaign(MEK);
-
-        assertEquals(PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO,
-              StratConPointOfInterestRules.processFormationDeployment(track, LEAD_COORDS, FORMATION_ID, campaign));
-
-        assertNull(track.getPointOfInterest(lead.getId()));
-        assertFalse(track.getStrategicObjectives().contains(objective), "a dud's objective is removed, not failed");
-        generalReport(campaign);
-    }
-
-    @Test
     void aFormationThatIsNotOnTheGroundCannotFollowUpALead() {
         Campaign campaign = deploymentCampaign(AEROSPACE_FIGHTER);
 
@@ -170,6 +159,7 @@ class StratConAssassinationLeadBehaviorTest {
 
     @Test
     void winningTheAssassinationMeetsTheObjectiveAndPaysTheCombatBonus() {
+        markRealTarget();
         lead.setLinkedScenarioId(SCENARIO_ID);
         Campaign campaign = deploymentCampaign(MEK);
         Finances finances = campaign.getPlayerForce().getFinances();
@@ -183,6 +173,7 @@ class StratConAssassinationLeadBehaviorTest {
 
     @Test
     void losingTheAssassinationFailsTheObjective() {
+        markRealTarget();
         lead.setLinkedScenarioId(SCENARIO_ID);
         Campaign campaign = deploymentCampaign(MEK);
 
@@ -190,5 +181,48 @@ class StratConAssassinationLeadBehaviorTest {
 
         assertTrue(objective.isObjectiveFailed(track));
         generalReport(campaign);
+    }
+
+    // Body doubles
+
+    @Test
+    void noLeadIsEverADud() {
+        StratConAssassinationLeadBehavior behavior = new StratConAssassinationLeadBehavior();
+        assertTrue(behavior.isContestCertain(lead), "a body double always fights");
+
+        markRealTarget();
+        assertTrue(behavior.isContestCertain(lead), "the real target always fights");
+    }
+
+    @Test
+    void beatingABodyDoubleWithdrawsItsObjectiveButPaysTheCombatBonus() {
+        lead.setLinkedScenarioId(SCENARIO_ID);
+        Campaign campaign = deploymentCampaign(MEK);
+        Finances finances = campaign.getPlayerForce().getFinances();
+
+        StratConPointOfInterestRules.processScenarioEnded(track, SCENARIO_ID, true, campaign);
+
+        assertNull(track.getPointOfInterest(lead.getId()));
+        assertFalse(track.getStrategicObjectives().contains(objective), "neither met nor failed");
+        verify(finances).credit(eq(TransactionType.CONTRACT_PAYMENT), eq(TODAY), eq(Money.of(25000)), anyString());
+        generalReport(campaign);
+    }
+
+    @Test
+    void losingToABodyDoubleWithdrawsItsObjectiveAndPaysNothing() {
+        lead.setLinkedScenarioId(SCENARIO_ID);
+        Campaign campaign = deploymentCampaign(MEK);
+        Finances finances = campaign.getPlayerForce().getFinances();
+
+        StratConPointOfInterestRules.processScenarioEnded(track, SCENARIO_ID, false, campaign);
+
+        assertNull(track.getPointOfInterest(lead.getId()));
+        assertFalse(track.getStrategicObjectives().contains(objective), "neither met nor failed");
+        verify(finances, never()).credit(any(), any(), any(), anyString());
+        generalReport(campaign);
+    }
+
+    private void markRealTarget() {
+        lead.setStateValue(StratConAssassinationLeadBehavior.REAL_TARGET_STATE_KEY, "true");
     }
 }

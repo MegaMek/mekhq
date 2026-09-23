@@ -747,6 +747,11 @@ public class StratConContractInitializer {
             markFacilityLeads(scheduledPointsOfInterest, max(1, contract.getScale()));
         }
 
+        // Likewise, only so many assassination leads point to the real target; the rest turn up body doubles.
+        if (StratConAssassinationLeadBehavior.TYPE_ID.equals(typeId)) {
+            markRealTargets(scheduledPointsOfInterest, max(1, contract.getScale()));
+        }
+
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
             campaignState.addScheduledPointOfInterest(scheduledPointOfInterest);
         }
@@ -765,14 +770,36 @@ public class StratConContractInitializer {
     // Package-private rather than private so the marking can be tested directly.
     static void markFacilityLeads(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest,
           int facilityLeadCount) {
+        markAtRandom(scheduledPointsOfInterest, facilityLeadCount,
+              StratConTargetIntelligenceBehavior.FACILITY_LEAD_STATE_KEY);
+    }
+
+    /**
+     * Marks, at random, which of a contract's scheduled assassination leads point to the real target rather than a body
+     * double (see {@link StratConAssassinationLeadBehavior}): as many as the given count, or all of them if there are
+     * fewer.
+     *
+     * @param scheduledPointsOfInterest the contract's scheduled assassination leads
+     * @param realTargetCount           how many point to the real target: one per point of the contract's scale
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the marking can be tested directly.
+    static void markRealTargets(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest,
+          int realTargetCount) {
+        markAtRandom(scheduledPointsOfInterest, realTargetCount,
+              StratConAssassinationLeadBehavior.REAL_TARGET_STATE_KEY);
+    }
+
+    private static void markAtRandom(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest, int count,
+          String stateKey) {
         List<StratConScheduledPointOfInterest> candidates = new ArrayList<>(scheduledPointsOfInterest);
         Collections.shuffle(candidates);
 
-        int leads = min(facilityLeadCount, candidates.size());
-        for (int index = 0; index < leads; index++) {
-            candidates.get(index)
-                  .getInitialState()
-                  .put(StratConTargetIntelligenceBehavior.FACILITY_LEAD_STATE_KEY, Boolean.TRUE.toString());
+        int marked = min(count, candidates.size());
+        for (int index = 0; index < marked; index++) {
+            candidates.get(index).getInitialState().put(stateKey, Boolean.TRUE.toString());
         }
     }
 
