@@ -116,6 +116,8 @@ class AtBDynamicScenarioFactoryTest {
         when(campaign.getCampaignOptions()).thenReturn(options);
         lenient().when(options.get(CampaignOption.USE_IMPLANTS)).thenReturn(false);
         lenient().when(options.get(CampaignOption.USE_SENSIBLE_TACTICS)).thenReturn(false);
+        // Read when rolling the generated crew's Natural Aptitudes
+        lenient().when(options.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
         when(campaign.getRandomSkillPreferences()).thenReturn(randomSkillPreferences);
 
         when(campaign.getGameYear()).thenReturn(3025);
