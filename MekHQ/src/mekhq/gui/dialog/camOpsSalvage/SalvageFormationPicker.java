@@ -46,7 +46,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -69,6 +68,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
+import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageFormationData;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -287,28 +287,9 @@ public class SalvageFormationPicker extends JDialog {
             sorter.setComparator(SalvageFormationTableModel.COL_FORMATION_TYPE,
                   (s1, s2) -> formationTypeComparator((String) s1, (String) s2));
             // Sort by experience level, then rank numeric, then full name
+            Campaign campaign = ((SalvageFormationTableModel) table.getModel()).campaign;
             sorter.setComparator(SalvageFormationTableModel.COL_TOE_TECH,
-                  (o1, o2) -> {
-                      SalvageFormationTableModel model = (SalvageFormationTableModel) table.getModel();
-                      int row1 = -1;
-                      int row2 = -1;
-
-                      // Find which rows have these values
-                      for (int i = 0; i < model.getRowCount(); i++) {
-                          if (Objects.equals(model.getValueAt(i, SalvageFormationTableModel.COL_TOE_TECH), o1)) {
-                              row1 = i;
-                          }
-                          if (Objects.equals(model.getValueAt(i, SalvageFormationTableModel.COL_TOE_TECH), o2)) {
-                              row2 = i;
-                          }
-                      }
-
-                      if (row1 == -1 || row2 == -1) {
-                          return 0;
-                      }
-
-                      return techComparator(model, row1, row2);
-                  });
+                  (o1, o2) -> techComparator(campaign, ((TechCell) o1).tech(), ((TechCell) o2).tech()));
             sorter.setComparator(SalvageFormationTableModel.COL_CARGO_CAPACITY,
                   Comparator.comparingDouble(d -> ((double) d)));
             sorter.setComparator(SalvageFormationTableModel.COL_TOW_CAPACITY,
@@ -338,34 +319,28 @@ public class SalvageFormationPicker extends JDialog {
      *
      * <p>{@code null} techs sort last.</p>
      *
-     * @param model backing table model
-     * @param row1  first model row
-     * @param row2  second model row
+     * @param campaign the current campaign
+     * @param tech1    the first tech; may be {@code null}
+     * @param tech2    the second tech; may be {@code null}
      *
-     * @return negative if row1 &lt; row2 under the ordering, positive if row1 &gt; row2, or 0 if equal
+     * @return negative if tech1 &lt; tech2 under the ordering, positive if tech1 &gt; tech2, or 0 if equal
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static int techComparator(SalvageFormationTableModel model, int row1, int row2) {
-        SalvageFormationData data1 = model.formations.get(row1);
-        SalvageFormationData data2 = model.formations.get(row2);
-
-        Person tech1 = data1.tech();
-        Person tech2 = data2.tech();
-
+    private static int techComparator(Campaign campaign, @Nullable Person tech1, @Nullable Person tech2) {
         // Handle null techs - should sort last
         if (tech1 == null && tech2 == null) {return 0;}
         if (tech1 == null) {return 1;}
         if (tech2 == null) {return -1;}
 
         // Compare by experience level
-        boolean isTechSecondary1 = tech1.getSecondaryRole().isTechSecondary();
-        boolean isTechSecondary2 = tech2.getSecondaryRole().isTechSecondary();
+        boolean isTechSecondary1 = CamOpsSalvageUtilities.isUseSecondaryTechSkill(tech1);
+        boolean isTechSecondary2 = CamOpsSalvageUtilities.isUseSecondaryTechSkill(tech2);
 
-        CampaignOptions campaignOptions = model.campaign.getCampaignOptions();
-        boolean isClanCampaign = model.campaign.getPlayerForce().isClanForce();
-        LocalDate today = model.campaign.getLocalDate();
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
+        LocalDate today = campaign.getLocalDate();
         int expLevel1 = tech1.getExperienceLevel(campaignOptions, isClanCampaign, today, isTechSecondary1, true);
         int expLevel2 = tech2.getExperienceLevel(campaignOptions, isClanCampaign, today, isTechSecondary2, true);
 
@@ -381,9 +356,8 @@ public class SalvageFormationPicker extends JDialog {
     }
 
     /**
-     * Comparator used for the Formation Type column. Ensures types with the display name containing
-     * {@link FormationType#SALVAGE} sort before others, then falls back to natural-order comparison of the type
-     * labels.
+     * Comparator used for the Formation Type column. Ensures {@link FormationType#SALVAGE} formations sort before
+     * others, then falls back to natural-order comparison of the type labels.
      *
      * @param s1 first type display string
      * @param s2 second type display string
@@ -394,8 +368,8 @@ public class SalvageFormationPicker extends JDialog {
      * @since 0.50.10
      */
     private static int formationTypeComparator(String s1, String s2) {
-        boolean isSalvage1 = s1.toLowerCase().contains(FormationType.SALVAGE.getDisplayName());
-        boolean isSalvage2 = s2.toLowerCase().contains(FormationType.SALVAGE.getDisplayName());
+        boolean isSalvage1 = s1.equals(FormationType.SALVAGE.getDisplayName());
+        boolean isSalvage2 = s2.equals(FormationType.SALVAGE.getDisplayName());
         if (isSalvage1 && !isSalvage2) {return -1;}
         if (!isSalvage1 && isSalvage2) {return 1;}
         return new NaturalOrderComparator().compare(s1, s2);
@@ -449,6 +423,22 @@ public class SalvageFormationPicker extends JDialog {
 
         buttonPanel.add(btnConfirm);
         buttonPanel.add(btnCancel);
+    }
+
+    /**
+     * The value held in the Tech column. Displays as its label, while keeping the tech available for sorting.
+     *
+     * @param label the display label
+     * @param tech  the formation's tech; may be {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private record TechCell(String label, @Nullable Person tech) {
+        @Override
+        public String toString() {
+            return label;
+        }
     }
 
     /**
@@ -540,7 +530,7 @@ public class SalvageFormationPicker extends JDialog {
         public Class<?> getColumnClass(int columnIndex) {
             return switch (columnIndex) {
                 case COL_SELECT, COL_HAS_TUG -> Boolean.class;
-                case COL_FORMATION_NAME, COL_FORMATION_TYPE, COL_TOE_TECH -> String.class;
+                case COL_FORMATION_NAME, COL_FORMATION_TYPE -> String.class;
                 case COL_CARGO_CAPACITY, COL_TOW_CAPACITY -> Double.class;
                 case COL_SALVAGE_UNITS, COL_CREW_TECHS -> Integer.class;
                 default -> Object.class;
@@ -560,7 +550,7 @@ public class SalvageFormationPicker extends JDialog {
                 case COL_SELECT -> selected[rowIndex];
                 case COL_FORMATION_NAME -> data.formation().getName();
                 case COL_FORMATION_TYPE -> data.formationType().getDisplayName();
-                case COL_TOE_TECH -> getTechLabel(data.tech());
+                case COL_TOE_TECH -> new TechCell(getTechLabel(data.tech()), data.tech());
                 case COL_CREW_TECHS -> getCrewTechCount(campaign.getPlayerForce().getHangar(), data.formation());
                 case COL_CARGO_CAPACITY -> data.maximumCargoCapacity();
                 case COL_TOW_CAPACITY -> data.maximumTowCapacity();
@@ -586,7 +576,7 @@ public class SalvageFormationPicker extends JDialog {
                 return "-";
             }
             String name = tech.getFullTitle();
-            boolean isTechSecondary = tech.getSecondaryRole().isTechSecondary();
+            boolean isTechSecondary = CamOpsSalvageUtilities.isUseSecondaryTechSkill(tech);
             String skillLevel = tech.getSkillLevel(campaign, isTechSecondary, true).getShortName();
             boolean isInjured = tech.needsFixing();
 

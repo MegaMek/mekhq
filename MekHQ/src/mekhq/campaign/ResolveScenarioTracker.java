@@ -2165,7 +2165,7 @@ public class ResolveScenarioTracker {
                           picker.getCountOfSalvageUnits());
                 }
 
-                CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs);
+                CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs, picker.getUsedSalvageTime());
             }
         } else {
             CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, getActualSalvage(), getSoldSalvage(),

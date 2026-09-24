@@ -36,29 +36,35 @@ import static java.lang.Math.max;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
-import megamek.common.units.Mek;
-import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.enums.TransporterType;
 
 public record SalvageFormationData(Formation formation, FormationType formationType, @Nullable Person tech,
       double maximumCargoCapacity,
-      double maximumTowCapacity, int salvageCapableUnits, boolean hasTug) {
+      double maximumTowCapacity, int salvageCapableUnits, boolean hasTug, boolean isSpaceScenario) {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageFormationData";
+
+    /**
+     * A single line in a capacity tooltip.
+     *
+     * @param unitName the name of the unit
+     * @param capacity the unit's capacity, in tons
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private record CapacityEntry(String unitName, double capacity) {}
 
     public static SalvageFormationData buildData(Campaign campaign, Formation formation, boolean isSpaceScenario) {
         FormationType formationType = formation.getFormationType();
@@ -74,58 +80,19 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         int salvageCapableUnits = 0;
         boolean hasTug = false;
 
-        mekhq.campaign.LocalHangar hangar = campaign.getPlayerForce().getHangar();
-        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
-            if (!unit.isFullyCrewed()) {
-                continue;
-            }
-
+        for (Unit unit : getAvailableSalvageUnits(campaign.getPlayerForce().getHangar(), formation,
+              isSpaceScenario)) {
             Entity entity = unit.getEntity();
-            if (entity != null) {
-                boolean canSalvage = isSpaceScenario ? entity.canPerformSpaceSalvageOperations() :
-                                           entity.canPerformGroundSalvageOperations();
-                if (!canSalvage) {
-                    continue;
-                }
+            salvageCapableUnits++;
 
-                boolean isTrailer = entity instanceof Tank tank && tank.isTrailer();
-                if (isTrailer) {
-                    ITransportAssignment transportAssignment = unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT);
-                    if (transportAssignment == null || !transportAssignment.hasTransport()) {
-                        continue; // If nothing is towing the trailer, it can't reach the salvage operation
-                    }
-                }
+            double cargoCapacity = unit.getCargoCapacityForSalvage();
+            maximumCargoCapacity = max(cargoCapacity, maximumCargoCapacity);
 
-                double cargoCapacity = unit.getCargoCapacityForSalvage();
-                maximumCargoCapacity = max(cargoCapacity, maximumCargoCapacity);
-
-                if (isSpaceScenario) {
-                    boolean hasNavalTug = CamOpsSalvageUtilities.hasNavalTug(entity);
-                    if (cargoCapacity > 0.0 || CamOpsSalvageUtilities.hasNavalTug(entity)) {
-                        salvageCapableUnits++;
-                    }
-
-                    double towCapacity = entity.getWeight();
-                    maximumTowCapacity = max(towCapacity, maximumTowCapacity);
-
-                    hasTug = hasNavalTug;
-                } else {
-                    boolean isTowCapable = entity instanceof Mek || (entity instanceof Tank && !isTrailer);
-                    if (cargoCapacity > 0.0) {
-                        salvageCapableUnits++;
-                    } else if (isTowCapable) {
-                        salvageCapableUnits++;
-                    }
-
-                    if (isTowCapable) {
-                        double currentTowWeight = unit.getTotalWeightOfUnitsAssignedToBeTransported(
-                              CampaignTransportType.TOW_TRANSPORT,
-                              TransporterType.TANK_TRAILER_HITCH);
-
-                        double towCapacity = max(0.0, entity.getWeight() - currentTowWeight);
-                        maximumTowCapacity = max(towCapacity, maximumTowCapacity);
-                    }
-                }
+            if (isSpaceScenario) {
+                maximumTowCapacity = max(entity.getWeight(), maximumTowCapacity);
+                hasTug |= CamOpsSalvageUtilities.hasNavalTug(entity);
+            } else {
+                maximumTowCapacity = max(CamOpsSalvageUtilities.getTowCapacity(unit), maximumTowCapacity);
             }
         }
 
@@ -135,7 +102,31 @@ public record SalvageFormationData(Formation formation, FormationType formationT
               maximumCargoCapacity,
               maximumTowCapacity,
               salvageCapableUnits,
-              hasTug);
+              hasTug,
+              isSpaceScenario);
+    }
+
+    /**
+     * Collects the units in a formation that are able to take part in salvage operations.
+     *
+     * @param hangar          the hangar containing the formation's units
+     * @param formation       the formation to check
+     * @param isSpaceScenario {@code true} if the salvage operation takes place in space
+     *
+     * @return the units available for salvage operations
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static List<Unit> getAvailableSalvageUnits(LocalHangar hangar, Formation formation,
+          boolean isSpaceScenario) {
+        List<Unit> availableUnits = new ArrayList<>();
+        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
+            if (CamOpsSalvageUtilities.isAvailableForSalvage(unit, isSpaceScenario)) {
+                availableUnits.add(unit);
+            }
+        }
+        return availableUnits;
     }
 
     public String getTechTooltip(Campaign campaign, Person tech) {
@@ -147,7 +138,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         } else {
             tooltip.append(tech.getFullTitle()).append("<br>");
 
-            boolean isTechSecondary = tech.getSecondaryRole().isTechSecondary();
+            boolean isTechSecondary = CamOpsSalvageUtilities.isUseSecondaryTechSkill(tech);
             tooltip.append(tech.getSkillLevel(campaign, isTechSecondary, true)).append("<br>");
 
             String injuryLabelKey;
@@ -167,12 +158,15 @@ public record SalvageFormationData(Formation formation, FormationType formationT
     }
 
     public String getAllCrewTechTooltip(Campaign campaign, Formation formation) {
-        mekhq.campaign.LocalHangar hangar = campaign.getPlayerForce().getHangar();
+        LocalHangar hangar = campaign.getPlayerForce().getHangar();
 
         StringBuilder tooltip = new StringBuilder();
         for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
             for (Person crew : unit.getCrew()) {
                 if (crew.isTechExpanded() && !crew.isEngineer()) {
+                    if (!tooltip.isEmpty()) {
+                        tooltip.append("<br><br>");
+                    }
                     tooltip.append(getTechTooltip(campaign, crew));
                 }
             }
@@ -181,89 +175,50 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         return tooltip.toString();
     }
 
-    public String getCargoCapacityTooltip(mekhq.campaign.LocalHangar hangar) {
-        LinkedHashMap<String, Double> capacityMap = getMap(hangar, false);
-        StringBuilder tooltip = getTooltip(capacityMap);
+    public String getCargoCapacityTooltip(LocalHangar hangar) {
+        List<CapacityEntry> capacityEntries = new ArrayList<>();
+        for (Unit unit : getAvailableSalvageUnits(hangar, formation, isSpaceScenario)) {
+            capacityEntries.add(new CapacityEntry(unit.getName(), unit.getCargoCapacityForSalvage()));
+        }
+        return getCapacityTooltip(capacityEntries);
+    }
+
+    public String getTowCapacityTooltip(LocalHangar hangar) {
+        List<CapacityEntry> capacityEntries = new ArrayList<>();
+        for (Unit unit : getAvailableSalvageUnits(hangar, formation, isSpaceScenario)) {
+            double towCapacity = isSpaceScenario ?
+                                       unit.getEntity().getWeight() :
+                                       CamOpsSalvageUtilities.getTowCapacity(unit);
+            capacityEntries.add(new CapacityEntry(unit.getName(), towCapacity));
+        }
+        return getCapacityTooltip(capacityEntries);
+    }
+
+    private static String getCapacityTooltip(List<CapacityEntry> capacityEntries) {
+        capacityEntries.sort(Comparator.comparing(CapacityEntry::unitName, String.CASE_INSENSITIVE_ORDER));
+
+        StringBuilder tooltip = new StringBuilder();
+        for (CapacityEntry entry : capacityEntries) {
+            if (entry.capacity() > 0.0) {
+                tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE, "SalvageFormationData.capacity",
+                      entry.unitName(), entry.capacity())).append("<br>");
+            }
+        }
         return tooltip.toString();
     }
 
-    public String getTowCapacityTooltip(mekhq.campaign.LocalHangar hangar) {
-        LinkedHashMap<String, Double> capacityMap = getMap(hangar, true);
-        StringBuilder tooltip = getTooltip(capacityMap);
-        return tooltip.toString();
-    }
-
-    private LinkedHashMap<String, Double> getMap(mekhq.campaign.LocalHangar hangar, boolean isTow) {
-        Map<String, Double> unsortedMap = getUnsortedMap(hangar, isTow);
-        return getSortedMap(unsortedMap);
-    }
-
-    private Map<String, Double> getUnsortedMap(mekhq.campaign.LocalHangar hangar, boolean isTow) {
-        Map<String, Double> capacityMap = new HashMap<>();
-        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
-            Entity entity = unit.getEntity();
-            if (entity == null) {
-                continue;
-            }
-
-            String unitName = unit.getName();
-            double weight = isTow ? entity.getWeight() : unit.getCargoCapacityForSalvage();
-            capacityMap.put(unitName, weight);
-        }
-        return capacityMap;
-    }
-
-    private static LinkedHashMap<String, Double> getSortedMap(Map<String, Double> capacityMap) {
-        return capacityMap.entrySet()
-                     .stream()
-                     .sorted(Map.Entry.comparingByKey())
-                     .collect(Collectors.toMap(
-                           Map.Entry::getKey,
-                           Map.Entry::getValue,
-                           (e1, e2) -> e1,
-                           LinkedHashMap::new
-                     ));
-    }
-
-    private static StringBuilder getTooltip(LinkedHashMap<String, Double> capacityMap) {
-        StringBuilder tooltip = new StringBuilder();
-        for (Map.Entry<String, Double> entry : capacityMap.entrySet()) {
-            double capacity = entry.getValue();
-            if (capacity > 0.0) {
-                tooltip.append(entry.getKey()).append(": ").append(entry.getValue()).append("<br>");
+    public String getTugTooltip(LocalHangar hangar) {
+        List<String> unitsWithTug = new ArrayList<>();
+        for (Unit unit : getAvailableSalvageUnits(hangar, formation, isSpaceScenario)) {
+            if (CamOpsSalvageUtilities.hasNavalTug(unit.getEntity())) {
+                unitsWithTug.add(unit.getName());
             }
         }
-        return tooltip;
-    }
-
-    public String getTugTooltip(mekhq.campaign.LocalHangar hangar) {
-        Map<String, Boolean> capacityMap = new HashMap<>();
-        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
-            Entity entity = unit.getEntity();
-            if (entity == null) {
-                continue;
-            }
-
-            String unitName = unit.getName();
-            boolean hasTug = CamOpsSalvageUtilities.hasNavalTug(entity);
-            capacityMap.put(unitName, hasTug);
-        }
-
-        LinkedHashMap<String, Boolean> sortedMap = capacityMap.entrySet()
-                                                         .stream()
-                                                         .sorted(Map.Entry.comparingByKey())
-                                                         .collect(Collectors.toMap(
-                                                               Map.Entry::getKey,
-                                                               Map.Entry::getValue,
-                                                               (e1, e2) -> e1,
-                                                               LinkedHashMap::new
-                                                         ));
+        unitsWithTug.sort(String.CASE_INSENSITIVE_ORDER);
 
         StringBuilder tooltip = new StringBuilder();
-        for (Map.Entry<String, Boolean> entry : sortedMap.entrySet()) {
-            if (entry.getValue()) {
-                tooltip.append(entry.getKey()).append(": \u2713<br>");
-            }
+        for (String unitName : unitsWithTug) {
+            tooltip.append(unitName).append(": ✓<br>");
         }
 
         if (tooltip.isEmpty()) {

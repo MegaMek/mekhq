@@ -1050,8 +1050,11 @@ public final class BriefingTab extends CampaignGuiTab {
      * Handles salvage assignment prompts for the supplied scenario before it is started or auto-resolved.
      *
      * <p>If the scenario's mission allows salvage, this method first displays the salvage formation picker. If the
-     * player cancels that picker or confirms it without selecting any salvage formations, processing should stop. When
-     * salvage formations are selected, the salvage tech picker is displayed next.</p>
+     * player cancels that picker, processing should stop. If they confirm it without selecting any salvage formations,
+     * no salvage operation takes place. When salvage formations are selected, the salvage tech picker is displayed
+     * next. If the player cancels the tech picker, the scenario's prior salvage assignments are restored.</p>
+     *
+     * <p>Salvage formations are only deployed to StratCon once both pickers have been confirmed.</p>
      *
      * @param scenario the scenario whose salvage formations and salvage techs should be assigned
      *
@@ -1068,19 +1071,54 @@ public final class BriefingTab extends CampaignGuiTab {
 
         boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
         if (hasSalvageOpportunity) {
+            // Snapshot the current assignments, so they can be restored if the player cancels part way through
+            List<Integer> priorSalvageFormations = new ArrayList<>(scenario.getSalvageFormations());
+            List<UUID> priorSalvageTechs = new ArrayList<>(scenario.getSalvageTechs());
+
             if (!displaySalvageFormationPicker(scenario)) {
                 return true;
             }
 
             // If we didn't pick any salvage units, there's no point assigning techs
             if (scenario.getSalvageFormations().isEmpty()) {
+                scenario.clearSalvageTechs();
                 return false;
             }
 
-            return !displaySalvageTechPicker(scenario);
+            if (!displaySalvageTechPicker(scenario)) {
+                restoreSalvageAssignments(scenario, priorSalvageFormations, priorSalvageTechs);
+                return true;
+            }
+
+            if (getCampaignOptions().isUseStratCon()) {
+                CamOpsSalvageUtilities.deploySalvageTeams(getCampaign(), scenario);
+            }
         }
 
         return false;
+    }
+
+    /**
+     * Restores a scenario's salvage formations and techs to a previously captured state.
+     *
+     * @param scenario          the scenario to restore
+     * @param salvageFormations the salvage formation IDs to restore
+     * @param salvageTechs      the salvage tech IDs to restore
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void restoreSalvageAssignments(Scenario scenario, List<Integer> salvageFormations,
+          List<UUID> salvageTechs) {
+        scenario.clearSalvageFormations();
+        for (int formationId : salvageFormations) {
+            scenario.addSalvageFormation(formationId);
+        }
+
+        scenario.clearSalvageTechs();
+        for (UUID techId : salvageTechs) {
+            scenario.addSalvageTech(techId);
+        }
     }
 
     /**
@@ -1131,6 +1169,18 @@ public final class BriefingTab extends CampaignGuiTab {
         boolean wasConfirmed = forcePicker.wasConfirmed();
         if (wasConfirmed) {
             scenario.clearSalvageFormations();
+
+            // Formation and crew techs are re-derived from the selected formations below. Only hand-picked salvage
+            // supervisors carry over, so techs from deselected formations don't linger.
+            List<UUID> formationDerivedTechs = new ArrayList<>();
+            for (UUID techId : scenario.getSalvageTechs()) {
+                Person tech = getCampaign().getPlayerForce().getHumanResources().getPerson(techId);
+                if (tech == null || !tech.isSalvageSupervisor()) {
+                    formationDerivedTechs.add(techId);
+                }
+            }
+            scenario.removeSalvageTechs(formationDerivedTechs);
+
             LocalHangar hangar = getCampaign().getPlayerForce().getHangar();
             List<Formation> selectedFormations = forcePicker.getSelectedFormations();
             for (Formation formation : selectedFormations) {
@@ -1158,10 +1208,6 @@ public final class BriefingTab extends CampaignGuiTab {
                         }
                     }
                 }
-            }
-
-            if (getCampaignOptions().isUseStratCon()) {
-                CamOpsSalvageUtilities.deploySalvageTeams(getCampaign(), scenario);
             }
         }
 
@@ -1228,9 +1274,11 @@ public final class BriefingTab extends CampaignGuiTab {
             }
         }
 
+        // Salvage supervisors can always be picked. Techs already assigned via their formation (the formation's TO&E
+        // tech and any tech crew) are also listed, so the player can see and keep them.
         List<SalvageTechData> techData = new ArrayList<>();
         for (Person tech : availableTechs) {
-            if (tech.isSalvageSupervisor()) {
+            if (tech.isSalvageSupervisor() || assignedTechs.contains(tech.getId())) {
                 SalvageTechData data = SalvageTechData.buildData(getCampaign(), tech);
                 techData.add(data);
             }
@@ -1241,7 +1289,7 @@ public final class BriefingTab extends CampaignGuiTab {
             if (!priorSelectedTechs.contains(techID)) {
                 Campaign campaign = getCampaign();
                 Person tech = campaign.getPlayerForce().getHumanResources().getPerson(techID);
-                if (tech != null && tech.isSalvageSupervisor()) {
+                if (tech != null) {
                     priorSelectedTechs.add(techID);
                 }
             }

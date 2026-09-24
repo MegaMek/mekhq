@@ -8511,7 +8511,8 @@ public class Unit implements ITechnology, ILocatable {
         if (!isMek) {
             boolean hasCargoCapacity = getCargoCapacityForSalvage() > 0;
             boolean hasNavalTugAdaptor = isInSpace && CamOpsSalvageUtilities.hasNavalTug(entity);
-            canSalvage = hasCargoCapacity || hasNavalTugAdaptor;
+            boolean isTowCapable = !isInSpace && CamOpsSalvageUtilities.isTowCapable(entity);
+            canSalvage = hasCargoCapacity || hasNavalTugAdaptor || isTowCapable;
         }
 
         return canSalvage && isFullyCrewed();

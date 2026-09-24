@@ -45,7 +45,7 @@ public record SalvageTechData(Person tech, UUID techId, String rank, int rankNum
       PersonnelRole secondaryRole, List<String> techUnits, String firstName, String lastName, int edge,
       String skillLevelName, int injuries, int minutesAvailable) {
     public static SalvageTechData buildData(Campaign campaign, Person tech) {
-        boolean isSecondaryTech = tech.getSecondaryRole().isTechSecondary();
+        boolean isSecondaryTech = CamOpsSalvageUtilities.isUseSecondaryTechSkill(tech);
         List<String> techUnits = new ArrayList<>();
         for (Unit unit : tech.getTechUnits()) {
             techUnits.add(unit.getName());

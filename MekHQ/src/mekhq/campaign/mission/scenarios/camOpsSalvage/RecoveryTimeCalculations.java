@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -113,9 +113,11 @@ public class RecoveryTimeCalculations {
         boolean isInSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
 
         if (isInSpace) {
-            int totalRecoveryTime = getTotalRecoveryTime(entityName, baseRecoveryTime, BASE_MULTIPLIER);
-            return new RecoveryTimeData(DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER,
-                  DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER, baseRecoveryTime, totalRecoveryTime);
+            // Space is always zero-G and vacuum; no other environmental conditions apply
+            double totalMultiplier = BASE_MULTIPLIER + ZERO_G + VACUUM_OR_TAINTED_ATMOSPHERE;
+            int totalRecoveryTime = getTotalRecoveryTime(entityName, baseRecoveryTime, totalMultiplier);
+            return new RecoveryTimeData(DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER, ZERO_G,
+                  VACUUM_OR_TAINTED_ATMOSPHERE, DEFAULT_MULTIPLIER, baseRecoveryTime, totalRecoveryTime);
         } else {
             double weatherMultiplier = getWeatherMultiplier(scenario.getWeather());
             double windMultiplier = getWindMultiplier(scenario.getWind());
@@ -295,7 +297,8 @@ public class RecoveryTimeCalculations {
      *
      * <p>Severe wind conditions impair recovery operations:</p>
      * <ul>
-     *   <li><b>Tornadoes (F1-F3 or F4):</b> +0.5 multiplier</li>
+     *   <li><b>Strong Gale:</b> +0.25 multiplier</li>
+     *   <li><b>Storm (hurricane) or Tornadoes (F1-F3 or F4):</b> +0.5 multiplier</li>
      *   <li><b>Other wind conditions:</b> No multiplier</li>
      * </ul>
      *
@@ -312,7 +315,8 @@ public class RecoveryTimeCalculations {
         }
 
         return switch (wind) {
-            case TORNADO_F1_TO_F3, TORNADO_F4 -> HURRICANE_OR_TORNADO;
+            case STRONG_GALE -> TERRIBLE_WEATHER;
+            case STORM, TORNADO_F1_TO_F3, TORNADO_F4 -> HURRICANE_OR_TORNADO;
             default -> DEFAULT_MULTIPLIER;
         };
     }

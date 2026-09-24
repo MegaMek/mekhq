@@ -45,12 +45,14 @@ import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.bays.ASFBay;
 import megamek.common.bays.Bay;
 import megamek.common.bays.SmallCraftBay;
@@ -84,6 +86,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
+import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
@@ -124,21 +127,12 @@ public class CamOpsSalvageUtilities {
                     }
 
                     boolean isLargeVessel = entity instanceof Dropship || entity instanceof Warship;
-                    boolean isTrailer = entity instanceof Tank tank && tank.isTrailer();
                     tooltip.append(unit.getName());
 
-                    double towCapacity = entity.getTonnage();
-                    if (!isLargeVessel && !isTrailer) {
-                        double currentTowWeight = unit.getTotalWeightOfUnitsAssignedToBeTransported(
-                              CampaignTransportType.TOW_TRANSPORT,
-                              TransporterType.TANK_TRAILER_HITCH);
-
-                        towCapacity = max(0.0, towCapacity - currentTowWeight);
-
-                        if (towCapacity > 0.0) {
-                            tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
-                                  "CamOpsSalvageUtilities.tooltip.drag", towCapacity)).append(")");
-                        }
+                    double towCapacity = getTowCapacity(unit);
+                    if (towCapacity > 0.0) {
+                        tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "CamOpsSalvageUtilities.tooltip.drag", towCapacity)).append(")");
                     }
 
                     double cargoCapacity = unit.getCargoCapacityForSalvage();
@@ -162,6 +156,94 @@ public class CamOpsSalvageUtilities {
         }
 
         return tooltip.toString();
+    }
+
+    /**
+     * Checks whether an entity is able to drag or tow salvage during ground salvage operations.
+     *
+     * <p>'Meks and non-trailer vehicles can tow. Trailers cannot, as they must themselves be towed.</p>
+     *
+     * @param entity the entity to check
+     *
+     * @return {@code true} if the entity can tow salvage
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isTowCapable(@Nullable Entity entity) {
+        if (entity instanceof Mek) {
+            return true;
+        }
+
+        return entity instanceof Tank tank && !tank.isTrailer();
+    }
+
+    /**
+     * Calculates how much salvage a unit can tow during ground salvage operations.
+     *
+     * <p>The tow capacity is the unit's own weight, less the weight of any trailers it is already towing. Units that
+     * are not tow capable (see {@link #isTowCapable(Entity)}) have no tow capacity.</p>
+     *
+     * @param unit the unit to check
+     *
+     * @return the available tow capacity, in tons
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getTowCapacity(Unit unit) {
+        Entity entity = unit.getEntity();
+        if (!isTowCapable(entity)) {
+            return 0.0;
+        }
+
+        double currentTowWeight = unit.getTotalWeightOfUnitsAssignedToBeTransported(
+              CampaignTransportType.TOW_TRANSPORT,
+              TransporterType.TANK_TRAILER_HITCH);
+        return max(0.0, entity.getWeight() - currentTowWeight);
+    }
+
+    /**
+     * Checks whether a unit is able to take part in a salvage operation.
+     *
+     * <p>The unit must be capable of salvaging in the current environment (see {@link Unit#canSalvage(boolean)}).
+     * Trailers must also be hitched to something, as otherwise they can't reach the salvage site.</p>
+     *
+     * @param unit      the unit to check
+     * @param isInSpace {@code true} if the salvage operation takes place in space
+     *
+     * @return {@code true} if the unit can take part in the salvage operation
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isAvailableForSalvage(Unit unit, boolean isInSpace) {
+        if (!unit.canSalvage(isInSpace)) {
+            return false;
+        }
+
+        if (unit.getEntity() instanceof Tank tank && tank.isTrailer()) {
+            ITransportAssignment transportAssignment = unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT);
+            return transportAssignment != null && transportAssignment.hasTransport();
+        }
+
+        return true;
+    }
+
+    /**
+     * Determines whether a tech's skill level should be taken from their secondary role.
+     *
+     * <p>The secondary role is only used when the primary role is not a tech role, but the secondary role is.</p>
+     *
+     * @param tech the tech to check
+     *
+     * @return {@code true} if the secondary role's skill level should be used
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isUseSecondaryTechSkill(Person tech) {
+        return !tech.getPrimaryRole().isTech() && tech.getSecondaryRole().isTechSecondary();
     }
 
     public static boolean hasNavalTug(Entity entity) {
@@ -285,7 +367,7 @@ public class CamOpsSalvageUtilities {
      * containing the specified scenario, then returns that track's deployment time.</p>
      *
      * @param scenarioId  the ID of the scenario to look up
-     * @param atbContract the Against the Bot contract to search within
+     * @param contract the contract to search within
      *
      * @return the deployment time in days for the track containing the scenario, or 0 if the scenario is not found or
      *       the contract has no StratCon state
@@ -418,7 +500,7 @@ public class CamOpsSalvageUtilities {
         for (UUID uuid : techUUIDs) {
             Person tech = campaign.getPlayerForce().getHumanResources().getPerson(uuid);
             if (tech == null) {
-                LOGGER.error("null tech was passed into risky salvage");
+                LOGGER.error("Salvage tech {} not found in campaign", uuid);
                 continue;
             }
 
@@ -439,28 +521,38 @@ public class CamOpsSalvageUtilities {
     }
 
     /**
-     * Depletes the remaining work time for all specified technicians to zero.
+     * Deducts the minutes spent on salvage operations from the assigned technicians.
      *
-     * <p>This method sets the remaining minutes to zero for each technician in the provided list, effectively
-     * marking them as having used all their available work time for the current period.</p>
+     * <p>The work is spread as evenly as possible across the technicians. Techs with the least remaining time are
+     * processed first; any share they cannot cover is carried over to the techs with more time remaining.</p>
      *
      * <p>If a technician UUID cannot be found in the campaign, an error is logged and that entry is skipped.</p>
      *
-     * @param campaign the campaign containing the technicians
-     * @param techs    list of technician UUIDs whose time should be depleted
+     * @param campaign    the campaign containing the technicians
+     * @param techs       list of technician UUIDs whose time should be depleted
+     * @param minutesUsed the total number of minutes spent on salvage operations
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static void depleteTechMinutes(Campaign campaign, List<UUID> techs) {
-        for (UUID uuid : techs) {
-            Person tech = campaign.getPlayerForce().getHumanResources().getPerson(uuid);
-            if (tech == null) {
-                LOGGER.error("null tech was passed into depleteTechMinutes");
-                continue;
+    public static void depleteTechMinutes(Campaign campaign, List<UUID> techs, int minutesUsed) {
+        List<Person> validTechs = getValidTechs(campaign, techs);
+        validTechs.sort(Comparator.comparingInt(Person::getMinutesLeft));
+
+        int remainingMinutes = max(0, minutesUsed);
+        int techsRemaining = validTechs.size();
+        for (Person tech : validTechs) {
+            if (remainingMinutes <= 0) {
+                break;
             }
 
-            tech.setMinutesLeft(0);
+            int minutesLeft = max(0, tech.getMinutesLeft());
+            int share = (remainingMinutes + techsRemaining - 1) / techsRemaining; // Round up
+            int minutesSpent = Math.min(share, minutesLeft);
+
+            tech.setMinutesLeft(minutesLeft - minutesSpent);
+            remainingMinutes -= minutesSpent;
+            techsRemaining--;
         }
     }
 

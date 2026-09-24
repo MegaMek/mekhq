@@ -41,9 +41,7 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import javax.swing.JCheckBox;
 import javax.swing.JDialog;
@@ -94,7 +92,7 @@ public class SalvageTechPicker extends JDialog {
 
     private boolean wasConfirmed;
     private final SalvageTechTableModel tableModel;
-    private static boolean isUseEdge = true;
+    private final boolean isUseEdge;
 
     /**
      * Checks whether the user confirmed their tech selection.
@@ -139,7 +137,7 @@ public class SalvageTechPicker extends JDialog {
      */
     public SalvageTechPicker(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs, boolean isClanCampaign,
           ScenarioTemplate.BattlefieldControlType fieldControl, boolean isUseEdge) {
-        SalvageTechPicker.isUseEdge = isUseEdge;
+        this.isUseEdge = isUseEdge;
         setTitle(getText("accessingTerminal.title"));
         setModal(true);
         setLayout(new BorderLayout());
@@ -172,7 +170,7 @@ public class SalvageTechPicker extends JDialog {
               SortOrder.DESCENDING));
         sorter.setSortKeys(sortKeys);
 
-        assignWidths(table);
+        assignWidths(table, isUseEdge);
         setRenderers(table);
 
         JScrollPane scrollPane = new JScrollPane(table);
@@ -218,10 +216,11 @@ public class SalvageTechPicker extends JDialog {
               });
 
         // Center align all other columns
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
         for (int i = 0; i < table.getColumnCount(); i++) {
             if (i != SalvageTechTableModel.COL_SELECT) {
-                DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-                centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+                table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
             }
         }
     }
@@ -234,7 +233,7 @@ public class SalvageTechPicker extends JDialog {
      * @author Illiani
      * @since 0.50.10
      */
-    private static void assignWidths(JTable table) {
+    private static void assignWidths(JTable table, boolean isUseEdge) {
         table.getColumnModel().getColumn(SalvageTechTableModel.COL_SELECT)
               .setPreferredWidth(WIDTH_40);
         table.getColumnModel().getColumn(SalvageTechTableModel.COL_RANK)
@@ -288,32 +287,8 @@ public class SalvageTechPicker extends JDialog {
                                                                          Boolean.compare(((Boolean) b1),
                                                                                ((Boolean) b2)));
 
-            // Precompute a map from rank string to numeric value for fast lookup
-            SalvageTechTableModel model = sorter.getModel();
-            Map<String, Integer> rankToNumeric = new HashMap<>();
-
-            // Build lookup map once
-            for (int i = 0; i < model.getRowCount(); i++) {
-                Object rankObj = model.getValueAt(i, SalvageTechTableModel.COL_RANK);
-                if (rankObj != null) {
-                    rankToNumeric.put(rankObj.toString(), model.getRankNumeric(i));
-                }
-            }
-
-            // Set the comparator with fast lookups
-            sorter.setComparator(SalvageTechTableModel.COL_RANK, (o1, o2) -> {
-                Integer n1 = rankToNumeric.get(o1 != null ? o1.toString() : null);
-                Integer n2 = rankToNumeric.get(o2 != null ? o2.toString() : null);
-
-                if (n1 != null && n2 != null) {
-                    return Integer.compare(n1, n2);
-                } else if (n1 != null) {
-                    return -1; // n1 comes first
-                } else if (n2 != null) {
-                    return 1; // n2 comes first
-                }
-                return 0; // both null, equal
-            });
+            sorter.setComparator(SalvageTechTableModel.COL_RANK,
+                  Comparator.comparingInt(rank -> ((RankCell) rank).rankNumeric()));
 
             sorter.setComparator(SalvageTechTableModel.COL_FIRST_NAME,
                   new NaturalOrderComparator());
@@ -393,8 +368,25 @@ public class SalvageTechPicker extends JDialog {
     }
 
     /**
+     * The value held in the Rank column. Displays as the rank name, while sorting by the numeric rank so that ranks
+     * sharing a name across rank systems don't collide.
+     *
+     * @param rankName    the rank's display name
+     * @param rankNumeric the rank's numeric value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private record RankCell(String rankName, int rankNumeric) {
+        @Override
+        public String toString() {
+            return rankName;
+        }
+    }
+
+    /**
      * Table model backing the salvage tech selection grid. Provides typed columns, pre-selection, and helpers for
-     * retrieving selected tech IDs and for comparing ranks by numeric strength.
+     * retrieving selected tech IDs.
      *
      * @author Illiani
      * @since 0.50.10
@@ -485,7 +477,7 @@ public class SalvageTechPicker extends JDialog {
         public Class<?> getColumnClass(int columnIndex) {
             return switch (columnIndex) {
                 case COL_SELECT -> Boolean.class;
-                case COL_RANK, COL_FIRST_NAME, COL_LAST_NAME, COL_SKILL_LEVEL, COL_PRIMARY_PROFESSION,
+                case COL_FIRST_NAME, COL_LAST_NAME, COL_SKILL_LEVEL, COL_PRIMARY_PROFESSION,
                      COL_SECONDARY_PROFESSION -> String.class;
                 case COL_INJURIES, COL_MINUTES_AVAILABLE, COL_UNITS, COL_EDGE -> Integer.class;
                 default -> Object.class;
@@ -503,7 +495,7 @@ public class SalvageTechPicker extends JDialog {
 
             return switch (columnIndex) {
                 case COL_SELECT -> selected[rowIndex];
-                case COL_RANK -> data.rank();
+                case COL_RANK -> new RankCell(data.rank(), data.rankNumeric());
                 case COL_FIRST_NAME -> data.firstName();
                 case COL_LAST_NAME -> data.lastName();
                 case COL_SKILL_LEVEL -> data.skillLevelName();
@@ -541,21 +533,6 @@ public class SalvageTechPicker extends JDialog {
                 }
             }
             return selectedTechs;
-        }
-
-        /**
-         * Returns the numeric rank value for the tech at the specified row. Useful for comparator logic to ensure
-         * correct ordering.
-         *
-         * @param rowIndex the row index
-         *
-         * @return the numeric rank value
-         *
-         * @author Illiani
-         * @since 0.50.10
-         */
-        public int getRankNumeric(int rowIndex) {
-            return techs.get(rowIndex).rankNumeric();
         }
     }
 
