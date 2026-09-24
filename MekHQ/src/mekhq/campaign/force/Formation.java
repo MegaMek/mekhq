@@ -60,6 +60,8 @@ import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
+import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -1446,7 +1448,17 @@ public class Formation {
         return true;
     }
 
-    public int getSalvageUnitCount(mekhq.campaign.LocalHangar hangar, boolean isInSpace) {
+    /**
+     * Counts the units in this formation that can take part in salvage operations.
+     *
+     * @param hangar       the hangar containing the formation's units
+     * @param isInSpace    {@code true} if the salvage operation takes place in space
+     * @param salvageRules the rules of the campaign's salvage system
+     *
+     * @return the number of units available for salvage operations
+     */
+    public int getSalvageUnitCount(mekhq.campaign.LocalHangar hangar, boolean isInSpace,
+          AbstractSalvage salvageRules) {
         List<Unit> unitsInFormation = getAllUnitsAsUnits(hangar, false);
 
         int unitCount = 0;
@@ -1456,7 +1468,8 @@ public class Formation {
             if (entity != null) {
                 canSurviveInSpace = !entity.doomedInSpace();
             }
-            if (unit.canSalvage(isInSpace) && (!isInSpace || canSurviveInSpace)) {
+            if (CamOpsSalvageUtilities.isAvailableForSalvage(unit, isInSpace, salvageRules) &&
+                      (!isInSpace || canSurviveInSpace)) {
                 unitCount++;
             }
         }

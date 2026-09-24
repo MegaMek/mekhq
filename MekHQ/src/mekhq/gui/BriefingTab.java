@@ -112,6 +112,7 @@ import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageFormationData;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageTechData;
+import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.mission.utilities.MissionCompletionManager;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -1159,12 +1160,13 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         boolean isSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
-        List<SalvageFormationData> salvageFormationOptions = getSalvageFormations(getCampaign(),
-              isSpace,
-              scenario.getSalvageFormations());
+        List<SalvageFormationData> salvageFormationOptions = getSalvageFormations(getCampaign(), scenario, isSpace);
 
+        boolean isSalvageFormationCombatAllowed = getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM)
+                                                        .getSalvage()
+                                                        .isSalvageFormationCombatAllowed();
         SalvageFormationPicker forcePicker = new SalvageFormationPicker(getCampaign(), salvageFormationOptions, isSpace,
-              scenario.getSalvageFormations(), getBattlefieldControlType(scenario));
+              scenario.getSalvageFormations(), getBattlefieldControlType(scenario), isSalvageFormationCombatAllowed);
 
         boolean wasConfirmed = forcePicker.wasConfirmed();
         if (wasConfirmed) {
@@ -1363,25 +1365,29 @@ public final class BriefingTab extends CampaignGuiTab {
      *
      * <p>Forces are filtered to include only those that:</p>
      * <ul>
-     *   <li>Are not currently deployed</li>
+     *   <li>Are not currently deployed. If the salvage system allows it, Salvage formations deployed to this scenario
+     *   are also included, as they may fight and then salvage.</li>
      *   <li>Have at least one unit capable of salvage operations</li>
      *   <li>Meet the scenario environment requirements (ground or space)</li>
      * </ul>
      *
      * <p>The returned list is sorted alphabetically by force name.</p>
      *
-     * @param campaign              the current campaign state
-     * @param isSpaceScenario       {@code true} if checking for space salvage capabilities, {@code false} for ground
-     * @param alreadyAssignedForces a list of salvage forces that have already been assigned to the scenario
+     * @param campaign        the current campaign state
+     * @param scenario        the scenario salvage formations are being chosen for
+     * @param isSpaceScenario {@code true} if checking for space salvage capabilities, {@code false} for ground
      *
      * @return a sorted list of forces capable of salvage operations
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private List<SalvageFormationData> getSalvageFormations(Campaign campaign, boolean isSpaceScenario,
-          List<Integer> alreadyAssignedForces) {
+    private List<SalvageFormationData> getSalvageFormations(Campaign campaign, Scenario scenario,
+          boolean isSpaceScenario) {
         List<SalvageFormationData> salvageFormationOptions = new ArrayList<>();
+        List<Integer> alreadyAssignedForces = scenario.getSalvageFormations();
+        AbstractSalvage salvageRules = campaign.getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage();
+        boolean isSalvageFormationCombatAllowed = salvageRules.isSalvageFormationCombatAllowed();
 
         // Collect eligible salvage forces (We want salvage forces first)
         List<AbstractContract> activeContracts = getCampaign().getActiveContracts();
@@ -1400,10 +1406,14 @@ public final class BriefingTab extends CampaignGuiTab {
             boolean isDeployedToStratCon = !alreadyAssignedForces.contains(formation.getId()) &&
                                                  isForceDeployedToStratCon(activeContracts, formation.getId());
             boolean isSalvageFormation = formation.getFormationType().isSalvage();
-            boolean hasAtLeastOneSalvageUnit = formation.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
+            boolean hasAtLeastOneSalvageUnit = formation.getSalvageUnitCount(hangar, isSpaceScenario, salvageRules) > 0;
 
-            if (!isDeployedToScenario &&
-                      !isDeployedToStratCon &&
+            boolean isIdle = !isDeployedToScenario && !isDeployedToStratCon;
+            // Some salvage systems let Salvage formations fight in a scenario and then salvage it
+            boolean isFightingInThisScenario = isSalvageFormationCombatAllowed &&
+                                                     isFormationDeployedToScenario(formation, scenario.getId());
+
+            if ((isIdle || isFightingInThisScenario) &&
                       isSalvageFormation &&
                       hasAtLeastOneSalvageUnit) {
                 eligibleSalvageFormations.add(formation);
@@ -1433,7 +1443,7 @@ public final class BriefingTab extends CampaignGuiTab {
             // forces will no longer be available for the salvage operations they were assigned to perform.
             boolean isDeployedToStratCon = !alreadyAssignedForces.contains(formation.getId()) &&
                                                  isForceDeployedToStratCon(activeContracts, formation.getId());
-            boolean hasAtLeastOneSalvageUnit = formation.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
+            boolean hasAtLeastOneSalvageUnit = formation.getSalvageUnitCount(hangar, isSpaceScenario, salvageRules) > 0;
 
             if (!isDeployedToScenario &&
                       !isDeployedToStratCon &&
@@ -1449,6 +1459,28 @@ public final class BriefingTab extends CampaignGuiTab {
         }
 
         return salvageFormationOptions;
+    }
+
+    /**
+     * Checks whether a formation, or any formation above it, is deployed to a specific scenario.
+     *
+     * @param formation  the formation to check
+     * @param scenarioId the ID of the scenario
+     *
+     * @return {@code true} if the formation is deployed to that scenario
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isFormationDeployedToScenario(Formation formation, int scenarioId) {
+        Formation currentFormation = formation;
+        while (currentFormation != null) {
+            if (currentFormation.getScenarioId() == scenarioId) {
+                return true;
+            }
+            currentFormation = currentFormation.getParentFormation();
+        }
+        return false;
     }
 
     /**

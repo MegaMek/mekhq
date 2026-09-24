@@ -72,6 +72,7 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -80,6 +81,7 @@ import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.RecoveryTimeCalculations;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.RecoveryTimeData;
+import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -337,6 +339,9 @@ public class SalvagePostScenarioPicker {
      * <p>Retrieves all forces assigned to salvage operations for this scenario and collects units from those forces
      * that are capable of salvaging in the current environment (ground or space).</p>
      *
+     * <p>Units that fought in the scenario are excluded, unless the salvage system allows Salvage formations to fight
+     * and then salvage, and the unit's formation is a Salvage formation.</p>
+     *
      * @param campaign the campaign containing the salvage forces
      * @param scenario the scenario being resolved
      *
@@ -349,6 +354,7 @@ public class SalvagePostScenarioPicker {
         List<Integer> salvageFormations = new ArrayList<>();
         salvageUnits = new ArrayList<>();
         mekhq.campaign.LocalHangar hangar = campaign.getPlayerForce().getHangar();
+        AbstractSalvage salvageRules = campaign.getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage();
         for (Integer forceId : scenario.getSalvageFormations()) {
             salvageFormations.add(forceId);
 
@@ -358,8 +364,16 @@ public class SalvagePostScenarioPicker {
                 continue;
             }
 
+            // Units that fought can't also salvage, unless the salvage system lets Salvage formations do both
+            boolean canCombatUnitsSalvage = salvageRules.isSalvageFormationCombatAllowed() &&
+                                                  formation.getFormationType().isSalvage();
             for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
-                if (CamOpsSalvageUtilities.isAvailableForSalvage(unit, isInSpace)) {
+                boolean didFightInScenario = unit.getScenarioId() == scenario.getId();
+                if (didFightInScenario && !canCombatUnitsSalvage) {
+                    continue;
+                }
+
+                if (CamOpsSalvageUtilities.isAvailableForSalvage(unit, isInSpace, salvageRules)) {
                     salvageUnits.add(unit);
                 }
             }

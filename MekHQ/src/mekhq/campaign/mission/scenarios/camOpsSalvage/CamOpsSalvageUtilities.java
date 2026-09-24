@@ -85,6 +85,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -210,28 +211,67 @@ public class CamOpsSalvageUtilities {
     /**
      * Checks whether a unit is able to take part in a salvage operation.
      *
-     * <p>The unit must be capable of salvaging in the current environment (see {@link Unit#canSalvage(boolean)}).
-     * Trailers must also be hitched to something, as otherwise they can't reach the salvage site.</p>
+     * <p>The unit must:</p>
+     * <ul>
+     *   <li>Be capable of salvaging in the current environment (see {@link Unit#canSalvage(boolean)})</li>
+     *   <li>Be repairable, and not being stripped for parts</li>
+     *   <li>Be able to move (see {@link #isImmobilized(Entity, AbstractSalvage)})</li>
+     * </ul>
      *
-     * @param unit      the unit to check
-     * @param isInSpace {@code true} if the salvage operation takes place in space
+     * <p>Trailers can't move on their own, so instead they must be hitched to something.</p>
+     *
+     * @param unit         the unit to check
+     * @param isInSpace    {@code true} if the salvage operation takes place in space
+     * @param salvageRules the rules of the campaign's salvage system
      *
      * @return {@code true} if the unit can take part in the salvage operation
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static boolean isAvailableForSalvage(Unit unit, boolean isInSpace) {
+    public static boolean isAvailableForSalvage(Unit unit, boolean isInSpace, AbstractSalvage salvageRules) {
         if (!unit.canSalvage(isInSpace)) {
             return false;
         }
 
-        if (unit.getEntity() instanceof Tank tank && tank.isTrailer()) {
+        // A unit that can't be repaired, or is being stripped for parts, is in no state to recover anything
+        if (unit.isSalvage() || !unit.isRepairable()) {
+            return false;
+        }
+
+        Entity entity = unit.getEntity();
+        if (entity instanceof Tank tank && tank.isTrailer()) {
             ITransportAssignment transportAssignment = unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT);
             return transportAssignment != null && transportAssignment.hasTransport();
         }
 
-        return true;
+        return !isImmobilized(entity, salvageRules);
+    }
+
+    /**
+     * Checks whether damage has left an entity unable to move, and therefore unable to reach or haul salvage.
+     *
+     * <p>Only lasting damage counts, such as a destroyed motive system, gyro, or engine. Under CamOps (Strict), 'Meks
+     * only need working hands to salvage, so their mobility isn't checked; other salvage systems also rule out 'Meks
+     * with a destroyed leg (see {@link AbstractSalvage#isMekMobilityRequiredForSalvage()}).</p>
+     *
+     * @param entity       the entity to check
+     * @param salvageRules the rules of the campaign's salvage system
+     *
+     * @return {@code true} if the entity is immobilized
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isImmobilized(Entity entity, AbstractSalvage salvageRules) {
+        if (entity instanceof Mek mek) {
+            if (!salvageRules.isMekMobilityRequiredForSalvage()) {
+                return false;
+            }
+            return mek.atLeastOneBadLeg() || mek.isPermanentlyImmobilized(false);
+        }
+
+        return entity.isPermanentlyImmobilized(false);
     }
 
     /**

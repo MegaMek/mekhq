@@ -45,8 +45,10 @@ import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
+import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -80,8 +82,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         int salvageCapableUnits = 0;
         boolean hasTug = false;
 
-        for (Unit unit : getAvailableSalvageUnits(campaign.getPlayerForce().getHangar(), formation,
-              isSpaceScenario)) {
+        for (Unit unit : getAvailableSalvageUnits(campaign, formation, isSpaceScenario)) {
             Entity entity = unit.getEntity();
             salvageCapableUnits++;
 
@@ -109,7 +110,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
     /**
      * Collects the units in a formation that are able to take part in salvage operations.
      *
-     * @param hangar          the hangar containing the formation's units
+     * @param campaign        the current campaign
      * @param formation       the formation to check
      * @param isSpaceScenario {@code true} if the salvage operation takes place in space
      *
@@ -118,11 +119,12 @@ public record SalvageFormationData(Formation formation, FormationType formationT
      * @author Illiani
      * @since 0.51.01
      */
-    private static List<Unit> getAvailableSalvageUnits(LocalHangar hangar, Formation formation,
+    private static List<Unit> getAvailableSalvageUnits(Campaign campaign, Formation formation,
           boolean isSpaceScenario) {
+        AbstractSalvage salvageRules = campaign.getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage();
         List<Unit> availableUnits = new ArrayList<>();
-        for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
-            if (CamOpsSalvageUtilities.isAvailableForSalvage(unit, isSpaceScenario)) {
+        for (Unit unit : formation.getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(), false)) {
+            if (CamOpsSalvageUtilities.isAvailableForSalvage(unit, isSpaceScenario, salvageRules)) {
                 availableUnits.add(unit);
             }
         }
@@ -175,17 +177,17 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         return tooltip.toString();
     }
 
-    public String getCargoCapacityTooltip(LocalHangar hangar) {
+    public String getCargoCapacityTooltip(Campaign campaign) {
         List<CapacityEntry> capacityEntries = new ArrayList<>();
-        for (Unit unit : getAvailableSalvageUnits(hangar, formation, isSpaceScenario)) {
+        for (Unit unit : getAvailableSalvageUnits(campaign, formation, isSpaceScenario)) {
             capacityEntries.add(new CapacityEntry(unit.getName(), unit.getCargoCapacityForSalvage()));
         }
         return getCapacityTooltip(capacityEntries);
     }
 
-    public String getTowCapacityTooltip(LocalHangar hangar) {
+    public String getTowCapacityTooltip(Campaign campaign) {
         List<CapacityEntry> capacityEntries = new ArrayList<>();
-        for (Unit unit : getAvailableSalvageUnits(hangar, formation, isSpaceScenario)) {
+        for (Unit unit : getAvailableSalvageUnits(campaign, formation, isSpaceScenario)) {
             double towCapacity = isSpaceScenario ?
                                        unit.getEntity().getWeight() :
                                        CamOpsSalvageUtilities.getTowCapacity(unit);
@@ -207,9 +209,9 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         return tooltip.toString();
     }
 
-    public String getTugTooltip(LocalHangar hangar) {
+    public String getTugTooltip(Campaign campaign) {
         List<String> unitsWithTug = new ArrayList<>();
-        for (Unit unit : getAvailableSalvageUnits(hangar, formation, isSpaceScenario)) {
+        for (Unit unit : getAvailableSalvageUnits(campaign, formation, isSpaceScenario)) {
             if (CamOpsSalvageUtilities.hasNavalTug(unit.getEntity())) {
                 unitsWithTug.add(unit.getName());
             }

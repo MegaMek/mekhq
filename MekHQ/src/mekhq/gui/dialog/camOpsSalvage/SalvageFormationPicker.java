@@ -145,19 +145,22 @@ public class SalvageFormationPicker extends JDialog {
      *                                {@code false} to hide them
      * @param priorSelectedFormations a list of formations that were previously selected
      * @param fieldControl            who controls the field at the end of the scenario
+     * @param isSalvageFormationCombatAllowed {@code true} if Salvage formations may fight and then salvage the same
+     *                                        scenario
      *
      * @author Illiani
      * @since 0.50.10
      */
     public SalvageFormationPicker(Campaign campaign, List<SalvageFormationData> formations, boolean isSpaceOperation,
-          List<Integer> priorSelectedFormations, @Nullable ScenarioTemplate.BattlefieldControlType fieldControl) {
+          List<Integer> priorSelectedFormations, @Nullable ScenarioTemplate.BattlefieldControlType fieldControl,
+          boolean isSalvageFormationCombatAllowed) {
         setTitle(getText("accessingTerminal.title"));
         setModal(true);
         setLayout(new BorderLayout());
 
         // Instructions at the top
         JPanel instructionsPanel = new JPanel(new BorderLayout());
-        JTextArea instructionsLabel = new JTextArea(getInstructions(fieldControl));
+        JTextArea instructionsLabel = new JTextArea(getInstructions(fieldControl, isSalvageFormationCombatAllowed));
         instructionsLabel.setLineWrap(true);
         instructionsLabel.setWrapStyleWord(true);
         instructionsLabel.setEditable(false);
@@ -378,15 +381,22 @@ public class SalvageFormationPicker extends JDialog {
     /**
      * Loads the localized instruction string shown at the top of the dialog.
      *
-     * @param fieldControl the field control type to use for the instructions text
+     * @param fieldControl                    the field control type to use for the instructions text
+     * @param isSalvageFormationCombatAllowed {@code true} if Salvage formations may fight and then salvage the same
+     *                                        scenario
      *
      * @return localized instructions text
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static String getInstructions(@Nullable ScenarioTemplate.BattlefieldControlType fieldControl) {
-        String instructions = getTextAt(RESOURCE_BUNDLE, "SalvageFormationPicker.instructions");
+    private static String getInstructions(@Nullable ScenarioTemplate.BattlefieldControlType fieldControl,
+          boolean isSalvageFormationCombatAllowed) {
+        String combatRuleKey = isSalvageFormationCombatAllowed ?
+                                     "SalvageFormationPicker.instructions.combat.allowed" :
+                                     "SalvageFormationPicker.instructions.combat.forbidden";
+        String instructions = getTextAt(RESOURCE_BUNDLE, combatRuleKey) +
+                                    getTextAt(RESOURCE_BUNDLE, "SalvageFormationPicker.instructions");
 
         if (fieldControl != null) {
             String controlText = getText("ResolveDialog.control." + fieldControl.name());
@@ -674,7 +684,7 @@ public class SalvageFormationPicker extends JDialog {
                 checkBox.setSelected(value != null && (Boolean) value);
                 checkBox.setBackground(isSelected ? table.getSelectionBackground() : table.getBackground());
 
-                String tugTooltip = data.getTugTooltip(campaign.getPlayerForce().getHangar());
+                String tugTooltip = data.getTugTooltip(campaign);
                 checkBox.setToolTipText(!tugTooltip.isBlank() ? wordWrap(tugTooltip) : null);
                 return checkBox;
             }
@@ -695,9 +705,9 @@ public class SalvageFormationPicker extends JDialog {
                     case SalvageFormationTableModel.COL_CREW_TECHS ->
                           wordWrap(data.getAllCrewTechTooltip(campaign, data.formation()));
                     case SalvageFormationTableModel.COL_CARGO_CAPACITY ->
-                          wordWrap(data.getCargoCapacityTooltip(campaign.getPlayerForce().getHangar()));
+                          wordWrap(data.getCargoCapacityTooltip(campaign));
                     case SalvageFormationTableModel.COL_TOW_CAPACITY ->
-                          wordWrap(data.getTowCapacityTooltip(campaign.getPlayerForce().getHangar()));
+                          wordWrap(data.getTowCapacityTooltip(campaign));
                     case SalvageFormationTableModel.COL_SALVAGE_UNITS ->
                           wordWrap(getTextAt(RESOURCE_BUNDLE, "SalvageFormationPicker.column.picks.tooltip"));
                     default -> null;

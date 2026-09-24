@@ -77,6 +77,7 @@ import megamek.Version;
 import megamek.client.ui.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.CriticalSlot;
+import megamek.common.MPCalculationSetting;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
@@ -1910,7 +1911,9 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public double getCargoCapacityForSalvage() {
-        return getCargoCapacity(Math.max(0, getEntity().getOriginalWalkMP() - 1), FormationType.SALVAGE);
+        // Based on the unit's current walk MP, so battle damage limits how much it can haul
+        int currentWalkMP = getEntity().getWalkMP(MPCalculationSetting.PERM_IMMOBILIZED);
+        return getCargoCapacity(Math.max(0, currentWalkMP - 1), FormationType.SALVAGE);
     }
 
     public double getCargoCapacityForConvoy() {
@@ -2054,6 +2057,8 @@ public class Unit implements ITechnology, ILocatable {
 
         // No using your arms, roof rack, or lift hoists for convoys!
         if (formationType != FormationType.CONVOY) {
+            // Current rather than original MP, so battle damage is taken into account
+            int currentWalkMP = getEntity().getWalkMP(MPCalculationSetting.PERM_IMMOBILIZED);
             if (liftHoistCount > 0) {
                 double maxLiftHoistCapacity = liftHoistCount * getEntity().getTonnage() / 2;
                 // Lift Hoist
@@ -2070,9 +2075,9 @@ public class Unit implements ITechnology, ILocatable {
 
             if (roofRackCapacity > 0) {
                 if (maximumMpPenalty - currentMpReduction > 2 ||
-                          maximumMpPenalty - currentMpReduction >= getEntity().getOriginalWalkMP() / 2) {
+                          maximumMpPenalty - currentMpReduction >= currentWalkMP / 2) {
                     // If we're okay with the max roof rack penalty, let's take it
-                    if (maximumMpPenalty - currentMpReduction >= getEntity().getOriginalWalkMP() / 2) {
+                    if (maximumMpPenalty - currentMpReduction >= currentWalkMP / 2) {
                         capacity += roofRackCapacity;
                     } else {
                         capacity += Math.max(roofRackCapacity, getEntity().getTonnage() / 4.0);

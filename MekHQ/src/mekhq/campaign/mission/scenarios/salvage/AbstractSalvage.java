@@ -26,4 +26,36 @@ public abstract class AbstractSalvage {
     public boolean isUseSalvageOperations() {
         return true;
     }
+
+    /**
+     * Checks whether a formation set to 'Salvage' may fight in a scenario and still recover that scenario's salvage.
+     *
+     * <p>Under CamOps (Strict) rules, a salvage team cannot take part in the fighting; it sits on the sidelines until
+     * the OpFor has been routed. Other systems may allow Salvage formations to fight and then salvage. Units in any
+     * other kind of formation can never salvage a scenario they fought in.</p>
+     *
+     * @return {@code true} if Salvage formations may fight and then salvage the same scenario
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isSalvageFormationCombatAllowed() {
+        return false;
+    }
+
+    /**
+     * Checks whether a 'Mek needs working legs to take part in salvage operations.
+     *
+     * <p>Campaign Operations only requires a salvaging 'Mek to have two working hands, so under CamOps (Strict) a 'Mek
+     * with a destroyed leg can still salvage. Other systems require the 'Mek to have no destroyed legs and to not be
+     * permanently immobilized.</p>
+     *
+     * @return {@code true} if a 'Mek with a destroyed leg, or that is immobilized, cannot salvage
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isMekMobilityRequiredForSalvage() {
+        return false;
+    }
 }
