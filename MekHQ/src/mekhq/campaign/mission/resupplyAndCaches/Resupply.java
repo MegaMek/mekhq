@@ -120,6 +120,18 @@ public class Resupply {
     public static final int RESUPPLY_AMMO_TONNAGE = 1;
     public static final int RESUPPLY_ARMOR_TONNAGE = 5;
 
+    // Need-based weighting: how heavily each demand signal counts toward how many of a part are stocked.
+    private static final int MISSING_PART_WEIGHT_MULTIPLIER = 4;
+    private static final int SHOPPING_LIST_WEIGHT_MULTIPLIER = 3;
+
+    // Part-type multipliers (a rebalanced Mishra Method). Scarce, expensive components are favored rather than
+    // penalized, so a player is more likely to be resupplied the parts they cannot easily self-supply.
+    private static final double DEFAULT_PART_MULTIPLIER = 1.0;
+    private static final double HEAT_SINK_MULTIPLIER = 2.5;
+    private static final double MEK_HEAD_MULTIPLIER = 2.0;
+    private static final double CRITICAL_COMPONENT_MULTIPLIER = 1.5;
+    private static final double ARMOR_AND_AMMO_MULTIPLIER = 5.0;
+
     /**
      * Enum representing the various types of resupply methods available during a campaign.
      */
@@ -570,9 +582,10 @@ public class Resupply {
 
         Set<PartInUse> partsToRemove = new HashSet<>();
         for (PartInUse partInUse : partsInUse) {
-            // Only resupply what the player actually fields. A use count of zero means the part is not
-            // mounted on any active unit and is only present as warehouse salvage.
-            if (partInUse.getUseCount() == 0) {
+            // Only resupply parts the player actually needs. A use count of zero with nothing on the shopping
+            // list means the part is not mounted on any active unit and is only present as warehouse salvage.
+            // Parts on the shopping list are kept even when not currently fielded, as they are explicit demand.
+            if (partInUse.getUseCount() == 0 && partInUse.getPlannedCount() == 0) {
                 partsToRemove.add(partInUse);
                 continue;
             }
@@ -614,8 +627,8 @@ public class Resupply {
 
     /**
      * Adds {@code incoming} to {@code merged}, or accumulates its per-location counts onto the existing entry for the
-     * same part. Planned count comes from the campaign-wide shopping list and is identical for every location, so it is
-     * not summed.
+     * same part. The shopping list is filtered per location, so each location contributes its own planned count and the
+     * counts are summed alongside the use, store, transfer, and missing counts.
      */
     private static void mergePartInUse(Map<PartInUse, PartInUse> merged, PartInUse incoming) {
         PartInUse existing = merged.get(incoming);
@@ -626,6 +639,8 @@ public class Resupply {
         existing.setUseCount(existing.getUseCount() + incoming.getUseCount());
         existing.setStoreCount(existing.getStoreCount() + incoming.getStoreCount());
         existing.setTransferCount(existing.getTransferCount() + incoming.getTransferCount());
+        existing.setPlannedCount(existing.getPlannedCount() + incoming.getPlannedCount());
+        existing.setMissingCount(existing.getMissingCount() + incoming.getMissingCount());
     }
 
     /**
@@ -712,8 +727,9 @@ public class Resupply {
     /**
      * Applies warehouse-based weight modifiers to a set of parts currently in use.
      *
-     * <p>Each part will be assigned a weight representing its resupply priority or need, based on its usage count,
-     * the current store's supply, and any applicable multipliers.</p>
+     * <p>Each part will be assigned a weight representing its resupply priority or need, based on its battle damage,
+     * shopping-list demand, and stock shortfall (see {@link #calculateBaseWeight(PartInUse)}), modulated by a
+     * part-type multiplier.</p>
      *
      * <p>Parts always have a minimum weight of 1, ensuring resupply requests are never empty. If a part cannot be
      * acquired or is invalid, it will be skipped.</p>
@@ -761,14 +777,43 @@ public class Resupply {
     }
 
     /**
-     * Calculates the base weight for a given PartInUse, applying a minimum of 1.
+     * Calculates the need-based weight for a given {@link PartInUse}, expressing how much the player actually needs a
+     * part rather than simply how many they field.
+     *
+     * <p>The weight combines three demand signals:</p>
+     * <ul>
+     *     <li><b>Battle damage</b> - parts currently destroyed or missing on fielded units. Weighted most heavily, as
+     *     each one is an immediate hole in a unit.</li>
+     *     <li><b>Shopping list demand</b> - parts the player has explicitly queued to acquire.</li>
+     *     <li><b>Stock shortfall</b> - how far the on-hand, inbound, and on-order supply falls below the
+     *     auto-logistics target stock level for the part.</li>
+     * </ul>
+     *
+     * <p>A minimum of 1 is always applied so that a fully-stocked, undamaged force still receives a representative
+     * spread of parts rather than an empty resupply.</p>
      *
      * @author Illiani
      * @since 0.50.07
      */
     private int calculateBaseWeight(PartInUse partInUse) {
+        int missingCount = partInUse.getMissingCount();
+        int plannedCount = partInUse.getPlannedCount();
+
+        // Stock the player already holds, has inbound, or has on order. This mirrors how auto-logistics measures
+        // inventory against its target, so a gap already on the shopping list is weighted once (as shopping-list
+        // demand below) rather than again as a shortfall.
+        int suppliedCount = partInUse.getStoreCount() + partInUse.getTransferCount() + plannedCount;
+
+        // The auto-logistics target buffer for a fielded part, as a percentage of how many are in use.
+        int targetStock = (int) Math.ceil(partInUse.getRequestedStock() / 100.0 * partInUse.getUseCount());
+        int stockShortfall = Math.max(0, targetStock - suppliedCount);
+
+        int needScore = (MISSING_PART_WEIGHT_MULTIPLIER * missingCount) +
+                              (SHOPPING_LIST_WEIGHT_MULTIPLIER * plannedCount) +
+                              stockShortfall;
+
         // Always at least 1 to avoid empty resupplies
-        return Math.max(1, partInUse.getUseCount() - partInUse.getStoreCount());
+        return Math.max(1, needScore);
     }
 
     /**
@@ -792,22 +837,24 @@ public class Resupply {
      * @return A multiplier value for the given part type.
      */
     private static double getPartMultiplier(Part part) {
-        double multiplier = 1;
+        double multiplier = DEFAULT_PART_MULTIPLIER;
 
-        // This is based on the Mishra Method, found in the Company Generator
+        // This is based on the Mishra Method, found in the Company Generator, rebalanced so that scarce, expensive
+        // components the player cannot easily self-supply (engines, gyros, MASC, weapons and other equipment) are
+        // favored rather than penalized.
         if (part instanceof HeatSink) {
-            multiplier = 2.5;
+            multiplier = HEAT_SINK_MULTIPLIER;
         } else if (part instanceof MekLocation) {
             if (((MekLocation) part).getLoc() == Mek.LOC_HEAD) {
-                multiplier = 2;
+                multiplier = MEK_HEAD_MULTIPLIER;
             }
         } else if (part instanceof MASC ||
                          part instanceof MekGyro ||
                          part instanceof EnginePart ||
                          checkEquipmentSubType(part)) {
-            multiplier = 0.5;
+            multiplier = CRITICAL_COMPONENT_MULTIPLIER;
         } else if (part instanceof AmmoBin || part instanceof Armor) {
-            multiplier = 5;
+            multiplier = ARMOR_AND_AMMO_MULTIPLIER;
         }
 
         return multiplier;

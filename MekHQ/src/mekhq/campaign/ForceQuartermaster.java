@@ -43,8 +43,8 @@ import megamek.common.equipment.AmmoType;
 import megamek.common.units.Entity;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.MekHQ;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.parts.PartArrivedEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -677,7 +677,10 @@ public record ForceQuartermaster(Campaign campaign) {
         }
 
         if (getCampaignOptions().get(CampaignOption.PAY_FOR_UNITS)) {
-            Money cost = new Unit(en, campaign()).getBuyCost().multipliedBy(valueMultiplier);
+            double contractMultiplier = campaign().getPlayerForce().getPurchaseCostMultiplier(campaign().getActiveContracts());
+            Money cost = new Unit(en, campaign()).getBuyCost()
+                               .multipliedBy(valueMultiplier)
+                               .multipliedBy(contractMultiplier);
             if (campaign().getPlayerForce()
                       .getFinances()
                       .debit(TransactionType.UNIT_PURCHASE, campaign().getLocalDate(),
@@ -912,8 +915,10 @@ public record ForceQuartermaster(Campaign campaign) {
      */
     public boolean buyRefurbishment(Part part) {
         if (getCampaignOptions().get(CampaignOption.PAY_FOR_PARTS)) {
+            double contractMultiplier = campaign().getPlayerForce().getPurchaseCostMultiplier(campaign().getActiveContracts());
+            Money cost = part.getActualValue().multipliedBy(contractMultiplier);
             return campaign().getPlayerForce().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
-                  campaign().getLocalDate(), part.getActualValue(),
+                  campaign().getLocalDate(), cost,
                   "Purchase of " + part.getName());
         } else {
             return true;
@@ -960,7 +965,11 @@ public record ForceQuartermaster(Campaign campaign) {
         Objects.requireNonNull(part);
 
         if (getCampaignOptions().get(CampaignOption.PAY_FOR_PARTS)) {
-            Money cost = part.getActualValue().multipliedBy(costMultiplier);
+            double contractMultiplier = campaign().getPlayerForce().getPurchaseCostMultiplier(campaign().getActiveContracts());
+            Money cost = part.getActualValue()
+                               .multipliedBy(costMultiplier)
+                               .multipliedBy(contractMultiplier);
+
             if (campaign().getPlayerForce().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
                   campaign().getLocalDate(), cost, "Purchase of " + part.getName())) {
                 addPart(part, transitDays, true, target);

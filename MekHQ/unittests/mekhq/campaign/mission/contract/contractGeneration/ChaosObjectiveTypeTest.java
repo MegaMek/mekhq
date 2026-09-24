@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.EnumMap;
 import java.util.Map;
 
+import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -121,6 +122,15 @@ class ChaosObjectiveTypeTest {
               "a pirate hunt does not itself loot");
         assertTrue(ChaosObjectiveType.PIRATE_RAID.usesSpecialRule(ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING),
               "a pirate raid loots");
+    }
+
+    @Test
+    void cadreDutyCarriesSimulatedDamageAndReducedCombatPay() {
+        assertTrue(ChaosObjectiveType.CADRE_DUTY.usesSpecialRule(ChaosObjectiveSpecialRules.SIMULATED_DAMAGE),
+              "cadre duty's combat damage is simulated, not real");
+        assertTrue(ChaosObjectiveType.CADRE_DUTY.usesSpecialRule(ChaosObjectiveSpecialRules.REDUCED_COMBAT_PAY),
+              "cadre duty pays only a quarter of the usual combat bonus");
+        assertFalse(ChaosObjectiveType.CADRE_DUTY.usesSpecialRule(ChaosObjectiveSpecialRules.DOUBLE_ALL_COSTS));
     }
 
     @Test

@@ -106,6 +106,7 @@ public abstract class AbstractContract {
 
     private @Nonnull Money salvagedByUnitValue = Money.zero();
     private @Nonnull Money salvagedByEmployerValue = Money.zero();
+    private @Nonnull Money withheldSupportPayments = Money.zero();
 
     private MissionStatus missionStatus;
     private ContractScheduleData scheduleData;
@@ -120,6 +121,11 @@ public abstract class AbstractContract {
     private Person playerNegotiator;
 
     private int sharesPercent = DEFAULT_SHARES_PERCENT;
+
+    /**
+     * Running tally for the {@link ChaosObjectiveSpecialRules#END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS} special rule.
+     */
+    private int consecutiveTrackResultTally = 0;
     private final EnumSet<ObfuscatableIntel> obfuscatedIntel = EnumSet.noneOf(ObfuscatableIntel.class);
     private final EnumSet<ContractCharacteristic> characteristics = EnumSet.noneOf(ContractCharacteristic.class);
 
@@ -628,6 +634,18 @@ public abstract class AbstractContract {
         this.sharesPercent = sharesPercent;
     }
 
+    public int getConsecutiveTrackResultTally() {
+        return consecutiveTrackResultTally;
+    }
+
+    public void setConsecutiveTrackResultTally(int consecutiveTrackResultTally) {
+        this.consecutiveTrackResultTally = consecutiveTrackResultTally;
+    }
+
+    public void changeConsecutiveTrackResultTally(int delta) {
+        consecutiveTrackResultTally += delta;
+    }
+
     public @Nullable StratConCampaignState getStratConCampaignState() {
         return stratConCampaignState;
     }
@@ -1043,6 +1061,44 @@ public abstract class AbstractContract {
         return getObjectiveType().getChaosObjectiveType().isAttacker();
     }
 
+    /**
+     * Reports whether this contract's objective carries the given Chaos special rule.
+     *
+     * @param specialRule the special rule to test for
+     *
+     * @return {@code true} when the contract's objective type uses the special rule; {@code false} when it does not,
+     *       when no objective data has been assigned, or when the objective data has no player objective type
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean usesSpecialRule(ChaosObjectiveSpecialRules specialRule) {
+        if (objectiveData == null) {
+            return false;
+        }
+
+        ContractObjectiveType objectiveType = getObjectiveType();
+        return (objectiveType != null) && objectiveType.getChaosObjectiveType().usesSpecialRule(specialRule);
+    }
+
+    /**
+     * Lists the Chaos special rules carried by this contract's objective.
+     *
+     * @return the objective type's special rules, or an empty list when no objective data has been assigned or the
+     *       objective data has no player objective type
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<ChaosObjectiveSpecialRules> getSpecialRules() {
+        if (objectiveData == null) {
+            return List.of();
+        }
+
+        ContractObjectiveType objectiveType = getObjectiveType();
+        return (objectiveType == null) ? List.of() : objectiveType.getChaosObjectiveType().getSpecialRules();
+    }
+
     public @Nonnull Money getSalvagedByEmployerValue() {
         return salvagedByEmployerValue;
     }
@@ -1053,6 +1109,18 @@ public abstract class AbstractContract {
 
     public void changeSalvagedByEmployerValue(Money delta) {
         salvagedByEmployerValue = salvagedByEmployerValue.plus(delta);
+    }
+
+    public @Nonnull Money getWithheldSupportPayments() {
+        return withheldSupportPayments;
+    }
+
+    public void setWithheldSupportPayments(@Nonnull Money withheldSupportPayments) {
+        this.withheldSupportPayments = withheldSupportPayments;
+    }
+
+    public void changeWithheldSupportPayments(Money delta) {
+        withheldSupportPayments = withheldSupportPayments.plus(delta);
     }
 
     public @Nonnull Money getSalvagedByUnitValue() {

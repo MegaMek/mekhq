@@ -34,13 +34,14 @@ package mekhq.campaign.universe.commandGeneration;
 
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.ToIntFunction;
+import java.util.function.ToIntBiFunction;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSection;
 
 /**
@@ -59,8 +60,8 @@ import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSe
 public enum SupportCapability {
     /** Recovery vehicles, crewed by the maintenance section, granted under CamOps salvage rules. */
     SALVAGE(campaignOptions -> campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE),
-          campaign -> SupportUnitGenerator.SALVAGE_UNIT,
-          SupportUnitGenerator::scaledCount,
+          campaign -> null,
+          SupportUnitGenerator::salvageUnitCount,
           SupportTOEFormationTypes.SALVAGE_FORMATION,
           SupportSection.MAINTENANCE,
           PersonnelRole.VEHICLE_CREW_GROUND,
@@ -70,7 +71,7 @@ public enum SupportCapability {
 
     /** MASH trucks, crewed by the medical section, scaled to treat the command's combatants. */
     MEDICAL(campaignOptions -> campaignOptions.get(CampaignOption.USE_MASH_THEATRES),
-          campaign -> SupportUnitGenerator.MEDICAL_UNIT,
+          campaign -> null,
           SupportUnitGenerator::medicalUnitCount,
           SupportTOEFormationTypes.MEDICAL_FORMATION,
           SupportSection.MEDICAL,
@@ -81,8 +82,8 @@ public enum SupportCapability {
 
     /** Flatbed trucks for the StratCon supply convoy, generated with their own crews. */
     LOGISTICS(CampaignOptions::isUseStratCon,
-          campaign -> SupportUnitGenerator.LOGISTICS_UNIT,
-          SupportUnitGenerator::scaledCount,
+          campaign -> null,
+          SupportUnitGenerator::logisticsUnitCount,
           SupportTOEFormationTypes.LOGISTICS_FORMATION,
           null,
           PersonnelRole.VEHICLE_CREW_GROUND,
@@ -92,7 +93,7 @@ public enum SupportCapability {
 
     /** Mobile canteens feeding the command once fatigue is tracked. */
     COMMISSARY(campaignOptions -> campaignOptions.get(CampaignOption.USE_FATIGUE),
-          campaign -> SupportUnitGenerator.COMMISSARY_UNIT,
+          campaign -> null,
           SupportUnitGenerator::commissaryUnitCount,
           SupportTOEFormationTypes.COMMISSARY_FORMATION,
           null,
@@ -114,7 +115,7 @@ public enum SupportCapability {
 
     private final Predicate<CampaignOptions> enabledCheck;
     private final Function<Campaign, String> unitNameResolver;
-    private final ToIntFunction<Campaign> targetCountResolver;
+    private final ToIntBiFunction<Campaign, Faction> targetCountResolver;
     private final SupportTOEFormationTypes formationType;
     private final SupportSection crewSection;
     private final PersonnelRole crewRole;
@@ -123,7 +124,7 @@ public enum SupportCapability {
     private final String resourceKeyPrefix;
 
     SupportCapability(Predicate<CampaignOptions> enabledCheck, Function<Campaign, String> unitNameResolver,
-          ToIntFunction<Campaign> targetCountResolver, SupportTOEFormationTypes formationType,
+          ToIntBiFunction<Campaign, Faction> targetCountResolver, SupportTOEFormationTypes formationType,
           @Nullable SupportSection crewSection, PersonnelRole crewRole, boolean needsMechanics,
           String resourceBundle, String resourceKeyPrefix) {
         this.enabledCheck = enabledCheck;
@@ -157,7 +158,7 @@ public enum SupportCapability {
      *
      * @return the unit name as the unit cache holds it
      */
-    public String unitName(Campaign campaign) {
+    public @Nullable String unitName(Campaign campaign) {
         return unitNameResolver.apply(campaign);
     }
 
@@ -165,11 +166,13 @@ public enum SupportCapability {
      * How many of the unit a command of this size should field, before subtracting whatever it already owns.
      *
      * @param campaign the campaign the vehicles are generated into
+     * @param faction  the faction of the command being supported, which is the campaign's own faction mid-campaign
+     *                 and the generated command's faction during command generation
      *
      * @return the target count
      */
-    public int targetCount(Campaign campaign) {
-        return targetCountResolver.applyAsInt(campaign);
+    public int targetCount(Campaign campaign, Faction faction) {
+        return targetCountResolver.applyAsInt(campaign, faction);
     }
 
     /**
@@ -250,7 +253,7 @@ public enum SupportCapability {
     }
 
     /** The security detail's unit count: a company-sized detail is fielded as repeated platoons. */
-    private static int securityCount(Campaign campaign) {
+    private static int securityCount(Campaign campaign, Faction faction) {
         return SupportUnitGenerator.securityTier(campaign) == SupportUnitGenerator.SecurityTier.COMPANY
                      ? SupportUnitGenerator.PLATOONS_PER_COMPANY
                      : 1;

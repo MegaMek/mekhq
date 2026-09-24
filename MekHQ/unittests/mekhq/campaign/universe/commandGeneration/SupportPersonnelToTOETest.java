@@ -297,10 +297,11 @@ class SupportPersonnelToTOETest {
 
     @Test
     void organize_nullOrEmpty_noOp() {
+        // The faction is only reached once there is something to organise, so these guards are exercised with none.
         Campaign campaign = mock(Campaign.class);
-        assertDoesNotThrow(() -> SupportPersonnelToTOE.organize(null, people(3), false));
-        assertDoesNotThrow(() -> SupportPersonnelToTOE.organize(campaign, null, false));
-        assertDoesNotThrow(() -> SupportPersonnelToTOE.organize(campaign, List.of(), false));
+        assertDoesNotThrow(() -> SupportPersonnelToTOE.organize(null, people(3), false, null));
+        assertDoesNotThrow(() -> SupportPersonnelToTOE.organize(campaign, null, false, null));
+        assertDoesNotThrow(() -> SupportPersonnelToTOE.organize(campaign, List.of(), false, null));
     }
 
     // --- Helpers ---

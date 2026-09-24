@@ -51,10 +51,15 @@ import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
+import megamek.client.bot.princess.BehaviorSettings;
+import megamek.client.bot.princess.CardinalEdge;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.common.Player;
+import megamek.common.board.Board;
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.game.Game;
@@ -74,6 +79,9 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.w3c.dom.DOMException;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -386,6 +394,100 @@ class AtBDynamicScenarioFactoryTest {
         int actual = AtBDynamicScenarioFactory.calculateEffectiveBV(scenario, campaign, false);
 
         assertEquals(10000, actual);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CardinalEdge.class)
+    void setDestinationZoneMapsStoredZoneAsCardinalEdgeIndex(CardinalEdge storedEdge) {
+        BotForce force = createBotForce(Board.START_N);
+
+        AtBDynamicScenarioFactory.setDestinationZone(force, createForceTemplate(storedEdge.getIndex()));
+
+        assertEquals(storedEdge, force.getBehaviorSettings().getDestinationEdge());
+    }
+
+    @Test
+    void setDestinationZoneRandomOnlyPicksCardinalEdges() {
+        Set<CardinalEdge> cardinalEdges = EnumSet.of(CardinalEdge.NORTH,
+              CardinalEdge.SOUTH,
+              CardinalEdge.EAST,
+              CardinalEdge.WEST);
+        ScenarioForceTemplate forceTemplate = createForceTemplate(ScenarioForceTemplate.DESTINATION_EDGE_RANDOM);
+
+        for (int attempt = 0; attempt < 200; attempt++) {
+            BotForce force = createBotForce(Board.START_N);
+
+            AtBDynamicScenarioFactory.setDestinationZone(force, forceTemplate);
+
+            CardinalEdge destinationEdge = force.getBehaviorSettings().getDestinationEdge();
+            assertTrue(cardinalEdges.contains(destinationEdge), "Unexpected random destination " + destinationEdge);
+            assertEquals(destinationEdge, force.getBehaviorSettings().getRetreatEdge());
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource(value = { "2, SOUTH", "6, NORTH", "4, WEST", "8, EAST" })
+    void setDestinationZoneOppositeDeploymentMapsBoardStartEdge(int startingPosition, CardinalEdge expectedEdge) {
+        BotForce force = createBotForce(startingPosition);
+
+        AtBDynamicScenarioFactory.setDestinationZone(force,
+              createForceTemplate(ScenarioForceTemplate.DESTINATION_EDGE_OPPOSITE_DEPLOYMENT));
+
+        assertEquals(expectedEdge, force.getBehaviorSettings().getDestinationEdge());
+        assertEquals(expectedEdge, force.getBehaviorSettings().getRetreatEdge());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CardinalEdge.class, names = { "NORTH", "SOUTH", "EAST", "WEST" })
+    void setDestinationZoneAlignsRetreatEdgeWithExplicitDestination(CardinalEdge storedEdge) {
+        BotForce force = createBotForce(Board.START_N);
+
+        AtBDynamicScenarioFactory.setDestinationZone(force, createForceTemplate(storedEdge.getIndex()));
+
+        assertEquals(storedEdge, force.getBehaviorSettings().getRetreatEdge());
+        assertTrue(force.getBehaviorSettings().shouldAutoFlee());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = CardinalEdge.class, names = { "NEAREST", "NONE" })
+    void setDestinationZoneLeavesRetreatEdgeForNonExplicitDestination(CardinalEdge storedEdge) {
+        BotForce force = createBotForce(Board.START_N);
+
+        AtBDynamicScenarioFactory.setDestinationZone(force, createForceTemplate(storedEdge.getIndex()));
+
+        assertEquals(CardinalEdge.NEAREST, force.getBehaviorSettings().getRetreatEdge());
+    }
+
+    /**
+     * Creates a bot force with fresh default behavior settings, so the tests don't depend on the Princess behavior
+     * settings file loading.
+     *
+     * @param startingPosition the force's deployment edge, as a {@code Board.START_*} value
+     *
+     * @return the bot force
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static BotForce createBotForce(int startingPosition) {
+        BotForce force = new BotForce();
+        force.setBehaviorSettings(new BehaviorSettings());
+        force.setStartingPos(startingPosition);
+        return force;
+    }
+
+    /**
+     * @param destinationZone the stored destination zone value
+     *
+     * @return a force template with the given destination zone
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static ScenarioForceTemplate createForceTemplate(int destinationZone) {
+        ScenarioForceTemplate forceTemplate = new ScenarioForceTemplate();
+        forceTemplate.setDestinationZone(destinationZone);
+        return forceTemplate;
     }
 
     private static Campaign mockCampaignWithNoSeedForces() {
