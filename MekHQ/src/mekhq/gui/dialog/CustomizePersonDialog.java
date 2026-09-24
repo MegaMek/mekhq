@@ -44,6 +44,7 @@ import static mekhq.campaign.personnel.skills.Skill.getCountUpMaxValue;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writeInterviewersNotes;
 import static mekhq.campaign.randomEvents.personalities.PersonalityController.writePersonalityDescription;
 import static mekhq.campaign.randomEvents.personalities.PersonalityQuirk.personalityQuirksSortedAlphabetically;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Component;
 import java.awt.GridBagConstraints;
@@ -123,6 +124,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private final Map<String, JSpinner> skillBonus = new Hashtable<>();
     private final Map<String, JLabel> skillValues = new Hashtable<>();
     private final Map<String, JCheckBox> skillChecks = new Hashtable<>();
+    private final Map<String, JCheckBox> skillNaturalAptitudes = new Hashtable<>();
     private PersonnelOptions options;
     private LocalDate birthdate;
     private LocalDate recruitment;
@@ -197,6 +199,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
     private final Campaign campaign;
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.CustomizePersonDialog";
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle(
           "mekhq.resources.CustomizePersonDialog",
           MekHQ.getMHQOptions().getLocale());
@@ -2091,6 +2094,8 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
         JLabel lblBonus;
         JSpinner spnLevel;
         JSpinner spnBonus;
+        JCheckBox chkNaturalAptitude;
+        String naturalAptitudeTooltip = getTextAt(RESOURCE_BUNDLE, "chkNaturalAptitude.tooltip");
 
         GridBagLayout gridBag = new GridBagLayout();
         GridBagConstraints constraints = new GridBagConstraints();
@@ -2146,6 +2151,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             skillLevels.put(type, spnLevel);
             skillBonus.put(type, spnBonus);
 
+            chkNaturalAptitude = new JCheckBox(getTextAt(RESOURCE_BUNDLE, "chkNaturalAptitude.text"));
+            chkNaturalAptitude.setToolTipText(naturalAptitudeTooltip);
+            chkNaturalAptitude.setSelected(person.hasSkill(type) && person.getSkill(type).getHasNaturalAptitude());
+            chkNaturalAptitude.setEnabled(chkSkill.isSelected());
+            skillNaturalAptitudes.put(type, chkNaturalAptitude);
+
             constraints.anchor = GridBagConstraints.WEST;
             constraints.weightx = 0;
             skillsPanel.add(chkSkill, constraints);
@@ -2172,8 +2183,12 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
 
             constraints.gridx = 6;
             constraints.anchor = GridBagConstraints.WEST;
-            constraints.weightx = 1.0;
             skillsPanel.add(spnBonus, constraints);
+
+            constraints.gridx = 7;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.weightx = 1.0;
+            skillsPanel.add(chkNaturalAptitude, constraints);
         }
     }
 
@@ -2213,7 +2228,11 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
             if (skillChecks.get(type).isSelected()) {
                 int level = (Integer) skillLevels.get(type).getModel().getValue();
                 int bonus = (Integer) skillBonus.get(type).getModel().getValue();
-                person.addSkill(type, level, bonus);
+                boolean hasNaturalAptitude = skillNaturalAptitudes.get(type).isSelected();
+                // Keep any progress towards the next level, which rebuilding the skill would otherwise throw away
+                int xpProgress = person.hasSkill(type) ? person.getSkill(type).getXpProgress() : 0;
+                person.addSkill(type, new Skill(SkillType.getType(type), level, bonus, xpProgress,
+                      hasNaturalAptitude));
             } else {
                 person.removeSkill(type);
             }
@@ -2384,6 +2403,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     private void changeValueEnabled(String type) {
         skillLevels.get(type).setEnabled(skillChecks.get(type).isSelected());
         skillBonus.get(type).setEnabled(skillChecks.get(type).isSelected());
+        skillNaturalAptitudes.get(type).setEnabled(skillChecks.get(type).isSelected());
     }
 
     private void btnDateActionPerformed(ActionEvent evt) {
