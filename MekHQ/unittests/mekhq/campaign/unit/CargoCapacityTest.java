@@ -32,14 +32,11 @@
  */
 package mekhq.campaign.unit;
 
-import mekhq.campaign.campaignOptions.CampaignOption;
-
-import static org.mockito.Mockito.lenient;
-
 import static megamek.common.equipment.MiscType.F_CARGO;
 import static megamek.common.equipment.MiscType.F_LIFT_HOIST;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.getEntityForUnitTesting;
@@ -57,6 +54,7 @@ import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
@@ -416,6 +414,8 @@ class CargoCapacityTest {
             lenient().when(mockCampaignOptions.get(CampaignOption.USE_TACTICS)).thenReturn(false);
             lenient().when(mockCampaignOptions.get(CampaignOption.USE_BLOB_VESSEL_CREW)).thenReturn(false);
             lenient().when(mockCampaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)).thenReturn(false);
+            // Read when a unit's crew gets its Natural Aptitudes
+            lenient().when(mockCampaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
             lenient().when(mockCampaignOptions.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
             when(crewMember.getPortrait()).thenReturn(mock(Portrait.class));
             when(crewMember.getId()).thenReturn(mock(UUID.class));

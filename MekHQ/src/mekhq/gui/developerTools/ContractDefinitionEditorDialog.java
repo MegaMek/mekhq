@@ -46,9 +46,11 @@ import java.util.Map;
 import javax.swing.*;
 
 import megamek.codeUtilities.MathUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.PointOfInterestParameters;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.gui.FileDialogs;
 
@@ -79,6 +81,8 @@ public class ContractDefinitionEditorDialog extends JDialog {
     private final JTextArea txtGlobalModifiers = new JTextArea(3, 40);
     private final DefaultListModel<ObjectiveParameters> objectiveModel = new DefaultListModel<>();
     private final JList<ObjectiveParameters> lstObjectives = new JList<>(objectiveModel);
+    private final DefaultListModel<PointOfInterestParameters> pointOfInterestModel = new DefaultListModel<>();
+    private final JList<PointOfInterestParameters> lstPointsOfInterest = new JList<>(pointOfInterestModel);
 
     public ContractDefinitionEditorDialog(JFrame parent) {
         super(parent, true);
@@ -145,7 +149,55 @@ public class ContractDefinitionEditorDialog extends JDialog {
         constraints.gridx = 2;
         panel.add(objButtons, constraints);
 
+        addPointsOfInterestRow(panel, constraints);
+
         return panel;
+    }
+
+    /**
+     * Adds the row listing the points of interest the contract places outside its strategic objectives, with add /
+     * edit / remove buttons. Points of interest that are objectives are set on their objective instead.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void addPointsOfInterestRow(JPanel panel, GridBagConstraints constraints) {
+        lstPointsOfInterest.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        lstPointsOfInterest.setVisibleRowCount(5);
+
+        String labelKey = "contractEditor.pointsOfInterest";
+        FastJScrollPane listPane = new FastJScrollPane(lstPointsOfInterest);
+        JLabel label = new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey));
+        DeveloperToolsUI.applyRowTooltip(RESOURCE_BUNDLE, labelKey, label, listPane);
+
+        constraints.gridx = 0;
+        constraints.gridy++;
+        panel.add(label, constraints);
+        constraints.gridx = 1;
+        panel.add(listPane, constraints);
+
+        JPanel pointOfInterestButtons = new JPanel();
+        JButton btnAdd = new JButton(getTextAt(RESOURCE_BUNDLE, "button.add"));
+        btnAdd.addActionListener(event -> editPointOfInterest(null));
+        JButton btnEdit = new JButton(getTextAt(RESOURCE_BUNDLE, "button.edit"));
+        btnEdit.addActionListener(event -> {
+            PointOfInterestParameters selected = lstPointsOfInterest.getSelectedValue();
+            if (selected != null) {
+                editPointOfInterest(selected);
+            }
+        });
+        JButton btnRemove = new JButton(getTextAt(RESOURCE_BUNDLE, "button.remove"));
+        btnRemove.addActionListener(event -> {
+            int selectedIndex = lstPointsOfInterest.getSelectedIndex();
+            if (selectedIndex >= 0) {
+                pointOfInterestModel.remove(selectedIndex);
+            }
+        });
+        pointOfInterestButtons.add(btnAdd);
+        pointOfInterestButtons.add(btnEdit);
+        pointOfInterestButtons.add(btnRemove);
+        constraints.gridx = 2;
+        panel.add(pointOfInterestButtons, constraints);
     }
 
     private void addRow(JPanel panel, GridBagConstraints constraints, String labelKey, java.awt.Component control) {
@@ -201,6 +253,10 @@ public class ContractDefinitionEditorDialog extends JDialog {
         if (source.getObjectiveParameters() != null) {
             source.getObjectiveParameters().forEach(objectiveModel::addElement);
         }
+        pointOfInterestModel.clear();
+        for (PointOfInterestParameters pointOfInterest : source.getPointsOfInterest()) {
+            pointOfInterestModel.addElement(pointOfInterest);
+        }
     }
 
     private void writeInto(StratConContractDefinition target) {
@@ -217,6 +273,11 @@ public class ContractDefinitionEditorDialog extends JDialog {
             objectives.add(objectiveModel.get(i));
         }
         target.setObjectiveParameters(objectives);
+        List<PointOfInterestParameters> pointsOfInterest = new ArrayList<>();
+        for (int index = 0; index < pointOfInterestModel.size(); index++) {
+            pointsOfInterest.add(pointOfInterestModel.get(index));
+        }
+        target.setPointsOfInterest(pointsOfInterest);
     }
 
     private void loadFromFile() {
@@ -312,6 +373,24 @@ public class ContractDefinitionEditorDialog extends JDialog {
             objectiveModel.addElement(target);
         } else if (saved) {
             lstObjectives.repaint();
+        }
+    }
+
+    /**
+     * Opens the sub-editor for a point of interest entry, adding it to the list if it is new and the user saves.
+     *
+     * @param existing the entry to edit, or {@code null} to create one
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void editPointOfInterest(@Nullable PointOfInterestParameters existing) {
+        PointOfInterestParameters target = (existing != null) ? existing : new PointOfInterestParameters();
+        boolean saved = new PointOfInterestParameterEditDialog(this, target).showDialog();
+        if (saved && (existing == null)) {
+            pointOfInterestModel.addElement(target);
+        } else if (saved) {
+            lstPointsOfInterest.repaint();
         }
     }
 

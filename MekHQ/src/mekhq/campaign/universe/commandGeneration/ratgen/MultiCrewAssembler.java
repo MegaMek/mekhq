@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.client.ratgenerator.CrewDescriptor;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
@@ -55,9 +56,11 @@ import mekhq.campaign.unit.Unit;
  * cockpit type, command consoles, tripod / superheavy variations, infantry squad size, BA trooper count, etc. We don't
  * reimplement that logic here.</p>
  *
- * <p>Role assignment per seat is delegated to {@link PersonnelRoleResolver}. The commander (descriptor
- * from {@code ForceDescriptor.getCo()}) is the first Person; their name is overridden from the descriptor when
- * {@code overrideName} is {@code true}. All other crew are randomly named by MekHQ's standard personnel generator.</p>
+ * <p>Role assignment per seat is delegated to {@link Unit#getDriverRole()} and
+ * {@link Unit#getGunnerRole()}. The commander (descriptor
+ * from {@code ForceDescriptor.getCo()}) is the first Person; their name is overridden from the
+ * descriptor when {@code overrideName} is {@code true}. All other crew are randomly named by MekHQ's standard
+ * personnel generator.</p>
  */
 public final class MultiCrewAssembler {
 
@@ -88,8 +91,11 @@ public final class MultiCrewAssembler {
             return crew;
         }
         int unitType = entity.getUnitType();
-        PersonnelRole primary = PersonnelRoleResolver.primaryRole(unitType, entity);
-        PersonnelRole gunner = PersonnelRoleResolver.gunnerRole(unitType);
+        // Unit already works these out from the entity it wraps, so ask it rather than keeping a
+        // second copy of the same table here. It answers null for a type it does not recognise; a
+        // crew of nobody would be worse than a crew of MekWarriors, so an unknown type falls back.
+        PersonnelRole primary = defaultedRole(unit.getDriverRole(), unit, "driver");
+        PersonnelRole gunner = defaultedRole(unit.getGunnerRole(), unit, "gunner");
 
         // Every crew member of a single leaf shares the leaf's CrewDescriptor — same gunnery /
         // piloting target numbers, same experience class. Only the commander adopts the descriptor's
@@ -155,27 +161,27 @@ public final class MultiCrewAssembler {
         int namedGunners = namedSeats(campaign, gunner, gunnerNeeds, !crew.isEmpty());
         for (int i = 0; i < namedGunners; i++) {
             boolean isCommander = crew.isEmpty();
-            Person g = newPerson(campaign, gunner, commander, entity,
+            Person gunnerPerson = newPerson(campaign, gunner, commander, entity,
                   isCommander && overrideName);
-            unit.addGunner(g);
-            crew.add(g);
+            unit.addGunner(gunnerPerson);
+            crew.add(gunnerPerson);
         }
         // Generic vessel crew.
         if (vesselCrewNeeds > 0) {
-            PersonnelRole crewRole = PersonnelRoleResolver.vesselCrewRole();
+            PersonnelRole crewRole = PersonnelRole.VESSEL_CREW;
             int namedVesselCrew = namedSeats(campaign, crewRole, vesselCrewNeeds, !crew.isEmpty());
             for (int i = 0; i < namedVesselCrew; i++) {
-                Person c = newPerson(campaign, crewRole, commander, entity, false);
-                unit.addVesselCrew(c);
-                crew.add(c);
+                Person crewMember = newPerson(campaign, crewRole, commander, entity, false);
+                unit.addVesselCrew(crewMember);
+                crew.add(crewMember);
             }
         }
         // Navigator (JumpShip / WarShip, not SpaceStation).
         if (needsNavigator) {
-            Person nav = newPerson(campaign, PersonnelRoleResolver.navigatorRole(), commander, entity,
+            Person navigator = newPerson(campaign, PersonnelRole.VESSEL_NAVIGATOR, commander, entity,
                   false);
-            unit.setNavigator(nav);
-            crew.add(nav);
+            unit.setNavigator(navigator);
+            crew.add(navigator);
         }
 
         if (crew.isEmpty()) {
@@ -288,5 +294,28 @@ public final class MultiCrewAssembler {
         return unitType == UnitType.SMALL_CRAFT || unitType == UnitType.DROPSHIP
                      || unitType == UnitType.JUMPSHIP || unitType == UnitType.WARSHIP
                      || unitType == UnitType.SPACE_STATION;
+    }
+
+    /**
+     * Falls back to a MekWarrior where {@link Unit} does not recognise the unit type.
+     *
+     * <p>{@code getDriverRole()} and {@code getGunnerRole()} answer {@code null} for a type they have no
+     * mapping for. A generated command with an uncrewed unit in it is harder to spot, and harder to fix,
+     * than one with a warrior in the wrong speciality, so the seat is filled and the gap is logged.</p>
+     *
+     * @param role     the role the unit reported, or {@code null} if it had none
+     * @param unit     the unit being crewed, named in the log where the role was missing
+     * @param seatName the seat being filled, named in the log where the role was missing
+     *
+     * @return the reported role, or {@link PersonnelRole#MEKWARRIOR} where there was none
+     */
+    private static PersonnelRole defaultedRole(@Nullable PersonnelRole role, Unit unit, String seatName) {
+        if (role != null) {
+            return role;
+        }
+        LOGGER.warn("[CompanyGen]     MultiCrewAssembler: '{}' reported no {} role for unit type {};"
+                    + " filling the seat with a MekWarrior",
+              unit.getName(), seatName, unit.getEntity().getUnitType());
+        return PersonnelRole.MEKWARRIOR;
     }
 }

@@ -184,7 +184,6 @@ import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.other.GrayMonday;
-import mekhq.campaign.randomEvents.other.RiotScenario;
 import mekhq.campaign.randomEvents.other.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
@@ -1341,13 +1340,6 @@ public class CampaignNewDayManager {
                             campaign.addReport(GENERAL, report);
                         }
                     }
-                }
-            }
-
-            if (isMonday && contract.getObjectiveType().isRiotDuty() && contract.getStratConCampaignState() != null) {
-                int riotChance = 4;
-                if (randomInt(riotChance) == 0) {
-                    new RiotScenario(campaign, contract);
                 }
             }
 

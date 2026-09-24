@@ -38,9 +38,9 @@ import jakarta.annotation.Nonnull;
 import mekhq.campaign.personnel.skills.SkillType;
 
 /**
- * A mutable, package-private data holder for one skill's editable values (target number, per-level XP costs, and the
- * six experience milestones). Fields are intentionally exposed directly and accessed by the other Skills page classes
- * ({@code SkillsPages}, {@code SkillsTableModel}, {@code SkillAdvancedEditorDialog}); this is a plain DTO, not an
+ * A mutable, package-private data holder for one skill's editable values (target number, per-level XP costs, the six
+ * experience milestones, and the Natural Aptitude XP cost). Fields are intentionally exposed directly and accessed by
+ * the other Skills page classes ({@code SkillsPages}, {@code SkillsTableModel}, {@code SkillAdvancedEditorDialog}); this is a plain DTO, not an
  * encapsulated domain object, so it stays trivially copyable for the table's Copy/Paste feature.
  */
 class SkillConfiguration {
@@ -52,6 +52,7 @@ class SkillConfiguration {
     int eliteLevel;
     int heroicLevel;
     int legendaryLevel;
+    int naturalAptitudeCost;
 
     SkillConfiguration(@Nonnull SkillType skillType) {
         targetNumber = skillType.getTarget();
@@ -62,6 +63,7 @@ class SkillConfiguration {
         eliteLevel = skillType.getEliteLevel();
         heroicLevel = skillType.getHeroicLevel();
         legendaryLevel = skillType.getLegendaryLevel();
+        naturalAptitudeCost = skillType.getNaturalAptitudeCost();
     }
 
     SkillConfiguration(@Nonnull SkillConfiguration other) {
@@ -82,6 +84,7 @@ class SkillConfiguration {
         eliteLevel = other.eliteLevel;
         heroicLevel = other.heroicLevel;
         legendaryLevel = other.legendaryLevel;
+        naturalAptitudeCost = other.naturalAptitudeCost;
     }
 
     void applyTo(@Nonnull SkillType skillType) {
@@ -96,5 +99,6 @@ class SkillConfiguration {
         skillType.setEliteLevel(eliteLevel);
         skillType.setHeroicLevel(heroicLevel);
         skillType.setLegendaryLevel(legendaryLevel);
+        skillType.setNaturalAptitudeCost(naturalAptitudeCost);
     }
 }

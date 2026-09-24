@@ -41,6 +41,7 @@ import megamek.client.ratgenerator.ClanEnhancedImagingAugmentor;
 import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.common.annotations.Nullable;
+import megamek.common.compute.Compute;
 import megamek.common.enums.AugmentedUnitType;
 import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
@@ -162,7 +163,7 @@ public final class EnhancedImagingAugmentor {
     private static int implantWholeFormations(Map<Integer, List<Person>> formations, double chance) {
         int implanted = 0;
         for (Map.Entry<Integer, List<Person>> formation : formations.entrySet()) {
-            if (Math.random() >= chance) {
+            if (Compute.randomFloat() >= chance) {
                 continue;
             }
             int implantedHere = 0;

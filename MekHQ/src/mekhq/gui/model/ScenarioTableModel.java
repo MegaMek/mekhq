@@ -51,6 +51,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.utilities.MHQMorale;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
@@ -183,11 +184,14 @@ public class ScenarioTableModel extends DataTableModel<Scenario> {
             return ScenarioClassification.NONE;
         }
 
+        AbstractContract contract = (scenario instanceof AtBScenario atBScenario) ?
+                                          atBScenario.getContract(getCampaign()) :
+                                          null;
         return new ScenarioClassification(true,
               stratconScenario.isStrategicObjective(),
               stratconScenario.isTurningPoint(),
               scenario.isCrisis() || scenario.getStratConScenarioType().isSpecial(),
-              scenario.getStratConScenarioType().isScenarioOutcomeAffectsMorale());
+              MHQMorale.isScenarioOutcomeAffectingMorale(scenario.getStratConScenarioType(), contract));
     }
 
     private String getScenarioSeverityText(ScenarioClassification classification) {

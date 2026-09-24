@@ -46,23 +46,7 @@ import static mekhq.gui.dialog.glossary.GlossaryDialog.DOCUMENTATION_COMMAND_STR
 import static mekhq.gui.dialog.glossary.GlossaryDialog.GLOSSARY_COMMAND_STRING;
 import static mekhq.utilities.MHQInternationalization.getText;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.FontMetrics;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.GraphicsEnvironment;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Image;
-import java.awt.Insets;
-import java.awt.KeyboardFocusManager;
-import java.awt.Point;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.Window;
+import java.awt.*;
 import java.awt.image.ImageObserver;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -123,6 +107,8 @@ public class ImmersiveDialogCore extends JDialog {
     public final static String PERSON_COMMAND_STRING = "PERSON";
     public final static String MISSION_COMMAND_STRING = "MISSION";
     public final static String SCENARIO_COMMAND_STRING = "SCENARIO";
+    /** Links to a StratCon sector, as {@code STRATCON_SECTOR:<contract UUID>:<track index>}. */
+    public final static String STRATCON_SECTOR_COMMAND_STRING = "STRATCON_SECTOR";
 
     private final Campaign campaign;
 
@@ -630,6 +616,8 @@ public class ImmersiveDialogCore extends JDialog {
      *   <li>{@code PERSON_COMMAND_STRING}: Focuses on a specific person in the campaign using
      *   their unique identifier (UUID). If using this, you will need to ensure your dialog has
      *   modal set to {@code false}</li>
+     *   <li>{@code STRATCON_SECTOR_COMMAND_STRING}: Opens the StratCon tab on a sector, switching the contract being
+     *   viewed if needed. The reference is {@code STRATCON_SECTOR:<contract UUID>:<track index>}.</li>
      * </ul>
      *
      * <p>
@@ -687,6 +675,14 @@ public class ImmersiveDialogCore extends JDialog {
                 campaignGUI.focusOnScenario(targetId);
             } catch (Exception e) {
                 LOGGER.error("Failed to parse scenario ID: {}", entryKey, e);
+            }
+        } else if (commandKey.equalsIgnoreCase(STRATCON_SECTOR_COMMAND_STRING)) {
+            try {
+                final UUID contractId = UUID.fromString(entryKey);
+                final int trackIndex = Integer.parseInt(splitReference[2]);
+                campaignGUI.focusOnStratConSector(contractId, trackIndex);
+            } catch (Exception exception) {
+                LOGGER.error("Failed to parse StratCon sector reference: {}", reference, exception);
             }
         }
     }

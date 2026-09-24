@@ -378,12 +378,11 @@ public class Bloodmark {
             }
         } else {
             int currentWounds = person.getHits();
-            int newWounds = currentWounds + wounds;
+            int newWounds = min(currentWounds + wounds, DEATH);
+            person.setHits(newWounds);
             if (newWounds >= DEATH) {
-                newWounds = 6;
                 person.changeStatus(campaign, today, PersonnelStatus.HOMICIDE);
             }
-            person.setHits(newWounds);
         }
     }
 }

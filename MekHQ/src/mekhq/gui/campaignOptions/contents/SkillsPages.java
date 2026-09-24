@@ -57,27 +57,10 @@ import java.util.EnumMap;
 import java.util.EventObject;
 import java.util.List;
 import java.util.Map;
-import javax.swing.AbstractAction;
-import javax.swing.ActionMap;
-import javax.swing.BorderFactory;
-import javax.swing.DefaultCellEditor;
-import javax.swing.InputMap;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollBar;
-import javax.swing.JScrollPane;
-import javax.swing.JSpinner;
-import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.KeyStroke;
-import javax.swing.ListSelectionModel;
-import javax.swing.SwingConstants;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 import javax.swing.text.AbstractDocument;
 import javax.swing.text.AttributeSet;
 import javax.swing.text.BadLocationException;
@@ -104,6 +87,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsStandardPanel;
  * <p>Each skill sub-type (Gunnery, Piloting, Support, Utility, Roleplay) is presented as a single table listing every
  * skill in that category alongside its base target number and a summary of its experience milestones. Per-level XP
  * costs and the milestone thresholds are edited through a dedicated "Advanced" pop-up so the main view stays compact.
+ * A final column sets the XP cost of buying a Natural Aptitude in each skill.
  * The platform copy/paste shortcut (Ctrl+C on Windows/Linux, Cmd+C on macOS) copies the selected row's full
  * configuration and the corresponding paste shortcut applies it onto one or more selected rows.</p>
  */
@@ -291,11 +275,13 @@ public class SkillsPages {
         for (int column = SkillsTableModel.MILESTONE_FIRST_COLUMN; column < SkillsTableModel.COST_FIRST_COLUMN; column++) {
             table.getColumnModel().getColumn(column).setPreferredWidth(UIUtil.scaleForGUI(32));
         }
-        for (int column = SkillsTableModel.COST_FIRST_COLUMN; column < SkillsTableModel.COLUMN_COUNT; column++) {
-            // The final column carries the two-digit level 10, so give it one extra digit of width.
-            int width = (column == SkillsTableModel.COLUMN_COUNT - 1) ? 60 : 50;
+        for (int column = SkillsTableModel.COST_FIRST_COLUMN; column < SkillsTableModel.COST_END_COLUMN; column++) {
+            // The final cost column carries the two-digit level 10, so give it one extra digit of width.
+            int width = (column == SkillsTableModel.COST_END_COLUMN - 1) ? 60 : 50;
             table.getColumnModel().getColumn(column).setPreferredWidth(UIUtil.scaleForGUI(width));
         }
+        table.getColumnModel().getColumn(SkillsTableModel.NATURAL_APTITUDE_COLUMN)
+              .setPreferredWidth(UIUtil.scaleForGUI(70));
 
         // Left-align the target number so it reads as a value rather than a right-aligned figure.
         DefaultTableCellRenderer leftAlignedRenderer = new DefaultTableCellRenderer();
@@ -350,10 +336,14 @@ public class SkillsPages {
         // Milestone and XP cells store a raw number but render with their label/level prefix (e.g. "G 2", "7 · 70");
         // editing exposes just the number. They reuse the same digit-only editor as the TN column.
         SkillValueRenderer skillValueRenderer = new SkillValueRenderer();
-        for (int column = SkillsTableModel.MILESTONE_FIRST_COLUMN; column < SkillsTableModel.COLUMN_COUNT; column++) {
+        for (int column = SkillsTableModel.MILESTONE_FIRST_COLUMN; column < SkillsTableModel.COST_END_COLUMN; column++) {
             table.getColumnModel().getColumn(column).setCellRenderer(skillValueRenderer);
             table.getColumnModel().getColumn(column).setCellEditor(targetEditor);
         }
+        // The Natural Aptitude cost uses the same editor: a blank edit makes the aptitude unpurchasable.
+        table.getColumnModel().getColumn(SkillsTableModel.NATURAL_APTITUDE_COLUMN)
+              .setCellRenderer(new NaturalAptitudeCostRenderer());
+        table.getColumnModel().getColumn(SkillsTableModel.NATURAL_APTITUDE_COLUMN).setCellEditor(targetEditor);
         // Mirror the row copy/paste shortcuts onto the TN editor field so Ctrl+C/Ctrl+V still copy the whole row even
         // when a TN cell is in edit mode (the field would otherwise consume them as a plain text copy/paste).
         registerRowCopyPasteShortcuts(targetEditorField, JComponent.WHEN_FOCUSED, table, tableModel);
@@ -363,6 +353,7 @@ public class SkillsPages {
               .setCellRenderer(new TruncationTooltipRenderer());
 
         // Group the 6 milestone and 11 XP columns under spanning header captions while keeping per-value sub-columns.
+        // The Natural Aptitude cost column is ungrouped and shows its own caption.
         GroupableTableHeader header = new GroupableTableHeader(table.getColumnModel());
         GroupableTableHeader.ColumnGroup milestones = new GroupableTableHeader.ColumnGroup(
               getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableProgressionColumn.text"));
@@ -372,7 +363,7 @@ public class SkillsPages {
         header.addColumnGroup(milestones);
         GroupableTableHeader.ColumnGroup costs = new GroupableTableHeader.ColumnGroup(
               getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableCostColumn.text"));
-        for (int column = SkillsTableModel.COST_FIRST_COLUMN; column < SkillsTableModel.COLUMN_COUNT; column++) {
+        for (int column = SkillsTableModel.COST_FIRST_COLUMN; column < SkillsTableModel.COST_END_COLUMN; column++) {
             costs.add(table.getColumnModel().getColumn(column));
         }
         header.addColumnGroup(costs);
@@ -621,7 +612,10 @@ public class SkillsPages {
         private static final int MILESTONE_FIRST_COLUMN = 2;
         private static final int COST_FIRST_COLUMN = 8;
         private static final int COST_COLUMN_COUNT = 11;
-        private static final int COLUMN_COUNT = 19;
+        /** One past the last per-level XP cost column. */
+        private static final int COST_END_COLUMN = COST_FIRST_COLUMN + COST_COLUMN_COUNT;
+        private static final int NATURAL_APTITUDE_COLUMN = COST_END_COLUMN;
+        private static final int COLUMN_COUNT = NATURAL_APTITUDE_COLUMN + 1;
 
         private final List<String> skillNames;
         private SkillsOptionsModel optionsModel;
@@ -659,7 +653,7 @@ public class SkillsPages {
 
         @Override
         public String getColumnName(int column) {
-            if (column >= MILESTONE_FIRST_COLUMN && column < COLUMN_COUNT) {
+            if (column >= MILESTONE_FIRST_COLUMN && column < COST_END_COLUMN) {
                 // Each cell already carries its label ("G 2", "7 · 70"), so the per-value sub-headers are blank; only
                 // the spanning group captions are shown.
                 return "";
@@ -667,6 +661,8 @@ public class SkillsPages {
             return switch (column) {
                 case SKILL_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableSkillColumn.text");
                 case TARGET_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(), "lblSkillTableTargetColumn.text");
+                case NATURAL_APTITUDE_COLUMN -> getTextAt(getCampaignOptionsResourceBundle(),
+                      "lblSkillTableNaturalAptitudeColumn.text");
                 default -> throw new IllegalArgumentException("Unknown skill table column: " + column);
             };
         }
@@ -702,8 +698,11 @@ public class SkillsPages {
             if (columnIndex >= MILESTONE_FIRST_COLUMN && columnIndex < COST_FIRST_COLUMN) {
                 return milestoneLevel(configuration, columnIndex - MILESTONE_FIRST_COLUMN);
             }
-            if (columnIndex >= COST_FIRST_COLUMN && columnIndex < COLUMN_COUNT) {
+            if (columnIndex >= COST_FIRST_COLUMN && columnIndex < COST_END_COLUMN) {
                 return configuration.costs[columnIndex - COST_FIRST_COLUMN];
+            }
+            if (columnIndex == NATURAL_APTITUDE_COLUMN) {
+                return configuration.naturalAptitudeCost;
             }
             throw new IllegalArgumentException("Unknown skill table column: " + columnIndex);
         }
@@ -739,8 +738,13 @@ public class SkillsPages {
                 fireTableRowsUpdated(rowIndex, rowIndex);
                 return;
             }
-            if (columnIndex >= COST_FIRST_COLUMN && columnIndex < COLUMN_COUNT) {
+            if (columnIndex >= COST_FIRST_COLUMN && columnIndex < COST_END_COLUMN) {
                 configuration.costs[columnIndex - COST_FIRST_COLUMN] = parseCost(value);
+                fireTableCellUpdated(rowIndex, columnIndex);
+                return;
+            }
+            if (columnIndex == NATURAL_APTITUDE_COLUMN) {
+                configuration.naturalAptitudeCost = parseCost(value);
                 fireTableCellUpdated(rowIndex, columnIndex);
             }
         }
@@ -795,8 +799,9 @@ public class SkillsPages {
         }
 
         /**
-         * Parses an edited XP cost. A blank edit clears the level back to {@link SkillType#DISABLED_SKILL_LEVEL}
-         * (shown as an em dash); any entered value is clamped to a non-negative cost. A blank edit is the only way to
+         * Parses an edited XP cost, for a skill level or a Natural Aptitude. A blank edit clears it back to
+         * {@link SkillType#DISABLED_SKILL_LEVEL} (shown as an em dash, and meaning it can't be bought); any entered
+         * value is clamped to a non-negative cost. A blank edit is the only way to
          * disable a level inline, since the digit-only editor cannot accept the -1 sentinel directly.
          */
         private int parseCost(Object value) {
@@ -854,6 +859,25 @@ public class SkillsPages {
             int textWidth = fontMetrics.stringWidth(text) + insets.left + insets.right;
             int columnWidth = table.getColumnModel().getColumn(column).getWidth();
             setToolTipText(textWidth > columnWidth ? text : null);
+            return this;
+        }
+    }
+
+    /**
+     * Renders the Natural Aptitude cost cell: the XP cost, or an em dash when a Natural Aptitude in the skill can't be
+     * bought.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static final class NaturalAptitudeCostRenderer extends DefaultTableCellRenderer {
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+              boolean hasFocus, int row, int column) {
+            super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+            setHorizontalAlignment(SwingConstants.LEFT);
+            Integer number = (value instanceof Integer integer) ? integer : null;
+            setText((number == null || number < 0) ? "\u2014" : number.toString());
             return this;
         }
     }

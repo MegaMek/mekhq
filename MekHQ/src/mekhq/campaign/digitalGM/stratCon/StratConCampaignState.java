@@ -51,6 +51,7 @@ import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import org.w3c.dom.Node;
@@ -72,6 +73,11 @@ public class StratConCampaignState {
     // these are all state variables that affect the current Stratcon Campaign
     private int supportPoints;
     private int victoryPoints;
+    // how far the contract's hostilities have escalated; see StratConEscalation
+    private int escalation;
+    // whether "Contracts Use Special Mechanics" was on when the contract was accepted; see
+    // isContractsUseSpecialMechanics
+    private boolean contractsUseSpecialMechanics;
     private String briefingText;
     @XmlElement(required = true, defaultValue = "false")
     private boolean allowEarlyVictory;
@@ -85,6 +91,7 @@ public class StratConCampaignState {
 
     private List<LocalDate> weeklyScenarios;
     private final List<LocalDate> strategicScenarioSpawnDates;
+    private final List<StratConScheduledPointOfInterest> scheduledPointsOfInterest;
 
     @XmlTransient
     public AbstractContract getContract() {
@@ -99,12 +106,14 @@ public class StratConCampaignState {
         tracks = new ArrayList<>();
         weeklyScenarios = new ArrayList<>();
         strategicScenarioSpawnDates = new ArrayList<>();
+        scheduledPointsOfInterest = new ArrayList<>();
     }
 
     public StratConCampaignState(AbstractContract contract) {
         tracks = new ArrayList<>();
         weeklyScenarios = new ArrayList<>();
         strategicScenarioSpawnDates = new ArrayList<>();
+        scheduledPointsOfInterest = new ArrayList<>();
         setContract(contract);
     }
 
@@ -152,6 +161,52 @@ public class StratConCampaignState {
         strategicScenarioSpawnDates.add(spawnDate);
     }
 
+    /**
+     * @return the points of interest still to appear over the contract's run (mutable; drained as they are placed)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElementWrapper(name = "scheduledPointsOfInterest")
+    @XmlElement(name = "scheduledPointOfInterest")
+    public List<StratConScheduledPointOfInterest> getScheduledPointsOfInterest() {
+        return scheduledPointsOfInterest;
+    }
+
+    /**
+     * @param scheduledPointOfInterest a point of interest to place on its scheduled day
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addScheduledPointOfInterest(StratConScheduledPointOfInterest scheduledPointOfInterest) {
+        scheduledPointsOfInterest.add(scheduledPointOfInterest);
+    }
+
+    /**
+     * Moves every date still to come in the contract's pre-rolled schedule - its strategic-objective scenarios and its
+     * points of interest - by the given number of days. Used when the contract's start date moves, so the schedule
+     * keeps its place within the contract.
+     *
+     * @param days how many days to move them; negative moves them earlier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void shiftScheduledDates(long days) {
+        if (days == 0) {
+            return;
+        }
+
+        strategicScenarioSpawnDates.replaceAll(spawnDate -> spawnDate.plusDays(days));
+        for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
+            LocalDate spawnDate = scheduledPointOfInterest.getSpawnDate();
+            if (spawnDate != null) {
+                scheduledPointOfInterest.setSpawnDate(spawnDate.plusDays(days));
+            }
+        }
+    }
+
     public int getSupportPoints() {
         return supportPoints;
     }
@@ -186,6 +241,53 @@ public class StratConCampaignState {
 
     public void changeVictoryPoints(int delta) {
         victoryPoints += delta;
+    }
+
+    /**
+     * @return how far the contract's hostilities have escalated, from 0 up to the contract's maximum (see
+     *       {@link StratConEscalation}); 0 for contracts that do not track Escalation
+     */
+    public int getEscalation() {
+        return escalation;
+    }
+
+    /**
+     * Sets the contract's Escalation directly. Play should raise it through {@link StratConEscalation}, which caps it
+     * and keeps any Escalation objectives up to date.
+     *
+     * @param escalation the new Escalation
+     */
+    public void setEscalation(int escalation) {
+        this.escalation = escalation;
+    }
+
+    /**
+     * Whether the contract runs its type's special mechanics (see {@link StratConContractMechanics}). This is the
+     * "Contracts Use Special Mechanics" option as it stood when the contract was accepted, and is always {@code false}
+     * in mapless play, where those mechanics are not set up. Rules read this rather than the option itself: what a
+     * contract was set up with (its Essential scenarios, its points of interest, its Escalation) cannot change with the
+     * option mid-contract, so neither can the rules that act on them.
+     *
+     * @return {@code true} if the contract uses its type's special mechanics
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isContractsUseSpecialMechanics() {
+        return contractsUseSpecialMechanics;
+    }
+
+    /**
+     * Records whether the contract uses its type's special mechanics. Set once, when the contract is accepted (see
+     * {@link #isContractsUseSpecialMechanics()}).
+     *
+     * @param contractsUseSpecialMechanics {@code true} if the contract uses its type's special mechanics
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setContractsUseSpecialMechanics(boolean contractsUseSpecialMechanics) {
+        this.contractsUseSpecialMechanics = contractsUseSpecialMechanics;
     }
 
     public String getBriefingText() {
@@ -305,7 +407,10 @@ public class StratConCampaignState {
      *   <li>The base contract allows early termination</li>
      *   <li>There is at least one strategic objective defined</li>
      *   <li>All strategic objectives across all tracks have been resolved (completed or failed)</li>
+     *   <li>No strategic-objective point of interest is still waiting to appear</li>
      * </ul>
+     *
+     * <p>Strategic-objective scenarios still waiting to appear do not hold the contract open.</p>
      *
      * @return {@code true} if the contract can be ended early, {@code false} otherwise
      *
@@ -314,6 +419,11 @@ public class StratConCampaignState {
      */
     public boolean canEndContractEarly() {
         if (!allowEarlyVictory()) {
+            return false;
+        }
+
+        // Objectives still to come are not on the map yet, so they would otherwise not count against ending early.
+        if (hasScheduledStrategicObjectivePointsOfInterest()) {
             return false;
         }
 
@@ -330,6 +440,22 @@ public class StratConCampaignState {
         }
 
         return hasObjectives;
+    }
+
+    /**
+     * @return {@code true} if a point of interest that will be a strategic objective is still scheduled to appear
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean hasScheduledStrategicObjectivePointsOfInterest() {
+        for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
+            if (scheduledPointOfInterest.isStrategicObjective()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

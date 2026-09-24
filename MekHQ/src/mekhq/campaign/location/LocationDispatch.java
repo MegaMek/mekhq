@@ -78,6 +78,48 @@ public final class LocationDispatch {
     private LocationDispatch() {}
 
     /**
+     * Moves a person directly to the same effective location as {@code anchor}, with no travel time.
+     *
+     * <p>Used when a person is created or recruited with the main force but is immediately meant to serve with
+     * something elsewhere, such as crew hired for a unit at a player base or in transit. The person is placed in the
+     * anchor's base personnel when it is at a base, onto the anchor's travel node when it is in transit, and otherwise
+     * with the main force's personnel.</p>
+     *
+     * @param campaign the current campaign
+     * @param person   the person to move
+     * @param anchor   the location item the person must end up alongside, typically a {@link Unit}
+     *
+     * @return {@code true} if the person is now at the same effective location as {@code anchor}, otherwise
+     *       {@code false}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean movePersonToLocationOf(Campaign campaign, Person person, ILocation anchor) {
+        if (LocationUtils.areSameEffectiveLocation(anchor, person)) {
+            return true;
+        }
+
+        AbstractBase anchorBase = LocationUtils.findEffectiveBase(anchor);
+        ILocation personnelDestination;
+        if (anchorBase != null) {
+            personnelDestination = anchorBase.getBasePersonnel();
+        } else if (LocationUtils.isInTransit(anchor)) {
+            personnelDestination = anchor.getCurrentLocation();
+        } else {
+            personnelDestination = campaign.getPlayerForce().getPersonnel();
+        }
+
+        person.setParent(personnelDestination);
+
+        if (!LocationUtils.areSameEffectiveLocation(anchor, person)) {
+            LOGGER.warn("Could not move {} to the location of {}", person.getFullName(), anchor);
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Removes a spent travel node from the campaign: detaches it from the location tree and de-registers it from the
      * campaign's location list.
      *

@@ -48,6 +48,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.persons.PersonNewEvent;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.backgrounds.BackgroundsController;
@@ -241,6 +242,8 @@ public class CreateCharacterStoryPoint extends StoryPoint {
         if (null != assignedUnitId) {
             Unit u = getCampaign().getUnit(assignedUnitId);
             if (null != u && u.isUnmanned()) {
+                // New characters join the main force, so bring them to the unit if it is elsewhere
+                LocationDispatch.movePersonToLocationOf(getCampaign(), person, u);
                 u.addPilotOrSoldier(person, false);
                 // only assign to force if properly assigned to a unit
                 Campaign campaign1 = getCampaign();

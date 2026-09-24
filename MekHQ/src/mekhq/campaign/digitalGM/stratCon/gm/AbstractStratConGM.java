@@ -34,17 +34,24 @@ package mekhq.campaign.digitalGM.stratCon.gm;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.*;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
+import mekhq.campaign.digitalGM.stratCon.StratConReconnaissance;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.ImprovedStratConSectorGeneration;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.LegacyStratConSectorGeneration;
 import mekhq.campaign.digitalGM.stratCon.strategy.NoOpFacilityStrategy;
@@ -82,6 +89,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * @since 0.51.01
  */
 public abstract class AbstractStratConGM extends AbstractDigitalGM {
+    private static final MMLogger LOGGER = MMLogger.create(AbstractStratConGM.class);
+
     private final IScenarioGenerationStrategy scenarioGeneration = new StratConScenarioGenerationStrategy();
     private final IScenarioLifecycleStrategy scenarioLifecycle = new StratConScenarioLifecycleStrategy();
     private final IFacilityStrategy facility = new StratConFacilityStrategy();
@@ -204,6 +213,9 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             // rather than all being placed at contract start.
             processScheduledStrategicScenarios(campaign, contract, campaignState, today);
 
+            // Points of interest likewise appear over the contract's run, on days rolled when it was accepted.
+            processScheduledPointsOfInterest(campaign, contract, campaignState, today);
+
             boolean hasAssignedSingleDropScenario = false;
             for (StratConTrackState track : campaignState.getTracks()) {
                 cleanupPhantomScenarios(track);
@@ -216,6 +228,11 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
 
                 // map-based play applies facility effects here; Mapless/Singles supply a no-op strategy
                 getFacilityStrategy().applyPeriodicEffects(track, campaignState, isStartOfMonth);
+
+                processPointsOfInterest(track, campaign);
+
+                // Ground revealed some other way than scouting - by a facility that reveals the sector - still counts.
+                StratConReconnaissance.updateObjectives(track);
 
                 // loop through scenarios - if we haven't deployed in time,
                 // fail it and apply consequences
@@ -263,6 +280,100 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 }
             }
         }
+    }
+
+    /**
+     * Runs the daily point of interest step for a track: expiring those whose date has come and giving the rest their
+     * daily hook (see {@link StratConPointOfInterestRules#processNewDay}). Mapless play places no points of interest,
+     * so this finds nothing to do there; a GM may still override it to change or skip the step.
+     *
+     * @param track    the track to process
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected void processPointsOfInterest(StratConTrackState track, Campaign campaign) {
+        StratConPointOfInterestRules.processNewDay(track, campaign);
+    }
+
+    /**
+     * Places the points of interest whose scheduled day has arrived (scheduled by
+     * {@code StratConContractInitializer#schedulePointsOfInterest} when the contract was accepted). Every one due on or
+     * before today is placed and removed from the schedule, so a skipped day or a save loaded past a date still catches
+     * up. One that no sector has room for stays on the schedule and is tried again the next day, so that none is lost -
+     * which matters most for the ones marked, when the contract was accepted, as the real target or as leading to a
+     * facility. It is not tried forever, though: once it is more than
+     * {@link StratConScheduledPointOfInterest#MAXIMUM_PLACEMENT_DELAY_DAYS} days late it is dropped, so a sector that
+     * never frees up cannot hold the contract open (see {@link StratConCampaignState#canEndContractEarly()}). One whose
+     * type is no longer defined (its data renamed or removed) can never be placed, so it is dropped at once. In mapless
+     * play, where there is no map to place them on, due points of interest are simply dropped.
+     *
+     * <p>Unlike strategic-objective scenarios, points of interest still appear while the enemy is routed: they are
+     * features of the ground, not attacks the enemy has to mount.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void processScheduledPointsOfInterest(Campaign campaign, AbstractContract contract,
+          StratConCampaignState campaignState, LocalDate today) {
+        List<StratConScheduledPointOfInterest> scheduledPointsOfInterest =
+              campaignState.getScheduledPointsOfInterest();
+        if (scheduledPointsOfInterest.isEmpty()) {
+            return;
+        }
+
+        List<StratConScheduledPointOfInterest> duePointsOfInterest = new ArrayList<>();
+        for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
+            if (scheduledPointOfInterest.isDue(today)) {
+                duePointsOfInterest.add(scheduledPointOfInterest);
+            }
+        }
+
+        // With no map, there is nowhere to place them now or later.
+        if (campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+            scheduledPointsOfInterest.removeAll(duePointsOfInterest);
+            return;
+        }
+
+        List<StratConPointOfInterest> placedPointsOfInterest = new ArrayList<>();
+        int unplacedCount = 0;
+        for (StratConScheduledPointOfInterest duePointOfInterest : duePointsOfInterest) {
+            // Its type is gone from the data, so no day will ever place it; warned once, as it is dropped here.
+            if (StratConPointOfInterestDefinitions.getDefinition(duePointOfInterest.getTypeId()) == null) {
+                LOGGER.warn("Dropping scheduled point of interest {} on contract {}: its type is not defined.",
+                      duePointOfInterest,
+                      contract.getName());
+                scheduledPointsOfInterest.remove(duePointOfInterest);
+                continue;
+            }
+
+            StratConPointOfInterest placedPointOfInterest =
+                  StratConContractInitializer.spawnScheduledPointOfInterest(campaign, contract, duePointOfInterest);
+            if (placedPointOfInterest != null) {
+                scheduledPointsOfInterest.remove(duePointOfInterest);
+                placedPointsOfInterest.add(placedPointOfInterest);
+            } else if (duePointOfInterest.isPlacementAbandoned(today)) {
+                LOGGER.info("Dropping scheduled point of interest {} on contract {}: no sector had room for it within"
+                            + " {} days.",
+                      duePointOfInterest,
+                      contract.getName(),
+                      StratConScheduledPointOfInterest.MAXIMUM_PLACEMENT_DELAY_DAYS);
+                scheduledPointsOfInterest.remove(duePointOfInterest);
+            } else {
+                unplacedCount++;
+            }
+        }
+
+        // One line a day for whatever is still waiting, rather than one per point of interest per sector.
+        if (unplacedCount > 0) {
+            LOGGER.info("{} scheduled point(s) of interest on contract {} found no room today and will be tried again.",
+                  unplacedCount,
+                  contract.getName());
+        }
+
+        // One dialog for the whole day's arrivals on this contract, rather than one per point of interest.
+        StratConPointOfInterestRules.announceNewPointsOfInterest(campaign, contract, placedPointsOfInterest);
     }
 
     /**
