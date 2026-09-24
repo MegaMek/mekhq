@@ -162,8 +162,12 @@ import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.DiseaseService;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
+import mekhq.campaign.personnel.quartermaster.AbstractKitIssuer;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
+import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitIssuer;
+import mekhq.campaign.personnel.quartermaster.KitSlot;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -504,6 +508,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     writePersonalityDescription(person);
                     writeInterviewersNotes(person);
                     Campaign campaign = getCampaign();
+                    equipDefaultKitsOnRoleChange(person, KitSlot.PRIMARY);
                     campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
                     if (getCampaignOptions().isUsePortraitForRole(role) &&
                               getCampaignOptions().get(CampaignOption.ASSIGN_PORTRAIT_ON_ROLE_CHANGE) &&
@@ -522,6 +527,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (final Person person : people) {
                     person.setSecondaryRole(role);
                     Campaign campaign = getCampaign();
+                    equipDefaultKitsOnRoleChange(person, KitSlot.SECONDARY);
                     campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
                 }
                 break;
@@ -889,6 +895,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
 
                     person.setPrimaryRole(getCampaign(), randomProfession);
+                    equipDefaultKitsOnRoleChange(person, KitSlot.PRIMARY);
 
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                     Campaign campaign = getCampaign();
@@ -2633,7 +2640,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   "menu.issueArmorKits"));
             issueKits.addActionListener(ev -> IssueEquipmentDialog.showFor(getFrame(),
                   getCampaign(), Arrays.asList(selected), null));
-            popup.add(issueKits);
+            JMenu kitsMenu = new JMenu(getTextAt("mekhq.resources.IssueEquipmentDialog", "menu.kits"));
+            kitsMenu.add(issueKits);
+
+            JMenuItem issueDefaultKits = new JMenuItem(getTextAt("mekhq.resources.IssueEquipmentDialog",
+                  "menu.issueDefaultKits"));
+            issueDefaultKits.addActionListener(ev -> issueDefaultKits(Arrays.asList(selected)));
+            kitsMenu.add(issueDefaultKits);
+            popup.add(kitsMenu);
         }
 
         List<mekhq.campaign.personnel.Person> selectedPeople = Arrays.asList(selected);
@@ -6089,5 +6103,43 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         result.addActionListener(this);
         result.setEnabled(true);
         return result;
+    }
+
+    /**
+     * Gives a person their changed role's default kits: the role's equipment kit into a free kit slot, and their group's
+     * armor kit if they are still in coveralls.
+     *
+     * @param person      the person whose role changed
+     * @param changedSlot the kit slot tied to the changed role
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void equipDefaultKitsOnRoleChange(Person person, KitSlot changedSlot) {
+        EquipmentKitIssuer.equipDefaultToolKitOnRoleChange(person, changedSlot, getCampaign());
+        if (changedSlot == KitSlot.PRIMARY) {
+            ArmorKitIssuer.equipDefaultKitOnRoleChange(person, getCampaign());
+        }
+    }
+
+    /**
+     * Swaps every selected person onto their roles' default armor and equipment kits, drawing from stores and ordering
+     * (and paying for) any shortfall, then reports the result.
+     *
+     * @param people the selected personnel
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void issueDefaultKits(List<Person> people) {
+        Campaign campaign = getCampaign();
+        AbstractKitIssuer.KitIssueTotals totals = new AbstractKitIssuer.KitIssueTotals();
+        ArmorKitIssuer.issueDefaultKits(people, campaign, totals);
+        EquipmentKitIssuer.issueDefaultKits(people, campaign, totals);
+        if ((totals.issued > 0) || (totals.ordered > 0)) {
+            campaign.addReport(PERSONNEL,
+                  getFormattedTextAt("mekhq.resources.IssueEquipmentDialog", "report.issued",
+                        totals.issued + totals.ordered, totals.issued, totals.ordered));
+        }
     }
 }

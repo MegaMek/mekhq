@@ -629,6 +629,7 @@ public class PartsInUseManager {
             if (placeOf(person) == place) {
                 addWornKit(counts, person.getArmorKitName(), 1);
                 addWornKit(counts, person.getRepairKitName(), 1);
+                addWornKit(counts, person.getSecondaryKitName(), 1);
             }
         }
         for (Unit unit : campaign.getUnits()) {

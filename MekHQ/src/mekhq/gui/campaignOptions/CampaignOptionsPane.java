@@ -88,6 +88,7 @@ import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
+import mekhq.campaign.personnel.quartermaster.DefaultKitChanges;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
@@ -846,6 +847,7 @@ public class CampaignOptionsPane extends JPanel {
 
         CampaignOptionsFreebieTracker oldCampaignOptions = new CampaignOptionsFreebieTracker(
               campaign.getCampaignOptions());
+        Map<CampaignOption<String>, String> oldDefaultKits = DefaultKitChanges.snapshot(campaign.getCampaignOptions());
 
         // Options get applied in the order they are defined in the UI
         generalPage.applyCampaignOptionsToCampaign(isStartUp, isSaveAction);
@@ -898,6 +900,14 @@ public class CampaignOptionsPane extends JPanel {
         CampaignOptionsFreebieTracker newCampaignOptions = new CampaignOptionsFreebieTracker(
               campaign.getCampaignOptions());
         triggerUpgradeFreebies(campaign, oldCampaignOptions, newCampaignOptions, isStartUp);
+
+        if (!isStartUp) {
+            List<DefaultKitChanges.Change> defaultKitChanges = DefaultKitChanges.detect(oldDefaultKits,
+                  campaign.getCampaignOptions());
+            if (!defaultKitChanges.isEmpty()) {
+                new DefaultKitCampaignOptionsChangedConfirmationDialog(campaign, defaultKitChanges);
+            }
+        }
     }
 
     /**
@@ -1052,6 +1062,12 @@ public class CampaignOptionsPane extends JPanel {
                   newRequireMekWarriorKitToDeploy &&
                   !oldRequireMekWarriorKitToDeploy) { // Has tracking changed?
             new MekWarriorKitCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        if (!isStartUp
+                  && newOptions.requireAerospaceKitToDeploy()
+                  && !oldOptions.requireAerospaceKitToDeploy()) { // Has tracking changed?
+            new AerospaceKitCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
         boolean newSpecialistTechSkillsEnabled = newOptions.specialistTechSkillsEnabled();

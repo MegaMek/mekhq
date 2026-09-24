@@ -344,6 +344,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "npcFactionArmorKits");
     public static final CampaignOption<Boolean> REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY =
           of(Boolean.class, false, "requireMekWarriorKitToDeploy");
+    public static final CampaignOption<Boolean> REQUIRE_AEROSPACE_KIT_TO_DEPLOY =
+          of(Boolean.class, false, "requireAerospaceKitToDeploy");
     public static final CampaignOption<Boolean> USE_EXTENDED_TOE_FORCE_NAME =
           of(Boolean.class, true, "useExtendedTOEForceName");
     public static final CampaignOption<Boolean> PERSONNEL_LOG_SKILL_GAIN =

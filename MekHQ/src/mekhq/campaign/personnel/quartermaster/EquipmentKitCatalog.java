@@ -107,9 +107,8 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
           KIT_DELUXE_TOOLKIT);
 
     /**
-     * Kit internal name -> the non-technician skills it improves and by how much. The medical kits' Surgery bonus is
-     * one above the CamOps value (raised by +1, even where the book lists none) per campaign customization. These
-     * bonuses are separate from the specialized-repair-kit repair bonus ({@link #REPAIR_KIT_ROLL_BONUS}).
+     * Kit internal name -> the non-technician skills it improves and by how much. These bonuses are separate from the
+     * specialized-repair-kit repair bonus ({@link #REPAIR_KIT_ROLL_BONUS}).
      */
     private static final Map<String, Map<String, Integer>> SKILL_BONUSES = new LinkedHashMap<>();
 
@@ -158,8 +157,9 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
     public static final String NO_DEFAULT_KIT = "";
 
     /**
-     * The professions that receive a per-profession default equipment kit on recruitment: the four technician
-     * professions (Astechs excluded), plus doctors and administrators for their medical and computer kits.
+     * The professions that receive a per-profession default equipment kit on recruitment: the technician professions
+     * (including vessel crew and Astechs), plus doctors, medics, and administrators for their medical and computer
+     * kits.
      */
     public enum KitProfession {MEK_TECH, MECHANIC, AERO_TEK, BA_TECH, VESSEL_CREW, ASTECH, DOCTOR, MEDIC, ADMIN}
 
@@ -177,8 +177,7 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
     }
 
     /**
-     * The technician professions this person qualifies for, by primary and secondary role. Used to decide which
-     * per-profession default tool kits to issue on recruitment.
+     * The kit professions this person qualifies for, by primary and secondary role.
      *
      * @param person the person, or {@code null}
      *
@@ -190,44 +189,56 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
             return professions;
         }
         for (PersonnelRole role : List.of(person.getPrimaryRole(), person.getSecondaryRole())) {
-            if (role.isMekTech()) {
-                professions.add(KitProfession.MEK_TECH);
-                continue;
-            }
-            if (role.isMechanic()) {
-                professions.add(KitProfession.MECHANIC);
-                continue;
-            }
-            if (role.isAeroTek()) {
-                professions.add(KitProfession.AERO_TEK);
-                continue;
-            }
-            if (role.isBATech()) {
-                professions.add(KitProfession.BA_TECH);
-                continue;
-            }
-            if (role.isVesselCrewMember()) {
-                professions.add(KitProfession.VESSEL_CREW);
-                continue;
-            }
-            if (role.isDoctor()) {
-                professions.add(KitProfession.DOCTOR);
-                continue;
-            }
-            if (role.isAdministrator()) {
-                professions.add(KitProfession.ADMIN);
-                continue;
-            }
-            if (role.isMedic()) {
-                professions.add(KitProfession.MEDIC);
-                continue;
-            }
-            if (role.isAstech()) {
-                professions.add(KitProfession.ASTECH);
-                continue;
+            KitProfession profession = professionFor(role);
+            if (profession != null) {
+                professions.add(profession);
             }
         }
         return professions;
+    }
+
+    /**
+     * The kit profession a single role belongs to, deciding which per-profession default kit it is issued.
+     *
+     * @param role the role, or {@code null}
+     *
+     * @return the role's kit profession, or {@code null} if the role has no default kit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable KitProfession professionFor(@Nullable PersonnelRole role) {
+        if (role == null) {
+            return null;
+        }
+        if (role.isMekTech()) {
+            return KitProfession.MEK_TECH;
+        }
+        if (role.isMechanic()) {
+            return KitProfession.MECHANIC;
+        }
+        if (role.isAeroTek()) {
+            return KitProfession.AERO_TEK;
+        }
+        if (role.isBATech()) {
+            return KitProfession.BA_TECH;
+        }
+        if (role.isVesselCrewMember()) {
+            return KitProfession.VESSEL_CREW;
+        }
+        if (role.isDoctor()) {
+            return KitProfession.DOCTOR;
+        }
+        if (role.isAdministrator()) {
+            return KitProfession.ADMIN;
+        }
+        if (role.isMedic()) {
+            return KitProfession.MEDIC;
+        }
+        if (role.isAstech()) {
+            return KitProfession.ASTECH;
+        }
+        return null;
     }
 
     /**
@@ -254,14 +265,13 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
     }
 
     /**
-     * Every skill this person's owned tool kit improves, mapped to the modifier for each - the single source of truth
+     * Every skill this person's owned equipment kits improve (across both kit slots), mapped to the modifier for each - the single source of truth
      * folded into {@code SkillModifierData} so a kit acts as a plain modifier to the skill (raising its effective value)
      * rather than a bespoke modifier on a particular roll. This covers:
      *
      * <ul>
      *     <li>a specialized repair kit: {@link #REPAIR_KIT_ROLL_BONUS} to each {@code Tech/...} skill it covers;</li>
-     *     <li>the Deluxe Toolkit: {@link #DELUXE_TOOLKIT_ROLL_BONUS} to every technician skill (so it reaches both part
-     *     repairs and, through the whole-unit global skills, maintenance and refits);</li>
+     *     <li>the Deluxe Toolkit: {@link #DELUXE_TOOLKIT_ROLL_BONUS} to the Astech skill;</li>
      *     <li>a field/medical/computer kit: its {@link #SKILL_BONUSES} bonus to the non-technician skill(s) it aids.</li>
      * </ul>
      *
@@ -383,12 +393,10 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
     }
 
     /**
-     * The bespoke bonus a Descartes diagnostic scanner grants to a <em>maintenance</em> check (MK XXV grants +3, MK XXI
-     * grants +2, for "diagnosing damage"). This modifies the maintenance roll itself rather than a skill, so unlike the
-     * repair and Deluxe-Toolkit bonuses - which are skill modifiers folded into {@link #kitSkillBonuses(Person)} and so
-     * reach maintenance automatically through the whole-unit skill's value - it must be applied by the maintenance logic
-     * directly. The Descartes values sit one above their base CamOps figures so a Deluxe Toolkit's general +1 (already
-     * in the skill value) does not invalidate them.
+     * The bespoke bonus a Descartes diagnostic scanner grants to a <em>maintenance</em> check (MK XXV grants +2, MK XXI
+     * grants +1, for "diagnosing damage"). This modifies the maintenance roll itself rather than a skill, so unlike the
+     * repair and Deluxe-Toolkit bonuses - which are skill modifiers folded into {@link #kitSkillBonuses(Person)} - it
+     * must be applied by the maintenance logic directly.
      *
      * @param person the technician, or {@code null}
      *
@@ -407,12 +415,13 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
     }
 
     /**
-     * Whether this technician carries a general tool kit - a Basic Toolkit or the better Deluxe Toolkit - which is the
-     * minimum kit required to perform a repair when the "Techs Need a Tool Kit" campaign option is enabled.
+     * Whether this technician carries a tool kit in either kit slot - a Basic or Deluxe Toolkit, or any specialized
+     * repair kit ({@link #REPAIR_KITS}) - which is required to perform a repair when the "Techs Need a Tool Kit"
+     * campaign option is enabled.
      *
      * @param person the technician, or {@code null}
      *
-     * @return {@code true} if the technician carries at least a Basic Toolkit
+     * @return {@code true} if the technician carries at least one tool kit
      */
     public static boolean hasToolKit(@Nullable Person person) {
         if (person == null) {

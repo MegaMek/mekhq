@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.quartermaster;
 
+import static mekhq.campaign.personnel.enums.PersonnelRole.ADMINISTRATOR;
 import static mekhq.campaign.personnel.enums.PersonnelRole.MEK_TECH;
 import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
 import static mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog.KIT_BASIC_TOOLKIT;
@@ -81,7 +82,7 @@ class EquipmentKitIssuerTest {
         kit = EquipmentType.get(KIT_BASIC_TOOLKIT);
     }
 
-    /** A person carrying the given single tool kit ({@code null} for none), with a live single-kit get/set/has mock. */
+    /** A person carrying the given primary-slot kit ({@code null} for none), with live two-slot kit state. */
     private static Person personOwning(String kit) {
         Person person = mock(Person.class);
         wireKitState(person, kit);
@@ -89,28 +90,42 @@ class EquipmentKitIssuerTest {
     }
 
     private static Person techWithRole(PersonnelRole role) {
+        return personWithRoles(role, NONE);
+    }
+
+    private static Person personWithRoles(PersonnelRole primary, PersonnelRole secondary) {
         Person person = mock(Person.class);
-        when(person.getPrimaryRole()).thenReturn(role);
-        when(person.getSecondaryRole()).thenReturn(NONE);
+        when(person.getPrimaryRole()).thenReturn(primary);
+        when(person.getSecondaryRole()).thenReturn(secondary);
         wireKitState(person, null);
         return person;
     }
 
-    /** Backs the single tool-kit and intended-kit accessors with mutable holders so issue/remove/strip round-trip. */
+    /**
+     * Backs both kit slots and their intended kits with mutable holders, through the slot accessors and the
+     * primary-slot shorthands, so issue/remove/strip round-trip.
+     */
     private static void wireKitState(Person person, String initialKit) {
-        String[] held = { initialKit };
-        String[] intended = { null };
+        String[] held = { initialKit, null };
+        String[] intended = { null, null };
+        when(person.getKitName(any(KitSlot.class)))
+              .thenAnswer(invocation -> held[((KitSlot) invocation.getArgument(0)).ordinal()]);
+        doAnswer(invocation -> {
+            held[((KitSlot) invocation.getArgument(0)).ordinal()] = invocation.getArgument(1);
+            return null;
+        }).when(person).setKitName(any(KitSlot.class), any());
+        when(person.getIntendedKitName(any(KitSlot.class)))
+              .thenAnswer(invocation -> intended[((KitSlot) invocation.getArgument(0)).ordinal()]);
+        doAnswer(invocation -> {
+            intended[((KitSlot) invocation.getArgument(0)).ordinal()] = invocation.getArgument(1);
+            return null;
+        }).when(person).setIntendedKitName(any(KitSlot.class), any());
         when(person.getRepairKitName()).thenAnswer(invocation -> held[0]);
-        doAnswer(invocation -> {
-            held[0] = invocation.getArgument(0);
-            return null;
-        }).when(person).setRepairKitName(any());
+        when(person.getSecondaryKitName()).thenAnswer(invocation -> held[1]);
         when(person.getIntendedRepairKitName()).thenAnswer(invocation -> intended[0]);
-        doAnswer(invocation -> {
-            intended[0] = invocation.getArgument(0);
-            return null;
-        }).when(person).setIntendedRepairKitName(any());
-        when(person.hasRepairKit(anyString())).thenAnswer(invocation -> invocation.getArgument(0).equals(held[0]));
+        when(person.getIntendedSecondaryKitName()).thenAnswer(invocation -> intended[1]);
+        when(person.hasRepairKit(anyString())).thenAnswer(invocation -> invocation.getArgument(0).equals(held[0])
+                                                                        || invocation.getArgument(0).equals(held[1]));
     }
 
     /** A present, spare warehouse part of the given kit type. */
@@ -139,6 +154,16 @@ class EquipmentKitIssuerTest {
         options.set(CampaignOption.MEK_TECH_DEFAULT_TOOL_KIT, mekTechDefault);
         options.set(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT, addToProcurement);
         return options;
+    }
+
+    /** A present, spare warehouse part of an arbitrary kit type. */
+    private static EquipmentPart partOf(EquipmentType type) {
+        EquipmentPart part = mock(EquipmentPart.class);
+        when(part.isPresent()).thenReturn(true);
+        when(part.isSpare()).thenReturn(true);
+        when(part.getQuantity()).thenReturn(1);
+        when(part.getType()).thenReturn(type);
+        return part;
     }
 
     // region localStock
@@ -282,4 +307,82 @@ class EquipmentKitIssuerTest {
         assertNull(tech.getIntendedRepairKitName());
     }
     // endregion equipDefaultToolKitOnRecruitment
+
+    // region two kit slots
+    @Test
+    void recruitmentFillsEachSlotFromItsOwnRolesDefault() {
+        EquipmentType computer = EquipmentType.get(EquipmentKitCatalog.KIT_PERSONAL_COMPUTER);
+        LocalWarehouse warehouse = warehouseHolding(List.of(kitPart(), partOf(computer)));
+        Person person = personWithRoles(MEK_TECH, ADMINISTRATOR);
+        when(person.getWarehouse()).thenReturn(warehouse);
+        CampaignOptions options = optionsWith(KIT_BASIC_TOOLKIT, false);
+        options.set(CampaignOption.ADMIN_DEFAULT_TOOL_KIT, EquipmentKitCatalog.KIT_PERSONAL_COMPUTER);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+
+        EquipmentKitIssuer.equipDefaultToolKitOnRecruitment(person, campaign, false);
+
+        assertEquals(KIT_BASIC_TOOLKIT, person.getRepairKitName());
+        assertEquals(EquipmentKitCatalog.KIT_PERSONAL_COMPUTER, person.getSecondaryKitName());
+    }
+
+    @Test
+    void recruitmentGmAddGrantsTheKitDirectlyEvenWhenProcurementIsOff() {
+        LocalWarehouse warehouse = warehouseHolding(new java.util.ArrayList<>()); // empty stores
+        Person tech = techWithRole(MEK_TECH);
+        when(tech.getWarehouse()).thenReturn(warehouse);
+        when(campaign.getCampaignOptions()).thenReturn(optionsWith(KIT_BASIC_TOOLKIT, false));
+
+        EquipmentKitIssuer.equipDefaultToolKitOnRecruitment(tech, campaign, true);
+
+        assertEquals(kit.getInternalName(), tech.getRepairKitName());
+    }
+
+    @Test
+    void issueFromStockIntoTheSecondarySlotLeavesThePrimaryAlone() {
+        EquipmentType scanner = EquipmentType.get(EquipmentKitCatalog.KIT_DESCARTES_MK_XXV);
+        LocalWarehouse warehouse = warehouseHolding(List.of(partOf(scanner)));
+        Person person = personOwning(KIT_BASIC_TOOLKIT);
+        when(person.getWarehouse()).thenReturn(warehouse);
+
+        assertTrue(EquipmentKitIssuer.issueFromStock(person, scanner, KitSlot.SECONDARY, campaign));
+
+        assertEquals(KIT_BASIC_TOOLKIT, person.getRepairKitName());
+        assertEquals(scanner.getInternalName(), person.getSecondaryKitName());
+    }
+
+    @Test
+    void roleChangeFillsOnlyAFreeSlot() {
+        EquipmentType computer = EquipmentType.get(EquipmentKitCatalog.KIT_PERSONAL_COMPUTER);
+        LocalWarehouse warehouse = warehouseHolding(List.of(partOf(computer)));
+        Person person = personWithRoles(ADMINISTRATOR, NONE);
+        wireKitState(person, KIT_BASIC_TOOLKIT); // primary slot already taken
+        when(person.getWarehouse()).thenReturn(warehouse);
+        CampaignOptions options = optionsWith(EquipmentKitCatalog.NO_DEFAULT_KIT, false);
+        options.set(CampaignOption.ADMIN_DEFAULT_TOOL_KIT, EquipmentKitCatalog.KIT_PERSONAL_COMPUTER);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+
+        EquipmentKitIssuer.equipDefaultToolKitOnRoleChange(person, KitSlot.PRIMARY, campaign);
+
+        assertEquals(KIT_BASIC_TOOLKIT, person.getRepairKitName(), "an occupied slot is never overwritten");
+        assertEquals(computer.getInternalName(), person.getSecondaryKitName());
+    }
+
+    @Test
+    void roleChangeDoesNothingWhenBothSlotsAreFull() {
+        EquipmentType computer = EquipmentType.get(EquipmentKitCatalog.KIT_PERSONAL_COMPUTER);
+        LocalWarehouse warehouse = warehouseHolding(List.of(partOf(computer)));
+        Person person = personWithRoles(ADMINISTRATOR, NONE);
+        when(person.getWarehouse()).thenReturn(warehouse);
+        person.setKitName(KitSlot.PRIMARY, KIT_BASIC_TOOLKIT);
+        person.setKitName(KitSlot.SECONDARY, EquipmentKitCatalog.KIT_DESCARTES_MK_XXI);
+        CampaignOptions options = optionsWith(EquipmentKitCatalog.NO_DEFAULT_KIT, false);
+        options.set(CampaignOption.ADMIN_DEFAULT_TOOL_KIT, EquipmentKitCatalog.KIT_PERSONAL_COMPUTER);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+
+        EquipmentKitIssuer.equipDefaultToolKitOnRoleChange(person, KitSlot.PRIMARY, campaign);
+
+        assertFalse(person.hasRepairKit(computer.getInternalName()));
+        verify(warehouse, never()).removePart(any(), anyInt());
+    }
+    // endregion two kit slots
 }

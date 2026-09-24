@@ -1431,13 +1431,37 @@ public class Unit implements ITechnology, ILocatable {
                 }
             }
         }
-        // When the campaign requires it, a Mek may not deploy unless every crew member wears one of the three
-        // MekWarrior kits (Basic, Advanced, or Clan): a MekWarrior without one is doesn't have a neurohelmet.
-        if ((entity instanceof Mek) &&
-                  getCampaign().getCampaignOptions().get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY)) {
-            for (Person crewMember : getCrew()) {
+        return checkCrewArmorKits(entity, getCrew(), getCampaign().getCampaignOptions());
+    }
+
+    /**
+     * The armor-kit part of {@link #checkDeployment()}: when the campaign requires it, a Mek may not deploy unless every
+     * crew member wears one of the three MekWarrior kits (Basic, Advanced, or Clan), and an aerospace fighter may not
+     * deploy unless every crew member wears the Aerospace Fighter Pilot Kit — in both cases the kit carries the
+     * neurohelmet. Conventional fighters are not affected.
+     *
+     * @param entity  the unit's entity
+     * @param crew    the unit's crew
+     * @param options the campaign options
+     *
+     * @return the reason the crew cannot deploy, or {@code null} if their kits allow it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable String checkCrewArmorKits(@Nullable Entity entity, List<Person> crew, CampaignOptions options) {
+        if ((entity instanceof Mek) && options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY)) {
+            for (Person crewMember : crew) {
                 if (!ArmorKitCatalog.isMekWarriorKit(crewMember.getArmorKitName())) {
                     return getTextAt(RESOURCE_BUNDLE, "Unit.checkDeployment.needsMekWarriorKit");
+                }
+            }
+        }
+        if ((entity != null) && entity.isAerospaceFighter()
+                  && options.get(CampaignOption.REQUIRE_AEROSPACE_KIT_TO_DEPLOY)) {
+            for (Person crewMember : crew) {
+                if (!ArmorKitCatalog.isAerospacePilotKit(crewMember.getArmorKitName())) {
+                    return getTextAt(RESOURCE_BUNDLE, "Unit.checkDeployment.needsAerospaceKit");
                 }
             }
         }
