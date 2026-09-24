@@ -1319,6 +1319,9 @@ public class Campaign implements ITechManager {
             unit.setSalvage(true);
         }
 
+        // The unit isn't available until it has been delivered, just like its parts
+        unit.setDaysToArrival(Math.max(0, deliveryTime));
+
         // Assign an entity ID to our new unit
         if (Entity.NONE == unit.getEntity().getId()) {
             unit.getEntity().setId(game.getNextEntityId());

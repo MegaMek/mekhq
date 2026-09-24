@@ -45,6 +45,8 @@ import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -295,7 +297,7 @@ public class CamOpsSalvageUtilities {
      */
     public static void resolveSalvage(Campaign campaign, AbstractContract mission, Scenario scenario,
           List<TestUnit> keptSalvage, List<TestUnit> soldSalvage, List<TestUnit> employerSalvage) {
-        int deliveryTime = getDeploymentTime(scenario.getId(), mission);
+        int deliveryTime = getSalvageDeliveryTime(campaign, scenario, mission);
         boolean isKeepEnemyCamouflage = campaign.getCampaignOptions()
                                               .get(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE);
 
@@ -371,28 +373,53 @@ public class CamOpsSalvageUtilities {
     }
 
     /**
-     * Gets the deployment time for a scenario within a StratCon contract.
+     * Gets how many days until salvage from a StratCon scenario reaches the hangar.
      *
-     * <p>This method searches through all tracks in the contract's StratCon campaign state to find the track
-     * containing the specified scenario, then returns that track's deployment time.</p>
+     * <p>Salvage travels back with the salvage teams, so it arrives when the last salvage formation assigned to the
+     * scenario returns. If no salvage formation has a return date (for example, when not using CamOps salvage), the
+     * scenario's own return date is used instead, falling back to the track's deployment time.</p>
      *
-     * @param scenarioId  the ID of the scenario to look up
+     * @param campaign the current campaign
+     * @param scenario the scenario the salvage came from
      * @param contract the contract to search within
      *
-     * @return the deployment time in days for the track containing the scenario, or 0 if the scenario is not found or
-     *       the contract has no StratCon state
+     * @return the number of days until the salvage arrives, or 0 if the scenario is not found or the contract has no
+     *       StratCon state
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getDeploymentTime(int scenarioId, AbstractContract contract) {
+    private static int getSalvageDeliveryTime(Campaign campaign, Scenario scenario, AbstractContract contract) {
         StratConCampaignState campaignState = contract.getStratConCampaignState();
-        if (campaignState != null) {
-            for (StratConTrackState track : campaignState.getTracks()) {
-                if (track.getBackingScenariosMap().get(scenarioId) != null) {
-                    return track.getDeploymentTime();
+        if (campaignState == null) {
+            return 0;
+        }
+
+        for (StratConTrackState track : campaignState.getTracks()) {
+            StratConScenario stratConScenario = track.getBackingScenariosMap().get(scenario.getId());
+            if (stratConScenario == null) {
+                continue;
+            }
+
+            LocalDate returnDate = null;
+            Map<Integer, LocalDate> formationReturnDates = track.getAssignedForceReturnDates();
+            for (int formationId : scenario.getSalvageFormations()) {
+                LocalDate formationReturnDate = formationReturnDates.get(formationId);
+                if ((formationReturnDate != null) &&
+                          ((returnDate == null) || formationReturnDate.isAfter(returnDate))) {
+                    returnDate = formationReturnDate;
                 }
             }
+
+            if (returnDate == null) {
+                returnDate = stratConScenario.getReturnDate();
+            }
+
+            if (returnDate == null) {
+                return track.getDeploymentTime();
+            }
+
+            return (int) max(0, ChronoUnit.DAYS.between(campaign.getLocalDate(), returnDate));
         }
 
         return 0;
