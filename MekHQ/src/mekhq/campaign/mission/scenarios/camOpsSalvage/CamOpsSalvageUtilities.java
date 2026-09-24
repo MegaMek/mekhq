@@ -108,23 +108,24 @@ public class CamOpsSalvageUtilities {
      * <ul>
      *   <li>Unit name</li>
      *   <li>Drag/tow capacity in tons (for non-large vessels)</li>
-     *   <li>Cargo capacity in tons (for non-Mek units)</li>
+     *   <li>Cargo capacity in tons (for non-Mek units, and 'Meks with cargo space)</li>
      *   <li>Naval tug status (for large vessels like DropShips and WarShips)</li>
      * </ul>
      *
      * @param unitsInForce the list of units to analyze for salvage capabilities
      * @param isInSpace    {@code true} if checking space salvage capabilities, {@code false} for ground operations
+     * @param salvageRules the rules of the campaign's salvage system
      *
      * @return an HTML-formatted string describing each salvage-capable unit's capabilities
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static String getSalvageTooltip(List<Unit> unitsInForce, boolean isInSpace) {
+    public static String getSalvageTooltip(List<Unit> unitsInForce, boolean isInSpace, AbstractSalvage salvageRules) {
         StringBuilder tooltip = new StringBuilder();
 
         for (Unit unit : unitsInForce) {
-            if (unit.canSalvage(isInSpace)) {
+            if (canSalvage(unit, isInSpace, salvageRules)) {
                 Entity entity = unit.getEntity();
                 if (entity != null) {
                     if (!tooltip.isEmpty()) {
@@ -141,10 +142,13 @@ public class CamOpsSalvageUtilities {
                     }
 
                     double cargoCapacity = unit.getCargoCapacityForSalvage();
-                    if (!(entity instanceof Mek)) {
+                    boolean isMek = entity instanceof Mek;
+                    if (!isMek || (cargoCapacity > 0.0)) {
                         tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
                               "CamOpsSalvageUtilities.tooltip.cargo", cargoCapacity)).append(")");
+                    }
 
+                    if (!isMek) {
                         if (isLargeVessel) {
                             if (CamOpsSalvageUtilities.hasNavalTug(entity)) {
                                 tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -166,7 +170,8 @@ public class CamOpsSalvageUtilities {
     /**
      * Checks whether an entity is able to drag or tow salvage during ground salvage operations.
      *
-     * <p>'Meks and non-trailer vehicles can tow. Trailers cannot, as they must themselves be towed.</p>
+     * <p>'Meks with two working hands and non-trailer vehicles can tow. Trailers cannot, as they must themselves be
+     * towed.</p>
      *
      * @param entity the entity to check
      *
@@ -176,8 +181,9 @@ public class CamOpsSalvageUtilities {
      * @since 0.51.01
      */
     public static boolean isTowCapable(@Nullable Entity entity) {
-        if (entity instanceof Mek) {
-            return true;
+        // A 'Mek needs two working hands to drag salvage
+        if (entity instanceof Mek mek) {
+            return mek.canPerformGroundSalvageOperations();
         }
 
         return entity instanceof Tank tank && !tank.isTrailer();
@@ -209,11 +215,40 @@ public class CamOpsSalvageUtilities {
     }
 
     /**
+     * Checks whether a unit is capable of salvaging in the current environment.
+     *
+     * <p>This is {@link Unit#canSalvage(boolean)}, plus: where the salvage system allows it, a 'Mek without two working
+     * hands can still salvage on the ground using its cargo space, such as lift hoists (see
+     * {@link AbstractSalvage#isMekCargoSalvageWithoutHandsAllowed()}). Such a 'Mek can't drag salvage.</p>
+     *
+     * @param unit         the unit to check
+     * @param isInSpace    {@code true} if the salvage operation takes place in space
+     * @param salvageRules the rules of the campaign's salvage system
+     *
+     * @return {@code true} if the unit is capable of salvaging
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean canSalvage(Unit unit, boolean isInSpace, AbstractSalvage salvageRules) {
+        if (unit.canSalvage(isInSpace)) {
+            return true;
+        }
+
+        return !isInSpace &&
+                     salvageRules.isMekCargoSalvageWithoutHandsAllowed() &&
+                     (unit.getEntity() instanceof Mek) &&
+                     unit.isFullyCrewed() &&
+                     (unit.getCargoCapacityForSalvage() > 0.0);
+    }
+
+    /**
      * Checks whether a unit is able to take part in a salvage operation.
      *
      * <p>The unit must:</p>
      * <ul>
-     *   <li>Be capable of salvaging in the current environment (see {@link Unit#canSalvage(boolean)})</li>
+     *   <li>Be capable of salvaging in the current environment (see
+     *   {@link #canSalvage(Unit, boolean, AbstractSalvage)})</li>
      *   <li>Be repairable, and not being stripped for parts</li>
      *   <li>Be able to move (see {@link #isImmobilized(Entity, AbstractSalvage)})</li>
      * </ul>
@@ -230,7 +265,7 @@ public class CamOpsSalvageUtilities {
      * @since 0.51.01
      */
     public static boolean isAvailableForSalvage(Unit unit, boolean isInSpace, AbstractSalvage salvageRules) {
-        if (!unit.canSalvage(isInSpace)) {
+        if (!canSalvage(unit, isInSpace, salvageRules)) {
             return false;
         }
 

@@ -524,9 +524,10 @@ public class SalvagePostScenarioPicker {
         RoundedJButton confirmButton = new RoundedJButton(getText("Confirm.text"));
 
         // Build the mapping and populate salvage unit options ONCE, outside the loop
+        AbstractSalvage salvageRules = campaign.getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage();
         unitNameMap.clear();
         for (Unit salvageUnit : salvageUnits) {
-            String base = CamOpsSalvageUtilities.getSalvageTooltip(List.of(salvageUnit), isInSpace);
+            String base = CamOpsSalvageUtilities.getSalvageTooltip(List.of(salvageUnit), isInSpace, salvageRules);
             String key = base;
             int duplicate = 2;
             while (unitNameMap.containsKey(key)) {

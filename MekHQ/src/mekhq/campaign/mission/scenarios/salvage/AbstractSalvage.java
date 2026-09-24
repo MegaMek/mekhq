@@ -58,4 +58,19 @@ public abstract class AbstractSalvage {
     public boolean isMekMobilityRequiredForSalvage() {
         return false;
     }
+
+    /**
+     * Checks whether a 'Mek without two working hands may still salvage using its cargo space, such as lift hoists.
+     *
+     * <p>A 'Mek always needs two working hands to drag salvage. Under CamOps (Strict), a 'Mek without them can't
+     * salvage at all. Other systems let it carry salvage in its cargo space instead.</p>
+     *
+     * @return {@code true} if a 'Mek without two working hands may salvage using its cargo space
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isMekCargoSalvageWithoutHandsAllowed() {
+        return false;
+    }
 }

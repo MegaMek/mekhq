@@ -4,7 +4,8 @@ package mekhq.campaign.mission.scenarios.salvage;
  * The {@link SalvageSystem#CHAOS_CAMPAIGN Chaos Campaign} salvage system: a simplified version of Campaign Operations
  * salvage.
  *
- * <p>Salvage formations may fight in a scenario and still salvage it, and salvaging 'Meks need working legs.
+ * <p>Salvage formations may fight in a scenario and still salvage it. Salvaging 'Meks need working legs, and
+ * 'Meks without two working hands may still salvage using cargo space (but can't drag salvage).
  * Otherwise, not yet implemented; currently behaves like {@link CamOpsStrictSalvage CamOps (Strict)}.</p>
  *
  * @author Illiani
@@ -18,6 +19,11 @@ public class ChaosCampaignSalvage extends AbstractSalvage {
 
     @Override
     public boolean isMekMobilityRequiredForSalvage() {
+        return true;
+    }
+
+    @Override
+    public boolean isMekCargoSalvageWithoutHandsAllowed() {
         return true;
     }
 }

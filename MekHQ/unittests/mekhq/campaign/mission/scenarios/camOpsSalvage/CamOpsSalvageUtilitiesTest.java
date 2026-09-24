@@ -51,6 +51,12 @@ class CamOpsSalvageUtilitiesTest {
         return tank;
     }
 
+    private static Mek mekWithHands(boolean hasTwoWorkingHands) {
+        Mek mek = mock(Mek.class);
+        when(mek.canPerformGroundSalvageOperations()).thenReturn(hasTwoWorkingHands);
+        return mek;
+    }
+
     private static Unit unitWithEntity(Entity entity, double currentTowWeight) {
         Unit unit = mock(Unit.class);
         when(unit.getEntity()).thenReturn(entity);
@@ -62,8 +68,13 @@ class CamOpsSalvageUtilitiesTest {
     @Nested
     class IsTowCapable {
         @Test
-        void mekCanTow() {
-            assertTrue(CamOpsSalvageUtilities.isTowCapable(mock(Mek.class)));
+        void mekWithTwoWorkingHandsCanTow() {
+            assertTrue(CamOpsSalvageUtilities.isTowCapable(mekWithHands(true)));
+        }
+
+        @Test
+        void mekWithoutTwoWorkingHandsCannotTow() {
+            assertFalse(CamOpsSalvageUtilities.isTowCapable(mekWithHands(false)));
         }
 
         @Test
@@ -112,11 +123,20 @@ class CamOpsSalvageUtilitiesTest {
 
         @Test
         void mekTowsItsOwnWeight() {
-            Mek mek = mock(Mek.class);
+            Mek mek = mekWithHands(true);
             when(mek.getWeight()).thenReturn(75.0);
             Unit unit = unitWithEntity(mek, 0.0);
 
             assertEquals(75.0, CamOpsSalvageUtilities.getTowCapacity(unit), DELTA);
+        }
+
+        @Test
+        void mekWithoutTwoWorkingHandsHasNoTowCapacity() {
+            Mek mek = mekWithHands(false);
+            when(mek.getWeight()).thenReturn(75.0);
+            Unit unit = unitWithEntity(mek, 0.0);
+
+            assertEquals(0.0, CamOpsSalvageUtilities.getTowCapacity(unit), DELTA);
         }
 
         @Test
@@ -131,6 +151,55 @@ class CamOpsSalvageUtilitiesTest {
             Unit unit = mock(Unit.class);
 
             assertEquals(0.0, CamOpsSalvageUtilities.getTowCapacity(unit), DELTA);
+        }
+    }
+
+    @Nested
+    class CanSalvage {
+        private static final AbstractSalvage STRICT_RULES = new CamOpsStrictSalvage();
+        private static final AbstractSalvage REVISED_RULES = new CamOpsRevisedSalvage();
+
+        /** A 'Mek whose unit fails the basic capability check, as it lacks two working hands. */
+        private static Unit handlessMek(double cargoCapacity, boolean isFullyCrewed) {
+            Unit unit = mock(Unit.class);
+            when(unit.getEntity()).thenReturn(mekWithHands(false));
+            when(unit.canSalvage(anyBoolean())).thenReturn(false);
+            when(unit.getCargoCapacityForSalvage()).thenReturn(cargoCapacity);
+            when(unit.isFullyCrewed()).thenReturn(isFullyCrewed);
+            return unit;
+        }
+
+        @Test
+        void unitThatPassesTheBasicCheckCanSalvage() {
+            Unit unit = mock(Unit.class);
+            when(unit.canSalvage(false)).thenReturn(true);
+
+            assertTrue(CamOpsSalvageUtilities.canSalvage(unit, false, STRICT_RULES));
+        }
+
+        @Test
+        void strictRulesDontLetAHandlessMekUseCargo() {
+            assertFalse(CamOpsSalvageUtilities.canSalvage(handlessMek(10.0, true), false, STRICT_RULES));
+        }
+
+        @Test
+        void otherRulesLetAHandlessMekUseCargo() {
+            assertTrue(CamOpsSalvageUtilities.canSalvage(handlessMek(10.0, true), false, REVISED_RULES));
+        }
+
+        @Test
+        void handlessMekWithoutCargoCannotSalvage() {
+            assertFalse(CamOpsSalvageUtilities.canSalvage(handlessMek(0.0, true), false, REVISED_RULES));
+        }
+
+        @Test
+        void handlessMekThatIsNotFullyCrewedCannotSalvage() {
+            assertFalse(CamOpsSalvageUtilities.canSalvage(handlessMek(10.0, false), false, REVISED_RULES));
+        }
+
+        @Test
+        void handlessMekCannotUseCargoInSpace() {
+            assertFalse(CamOpsSalvageUtilities.canSalvage(handlessMek(10.0, true), true, REVISED_RULES));
         }
     }
 
