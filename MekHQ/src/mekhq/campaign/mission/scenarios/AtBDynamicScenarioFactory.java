@@ -49,7 +49,6 @@ import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.scenarioModifierShouldBeBlocked;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.mission.scenarios.AtBScenario.selectBotTeamCommanders;
-import static mekhq.campaign.mission.scenarios.BotForceRandomizer.hasNaturalAptitude;
 import static mekhq.campaign.mission.scenarios.Scenario.T_ATMOSPHERE;
 import static mekhq.campaign.mission.scenarios.Scenario.T_GROUND;
 import static mekhq.campaign.mission.scenarios.Scenario.T_SPACE;
@@ -3155,11 +3154,11 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
-        boolean hasNaturalAptitudeGunnery = hasNaturalAptitude(skill);
-        boolean hasNaturalAptitudePiloting = hasNaturalAptitude(skill);
+        boolean hasNaturalAptitudeGunnery = Crew.rollNaturalAptitude(skill);
+        boolean hasNaturalAptitudePiloting = Crew.rollNaturalAptitude(skill);
 
         boolean useArtillery = campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
-        boolean hasNaturalAptitudeArtillery = useArtillery ? hasNaturalAptitude(skill) : hasNaturalAptitudeGunnery;
+        boolean hasNaturalAptitudeArtillery = useArtillery ? Crew.rollNaturalAptitude(skill) : hasNaturalAptitudeGunnery;
 
         extraData.put(0, innerMap);
 

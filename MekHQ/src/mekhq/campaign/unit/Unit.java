@@ -5270,6 +5270,8 @@ public class Unit implements ITechnology, ILocatable {
         final String gunType = SkillType.getGunnerySkillFor(entity);
         final Person commander = getCommander();
 
+        updateCrewNaturalAptitudes(crew, commander, gunType, driveType);
+
         if (crew.getSlotCount() > 1) {
             if (crew.getCrewType().getPilotPos() == crew.getCrewType().getGunnerPos()) {
                 // Command console; each crew is assigned as both driver and gunner
@@ -5359,21 +5361,43 @@ public class Unit implements ITechnology, ILocatable {
             }
             crew.setMissing(false, 0);
         }
+    }
 
-        if (commander != null) {
-            boolean hasGunnerySkill = commander.hasSkill(gunType);
-            boolean hasNaturalAptitudeGunnery = hasGunnerySkill && commander.getSkill(gunType).getHasNaturalAptitude();
-            crew.setHasNaturalAptitudeGunnery(hasNaturalAptitudeGunnery);
+    /**
+     * Copies the commander's Natural Aptitudes onto the entity's crew. If there is no commander, all aptitudes are
+     * cleared so a previous commander's aptitudes don't linger on the unit.
+     *
+     * <p>When the campaign doesn't use the separate Artillery skill, artillery is fired using Gunnery, so the
+     * Artillery aptitude mirrors the Gunnery aptitude.</p>
+     *
+     * @param crew      the entity's crew
+     * @param commander the unit's commander, or {@code null} if there is none
+     * @param gunType   the gunnery skill used by this unit
+     * @param driveType the piloting or driving skill used by this unit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void updateCrewNaturalAptitudes(Crew crew, @Nullable Person commander, String gunType,
+          String driveType) {
+        boolean hasNaturalAptitudeGunnery = hasNaturalAptitude(commander, gunType);
+        crew.setHasNaturalAptitudeGunnery(hasNaturalAptitudeGunnery);
+        crew.setHasNaturalAptitudePiloting(hasNaturalAptitude(commander, driveType));
 
-            boolean hasPilotingSkill = commander.hasSkill(driveType);
-            boolean hasNaturalAptitudePiloting = hasPilotingSkill && commander.getSkill(driveType).getHasNaturalAptitude();
-            crew.setHasNaturalAptitudePiloting(hasNaturalAptitudePiloting);
+        boolean isUseArtillerySkill = campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
+        crew.setHasNaturalAptitudeArtillery(isUseArtillerySkill ?
+                                                  hasNaturalAptitude(commander, SkillType.S_ARTILLERY) :
+                                                  hasNaturalAptitudeGunnery);
+    }
 
-            boolean isUseArtillerySkill = campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
-            boolean hasArtillerySkill = isUseArtillerySkill ? commander.hasSkill(SkillType.S_ARTILLERY) : hasNaturalAptitudeGunnery;
-            boolean hasNaturalAptitudeArtillery = hasArtillerySkill && commander.getSkill(SkillType.S_ARTILLERY).getHasNaturalAptitude();
-            crew.setHasNaturalAptitudePiloting(hasNaturalAptitudeArtillery);
-        }
+    /**
+     * @return {@code true} if the person exists, has the named skill, and has a Natural Aptitude in it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean hasNaturalAptitude(@Nullable Person person, String skillName) {
+        return (person != null) && person.hasSkill(skillName) && person.getSkill(skillName).getHasNaturalAptitude();
     }
 
     private void setTacticsInitiativeBonus(@Nullable Person commander) {
@@ -5965,6 +5989,10 @@ public class Unit implements ITechnology, ILocatable {
         if (null == pilot) {
             entity.getCrew().setMissing(true, 0);
             entity.getCrew().setSize(0);
+            if (entity.getCrew() instanceof LAMPilot lamPilot) {
+                lamPilot.setHasNaturalAptitudeGunneryAero(false);
+                lamPilot.setHasNaturalAptitudePilotingAero(false);
+            }
             return;
         }
 
@@ -6017,11 +6045,8 @@ public class Unit implements ITechnology, ILocatable {
         entity.getCrew().setSize(1);
         entity.getCrew().setMissing(false, 0);
 
-        boolean hasNaturalAptitudeGunnery = pilot.getSkill(S_GUN_AERO).getHasNaturalAptitude();
-        crew.setHasNaturalAptitudeGunneryAero(hasNaturalAptitudeGunnery);
-
-        boolean hasNaturalAptitudePiloting = pilot.getSkill(S_PILOT_AERO).getHasNaturalAptitude();
-        crew.setHasNaturalAptitudePilotingAero(hasNaturalAptitudePiloting);
+        crew.setHasNaturalAptitudeGunneryAero(hasNaturalAptitude(pilot, S_GUN_AERO));
+        crew.setHasNaturalAptitudePilotingAero(hasNaturalAptitude(pilot, S_PILOT_AERO));
     }
 
     /**

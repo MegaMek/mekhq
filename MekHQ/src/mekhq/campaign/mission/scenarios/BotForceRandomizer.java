@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.mission.scenarios;
 
-import static java.lang.Math.floor;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -91,9 +90,6 @@ public class BotForceRandomizer {
 
     // region Variable declarations
     public static final int UNIT_WEIGHT_UNSPECIFIED = -1;
-
-    /** This is later reduced by crew experience level */
-    public static final int NATURAL_APTITUDE_CHANCE = 1000;
 
     public enum BalancingMethod {
         BV,
@@ -546,11 +542,13 @@ public class BotForceRandomizer {
 
         extraData.put(0, innerMap);
 
-        boolean hasNaturalAptitudeGunnery = hasNaturalAptitude(entitySkill);
-        boolean hasNaturalAptitudePiloting = hasNaturalAptitude(entitySkill);
+        boolean hasNaturalAptitudeGunnery = Crew.rollNaturalAptitude(entitySkill);
+        boolean hasNaturalAptitudePiloting = Crew.rollNaturalAptitude(entitySkill);
 
         boolean useArtillery = campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
-        boolean hasNaturalAptitudeArtillery = useArtillery ? hasNaturalAptitude(entitySkill) : hasNaturalAptitudeGunnery;
+        boolean hasNaturalAptitudeArtillery = useArtillery ?
+                                                    Crew.rollNaturalAptitude(entitySkill) :
+                                                    hasNaturalAptitudeGunnery;
 
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
               skills[0], hasNaturalAptitudeGunnery, hasNaturalAptitudeArtillery, skills[1],
@@ -559,15 +557,6 @@ public class BotForceRandomizer {
 
         en.setExternalIdAsString(UUID.randomUUID().toString());
         return en;
-    }
-
-    public static boolean hasNaturalAptitude(SkillLevel entitySkill) {
-        return hasNaturalAptitude(entitySkill.getExperienceLevel());
-    }
-
-    public static boolean hasNaturalAptitude(double experienceLevel) {
-        int chance = (int) floor(NATURAL_APTITUDE_CHANCE / experienceLevel);
-        return randomInt(chance) == 0;
     }
 
     /**
