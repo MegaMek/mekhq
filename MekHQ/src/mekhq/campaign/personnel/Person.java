@@ -1712,6 +1712,23 @@ public class Person implements ILocatable {
      * @param status   the person's new PersonnelStatus
      */
     public void changeStatus(final Campaign campaign, final LocalDate today, final PersonnelStatus status) {
+        changeStatus(campaign, today, status, true);
+    }
+
+    /**
+     * This is used to change the person's PersonnelStatus
+     *
+     * @param campaign      the campaign the person is part of
+     * @param today         the current date
+     * @param status        the person's new PersonnelStatus
+     * @param canCheatDeath {@code false} if this death is deliberate (for example, set manually by the player or
+     *                      scripted by a Story Arc) and must not be averted by Twist of Fate
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void changeStatus(final Campaign campaign, final LocalDate today, final PersonnelStatus status,
+          final boolean canCheatDeath) {
         if (status == getStatus()) { // no change means we don't need to process anything
             return;
         } else if (getStatus().isDead() && !status.isDead()) {
@@ -1722,7 +1739,7 @@ public class Person implements ILocatable {
             ServiceLogger.resurrected(this, today);
         }
 
-        if (status.isDead() && attemptToCheatDeath(campaign)) {
+        if (canCheatDeath && status.isDead() && attemptToCheatDeath(campaign, status)) {
             return;
         }
 
@@ -1929,12 +1946,32 @@ public class Person implements ILocatable {
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
     }
 
-    private boolean attemptToCheatDeath(Campaign campaign) {
+    /**
+     * Attempts to have this person survive a death of the given cause through Twist of Fate, spending Edge and healing
+     * their lethal wounds if successful.
+     *
+     * <p>This is called automatically by {@link #changeStatus(Campaign, LocalDate, PersonnelStatus)}. Call it
+     * directly only when death has to be announced before the status is changed; in that case, if it fails, change
+     * the status with {@code canCheatDeath} set to {@code false} so a second attempt is not made.</p>
+     *
+     * @param campaign     the current campaign
+     * @param causeOfDeath the {@link PersonnelStatus} the person is about to die with
+     *
+     * @return {@code true} if the person cheated death and remains alive
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean attemptToCheatDeath(Campaign campaign, PersonnelStatus causeOfDeath) {
         LocalDate today = campaign.getLocalDate();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         boolean isUseTwistOfFateSurvival = campaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL);
         if (!isUseTwistOfFateSurvival) {
+            return false;
+        }
+
+        if (!isEligibleToCheatDeath(causeOfDeath)) {
             return false;
         }
 
@@ -1948,15 +1985,10 @@ public class Person implements ILocatable {
                   CLOSING_SPAN_TAG,
                   choiceEnumeration);
 
-            if (getNonPermanentInjurySeverity() >= DEATH) {
-                healExcessHits(campaign);
-                healExcessInjuries(campaign, today);
-
-                MekHQ.triggerEvent(new PersonChangedEvent(this));
-            }
-
             campaign.addReport(PERSONNEL, report);
             PersonalLogger.cheatedDeath(this, today);
+
+            healLethalWounds(campaign, today);
 
             return true;
         }
@@ -1964,33 +1996,125 @@ public class Person implements ILocatable {
         return false;
     }
 
-    private void healExcessInjuries(Campaign campaign, LocalDate today) {
+    /**
+     * Determines whether this person could survive a death of the given cause through Twist of Fate.
+     *
+     * <p>Voluntary deaths, deaths of people who are already dead, have left the unit, or are prisoners cannot be
+     * averted. Nor can deaths where the person's unhealable (permanent) injuries would still be lethal on their
+     * own; in that case no Edge is spent.</p>
+     *
+     * @param causeOfDeath the {@link PersonnelStatus} the person is about to die with
+     *
+     * @return {@code true} if the person may cheat this death
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isEligibleToCheatDeath(PersonnelStatus causeOfDeath) {
+        if (causeOfDeath.isSeppuku() || causeOfDeath.isBondsref() || causeOfDeath.isSuicide()) {
+            return false;
+        }
+
+        if (getStatus().isDepartedUnit() || getPrisonerStatus().isCurrentPrisoner()) {
+            return false;
+        }
+
+        int unhealableSeverity = 0;
+        for (Injury injury : injuries) {
+            if (!isHealableByTwistOfFate(injury)) {
+                if (injury.getType().impliesDead(injury.getLocation())) {
+                    return false;
+                }
+                unhealableSeverity += injury.getHits();
+            }
+        }
+
+        return unhealableSeverity < DEATH;
+    }
+
+    private static boolean isHealableByTwistOfFate(Injury injury) {
+        return !injury.isPermanent() && !injury.getSubType().isPermanentModification();
+    }
+
+    /**
+     * Heals this person's lethal wounds after they have cheated death, so that they are no longer dead by the
+     * standards of any death check.
+     *
+     * <p>Also used when a person has already cheated death, but further injuries were applied afterward (for
+     * example, combat hits being converted into injuries under Advanced Medical once the scenario is resolved).</p>
+     *
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void healExcessInjuriesAfterCheatingDeath(Campaign campaign) {
+        healLethalWounds(campaign, campaign.getLocalDate());
+    }
+
+    private void healLethalWounds(Campaign campaign, LocalDate today) {
+        boolean wasHealed = healExcessHits(campaign);
+        wasHealed |= healFatalInjuries(campaign, today);
+        wasHealed |= healExcessInjuries(campaign, today);
+
+        if (wasHealed) {
+            MekHQ.triggerEvent(new PersonChangedEvent(this));
+        }
+    }
+
+    private boolean healFatalInjuries(Campaign campaign, LocalDate today) {
+        boolean wasHealed = false;
+        for (Injury injury : getInjuries()) {
+            if (isHealableByTwistOfFate(injury) && injury.getType().impliesDead(injury.getLocation())) {
+                healInjuryByTwistOfFate(campaign, today, injury);
+                wasHealed = true;
+            }
+        }
+
+        return wasHealed;
+    }
+
+    private boolean healExcessInjuries(Campaign campaign, LocalDate today) {
         ArrayList<Injury> potentiallyHealedInjuries = new ArrayList<>();
         for (Injury injury : getInjuries()) {
-            if (!injury.isPermanent() && injury.getHits() > 0) {
+            if (isHealableByTwistOfFate(injury) && injury.getHits() > 0) {
                 potentiallyHealedInjuries.add(injury);
             }
         }
 
-        while (!potentiallyHealedInjuries.isEmpty() && getNonPermanentInjurySeverity() >= DEATH) {
+        boolean wasHealed = false;
+        while (!potentiallyHealedInjuries.isEmpty() && getTotalInjurySeverity() >= DEATH) {
             Injury randomInjury = ObjectUtility.getRandomItem(potentiallyHealedInjuries);
-            clearSpecificInjury(today, randomInjury);
             potentiallyHealedInjuries.remove(randomInjury);
+            healInjuryByTwistOfFate(campaign, today, randomInjury);
+            wasHealed = true;
+        }
 
-            String injuryHealingReport = getFormattedTextAt(RESOURCE_BUNDLE, "twistOfFate.miracle.injury",
-                  getHyperlinkedFullTitle(),
-                  randomInjury.getName());
-            campaign.addReport(PERSONNEL, injuryHealingReport);
+        return wasHealed;
+    }
 
-            if (injuries.isEmpty()) {
-                doctorId = null;
-            }
+    private void healInjuryByTwistOfFate(Campaign campaign, LocalDate today, Injury injury) {
+        clearSpecificInjury(today, injury);
+
+        String injuryHealingReport = getFormattedTextAt(RESOURCE_BUNDLE, "twistOfFate.miracle.injury",
+              getHyperlinkedFullTitle(),
+              injury.getName());
+        campaign.addReport(PERSONNEL, injuryHealingReport);
+
+        if (injuries.isEmpty()) {
+            doctorId = null;
         }
     }
 
-    private void healExcessHits(Campaign campaign) {
-        if (hits >= DEATH) {
-            int hitsHealed = hits - (DEATH - 1);
+    /**
+     * Reduces this person's hits so that, combined with their injuries, they are below the death threshold. Hits
+     * are healed before injuries, so that no injury is healed when healing hits alone would suffice.
+     */
+    private boolean healExcessHits(Campaign campaign) {
+        int injurySeverity = getTotalInjurySeverity() - hits;
+        int maximumSurvivableHits = max(0, DEATH - 1 - injurySeverity);
+        if (hits > maximumSurvivableHits) {
+            int hitsHealed = hits - maximumSurvivableHits;
             int hitsHealedEnumeration = hitsHealed == 1 ? 0 : 1;
 
             String hitHealingReport = getFormattedTextAt(RESOURCE_BUNDLE, "twistOfFate.miracle.hits",
@@ -1999,8 +2123,11 @@ public class Person implements ILocatable {
                   hitsHealedEnumeration);
             campaign.addReport(PERSONNEL, hitHealingReport);
 
-            hits = DEATH - 1;
+            hits = maximumSurvivableHits;
+            return true;
         }
+
+        return false;
     }
 
     /**

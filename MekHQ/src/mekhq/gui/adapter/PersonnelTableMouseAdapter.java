@@ -1061,7 +1061,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 status.toString(),
                                 JOptionPane.YES_NO_OPTION) == 0)) {
                     for (Person person : people) {
-                        person.changeStatus(getCampaign(), getCampaign().getLocalDate(), status);
+                        person.changeStatus(getCampaign(), getCampaign().getLocalDate(), status, false);
                     }
                 }
                 break;
@@ -1457,7 +1457,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     getCampaign().getPlayerForce()
                           .getFinances()
                           .credit(TransactionType.RANSOM, today, bounty, bountyReport);
-                    person.changeStatus(getCampaign(), today, PersonnelStatus.HOMICIDE);
+                    person.changeStatus(getCampaign(), today, PersonnelStatus.HOMICIDE, false);
                     if (person.getPrisonerStatus().isFree()) { // Deliberately excluding Bondsmen from this check
                         validBounty = true;
                     }
