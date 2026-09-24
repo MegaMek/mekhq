@@ -734,7 +734,7 @@ public abstract class AbstractContractGeneration {
         String targetSystemId = shouldAlwaysPickCurrentSystem ?
                                       currentSystemId :
                                       ChaosContractDeterminationLocation.determineContractLocation(objectiveData.playerObjectiveType(),
-                                            true,
+                                            !isDefensiveObjective,
                                             employerData.anchorFactionCode(),
                                             enemyData.factionCode(),
                                             currentLocation);
