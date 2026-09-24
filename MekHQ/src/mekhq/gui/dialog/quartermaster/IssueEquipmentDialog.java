@@ -524,42 +524,63 @@ public class IssueEquipmentDialog extends JDialog {
             }
 
             if (stripped.contains(category)) {
-                for (Person person : people) {
-                    person.setIntendedArmorKitName(null);
-                    if (!ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(person.getArmorKitName())) {
-                        ArmorKitIssuer.strip(person, campaign);
-                        totals.changed.add(person);
-                        totals.removed++;
-                    }
-                }
+                commitCrewStrip(people, campaign, totals);
                 continue;
             }
 
             EquipmentType kit = chosenKit.get(category);
-            if (kit == null) {
+            if (kit != null) {
+                commitCrewKit(people, category, kit, campaign, totals);
+            }
+        }
+    }
+
+    /**
+     * Strips a group of crew back to coveralls, returning their kits to stores and cancelling any awaited kit.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void commitCrewStrip(List<Person> people, Campaign campaign, KitIssueSection.CommitTotals totals) {
+        for (Person person : people) {
+            person.setIntendedArmorKitName(null);
+            if (!ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(person.getArmorKitName())) {
+                ArmorKitIssuer.strip(person, campaign);
+                totals.changed.add(person);
+                totals.removed++;
+            }
+        }
+    }
+
+    /**
+     * Issues a kit to every member of a (non-soldier) group who does not already wear it: drawn from stores where
+     * possible, otherwise remembered as awaited and the shortfall ordered in one go.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void commitCrewKit(List<Person> people, Category category, EquipmentType kit, Campaign campaign,
+          KitIssueSection.CommitTotals totals) {
+        int shortfall = 0;
+        for (Person person : people) {
+            if (wearsKit(person, category, kit)) {
+                // already wearing it — nothing to draw, order, or report
+                person.setIntendedArmorKitName(null);
                 continue;
             }
-            int shortfall = 0;
-            for (Person person : people) {
-                if (wearsKit(person, category, kit)) {
-                    // already wearing it — nothing to draw, order, or report
-                    person.setIntendedArmorKitName(null);
-                    continue;
-                }
-                if (ArmorKitIssuer.issueFromStock(person, kit, campaign)) {
-                    person.setIntendedArmorKitName(null);
-                    totals.changed.add(person);
-                    totals.issued++;
-                } else {
-                    // out of stock now — remember what they are meant to wear so it is issued when a kit arrives
-                    person.setIntendedArmorKitName(kit.getInternalName());
-                    shortfall++;
-                }
+            if (ArmorKitIssuer.issueFromStock(person, kit, campaign)) {
+                person.setIntendedArmorKitName(null);
+                totals.changed.add(person);
+                totals.issued++;
+            } else {
+                // out of stock now — remember what they are meant to wear so it is issued when a kit arrives
+                person.setIntendedArmorKitName(kit.getInternalName());
+                shortfall++;
             }
-            if (shortfall > 0) {
-                ArmorKitIssuer.order(kit, shortfall, campaign);
-                totals.ordered += shortfall;
-            }
+        }
+        if (shortfall > 0) {
+            ArmorKitIssuer.order(kit, shortfall, campaign);
+            totals.ordered += shortfall;
         }
     }
 
@@ -569,7 +590,7 @@ public class IssueEquipmentDialog extends JDialog {
      * @author Illiani
      * @since 0.51.01
      */
-    private static int countLacking(Category category, List<Person> people, EquipmentType kit) {
+    static int countLacking(Category category, List<Person> people, EquipmentType kit) {
         int count = 0;
         for (Person person : people) {
             if (!wearsKit(person, category, kit)) {
@@ -585,7 +606,7 @@ public class IssueEquipmentDialog extends JDialog {
      * @author Illiani
      * @since 0.51.01
      */
-    private static boolean wearsKit(Person person, Category category, EquipmentType kit) {
+    static boolean wearsKit(Person person, Category category, EquipmentType kit) {
         String worn;
         if (category == Category.SOLDIER) {
             worn = (person.getUnit() != null) ? person.getUnit().getArmorKitName() : null;

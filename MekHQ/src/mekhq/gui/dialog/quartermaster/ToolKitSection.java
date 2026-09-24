@@ -65,8 +65,8 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
  * One of the two equipment-kit tabs (primary slot or secondary slot) of the shared kit-issue dialog. It reuses the
  * same {@link KitCard} tiles and top-anchored grid as the armor-kit tab, and works the same way: the player picks a
  * single card and it applies to everyone selected - choose a kit to issue it to all who lack it (drawn from stores, a
- * shortfall ordered), or the "No kit" card to strip this slot's kit from everyone. A person carries up to two equipment kits, one per {@link KitSlot}, and this
- * tab only ever changes its own slot.
+ * shortfall ordered), or the "No kit" card to strip this slot's kit from everyone. A person carries up to two
+ * equipment kits, one per {@link KitSlot}, and this tab only ever changes its own slot.
  *
  * @author Illiani
  * @since 0.51.01
@@ -202,19 +202,40 @@ public class ToolKitSection implements KitIssueSection {
             return;
         }
         if (STRIP.equals(selected)) {
-            for (Person tech : technicians) {
-                tech.setIntendedKitName(slot, null);
-                if (EquipmentKitIssuer.removeKit(tech, slot, campaign)) {
-                    totals.removed++;
-                    totals.changed.add(tech);
-                }
-            }
+            commitStrip(technicians, slot, campaign, totals);
             return;
         }
         EquipmentType kit = EquipmentType.get(selected);
-        if (kit == null) {
-            return;
+        if (kit != null) {
+            commitIssue(technicians, kit, slot, campaign, totals);
         }
+    }
+
+    /**
+     * Empties a kit slot for everyone, returning the kits to stores and cancelling any kit awaited for that slot.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void commitStrip(List<Person> technicians, KitSlot slot, Campaign campaign, CommitTotals totals) {
+        for (Person tech : technicians) {
+            tech.setIntendedKitName(slot, null);
+            if (EquipmentKitIssuer.removeKit(tech, slot, campaign)) {
+                totals.removed++;
+                totals.changed.add(tech);
+            }
+        }
+    }
+
+    /**
+     * Issues a kit into a slot for everyone who does not already carry it: drawn from stores where possible, otherwise
+     * remembered as awaited and the shortfall ordered in one go.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void commitIssue(List<Person> technicians, EquipmentType kit, KitSlot slot, Campaign campaign,
+          CommitTotals totals) {
         int shortfall = 0;
         for (Person tech : technicians) {
             if (tech.hasRepairKit(kit.getInternalName())) {
