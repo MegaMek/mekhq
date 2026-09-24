@@ -5393,7 +5393,8 @@ public class Unit implements ITechnology, ILocatable {
      * @author Illiani
      * @since 0.51.01
      */
-    private void updateCrewNaturalAptitudes(Crew crew, int slot, @Nullable Person person, String gunType,
+    // package-private for testing
+    void updateCrewNaturalAptitudes(Crew crew, int slot, @Nullable Person person, String gunType,
           String driveType) {
         // Conventional infantry fire with their best infantry weapon skill, as in calcCompositeCrew, so the aptitude
         // must come from that same skill
@@ -5427,7 +5428,8 @@ public class Unit implements ITechnology, ILocatable {
      * @author Illiani
      * @since 0.51.01
      */
-    private void updateCrewSmallArms(Crew crew, int slot, @Nullable Person person) {
+    // package-private for testing
+    void updateCrewSmallArms(Crew crew, int slot, @Nullable Person person) {
         String skillName = (person == null) ? null : getInfantryGunnerySkill(person);
         if ((person == null) || !person.hasSkill(skillName)) {
             crew.setSmallArms(Crew.SMALL_ARMS_UNSET, slot);
@@ -5456,7 +5458,8 @@ public class Unit implements ITechnology, ILocatable {
      * @author Illiani
      * @since 0.51.01
      */
-    private String getInfantryGunnerySkill(Person person) {
+    // package-private for testing
+    String getInfantryGunnerySkill(Person person) {
         boolean isSmallArmsOnly = getCampaign().getCampaignOptions().get(CampaignOption.USE_SMALL_ARMS_ONLY);
         String skillName = InfantryGunnerySkills.getBestInfantryGunnerySkill(person, isSmallArmsOnly);
         return (skillName == null) ? SkillType.S_SMALL_ARMS : skillName;
