@@ -49,6 +49,7 @@ import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static megamek.common.units.Crew.DEATH;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
@@ -473,6 +474,13 @@ public class Person implements ILocatable {
           MekHQ.getMHQOptions().getLocale());
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Personnel";
     private static final MMLogger LOGGER = MMLogger.create(Person.class);
+
+    // <51.01 compatibility: Natural Aptitude used to be a pair of SPAs, before it became a property of each skill
+    private static final String LEGACY_NATURAL_APTITUDE_GUNNERY = "aptitude_gunnery";
+    private static final String LEGACY_NATURAL_APTITUDE_PILOTING = "aptitude_piloting";
+
+    private transient boolean hasUnresolvedLegacyNaturalAptitudeGunnery;
+    private transient boolean hasUnresolvedLegacyNaturalAptitudePiloting;
 
     // initializes the AtB ransom values
     static {
@@ -4935,12 +4943,23 @@ public class Person implements ILocatable {
 
             person.setFullName(); // this sets the name based on the loaded values
 
+            boolean hasLegacyNaturalAptitudeGunnery = false;
+            boolean hasLegacyNaturalAptitudePiloting = false;
             if ((advantages != null) && !advantages.isBlank()) {
                 StringTokenizer st = new StringTokenizer(advantages, DELIMITER);
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
                     String advName = Crew.parseAdvantageName(adv);
                     Object value = Crew.parseAdvantageValue(adv);
+
+                    // <51.01 compatibility handler: the retired Natural Aptitude SPAs are converted below
+                    if (LEGACY_NATURAL_APTITUDE_GUNNERY.equals(advName)) {
+                        hasLegacyNaturalAptitudeGunnery = true;
+                        continue;
+                    } else if (LEGACY_NATURAL_APTITUDE_PILOTING.equals(advName)) {
+                        hasLegacyNaturalAptitudePiloting = true;
+                        continue;
+                    }
 
                     try {
                         person.getOptions().getOption(advName).setValue(value);
@@ -4949,6 +4968,8 @@ public class Person implements ILocatable {
                     }
                 }
             }
+            // Skills have been loaded by now, so the aptitudes have somewhere to go
+            person.convertLegacyNaturalAptitudes(hasLegacyNaturalAptitudeGunnery, hasLegacyNaturalAptitudePiloting);
 
             if ((edge != null) && !edge.isBlank()) {
                 List<String> edgeOptionList = getEdgeTriggersList();
@@ -6280,6 +6301,124 @@ public class Person implements ILocatable {
         double multiplier = getTalentBasedXpCostMultiplier(useReasoning, skillType);
 
         return (int) round(cost * multiplier);
+    }
+
+    /**
+     * Calculates the XP cost of gaining a Natural Aptitude in a skill, before the campaign's XP cost multiplier and
+     * before any XP already put towards the aptitude. Like improving a skill, the cost is adjusted by the character's
+     * Reasoning (optionally) and learning traits.
+     *
+     * @param skillName    the name of the skill
+     * @param useReasoning whether to apply the Reasoning-based cost multiplier
+     *
+     * @return the cost, or {@link SkillType#DISABLED_SKILL_LEVEL} if a Natural Aptitude in the skill can't be bought
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getCostToGainNaturalAptitude(final String skillName, final boolean useReasoning) {
+        final SkillType skillType = getType(skillName);
+        if ((skillType == null) || !skillType.isNaturalAptitudePurchasable()) {
+            return SkillType.DISABLED_SKILL_LEVEL;
+        }
+
+        double multiplier = getTalentBasedXpCostMultiplier(useReasoning, skillType);
+        return (int) round(skillType.getNaturalAptitudeCost() * multiplier);
+    }
+
+    /**
+     * @return the character's skills that have XP put towards gaining a Natural Aptitude they don't yet have, sorted by
+     *       name
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<Skill> getInProgressNaturalAptitudes() {
+        List<Skill> inProgressNaturalAptitudes = new ArrayList<>();
+        for (Skill skill : skills.getSkills()) {
+            if (!skill.getHasNaturalAptitude() && (skill.getNaturalAptitudeXpProgress() > 0)) {
+                inProgressNaturalAptitudes.add(skill);
+            }
+        }
+
+        inProgressNaturalAptitudes.sort(Comparator.comparing(s -> s.getType().getName()));
+
+        return inProgressNaturalAptitudes;
+    }
+
+    /**
+     * <51.01 compatibility handler. Converts the retired Natural Aptitude SPAs into per-skill Natural Aptitudes, free of
+     * charge: the Gunnery SPA gives an aptitude in every Combat Gunnery skill the person has, and the Piloting SPA in
+     * every Combat Piloting skill. If the person has no such skill, the SPA can't be converted and is flagged so the
+     * player can be told; see {@link #reportUnresolvedLegacyNaturalAptitudes(Campaign)}.
+     *
+     * @param hasLegacyNaturalAptitudeGunnery  whether the person had the retired Gunnery SPA
+     * @param hasLegacyNaturalAptitudePiloting whether the person had the retired Piloting SPA
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void convertLegacyNaturalAptitudes(boolean hasLegacyNaturalAptitudeGunnery,
+          boolean hasLegacyNaturalAptitudePiloting) {
+        if (hasLegacyNaturalAptitudeGunnery) {
+            hasUnresolvedLegacyNaturalAptitudeGunnery = grantNaturalAptitudes(SkillSubType.COMBAT_GUNNERY) == 0;
+        }
+
+        if (hasLegacyNaturalAptitudePiloting) {
+            hasUnresolvedLegacyNaturalAptitudePiloting = grantNaturalAptitudes(SkillSubType.COMBAT_PILOTING) == 0;
+        }
+    }
+
+    /**
+     * Gives the person a Natural Aptitude in every skill they have of the given sub-type.
+     *
+     * @param subType the skill sub-type
+     *
+     * @return the number of the person's skills of that sub-type, all of which now have a Natural Aptitude
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int grantNaturalAptitudes(SkillSubType subType) {
+        int skillCount = 0;
+        for (Skill skill : skills.getSkills()) {
+            SkillType skillType = skill.getType();
+            if ((skillType != null) && (skillType.getSubType() == subType)) {
+                skill.setHasNaturalAptitude(true);
+                skillCount++;
+            }
+        }
+        return skillCount;
+    }
+
+    /**
+     * pre-51.01 compatibility handler. Tells the player, with an important report, about any retired Natural Aptitude
+     * SPA this person had that couldn't be converted, so they can give the person a Natural Aptitude by hand. Each
+     * is only reported once.
+     *
+     * @param campaign the campaign to report to
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void reportUnresolvedLegacyNaturalAptitudes(Campaign campaign) {
+        if (hasUnresolvedLegacyNaturalAptitudeGunnery) {
+            reportUnresolvedLegacyNaturalAptitude(campaign, "compatibility.naturalAptitude.gunnery");
+            hasUnresolvedLegacyNaturalAptitudeGunnery = false;
+        }
+
+        if (hasUnresolvedLegacyNaturalAptitudePiloting) {
+            reportUnresolvedLegacyNaturalAptitude(campaign, "compatibility.naturalAptitude.piloting");
+            hasUnresolvedLegacyNaturalAptitudePiloting = false;
+        }
+    }
+
+    private void reportUnresolvedLegacyNaturalAptitude(Campaign campaign, String skillGroupKey) {
+        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE,
+              "compatibility.naturalAptitude.unresolved",
+              spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG,
+              getHyperlinkedFullTitle(),
+              getTextAt(RESOURCE_BUNDLE, skillGroupKey)));
     }
 
     public double getTalentBasedXpCostMultiplier(boolean useReasoning, @Nullable SkillType skillType) {

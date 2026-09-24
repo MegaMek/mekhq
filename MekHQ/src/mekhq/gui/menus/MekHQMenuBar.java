@@ -841,6 +841,9 @@ public class MekHQMenuBar extends JMenuBar {
                     // changed...
                     person.setUnit(null);
                     person.clearTechUnits();
+
+                    // <51.01 compatibility handler: an older export may hold a Natural Aptitude SPA we couldn't convert
+                    person.reportUnresolvedLegacyNaturalAptitudes(campaign);
                 }
             }
 

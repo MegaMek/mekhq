@@ -151,6 +151,7 @@ import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.universe.Faction;
@@ -1440,14 +1441,15 @@ public class PersonViewPanel extends JScrollablePanel {
         }
 
         List<Skill> inProgressSkills = person.getInProgressSkills();
-        if (!inProgressSkills.isEmpty()) {
+        List<Skill> inProgressNaturalAptitudes = person.getInProgressNaturalAptitudes();
+        if (!inProgressSkills.isEmpty() || !inProgressNaturalAptitudes.isEmpty()) {
             JPanel pnlProgressShow = new JPanel();
             pnlProgressShow.setName("pnlProgress");
             pnlProgressShow.setBorder(RoundedLineBorder.createRoundedLineBorder(getTextAt(RESOURCE_BUNDLE,
                   "pnlInProgress.show")));
             pnlProgressShow.setVisible(true);
 
-            JPanel pnlProgressHide = fillInProgressSkills(inProgressSkills);
+            JPanel pnlProgressHide = fillInProgressSkills(inProgressSkills, inProgressNaturalAptitudes);
 
             pnlProgressShow.addMouseListener(getSwitchListener(pnlProgressShow, pnlProgressHide));
             pnlProgressHide.addMouseListener(getSwitchListener(pnlProgressHide, pnlProgressShow));
@@ -3034,17 +3036,22 @@ public class PersonViewPanel extends JScrollablePanel {
             String skillName = relevantSkills.get(i);
             Skill skill = person.getSkill(skillName);
 
+            // Skills with a Natural Aptitude carry a marker after their name; the tooltip explains it
+            String displayName = skill.getHasNaturalAptitude() ?
+                                       getFormattedTextAt(RESOURCE_BUNDLE, "format.naturalAptitude", skillName) :
+                                       skillName;
+
             String label;
             if (primaryProfessionSkills.contains(skillName)) {
                 label = String.format(resourceMap.getString("format.itemHeader.profession"),
                       ReportingUtilities.spanOpeningWithCustomColor(getAmazingColor()), CLOSING_SPAN_TAG,
-                      skillName);
+                      displayName);
             } else if (secondaryProfessionSkills.contains(skillName)) {
                 label = String.format(resourceMap.getString("format.itemHeader.profession"),
                       ReportingUtilities.spanOpeningWithCustomColor(getPositiveColor()), CLOSING_SPAN_TAG,
-                      skillName);
+                      displayName);
             } else {
-                label = skillName;
+                label = displayName;
             }
             JLabel lblName = new JLabel(label);
             List<InjuryEffect> injuryEffects = person.getActiveInjuryEffects();
@@ -3091,7 +3098,11 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlSkills;
     }
 
-    private JPanel fillInProgressSkills(List<Skill> relevantSkills) {
+    /**
+     * Builds the partially trained panel: skills with XP put towards their next level, followed by skills with XP put
+     * towards a Natural Aptitude. Each shows the XP put in against the XP needed.
+     */
+    private JPanel fillInProgressSkills(List<Skill> relevantSkills, List<Skill> relevantNaturalAptitudes) {
         JPanel pnlProgressHide = new JPanel(new GridBagLayout());
         pnlProgressHide.setName("pnlInProgress");
         pnlProgressHide.setBorder(RoundedLineBorder.createRoundedLineBorder(resourceMap.getString(
@@ -3100,22 +3111,34 @@ public class PersonViewPanel extends JScrollablePanel {
 
         boolean isUseReasoning = campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
 
+        // Each entry is a name and "progress/cost"
+        List<String[]> entries = new ArrayList<>();
+        for (Skill skill : relevantSkills) {
+            String skillName = skill.getType().getName();
+            entries.add(new String[] { skillName,
+                                       skill.getXpProgress() + "/" + person.getCostToImprove(skillName,
+                                             isUseReasoning) });
+        }
+        for (Skill skill : relevantNaturalAptitudes) {
+            String skillName = skill.getType().getName();
+            int cost = person.getCostToGainNaturalAptitude(skillName, isUseReasoning);
+            String costText = (cost == SkillType.DISABLED_SKILL_LEVEL) ? "\u2014" : String.valueOf(cost);
+            entries.add(new String[] {
+                  getFormattedTextAt(RESOURCE_BUNDLE, "format.naturalAptitudeProgress", skillName),
+                  skill.getNaturalAptitudeXpProgress() + "/" + costText });
+        }
+
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
-        int skillsPerColumn = (int) ceil(relevantSkills.size() / numColumns);
-        for (int i = 0; i < relevantSkills.size(); i++) {
+        int skillsPerColumn = (int) ceil(entries.size() / numColumns);
+        for (int i = 0; i < entries.size(); i++) {
             int column = i / skillsPerColumn; // 0, 1, 2
             int row = i % skillsPerColumn;
             int gridX = column * 2; // Each column takes 2 grid positions: name + value
 
-            Skill skill = relevantSkills.get(i);
-            String skillName = skill.getType().getName();
+            JLabel lblName = new JLabel(entries.get(i)[0]);
 
-            JLabel lblName = new JLabel(skillName);
-
-            JLabel lblValue = new JLabel(String.format("<html>%s/%s</html>",
-                  skill.getXpProgress(),
-                  person.getCostToImprove(skillName, isUseReasoning)));
+            JLabel lblValue = new JLabel(String.format("<html>%s</html>", entries.get(i)[1]));
             lblName.setLabelFor(lblValue);
 
             // Name label constraints

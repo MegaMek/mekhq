@@ -79,6 +79,7 @@ import static mekhq.campaign.randomEvents.personalities.PersonalityController.wr
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.checkForIntelBreachEvent;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -272,6 +273,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_REPLENISH_EDGE = "REPLENISH_EDGE";
     private static final String CMD_IMPROVE = "IMPROVE";
     private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
+    private static final String CMD_BUY_NATURAL_APTITUDE = "BUY_NATURAL_APTITUDE";
     private static final String CMD_CHANGE_ATTRIBUTE = "CHANGE_ATTRIBUTE";
     private static final String CMD_SET_ATTRIBUTE = "SET_ATTRIBUTE";
     private static final String CMD_RANDOM_PROFESSION = "RANDOM_PROFESSION";
@@ -343,6 +345,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private final JTable personnelTable;
     private final PersonnelTableModel personnelModel;
 
+    private static final String GUI_RESOURCE_BUNDLE = "mekhq.resources.GUI";
     @Deprecated(since = "0.50.11", forRemoval = true)
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
@@ -727,6 +730,34 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                       skillType.getName(),
                       skill.getLevel());
                 getCampaign().addReport(PERSONNEL, String.format(resources.getString("improved.format"),
+                      selectedPerson.getHyperlinkedName(),
+                      skillName));
+
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
+                break;
+            }
+            case CMD_BUY_NATURAL_APTITUDE: {
+                String skillName = data[1];
+                int cost = MathUtility.parseInt(data[2]);
+                Skill skill = selectedPerson.getSkill(skillName);
+                if ((skill == null) || skill.getHasNaturalAptitude() || (selectedPerson.getXP() < cost)) {
+                    // The menu only offers skills the person has, without the aptitude, that they can afford; the
+                    // person may have changed since the menu was built
+                    break;
+                }
+
+                skill.setHasNaturalAptitude(true);
+                // The progress was already taken off the price, so it's used up
+                skill.changeNaturalAptitudeXpProgress(-skill.getNaturalAptitudeXpProgress());
+                selectedPerson.spendXP(cost);
+
+                PerformanceLogger.gainedNaturalAptitude(getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN),
+                      selectedPerson,
+                      getCampaign().getLocalDate(),
+                      skillName);
+                getCampaign().addReport(PERSONNEL, getFormattedTextAt(GUI_RESOURCE_BUNDLE,
+                      "naturalAptitudeGained.format",
                       selectedPerson.getHyperlinkedName(),
                       skillName));
 
@@ -3319,6 +3350,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menu.add(newSkillsMenu);
             }
 
+            JMenu naturalAptitudesMenu = createNaturalAptitudesMenu(person, isUseReasoningMultiplier,
+                  xpCostMultiplier);
+            if (naturalAptitudesMenu.getMenuComponentCount() > 0) {
+                menu.add(naturalAptitudesMenu);
+            }
+
             JMenu traitsMenu = new JMenu(resources.getString("spendOnTraits.text"));
             double costMultiplier = getCampaignOptions().get(CampaignOption.XP_COST_MULTIPLIER);
             int traitCost = (int) round(TRAIT_MODIFICATION_COST * costMultiplier);
@@ -5020,6 +5057,61 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      */
     private static boolean isFlagEnabled(long eligibleCount, int selectedCount) {
         return (eligibleCount * 2) >= selectedCount;
+    }
+
+    /**
+     * Builds the menu for spending XP on Natural Aptitudes: one entry for each skill the person has learned but has no
+     * Natural Aptitude in, where the campaign allows one to be bought. As with improving skills, the cost is adjusted
+     * by the person's Reasoning and learning traits ({@link Person#getCostToGainNaturalAptitude}), then the campaign's
+     * XP cost multiplier, and any XP already put towards the aptitude is then taken off.
+     *
+     * @param person                   the person spending XP
+     * @param isUseReasoningMultiplier whether the campaign applies Reasoning to XP costs
+     * @param xpCostMultiplier         the campaign's XP cost multiplier
+     *
+     * @return the menu, which is empty if there is nothing to buy
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JMenu createNaturalAptitudesMenu(Person person, boolean isUseReasoningMultiplier,
+          double xpCostMultiplier) {
+        JMenu naturalAptitudesMenu = new JMenu(getTextAt(GUI_RESOURCE_BUNDLE, "spendOnNaturalAptitudes.text"));
+        boolean isUseArtillery = getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
+        String tooltip = wordWrap(getTextAt(GUI_RESOURCE_BUNDLE, "spendOnNaturalAptitudes.tooltip"));
+
+        List<Skill> learnedSkills = new ArrayList<>(person.getSkills().getSkills());
+        learnedSkills.sort(Comparator.comparing(skill -> skill.getType().getName()));
+        for (Skill skill : learnedSkills) {
+            SkillType skillType = skill.getType();
+            if ((skillType == null) || skill.getHasNaturalAptitude()) {
+                continue;
+            }
+
+            String skillName = skillType.getName();
+            // As with improving skills, the Artillery skill is only offered when the campaign uses it
+            if (Objects.equals(skillName, S_ARTILLERY) && !isUseArtillery) {
+                continue;
+            }
+
+            int cost = person.getCostToGainNaturalAptitude(skillName, isUseReasoningMultiplier);
+            if (cost == SkillType.DISABLED_SKILL_LEVEL) {
+                continue;
+            }
+            cost = (int) round(cost * xpCostMultiplier);
+            // As with improving skills, XP already put towards the aptitude comes off the price
+            cost = max(0, cost - skill.getNaturalAptitudeXpProgress());
+
+            JMenuItem menuItem = new JMenuItem(String.format(resources.getString("skillDesc.format"), skillName,
+                  cost));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_NATURAL_APTITUDE, skillName, String.valueOf(cost)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(person.getXP() >= cost);
+            menuItem.setToolTipText(tooltip);
+            naturalAptitudesMenu.add(menuItem);
+        }
+
+        return naturalAptitudesMenu;
     }
 
     private void addSPAToMenu(SpecialAbility spa, double reasoningXpCostMultiplier, double xpCostMultiplier,

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.scenarios;
 
+import static megamek.common.compute.Compute.randomInt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
@@ -343,10 +344,10 @@ public class BotForceRandomizer {
                 // unit instead
                 uType = unitType;
                 if ((unitType == UnitType.MEK) && (percentConventional > 0)
-                          && (Compute.randomInt(100) <= percentConventional)) {
+                          && (randomInt(100) <= percentConventional)) {
                     uType = UnitType.TANK;
                 } else if ((unitType == UnitType.AEROSPACE_FIGHTER) && (percentConventional > 0)
-                                 && (Compute.randomInt(100) <= percentConventional)) {
+                                 && (randomInt(100) <= percentConventional)) {
                     uType = UnitType.CONV_FIGHTER;
                 }
                 lanceList = generateLance(lanceSize, uType, weightClass, campaign);
@@ -392,7 +393,7 @@ public class BotForceRandomizer {
 
         // check for integrated BA support
         if ((unitType == UnitType.MEK) && (baChance > 0)
-                  && (Compute.randomInt(100) <= baChance)) {
+                  && (randomInt(100) <= baChance)) {
             for (int i = 0; i < size; i++) {
                 Entity e = getEntity(UnitType.BATTLE_ARMOR, UNIT_WEIGHT_UNSPECIFIED, campaign);
                 if (null != e) {
@@ -418,7 +419,7 @@ public class BotForceRandomizer {
         MekSummary ms;
 
         // allow some variation in actual weight class
-        int weightRoll = Compute.randomInt(6);
+        int weightRoll = randomInt(6);
         if ((weightRoll == 1) && (weightClass > EntityWeightClass.WEIGHT_LIGHT)) {
             weightClass -= 1;
         } else if ((weightRoll == 6) && (weightClass < EntityWeightClass.WEIGHT_ASSAULT)) {
@@ -468,7 +469,7 @@ public class BotForceRandomizer {
         Gender gender;
         int nonBinaryDiceSize = campaign.getCampaignOptions().get(CampaignOption.NON_BINARY_DICE_SIZE);
 
-        if ((nonBinaryDiceSize > 0) && (Compute.randomInt(nonBinaryDiceSize) == 0)) {
+        if ((nonBinaryDiceSize > 0) && (randomInt(nonBinaryDiceSize) == 0)) {
             gender = RandomGenderGenerator.generateOther();
         } else {
             gender = RandomGenderGenerator.generate();
@@ -541,8 +542,18 @@ public class BotForceRandomizer {
 
         extraData.put(0, innerMap);
 
+        boolean hasNaturalAptitudeGunnery = Crew.rollNaturalAptitude(entitySkill);
+        boolean hasNaturalAptitudePiloting = Crew.rollNaturalAptitude(entitySkill);
+
+        boolean useArtillery = campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
+        boolean hasNaturalAptitudeArtillery = useArtillery ?
+                                                    Crew.rollNaturalAptitude(entitySkill) :
+                                                    hasNaturalAptitudeGunnery;
+
         en.setCrew(new Crew(en.getCrew().getCrewType(), crewName, Compute.getFullCrewSize(en),
-              skills[0], skills[1], gender, faction.isClan(), extraData));
+              skills[0], hasNaturalAptitudeGunnery, hasNaturalAptitudeArtillery, skills[1],
+              hasNaturalAptitudePiloting, gender, faction.isClan(),
+              extraData));
 
         en.setExternalIdAsString(UUID.randomUUID().toString());
         return en;
