@@ -68,6 +68,7 @@ import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
+import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -516,9 +517,15 @@ public class SalvagePostScenarioPicker {
             unitNameMap.put(key, salvageUnit);
         }
 
-        // We sort alphabetically for ease of use
+        // We sort alphabetically for ease of use. Natural ordering keeps "#10" after "#9". The map itself is rebuilt
+        // in sorted order, as every combo box is repopulated from it whenever a selection changes.
         List<String> names = new ArrayList<>(unitNameMap.keySet());
-        names.sort(String.CASE_INSENSITIVE_ORDER);
+        names.sort(new NaturalOrderComparator());
+        Map<String, Unit> unsortedUnitNameMap = new HashMap<>(unitNameMap);
+        unitNameMap.clear();
+        for (String name : names) {
+            unitNameMap.put(name, unsortedUnitNameMap.get(name));
+        }
 
         // Add all units to single column
         for (TestUnit unit : allUnits) {
