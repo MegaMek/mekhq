@@ -59,9 +59,12 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageTechData;
+import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.sorter.LevelSorter;
+import mekhq.gui.utilities.ComponentColors;
+import mekhq.gui.utilities.PersonnelStateColors;
 
 /**
  * Modal dialog that lets the user pick one or more salvage technicians from a tabular list. The table supports sorting,
@@ -201,14 +204,17 @@ public class SalvageTechPicker extends JDialog {
     }
 
     /**
-     * Installs a checkbox renderer for the Select column so that boolean values are shown as centered checkboxes.
+     * Installs the table's renderers. The Select column shows centered checkboxes; every other column is centered.
+     *
+     * <p>Rows are colored to flag each tech's state (deployed, injured, fatigued, and so on) using the same colors and
+     * rules as the personnel table, with the reasons listed in each cell's tooltip.</p>
      *
      * @param table the table to update
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private static void setRenderers(JTable table) {
+    private void setRenderers(JTable table) {
         // Custom renderer for the checkbox column
         table.getColumnModel().getColumn(SalvageTechTableModel.COL_SELECT).setCellRenderer(
               new DefaultTableCellRenderer() {
@@ -220,21 +226,73 @@ public class SalvageTechPicker extends JDialog {
                         boolean hasFocus, int row, int column) {
                       checkBox.setSelected(value != null && (Boolean) value);
                       checkBox.setHorizontalAlignment(JLabel.CENTER);
-                      checkBox.setBackground(
-                            isSelected ? table.getSelectionBackground()
-                                  : table.getBackground());
+                      checkBox.setOpaque(true);
+
+                      List<String> colorReasonKeys = new ArrayList<>();
+                      ComponentColors rowColors = getRowColors(table, row, colorReasonKeys);
+                      if (isSelected) {
+                          checkBox.setBackground(table.getSelectionBackground());
+                      } else {
+                          checkBox.setBackground(rowColors == null ? table.getBackground() : rowColors.background());
+                      }
+                      checkBox.setToolTipText(getColorReasonsTooltip(colorReasonKeys));
                       return checkBox;
                   }
               });
 
-        // Center align all other columns
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        // Center align all other columns, colored by the tech's state
+        DefaultTableCellRenderer stateRenderer = new DefaultTableCellRenderer() {
+            @Override
+            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected,
+                  boolean hasFocus, int row, int column) {
+                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                setHorizontalAlignment(JLabel.CENTER);
+
+                List<String> colorReasonKeys = new ArrayList<>();
+                ComponentColors rowColors = getRowColors(table, row, colorReasonKeys);
+                // Colors are always set explicitly, as DefaultTableCellRenderer otherwise remembers the last
+                // background and bleeds it into later rows
+                if (isSelected) {
+                    setForeground(table.getSelectionForeground());
+                    setBackground(table.getSelectionBackground());
+                } else if (rowColors == null) {
+                    setForeground(table.getForeground());
+                    setBackground(table.getBackground());
+                } else {
+                    setForeground(rowColors.foreground());
+                    setBackground(rowColors.background());
+                }
+                setToolTipText(getColorReasonsTooltip(colorReasonKeys));
+                return this;
+            }
+        };
         for (int i = 0; i < table.getColumnCount(); i++) {
             if (i != SalvageTechTableModel.COL_SELECT) {
-                table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+                table.getColumnModel().getColumn(i).setCellRenderer(stateRenderer);
             }
         }
+    }
+
+    /**
+     * Determines the state colors for a table row, using the same rules as the personnel table.
+     *
+     * @param table           the table being rendered
+     * @param viewRow         the row, in view coordinates
+     * @param colorReasonKeys receives a resource key for every state that applies to the row's tech
+     *
+     * @return the row colors, or {@code null} if the tech isn't in a highlighted state
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private @Nullable ComponentColors getRowColors(JTable table, int viewRow, List<String> colorReasonKeys) {
+        Person tech = tableModel.getTech(table.convertRowIndexToModel(viewRow));
+        return PersonnelStateColors.getStateColors(campaign, tech, colorReasonKeys);
+    }
+
+    private static @Nullable String getColorReasonsTooltip(List<String> colorReasonKeys) {
+        String colorReasons = PersonnelStateColors.getColorReasonsText(colorReasonKeys);
+        return colorReasons.isEmpty() ? null : "<html><i>" + colorReasons + "</i></html>";
     }
 
     /**
@@ -589,6 +647,20 @@ public class SalvageTechPicker extends JDialog {
                 }
             }
             return selectedTechs;
+        }
+
+        /**
+         * Returns the tech shown in a row.
+         *
+         * @param rowIndex the row, in model coordinates
+         *
+         * @return the tech in that row
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        public Person getTech(int rowIndex) {
+            return techs.get(rowIndex).tech();
         }
 
         /**

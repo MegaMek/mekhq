@@ -32,7 +32,6 @@
  */
 package mekhq.gui.model;
 
-import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffectiveFatigue;
 import static mekhq.gui.enums.PersonnelTableModelColumn.FIRST_NAME;
 import static mekhq.gui.enums.PersonnelTableModelColumn.FORCE_GRAPHICAL;
 import static mekhq.gui.enums.PersonnelTableModelColumn.LAST_NAME;
@@ -56,20 +55,16 @@ import io.sentry.util.Objects;
 import megamek.client.ui.tileset.EntityImage;
 import megamek.common.annotations.Nullable;
 import megamek.common.icons.Portrait;
-import mekhq.MHQOptions;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.tables.MHQTableModel;
 import mekhq.gui.enums.PersonnelTableModelColumn;
 import mekhq.gui.utilities.ComponentColors;
 import mekhq.gui.utilities.MekHqTableCellRenderer;
+import mekhq.gui.utilities.PersonnelStateColors;
 
 /**
  * A table Model for displaying information about personnel
@@ -204,47 +199,7 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
          * Populates a list with personal state flags. Selects a color for the most important state.
          */
         private ComponentColors populatePersonalStateFlags(Person person, List<String> colorReasonKeys) {
-            // Set color based on priority (first match wins for display color)
-            // But collect ALL applicable reasons for tooltip
-            MHQOptions mhqOptions = MekHQ.getMHQOptions();
-            CampaignOptions campaignOptions = campaign.getCampaignOptions();
-
-            ComponentColors cellColors = null;
-            if (person.getStatus().isAbsent()) {
-                colorReasonKeys.add("colorReason.personnel.absent");
-                cellColors = mhqOptions.getAbsentColors();
-            }
-            if (person.getStatus().isDepartedUnit()) {
-                colorReasonKeys.add("colorReason.personnel.departed");
-                cellColors = (cellColors == null) ? mhqOptions.getGoneColors() : cellColors;
-            }
-            if (person.isDeployed()) {
-                colorReasonKeys.add("colorReason.personnel.deployed");
-                cellColors = (cellColors == null) ? mhqOptions.getDeployedColors() : cellColors;
-            }
-            if (person.isQueuedForTravel(campaign.getCampaignLocationManager())) {
-                colorReasonKeys.add("colorReason.personnel.queuedForTravel");
-                cellColors = (cellColors == null) ? mhqOptions.getQueuedForTravelColors() : cellColors;
-            }
-            if (PersonnelStatus.computeIsAwayFromMainForce(campaign, person)) {
-                cellColors = (cellColors == null) ? mhqOptions.getAwayFromMainForceColors() : cellColors;
-            }
-            if (campaignOptions.isUseAdvancedMedical() ? person.hasInjuries(true) : (person.getHits() > 0)) {
-                colorReasonKeys.add("colorReason.personnel.injured");
-                cellColors = (cellColors == null) ? mhqOptions.getInjuredColors() : cellColors;
-            }
-            if (person.isPregnant()) {
-                colorReasonKeys.add("colorReason.personnel.pregnant");
-                cellColors = (cellColors == null) ? mhqOptions.getPregnantColors() : cellColors;
-            }
-            if (campaignOptions.get(CampaignOption.USE_FATIGUE) && (getEffectiveFatigue(person, campaign) >= 5)) {
-                colorReasonKeys.add("colorReason.personnel.fatigued");
-                cellColors = (cellColors == null) ? mhqOptions.getFatiguedColors() : cellColors;
-            }
-            if (person.hasNonProstheticPermanentInjuries(campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL))) {
-                colorReasonKeys.add("colorReason.personnel.healedInjuries");
-                cellColors = (cellColors == null) ? mhqOptions.getHealedInjuriesColors() : cellColors;
-            }
+            ComponentColors cellColors = PersonnelStateColors.getStateColors(campaign, person, colorReasonKeys);
             return (cellColors == null) ? DEFAULT_COLORS : cellColors;
         }
 
