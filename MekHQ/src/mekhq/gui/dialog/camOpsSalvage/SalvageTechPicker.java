@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.camOpsSalvage;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -43,15 +44,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.RowSorter;
-import javax.swing.SortOrder;
+import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableColumn;
@@ -63,8 +56,10 @@ import megamek.common.annotations.Nullable;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageTechData;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.sorter.LevelSorter;
 
@@ -89,10 +84,18 @@ public class SalvageTechPicker extends JDialog {
     private static final int WIDTH_40 = scaleForGUI(40);
     private static final int WIDTH_60 = scaleForGUI(60);
     private static final int WIDTH_100 = scaleForGUI(100);
+    private static final int PADDING = scaleForGUI(5);
+
+    /**
+     * If the selected techs have fewer minutes than this between them, the player is warned before confirming. This is
+     * enough time to recover roughly six 'Meks, or a DropShip and three aerospace fighters.
+     */
+    private static final int LOW_SALVAGE_MINUTES_THRESHOLD = 360;
 
     private boolean wasConfirmed;
+    private final Campaign campaign;
     private final SalvageTechTableModel tableModel;
-    private final boolean isUseEdge;
+    private final JLabel totalMinutesLabel = new JLabel();
 
     /**
      * Checks whether the user confirmed their tech selection.
@@ -125,6 +128,7 @@ public class SalvageTechPicker extends JDialog {
     /**
      * Creates and shows a modal picker dialog for salvage technicians.
      *
+     * @param campaign             the current campaign
      * @param techs                list of available technicians to display. When {@code null} or empty, only
      *                             instructions and a Cancel button are shown.
      * @param alreadySelectedTechs list of tech UUIDs that should start as pre-selected.
@@ -135,9 +139,9 @@ public class SalvageTechPicker extends JDialog {
      * @author Illiani
      * @since 0.50.10
      */
-    public SalvageTechPicker(List<SalvageTechData> techs, List<UUID> alreadySelectedTechs, boolean isClanCampaign,
-          ScenarioTemplate.BattlefieldControlType fieldControl, boolean isUseEdge) {
-        this.isUseEdge = isUseEdge;
+    public SalvageTechPicker(Campaign campaign, List<SalvageTechData> techs, List<UUID> alreadySelectedTechs,
+          boolean isClanCampaign, ScenarioTemplate.BattlefieldControlType fieldControl, boolean isUseEdge) {
+        this.campaign = campaign;
         setTitle(getText("accessingTerminal.title"));
         setModal(true);
         setLayout(new BorderLayout());
@@ -177,10 +181,18 @@ public class SalvageTechPicker extends JDialog {
         scrollPane.setPreferredSize(DIMENSION);
         add(scrollPane, BorderLayout.CENTER);
 
-        // Buttons at the bottom
+        // Minutes summary and buttons at the bottom
+        JPanel bottomPanel = new JPanel(new BorderLayout());
+        totalMinutesLabel.setHorizontalAlignment(JLabel.CENTER);
+        totalMinutesLabel.setBorder(BorderFactory.createEmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        updateTotalMinutesLabel();
+        tableModel.addTableModelListener(event -> updateTotalMinutesLabel());
+        bottomPanel.add(totalMinutesLabel, BorderLayout.NORTH);
+
         JPanel buttonPanel = new JPanel();
         getButtons(buttonPanel);
-        add(buttonPanel, BorderLayout.SOUTH);
+        bottomPanel.add(buttonPanel, BorderLayout.SOUTH);
+        add(bottomPanel, BorderLayout.SOUTH);
 
         pack();
         setLocationRelativeTo(null);
@@ -359,12 +371,56 @@ public class SalvageTechPicker extends JDialog {
 
         RoundedJButton btnConfirm = new RoundedJButton(getText("Confirm.text"));
         btnConfirm.addActionListener(evt -> {
+            if (!isLowSalvageTimeAccepted()) {
+                return; // Player wants to revise their selection
+            }
+
             wasConfirmed = true;
             dispose();
         });
 
         buttonPanel.add(btnConfirm);
         buttonPanel.add(btnCancel);
+    }
+
+    /**
+     * Refreshes the label showing how many techs are selected and how many work minutes they have between them. The
+     * label is highlighted when the total falls below {@link #LOW_SALVAGE_MINUTES_THRESHOLD}.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void updateTotalMinutesLabel() {
+        int selectedMinutes = tableModel.getSelectedMinutes();
+        totalMinutesLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.totalMinutes",
+              tableModel.getSelectedTechs().size(), selectedMinutes));
+        totalMinutesLabel.setForeground(selectedMinutes < LOW_SALVAGE_MINUTES_THRESHOLD ?
+                                              MekHQ.getMHQOptions().getFontColorNegative() :
+                                              null);
+    }
+
+    /**
+     * Warns the player if the selected techs have little or no work time left for salvage operations.
+     *
+     * @return {@code true} if there is enough time, or the player chose to continue anyway; {@code false} if the player
+     *       wants to revise their selection
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isLowSalvageTimeAccepted() {
+        int selectedMinutes = tableModel.getSelectedMinutes();
+        if (selectedMinutes >= LOW_SALVAGE_MINUTES_THRESHOLD) {
+            return true;
+        }
+
+        String message = selectedMinutes <= 0 ?
+                               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.lowMinutes.none") :
+                               getFormattedTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.lowMinutes.some",
+                                     selectedMinutes);
+        ImmersiveDialogSimple warningDialog = new ImmersiveDialogSimple(campaign, null, null, message,
+              List.of(getText("Cancel.text"), getText("Confirm.text")), null, null, false);
+        return warningDialog.getDialogChoice() != 0; // 0 = Cancel
     }
 
     /**
@@ -533,6 +589,24 @@ public class SalvageTechPicker extends JDialog {
                 }
             }
             return selectedTechs;
+        }
+
+        /**
+         * Returns the combined remaining work minutes of all selected techs.
+         *
+         * @return the total minutes available to the selected techs
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        public int getSelectedMinutes() {
+            int selectedMinutes = 0;
+            for (int i = 0; i < techs.size(); i++) {
+                if (selected[i]) {
+                    selectedMinutes += Math.max(0, techs.get(i).minutesAvailable());
+                }
+            }
+            return selectedMinutes;
         }
     }
 

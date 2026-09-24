@@ -1299,7 +1299,7 @@ public final class BriefingTab extends CampaignGuiTab {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
         boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE);
-        SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs,
+        SalvageTechPicker techPicker = new SalvageTechPicker(campaign, techData, priorSelectedTechs,
               isClanCampaign, getBattlefieldControlType(scenario), isUseEdge);
         boolean wasConfirmed = techPicker.wasConfirmed();
         if (wasConfirmed) {
