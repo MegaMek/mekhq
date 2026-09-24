@@ -32,9 +32,7 @@
  */
 package mekhq.campaign.universe.enums;
 
-import java.util.ResourceBundle;
-
-import mekhq.MekHQ;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 /**
  * Factor by which the Company Generator sorts units when picking which Unit gets the next-best
@@ -55,14 +53,14 @@ public enum TechAssignmentSortFactor {
     PILOT_SKILL("TechAssignmentSortFactor.PILOT_SKILL.text",
           "TechAssignmentSortFactor.PILOT_SKILL.toolTipText");
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Universe";
+
     private final String displayName;
     private final String toolTipText;
 
     TechAssignmentSortFactor(final String displayNameKey, final String toolTipKey) {
-        final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.Universe",
-              MekHQ.getMHQOptions().getLocale());
-        this.displayName = resources.getString(displayNameKey);
-        this.toolTipText = resources.getString(toolTipKey);
+        this.displayName = getTextAt(RESOURCE_BUNDLE, displayNameKey);
+        this.toolTipText = getTextAt(RESOURCE_BUNDLE, toolTipKey);
     }
 
     public String getToolTipText() {

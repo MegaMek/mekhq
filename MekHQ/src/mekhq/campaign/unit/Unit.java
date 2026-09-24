@@ -8549,7 +8549,9 @@ public class Unit implements ITechnology, ILocatable {
             }
         } else if (getEntity() instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
-        } else if (getEntity().isLargeCraft()) {
+        } else if ((getEntity() instanceof SmallCraft) || (getEntity() instanceof Jumpship)) {
+            // Small craft fly on Piloting/Spacecraft like DropShips do, so they take a vessel pilot;
+            // Person.canDrive asks for the same, and the two must agree or the seat can never be filled.
             return PersonnelRole.VESSEL_PILOT;
         } else if (getEntity().isAerospace()) {
             return PersonnelRole.AEROSPACE_PILOT;
@@ -8597,7 +8599,7 @@ public class Unit implements ITechnology, ILocatable {
             }
         } else if (getEntity() instanceof ConvFighter) { // do not use entity.isConventionalFighter here
             return PersonnelRole.CONVENTIONAL_AIRCRAFT_PILOT;
-        } else if (getEntity().isSmallCraft() || entity.isLargeCraft()) {
+        } else if ((getEntity() instanceof SmallCraft) || (getEntity() instanceof Jumpship)) {
             return PersonnelRole.VESSEL_GUNNER;
         } else if (getEntity().isAerospace()) {
             return PersonnelRole.AEROSPACE_PILOT;
