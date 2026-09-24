@@ -293,16 +293,54 @@ public class ResolveScenarioTracker {
         return nu;
     }
 
+    /**
+     * Checks whether an entity has already been processed while resolving this scenario, recording it if not.
+     *
+     * <p>MegaMek can occasionally report the same entity more than once at the end of a game (seen after resuming a
+     * saved game). Processing it twice would list its salvage twice, with both copies sharing a unit ID, and would
+     * duplicate kill credits.</p>
+     *
+     * @param entity             the entity about to be processed
+     * @param processedEntityIds the game IDs of entities already processed
+     *
+     * @return {@code true} if the entity is a duplicate and should be skipped
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isDuplicateEntity(Entity entity, Set<Integer> processedEntityIds) {
+        int entityId = entity.getId();
+        if (entityId == Entity.NONE) {
+            return false; // Without a game ID we can't tell duplicates apart, so process it
+        }
+
+        if (processedEntityIds.add(entityId)) {
+            return false;
+        }
+
+        logger.warn("Entity {} (id {}) was reported more than once at the end of the scenario; ignoring the duplicate",
+              entity.getDisplayName(), entityId);
+        return true;
+    }
+
     public void processGame() {
         int playerId = client.getLocalPlayer().getId();
         int team = client.getLocalPlayer().getTeam();
 
         sanitizeAllEntityExternalIds();
 
+        // MegaMek can occasionally report the same entity more than once (seen after resuming a saved game), which
+        // would otherwise duplicate salvage and kill credits
+        Set<Integer> processedEntityIds = new HashSet<>();
+
         for (Enumeration<Entity> entityIterator = victoryEvent.getEntities(); entityIterator.hasMoreElements(); ) {
             Entity entity = entityIterator.nextElement();
             if (!entity.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
+                continue;
+            }
+
+            if (isDuplicateEntity(entity, processedEntityIds)) {
                 continue;
             }
 
@@ -393,6 +431,10 @@ public class ResolveScenarioTracker {
                 continue;
             }
 
+            if (isDuplicateEntity(entity, processedEntityIds)) {
+                continue;
+            }
+
             entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 
             if ((entity.getOwnerId() == playerId) ||
@@ -435,6 +477,10 @@ public class ResolveScenarioTracker {
                 continue;
             }
 
+            if (isDuplicateEntity(entity, processedEntityIds)) {
+                continue;
+            }
+
             entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 
             checkForLostLimbs(entity, control);
@@ -468,6 +514,10 @@ public class ResolveScenarioTracker {
             Entity wreck = wrecks.nextElement();
             if (!wreck.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
+                continue;
+            }
+
+            if (isDuplicateEntity(wreck, processedEntityIds)) {
                 continue;
             }
 
@@ -1544,6 +1594,10 @@ public class ResolveScenarioTracker {
 
         killCredits = parser.getKills();
 
+        // MUL files are written from the same end-of-game data as the live path, so the same entity can be listed
+        // more than once; see processGame()
+        Set<Integer> processedEntityIds = new HashSet<>();
+
         // Map everyone's ID to External ID
         for (Entity e : parser.getEntities()) {
             idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
@@ -1570,6 +1624,10 @@ public class ResolveScenarioTracker {
         }
 
         for (Entity e : parser.getSurvivors()) {
+            if (isDuplicateEntity(e, processedEntityIds)) {
+                continue;
+            }
+
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
             checkForLostLimbs(e, control);
             if (!"-1".equals(e.getExternalIdAsString())) {
@@ -1599,6 +1657,10 @@ public class ResolveScenarioTracker {
         }
 
         for (Entity e : parser.getAllies()) {
+            if (isDuplicateEntity(e, processedEntityIds)) {
+                continue;
+            }
+
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
             checkForLostLimbs(e, control);
             if (!"-1".equals(e.getExternalIdAsString())) {
@@ -1627,6 +1689,10 @@ public class ResolveScenarioTracker {
 
         // Utterly destroyed entities
         for (Entity e : parser.getDevastated()) {
+            if (isDuplicateEntity(e, processedEntityIds)) {
+                continue;
+            }
+
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
             UnitStatus status = null;
             if (!"-1".equals(e.getExternalIdAsString())) {
@@ -1645,6 +1711,10 @@ public class ResolveScenarioTracker {
         }
 
         for (Entity e : parser.getSalvage()) {
+            if (isDuplicateEntity(e, processedEntityIds)) {
+                continue;
+            }
+
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
             checkForLostLimbs(e, control);
             UnitStatus status = null;
@@ -1709,6 +1779,10 @@ public class ResolveScenarioTracker {
         }
 
         for (Entity e : parser.getRetreated()) {
+            if (isDuplicateEntity(e, processedEntityIds)) {
+                continue;
+            }
+
             if (!"-1".equals(e.getExternalIdAsString())) {
                 UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
                 if (null == status && scenario instanceof AtBScenario) {
