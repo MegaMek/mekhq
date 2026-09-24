@@ -271,6 +271,11 @@ public class SkillType {
 
     public static final int SKILL_NONE = 0;
     public static final int DISABLED_SKILL_LEVEL = -1;
+    /**
+     * The XP cost of buying a Natural Aptitude in a skill, before the campaign's XP cost multiplier, unless the
+     * campaign sets a different cost for that skill. {@link #DISABLED_SKILL_LEVEL} means it can't be bought.
+     */
+    public static final int DEFAULT_NATURAL_APTITUDE_COST = 300;
 
     public static final int EXP_NONE = -1;
     public static final int EXP_ULTRA_GREEN = 0;
@@ -294,6 +299,7 @@ public class SkillType {
     private int heroicLvl;
     private int legendaryLvl;
     private Integer[] costs;
+    private int naturalAptitudeCost = DEFAULT_NATURAL_APTITUDE_COST;
 
     /**
      * @param level skill level integer to get name for
@@ -901,6 +907,38 @@ public class SkillType {
     }
 
     /**
+     * @return the XP cost of buying a Natural Aptitude in this skill, before the campaign's XP cost multiplier, or
+     *       {@link #DISABLED_SKILL_LEVEL} if it can't be bought
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getNaturalAptitudeCost() {
+        return naturalAptitudeCost;
+    }
+
+    /**
+     * @param naturalAptitudeCost the XP cost of buying a Natural Aptitude in this skill, before the campaign's XP cost
+     *                            multiplier, or {@link #DISABLED_SKILL_LEVEL} if it can't be bought
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setNaturalAptitudeCost(int naturalAptitudeCost) {
+        this.naturalAptitudeCost = naturalAptitudeCost;
+    }
+
+    /**
+     * @return {@code true} if a Natural Aptitude in this skill can be bought with XP
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isNaturalAptitudePurchasable() {
+        return naturalAptitudeCost != DISABLED_SKILL_LEVEL;
+    }
+
+    /**
      * Sets the first {@link SkillAttribute} associated with the skill type.
      *
      * <p>If {@code firstAttribute} is {@code null}, no action is taken, and the current value of the first attribute
@@ -1370,6 +1408,7 @@ public class SkillType {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "heroicLvl", heroicLvl);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "legendaryLvl", legendaryLvl);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "costs", StringUtils.join(costs, ','));
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "naturalAptitudeCost", naturalAptitudeCost);
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skillType");
     }
 
@@ -1427,6 +1466,9 @@ public class SkillType {
                     for (int i = 0; i < values.length; i++) {
                         skillType.costs[i] = MathUtility.parseInt(values[i], skillType.costs[i]);
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("naturalAptitudeCost")) {
+                    skillType.naturalAptitudeCost = MathUtility.parseInt(wn2.getTextContent(),
+                          skillType.naturalAptitudeCost);
                 }
             }
 
@@ -1474,6 +1516,9 @@ public class SkillType {
                     for (int i = 0; i < values.length; i++) {
                         skillType.costs[i] = MathUtility.parseInt(values[i], skillType.costs[i]);
                     }
+                } else if (wn2.getNodeName().equalsIgnoreCase("naturalAptitudeCost")) {
+                    skillType.naturalAptitudeCost = MathUtility.parseInt(wn2.getTextContent(),
+                          skillType.naturalAptitudeCost);
                 }
             }
 
