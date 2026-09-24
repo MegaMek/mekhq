@@ -5275,6 +5275,7 @@ public class Unit implements ITechnology, ILocatable {
             // and empty slots don't keep a previous occupant's aptitudes
             for (int slot = 0; slot < crew.getSlotCount(); slot++) {
                 updateCrewNaturalAptitudes(crew, slot, null, gunType, driveType);
+                updateCrewSmallArms(crew, slot, null);
             }
 
             if (crew.getCrewType().getPilotPos() == crew.getCrewType().getGunnerPos()) {
@@ -5336,8 +5337,10 @@ public class Unit implements ITechnology, ILocatable {
                 }
             }
         } else {
-            // Single-slot crews, including composite vehicle and vessel crews, use the commander's aptitudes
+            // Single-slot crews, including composite vehicle and vessel crews, use the commander's aptitudes and
+            // Small Arms
             updateCrewNaturalAptitudes(crew, 0, commander, gunType, driveType);
+            updateCrewSmallArms(crew, 0, commander);
 
             if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MEK) == 0) {
                 calcCompositeCrew(isOnlyCommandersMatter);
@@ -5377,13 +5380,14 @@ public class Unit implements ITechnology, ILocatable {
      * <p>When the campaign doesn't use the separate Artillery skill, artillery is fired using Gunnery, so the
      * Artillery aptitude mirrors the Gunnery aptitude.</p>
      *
-     * <p>The Small Arms aptitude is sent even though the Small Arms skill itself isn't; MegaMek uses its default
-     * skill for crews on foot, but the aptitude is still the person's own.</p>
+     * <p>The aptitude for fighting on foot is set by {@link #updateCrewSmallArms(Crew, int, Person)}, alongside
+     * the skill it applies to.</p>
      *
      * @param crew      the entity's crew
      * @param slot      the crew slot to update
      * @param person    the person in that slot (the commander, for single-slot crews), or {@code null} if none
-     * @param gunType   the gunnery skill used by this unit
+     * @param gunType   the gunnery skill used by this unit; replaced by the person's best infantry weapon skill for
+     *                  conventional infantry
      * @param driveType the piloting or driving skill used by this unit
      *
      * @author Illiani
@@ -5391,6 +5395,12 @@ public class Unit implements ITechnology, ILocatable {
      */
     private void updateCrewNaturalAptitudes(Crew crew, int slot, @Nullable Person person, String gunType,
           String driveType) {
+        // Conventional infantry fire with their best infantry weapon skill, as in calcCompositeCrew, so the aptitude
+        // must come from that same skill
+        if ((person != null) && entity.isConventionalInfantry()) {
+            gunType = getInfantryGunnerySkill(person);
+        }
+
         boolean hasNaturalAptitudeGunnery = hasNaturalAptitude(person, gunType);
         crew.setHasNaturalAptitudeGunnery(hasNaturalAptitudeGunnery, slot);
         crew.setHasNaturalAptitudePiloting(hasNaturalAptitude(person, driveType), slot);
@@ -5399,9 +5409,57 @@ public class Unit implements ITechnology, ILocatable {
         crew.setHasNaturalAptitudeArtillery(isUseArtillerySkill ?
                                                   hasNaturalAptitude(person, SkillType.S_ARTILLERY) :
                                                   hasNaturalAptitudeGunnery, slot);
+    }
 
-        // Used by MegaMek once the crew is on foot and fighting with their sidearms
-        crew.setHasNaturalAptitudeSmallArms(hasNaturalAptitude(person, SkillType.S_SMALL_ARMS), slot);
+    /**
+     * Records the skill, and Natural Aptitude, a person fights with on foot on one slot of the entity's crew. MegaMek
+     * calls this the Small Arms skill and uses it once the crew has left their unit. It is the person's best infantry
+     * weapon skill, or strictly Small Arms if the campaign uses Small Arms only, as for conventional infantry.
+     *
+     * <p>With no person, or a person without any usable skill, the slot's skill is left unset so MegaMek falls back
+     * to its default for the unit type. Chassis familiarity isn't applied, as it doesn't carry over to fighting
+     * outside the unit.</p>
+     *
+     * @param crew   the entity's crew
+     * @param slot   the crew slot to update
+     * @param person the person in that slot (the commander, for single-slot crews), or {@code null} if none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void updateCrewSmallArms(Crew crew, int slot, @Nullable Person person) {
+        String skillName = (person == null) ? null : getInfantryGunnerySkill(person);
+        if ((person == null) || !person.hasSkill(skillName)) {
+            crew.setSmallArms(Crew.SMALL_ARMS_UNSET, slot);
+            crew.setHasNaturalAptitudeSmallArms(false, slot);
+            return;
+        }
+
+        Skill skill = person.getSkill(skillName);
+        int smallArms = skill.getFinalSkillValue(person.getSkillModifierData());
+        if (getCampaign().getCampaignOptions().isUseAdvancedMedical()) {
+            smallArms += person.getInjuryModifiers(false);
+        }
+        crew.setSmallArms(Math.clamp(smallArms, 0, Crew.MAX_SKILL), slot);
+        crew.setHasNaturalAptitudeSmallArms(skill.getHasNaturalAptitude(), slot);
+    }
+
+    /**
+     * The infantry weapon skill a person fights with: their best infantry gunnery skill, honouring the campaign's
+     * Small Arms only option. Falls back to Small Arms when the person has none, so callers always have a skill to
+     * look up (the person may still lack it).
+     *
+     * @param person the person to check
+     *
+     * @return the skill name, never {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private String getInfantryGunnerySkill(Person person) {
+        boolean isSmallArmsOnly = getCampaign().getCampaignOptions().get(CampaignOption.USE_SMALL_ARMS_ONLY);
+        String skillName = InfantryGunnerySkills.getBestInfantryGunnerySkill(person, isSmallArmsOnly);
+        return (skillName == null) ? SkillType.S_SMALL_ARMS : skillName;
     }
 
     /**
@@ -5703,7 +5761,6 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         relevantCrew = getCompositeCrew(isTank || entityIsConventionalInfantry, false);
-        boolean smallArmsOnly = campaign.getCampaignOptions().get(CampaignOption.USE_SMALL_ARMS_ONLY);
         for (Person person : relevantCrew) {
             if (person.getTotalInjurySeverity() > 0 && !usesSoloPilot()) {
                 continue;
@@ -5712,13 +5769,7 @@ public class Unit implements ITechnology, ILocatable {
             SkillModifierData skillModifierData = person.getSkillModifierData();
             int familiarityBonusGunnery = person.getChassisFamiliarityCombatBonus(familiarity, true);
 
-            String tempGunType = gunType;
-            if (entityIsConventionalInfantry) {
-                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(person, smallArmsOnly);
-                if (tempGunType == null) {
-                    tempGunType = SkillType.S_SMALL_ARMS;
-                }
-            }
+            String tempGunType = entityIsConventionalInfantry ? getInfantryGunnerySkill(person) : gunType;
 
             if (person.hasSkill(tempGunType)) {
                 sumGunnery += person.getSkill(tempGunType)
@@ -5774,13 +5825,7 @@ public class Unit implements ITechnology, ILocatable {
                 piloting = 8;
             }
 
-            String tempGunType = gunType;
-            if (entityIsConventionalInfantry) {
-                tempGunType = InfantryGunnerySkills.getBestInfantryGunnerySkill(getCommander(), smallArmsOnly);
-                if (tempGunType == null) {
-                    tempGunType = SkillType.S_SMALL_ARMS;
-                }
-            }
+            String tempGunType = entityIsConventionalInfantry ? getInfantryGunnerySkill(getCommander()) : gunType;
 
             Skill gunnerySkill = getCommander().getSkill(tempGunType);
             gunnery = gunnerySkill == null ?
@@ -6112,6 +6157,7 @@ public class Unit implements ITechnology, ILocatable {
         entity.getCrew().setArtillery(Math.clamp(artillery, 0, 8), slot);
         entity.getCrew().setToughness(person.getAdjustedToughness(), slot);
         updateCrewNaturalAptitudes(entity.getCrew(), slot, person, gunType, driveType);
+        updateCrewSmallArms(entity.getCrew(), slot, person);
 
         entity.getCrew().setExternalIdAsString(person.getId().toString(), slot);
         entity.getCrew().setMissing(false, slot);
