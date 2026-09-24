@@ -182,6 +182,20 @@ public final class KitTestSupport {
     }
 
     /**
+     * Gives a person their own stores holding one of each given kit, and returns them. The warehouse is built before
+     * the person is stubbed: building it inline inside {@code when(person.getWarehouse()).thenReturn(...)} would start
+     * the warehouse's own stubbing while the person's is unfinished, which Mockito rejects.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static LocalWarehouse giveStores(Person person, EquipmentType... kits) {
+        LocalWarehouse warehouse = warehouseWith(kits);
+        when(person.getWarehouse()).thenReturn(warehouse);
+        return warehouse;
+    }
+
+    /**
      * How many of a kit a {@link #warehouseWith} warehouse currently holds.
      *
      * @author Illiani

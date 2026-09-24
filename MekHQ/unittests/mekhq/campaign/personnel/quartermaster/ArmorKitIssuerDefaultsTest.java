@@ -44,6 +44,7 @@ import static mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.KIT_AEROSPA
 import static mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.KIT_MEKWARRIOR_ADVANCED;
 import static mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.KIT_MEKWARRIOR_BASIC;
 import static mekhq.campaign.personnel.quartermaster.KitTestSupport.count;
+import static mekhq.campaign.personnel.quartermaster.KitTestSupport.giveStores;
 import static mekhq.campaign.personnel.quartermaster.KitTestSupport.kit;
 import static mekhq.campaign.personnel.quartermaster.KitTestSupport.person;
 import static mekhq.campaign.personnel.quartermaster.KitTestSupport.setRoster;
@@ -107,7 +108,7 @@ class ArmorKitIssuerDefaultsTest {
     @Test
     void gmAddGrantsTheDefaultDirectlyEvenWhenProcurementIsOff() {
         Person mekWarrior = person(MEKWARRIOR, NONE);
-        when(mekWarrior.getWarehouse()).thenReturn(warehouseWith());
+        giveStores(mekWarrior);
         options.set(CampaignOption.MEKWARRIOR_DEFAULT_KIT, KIT_MEKWARRIOR_BASIC);
         options.set(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT, false);
 
@@ -120,7 +121,7 @@ class ArmorKitIssuerDefaultsTest {
     @Test
     void aRegularRecruitGetsNothingWhenOutOfStockAndProcurementIsOff() {
         Person mekWarrior = person(MEKWARRIOR, NONE);
-        when(mekWarrior.getWarehouse()).thenReturn(warehouseWith());
+        giveStores(mekWarrior);
         options.set(CampaignOption.MEKWARRIOR_DEFAULT_KIT, KIT_MEKWARRIOR_BASIC);
 
         ArmorKitIssuer.equipDefaultKitOnRecruitment(mekWarrior, campaign, false);
@@ -195,8 +196,8 @@ class ArmorKitIssuerDefaultsTest {
         Person soldier = person(SOLDIER, NONE);
         Person alreadyKitted = person(MEKWARRIOR, NONE);
         wireArmorKit(alreadyKitted, KIT_MEKWARRIOR_BASIC);
-        when(soldier.getWarehouse()).thenReturn(warehouseWith());
-        when(alreadyKitted.getWarehouse()).thenReturn(warehouseWith());
+        giveStores(soldier);
+        giveStores(alreadyKitted);
         options.set(CampaignOption.MEKWARRIOR_DEFAULT_KIT, KIT_MEKWARRIOR_BASIC);
 
         KitIssueTotals totals = new KitIssueTotals();
@@ -213,8 +214,8 @@ class ArmorKitIssuerDefaultsTest {
     void issueDefaultKitsOrdersTheShortfallOnce() {
         Person first = person(MEKWARRIOR, NONE);
         Person second = person(MEKWARRIOR, NONE);
-        when(first.getWarehouse()).thenReturn(warehouseWith());
-        when(second.getWarehouse()).thenReturn(warehouseWith());
+        giveStores(first);
+        giveStores(second);
         options.set(CampaignOption.MEKWARRIOR_DEFAULT_KIT, KIT_MEKWARRIOR_BASIC);
 
         KitIssueTotals totals = new KitIssueTotals();
@@ -232,15 +233,15 @@ class ArmorKitIssuerDefaultsTest {
     void switchDefaultKitOnlyMovesTheGroupsHoldersOfTheOldKit() {
         Person holder = person(MEKWARRIOR, NONE);
         wireArmorKit(holder, KIT_MEKWARRIOR_BASIC);
-        when(holder.getWarehouse()).thenReturn(warehouseWith(advanced));
+        giveStores(holder, advanced);
 
         Person otherKit = person(MEKWARRIOR, NONE);
         wireArmorKit(otherKit, KIT_AEROSPACE_PILOT);
-        when(otherKit.getWarehouse()).thenReturn(warehouseWith(advanced));
+        giveStores(otherKit, advanced);
 
         Person otherGroup = person(VEHICLE_CREW_GROUND, NONE);
         wireArmorKit(otherGroup, KIT_MEKWARRIOR_BASIC);
-        when(otherGroup.getWarehouse()).thenReturn(warehouseWith(advanced));
+        giveStores(otherGroup, advanced);
 
         setRoster(campaign, List.of(holder, otherKit, otherGroup));
 
@@ -257,7 +258,7 @@ class ArmorKitIssuerDefaultsTest {
     void switchDefaultKitKeepsTheOldKitUntilTheOrderedOneArrives() {
         Person holder = person(MEKWARRIOR, NONE);
         wireArmorKit(holder, KIT_MEKWARRIOR_BASIC);
-        when(holder.getWarehouse()).thenReturn(warehouseWith());
+        giveStores(holder);
         setRoster(campaign, List.of(holder));
 
         KitIssueTotals totals = new KitIssueTotals();

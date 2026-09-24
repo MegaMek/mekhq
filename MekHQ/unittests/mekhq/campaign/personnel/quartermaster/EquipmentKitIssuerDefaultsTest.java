@@ -43,6 +43,7 @@ import static mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog.KIT_DES
 import static mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog.KIT_PERSONAL_COMPUTER;
 import static mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog.KIT_WEAPON;
 import static mekhq.campaign.personnel.quartermaster.KitTestSupport.count;
+import static mekhq.campaign.personnel.quartermaster.KitTestSupport.giveStores;
 import static mekhq.campaign.personnel.quartermaster.KitTestSupport.kit;
 import static mekhq.campaign.personnel.quartermaster.KitTestSupport.person;
 import static mekhq.campaign.personnel.quartermaster.KitTestSupport.setRoster;
@@ -196,7 +197,7 @@ class EquipmentKitIssuerDefaultsTest {
     void fulfilmentKeepsWaitingWhileTheKitIsNotInStores() {
         Person person = person(MEK_TECH, ADMINISTRATOR);
         person.setIntendedKitName(KitSlot.SECONDARY, KIT_PERSONAL_COMPUTER);
-        when(person.getWarehouse()).thenReturn(warehouseWith());
+        giveStores(person);
         setRoster(campaign, List.of(person));
 
         EquipmentKitIssuer.fulfillPendingToolKits(campaign);
@@ -231,8 +232,8 @@ class EquipmentKitIssuerDefaultsTest {
     void issueDefaultKitsOrdersTheWholeShortfallInOneEntryPerKit() {
         Person first = person(MEK_TECH, ADMINISTRATOR);
         Person second = person(MEK_TECH, ADMINISTRATOR);
-        when(first.getWarehouse()).thenReturn(warehouseWith());
-        when(second.getWarehouse()).thenReturn(warehouseWith());
+        giveStores(first);
+        giveStores(second);
         options.set(CampaignOption.MEK_TECH_DEFAULT_TOOL_KIT, KIT_BASIC_TOOLKIT);
         options.set(CampaignOption.ADMIN_DEFAULT_TOOL_KIT, KIT_PERSONAL_COMPUTER);
 
@@ -250,7 +251,7 @@ class EquipmentKitIssuerDefaultsTest {
     void issueDefaultKitsLeavesASlotWhoseRoleHasNoDefault() {
         Person person = person(MEK_TECH, NONE);
         KitTestSupport.wireEquipmentKits(person, KIT_WEAPON, KIT_DESCARTES_MK_XXV);
-        when(person.getWarehouse()).thenReturn(warehouseWith());
+        giveStores(person);
         // no defaults configured at all
 
         KitIssueTotals totals = new KitIssueTotals();
@@ -265,7 +266,7 @@ class EquipmentKitIssuerDefaultsTest {
     void issueDefaultKitsDoesNotReorderAKitAlreadyAwaited() {
         Person person = person(MEK_TECH, NONE);
         person.setIntendedKitName(KitSlot.PRIMARY, KIT_BASIC_TOOLKIT);
-        when(person.getWarehouse()).thenReturn(warehouseWith());
+        giveStores(person);
         options.set(CampaignOption.MEK_TECH_DEFAULT_TOOL_KIT, KIT_BASIC_TOOLKIT);
 
         KitIssueTotals totals = new KitIssueTotals();
@@ -281,19 +282,19 @@ class EquipmentKitIssuerDefaultsTest {
     void switchDefaultKitOnlyTouchesTheProfessionsSlotAndHoldersOfTheOldKit() {
         Person holder = person(MEK_TECH, NONE);
         KitTestSupport.wireEquipmentKits(holder, KIT_BASIC_TOOLKIT, null);
-        when(holder.getWarehouse()).thenReturn(warehouseWith(deluxe));
+        giveStores(holder, deluxe);
 
         Person otherKit = person(MEK_TECH, NONE);
         KitTestSupport.wireEquipmentKits(otherKit, KIT_WEAPON, null);
-        when(otherKit.getWarehouse()).thenReturn(warehouseWith(deluxe));
+        giveStores(otherKit, deluxe);
 
         Person otherProfession = person(ADMINISTRATOR, NONE);
         KitTestSupport.wireEquipmentKits(otherProfession, KIT_BASIC_TOOLKIT, null);
-        when(otherProfession.getWarehouse()).thenReturn(warehouseWith(deluxe));
+        giveStores(otherProfession, deluxe);
 
         Person secondaryHolder = person(ADMINISTRATOR, MEK_TECH);
         KitTestSupport.wireEquipmentKits(secondaryHolder, KIT_BASIC_TOOLKIT, KIT_BASIC_TOOLKIT);
-        when(secondaryHolder.getWarehouse()).thenReturn(warehouseWith()); // no stock: ordered
+        giveStores(secondaryHolder); // no stock: ordered
 
         setRoster(campaign, List.of(holder, otherKit, otherProfession, secondaryHolder));
 
