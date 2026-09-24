@@ -132,6 +132,21 @@ public final class ArmorKitCatalog extends AbstractKitCatalog {
         return MEKWARRIOR_KITS.contains(kitInternalName);
     }
 
+    /**
+     * Whether a kit is the Aerospace Fighter Pilot Kit — the kit an aerospace fighter pilot must wear to meet the
+     * deployment requirement, as it carries their neurohelmet.
+     *
+     * @param kitInternalName the internal name of the kit, or {@code null}
+     *
+     * @return {@code true} if the kit is an aerospace pilot kit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isAerospacePilotKit(@Nullable String kitInternalName) {
+        return AEROSPACE_KITS.contains(kitInternalName);
+    }
+
     /** The fixed kit sets used by the campaign-options dropdowns. Soldiers have no dropdown, so an empty set. */
     private static Set<String> kitsFor(Category category) {
         return switch (category) {

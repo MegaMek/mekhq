@@ -64,6 +64,7 @@ import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.Category;
 import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
+import mekhq.campaign.personnel.quartermaster.KitSlot;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -169,7 +170,8 @@ public class IssueEquipmentDialog extends JDialog {
             sections.add(armorSection());
         }
         if (!toolTechnicians.isEmpty()) {
-            sections.add(new ToolKitSection(campaign, toolTechnicians, this::recalculate));
+            sections.add(new ToolKitSection(campaign, toolTechnicians, KitSlot.PRIMARY, this::recalculate));
+            sections.add(new ToolKitSection(campaign, toolTechnicians, KitSlot.SECONDARY, this::recalculate));
         }
 
         buildUI();
@@ -280,7 +282,7 @@ public class IssueEquipmentDialog extends JDialog {
         kits.sort(Comparator.comparing(this::price));
 
         // Tally this group's warehouse stock once, rather than rescanning per kit inside each card.
-        Map<EquipmentType, Integer> stock = ArmorKitIssuer.localStock(people);
+        Map<EquipmentType, Integer> stock = ArmorKitIssuer.localStock(people, campaign);
 
         List<KitCard> cards = new ArrayList<>();
         for (EquipmentType kit : kits) {
@@ -440,7 +442,10 @@ public class IssueEquipmentDialog extends JDialog {
             if (kit == null) {
                 continue;
             }
-            int quantity = entry.getValue().size();
+            int quantity = countLacking(category, entry.getValue(), kit);
+            if (quantity == 0) {
+                continue;
+            }
             int stock = stockFor(entry.getValue(), kit);
             int drawn = Math.min(stock, quantity);
             int ordered = quantity - drawn;
@@ -536,6 +541,11 @@ public class IssueEquipmentDialog extends JDialog {
             }
             int shortfall = 0;
             for (Person person : people) {
+                if (wearsKit(person, category, kit)) {
+                    // already wearing it — nothing to draw, order, or report
+                    person.setIntendedArmorKitName(null);
+                    continue;
+                }
                 if (ArmorKitIssuer.issueFromStock(person, kit, campaign)) {
                     person.setIntendedArmorKitName(null);
                     totals.changed.add(person);
@@ -553,14 +563,46 @@ public class IssueEquipmentDialog extends JDialog {
         }
     }
 
+    /**
+     * How many of a group do not already wear the given kit, and so would draw or order one.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static int countLacking(Category category, List<Person> people, EquipmentType kit) {
+        int count = 0;
+        for (Person person : people) {
+            if (!wearsKit(person, category, kit)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Whether a person already wears the given kit. A soldier's kit is their platoon's, so it is read from the unit.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean wearsKit(Person person, Category category, EquipmentType kit) {
+        String worn;
+        if (category == Category.SOLDIER) {
+            worn = (person.getUnit() != null) ? person.getUnit().getArmorKitName() : null;
+        } else {
+            worn = person.getArmorKitName();
+        }
+        return kit.getInternalName().equals(worn);
+    }
+
     /** Kits stock is per location, so sum across each distinct local warehouse the group draws from. */
     private int stockFor(List<Person> people, EquipmentType kit) {
         Set<LocalWarehouse> counted = new HashSet<>();
         int total = 0;
         for (Person person : people) {
-            LocalWarehouse warehouse = person.getWarehouse();
+            LocalWarehouse warehouse = ArmorKitIssuer.warehouseFor(person, campaign);
             if ((warehouse != null) && counted.add(warehouse)) {
-                total += ArmorKitIssuer.localStock(person, kit);
+                total += ArmorKitIssuer.localStock(person, kit, campaign);
             }
         }
         return total;

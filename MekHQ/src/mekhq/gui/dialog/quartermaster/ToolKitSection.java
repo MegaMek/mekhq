@@ -58,13 +58,15 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitIssuer;
+import mekhq.campaign.personnel.quartermaster.KitSlot;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
- * The "Tool Kits" tab of the shared kit-issue dialog. It reuses the same {@link KitCard} tiles and top-anchored grid as
- * the armor-kit tab, and works the same way: the player picks a single card and it applies to everyone selected -
- * choose a kit to issue it to all who lack it (drawn from local stores, a shortfall ordered), or the "No kit" card to
- * strip the tool kit from everyone. A technician carries at most one tool kit, exactly like an armor kit.
+ * One of the two equipment-kit tabs (primary slot or secondary slot) of the shared kit-issue dialog. It reuses the
+ * same {@link KitCard} tiles and top-anchored grid as the armor-kit tab, and works the same way: the player picks a
+ * single card and it applies to everyone selected - choose a kit to issue it to all who lack it (drawn from stores, a
+ * shortfall ordered), or the "No kit" card to strip this slot's kit from everyone. A person carries up to two equipment kits, one per {@link KitSlot}, and this
+ * tab only ever changes its own slot.
  *
  * @author Illiani
  * @since 0.51.01
@@ -79,6 +81,7 @@ public class ToolKitSection implements KitIssueSection {
 
     private final transient Campaign campaign;
     private final transient List<Person> technicians;
+    private final KitSlot slot;
     private final transient Runnable onChange;
 
     /** The single active selection: {@code null} = no change, {@link #STRIP} = strip, else a kit internal name. */
@@ -88,15 +91,16 @@ public class ToolKitSection implements KitIssueSection {
     /** Kit stock tallied once across the technicians' warehouses; see {@link #stockFor(EquipmentType)}. */
     private transient Map<EquipmentType, Integer> stockCache;
 
-    public ToolKitSection(Campaign campaign, List<Person> technicians, Runnable onChange) {
+    public ToolKitSection(Campaign campaign, List<Person> technicians, KitSlot slot, Runnable onChange) {
         this.campaign = campaign;
         this.technicians = technicians;
+        this.slot = slot;
         this.onChange = onChange;
     }
 
     @Override
     public String getTitle() {
-        return getTextAt(RESOURCE_BUNDLE, "tab.tools");
+        return getTextAt(RESOURCE_BUNDLE, (slot == KitSlot.PRIMARY) ? "tab.tools.primary" : "tab.tools.secondary");
     }
 
     @Override
@@ -124,7 +128,7 @@ public class ToolKitSection implements KitIssueSection {
         scroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
         tab.add(scroll, BorderLayout.CENTER);
 
-        rosterModel = new RosterModel(technicians);
+        rosterModel = new RosterModel(technicians, slot);
         JTable roster = new JTable(rosterModel);
         roster.setEnabled(false);
         roster.getTableHeader().setReorderingAllowed(false);
@@ -199,12 +203,8 @@ public class ToolKitSection implements KitIssueSection {
         }
         if (STRIP.equals(selected)) {
             for (Person tech : technicians) {
-                String wornName = tech.getRepairKitName();
-                if (wornName == null) {
-                    continue;
-                }
-                EquipmentType worn = EquipmentType.get(wornName);
-                if ((worn != null) && EquipmentKitIssuer.removeKit(tech, worn, campaign)) {
+                tech.setIntendedKitName(slot, null);
+                if (EquipmentKitIssuer.removeKit(tech, slot, campaign)) {
                     totals.removed++;
                     totals.changed.add(tech);
                 }
@@ -220,10 +220,13 @@ public class ToolKitSection implements KitIssueSection {
             if (tech.hasRepairKit(kit.getInternalName())) {
                 continue;
             }
-            if (EquipmentKitIssuer.issueFromStock(tech, kit, campaign)) {
+            if (EquipmentKitIssuer.issueFromStock(tech, kit, slot, campaign)) {
+                tech.setIntendedKitName(slot, null);
                 totals.issued++;
                 totals.changed.add(tech);
             } else {
+                // out of stock now — remember what they are meant to carry so it is issued when a kit arrives
+                tech.setIntendedKitName(slot, kit.getInternalName());
                 shortfall++;
             }
         }
@@ -272,13 +275,14 @@ public class ToolKitSection implements KitIssueSection {
      */
     private int stockFor(EquipmentType kit) {
         if (stockCache == null) {
-            stockCache = EquipmentKitIssuer.localStock(technicians);
+            stockCache = EquipmentKitIssuer.localStock(technicians, campaign);
         }
         return stockCache.getOrDefault(kit, 0);
     }
 
     private static final class RosterModel extends AbstractTableModel {
         private final List<Person> technicians;
+        private final KitSlot slot;
         private String selected;
 
         private final String[] columnNames = {
@@ -287,8 +291,9 @@ public class ToolKitSection implements KitIssueSection {
               getTextAt(RESOURCE_BUNDLE, "tools.col.owned")
         };
 
-        RosterModel(List<Person> technicians) {
+        RosterModel(List<Person> technicians, KitSlot slot) {
             this.technicians = technicians;
+            this.slot = slot;
         }
 
         void setSelected(String selected) {
@@ -331,10 +336,11 @@ public class ToolKitSection implements KitIssueSection {
             String kitName;
             if (STRIP.equals(selected)) {
                 kitName = null;
-            } else if (selected != null) {
+            } else if ((selected != null) && !tech.hasRepairKit(selected)) {
                 kitName = selected;
             } else {
-                kitName = tech.getRepairKitName();
+                // unchanged, or already carried (possibly in the other slot, which this issue leaves alone)
+                kitName = tech.getKitName(slot);
             }
 
             if (kitName == null) {

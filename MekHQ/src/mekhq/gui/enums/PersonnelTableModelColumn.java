@@ -912,6 +912,11 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
             kits.add(kitDisplayName(toolKit));
         }
 
+        String secondaryKit = person.getSecondaryKitName();
+        if (secondaryKit != null) {
+            kits.add(kitDisplayName(secondaryKit));
+        }
+
         if (kits.isEmpty()) {
             return "-";
         }

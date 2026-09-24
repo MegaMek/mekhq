@@ -42,6 +42,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
@@ -119,19 +120,22 @@ public abstract class AbstractKitIssuer {
     }
 
     /**
-     * The number of each present, spare kit these people's distinct local warehouses hold, tallied by kit type in a
-     * single pass. Callers building many cards should use this once instead of
-     * {@link #localStock(Person, EquipmentType)} per kit, which rescans the whole spare-parts list every call.
+     * Kits on hand across the distinct stores the given people draw from (see
+     * {@link #warehouseFor(Person, Campaign)}), keyed by kit type.
      *
-     * @param people the people whose local warehouses to tally
+     * @param people   the people whose stores are counted
+     * @param campaign the campaign whose main warehouse stands in for anyone without local stores
      *
-     * @return kit equipment type -&gt; count in stock across those warehouses
+     * @return kit type to count on hand
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    public static Map<EquipmentType, Integer> localStock(Collection<Person> people) {
+    public static Map<EquipmentType, Integer> localStock(Collection<Person> people, Campaign campaign) {
         Map<EquipmentType, Integer> counts = new HashMap<>();
         Set<LocalWarehouse> counted = new HashSet<>();
         for (Person person : people) {
-            LocalWarehouse warehouse = person.getWarehouse();
+            LocalWarehouse warehouse = warehouseFor(person, campaign);
             if ((warehouse == null) || !counted.add(warehouse)) {
                 continue;
             }
@@ -142,6 +146,70 @@ public abstract class AbstractKitIssuer {
             }
         }
         return counts;
+    }
+
+    /**
+     * The stores a person draws kits from and returns them to: their local warehouse, or the campaign's main warehouse
+     * when they have none.
+     *
+     * @param person   the person
+     * @param campaign the campaign
+     *
+     * @return the warehouse to use, or {@code null} if neither exists
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable LocalWarehouse warehouseFor(Person person, Campaign campaign) {
+        LocalWarehouse warehouse = person.getWarehouse();
+        if ((warehouse != null) || (campaign == null) || (campaign.getPlayerForce() == null)) {
+            return warehouse;
+        }
+        return campaign.getPlayerForce().getWarehouse();
+    }
+
+    /**
+     * How many of a kit the person's stores hold (see {@link #warehouseFor(Person, Campaign)}).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int localStock(Person person, EquipmentType kit, Campaign campaign) {
+        return stockIn(warehouseFor(person, campaign), kit);
+    }
+
+    /** How many present, spare copies of a kit a warehouse holds; 0 for a {@code null} warehouse. */
+    protected static int stockIn(@Nullable LocalWarehouse warehouse, EquipmentType kit) {
+        if (warehouse == null) {
+            return 0;
+        }
+        int count = 0;
+        for (Part part : warehouse.getSpareParts()) {
+            if (isKitPart(part, kit)) {
+                count += Math.max(1, part.getQuantity());
+            }
+        }
+        return count;
+    }
+
+    /**
+     * What a bulk kit operation did, for its report: kits issued from stores and kits ordered for later issue.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static final class KitIssueTotals {
+        public int issued;
+        public int ordered;
+    }
+
+    /** Orders every tallied shortfall, one shopping-list entry per kit type, and adds it to the totals. */
+    protected static void orderShortfall(Map<EquipmentType, Integer> shortfall, Campaign campaign,
+          KitIssueTotals totals) {
+        for (Map.Entry<EquipmentType, Integer> entry : shortfall.entrySet()) {
+            order(entry.getKey(), entry.getValue(), campaign);
+            totals.ordered += entry.getValue();
+        }
     }
 
     /**

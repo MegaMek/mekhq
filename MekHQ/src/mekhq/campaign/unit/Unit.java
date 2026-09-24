@@ -1439,6 +1439,16 @@ public class Unit implements ITechnology, ILocatable {
                 }
             }
         }
+        // Likewise, an aerospace fighter may not deploy unless every crew member wears the Aerospace Fighter Pilot
+        // Kit, which carries the pilot's neurohelmet. Conventional fighters are not affected.
+        if (entity.isAerospaceFighter() &&
+                  getCampaign().getCampaignOptions().get(CampaignOption.REQUIRE_AEROSPACE_KIT_TO_DEPLOY)) {
+            for (Person crewMember : getCrew()) {
+                if (!ArmorKitCatalog.isAerospacePilotKit(crewMember.getArmorKitName())) {
+                    return getTextAt(RESOURCE_BUNDLE, "Unit.checkDeployment.needsAerospaceKit");
+                }
+            }
+        }
         return null;
     }
 

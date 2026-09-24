@@ -159,6 +159,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
+import mekhq.campaign.personnel.quartermaster.KitSlot;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -284,6 +285,8 @@ public class Person implements ILocatable {
     private String intendedArmorKitName;
     private String repairKitName;
     private String intendedRepairKitName;
+    private String secondaryKitName;
+    private String intendedSecondaryKitName;
     private int chaosCampaignReputation;
     private int chaosCampaignCriminalRecord;
     private Attributes atowAttributes;
@@ -3783,6 +3786,14 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intendedRepairKitName", intendedRepairKitName);
             }
 
+            if (secondaryKitName != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "secondaryKitName", secondaryKitName);
+            }
+
+            if (intendedSecondaryKitName != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intendedSecondaryKitName", intendedSecondaryKitName);
+            }
+
             if (chaosCampaignReputation != STARTING_REPUTATION_SCORE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chaosCampaignReputation", chaosCampaignReputation);
             }
@@ -4415,6 +4426,10 @@ public class Person implements ILocatable {
                     person.repairKitName = wn2.getTextContent().trim();
                 } else if (nodeName.equalsIgnoreCase("intendedRepairKitName")) {
                     person.intendedRepairKitName = wn2.getTextContent().trim();
+                } else if (nodeName.equalsIgnoreCase("secondaryKitName")) {
+                    person.secondaryKitName = wn2.getTextContent().trim();
+                } else if (nodeName.equalsIgnoreCase("intendedSecondaryKitName")) {
+                    person.intendedSecondaryKitName = wn2.getTextContent().trim();
                 } else if (nodeName.equalsIgnoreCase("chaosCampaignReputation")) {
                     person.chaosCampaignReputation = MathUtility.parseInt(wn2.getTextContent().trim(),
                           STARTING_REPUTATION_SCORE);
@@ -7731,11 +7746,12 @@ public class Person implements ILocatable {
     }
 
     /**
-     * The single tool kit this technician owns, by MegaMek internal name, or {@code null} if they carry none. The kit
-     * grants a bonus to certain skill rolls (see {@code EquipmentKitCatalog}). Like an armor kit, a technician carries at
-     * most one tool kit at a time.
+     * The kit in this person's primary kit slot, by MegaMek internal name, or {@code null} if the slot is empty. The
+     * primary slot is the one filled by the default kit of the person's primary role. A person carries at most two
+     * equipment kits (see {@link #getSecondaryKitName()}), separate from their armor kit; each grants a bonus to
+     * certain skill rolls (see {@code EquipmentKitCatalog}).
      *
-     * @return the owned tool-kit internal name, or {@code null}
+     * @return the primary-slot kit internal name, or {@code null}
      */
     public @Nullable String getRepairKitName() {
         return repairKitName;
@@ -7746,20 +7762,69 @@ public class Person implements ILocatable {
     }
 
     /**
-     * @param kitInternalName the MegaMek internal name of a tool kit
+     * The kit in this person's secondary kit slot, by MegaMek internal name, or {@code null} if the slot is empty. The
+     * secondary slot is the one filled by the default kit of the person's secondary role.
      *
-     * @return {@code true} if this is the tool kit this person carries
+     * @return the secondary-slot kit internal name, or {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    public boolean hasRepairKit(final String kitInternalName) {
-        return (kitInternalName != null) && kitInternalName.equals(repairKitName);
+    public @Nullable String getSecondaryKitName() {
+        return secondaryKitName;
     }
 
     /**
-     * The tool kit this person is meant to own but has not yet been issued, pending a kit arriving in their local
-     * stores; {@code null} once they have it or were never waiting on one. The quartermaster fulfills these as kits
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setSecondaryKitName(final @Nullable String secondaryKitName) {
+        this.secondaryKitName = secondaryKitName;
+    }
+
+    /**
+     * @param slot the kit slot to read
+     *
+     * @return the kit internal name in that slot, or {@code null} if it is empty
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable String getKitName(final KitSlot slot) {
+        return (slot == KitSlot.PRIMARY) ? getRepairKitName() : getSecondaryKitName();
+    }
+
+    /**
+     * @param slot    the kit slot to fill
+     * @param kitName the kit internal name to put in it, or {@code null} to empty it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setKitName(final KitSlot slot, final @Nullable String kitName) {
+        if (slot == KitSlot.PRIMARY) {
+            setRepairKitName(kitName);
+        } else {
+            setSecondaryKitName(kitName);
+        }
+    }
+
+    /**
+     * @param kitInternalName the MegaMek internal name of an equipment kit
+     *
+     * @return {@code true} if this person carries that kit in either kit slot
+     */
+    public boolean hasRepairKit(final String kitInternalName) {
+        return (kitInternalName != null)
+                     && (kitInternalName.equals(repairKitName) || kitInternalName.equals(secondaryKitName));
+    }
+
+    /**
+     * The kit this person is meant to carry in their primary slot but has not yet been issued, pending a kit arriving
+     * in stores; {@code null} once they have it or were never waiting on one. The quartermaster fulfills these as kits
      * arrive.
      *
-     * @return the internal name of the awaited tool kit, or {@code null}
+     * @return the internal name of the awaited primary-slot kit, or {@code null}
      */
     public @Nullable String getIntendedRepairKitName() {
         return intendedRepairKitName;
@@ -7767,6 +7832,54 @@ public class Person implements ILocatable {
 
     public void setIntendedRepairKitName(final @Nullable String intendedRepairKitName) {
         this.intendedRepairKitName = intendedRepairKitName;
+    }
+
+    /**
+     * The kit this person is meant to carry in their secondary slot but has not yet been issued; {@code null} once
+     * they have it or were never waiting on one.
+     *
+     * @return the internal name of the awaited secondary-slot kit, or {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable String getIntendedSecondaryKitName() {
+        return intendedSecondaryKitName;
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setIntendedSecondaryKitName(final @Nullable String intendedSecondaryKitName) {
+        this.intendedSecondaryKitName = intendedSecondaryKitName;
+    }
+
+    /**
+     * @param slot the kit slot to read
+     *
+     * @return the internal name of the kit awaited for that slot, or {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable String getIntendedKitName(final KitSlot slot) {
+        return (slot == KitSlot.PRIMARY) ? getIntendedRepairKitName() : getIntendedSecondaryKitName();
+    }
+
+    /**
+     * @param slot    the kit slot the awaited kit is for
+     * @param kitName the awaited kit internal name, or {@code null} to clear it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setIntendedKitName(final KitSlot slot, final @Nullable String kitName) {
+        if (slot == KitSlot.PRIMARY) {
+            setIntendedRepairKitName(kitName);
+        } else {
+            setIntendedSecondaryKitName(kitName);
+        }
     }
 
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate) {

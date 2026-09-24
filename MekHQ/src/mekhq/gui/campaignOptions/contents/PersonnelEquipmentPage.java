@@ -88,6 +88,7 @@ class PersonnelEquipmentPage {
     private MMComboBox<String> cboAircraftDefaultKit;
     private JCheckBox chkNpcFactionArmorKits;
     private JCheckBox chkRequireMekWarriorKitToDeploy;
+    private JCheckBox chkRequireAerospaceKitToDeploy;
 
     private JLabel lblMekTechDefaultToolKit;
     private MMComboBox<String> cboMekTechDefaultToolKit;
@@ -197,6 +198,10 @@ class PersonnelEquipmentPage {
               getMetadata(new Version(0, 51, 1)));
         chkRequireMekWarriorKitToDeploy.addMouseListener(createTipPanelUpdater("RequireMekWarriorKitToDeploy"));
 
+        chkRequireAerospaceKitToDeploy = new CampaignOptionsCheckBox("RequireAerospaceKitToDeploy",
+              getMetadata(new Version(0, 51, 1)));
+        chkRequireAerospaceKitToDeploy.addMouseListener(createTipPanelUpdater("RequireAerospaceKitToDeploy"));
+
         final SettingsFormPanel panel = new SettingsFormPanel("ArmorKitsPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
@@ -205,6 +210,7 @@ class PersonnelEquipmentPage {
         panel.addRow(lblAircraftDefaultKit, cboAircraftDefaultKit);
         panel.addCheckBox(chkNpcFactionArmorKits);
         panel.addCheckBox(chkRequireMekWarriorKitToDeploy);
+        panel.addCheckBox(chkRequireAerospaceKitToDeploy);
 
         return panel;
     }
@@ -404,6 +410,7 @@ class PersonnelEquipmentPage {
         cboAircraftDefaultKit.setSelectedItem(model.aircraftDefaultKit);
         chkNpcFactionArmorKits.setSelected(model.npcFactionArmorKits);
         chkRequireMekWarriorKitToDeploy.setSelected(model.requireMekWarriorKitToDeploy);
+        chkRequireAerospaceKitToDeploy.setSelected(model.requireAerospaceKitToDeploy);
         cboMekTechDefaultToolKit.setSelectedItem(model.mekTechDefaultToolKit);
         cboMechanicDefaultToolKit.setSelectedItem(model.mechanicDefaultToolKit);
         cboAeroTechDefaultToolKit.setSelectedItem(model.aeroTechDefaultToolKit);
@@ -433,8 +440,10 @@ class PersonnelEquipmentPage {
         model.aircraftDefaultKit = cboAircraftDefaultKit.getSelectedItem();
         model.npcFactionArmorKits = chkNpcFactionArmorKits.isSelected();
         model.requireMekWarriorKitToDeploy = chkRequireMekWarriorKitToDeploy.isSelected();
+        model.requireAerospaceKitToDeploy = chkRequireAerospaceKitToDeploy.isSelected();
         model.mekTechDefaultToolKit = cboMekTechDefaultToolKit.getSelectedItem();
         model.mechanicDefaultToolKit = cboMechanicDefaultToolKit.getSelectedItem();
+        model.aeroTechDefaultToolKit = cboAeroTechDefaultToolKit.getSelectedItem();
         model.vesselCrewDefaultToolKit = cboVesselCrewDefaultToolKit.getSelectedItem();
         model.baTechDefaultToolKit = cboBATechDefaultToolKit.getSelectedItem();
         model.astechDefaultToolKit = cboAstechDefaultToolKit.getSelectedItem();
