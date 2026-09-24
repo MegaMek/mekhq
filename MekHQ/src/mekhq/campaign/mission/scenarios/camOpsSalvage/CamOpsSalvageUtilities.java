@@ -338,6 +338,27 @@ public class CamOpsSalvageUtilities {
         return false;
     }
 
+    /**
+     * Counts an entity's bays of a given type that still have at least one working door.
+     *
+     * @param entity  the entity to check
+     * @param bayType the type of bay to count, such as {@link ASFBay} or {@link SmallCraftBay}
+     *
+     * @return the number of matching bays with working doors
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int countBaysWithWorkingDoors(Entity entity, Class<? extends Bay> bayType) {
+        int bayCount = 0;
+        for (Bay bay : entity.getTransportBays()) {
+            if (bayType.isInstance(bay) && (bay.getCurrentDoors() > 0)) {
+                bayCount++;
+            }
+        }
+        return bayCount;
+    }
+
     public static boolean hasSuitableBayEquipment(Entity entity) {
         for (Bay b : entity.getTransportBays()) {
             //ASF and SC bays are assumed to have the equipment needed to handle space derelicts

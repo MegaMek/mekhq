@@ -5,7 +5,8 @@ package mekhq.campaign.mission.scenarios.salvage;
  * salvage.
  *
  * <p>Salvage formations may fight in a scenario and still salvage it. Salvaging 'Meks need working legs, and
- * 'Meks without two working hands may still salvage using cargo space (but can't drag salvage).
+ * 'Meks without two working hands may still salvage using cargo space (but can't drag salvage). Carrying units
+ * may recover as many wrecks as fit in their cargo space (or, in space, suitable bays).
  * Otherwise, not yet implemented; currently behaves like {@link CamOpsStrictSalvage CamOps (Strict)}.</p>
  *
  * @author Illiani
@@ -24,6 +25,11 @@ public class ChaosCampaignSalvage extends AbstractSalvage {
 
     @Override
     public boolean isMekCargoSalvageWithoutHandsAllowed() {
+        return true;
+    }
+
+    @Override
+    public boolean isMultipleSalvagePerUnitAllowed() {
         return true;
     }
 }

@@ -73,4 +73,24 @@ public abstract class AbstractSalvage {
     public boolean isMekCargoSalvageWithoutHandsAllowed() {
         return false;
     }
+
+    /**
+     * Checks whether a unit carrying salvage may recover more than one wreck.
+     *
+     * <p>Under CamOps (Strict), each recovery unit recovers a single wreck. Other systems let a unit carry as many
+     * wrecks as fit in its cargo space. In space, fighters and small craft are instead limited by the number of
+     * suitable bays with working doors: fighters fit in fighter or small craft bays, small craft only in small craft
+     * bays.</p>
+     *
+     * <p>Either way, a unit either drags (or tugs) salvage or carries it; never both. A unit that drags salvage, or
+     * that teams up with another unit to recover a wreck, is committed to that one wreck.</p>
+     *
+     * @return {@code true} if a carrying unit may recover several wrecks
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isMultipleSalvagePerUnitAllowed() {
+        return false;
+    }
 }
