@@ -55,7 +55,6 @@ import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -2303,18 +2302,27 @@ public class PersonTest {
     }
 
     /**
-     * Tests for {@code Person#attemptToCheatDeath(Campaign)} (the "Twist of Fate Survival" ability). The method is
-     * private, so it is exercised here via reflection.
+     * Tests for {@code Person#attemptToCheatDeath(Campaign, PersonnelStatus)} (the "Twist of Fate Survival" ability).
      */
     @Nested
     class AttemptToCheatDeath {
         private static final int DEATH = 6;
+        private static final LocalDate TODAY = LocalDate.of(3151, 1, 1);
 
-        /** Invokes the private {@code attemptToCheatDeath(Campaign)} method reflectively. */
-        private boolean invokeAttemptToCheatDeath(Person person, Campaign campaign) throws Exception {
-            Method method = Person.class.getDeclaredMethod("attemptToCheatDeath", Campaign.class);
-            method.setAccessible(true);
-            return (boolean) method.invoke(person, campaign);
+        private boolean invokeAttemptToCheatDeath(Person person, Campaign campaign) {
+            return person.attemptToCheatDeath(campaign, PersonnelStatus.KIA);
+        }
+
+        private CampaignOptions mockTwistOfFateOptions(boolean isUseAdvancedMedical) {
+            CampaignOptions options = mock(CampaignOptions.class);
+            when(options.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL)).thenReturn(true);
+            lenient().when(options.isUseAdvancedMedical()).thenReturn(isUseAdvancedMedical);
+            return options;
+        }
+
+        private Injury newConcussion(int hits, boolean isPermanent) {
+            return new Injury(1, "Test concussion", BodyLocation.HEAD, InjuryTypes.CONCUSSION, hits, TODAY,
+                  isPermanent);
         }
 
         private Campaign mockCampaignWith(CampaignOptions options) {
@@ -2331,7 +2339,7 @@ public class PersonTest {
         }
 
         @Test
-        void returnsFalseWhenTwistOfFateDisabled() throws Exception {
+        void returnsFalseWhenTwistOfFateDisabled() {
             Person person = new Person("GivenName", "Surname", null, "MERC");
             person.setAttributeScore(SkillAttribute.EDGE, 3);
 
@@ -2346,7 +2354,7 @@ public class PersonTest {
         }
 
         @Test
-        void returnsFalseWhenNoPermanentEdge() throws Exception {
+        void returnsFalseWhenNoPermanentEdge() {
             Person person = new Person("GivenName", "Surname", null, "MERC");
             // Fresh personnel default to an Edge score of 0.
             assertEquals(0, person.getAttributeScore(SkillAttribute.EDGE));
@@ -2361,7 +2369,7 @@ public class PersonTest {
         }
 
         @Test
-        void survivesAndConsumesEdgeWhenNoLethalDamage() throws Exception {
+        void survivesAndConsumesEdgeWhenNoLethalDamage() {
             Person person = new Person("GivenName", "Surname", null, "MERC");
             person.setAttributeScore(SkillAttribute.EDGE, 3);
 
@@ -2380,7 +2388,7 @@ public class PersonTest {
         }
 
         @Test
-        void survivesAndHealsExcessHits() throws Exception {
+        void survivesAndHealsExcessHits() {
             Person person = new Person("GivenName", "Surname", null, "MERC");
             person.setAttributeScore(SkillAttribute.EDGE, 3);
             person.setHits(DEATH + 2); // lethal hit total
@@ -2399,7 +2407,7 @@ public class PersonTest {
         }
 
         @Test
-        void survivesAndHealsExcessInjuries() throws Exception {
+        void survivesAndHealsExcessInjuries() {
             Person person = new Person("GivenName", "Surname", null, "MERC");
             person.setAttributeScore(SkillAttribute.EDGE, 3);
             person.addInjury(new Injury(1, "Test concussion 1", BodyLocation.HEAD, InjuryTypes.CONCUSSION, 2,
@@ -2416,8 +2424,87 @@ public class PersonTest {
 
             assertTrue(invokeAttemptToCheatDeath(person, campaign));
             assertEquals(2, person.getAttributeScore(SkillAttribute.EDGE));
-            assertTrue(person.getNonPermanentInjurySeverity() < DEATH);
+            assertTrue(person.getTotalInjurySeverity() < DEATH);
             verify(campaign, atLeast(2)).addReport(any(), anyString());
+        }
+
+        @Test
+        void healsBelowThresholdIncludingPermanentInjuries() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setAttributeScore(SkillAttribute.EDGE, 3);
+            person.addInjury(newConcussion(2, true));
+            person.addInjury(newConcussion(2, false));
+            person.addInjury(newConcussion(2, false));
+
+            Campaign campaign = mockCampaignWith(mockTwistOfFateOptions(true));
+
+            assertTrue(invokeAttemptToCheatDeath(person, campaign));
+            assertTrue(person.getTotalInjurySeverity() < DEATH);
+            // The permanent injury cannot be healed
+            assertEquals(1, person.getPermanentInjuries().size());
+        }
+
+        @Test
+        void healsHitsBelowThresholdIncludingPermanentInjuries() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setAttributeScore(SkillAttribute.EDGE, 3);
+            person.addInjury(newConcussion(2, true));
+            person.setHits(DEATH);
+
+            Campaign campaign = mockCampaignWith(mockTwistOfFateOptions(false));
+
+            assertTrue(invokeAttemptToCheatDeath(person, campaign));
+            assertEquals(DEATH - 1 - 2, person.getHits());
+            assertTrue(person.getTotalInjurySeverity() < DEATH);
+        }
+
+        @Test
+        void failsWithoutConsumingEdgeWhenPermanentInjuriesAreLethal() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setAttributeScore(SkillAttribute.EDGE, 3);
+            person.addInjury(newConcussion(3, true));
+            person.addInjury(newConcussion(3, true));
+
+            Campaign campaign = mockCampaignWith(mockTwistOfFateOptions(true));
+
+            assertFalse(invokeAttemptToCheatDeath(person, campaign));
+            assertEquals(3, person.getAttributeScore(SkillAttribute.EDGE));
+            verify(campaign, never()).addReport(any(), anyString());
+        }
+
+        @Test
+        void failsWithoutConsumingEdgeForVoluntaryDeath() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setAttributeScore(SkillAttribute.EDGE, 3);
+
+            Campaign campaign = mockCampaignWith(mockTwistOfFateOptions(false));
+
+            assertFalse(person.attemptToCheatDeath(campaign, PersonnelStatus.SEPPUKU));
+            assertEquals(3, person.getAttributeScore(SkillAttribute.EDGE));
+        }
+
+        @Test
+        void failsWithoutConsumingEdgeWhenAlreadyDead() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setAttributeScore(SkillAttribute.EDGE, 3);
+            person.setStatus(PersonnelStatus.KIA);
+
+            Campaign campaign = mockCampaignWith(mockTwistOfFateOptions(false));
+
+            assertFalse(person.attemptToCheatDeath(campaign, PersonnelStatus.WOUNDS));
+            assertEquals(3, person.getAttributeScore(SkillAttribute.EDGE));
+        }
+
+        @Test
+        void failsWithoutConsumingEdgeWhenPrisoner() {
+            Person person = new Person("GivenName", "Surname", null, "MERC");
+            person.setAttributeScore(SkillAttribute.EDGE, 3);
+            person.setPrisonerStatusDirect(PrisonerStatus.PRISONER);
+
+            Campaign campaign = mockCampaignWith(mockTwistOfFateOptions(false));
+
+            assertFalse(invokeAttemptToCheatDeath(person, campaign));
+            assertEquals(3, person.getAttributeScore(SkillAttribute.EDGE));
         }
     }
 

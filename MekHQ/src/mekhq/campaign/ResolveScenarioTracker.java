@@ -2032,7 +2032,7 @@ public class ResolveScenarioTracker {
                 // injuries for the pre-existing severity the person already carries, doubling their injuries.
                 person.diagnose(getCampaign(), newInjuryHits);
 
-                if (hasCheatedDeath) {
+                if (hasCheatedDeath && !person.getStatus().isDead()) {
                     person.healExcessInjuriesAfterCheatingDeath(getCampaign());
                 }
             }

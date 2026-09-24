@@ -1106,9 +1106,11 @@ public class EducationController {
                             reportMessage += ' ' + resources.getString("eventTrainingAccidentSuspicious.text");
                         }
 
-                        campaign.addReport(PERSONNEL, reportMessage);
-
                         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACCIDENTAL);
+
+                        if (person.getStatus().isDead()) {
+                            campaign.addReport(PERSONNEL, reportMessage);
+                        }
                     }
                 } else {
                     processTrainingInjury(campaign, academy, person, resources);
