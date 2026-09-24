@@ -1956,6 +1956,24 @@ public class Person implements ILocatable {
         return false;
     }
 
+    /**
+     * Heals non-permanent injuries until this person's non-permanent injury severity is below the death threshold.
+     *
+     * <p>Used when a person has already cheated death, but further injuries were applied afterward (for example,
+     * combat hits being converted into injuries under Advanced Medical once the scenario is resolved).</p>
+     *
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void healExcessInjuriesAfterCheatingDeath(Campaign campaign) {
+        if (getNonPermanentInjurySeverity() >= DEATH) {
+            healExcessInjuries(campaign, campaign.getLocalDate());
+            MekHQ.triggerEvent(new PersonChangedEvent(this));
+        }
+    }
+
     private void healExcessInjuries(Campaign campaign, LocalDate today) {
         ArrayList<Injury> potentiallyHealedInjuries = new ArrayList<>();
         for (Injury injury : getInjuries()) {
