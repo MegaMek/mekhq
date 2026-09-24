@@ -76,7 +76,7 @@ public final class StratConPointOfInterestDefinitions {
     /**
      * Re-reads every data file definition, replacing the old ones in one step. Definitions registered from code are
      * kept. Called at start-up, and after the point of interest editor saves a file, so the change takes effect at
-     * once. Under test this also undoes {@link #loadForTest}, as the default paths hold no data there.
+     * once.
      *
      * @author Illiani
      * @since 0.51.01
@@ -90,8 +90,9 @@ public final class StratConPointOfInterestDefinitions {
     /**
      * Test seam: reloads the data file definitions from an explicit manifest and directory.
      *
-     * <p>The {@code data} directory is built when the application launches, so under test the default paths resolve
-     * to nothing and no definitions are loaded. Tests relying on data file definitions must call this first.</p>
+     * <p>Whether the default paths hold any data under test depends on whether the {@code data} directory has been
+     * built on that machine, so tests must not rely on them: a test relying on data file definitions calls this first,
+     * and undoes it with {@link #clearForTest()}.</p>
      *
      * @param manifestPath       the point of interest manifest to read
      * @param pointOfInterestPath the directory holding the definition files the manifest names
@@ -101,6 +102,17 @@ public final class StratConPointOfInterestDefinitions {
      */
     public static void loadForTest(String manifestPath, String pointOfInterestPath) {
         reloadDefinitions(manifestPath, null, pointOfInterestPath);
+    }
+
+    /**
+     * Test seam: forgets every data file definition, leaving only those registered from code, so a test ends in the
+     * same state on every machine.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static synchronized void clearForTest() {
+        fileDefinitions = Map.of();
     }
 
     private static synchronized void reloadDefinitions(String manifestPath, @Nullable String userManifestPath,

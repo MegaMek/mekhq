@@ -50,6 +50,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectiveParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.PointOfInterestParameters;
@@ -508,6 +509,23 @@ class StratConDataCacheSchedulingTest {
     }
 
     @Test
+    void withTheOptionOffARiotDutyContractHasNoRiotsAndKeepsItsEssentialScenarios() {
+        // The weekly riot event is gone, so with the option off a Riot Duty contract runs as an ordinary contract:
+        // its definition's points of interest, no Civil Disobedience, and its Essential scenarios.
+        AbstractContract contract = contract(ContractObjectiveType.RIOT_DUTY, 1);
+        assertNull(StratConContractInitializer.getSpecialPointOfInterestTypeId(contract, false));
+        assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract, false));
+
+        List<StratConScheduledPointOfInterest> scheduled = schedule(contract, true, false);
+
+        assertFalse(scheduled.isEmpty(), "the definition's points of interest are still scheduled");
+        for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
+            assertFalse(StratConCivilDisobedienceBehavior.TYPE_ID.equals(pointOfInterest.getTypeId()),
+                  "no Civil Disobedience with the option off");
+        }
+    }
+
+    @Test
     void aRetainerContractSchedulesOnlyScheduledParadesEachAnObjective() {
         assertEquals(StratConScheduledParadeBehavior.TYPE_ID,
               StratConContractInitializer.getSpecialPointOfInterestTypeId(
@@ -586,13 +604,25 @@ class StratConDataCacheSchedulingTest {
         }
     }
 
-    @Test
-    void everySpecialPointOfInterestButHighProfileTargetsIsAnObjective() {
-        assertFalse(StratConContractInitializer.isSpecialPointOfInterestObjective(
-              StratConHighProfileTargetBehavior.TYPE_ID));
-        assertTrue(StratConContractInitializer.isSpecialPointOfInterestObjective(DATA_CACHE.getTypeId()));
-        assertTrue(StratConContractInitializer.isSpecialPointOfInterestObjective(
-              BELEAGUERED_FORCES.getTypeId()));
+    /** The special points of interest that are not strategic objectives; every other one is. */
+    private static final Set<String> NON_OBJECTIVE_SPECIAL_POINTS_OF_INTEREST = Set.of(
+          StratConHighProfileTargetBehavior.TYPE_ID,
+          StratConShowOfForceBehavior.TYPE_ID,
+          StratConPirateCaptainBehavior.TYPE_ID,
+          StratConTargetIntelligenceBehavior.TYPE_ID);
+
+    @ParameterizedTest
+    @EnumSource(ContractObjectiveType.class)
+    void eachContractTypesSpecialPointOfInterestIsAnObjectiveUnlessItIsOneOfTheFourThatAreNot(
+          ContractObjectiveType objectiveType) {
+        String typeId = StratConContractInitializer.getSpecialPointOfInterestTypeId(contract(objectiveType, 1), true);
+        if (typeId == null) {
+            return;
+        }
+
+        assertEquals(!NON_OBJECTIVE_SPECIAL_POINTS_OF_INTEREST.contains(typeId),
+              StratConContractInitializer.isSpecialPointOfInterestObjective(typeId),
+              objectiveType + "'s " + typeId);
     }
 
     @Test

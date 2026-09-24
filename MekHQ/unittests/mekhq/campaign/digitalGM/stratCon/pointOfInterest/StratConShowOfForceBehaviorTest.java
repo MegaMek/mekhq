@@ -54,12 +54,14 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.List;
 
+import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTestDice;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest.PointOfInterestStatus;
 import mekhq.campaign.finances.Finances;
@@ -75,6 +77,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
 import testUtilities.MHQTestUtilities;
 
 /**
@@ -234,10 +237,12 @@ class StratConShowOfForceBehaviorTest {
     void makingAShowOfForceLowersEscalationByThreeDice() {
         Campaign campaign = deploymentCampaign(MEK);
 
-        deploy(campaign);
+        try (MockedStatic<Compute> dice = StratConTestDice.loadDice()) {
+            deploy(campaign);
+        }
 
-        int drop = STARTING_ESCALATION - campaignState.getEscalation();
-        assertTrue((drop >= 3) && (drop <= 18), "-3d6 Escalation, got -" + drop);
+        assertEquals(STARTING_ESCALATION - (3 * StratConTestDice.PIPS_PER_DIE), campaignState.getEscalation(),
+              "-3d6 Escalation");
     }
 
     @Test

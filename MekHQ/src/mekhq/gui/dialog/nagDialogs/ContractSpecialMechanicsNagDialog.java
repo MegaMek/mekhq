@@ -180,7 +180,7 @@ public class ContractSpecialMechanicsNagDialog extends ImmersiveDialogNag {
         return new ImmersiveDialogCore(campaign,
               getSpeaker(campaign),
               null,
-              getBriefingText(messageKey),
+              getBriefingText(contract.getObjectiveType()),
               createButtons(),
               null,
               null,
@@ -207,13 +207,19 @@ public class ContractSpecialMechanicsNagDialog extends ImmersiveDialogNag {
      * suppressing the briefing. A Garrison Duty contract's Escalation runs the other way around, so its rules explain
      * it themselves.
      *
+     * @param objectiveType the contract type being briefed
+     *
+     * @return the briefing text
+     *
      * @author Illiani
      * @since 0.51.01
      */
-    private String getBriefingText(String key) {
-        StringBuilder message = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE, key));
+    // Package-private and static so the briefing's make-up can be tested without showing the dialog.
+    static String getBriefingText(ContractObjectiveType objectiveType) {
+        StringBuilder message = new StringBuilder(getFormattedTextAt(RESOURCE_BUNDLE,
+              KEY_PREFIX + objectiveType.name()));
 
-        EscalationMode escalationMode = StratConContractMechanics.forContract(contract).escalationMode();
+        EscalationMode escalationMode = StratConContractMechanics.forObjectiveType(objectiveType).escalationMode();
         if (escalationMode == EscalationMode.ESCALATING) {
             message.append(getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "escalation"));
         }

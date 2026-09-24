@@ -43,6 +43,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
@@ -54,6 +55,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.MockedStatic;
 
 /**
  * Tests for Escalation: which contracts track it, its maximum, what raises it and by how much, a Garrison Duty
@@ -220,13 +222,14 @@ class StratConEscalationTest {
     }
 
     @Test
-    void aWonFacilityFightRaisesEscalationByThreeToEighteen() {
+    void aWonFacilityFightRaisesEscalationByThreeDice() {
         AbstractContract contract = contract(ContractObjectiveType.RECON_RAID);
 
-        StratConEscalation.onScenarioCompleted(campaign(true), contract, true, true);
+        try (MockedStatic<Compute> dice = StratConTestDice.loadDice()) {
+            StratConEscalation.onScenarioCompleted(campaign(true), contract, true, true);
+        }
 
-        int escalation = campaignState.getEscalation();
-        assertTrue((escalation >= 3) && (escalation <= 18), "3d6 Escalation, got " + escalation);
+        assertEquals(3 * StratConTestDice.PIPS_PER_DIE, campaignState.getEscalation(), "3d6 Escalation");
     }
 
     @Test
@@ -238,11 +241,13 @@ class StratConEscalationTest {
     }
 
     @Test
-    void strikingAHighProfileTargetRaisesEscalationByThreeToEighteen() {
-        StratConEscalation.onHighProfileTargetStruck(campaign(true), contract(ContractObjectiveType.DIVERSIONARY_RAID));
+    void strikingAHighProfileTargetRaisesEscalationByThreeDice() {
+        try (MockedStatic<Compute> dice = StratConTestDice.loadDice()) {
+            StratConEscalation.onHighProfileTargetStruck(campaign(true),
+                  contract(ContractObjectiveType.DIVERSIONARY_RAID));
+        }
 
-        int escalation = campaignState.getEscalation();
-        assertTrue((escalation >= 3) && (escalation <= 18), "3d6 Escalation, got " + escalation);
+        assertEquals(3 * StratConTestDice.PIPS_PER_DIE, campaignState.getEscalation(), "3d6 Escalation");
     }
 
     // The morale check

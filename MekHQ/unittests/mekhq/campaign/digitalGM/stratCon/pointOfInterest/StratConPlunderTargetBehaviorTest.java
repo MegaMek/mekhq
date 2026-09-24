@@ -56,12 +56,14 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.List;
 
+import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConStrategicObjective;
+import mekhq.campaign.digitalGM.stratCon.StratConTestDice;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest.PointOfInterestStatus;
 import mekhq.campaign.finances.Finances;
@@ -213,7 +215,8 @@ class StratConPlunderTargetBehaviorTest {
         Finances finances = campaign.getPlayerForce().getFinances();
 
         try (MockedConstruction<Resupply> resupplies = mockConstruction(Resupply.class);
-              MockedStatic<PerformResupply> performResupply = mockStatic(PerformResupply.class)) {
+              MockedStatic<PerformResupply> performResupply = mockStatic(PerformResupply.class);
+              MockedStatic<Compute> dice = StratConTestDice.loadDice()) {
             assertEquals(PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO,
                   StratConPointOfInterestRules.processFormationDeployment(track, TARGET_COORDS, FORMATION_ID,
                         campaign));
@@ -227,8 +230,7 @@ class StratConPlunderTargetBehaviorTest {
         assertEquals(PointOfInterestStatus.RESOLVED, target.getStatus());
         assertTrue(objective.isObjectiveCompleted(track));
         verify(finances).credit(eq(TransactionType.CONTRACT_PAYMENT), eq(TODAY), eq(COMBAT_PAY), anyString());
-        int escalation = campaignState.getEscalation();
-        assertTrue((escalation >= 3) && (escalation <= 18), "3d6 Escalation, got " + escalation);
+        assertEquals(3 * StratConTestDice.PIPS_PER_DIE, campaignState.getEscalation(), "3d6 Escalation");
         assertGeneralReportIsValid(campaign);
     }
 

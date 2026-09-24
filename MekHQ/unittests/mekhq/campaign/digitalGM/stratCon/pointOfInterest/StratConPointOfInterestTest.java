@@ -68,8 +68,8 @@ class StratConPointOfInterestTest {
     void resetRegistries() {
         StratConPointOfInterestDefinitions.unregisterDefinition(TEST_TYPE_ID);
         StratConPointOfInterestBehaviors.unregisterBehavior(TEST_BEHAVIOR_ID);
-        // back to the default paths, which resolve to nothing under test
-        StratConPointOfInterestDefinitions.reloadDefinitions();
+        // Not reloadDefinitions(): the default paths hold real data on a machine that has built it.
+        StratConPointOfInterestDefinitions.clearForTest();
     }
 
     private static StratConPointOfInterestDefinition registerTestDefinition(boolean occupiesHex) {
@@ -351,7 +351,9 @@ class StratConPointOfInterestTest {
             assertEquals(2, StratConPointOfInterestDefinitions.getAllDefinitions().size(),
                   "an override replaces the file definition rather than adding a second one");
 
-            StratConPointOfInterestDefinitions.reloadDefinitions();
+            StratConPointOfInterestDefinitions.loadForTest(
+                  new File(FIXTURE_DIRECTORY, "pointofinterestmanifest.json").getPath(),
+                  FIXTURE_DIRECTORY);
             assertSame(override, StratConPointOfInterestDefinitions.getDefinition("TestSupplyCache"),
                   "a registered definition survives a reload");
         } finally {
