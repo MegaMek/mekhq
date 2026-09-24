@@ -1034,6 +1034,10 @@ public class Skill {
             tooltip.append(flavorText).append("<br><br>");
         }
 
+        if (hasNaturalAptitude) {
+            tooltip.append(getTextAt(RESOURCE_BUNDLE, "tooltip.naturalAptitude")).append("<br><br>");
+        }
+
         if (bonus != 0) {
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.bonus",

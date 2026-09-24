@@ -6282,6 +6282,49 @@ public class Person implements ILocatable {
         return (int) round(cost * multiplier);
     }
 
+    /**
+     * Calculates the XP cost of gaining a Natural Aptitude in a skill, before the campaign's XP cost multiplier and
+     * before any XP already put towards the aptitude. Like improving a skill, the cost is adjusted by the character's
+     * Reasoning (optionally) and learning traits.
+     *
+     * @param skillName    the name of the skill
+     * @param useReasoning whether to apply the Reasoning-based cost multiplier
+     *
+     * @return the cost, or {@link SkillType#DISABLED_SKILL_LEVEL} if a Natural Aptitude in the skill can't be bought
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getCostToGainNaturalAptitude(final String skillName, final boolean useReasoning) {
+        final SkillType skillType = getType(skillName);
+        if ((skillType == null) || !skillType.isNaturalAptitudePurchasable()) {
+            return SkillType.DISABLED_SKILL_LEVEL;
+        }
+
+        double multiplier = getTalentBasedXpCostMultiplier(useReasoning, skillType);
+        return (int) round(skillType.getNaturalAptitudeCost() * multiplier);
+    }
+
+    /**
+     * @return the character's skills that have XP put towards gaining a Natural Aptitude they don't yet have, sorted by
+     *       name
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<Skill> getInProgressNaturalAptitudes() {
+        List<Skill> inProgressNaturalAptitudes = new ArrayList<>();
+        for (Skill skill : skills.getSkills()) {
+            if (!skill.getHasNaturalAptitude() && (skill.getNaturalAptitudeXpProgress() > 0)) {
+                inProgressNaturalAptitudes.add(skill);
+            }
+        }
+
+        inProgressNaturalAptitudes.sort(Comparator.comparing(s -> s.getType().getName()));
+
+        return inProgressNaturalAptitudes;
+    }
+
     public double getTalentBasedXpCostMultiplier(boolean useReasoning, @Nullable SkillType skillType) {
         double multiplier = getReasoningXpCostMultiplier(useReasoning);
 

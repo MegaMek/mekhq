@@ -3350,7 +3350,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 menu.add(newSkillsMenu);
             }
 
-            JMenu naturalAptitudesMenu = createNaturalAptitudesMenu(person, reasoningXpCostMultiplier,
+            JMenu naturalAptitudesMenu = createNaturalAptitudesMenu(person, isUseReasoningMultiplier,
                   xpCostMultiplier);
             if (naturalAptitudesMenu.getMenuComponentCount() > 0) {
                 menu.add(naturalAptitudesMenu);
@@ -5061,20 +5061,20 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
     /**
      * Builds the menu for spending XP on Natural Aptitudes: one entry for each skill the person has learned but has no
-     * Natural Aptitude in, where the campaign allows one to be bought. Like SPAs, the cost is adjusted by the person's
-     * Reasoning before the campaign's XP cost multiplier; like skills, any XP already put towards the aptitude is then
-     * taken off.
+     * Natural Aptitude in, where the campaign allows one to be bought. As with improving skills, the cost is adjusted
+     * by the person's Reasoning and learning traits ({@link Person#getCostToGainNaturalAptitude}), then the campaign's
+     * XP cost multiplier, and any XP already put towards the aptitude is then taken off.
      *
-     * @param person                    the person spending XP
-     * @param reasoningXpCostMultiplier the person's Reasoning-based XP cost multiplier
-     * @param xpCostMultiplier          the campaign's XP cost multiplier
+     * @param person                   the person spending XP
+     * @param isUseReasoningMultiplier whether the campaign applies Reasoning to XP costs
+     * @param xpCostMultiplier         the campaign's XP cost multiplier
      *
      * @return the menu, which is empty if there is nothing to buy
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private JMenu createNaturalAptitudesMenu(Person person, double reasoningXpCostMultiplier,
+    private JMenu createNaturalAptitudesMenu(Person person, boolean isUseReasoningMultiplier,
           double xpCostMultiplier) {
         JMenu naturalAptitudesMenu = new JMenu(getTextAt(GUI_RESOURCE_BUNDLE, "spendOnNaturalAptitudes.text"));
         boolean isUseArtillery = getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
@@ -5084,7 +5084,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         learnedSkills.sort(Comparator.comparing(skill -> skill.getType().getName()));
         for (Skill skill : learnedSkills) {
             SkillType skillType = skill.getType();
-            if ((skillType == null) || skill.getHasNaturalAptitude() || !skillType.isNaturalAptitudePurchasable()) {
+            if ((skillType == null) || skill.getHasNaturalAptitude()) {
                 continue;
             }
 
@@ -5094,7 +5094,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 continue;
             }
 
-            int cost = (int) round(skillType.getNaturalAptitudeCost() * reasoningXpCostMultiplier);
+            int cost = person.getCostToGainNaturalAptitude(skillName, isUseReasoningMultiplier);
+            if (cost == SkillType.DISABLED_SKILL_LEVEL) {
+                continue;
+            }
             cost = (int) round(cost * xpCostMultiplier);
             // As with improving skills, XP already put towards the aptitude comes off the price
             cost = max(0, cost - skill.getNaturalAptitudeXpProgress());
