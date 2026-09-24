@@ -133,6 +133,8 @@ public class SalvagePostScenarioPicker {
     private final List<TestUnit> soldSalvage = new ArrayList<>();
     private final List<TestUnit> employerSalvage = new ArrayList<>();
     private final Map<String, Unit> unitNameMap = new LinkedHashMap<>();
+    private final Map<String, Integer> ownedVariantCounts = new HashMap<>();
+    private final Map<String, Integer> ownedChassisCounts = new HashMap<>();
     private Map<UUID, RecoveryTimeData> recoveryTimeData;
     private boolean isExchangeRights = false;
 
@@ -422,6 +424,8 @@ public class SalvagePostScenarioPicker {
      * @since 0.50.10
      */
     private void showSalvageDialog(Campaign campaign) {
+        countOwnedUnits(campaign);
+
         JDialog dialog = new JDialog((Frame) null, getText("accessingTerminal.title"), true);
         dialog.setLayout(new BorderLayout());
         dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE); // We don't want the player to cancel out
@@ -535,14 +539,21 @@ public class SalvagePostScenarioPicker {
             // Create row panel with label, two combo boxes, and validation label
             JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 2));
             rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-            rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, scaleForGUI(60)));
+            rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, scaleForGUI(75)));
 
             int unitWeight = getUnitWeight(unit);
             String unitWeightString = unitWeight == UNKNOWN_UNIT_WEIGHT ? "?" : String.valueOf(unitWeight);
 
             JLabel unitLabel = new JLabel();
+            Entity salvageEntity = unit.getEntity();
+            int ownedVariantCount = 0;
+            int ownedChassisCount = 0;
+            if (salvageEntity != null) {
+                ownedVariantCount = ownedVariantCounts.getOrDefault(getVariantKey(salvageEntity), 0);
+                ownedChassisCount = ownedChassisCounts.getOrDefault(salvageEntity.getChassis(), 0);
+            }
             unitLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.unitLabel.unit",
-                  unitName, sellValue.toAmountString(), unitWeightString));
+                  unitName, sellValue.toAmountString(), unitWeightString, ownedVariantCount, ownedChassisCount));
 
             RecoveryTimeData data = recoveryTimeData.get(unit.getId());
             if (data != null) {
@@ -654,6 +665,43 @@ public class SalvagePostScenarioPicker {
         dialog.setLocationRelativeTo(null);
         setPreferences(dialog); // Must be before setVisible
         dialog.setVisible(true);
+    }
+
+    /**
+     * Counts the units the player already owns, by exact variant and by chassis, so each piece of salvage can show how
+     * many of it the player already has.
+     *
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void countOwnedUnits(Campaign campaign) {
+        ownedVariantCounts.clear();
+        ownedChassisCounts.clear();
+        for (Unit ownedUnit : campaign.getPlayerForce().getHangar().getUnits()) {
+            Entity ownedEntity = ownedUnit.getEntity();
+            if (ownedEntity == null) {
+                continue;
+            }
+
+            ownedVariantCounts.merge(getVariantKey(ownedEntity), 1, Integer::sum);
+            ownedChassisCounts.merge(ownedEntity.getChassis(), 1, Integer::sum);
+        }
+    }
+
+    /**
+     * Builds a key identifying an entity's exact variant (chassis and model).
+     *
+     * @param entity the entity to identify
+     *
+     * @return the variant key
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static String getVariantKey(Entity entity) {
+        return entity.getChassis() + ' ' + entity.getModel();
     }
 
     private static int getUnitWeight(TestUnit unit) {
