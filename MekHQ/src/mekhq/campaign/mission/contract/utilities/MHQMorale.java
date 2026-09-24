@@ -70,6 +70,8 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
+import mekhq.campaign.digitalGM.stratCon.StratConContractMechanics;
+import mekhq.campaign.digitalGM.stratCon.StratConEscalation;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
@@ -529,6 +531,34 @@ public class MHQMorale {
     }
 
     /**
+     * Decides whether a scenario's outcome shifts the enemy's morale directly (see
+     * {@link #processMoraleChangeFromScenario}). That is up to the scenario's type, with one exception: a riot moves
+     * morale only on a Riot Duty contract, where quelling riots is the work. Riots fought elsewhere - such as a scheduled
+     * parade disrupted on a Retainer contract - leave morale to the ordinary morale check.
+     *
+     * @param stratConScenarioType the scenario's type
+     * @param contract             the contract the scenario belongs to, or {@code null} if it has none
+     *
+     * @return {@code true} if the scenario's outcome shifts the enemy's morale
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isScenarioOutcomeAffectingMorale(ScenarioType stratConScenarioType,
+          @Nullable AbstractContract contract) {
+        if (stratConScenarioType.isRiot()) {
+            boolean isRiotAffectingMorale = (contract != null)
+                                                  && StratConContractMechanics.forContract(contract)
+                                                           .isRiotAffectingMorale();
+            if (!isRiotAffectingMorale) {
+                return false;
+            }
+        }
+
+        return stratConScenarioType.isScenarioOutcomeAffectsMorale();
+    }
+
+    /**
      * Applies a simplified morale check as the result of a combat challenge, updating the contract's morale level and
      * triggering routed behavior if necessary.
      *
@@ -554,6 +584,10 @@ public class MHQMorale {
      */
     public static void processMoraleChangeFromScenario(Campaign campaign, AbstractContract contract,
           ScenarioStatus scenarioStatus, ScenarioType stratConScenarioType) {
+        if (!isScenarioOutcomeAffectingMorale(stratConScenarioType, contract)) {
+            return;
+        }
+
         boolean moraleCheckOnVictory = stratConScenarioType.isScenarioOutcomeAffectsMoraleOnVictory();
         boolean moraleCheckOnDefeat = stratConScenarioType.isScenarioOutcomeAffectsMoraleOnDefeat();
 
@@ -715,6 +749,14 @@ public class MHQMorale {
               campaignOptions.get(CampaignOption.MORALE_VICTORY_EFFECT),
               campaignOptions.get(CampaignOption.MORALE_DECISIVE_DEFEAT_EFFECT),
               campaignOptions.get(CampaignOption.MORALE_DEFEAT_EFFECT));
+
+        // Escalation may raise morale a further level. It is rolled before the rout is handled, so it can pull an enemy
+        // this check routed back from the brink.
+        String escalationReport = StratConEscalation.rollForMorale(campaign, contract);
+        if (escalationReport != null) {
+            moraleReport += "<br><br>" + escalationReport;
+        }
+
         String flavorText = MHQMorale.getFormattedTitle()
                                   + "<h2 style='text-align:center;'>" + contract.getName() + "</h2>"
                                   + MoraleBar.getMoraleDisplay(contract).tooltip();

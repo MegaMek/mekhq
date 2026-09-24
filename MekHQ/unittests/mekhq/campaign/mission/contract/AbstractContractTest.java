@@ -47,8 +47,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
@@ -192,6 +194,24 @@ class AbstractContractTest {
         assertEquals(LocalDate.of(3055, 9, 4), contract.getEndingDate(),
               "the end date must be the start date plus the contract length in months");
         assertEquals(6, contract.getLengthInMonths(), "shifting the whole contract must not change its length");
+    }
+
+    @Test
+    void movingTheStartMovesStratConsScheduleWithIt() {
+        AbstractContract contract = contract();
+        StratConCampaignState campaignState = new StratConCampaignState(contract);
+        campaignState.addStrategicScenarioSpawnDate(START.plusDays(3));
+        campaignState.addScheduledPointOfInterest(new StratConScheduledPointOfInterest(START.plusDays(40), "Test",
+              true));
+        contract.setStratConCampaignState(campaignState);
+
+        // The force arrives ten days after the date the schedule was rolled from.
+        contract.setStartAndEndDate(START.plusDays(10));
+
+        assertEquals(List.of(START.plusDays(13)), campaignState.getStrategicScenarioSpawnDates(),
+              "an Essential scenario keeps its place in the contract rather than firing on arrival");
+        assertEquals(START.plusDays(50), campaignState.getScheduledPointsOfInterest().get(0).getSpawnDate(),
+              "a point of interest keeps its place in the contract too");
     }
 
     @Test

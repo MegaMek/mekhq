@@ -99,6 +99,8 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.PointOfInterestDeploymentOutcome;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConOceanPlacer;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConRoadPlacer;
 import mekhq.campaign.events.StratConDeploymentEvent;
@@ -1196,12 +1198,24 @@ public class StratConRulesManager {
         // processForceDeployment, which reveals the hex.
         boolean deployedToUnexploredHex = !track.getRevealedCoords().contains(coords);
 
+        // Whether the hex holds nothing at all - no scenario, facility, or point of interest still in play - for
+        // Escalation. Captured before the points of interest react to the deployment, since one may take itself off
+        // the map.
+        boolean deployedToEmptyHex = (track.getScenario(coords) == null)
+                                           && (track.getFacility(coords) == null)
+                                           && !StratConPointOfInterestRules.hasActivePointOfInterest(track, coords);
+
         // the following things should happen:
         // 1. call to "process force deployment", which reveals fog of war in or around the coords,
         // depending on force role
         // 2. if coords are a hostile facility, we get a facility scenario
         // 3. if coords are empty, we *may* get a scenario
         processForceDeployment(coords, forceID, campaign, track, sticky);
+
+        // Points of interest on the hex react to the formation arriving. One may shape the random scenario roll below,
+        // or place a scenario of its own on the hex - which the check just after this then assigns the force to.
+        PointOfInterestDeploymentOutcome pointOfInterestOutcome =
+              StratConPointOfInterestRules.processFormationDeployment(track, coords, forceID, campaign);
 
         // we may stumble on a fixed objective scenario - in that case assign the force
         // to it and finalize we also will not be encountering any of the other stuff so bug out
@@ -1230,7 +1244,19 @@ public class StratConRulesManager {
         // Under "Essential Scenarios Only", deploying into an empty hex never rolls a random encounter - only the
         // contract's Essential objective scenarios appear. Facility scenarios (below) are objective-tied and unaffected.
         boolean essentialScenariosOnly = campaignOptions.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
-        boolean spawnScenario = !essentialScenariosOnly && (facility == null) && (randomInt(100) <= targetNum);
+        // Only a forced scenario needs to ask whether the enemy is routed: the usual roll already accounts for it, as
+        // calculateScenarioOdds returns odds no roll can meet against a routed enemy.
+        boolean enemyRouted = (pointOfInterestOutcome == PointOfInterestDeploymentOutcome.FORCE_SCENARIO) &&
+                                    contract.getMoraleLevel().isRouted();
+        // A point of interest still holding the hex - one this formation could not follow up - keeps the usual roll
+        // off it, as a facility does; only one that asks for a scenario gets one there.
+        boolean isHeldByPointOfInterest = (pointOfInterestOutcome == PointOfInterestDeploymentOutcome.NO_EFFECT) &&
+                                                (track.getOccupyingPointOfInterest(coords) != null);
+        boolean spawnScenario = rollsRandomScenario(pointOfInterestOutcome,
+              essentialScenariosOnly,
+              (facility != null) || isHeldByPointOfInterest,
+              enemyRouted,
+              targetNum);
 
         if (isNonAlliedFacility || spawnScenario) {
             StratConScenario scenario;
@@ -1321,6 +1347,11 @@ public class StratConRulesManager {
         if (isTraining) {
             track.addStickyForce(forceID);
         }
+
+        // A deployment to an empty hex that met no scenario escalates the contract's hostilities.
+        if (deployedToEmptyHex) {
+            StratConEscalation.onEmptyHexDeployment(campaign, contract);
+        }
     }
 
     /**
@@ -1370,8 +1401,8 @@ public class StratConRulesManager {
      * it meets all of the following conditions:</p>
      *
      * <ul>
-     *     <li>There is no scenario assigned to the coordinate (via {@link StratConTrackState#getScenario})</li>
-     *     <li>There is no facility present at the coordinate (via {@link StratConTrackState#getFacility})</li>
+     *     <li>The coordinate holds no scenario, facility, or point of interest that occupies it (via
+     *     {@link StratConTrackState#isHexOccupied})</li>
      *     <li>The coordinate is not occupied by any assigned forces (via {@link StratConTrackState#getAssignedForceCoords})</li>
      *     <li>The coordinate is within the boundaries of the map</li>
      *     <li>The coordinate is among the set of revealed coordinates (via {@link StratConTrackState#getRevealedCoords})</li>
@@ -1399,11 +1430,8 @@ public class StratConRulesManager {
                 continue;
             }
 
-            if (trackState.getScenario(newCoords) != null) {
-                continue;
-            }
-
-            if (trackState.getFacility(newCoords) != null) {
+            // A scenario, facility, or occupying point of interest already holds the hex.
+            if (trackState.isHexOccupied(newCoords)) {
                 continue;
             }
 
@@ -1598,6 +1626,7 @@ public class StratConRulesManager {
     public static void processForceDeployment(StratConCoords coords, int forceID, Campaign campaign,
           StratConTrackState track, boolean sticky) {
         scanNeighboringCoords(coords, forceID, campaign, track);
+        StratConReconnaissance.updateObjectives(track);
 
         // the force may be located in other places on the track - clear it out
         track.unassignFormation(forceID);
@@ -1606,8 +1635,41 @@ public class StratConRulesManager {
     }
 
     /**
-     * Scans neighboring coordinates around the deployment location to reveal facilities, scenarios, and coordinates
-     * within the force's scan range. Updates campaign and track states as needed.
+     * Decides whether a formation deploying onto a hex runs into a random scenario.
+     *
+     * <p>No random scenario is ever rolled under "Essential Scenarios Only", or on a hex already held - by a facility,
+     * whose own rules decide there, or by a point of interest the formation could not follow up. Otherwise a point of
+     * interest on the hex may rule the roll out, or make it certain - but not against a routed enemy, which fields no
+     * scenarios at all. Without a point of interest's say, it is the usual roll against the sector's scenario
+     * odds.</p>
+     *
+     * @param pointOfInterestOutcome what the points of interest on the hex want done to the roll
+     * @param essentialScenariosOnly whether the "Essential Scenarios Only" option is on
+     * @param isHexHeld              whether the hex is held by a facility, or by a point of interest occupying it
+     * @param enemyRouted            whether the contract's enemy is routed
+     * @param targetNumber           the sector's scenario odds, out of 100
+     *
+     * @return {@code true} if a random scenario spawns
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean rollsRandomScenario(PointOfInterestDeploymentOutcome pointOfInterestOutcome,
+          boolean essentialScenariosOnly, boolean isHexHeld, boolean enemyRouted, int targetNumber) {
+        if (essentialScenariosOnly || isHexHeld) {
+            return false;
+        }
+
+        return switch (pointOfInterestOutcome) {
+            case SUPPRESS_SCENARIO -> false;
+            case FORCE_SCENARIO -> !enemyRouted;
+            case NO_EFFECT -> randomInt(100) <= targetNumber;
+        };
+    }
+
+    /**
+     * Scans neighboring coordinates around the deployment location to reveal facilities, scenarios, points of interest,
+     * and coordinates within the force's scan range. Updates campaign and track states as needed.
      *
      * <p>This method uses a breadth-first search (BFS) approach to efficiently traverse the hex grid,
      * marking which coordinates have been visited and ensuring no redundant operations occur. It also increases
@@ -1639,6 +1701,7 @@ public class StratConRulesManager {
         }
 
         track.getRevealedCoords().add(coords);
+        StratConPointOfInterestRules.revealPointsOfInterest(track, coords, campaign);
 
         StratConFacility targetFacility = track.getFacility(coords);
         if (targetFacility != null) {
@@ -1726,8 +1789,10 @@ public class StratConRulesManager {
                         scoutQueue.add(new Pair<>(checkCoords, nextDistance));
                     }
 
-                    // Only roll if this hex is still unexplored in the global track
+                    // Only roll if this hex is still unexplored in the global track. A hex scouted earlier still
+                    // shows up any point of interest placed on it since, without a roll or any fatigue.
                     if (track.getRevealedCoords().contains(checkCoords)) {
+                        StratConPointOfInterestRules.revealPointsOfInterest(track, checkCoords, campaign);
                         continue;
                     }
 
@@ -1772,6 +1837,7 @@ public class StratConRulesManager {
                     }
 
                     track.getRevealedCoords().add(checkCoords);
+                    StratConPointOfInterestRules.revealPointsOfInterest(track, checkCoords, campaign);
                 }
             }
         }
@@ -3746,7 +3812,27 @@ public class StratConRulesManager {
      */
     public static int calculateScenarioOdds(StratConTrackState track, AbstractContract contract,
           boolean isReinforcements) {
-        if (contract.getMoraleLevel().isRouted()) {
+        return calculateScenarioOdds(track, contract, isReinforcements, false);
+    }
+
+    /**
+     * Calculates the scenario odds as {@link #calculateScenarioOdds(StratConTrackState, AbstractContract, boolean)}
+     * does, optionally ignoring a rout: for scenarios that break out whatever state the enemy is in, such as civil
+     * unrest.
+     *
+     * @param track            the sector
+     * @param contract         the contract
+     * @param isReinforcements whether morale modifiers apply
+     * @param isIgnoringRout   whether a routed enemy still leaves the usual odds, rather than none at all
+     *
+     * @return the scenario odds; {@code -1} against a routed enemy unless the rout is ignored
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int calculateScenarioOdds(StratConTrackState track, AbstractContract contract,
+          boolean isReinforcements, boolean isIgnoringRout) {
+        if (contract.getMoraleLevel().isRouted() && !isIgnoringRout) {
             return -1;
         }
 
@@ -3867,6 +3953,14 @@ public class StratConRulesManager {
                     awardCombatBonus(campaign, mission);
                 }
 
+                // Winning, or fighting at a hostile facility, escalates the contract's hostilities. The template, not
+                // the hex, marks a facility fight: a destroyed facility is already gone from the map by now.
+                AtBDynamicScenario dynamicScenario = scenario.getBackingScenario();
+                boolean isHostileFacilityScenario = (dynamicScenario != null)
+                                                          && (dynamicScenario.getTemplate() != null)
+                                                          && dynamicScenario.getTemplate().isHostileFacility();
+                StratConEscalation.onScenarioCompleted(campaign, mission, victory, isHostileFacilityScenario);
+
                 if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
                     switchFacilityOwner(facility);
                 }
@@ -3877,6 +3971,10 @@ public class StratConRulesManager {
                 // the ground at the end of a road, not whether the road was ever built.
 
                 processTrackForceReturnDates(track, campaign);
+
+                // Any point of interest whose fate rested on this scenario learns how it went, while the scenario is
+                // still on the track.
+                StratConPointOfInterestRules.processScenarioEnded(track, backingScenario.getId(), victory, campaign);
 
                 track.removeScenario(scenario);
 
@@ -3931,7 +4029,8 @@ public class StratConRulesManager {
 
 
     /**
-     * Credits the contract's combat bonus to the player for winning an Essential (strategic-objective) scenario.
+     * Credits the contract's combat bonus to the player for winning an Essential (strategic-objective) scenario, or
+     * for another achievement a contract's special mechanics reward the same way (such as recovering a data cache).
      *
      * <p>Combat pay is the per-battle bonus agreed during contract negotiation; it is paid out here, once per secured
      * Essential objective, rather than as a lump sum. Does nothing when the contract carries no positive combat
@@ -3940,7 +4039,7 @@ public class StratConRulesManager {
      * @param campaign the campaign whose finances receive the bonus
      * @param contract the contract supplying the combat-pay figure
      */
-    private static void awardCombatBonus(Campaign campaign, AbstractContract contract) {
+    public static void awardCombatBonus(Campaign campaign, AbstractContract contract) {
         ContractFinanceData financeData = contract.getContractFinanceData();
         Money combatPay = (financeData == null) ? null : financeData.combatPay();
         if ((combatPay == null) || !combatPay.isPositive()) {

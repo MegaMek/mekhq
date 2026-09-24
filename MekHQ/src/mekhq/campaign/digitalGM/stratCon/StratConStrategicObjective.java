@@ -32,8 +32,10 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
@@ -47,6 +49,10 @@ public class StratConStrategicObjective {
     private StrategicObjectiveType objectiveType;
     private int currentObjectiveCount;
     private int desiredObjectiveCount;
+
+    // Point of interest objectives follow their point of interest by ID rather than by hex: several points of interest
+    // can share a hex (and a facility), and one can be moved, so these objectives leave objectiveCoords unset.
+    private String pointOfInterestId;
 
     public StratConCoords getObjectiveCoords() {
         return objectiveCoords;
@@ -76,6 +82,18 @@ public class StratConStrategicObjective {
         currentObjectiveCount++;
     }
 
+    /**
+     * @return the ID of the point of interest a {@link StrategicObjectiveType#PointOfInterest} objective is tied to, or
+     *       {@code null} for any other kind of objective
+     */
+    public @Nullable String getPointOfInterestId() {
+        return pointOfInterestId;
+    }
+
+    public void setPointOfInterestId(@Nullable String pointOfInterestId) {
+        this.pointOfInterestId = pointOfInterestId;
+    }
+
     public int getDesiredObjectiveCount() {
         return desiredObjectiveCount;
     }
@@ -86,7 +104,7 @@ public class StratConStrategicObjective {
 
     public boolean isObjectiveFailed(StratConTrackState trackState) {
         return switch (getObjectiveType()) {
-            case AnyScenarioVictory, SpecificScenarioVictory ->
+            case AnyScenarioVictory, SpecificScenarioVictory, Escalation, Reconnaissance ->
                 // you can fail this if the scenario goes away somehow
                   getCurrentObjectiveCount() == OBJECTIVE_FAILED;
             case AlliedFacilityControl, HostileFacilityControl -> {
@@ -97,6 +115,7 @@ public class StratConStrategicObjective {
             case FacilityDestruction ->
                 // you can't really permanently fail this
                   false;
+            case PointOfInterest -> isPointOfInterestObjectiveFailed(trackState);
             default ->
                 // we shouldn't be here, but just in case
                   false;
@@ -108,8 +127,11 @@ public class StratConStrategicObjective {
      */
     public boolean isObjectiveCompleted(StratConTrackState trackState) {
         return switch (getObjectiveType()) {
-            case AnyScenarioVictory, SpecificScenarioVictory ->
-                // this is set once qualifying scenarios are completed
+            case AnyScenarioVictory, SpecificScenarioVictory, Escalation ->
+                // this is set once qualifying scenarios are completed (or, for Escalation, follows the contract's)
+                  getCurrentObjectiveCount() >= getDesiredObjectiveCount();
+            case Reconnaissance ->
+                // the counts are kept up to date with the sector's map as it is scouted (see StratConReconnaissance)
                   getCurrentObjectiveCount() >= getDesiredObjectiveCount();
             case AlliedFacilityControl -> {
                 // this is "ok" if the facility exists and is under allied control
@@ -122,10 +144,70 @@ public class StratConStrategicObjective {
                 StratConFacility hostileFacility = trackState.getFacility(getObjectiveCoords());
                 yield (hostileFacility == null) || (hostileFacility.getOwner() == ForceAlignment.Allied);
             }
+            case PointOfInterest -> isPointOfInterestObjectiveCompleted(trackState);
             default ->
                 // we shouldn't be here, but just in case
                   false;
         };
+    }
+
+    /**
+     * A point of interest objective is met - unless it has been marked failed - once it has been latched as met (see
+     * {@link mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules#resolvePointOfInterest}),
+     * or while its point of interest is on the map and that point of interest's behavior says it is met.
+     *
+     * <p>The latch is what lets a type remove its point of interest from the map once it has been dealt with, without
+     * the objective then reading as failed.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isPointOfInterestObjectiveCompleted(StratConTrackState trackState) {
+        // An objective explicitly marked failed stays failed, whatever becomes of its point of interest afterward.
+        if (getCurrentObjectiveCount() == OBJECTIVE_FAILED) {
+            return false;
+        }
+
+        if ((getDesiredObjectiveCount() > 0) && (getCurrentObjectiveCount() >= getDesiredObjectiveCount())) {
+            return true;
+        }
+
+        StratConPointOfInterest pointOfInterest = getPointOfInterest(trackState);
+        return (pointOfInterest != null) &&
+                     pointOfInterest.getBehavior().isObjectiveCompleted(pointOfInterest, trackState);
+    }
+
+    /**
+     * A point of interest objective fails when it has not been met and either its point of interest is gone from the
+     * map, or that point of interest's behavior says it has failed (by default, once it expires).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isPointOfInterestObjectiveFailed(StratConTrackState trackState) {
+        if (getCurrentObjectiveCount() == OBJECTIVE_FAILED) {
+            return true;
+        }
+
+        if (isPointOfInterestObjectiveCompleted(trackState)) {
+            return false;
+        }
+
+        StratConPointOfInterest pointOfInterest = getPointOfInterest(trackState);
+        return (pointOfInterest == null) ||
+                     pointOfInterest.getBehavior().isObjectiveFailed(pointOfInterest, trackState);
+    }
+
+    /**
+     * @param trackState the sector this objective belongs to
+     *
+     * @return the point of interest this objective is tied to, or {@code null} if it has none or it is gone
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConPointOfInterest getPointOfInterest(StratConTrackState trackState) {
+        return (pointOfInterestId == null) ? null : trackState.getPointOfInterest(pointOfInterestId);
     }
 
     /**

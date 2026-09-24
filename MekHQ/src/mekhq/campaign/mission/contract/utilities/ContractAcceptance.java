@@ -47,14 +47,16 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
+import mekhq.gui.dialog.nagDialogs.ContractSpecialMechanicsNagDialog;
 
 /**
  * Commits a {@link AbstractContract} offer from the market into an active campaign mission.
  *
  * <p>Acceptance runs as an ordered pipeline: confirm with the player, take the offer off the market and register it as
  * a mission, seed StratCon (unless opted out), pay the employer's transport reimbursement, then start the contract
- * (mothballing and transit) and announce it. The player is not shown transit/mothball prompts here - those choices were
- * already captured by the market dialog's checkboxes and are passed in.</p>
+ * (mothballing and transit), announce it, and brief the player on any special mechanics it brings. The player is not
+ * shown transit/mothball prompts here - those choices were already captured by the market dialog's checkboxes and are
+ * passed in.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -127,6 +129,9 @@ public final class ContractAcceptance {
 
         // Announce the fully-initialized contract so listeners (e.g. the StratCon tab) pick it up.
         MekHQ.triggerEvent(new MissionChangedEvent(contract));
+
+        // Brief the player on any special mechanics the contract brings to StratCon, now that they are set up.
+        ContractSpecialMechanicsNagDialog.showIfDue(campaign, contract);
 
         return true;
     }

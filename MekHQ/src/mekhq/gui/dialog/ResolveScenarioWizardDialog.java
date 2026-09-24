@@ -1706,11 +1706,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
         aborted = false;
         this.setVisible(false);
 
+        // Whether the outcome moves morale at all is decided inside, for every caller.
         if (tracker.getScenario() instanceof AtBScenario atBScenario) {
-            if (atBScenario.getStratConScenarioType().isScenarioOutcomeAffectsMorale()) {
-                MHQMorale.processMoraleChangeFromScenario(campaign, atBScenario.getContract(campaign),
-                      atBScenario.getStatus(), atBScenario.getStratConScenarioType());
-            }
+            MHQMorale.processMoraleChangeFromScenario(campaign, atBScenario.getContract(campaign),
+                  atBScenario.getStatus(), atBScenario.getStratConScenarioType());
         }
     }
 
