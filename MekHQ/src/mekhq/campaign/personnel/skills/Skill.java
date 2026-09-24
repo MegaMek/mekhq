@@ -246,7 +246,6 @@ public class Skill {
         return hasNaturalAptitude;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setHasNaturalAptitude(boolean hasNaturalAptitude) {
         this.hasNaturalAptitude = hasNaturalAptitude;
     }
@@ -1046,6 +1045,9 @@ public class Skill {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "level", level);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "bonus", bonus);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "xpProgress", xpProgress);
+        if (hasNaturalAptitude) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasNaturalAptitude", true);
+        }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skill");
     }
 
@@ -1070,6 +1072,8 @@ public class Skill {
                     retVal.bonus = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("xpProgress")) {
                     retVal.xpProgress = MathUtility.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("hasNaturalAptitude")) {
+                    retVal.hasNaturalAptitude = Boolean.parseBoolean(wn2.getTextContent().trim());
                 }
             }
         } catch (Exception ex) {
