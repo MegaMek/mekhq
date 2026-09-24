@@ -33,6 +33,8 @@
 package mekhq.gui.dialog.quartermaster;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.stratCon.deployment.HudStyle.ACCENT_BRIGHT;
+import static mekhq.gui.stratCon.deployment.HudStyle.GROUND;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
@@ -41,11 +43,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.BorderFactory;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTable;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 
@@ -57,7 +56,6 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitIssuer;
 import mekhq.campaign.personnel.quartermaster.KitSlot;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
 /**
  * One of the two equipment-kit tabs (primary slot or secondary slot) of the shared kit-issue dialog. It reuses the
@@ -74,8 +72,8 @@ public class ToolKitSection implements KitIssueSection {
 
     /** The selection sentinel meaning "remove the tool kit from the selected technicians". */
     private static final String STRIP = " strip ";
-    /** The accent color for the tool-kit cards (distinct from the four armor-category accents). */
-    private static final Color ACCENT = new Color(0x5A, 0x7A, 0x9A);
+    /** The top-band colour for the equipment-kit cards (distinct from the four armor-group bands). */
+    private static final Color BAND = ACCENT_BRIGHT;
 
     private final transient Campaign campaign;
     private final transient List<Person> technicians;
@@ -104,12 +102,12 @@ public class ToolKitSection implements KitIssueSection {
 
     @Override
     public JComponent getComponent() {
-        JPanel tab = new JPanel(new BorderLayout(0, scaleForGUI(6)));
-        tab.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(8), scaleForGUI(6), scaleForGUI(8)));
+        JPanel tab = new JPanel(new BorderLayout(0, scaleForGUI(10)));
+        tab.setOpaque(true);
+        tab.setBackground(GROUND);
+        tab.setBorder(IssueEquipmentDialog.pagePadding());
 
-        JLabel hint = new JLabel(getTextAt(RESOURCE_BUNDLE, "tools.hint"));
-        hint.setForeground(KitCard.mutedColor());
-        tab.add(hint, BorderLayout.NORTH);
+        tab.add(KitHud.hint(getTextAt(RESOURCE_BUNDLE, "tools.hint")), BorderLayout.NORTH);
 
         cards.clear();
         cards.add(stripCard());
@@ -120,27 +118,20 @@ public class ToolKitSection implements KitIssueSection {
             }
         }
 
-        FastJScrollPane scroll = new FastJScrollPane(KitCard.grid(cards),
+        FastJScrollPane scroll = new FastJScrollPane(KitCard.grid(cards, GROUND),
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scroll.setBorder(null);
-        scroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
+        KitHud.styleScroll(scroll, GROUND, false);
         tab.add(scroll, BorderLayout.CENTER);
 
         rosterModel = new RosterModel(technicians, slot);
-        JTable roster = new JTable(rosterModel);
-        roster.setEnabled(false);
-        roster.getTableHeader().setReorderingAllowed(false);
-        FastJScrollPane rosterScroll = new FastJScrollPane(roster);
-        rosterScroll.setBorder(RoundedLineBorder.createSubtleRoundedLineBorder());
-        rosterScroll.setPreferredSize(scaleForGUI(760, 130));
-        tab.add(rosterScroll, BorderLayout.SOUTH);
+        tab.add(IssueEquipmentDialog.roster(rosterModel), BorderLayout.SOUTH);
 
         return tab;
     }
 
     private KitCard stripCard() {
-        return new KitCard(ACCENT, getTextAt(RESOURCE_BUNDLE, "tools.strip.name"), true,
+        return new KitCard(BAND, getTextAt(RESOURCE_BUNDLE, "tools.strip.name"), true,
               List.of(getTextAt(RESOURCE_BUNDLE, "tools.strip.desc")), List.of(), null, false, null,
               () -> STRIP.equals(selected),
               () -> select(STRIP));
@@ -156,7 +147,7 @@ public class ToolKitSection implements KitIssueSection {
         int stock = stockFor(kit);
         String priceText = pricing.price(kit).toAmountString()
                                  + " " + getTextAt(RESOURCE_BUNDLE, "card.each");
-        return new KitCard(ACCENT, kit.getName(), false, detail, List.of(),
+        return new KitCard(BAND, kit.getName(), false, detail, List.of(),
               getFormattedTextAt(RESOURCE_BUNDLE, "card.stock", stock), stock < technicians.size(), priceText,
               () -> kit.getInternalName().equals(selected),
               () -> select(kit.getInternalName()));
