@@ -38,8 +38,8 @@ import java.util.ResourceBundle;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.personnel.Person;
 
 /**
  * This class is responsible to control the logging of Service Log Entries.
@@ -77,6 +77,25 @@ public class PerformanceLogger {
         if (isLogSkillGain) {
             person.addPerformanceLogEntry(new PerformanceLogEntry(date,
                   MessageFormat.format(resources.getString("improvedSkill.text"), skill, value)));
+        }
+    }
+
+    /**
+     * Logs a person gaining a Natural Aptitude in a skill, if skill gain logging is enabled.
+     *
+     * @param isLogSkillGain whether skill gain logging is enabled
+     * @param person         the person who gained the aptitude
+     * @param date           the date it was gained
+     * @param skill          the name of the skill
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void gainedNaturalAptitude(final boolean isLogSkillGain, final Person person, final LocalDate date,
+          final String skill) {
+        if (isLogSkillGain) {
+            person.addPerformanceLogEntry(new PerformanceLogEntry(date,
+                  MessageFormat.format(resources.getString("gainedNaturalAptitude.text"), skill)));
         }
     }
 

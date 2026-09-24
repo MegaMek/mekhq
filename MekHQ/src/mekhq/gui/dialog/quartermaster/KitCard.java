@@ -34,6 +34,7 @@ package mekhq.gui.dialog.quartermaster;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.stratCon.deployment.HudStyle.*;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -41,9 +42,13 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.BooleanSupplier;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -51,51 +56,55 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import megamek.client.ui.WrapLayout;
 
 /**
- * A single selectable kit tile shared by every tab of the kit-issue dialog (armor kits and tool kits alike). It renders
- * the same way for both families - an accent band, a bold name, muted detail lines, optional badges, and a stock/price
- * foot - and highlights itself when selected. The caller supplies the content and a {@link BooleanSupplier} that tells
- * the card whether it is currently the selection, plus a click handler; the card owns only its look.
+ * A single selectable kit tile shared by every tab of the kit-issue dialog (armor kits and tool kits alike), drawn as
+ * a heads-up-display card in the style of the interstellar-map chrome: a deep-surface panel with a hairline border and
+ * a thin coloured band along the top, a bold name, muted detail lines, optional sealing badges, and a stock/price foot.
+ * Hovering lifts the card; the selected card is raised to the surface colour, outlined in the accent colour, and lit
+ * by a faint accent glow under its band. The caller supplies the content and a {@link BooleanSupplier} that tells the
+ * card whether it is currently the selection, plus a click handler; the card owns only its look.
  *
  * @author Illiani
  * @since 0.51.01
  */
 class KitCard extends JPanel {
-    /** A small pill shown on a card: {@code accented} draws it in the card's accent color, otherwise muted. */
+    /** A small pill shown on a card: {@code accented} draws it in the accent colour, otherwise faint. */
     record Badge(String text, boolean accented) {}
 
-    private final Color accent;
+    private static final int BAND_HEIGHT = 3;
+
+    private final Color band;
     private final boolean special;
-    private final Color baseBackground;
     private final transient BooleanSupplier selected;
-    private final JPanel band;
-    private final JPanel body;
     private final JLabel nameLabel;
-    private final Color defaultForeground;
+    private boolean hovered;
+    /** The selection state last drawn, so a refresh only restyles a card whose state actually changed. */
+    private Boolean drawnSelected;
 
     /**
-     * @param accent    the card's accent color (band, selection highlight, accented badges)
+     * @param band      the colour of the card's top band, identifying its kit group
      * @param title     the kit name (word-wrapped to the card width)
-     * @param special   {@code true} for a non-kit action tile (strip / return-to-designed): gray band, no foot
+     * @param special   {@code true} for a non-kit action tile (strip / return-to-designed): faint band, no foot
      * @param detail    muted detail lines under the name (e.g. divisor/encumbrance, acquisition difficulty, effect)
      * @param badges    optional pills under the detail lines (environmental seals, "no protection", etc.)
      * @param stockText the foot's left text (e.g. "0 in stock"), or {@code null} for no foot
-     * @param stockWarn draw the stock text in the shortage color
+     * @param stockWarn draw the stock text in the shortage colour
      * @param priceText the foot's right text (e.g. "250 ea"), or {@code null}
      * @param selected  tells the card whether it is the current selection, re-read on every {@link #refreshSelected()}
      * @param onClick   run when the card is clicked
      */
-    KitCard(Color accent, String title, boolean special, List<String> detail, List<Badge> badges, String stockText,
+    KitCard(Color band, String title, boolean special, List<String> detail, List<Badge> badges, String stockText,
           boolean stockWarn, String priceText, BooleanSupplier selected, Runnable onClick) {
         super(new BorderLayout());
-        this.accent = accent;
+        this.band = special ? TEXT_FAINT : band;
         this.special = special;
         this.selected = selected;
-        this.baseBackground = getBackground();
 
+        setOpaque(false);
         setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         Dimension size = scaleForGUI(250, 168);
         setPreferredSize(size);
@@ -103,38 +112,29 @@ class KitCard extends JPanel {
         setMaximumSize(size);
         setAlignmentY(TOP_ALIGNMENT);
 
-        band = new JPanel();
-        band.setPreferredSize(scaleForGUI(1, 6));
-        add(band, BorderLayout.NORTH);
-
-        nameLabel = new JLabel(wordWrap(title, 26));
-        nameLabel.setFont(nameLabel.getFont().deriveFont(Font.BOLD));
-        nameLabel.setAlignmentX(LEFT_ALIGNMENT);
-        this.defaultForeground = nameLabel.getForeground();
-
-        body = new JPanel();
+        JPanel body = new JPanel();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
         body.setOpaque(false);
-        body.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(10), scaleForGUI(8),
-              scaleForGUI(10)));
+        body.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(10 + BAND_HEIGHT), scaleForGUI(12),
+              scaleForGUI(10), scaleForGUI(12)));
+
+        nameLabel = label(title, 26, hudFont(Font.BOLD, 1.0f, 0.02f), TEXT);
         body.add(nameLabel);
 
+        Font detailFont = hudFont(Font.PLAIN, 0.84f, 0.0f);
         for (String line : detail) {
             body.add(Box.createVerticalStrut(scaleForGUI(3)));
-            JLabel label = new JLabel(wordWrap(line, 34));
-            label.setForeground(mutedColor());
-            label.setFont(label.getFont().deriveFont(label.getFont().getSize2D() - 1f));
-            label.setAlignmentX(LEFT_ALIGNMENT);
-            body.add(label);
+            body.add(label(line, 34, detailFont, TEXT_MUTED));
         }
 
         if ((badges != null) && !badges.isEmpty()) {
-            body.add(Box.createVerticalStrut(scaleForGUI(5)));
-            JPanel badgeRow = new JPanel(new FlowLayout(FlowLayout.LEFT, scaleForGUI(4), 0));
+            body.add(Box.createVerticalStrut(scaleForGUI(6)));
+            JPanel badgeRow = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
             badgeRow.setOpaque(false);
             badgeRow.setAlignmentX(LEFT_ALIGNMENT);
-            for (Badge b : badges) {
-                badgeRow.add(badge(b.text(), b.accented() ? accent : mutedColor()));
+            for (Badge badge : badges) {
+                badgeRow.add(badge(badge.text(), badge.accented() ? ACCENT : TEXT_FAINT));
+                badgeRow.add(Box.createHorizontalStrut(scaleForGUI(4)));
             }
             body.add(badgeRow);
         }
@@ -144,14 +144,17 @@ class KitCard extends JPanel {
             JPanel foot = new JPanel(new BorderLayout());
             foot.setOpaque(false);
             foot.setAlignmentX(LEFT_ALIGNMENT);
-            JLabel stockLabel = new JLabel(stockText);
-            if (stockWarn) {
-                stockLabel.setForeground(new Color(0xC0, 0x70, 0x1F));
-            }
+            foot.setBorder(BorderFactory.createCompoundBorder(
+                  BorderFactory.createMatteBorder(scaleForGUI(1), 0, 0, 0, DIVIDER),
+                  BorderFactory.createEmptyBorder(scaleForGUI(6), 0, 0, 0)));
+            JLabel stockLabel = new JLabel(stockText.toUpperCase(Locale.ROOT));
+            stockLabel.setFont(hudFont(Font.BOLD, 0.72f, 0.12f));
+            stockLabel.setForeground(stockWarn ? AMBER : TEXT_FAINT);
             foot.add(stockLabel, BorderLayout.WEST);
             if (priceText != null) {
                 JLabel price = new JLabel(priceText);
-                price.setFont(price.getFont().deriveFont(Font.BOLD));
+                price.setFont(hudFont(Font.BOLD, 0.9f, 0.0f));
+                price.setForeground(TEXT);
                 foot.add(price, BorderLayout.EAST);
             }
             body.add(foot);
@@ -162,66 +165,116 @@ class KitCard extends JPanel {
         refreshSelected();
         addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                onClick.run();
+            public void mouseReleased(MouseEvent e) {
+                // Released, not clicked: a click is lost if the pointer drifts at all between press and release.
+                // Releasing outside the card cancels, as a button would.
+                if (SwingUtilities.isLeftMouseButton(e) && contains(e.getPoint())) {
+                    onClick.run();
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent e) {
+                hovered = true;
+                repaint();
+            }
+
+            @Override
+            public void mouseExited(MouseEvent e) {
+                hovered = false;
+                repaint();
             }
         });
     }
 
-    /** Re-reads the selection state and repaints the highlight; call after the selection changes. */
-    void refreshSelected() {
-        if (selected.getAsBoolean()) {
-            Color tint = blend(accent, baseBackground, 0.72f);
-            setBackground(tint);
-            body.setOpaque(true);
-            body.setBackground(tint);
-            band.setBackground(accent);
-            nameLabel.setForeground(accent);
-            setBorder(new RoundedLineBorder(accent, scaleForGUI(3), scaleForGUI(16)));
-        } else {
-            setBackground(baseBackground);
-            body.setOpaque(false);
-            band.setBackground(special ? mutedColor() : accent);
-            nameLabel.setForeground(defaultForeground);
-            setBorder(RoundedLineBorder.createSubtleRoundedLineBorder());
-        }
-        repaint();
+    /**
+     * A label with its font and colour applied before its text, so an HTML label is parsed once rather than again on
+     * each style change. HTML is only used when the text actually needs wrapping; short text stays plain, which is far
+     * cheaper to build and to restyle.
+     */
+    private static JLabel label(String text, int wrapAt, Font font, Color color) {
+        JLabel label = new JLabel();
+        label.setFont(font);
+        label.setForeground(color);
+        label.setAlignmentX(LEFT_ALIGNMENT);
+        boolean needsWrap = (text.length() > wrapAt) || text.contains("<br>");
+        label.setText(needsWrap ? wordWrap(text, wrapAt) : text);
+        return label;
     }
 
     /**
-     * Lays a set of cards out as a top-anchored grid that wraps to as many columns as the width allows. Returned ready
-     * to drop into a vertically scrolling pane.
+     * Re-reads the selection state and repaints; call after the selection changes. A card whose state is unchanged is
+     * left alone, so a click restyles only the cards it selected or deselected.
      */
-    static JComponent grid(List<KitCard> cards) {
-        JPanel grid = new JPanel(new megamek.client.ui.WrapLayout(FlowLayout.LEFT, scaleForGUI(10), scaleForGUI(10)));
+    void refreshSelected() {
+        boolean isSelected = selected.getAsBoolean();
+        if (Boolean.valueOf(isSelected).equals(drawnSelected)) {
+            return;
+        }
+        drawnSelected = isSelected;
+        nameLabel.setForeground(isSelected ? ACCENT_BRIGHT : TEXT);
+        repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics graphics) {
+        Graphics2D g2 = (Graphics2D) graphics.create();
+        try {
+            int width = getWidth();
+            int height = getHeight();
+            boolean isSelected = Boolean.TRUE.equals(drawnSelected);
+
+            g2.setColor(isSelected ? SURFACE : (hovered ? SURFACE_HIGHLIGHT : SURFACE_DEEP));
+            g2.fillRect(0, 0, width, height);
+
+            int bandHeight = scaleForGUI(BAND_HEIGHT);
+            if (isSelected) {
+                // A faint accent glow falling away beneath the band, as the map lights its selected system.
+                g2.setPaint(new GradientPaint(0, bandHeight, translucent(ACCENT, 46),
+                      0, height / 2.0f, translucent(ACCENT, 0)));
+                g2.fillRect(0, bandHeight, width, height / 2);
+            }
+
+            g2.setColor(isSelected ? ACCENT : (special ? translucent(band, 150) : band));
+            g2.fillRect(0, 0, width, bandHeight);
+
+            g2.setColor(isSelected ? ACCENT : (hovered ? translucent(ACCENT, 90) : BORDER));
+            g2.drawRect(0, 0, width - 1, height - 1);
+        } finally {
+            g2.dispose();
+        }
+        super.paintComponent(graphics);
+    }
+
+    /**
+     * Lays a set of cards out as a top-anchored grid that wraps to as many columns as the width allows, on the
+     * dialog's dark ground. Returned ready to drop into a vertically scrolling pane.
+     */
+    static JComponent grid(List<KitCard> cards, Color background) {
+        JPanel grid = new JPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(10), scaleForGUI(10)));
+        grid.setOpaque(true);
+        grid.setBackground(background);
         for (KitCard card : cards) {
             grid.add(card);
         }
         // NORTH pins the wrap grid to the top at full width, so cards fill from the top-left instead of centering.
         JPanel top = new JPanel(new BorderLayout());
+        top.setOpaque(true);
+        top.setBackground(background);
         top.add(grid, BorderLayout.NORTH);
         return top;
     }
 
+    /** A pill: tracked, upper-case small text inside a hairline outline in its colour. */
     private static JLabel badge(String text, Color color) {
-        JLabel badge = new JLabel(text);
-        badge.setFont(badge.getFont().deriveFont(badge.getFont().getSize2D() - 2f));
+        JLabel badge = new JLabel(text.toUpperCase(Locale.ROOT));
+        badge.setFont(hudFont(Font.BOLD, 0.66f, 0.1f));
         badge.setForeground(color);
-        badge.setBorder(BorderFactory.createCompoundBorder(new RoundedLineBorder(color, 1, scaleForGUI(8)),
-              BorderFactory.createEmptyBorder(scaleForGUI(1), scaleForGUI(5), scaleForGUI(1), scaleForGUI(5))));
+        badge.setOpaque(false);
+        badge.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createLineBorder(translucent(color, 120), 1),
+              BorderFactory.createEmptyBorder(scaleForGUI(2), scaleForGUI(6), scaleForGUI(2), scaleForGUI(6))));
         return badge;
-    }
-
-    /** A foreground/background blend used for the muted detail text and the selected tint. */
-    static Color mutedColor() {
-        return blend(new JLabel().getForeground(), new JPanel().getBackground(), 0.45f);
-    }
-
-    static Color blend(Color a, Color b, float t) {
-        return new Color(
-              Math.round(a.getRed() + (b.getRed() - a.getRed()) * t),
-              Math.round(a.getGreen() + (b.getGreen() - a.getGreen()) * t),
-              Math.round(a.getBlue() + (b.getBlue() - a.getBlue()) * t));
     }
 
     /** Renders a damage divisor without a trailing ".0" for whole numbers. */

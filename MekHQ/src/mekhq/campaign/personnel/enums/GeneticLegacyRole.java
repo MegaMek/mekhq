@@ -62,11 +62,23 @@ public enum GeneticLegacyRole {
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GeneticLegacyRole";
 
+    private final String label;
+
+    /**
+     * Reads this role's label out of the bundle once, when the constant is created.
+     *
+     * <p>Reading it per call looks free and is not: every call re-resolves the bundle and re-parses
+     * the key, and these labels are asked for once per person per repaint of the personnel table.</p>
+     */
+    GeneticLegacyRole() {
+        this.label = getTextAt(RESOURCE_BUNDLE, name() + ".label");
+    }
+
     /**
      * @return the localized name of this role, for display
      */
     public String getLabel() {
-        return getTextAt(RESOURCE_BUNDLE, name() + ".label");
+        return label;
     }
 
     /**

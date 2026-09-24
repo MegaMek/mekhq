@@ -49,6 +49,7 @@ import static megamek.common.icons.Portrait.NO_PORTRAIT_NAME;
 import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static megamek.common.units.Crew.DEATH;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.log.LogEntryType.ASSIGNMENT;
 import static mekhq.campaign.log.LogEntryType.MEDICAL;
@@ -159,6 +160,7 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
+import mekhq.campaign.personnel.quartermaster.KitSlot;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -284,6 +286,8 @@ public class Person implements ILocatable {
     private String intendedArmorKitName;
     private String repairKitName;
     private String intendedRepairKitName;
+    private String secondaryKitName;
+    private String intendedSecondaryKitName;
     private int chaosCampaignReputation;
     private int chaosCampaignCriminalRecord;
     private Attributes atowAttributes;
@@ -473,6 +477,13 @@ public class Person implements ILocatable {
           MekHQ.getMHQOptions().getLocale());
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Personnel";
     private static final MMLogger LOGGER = MMLogger.create(Person.class);
+
+    // <51.01 compatibility: Natural Aptitude used to be a pair of SPAs, before it became a property of each skill
+    private static final String LEGACY_NATURAL_APTITUDE_GUNNERY = "aptitude_gunnery";
+    private static final String LEGACY_NATURAL_APTITUDE_PILOTING = "aptitude_piloting";
+
+    private transient boolean hasUnresolvedLegacyNaturalAptitudeGunnery;
+    private transient boolean hasUnresolvedLegacyNaturalAptitudePiloting;
 
     // initializes the AtB ransom values
     static {
@@ -1704,6 +1715,23 @@ public class Person implements ILocatable {
      * @param status   the person's new PersonnelStatus
      */
     public void changeStatus(final Campaign campaign, final LocalDate today, final PersonnelStatus status) {
+        changeStatus(campaign, today, status, true);
+    }
+
+    /**
+     * This is used to change the person's PersonnelStatus
+     *
+     * @param campaign      the campaign the person is part of
+     * @param today         the current date
+     * @param status        the person's new PersonnelStatus
+     * @param canCheatDeath {@code false} if this death is deliberate (for example, set manually by the player or
+     *                      scripted by a Story Arc) and must not be averted by Twist of Fate
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void changeStatus(final Campaign campaign, final LocalDate today, final PersonnelStatus status,
+          final boolean canCheatDeath) {
         if (status == getStatus()) { // no change means we don't need to process anything
             return;
         } else if (getStatus().isDead() && !status.isDead()) {
@@ -1714,7 +1742,7 @@ public class Person implements ILocatable {
             ServiceLogger.resurrected(this, today);
         }
 
-        if (status.isDead() && attemptToCheatDeath(campaign)) {
+        if (canCheatDeath && status.isDead() && attemptToCheatDeath(campaign, status)) {
             return;
         }
 
@@ -1921,12 +1949,32 @@ public class Person implements ILocatable {
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
     }
 
-    private boolean attemptToCheatDeath(Campaign campaign) {
+    /**
+     * Attempts to have this person survive a death of the given cause through Twist of Fate, spending Edge and healing
+     * their lethal wounds if successful.
+     *
+     * <p>This is called automatically by {@link #changeStatus(Campaign, LocalDate, PersonnelStatus)}. Call it
+     * directly only when death has to be announced before the status is changed; in that case, if it fails, change
+     * the status with {@code canCheatDeath} set to {@code false} so a second attempt is not made.</p>
+     *
+     * @param campaign     the current campaign
+     * @param causeOfDeath the {@link PersonnelStatus} the person is about to die with
+     *
+     * @return {@code true} if the person cheated death and remains alive
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean attemptToCheatDeath(Campaign campaign, PersonnelStatus causeOfDeath) {
         LocalDate today = campaign.getLocalDate();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         boolean isUseTwistOfFateSurvival = campaignOptions.get(CampaignOption.USE_TWIST_OF_FATE_SURVIVAL);
         if (!isUseTwistOfFateSurvival) {
+            return false;
+        }
+
+        if (!isEligibleToCheatDeath(causeOfDeath)) {
             return false;
         }
 
@@ -1940,15 +1988,10 @@ public class Person implements ILocatable {
                   CLOSING_SPAN_TAG,
                   choiceEnumeration);
 
-            if (getNonPermanentInjurySeverity() >= DEATH) {
-                healExcessHits(campaign);
-                healExcessInjuries(campaign, today);
-
-                MekHQ.triggerEvent(new PersonChangedEvent(this));
-            }
-
             campaign.addReport(PERSONNEL, report);
             PersonalLogger.cheatedDeath(this, today);
+
+            healLethalWounds(campaign, today);
 
             return true;
         }
@@ -1956,33 +1999,125 @@ public class Person implements ILocatable {
         return false;
     }
 
-    private void healExcessInjuries(Campaign campaign, LocalDate today) {
+    /**
+     * Determines whether this person could survive a death of the given cause through Twist of Fate.
+     *
+     * <p>Voluntary deaths, deaths of people who are already dead, have left the unit, or are prisoners cannot be
+     * averted. Nor can deaths where the person's unhealable (permanent) injuries would still be lethal on their
+     * own; in that case no Edge is spent.</p>
+     *
+     * @param causeOfDeath the {@link PersonnelStatus} the person is about to die with
+     *
+     * @return {@code true} if the person may cheat this death
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isEligibleToCheatDeath(PersonnelStatus causeOfDeath) {
+        if (causeOfDeath.isSeppuku() || causeOfDeath.isBondsref() || causeOfDeath.isSuicide()) {
+            return false;
+        }
+
+        if (getStatus().isDepartedUnit() || getPrisonerStatus().isCurrentPrisoner()) {
+            return false;
+        }
+
+        int unhealableSeverity = 0;
+        for (Injury injury : injuries) {
+            if (!isHealableByTwistOfFate(injury)) {
+                if (injury.getType().impliesDead(injury.getLocation())) {
+                    return false;
+                }
+                unhealableSeverity += injury.getHits();
+            }
+        }
+
+        return unhealableSeverity < DEATH;
+    }
+
+    private static boolean isHealableByTwistOfFate(Injury injury) {
+        return !injury.isPermanent() && !injury.getSubType().isPermanentModification();
+    }
+
+    /**
+     * Heals this person's lethal wounds after they have cheated death, so that they are no longer dead by the
+     * standards of any death check.
+     *
+     * <p>Also used when a person has already cheated death, but further injuries were applied afterward (for
+     * example, combat hits being converted into injuries under Advanced Medical once the scenario is resolved).</p>
+     *
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void healExcessInjuriesAfterCheatingDeath(Campaign campaign) {
+        healLethalWounds(campaign, campaign.getLocalDate());
+    }
+
+    private void healLethalWounds(Campaign campaign, LocalDate today) {
+        boolean wasHealed = healExcessHits(campaign);
+        wasHealed |= healFatalInjuries(campaign, today);
+        wasHealed |= healExcessInjuries(campaign, today);
+
+        if (wasHealed) {
+            MekHQ.triggerEvent(new PersonChangedEvent(this));
+        }
+    }
+
+    private boolean healFatalInjuries(Campaign campaign, LocalDate today) {
+        boolean wasHealed = false;
+        for (Injury injury : getInjuries()) {
+            if (isHealableByTwistOfFate(injury) && injury.getType().impliesDead(injury.getLocation())) {
+                healInjuryByTwistOfFate(campaign, today, injury);
+                wasHealed = true;
+            }
+        }
+
+        return wasHealed;
+    }
+
+    private boolean healExcessInjuries(Campaign campaign, LocalDate today) {
         ArrayList<Injury> potentiallyHealedInjuries = new ArrayList<>();
         for (Injury injury : getInjuries()) {
-            if (!injury.isPermanent() && injury.getHits() > 0) {
+            if (isHealableByTwistOfFate(injury) && injury.getHits() > 0) {
                 potentiallyHealedInjuries.add(injury);
             }
         }
 
-        while (!potentiallyHealedInjuries.isEmpty() && getNonPermanentInjurySeverity() >= DEATH) {
+        boolean wasHealed = false;
+        while (!potentiallyHealedInjuries.isEmpty() && getTotalInjurySeverity() >= DEATH) {
             Injury randomInjury = ObjectUtility.getRandomItem(potentiallyHealedInjuries);
-            clearSpecificInjury(today, randomInjury);
             potentiallyHealedInjuries.remove(randomInjury);
+            healInjuryByTwistOfFate(campaign, today, randomInjury);
+            wasHealed = true;
+        }
 
-            String injuryHealingReport = getFormattedTextAt(RESOURCE_BUNDLE, "twistOfFate.miracle.injury",
-                  getHyperlinkedFullTitle(),
-                  randomInjury.getName());
-            campaign.addReport(PERSONNEL, injuryHealingReport);
+        return wasHealed;
+    }
 
-            if (injuries.isEmpty()) {
-                doctorId = null;
-            }
+    private void healInjuryByTwistOfFate(Campaign campaign, LocalDate today, Injury injury) {
+        clearSpecificInjury(today, injury);
+
+        String injuryHealingReport = getFormattedTextAt(RESOURCE_BUNDLE, "twistOfFate.miracle.injury",
+              getHyperlinkedFullTitle(),
+              injury.getName());
+        campaign.addReport(PERSONNEL, injuryHealingReport);
+
+        if (injuries.isEmpty()) {
+            doctorId = null;
         }
     }
 
-    private void healExcessHits(Campaign campaign) {
-        if (hits >= DEATH) {
-            int hitsHealed = hits - (DEATH - 1);
+    /**
+     * Reduces this person's hits so that, combined with their injuries, they are below the death threshold. Hits
+     * are healed before injuries, so that no injury is healed when healing hits alone would suffice.
+     */
+    private boolean healExcessHits(Campaign campaign) {
+        int injurySeverity = getTotalInjurySeverity() - hits;
+        int maximumSurvivableHits = max(0, DEATH - 1 - injurySeverity);
+        if (hits > maximumSurvivableHits) {
+            int hitsHealed = hits - maximumSurvivableHits;
             int hitsHealedEnumeration = hitsHealed == 1 ? 0 : 1;
 
             String hitHealingReport = getFormattedTextAt(RESOURCE_BUNDLE, "twistOfFate.miracle.hits",
@@ -1991,8 +2126,11 @@ public class Person implements ILocatable {
                   hitsHealedEnumeration);
             campaign.addReport(PERSONNEL, hitHealingReport);
 
-            hits = DEATH - 1;
+            hits = maximumSurvivableHits;
+            return true;
         }
+
+        return false;
     }
 
     /**
@@ -3783,6 +3921,14 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intendedRepairKitName", intendedRepairKitName);
             }
 
+            if (secondaryKitName != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "secondaryKitName", secondaryKitName);
+            }
+
+            if (intendedSecondaryKitName != null) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "intendedSecondaryKitName", intendedSecondaryKitName);
+            }
+
             if (chaosCampaignReputation != STARTING_REPUTATION_SCORE) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "chaosCampaignReputation", chaosCampaignReputation);
             }
@@ -4415,6 +4561,10 @@ public class Person implements ILocatable {
                     person.repairKitName = wn2.getTextContent().trim();
                 } else if (nodeName.equalsIgnoreCase("intendedRepairKitName")) {
                     person.intendedRepairKitName = wn2.getTextContent().trim();
+                } else if (nodeName.equalsIgnoreCase("secondaryKitName")) {
+                    person.secondaryKitName = wn2.getTextContent().trim();
+                } else if (nodeName.equalsIgnoreCase("intendedSecondaryKitName")) {
+                    person.intendedSecondaryKitName = wn2.getTextContent().trim();
                 } else if (nodeName.equalsIgnoreCase("chaosCampaignReputation")) {
                     person.chaosCampaignReputation = MathUtility.parseInt(wn2.getTextContent().trim(),
                           STARTING_REPUTATION_SCORE);
@@ -4935,12 +5085,23 @@ public class Person implements ILocatable {
 
             person.setFullName(); // this sets the name based on the loaded values
 
+            boolean hasLegacyNaturalAptitudeGunnery = false;
+            boolean hasLegacyNaturalAptitudePiloting = false;
             if ((advantages != null) && !advantages.isBlank()) {
                 StringTokenizer st = new StringTokenizer(advantages, DELIMITER);
                 while (st.hasMoreTokens()) {
                     String adv = st.nextToken();
                     String advName = Crew.parseAdvantageName(adv);
                     Object value = Crew.parseAdvantageValue(adv);
+
+                    // <51.01 compatibility handler: the retired Natural Aptitude SPAs are converted below
+                    if (LEGACY_NATURAL_APTITUDE_GUNNERY.equals(advName)) {
+                        hasLegacyNaturalAptitudeGunnery = true;
+                        continue;
+                    } else if (LEGACY_NATURAL_APTITUDE_PILOTING.equals(advName)) {
+                        hasLegacyNaturalAptitudePiloting = true;
+                        continue;
+                    }
 
                     try {
                         person.getOptions().getOption(advName).setValue(value);
@@ -4949,6 +5110,8 @@ public class Person implements ILocatable {
                     }
                 }
             }
+            // Skills have been loaded by now, so the aptitudes have somewhere to go
+            person.convertLegacyNaturalAptitudes(hasLegacyNaturalAptitudeGunnery, hasLegacyNaturalAptitudePiloting);
 
             if ((edge != null) && !edge.isBlank()) {
                 List<String> edgeOptionList = getEdgeTriggersList();
@@ -6280,6 +6443,124 @@ public class Person implements ILocatable {
         double multiplier = getTalentBasedXpCostMultiplier(useReasoning, skillType);
 
         return (int) round(cost * multiplier);
+    }
+
+    /**
+     * Calculates the XP cost of gaining a Natural Aptitude in a skill, before the campaign's XP cost multiplier and
+     * before any XP already put towards the aptitude. Like improving a skill, the cost is adjusted by the character's
+     * Reasoning (optionally) and learning traits.
+     *
+     * @param skillName    the name of the skill
+     * @param useReasoning whether to apply the Reasoning-based cost multiplier
+     *
+     * @return the cost, or {@link SkillType#DISABLED_SKILL_LEVEL} if a Natural Aptitude in the skill can't be bought
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getCostToGainNaturalAptitude(final String skillName, final boolean useReasoning) {
+        final SkillType skillType = getType(skillName);
+        if ((skillType == null) || !skillType.isNaturalAptitudePurchasable()) {
+            return SkillType.DISABLED_SKILL_LEVEL;
+        }
+
+        double multiplier = getTalentBasedXpCostMultiplier(useReasoning, skillType);
+        return (int) round(skillType.getNaturalAptitudeCost() * multiplier);
+    }
+
+    /**
+     * @return the character's skills that have XP put towards gaining a Natural Aptitude they don't yet have, sorted by
+     *       name
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<Skill> getInProgressNaturalAptitudes() {
+        List<Skill> inProgressNaturalAptitudes = new ArrayList<>();
+        for (Skill skill : skills.getSkills()) {
+            if (!skill.getHasNaturalAptitude() && (skill.getNaturalAptitudeXpProgress() > 0)) {
+                inProgressNaturalAptitudes.add(skill);
+            }
+        }
+
+        inProgressNaturalAptitudes.sort(Comparator.comparing(s -> s.getType().getName()));
+
+        return inProgressNaturalAptitudes;
+    }
+
+    /**
+     * <51.01 compatibility handler. Converts the retired Natural Aptitude SPAs into per-skill Natural Aptitudes, free of
+     * charge: the Gunnery SPA gives an aptitude in every Combat Gunnery skill the person has, and the Piloting SPA in
+     * every Combat Piloting skill. If the person has no such skill, the SPA can't be converted and is flagged so the
+     * player can be told; see {@link #reportUnresolvedLegacyNaturalAptitudes(Campaign)}.
+     *
+     * @param hasLegacyNaturalAptitudeGunnery  whether the person had the retired Gunnery SPA
+     * @param hasLegacyNaturalAptitudePiloting whether the person had the retired Piloting SPA
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void convertLegacyNaturalAptitudes(boolean hasLegacyNaturalAptitudeGunnery,
+          boolean hasLegacyNaturalAptitudePiloting) {
+        if (hasLegacyNaturalAptitudeGunnery) {
+            hasUnresolvedLegacyNaturalAptitudeGunnery = grantNaturalAptitudes(SkillSubType.COMBAT_GUNNERY) == 0;
+        }
+
+        if (hasLegacyNaturalAptitudePiloting) {
+            hasUnresolvedLegacyNaturalAptitudePiloting = grantNaturalAptitudes(SkillSubType.COMBAT_PILOTING) == 0;
+        }
+    }
+
+    /**
+     * Gives the person a Natural Aptitude in every skill they have of the given sub-type.
+     *
+     * @param subType the skill sub-type
+     *
+     * @return the number of the person's skills of that sub-type, all of which now have a Natural Aptitude
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int grantNaturalAptitudes(SkillSubType subType) {
+        int skillCount = 0;
+        for (Skill skill : skills.getSkills()) {
+            SkillType skillType = skill.getType();
+            if ((skillType != null) && (skillType.getSubType() == subType)) {
+                skill.setHasNaturalAptitude(true);
+                skillCount++;
+            }
+        }
+        return skillCount;
+    }
+
+    /**
+     * pre-51.01 compatibility handler. Tells the player, with an important report, about any retired Natural Aptitude
+     * SPA this person had that couldn't be converted, so they can give the person a Natural Aptitude by hand. Each
+     * is only reported once.
+     *
+     * @param campaign the campaign to report to
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void reportUnresolvedLegacyNaturalAptitudes(Campaign campaign) {
+        if (hasUnresolvedLegacyNaturalAptitudeGunnery) {
+            reportUnresolvedLegacyNaturalAptitude(campaign, "compatibility.naturalAptitude.gunnery");
+            hasUnresolvedLegacyNaturalAptitudeGunnery = false;
+        }
+
+        if (hasUnresolvedLegacyNaturalAptitudePiloting) {
+            reportUnresolvedLegacyNaturalAptitude(campaign, "compatibility.naturalAptitude.piloting");
+            hasUnresolvedLegacyNaturalAptitudePiloting = false;
+        }
+    }
+
+    private void reportUnresolvedLegacyNaturalAptitude(Campaign campaign, String skillGroupKey) {
+        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE,
+              "compatibility.naturalAptitude.unresolved",
+              spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG,
+              getHyperlinkedFullTitle(),
+              getTextAt(RESOURCE_BUNDLE, skillGroupKey)));
     }
 
     public double getTalentBasedXpCostMultiplier(boolean useReasoning, @Nullable SkillType skillType) {
@@ -7731,11 +8012,12 @@ public class Person implements ILocatable {
     }
 
     /**
-     * The single tool kit this technician owns, by MegaMek internal name, or {@code null} if they carry none. The kit
-     * grants a bonus to certain skill rolls (see {@code EquipmentKitCatalog}). Like an armor kit, a technician carries at
-     * most one tool kit at a time.
+     * The kit in this person's primary kit slot, by MegaMek internal name, or {@code null} if the slot is empty. The
+     * primary slot is the one filled by the default kit of the person's primary role. A person carries at most two
+     * equipment kits (see {@link #getSecondaryKitName()}), separate from their armor kit; each grants a bonus to
+     * certain skill rolls (see {@code EquipmentKitCatalog}).
      *
-     * @return the owned tool-kit internal name, or {@code null}
+     * @return the primary-slot kit internal name, or {@code null}
      */
     public @Nullable String getRepairKitName() {
         return repairKitName;
@@ -7746,20 +8028,69 @@ public class Person implements ILocatable {
     }
 
     /**
-     * @param kitInternalName the MegaMek internal name of a tool kit
+     * The kit in this person's secondary kit slot, by MegaMek internal name, or {@code null} if the slot is empty. The
+     * secondary slot is the one filled by the default kit of the person's secondary role.
      *
-     * @return {@code true} if this is the tool kit this person carries
+     * @return the secondary-slot kit internal name, or {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    public boolean hasRepairKit(final String kitInternalName) {
-        return (kitInternalName != null) && kitInternalName.equals(repairKitName);
+    public @Nullable String getSecondaryKitName() {
+        return secondaryKitName;
     }
 
     /**
-     * The tool kit this person is meant to own but has not yet been issued, pending a kit arriving in their local
-     * stores; {@code null} once they have it or were never waiting on one. The quartermaster fulfills these as kits
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setSecondaryKitName(final @Nullable String secondaryKitName) {
+        this.secondaryKitName = secondaryKitName;
+    }
+
+    /**
+     * @param slot the kit slot to read
+     *
+     * @return the kit internal name in that slot, or {@code null} if it is empty
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable String getKitName(final KitSlot slot) {
+        return (slot == KitSlot.PRIMARY) ? getRepairKitName() : getSecondaryKitName();
+    }
+
+    /**
+     * @param slot    the kit slot to fill
+     * @param kitName the kit internal name to put in it, or {@code null} to empty it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setKitName(final KitSlot slot, final @Nullable String kitName) {
+        if (slot == KitSlot.PRIMARY) {
+            setRepairKitName(kitName);
+        } else {
+            setSecondaryKitName(kitName);
+        }
+    }
+
+    /**
+     * @param kitInternalName the MegaMek internal name of an equipment kit
+     *
+     * @return {@code true} if this person carries that kit in either kit slot
+     */
+    public boolean hasRepairKit(final String kitInternalName) {
+        return (kitInternalName != null)
+                     && (kitInternalName.equals(repairKitName) || kitInternalName.equals(secondaryKitName));
+    }
+
+    /**
+     * The kit this person is meant to carry in their primary slot but has not yet been issued, pending a kit arriving
+     * in stores; {@code null} once they have it or were never waiting on one. The quartermaster fulfills these as kits
      * arrive.
      *
-     * @return the internal name of the awaited tool kit, or {@code null}
+     * @return the internal name of the awaited primary-slot kit, or {@code null}
      */
     public @Nullable String getIntendedRepairKitName() {
         return intendedRepairKitName;
@@ -7767,6 +8098,54 @@ public class Person implements ILocatable {
 
     public void setIntendedRepairKitName(final @Nullable String intendedRepairKitName) {
         this.intendedRepairKitName = intendedRepairKitName;
+    }
+
+    /**
+     * The kit this person is meant to carry in their secondary slot but has not yet been issued; {@code null} once
+     * they have it or were never waiting on one.
+     *
+     * @return the internal name of the awaited secondary-slot kit, or {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable String getIntendedSecondaryKitName() {
+        return intendedSecondaryKitName;
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setIntendedSecondaryKitName(final @Nullable String intendedSecondaryKitName) {
+        this.intendedSecondaryKitName = intendedSecondaryKitName;
+    }
+
+    /**
+     * @param slot the kit slot to read
+     *
+     * @return the internal name of the kit awaited for that slot, or {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable String getIntendedKitName(final KitSlot slot) {
+        return (slot == KitSlot.PRIMARY) ? getIntendedRepairKitName() : getIntendedSecondaryKitName();
+    }
+
+    /**
+     * @param slot    the kit slot the awaited kit is for
+     * @param kitName the awaited kit internal name, or {@code null} to clear it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setIntendedKitName(final KitSlot slot, final @Nullable String kitName) {
+        if (slot == KitSlot.PRIMARY) {
+            setIntendedRepairKitName(kitName);
+        } else {
+            setIntendedSecondaryKitName(kitName);
+        }
     }
 
     public int getAdjustedReputation(boolean isUseAgingEffects, boolean isClanCampaign, LocalDate currentDate) {

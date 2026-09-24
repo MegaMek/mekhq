@@ -53,6 +53,7 @@ import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
+import mekhq.campaign.enums.LithiumFusionBatteryMode;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -166,6 +167,7 @@ final class CampaignOptionCodecs {
         register(CampaignOption.MINIMUM_CALLSIGN_SKILL_LEVEL, enumCodec(SkillLevel::parseFromString));
         register(CampaignOption.AUTO_RESOLVE_METHOD, enumCodec(AutoResolveMethod::valueOf));
         register(CampaignOption.CHASSIS_FAMILIARITY_MODE, enumCodec(Familiarity::valueOf));
+        register(CampaignOption.LITHIUM_FUSION_BATTERY_MODE, enumCodec(LithiumFusionBatteryMode::valueOf));
 
         // Enums persisted by a lookup name/key rather than Enum.name().
         register(CampaignOption.ACQUISITIONS_TYPE,

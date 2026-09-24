@@ -33,13 +33,13 @@
 package mekhq.gui.dialog.quartermaster;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.stratCon.deployment.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.util.*;
 import javax.swing.*;
@@ -50,12 +50,10 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.enums.MiscTypeFlag;
-import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -64,15 +62,20 @@ import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.Category;
 import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
+import mekhq.campaign.personnel.quartermaster.KitSlot;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.gui.stratCon.deployment.HudButton;
 
 /**
- * The quartermaster's counter for issuing personal armor kits. It takes a selection of personnel — or units, whose
- * crews stand in for them — sorts them into the groups that draw from the same kits, and lets the player pick one kit
- * per group. Kits come out of the character's local stores; a shortfall is ordered. A panel along the bottom lists
- * everyone being kitted and what they wear now, so a bulk issue is legible before it is committed.
+ * The quartermaster's counter for issuing kits: personal armor kits, and the two equipment-kit slots. It takes a
+ * selection of personnel — or units, whose crews stand in for them — sorts them into the groups that draw from the
+ * same armor kits, and lets the player pick one kit per group, or one kit per equipment slot for everyone. Kits come
+ * out of stores; a shortfall is ordered. Each page ends with a roster of everyone being kitted and what they will carry
+ * after the issue, so a bulk issue is legible before it is committed.
+ *
+ * <p>The dialog is drawn as a heads-up display in the style of the interstellar-map tab, the StratCon deployment
+ * wizard, and the contract debrief console (see {@link KitHud}): a command bar with live procurement tiles and a
+ * segmented section strip, HUD kit cards, and a footer bar with the HUD buttons.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -95,15 +98,18 @@ public class IssueEquipmentDialog extends JDialog {
     private final transient Set<Category> restoreDesigned = new HashSet<>();
     /** The cards drawn for each group, so a click can re-mark the selected one. */
     private final transient Map<Category, List<KitCard>> cardsByCategory = new EnumMap<>(Category.class);
-    /** Per-kit unit price and acquisition-difficulty text, cached so building many cards prices each kit once. */
-    private final transient Map<EquipmentType, Money> priceCache = new HashMap<>();
-    private final transient Map<EquipmentType, String> acquireTextCache = new HashMap<>();
+    /** Per-kit unit price and acquisition-difficulty text, computed once and shared with the equipment-kit tabs. */
+    private final transient KitPricing pricing;
+    /** Each group's kit stock, tallied once when its tab is built, so a click's footer tally does not rescan stores. */
+    private final transient Map<Category, Map<EquipmentType, Integer>> stockByCategory = new EnumMap<>(Category.class);
 
     private transient RosterModel rosterModel;
-    private transient JLabel tallyLabel;
-    private transient JLabel tallyNote;
+    private transient KitHud.TabStrip sectionStrip;
+    private transient KitHud.StatTile fromStoresTile;
+    private transient KitHud.StatTile toProcureTile;
+    private transient KitHud.StatTile costTile;
     private transient JLabel summaryLabel;
-    private transient RoundedJButton issueButton;
+    private transient HudButton issueButton;
 
     /**
      * Opens the dialog for a selection of personnel and/or units. Units contribute their crews. If nothing in the
@@ -160,6 +166,7 @@ public class IssueEquipmentDialog extends JDialog {
         this.campaign = campaign;
         this.personnel = armorPersonnel;
         this.toolTechnicians = toolTechnicians;
+        this.pricing = new KitPricing(campaign);
 
         for (Person person : armorPersonnel) {
             byCategory.computeIfAbsent(ArmorKitCatalog.categoryFor(person), key -> new ArrayList<>()).add(person);
@@ -169,118 +176,167 @@ public class IssueEquipmentDialog extends JDialog {
             sections.add(armorSection());
         }
         if (!toolTechnicians.isEmpty()) {
-            sections.add(new ToolKitSection(campaign, toolTechnicians, this::recalculate));
+            sections.add(new ToolKitSection(campaign, toolTechnicians, KitSlot.PRIMARY, pricing, this::recalculate));
+            sections.add(new ToolKitSection(campaign, toolTechnicians, KitSlot.SECONDARY, pricing,
+                  this::recalculate));
         }
 
         buildUI();
         recalculate();
 
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        setMinimumSize(scaleForGUI(720, 560));
+        setMinimumSize(scaleForGUI(820, 640));
+        getContentPane().setPreferredSize(scaleForGUI(960, 760));
         pack();
         setLocationRelativeTo(parent);
     }
 
     private void buildUI() {
-        int pad = scaleForGUI(6);
         JPanel content = new JPanel(new BorderLayout());
-        content.setBorder(BorderFactory.createEmptyBorder(pad, pad, pad, pad));
+        content.setOpaque(true);
+        content.setBackground(GROUND);
 
-        content.add(buildHeader(), BorderLayout.NORTH);
-
-        JTabbedPane tabs = new JTabbedPane();
-        for (KitIssueSection section : sections) {
-            tabs.addTab(section.getTitle(), section.getComponent());
+        CardLayout pageLayout = new CardLayout();
+        JPanel pages = new JPanel(pageLayout);
+        pages.setOpaque(true);
+        pages.setBackground(GROUND);
+        List<String> titles = new ArrayList<>();
+        for (int index = 0; index < sections.size(); index++) {
+            KitIssueSection section = sections.get(index);
+            titles.add(section.getTitle());
+            pages.add(section.getComponent(), Integer.toString(index));
         }
-        content.add(tabs, BorderLayout.CENTER);
+        sectionStrip = new KitHud.TabStrip(titles, false, index -> {
+            pageLayout.show(pages, Integer.toString(index));
+            sectionStrip.setSelected(index);
+        });
+        sectionStrip.setSelected(0);
+
+        content.add(buildCommandBar(sectionStrip), BorderLayout.NORTH);
+        content.add(pages, BorderLayout.CENTER);
         content.add(buildFooter(), BorderLayout.SOUTH);
 
         setContentPane(content);
     }
 
-    // region Header
-    private JPanel buildHeader() {
-        JPanel header = new JPanel(new BorderLayout());
-        header.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(6),
-              scaleForGUI(6),
-              scaleForGUI(10),
-              scaleForGUI(6)));
+    // region Command bar
+    /**
+     * The command bar across the top, in the style of the deployment wizard's: a faint eyebrow, the tracked title and a
+     * muted subtitle on the left, the live procurement tiles on the right, and the section strip beneath.
+     */
+    private JPanel buildCommandBar(KitHud.TabStrip sectionStrip) {
+        JPanel commandBar = new JPanel(new BorderLayout(0, scaleForGUI(12)));
+        commandBar.setOpaque(true);
+        commandBar.setBackground(GROUND);
+        commandBar.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
+              BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(16), scaleForGUI(12), scaleForGUI(16))));
 
-        JPanel left = new JPanel();
-        left.setLayout(new BoxLayout(left, BoxLayout.Y_AXIS));
-        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "title"));
-        title.setFont(title.getFont().deriveFont(Font.BOLD, title.getFont().getSize2D() + 5f));
-        title.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JPanel identity = new JPanel();
+        identity.setLayout(new BoxLayout(identity, BoxLayout.Y_AXIS));
+        identity.setOpaque(false);
+
+        JLabel eyebrow = new JLabel(getTextAt(RESOURCE_BUNDLE, "window.name").toUpperCase(Locale.ROOT));
+        eyebrow.setForeground(TEXT_FAINT);
+        eyebrow.setFont(hudFont(Font.BOLD, 0.72f, 0.18f));
+        identity.add(KitHud.leftAligned(eyebrow));
+        identity.add(Box.createVerticalStrut(scaleForGUI(3)));
+
+        JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "title").toUpperCase(Locale.ROOT));
+        title.setForeground(ACCENT_BRIGHT);
+        title.setFont(hudFont(Font.BOLD, 1.35f, 0.16f));
+        identity.add(KitHud.leftAligned(title));
+        identity.add(Box.createVerticalStrut(scaleForGUI(4)));
+
         Set<Person> everyone = new HashSet<>(personnel);
         everyone.addAll(toolTechnicians);
         JLabel subtitle = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "header.subtitle", everyone.size()));
-        subtitle.setForeground(mutedColor());
-        subtitle.setAlignmentX(Component.LEFT_ALIGNMENT);
-        left.add(title);
-        left.add(Box.createVerticalStrut(scaleForGUI(2)));
-        left.add(subtitle);
+        subtitle.setForeground(TEXT_MUTED);
+        subtitle.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
+        identity.add(KitHud.leftAligned(subtitle));
 
-        JPanel right = new JPanel();
-        right.setLayout(new BoxLayout(right, BoxLayout.Y_AXIS));
-        JLabel stores = new JLabel(getTextAt(RESOURCE_BUNDLE, "header.stores"));
-        stores.setForeground(mutedColor());
-        stores.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        tallyLabel = new JLabel("0");
-        tallyLabel.setFont(tallyLabel.getFont().deriveFont(Font.BOLD, tallyLabel.getFont().getSize2D() + 8f));
-        tallyLabel.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        tallyNote = new JLabel(getTextAt(RESOURCE_BUNDLE, "header.tally.unit"));
-        tallyNote.setForeground(mutedColor());
-        tallyNote.setAlignmentX(Component.RIGHT_ALIGNMENT);
-        right.add(stores);
-        right.add(tallyLabel);
-        right.add(tallyNote);
+        fromStoresTile = new KitHud.StatTile(getTextAt(RESOURCE_BUNDLE, "tile.fromStores"),
+              getTextAt(RESOURCE_BUNDLE, "tile.fromStores.sub"));
+        toProcureTile = new KitHud.StatTile(getTextAt(RESOURCE_BUNDLE, "tile.toProcure"),
+              getTextAt(RESOURCE_BUNDLE, "tile.toProcure.sub"));
+        costTile = new KitHud.StatTile(getTextAt(RESOURCE_BUNDLE, "tile.cost"),
+              getTextAt(RESOURCE_BUNDLE, "tile.cost.sub"));
+        JPanel tiles = KitHud.tileRow(fromStoresTile, toProcureTile, costTile);
 
-        header.add(left, BorderLayout.WEST);
-        header.add(right, BorderLayout.EAST);
-        return header;
+        JPanel topRow = new JPanel(new BorderLayout(scaleForGUI(24), 0));
+        topRow.setOpaque(false);
+        topRow.add(identity, BorderLayout.CENTER);
+        topRow.add(tiles, BorderLayout.EAST);
+
+        commandBar.add(topRow, BorderLayout.CENTER);
+        commandBar.add(sectionStrip, BorderLayout.SOUTH);
+        return commandBar;
     }
-    // endregion Header
+    // endregion Command bar
 
     // region Sections
     /** Tab order by unit type: MekWarrior, Vehicle, Aircraft, Soldiers. */
     private static final List<Category> TAB_ORDER = List.of(Category.MEKWARRIOR, Category.INFANTRY,
           Category.AIRCRAFT, Category.SOLDIER);
 
-    private Component buildSections() {
-        JTabbedPane tabs = new JTabbedPane();
-        // Every unit-type tab is shown, even with nobody of that type selected, so the player sees the options exist.
-        for (Category category : TAB_ORDER) {
+    /**
+     * The armor family's group pages under a compact tab strip. Every unit-type page is offered, even with nobody of
+     * that type selected, so the player sees the options exist; the strip opens on the first group that has anyone.
+     */
+    private JComponent buildSections() {
+        CardLayout groupLayout = new CardLayout();
+        JPanel groupPages = new JPanel(groupLayout);
+        groupPages.setOpaque(true);
+        groupPages.setBackground(GROUND);
+
+        List<String> labels = new ArrayList<>();
+        int firstPopulated = -1;
+        for (int index = 0; index < TAB_ORDER.size(); index++) {
+            Category category = TAB_ORDER.get(index);
             List<Person> people = byCategory.getOrDefault(category, List.of());
-            String title = getFormattedTextAt(RESOURCE_BUNDLE, "tab.title",
-                  getTextAt(RESOURCE_BUNDLE, "section." + category.name()), people.size());
-            tabs.addTab(title, buildTab(category, people));
+            labels.add(getFormattedTextAt(RESOURCE_BUNDLE, "tab.title",
+                  getTextAt(RESOURCE_BUNDLE, "section." + category.name()), people.size()));
+            groupPages.add(buildTab(category, people), category.name());
+            if ((firstPopulated < 0) && !people.isEmpty()) {
+                firstPopulated = index;
+            }
         }
-        tabs.setPreferredSize(scaleForGUI(820, 340));
-        return tabs;
+        int opening = Math.max(firstPopulated, 0);
+
+        KitHud.TabStrip[] strip = new KitHud.TabStrip[1];
+        strip[0] = new KitHud.TabStrip(labels, true, index -> {
+            groupLayout.show(groupPages, TAB_ORDER.get(index).name());
+            strip[0].setSelected(index);
+        });
+        strip[0].setSelected(opening);
+        groupLayout.show(groupPages, TAB_ORDER.get(opening).name());
+
+        JPanel panel = new JPanel(new BorderLayout(0, scaleForGUI(10)));
+        panel.setOpaque(false);
+        panel.add(strip[0], BorderLayout.NORTH);
+        panel.add(groupPages, BorderLayout.CENTER);
+        return panel;
     }
 
     private JPanel buildTab(Category category, List<Person> people) {
-        JPanel tab = new JPanel(new BorderLayout(0, scaleForGUI(6)));
-        tab.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(8), scaleForGUI(6), scaleForGUI(8)));
+        JPanel tab = new JPanel(new BorderLayout(0, scaleForGUI(8)));
+        tab.setOpaque(true);
+        tab.setBackground(GROUND);
 
         if (people.isEmpty()) {
-            JLabel notice = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "tab.empty",
-                  getTextAt(RESOURCE_BUNDLE, "section." + category.name())), SwingConstants.CENTER);
-            notice.setForeground(mutedColor());
-            tab.add(notice, BorderLayout.CENTER);
+            tab.add(KitHud.notice(getFormattedTextAt(RESOURCE_BUNDLE, "tab.empty",
+                  getTextAt(RESOURCE_BUNDLE, "section." + category.name()))), BorderLayout.CENTER);
             return tab;
         }
 
         String hintKey = (category == Category.SOLDIER) ? "soldier.note" : "section.hint";
-        JLabel hint = new JLabel(getTextAt(RESOURCE_BUNDLE, hintKey));
-        hint.setForeground(mutedColor());
-        tab.add(hint, BorderLayout.NORTH);
+        tab.add(KitHud.hint(getTextAt(RESOURCE_BUNDLE, hintKey)), BorderLayout.NORTH);
 
         List<EquipmentType> kits = new ArrayList<>(ArmorKitCatalog.availableKits(category));
         kits.sort(Comparator.comparing(this::price));
 
         // Tally this group's warehouse stock once, rather than rescanning per kit inside each card.
-        Map<EquipmentType, Integer> stock = ArmorKitIssuer.localStock(people);
+        Map<EquipmentType, Integer> stock = stockFor(category);
 
         List<KitCard> cards = new ArrayList<>();
         for (EquipmentType kit : kits) {
@@ -293,11 +349,10 @@ public class IssueEquipmentDialog extends JDialog {
         }
         cardsByCategory.put(category, cards);
 
-        FastJScrollPane scroll = new FastJScrollPane(KitCard.grid(cards),
+        FastJScrollPane scroll = new FastJScrollPane(KitCard.grid(cards, GROUND),
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        scroll.setBorder(null);
-        scroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
+        KitHud.styleScroll(scroll, GROUND, false);
         tab.add(scroll, BorderLayout.CENTER);
         return tab;
     }
@@ -332,7 +387,7 @@ public class IssueEquipmentDialog extends JDialog {
 
     // region Bottom (roster + footer)
 
-    /** The armor kit family as a section: the category cards plus the "what everyone wears" roster. */
+    /** The armor kit family as a section: the group cards plus the "what everyone wears" roster. */
     private KitIssueSection armorSection() {
         return new KitIssueSection() {
             @Override
@@ -342,7 +397,10 @@ public class IssueEquipmentDialog extends JDialog {
 
             @Override
             public JComponent getComponent() {
-                JPanel panel = new JPanel(new BorderLayout(0, scaleForGUI(6)));
+                JPanel panel = new JPanel(new BorderLayout(0, scaleForGUI(12)));
+                panel.setOpaque(true);
+                panel.setBackground(GROUND);
+                panel.setBorder(pagePadding());
                 panel.add(buildSections(), BorderLayout.CENTER);
                 panel.add(buildArmorRoster(), BorderLayout.SOUTH);
                 return panel;
@@ -365,37 +423,60 @@ public class IssueEquipmentDialog extends JDialog {
         };
     }
 
-    private JComponent buildArmorRoster() {
-        rosterModel = new RosterModel();
-        JTable table = new JTable(rosterModel);
-        table.setRowHeight(scaleForGUI(22));
-        table.setFillsViewportHeight(true);
-        table.getTableHeader().setReorderingAllowed(false);
-        FastJScrollPane rosterScroll = new FastJScrollPane(table,
-              ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
-              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        rosterScroll.setBorder(RoundedLineBorder.createSubtleRoundedLineBorder());
-        rosterScroll.setPreferredSize(scaleForGUI(760, 150));
-        return rosterScroll;
+    /** The padding every section page sits inside. */
+    static javax.swing.border.Border pagePadding() {
+        return BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(16), scaleForGUI(12), scaleForGUI(16));
     }
 
+    private JComponent buildArmorRoster() {
+        rosterModel = new RosterModel();
+        return roster(rosterModel);
+    }
+
+    /**
+     * A roster block: a "Roster" section heading over a HUD-styled, read-only table of everyone being kitted and what
+     * they will carry after the issue.
+     */
+    static JComponent roster(AbstractTableModel model) {
+        JTable table = new JTable(model);
+        KitHud.styleTable(table);
+        FastJScrollPane scroll = new FastJScrollPane(table,
+              ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        KitHud.styleScroll(scroll, SURFACE_DEEP, true);
+        scroll.setPreferredSize(scaleForGUI(760, 160));
+
+        JPanel block = new JPanel(new BorderLayout(0, scaleForGUI(8)));
+        block.setOpaque(false);
+        block.add(KitHud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "heading.roster")), BorderLayout.NORTH);
+        block.add(scroll, BorderLayout.CENTER);
+        return block;
+    }
+
+    /** The footer bar, as the debrief console's: a muted summary on the left, Cancel and Issue on the right. */
     private JPanel buildFooter() {
-        JPanel footer = new JPanel(new BorderLayout());
-        footer.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8),
-              scaleForGUI(6),
-              scaleForGUI(2),
-              scaleForGUI(6)));
+        JPanel footer = new JPanel(new BorderLayout(scaleForGUI(16), 0));
+        footer.setOpaque(true);
+        footer.setBackground(SURFACE_DEEP);
+        footer.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(scaleForGUI(1), 0, 0, 0, BORDER),
+              BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(18), scaleForGUI(12), scaleForGUI(18))));
 
         summaryLabel = new JLabel();
-        summaryLabel.setForeground(mutedColor());
-        footer.add(summaryLabel, BorderLayout.WEST);
+        summaryLabel.setForeground(TEXT_MUTED);
+        summaryLabel.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
+        footer.add(summaryLabel, BorderLayout.CENTER);
 
-        JPanel buttons = new JPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(8), 0));
-        RoundedJButton cancel = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.cancel"));
+        JPanel buttons = new JPanel();
+        buttons.setLayout(new BoxLayout(buttons, BoxLayout.X_AXIS));
+        buttons.setOpaque(false);
+        HudButton cancel = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.cancel").toUpperCase(Locale.ROOT),
+              false);
         cancel.addActionListener(evt -> dispose());
-        issueButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "button.issue"));
-        issueButton.addActionListener(evt -> onIssue());
+        issueButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "button.issue").toUpperCase(Locale.ROOT), true);
+        issueButton.addActionListener(evt -> onIssue()); // a disarmed HudButton never fires
         buttons.add(cancel);
+        buttons.add(Box.createHorizontalStrut(scaleForGUI(10)));
         buttons.add(issueButton);
         footer.add(buttons, BorderLayout.EAST);
         return footer;
@@ -411,14 +492,16 @@ public class IssueEquipmentDialog extends JDialog {
             anyChoice |= section.hasPendingChanges();
         }
 
-        tallyLabel.setText(tally.cost().toAmountString());
+        fromStoresTile.setValue(Integer.toString(tally.fromStores()), (tally.fromStores() > 0) ? READY : TEXT_MUTED);
+        toProcureTile.setValue(Integer.toString(tally.toProcure()), (tally.toProcure() > 0) ? AMBER : TEXT_MUTED);
+        costTile.setValue(tally.cost().toAmountString(), tally.cost().isPositive() ? TEXT : TEXT_MUTED);
         if (anyChoice) {
             summaryLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "footer.summary",
                   tally.fromStores(), tally.toProcure(), tally.cost().toAmountString()));
         } else {
             summaryLabel.setText(getTextAt(RESOURCE_BUNDLE, "footer.summary.none"));
         }
-        issueButton.setEnabled(anyChoice);
+        issueButton.setArmed(anyChoice);
 
         if (rosterModel != null) {
             rosterModel.fireTableDataChanged();
@@ -440,8 +523,11 @@ public class IssueEquipmentDialog extends JDialog {
             if (kit == null) {
                 continue;
             }
-            int quantity = entry.getValue().size();
-            int stock = stockFor(entry.getValue(), kit);
+            int quantity = countLacking(category, entry.getValue(), kit);
+            if (quantity == 0) {
+                continue;
+            }
+            int stock = stockFor(category).getOrDefault(kit, 0);
             int drawn = Math.min(stock, quantity);
             int ordered = quantity - drawn;
             fromStores += drawn;
@@ -519,51 +605,105 @@ public class IssueEquipmentDialog extends JDialog {
             }
 
             if (stripped.contains(category)) {
-                for (Person person : people) {
-                    person.setIntendedArmorKitName(null);
-                    if (!ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(person.getArmorKitName())) {
-                        ArmorKitIssuer.strip(person, campaign);
-                        totals.changed.add(person);
-                        totals.removed++;
-                    }
-                }
+                commitCrewStrip(people, campaign, totals);
                 continue;
             }
 
             EquipmentType kit = chosenKit.get(category);
-            if (kit == null) {
-                continue;
-            }
-            int shortfall = 0;
-            for (Person person : people) {
-                if (ArmorKitIssuer.issueFromStock(person, kit, campaign)) {
-                    person.setIntendedArmorKitName(null);
-                    totals.changed.add(person);
-                    totals.issued++;
-                } else {
-                    // out of stock now — remember what they are meant to wear so it is issued when a kit arrives
-                    person.setIntendedArmorKitName(kit.getInternalName());
-                    shortfall++;
-                }
-            }
-            if (shortfall > 0) {
-                ArmorKitIssuer.order(kit, shortfall, campaign);
-                totals.ordered += shortfall;
+            if (kit != null) {
+                commitCrewKit(people, category, kit, campaign, totals);
             }
         }
     }
 
-    /** Kits stock is per location, so sum across each distinct local warehouse the group draws from. */
-    private int stockFor(List<Person> people, EquipmentType kit) {
-        Set<LocalWarehouse> counted = new HashSet<>();
-        int total = 0;
+    /**
+     * Strips a group of crew back to coveralls, returning their kits to stores and cancelling any awaited kit.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void commitCrewStrip(List<Person> people, Campaign campaign, KitIssueSection.CommitTotals totals) {
         for (Person person : people) {
-            LocalWarehouse warehouse = person.getWarehouse();
-            if ((warehouse != null) && counted.add(warehouse)) {
-                total += ArmorKitIssuer.localStock(person, kit);
+            person.setIntendedArmorKitName(null);
+            if (!ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(person.getArmorKitName())) {
+                ArmorKitIssuer.strip(person, campaign);
+                totals.changed.add(person);
+                totals.removed++;
             }
         }
-        return total;
+    }
+
+    /**
+     * Issues a kit to every member of a (non-soldier) group who does not already wear it: drawn from stores where
+     * possible, otherwise remembered as awaited and the shortfall ordered in one go.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void commitCrewKit(List<Person> people, Category category, EquipmentType kit, Campaign campaign,
+          KitIssueSection.CommitTotals totals) {
+        int shortfall = 0;
+        for (Person person : people) {
+            if (wearsKit(person, category, kit)) {
+                // already wearing it — nothing to draw, order, or report
+                person.setIntendedArmorKitName(null);
+                continue;
+            }
+            if (ArmorKitIssuer.issueFromStock(person, kit, campaign)) {
+                person.setIntendedArmorKitName(null);
+                totals.changed.add(person);
+                totals.issued++;
+            } else {
+                // out of stock now — remember what they are meant to wear so it is issued when a kit arrives
+                person.setIntendedArmorKitName(kit.getInternalName());
+                shortfall++;
+            }
+        }
+        if (shortfall > 0) {
+            ArmorKitIssuer.order(kit, shortfall, campaign);
+            totals.ordered += shortfall;
+        }
+    }
+
+    /**
+     * How many of a group do not already wear the given kit, and so would draw or order one.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int countLacking(Category category, List<Person> people, EquipmentType kit) {
+        int count = 0;
+        for (Person person : people) {
+            if (!wearsKit(person, category, kit)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Whether a person already wears the given kit. A soldier's kit is their platoon's, so it is read from the unit.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean wearsKit(Person person, Category category, EquipmentType kit) {
+        String worn;
+        if (category == Category.SOLDIER) {
+            worn = (person.getUnit() != null) ? person.getUnit().getArmorKitName() : null;
+        } else {
+            worn = person.getArmorKitName();
+        }
+        return kit.getInternalName().equals(worn);
+    }
+
+    /**
+     * A group's kit stock across the distinct stores it draws from, tallied once (a single pass over each warehouse)
+     * and reused for the tab's cards and every later footer tally.
+     */
+    private Map<EquipmentType, Integer> stockFor(Category category) {
+        return stockByCategory.computeIfAbsent(category,
+              key -> ArmorKitIssuer.localStock(byCategory.getOrDefault(key, List.of()), campaign));
     }
     // endregion Actions & totals
 
@@ -580,25 +720,14 @@ public class IssueEquipmentDialog extends JDialog {
         return EquipmentType.get(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME);
     }
 
-    /** The unit price of a kit, cached so repeated card/sort lookups price each kit only once. */
+    /** The unit price of a kit (see {@link KitPricing}). */
     private Money price(EquipmentType kit) {
-        return priceCache.computeIfAbsent(kit, candidate -> ArmorKitIssuer.unitPrice(candidate, campaign));
+        return pricing.price(kit);
     }
 
-    /** How hard a Regular acquirer would find this kit, rendered for the card. Cached per kit (see {@link #price}). */
+    /** How hard a Regular acquirer would find this kit, rendered for the card (see {@link KitPricing}). */
     private String acquisitionText(EquipmentType kit) {
-        return acquireTextCache.computeIfAbsent(kit, this::computeAcquisitionText);
-    }
-
-    private String computeAcquisitionText(EquipmentType kit) {
-        TargetRoll target = ArmorKitIssuer.acquisitionTarget(kit, campaign);
-        if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
-            return getTextAt(RESOURCE_BUNDLE, "card.acquire.automatic");
-        }
-        if (target.cannotSucceed()) {
-            return getTextAt(RESOURCE_BUNDLE, "card.acquire.unavailable");
-        }
-        return getFormattedTextAt(RESOURCE_BUNDLE, "card.acquire.tn", target.getValue());
+        return pricing.acquisitionText(kit);
     }
 
     private static List<String> survivalBadges(EquipmentType kit) {
@@ -622,17 +751,14 @@ public class IssueEquipmentDialog extends JDialog {
         return badges;
     }
 
+    /** The top-band colour identifying each kit group's cards, drawn from the HUD palette. */
     private static Color accentFor(Category category) {
         return switch (category) {
-            case MEKWARRIOR -> new Color(0xC0, 0x8A, 0x2A);
-            case AIRCRAFT -> new Color(0x2E, 0x88, 0xAB);
-            case INFANTRY -> new Color(0x4E, 0x8F, 0x3C);
-            case SOLDIER -> new Color(0x9A, 0x6E, 0x4A);
+            case MEKWARRIOR -> AMBER;
+            case AIRCRAFT -> ACCENT;
+            case INFANTRY -> READY;
+            case SOLDIER -> TEXT_MUTED;
         };
-    }
-
-    private static Color mutedColor() {
-        return KitCard.mutedColor();
     }
 
     /**

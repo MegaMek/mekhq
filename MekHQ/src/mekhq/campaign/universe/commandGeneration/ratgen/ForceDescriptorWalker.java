@@ -240,7 +240,7 @@ public final class ForceDescriptorWalker {
         }
         FormationSink previewSink = new FormationSink() {
             @Override
-            public Object formation(ForceDescriptor descriptor, NamedFormation named,
+            public @Nullable Object formation(ForceDescriptor descriptor, NamedFormation named,
                   FormationLevel level, Object parentHandle) {
                 if (descriptor != null) {
                     names.put(descriptor, named.name());
@@ -325,16 +325,16 @@ public final class ForceDescriptorWalker {
         // label rather than taking a formation name, and a formation whose units were all excluded is
         // dropped without ever spending a designator.
         List<ForceDescriptor> namedChildren = new ArrayList<>();
+        List<FormationRequest> requests = new ArrayList<>();
         for (ForceDescriptor child : children) {
             if (isFormation(child) && hasIncludedLeaf(child)) {
                 namedChildren.add(child);
+                requests.add(requestFor(child));
             }
         }
 
-        List<FormationRequest> requests = new ArrayList<>(namedChildren.size());
-        for (ForceDescriptor child : namedChildren) {
-            requests.add(requestFor(child));
-        }
+        // The namer needs the whole sibling group at once - it picks designators that do not collide -
+        // so the walk below has to be its own pass, after every name is settled.
         List<NamedFormation> names = namer.nameSiblings(requests, parentDesignator);
 
         int leaves = 0;
@@ -633,15 +633,16 @@ public final class ForceDescriptorWalker {
      * (LEVEL_II/CHOIR/LEVEL_III/…) since all three families reuse the same integers with different
      * semantics.
      *
-     * @param echelon     the {@code ForceDescriptor.echelon} value (boxed, may be null)
      * <p>Package-private so {@link RulesetRankAssigner} can resolve the requested echelon the same
      * way, rather than reading a Formation's own level back after MekHQ has recomputed it.</p>
      *
-     * @param echelon     the {@code ForceDescriptor.echelon} value (boxed, may be null)
+     * @param echelon     the {@code ForceDescriptor.echelon} value, or {@code null} if it carried none
      * @param factionCode the faction code on the descriptor (e.g. "FS", "CW", "WOB"); may be {@code null}
-     * @return the matching {@link FormationLevel}, or {@code null} if the echelon doesn't map
+     *
+     * @return the matching {@link FormationLevel}, or {@code null} if the echelon does not map
      */
-    static FormationLevel mapEchelonToFormationLevel(Integer echelon, String factionCode) {
+    static @Nullable FormationLevel mapEchelonToFormationLevel(@Nullable Integer echelon,
+          @Nullable String factionCode) {
         if (echelon == null) {
             return null;
         }

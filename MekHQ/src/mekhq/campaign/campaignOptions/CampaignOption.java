@@ -47,6 +47,7 @@ import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
+import mekhq.campaign.enums.LithiumFusionBatteryMode;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -117,6 +118,11 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Integer> CHASSIS_FAMILIARITY_SPEED =
           of(Integer.class, 2, "chassisFamiliaritySpeed");
     // endregion Chassis Familiarity
+
+    // region Interstellar Travel
+    public static final CampaignOption<LithiumFusionBatteryMode> LITHIUM_FUSION_BATTERY_MODE =
+          of(LithiumFusionBatteryMode.class, LithiumFusionBatteryMode.DISABLED, "lithiumFusionBatteryMode");
+    // endregion Interstellar Travel
 
     // region Migrated Options (generated storage-only migration)
     public static final CampaignOption<Boolean> REQUIRE_SUPPORT_FORCE_TRANSPORTATION =
@@ -339,6 +345,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "npcFactionArmorKits");
     public static final CampaignOption<Boolean> REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY =
           of(Boolean.class, false, "requireMekWarriorKitToDeploy");
+    public static final CampaignOption<Boolean> REQUIRE_AEROSPACE_KIT_TO_DEPLOY =
+          of(Boolean.class, false, "requireAerospaceKitToDeploy");
     public static final CampaignOption<Boolean> USE_EXTENDED_TOE_FORCE_NAME =
           of(Boolean.class, true, "useExtendedTOEForceName");
     public static final CampaignOption<Boolean> PERSONNEL_LOG_SKILL_GAIN =
@@ -962,6 +970,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "useAdvancedScouting");
     public static final CampaignOption<Boolean> ESSENTIAL_SCENARIOS_ONLY =
           of(Boolean.class, false, "essentialScenariosOnly");
+    public static final CampaignOption<Boolean> CONTRACTS_USE_SPECIAL_MECHANICS =
+          of(Boolean.class, false, "contractsUseSpecialMechanics");
     public static final CampaignOption<Boolean> RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY =
           of(Boolean.class, false, "restrictScenariosToFleetCapability");
     public static final CampaignOption<StratConSectorCountMethod> STRAT_CON_SECTOR_COUNT_METHOD =

@@ -79,6 +79,7 @@ import static mekhq.campaign.randomEvents.personalities.PersonalityController.wr
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.checkForIntelBreachEvent;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.processAdHocExecution;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -161,8 +162,12 @@ import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.DiseaseService;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
+import mekhq.campaign.personnel.quartermaster.AbstractKitIssuer;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
+import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitIssuer;
+import mekhq.campaign.personnel.quartermaster.KitSlot;
 import mekhq.campaign.personnel.ranks.Rank;
 import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.RankValidator;
@@ -272,6 +277,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_REPLENISH_EDGE = "REPLENISH_EDGE";
     private static final String CMD_IMPROVE = "IMPROVE";
     private static final String CMD_BUY_TRAIT = "BUY_TRAIT";
+    private static final String CMD_BUY_NATURAL_APTITUDE = "BUY_NATURAL_APTITUDE";
     private static final String CMD_CHANGE_ATTRIBUTE = "CHANGE_ATTRIBUTE";
     private static final String CMD_SET_ATTRIBUTE = "SET_ATTRIBUTE";
     private static final String CMD_RANDOM_PROFESSION = "RANDOM_PROFESSION";
@@ -343,6 +349,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private final JTable personnelTable;
     private final PersonnelTableModel personnelModel;
 
+    private static final String GUI_RESOURCE_BUNDLE = "mekhq.resources.GUI";
     @Deprecated(since = "0.50.11", forRemoval = true)
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
@@ -501,6 +508,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     writePersonalityDescription(person);
                     writeInterviewersNotes(person);
                     Campaign campaign = getCampaign();
+                    equipDefaultKitsOnRoleChange(person, KitSlot.PRIMARY);
                     campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
                     if (getCampaignOptions().isUsePortraitForRole(role) &&
                               getCampaignOptions().get(CampaignOption.ASSIGN_PORTRAIT_ON_ROLE_CHANGE) &&
@@ -519,6 +527,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (final Person person : people) {
                     person.setSecondaryRole(role);
                     Campaign campaign = getCampaign();
+                    equipDefaultKitsOnRoleChange(person, KitSlot.SECONDARY);
                     campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
                 }
                 break;
@@ -734,6 +743,34 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
                 break;
             }
+            case CMD_BUY_NATURAL_APTITUDE: {
+                String skillName = data[1];
+                int cost = MathUtility.parseInt(data[2]);
+                Skill skill = selectedPerson.getSkill(skillName);
+                if ((skill == null) || skill.getHasNaturalAptitude() || (selectedPerson.getXP() < cost)) {
+                    // The menu only offers skills the person has, without the aptitude, that they can afford; the
+                    // person may have changed since the menu was built
+                    break;
+                }
+
+                skill.setHasNaturalAptitude(true);
+                // The progress was already taken off the price, so it's used up
+                skill.changeNaturalAptitudeXpProgress(-skill.getNaturalAptitudeXpProgress());
+                selectedPerson.spendXP(cost);
+
+                PerformanceLogger.gainedNaturalAptitude(getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN),
+                      selectedPerson,
+                      getCampaign().getLocalDate(),
+                      skillName);
+                getCampaign().addReport(PERSONNEL, getFormattedTextAt(GUI_RESOURCE_BUNDLE,
+                      "naturalAptitudeGained.format",
+                      selectedPerson.getHyperlinkedName(),
+                      skillName));
+
+                Campaign campaign = getCampaign();
+                campaign.getPlayerForce().getHumanResources().personUpdated(campaign, selectedPerson);
+                break;
+            }
             case CMD_REPLENISH_EDGE: {
                 for (Person person : people) {
                     replenishEdgeActin(person);
@@ -858,6 +895,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     }
 
                     person.setPrimaryRole(getCampaign(), randomProfession);
+                    equipDefaultKitsOnRoleChange(person, KitSlot.PRIMARY);
 
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
                     Campaign campaign = getCampaign();
@@ -1030,7 +1068,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 status.toString(),
                                 JOptionPane.YES_NO_OPTION) == 0)) {
                     for (Person person : people) {
-                        person.changeStatus(getCampaign(), getCampaign().getLocalDate(), status);
+                        person.changeStatus(getCampaign(), getCampaign().getLocalDate(), status, false);
                     }
                 }
                 break;
@@ -1426,7 +1464,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     getCampaign().getPlayerForce()
                           .getFinances()
                           .credit(TransactionType.RANSOM, today, bounty, bountyReport);
-                    person.changeStatus(getCampaign(), today, PersonnelStatus.HOMICIDE);
+                    person.changeStatus(getCampaign(), today, PersonnelStatus.HOMICIDE, false);
                     if (person.getPrisonerStatus().isFree()) { // Deliberately excluding Bondsmen from this check
                         validBounty = true;
                     }
@@ -2602,7 +2640,14 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                   "menu.issueArmorKits"));
             issueKits.addActionListener(ev -> IssueEquipmentDialog.showFor(getFrame(),
                   getCampaign(), Arrays.asList(selected), null));
-            popup.add(issueKits);
+            JMenu kitsMenu = new JMenu(getTextAt("mekhq.resources.IssueEquipmentDialog", "menu.kits"));
+            kitsMenu.add(issueKits);
+
+            JMenuItem issueDefaultKits = new JMenuItem(getTextAt("mekhq.resources.IssueEquipmentDialog",
+                  "menu.issueDefaultKits"));
+            issueDefaultKits.addActionListener(ev -> issueDefaultKits(Arrays.asList(selected)));
+            kitsMenu.add(issueDefaultKits);
+            popup.add(kitsMenu);
         }
 
         List<mekhq.campaign.personnel.Person> selectedPeople = Arrays.asList(selected);
@@ -3317,6 +3362,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
             if (newSkillsMenu.getMenuComponentCount() > 0) {
                 menu.add(newSkillsMenu);
+            }
+
+            JMenu naturalAptitudesMenu = createNaturalAptitudesMenu(person, isUseReasoningMultiplier,
+                  xpCostMultiplier);
+            if (naturalAptitudesMenu.getMenuComponentCount() > 0) {
+                menu.add(naturalAptitudesMenu);
             }
 
             JMenu traitsMenu = new JMenu(resources.getString("spendOnTraits.text"));
@@ -5022,6 +5073,61 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         return (eligibleCount * 2) >= selectedCount;
     }
 
+    /**
+     * Builds the menu for spending XP on Natural Aptitudes: one entry for each skill the person has learned but has no
+     * Natural Aptitude in, where the campaign allows one to be bought. As with improving skills, the cost is adjusted
+     * by the person's Reasoning and learning traits ({@link Person#getCostToGainNaturalAptitude}), then the campaign's
+     * XP cost multiplier, and any XP already put towards the aptitude is then taken off.
+     *
+     * @param person                   the person spending XP
+     * @param isUseReasoningMultiplier whether the campaign applies Reasoning to XP costs
+     * @param xpCostMultiplier         the campaign's XP cost multiplier
+     *
+     * @return the menu, which is empty if there is nothing to buy
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JMenu createNaturalAptitudesMenu(Person person, boolean isUseReasoningMultiplier,
+          double xpCostMultiplier) {
+        JMenu naturalAptitudesMenu = new JMenu(getTextAt(GUI_RESOURCE_BUNDLE, "spendOnNaturalAptitudes.text"));
+        boolean isUseArtillery = getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
+        String tooltip = wordWrap(getTextAt(GUI_RESOURCE_BUNDLE, "spendOnNaturalAptitudes.tooltip"));
+
+        List<Skill> learnedSkills = new ArrayList<>(person.getSkills().getSkills());
+        learnedSkills.sort(Comparator.comparing(skill -> skill.getType().getName()));
+        for (Skill skill : learnedSkills) {
+            SkillType skillType = skill.getType();
+            if ((skillType == null) || skill.getHasNaturalAptitude()) {
+                continue;
+            }
+
+            String skillName = skillType.getName();
+            // As with improving skills, the Artillery skill is only offered when the campaign uses it
+            if (Objects.equals(skillName, S_ARTILLERY) && !isUseArtillery) {
+                continue;
+            }
+
+            int cost = person.getCostToGainNaturalAptitude(skillName, isUseReasoningMultiplier);
+            if (cost == SkillType.DISABLED_SKILL_LEVEL) {
+                continue;
+            }
+            cost = (int) round(cost * xpCostMultiplier);
+            // As with improving skills, XP already put towards the aptitude comes off the price
+            cost = max(0, cost - skill.getNaturalAptitudeXpProgress());
+
+            JMenuItem menuItem = new JMenuItem(String.format(resources.getString("skillDesc.format"), skillName,
+                  cost));
+            menuItem.setActionCommand(makeCommand(CMD_BUY_NATURAL_APTITUDE, skillName, String.valueOf(cost)));
+            menuItem.addActionListener(this);
+            menuItem.setEnabled(person.getXP() >= cost);
+            menuItem.setToolTipText(tooltip);
+            naturalAptitudesMenu.add(menuItem);
+        }
+
+        return naturalAptitudesMenu;
+    }
+
     private void addSPAToMenu(SpecialAbility spa, double reasoningXpCostMultiplier, double xpCostMultiplier,
           Person person,
           JMenu combatAbilityMenu, JMenu maneuveringAbilityMenu, JMenu utilityAbilityMenu, JMenu characterFlawMenu,
@@ -5997,5 +6103,43 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         result.addActionListener(this);
         result.setEnabled(true);
         return result;
+    }
+
+    /**
+     * Gives a person their changed role's default kits: the role's equipment kit into a free kit slot, and their group's
+     * armor kit if they are still in coveralls.
+     *
+     * @param person      the person whose role changed
+     * @param changedSlot the kit slot tied to the changed role
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void equipDefaultKitsOnRoleChange(Person person, KitSlot changedSlot) {
+        EquipmentKitIssuer.equipDefaultToolKitOnRoleChange(person, changedSlot, getCampaign());
+        if (changedSlot == KitSlot.PRIMARY) {
+            ArmorKitIssuer.equipDefaultKitOnRoleChange(person, getCampaign());
+        }
+    }
+
+    /**
+     * Swaps every selected person onto their roles' default armor and equipment kits, drawing from stores and ordering
+     * (and paying for) any shortfall, then reports the result.
+     *
+     * @param people the selected personnel
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void issueDefaultKits(List<Person> people) {
+        Campaign campaign = getCampaign();
+        AbstractKitIssuer.KitIssueTotals totals = new AbstractKitIssuer.KitIssueTotals();
+        ArmorKitIssuer.issueDefaultKits(people, campaign, totals);
+        EquipmentKitIssuer.issueDefaultKits(people, campaign, totals);
+        if ((totals.issued > 0) || (totals.ordered > 0)) {
+            campaign.addReport(PERSONNEL,
+                  getFormattedTextAt("mekhq.resources.IssueEquipmentDialog", "report.issued",
+                        totals.issued + totals.ordered, totals.issued, totals.ordered));
+        }
     }
 }

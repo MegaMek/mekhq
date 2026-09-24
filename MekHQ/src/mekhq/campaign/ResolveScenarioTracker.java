@@ -2108,6 +2108,7 @@ public class ResolveScenarioTracker {
                 getCampaign().addKill(k);
             }
 
+            boolean hasCheatedDeath = false;
             if (!voidsCombatDamage) {
                 if (status.isMissing()) {
                     if (control) {
@@ -2118,8 +2119,12 @@ public class ResolveScenarioTracker {
                     }
                 } else if (status.isDead()) {
                     person.changeStatus(getCampaign(), getCampaign().getLocalDate(), PersonnelStatus.KIA);
-                    getCampaign().getPlayerForce().getHumanResources().getRetirementDefectionTracker()
-                          .removeFromCampaign(person, true, false, getCampaign(), mission);
+
+                    hasCheatedDeath = !person.getStatus().isDead();
+                    if (!hasCheatedDeath) {
+                        getCampaign().getPlayerForce().getHumanResources().getRetirementDefectionTracker()
+                              .removeFromCampaign(person, true, false, getCampaign(), mission);
+                    }
                 }
             }
 
@@ -2135,6 +2140,10 @@ public class ResolveScenarioTracker {
                 // Pass only the hits suffered this scenario. status.getHits() is cumulative and would regenerate
                 // injuries for the pre-existing severity the person already carries, doubling their injuries.
                 person.diagnose(getCampaign(), newInjuryHits);
+
+                if (hasCheatedDeath && !person.getStatus().isDead()) {
+                    person.healExcessInjuriesAfterCheatingDeath(getCampaign());
+                }
             }
 
             if (status.toRemove()) {

@@ -3154,13 +3154,22 @@ public class AtBDynamicScenarioFactory {
             }
         }
 
+        boolean hasNaturalAptitudeGunnery = Crew.rollNaturalAptitude(skill);
+        boolean hasNaturalAptitudePiloting = Crew.rollNaturalAptitude(skill);
+
+        boolean useArtillery = campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
+        boolean hasNaturalAptitudeArtillery = useArtillery ? Crew.rollNaturalAptitude(skill) : hasNaturalAptitudeGunnery;
+
         extraData.put(0, innerMap);
 
         // Create the crew object
         Crew entityCrew = new Crew(entity.getCrew().getCrewType(),
               crewName, Compute.getFullCrewSize(entity),
               skills[0],
+              hasNaturalAptitudeGunnery,
+              hasNaturalAptitudeArtillery,
               skills[1],
+              hasNaturalAptitudePiloting,
               gender,
               faction.isClan(), extraData);
 

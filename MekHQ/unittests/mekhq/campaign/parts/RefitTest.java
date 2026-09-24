@@ -66,8 +66,8 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -128,6 +128,9 @@ public class RefitTest {
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_IMPLANTS)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_INITIATIVE_BONUS)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_TACTICS)).thenReturn(false);
+        // Read when a unit's crew gets its Natural Aptitudes and Small Arms skill
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockCampaignOptions.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);

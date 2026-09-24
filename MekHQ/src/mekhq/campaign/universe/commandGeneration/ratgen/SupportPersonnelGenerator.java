@@ -35,6 +35,7 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
@@ -369,7 +370,7 @@ public final class SupportPersonnelGenerator {
      * Clan-targeted index through the campaign's IS rank table, producing wrong names like
      * "Corporal" instead of the Clan equivalent.</p>
      */
-    private static Person createAndRecruit(Campaign campaign, AbstractSkillGenerator skillGen,
+    private static @Nullable Person createAndRecruit(Campaign campaign, AbstractSkillGenerator skillGen,
           PersonnelRole role, int expLvl, int supportRank, Faction faction, RankSystem targetRankSystem,
           RankValidator rankValidator) {
         // A Clan's support castes are Clan-born, so their origin is pinned to the Clan rather than
@@ -423,24 +424,23 @@ public final class SupportPersonnelGenerator {
     }
 
     /**
-     * Converts a {@link SkillLevel} (where {@code NONE = 0, ULTRA_GREEN = 1, …, LEGENDARY = 7}) to a
-     * {@link SkillType} {@code EXP_*} constant (where {@code EXP_ULTRA_GREEN = 0, …, EXP_LEGENDARY =
-     * 6}). The two enums use different baselines; this is the canonical mapping.
+     * Converts a {@link SkillLevel} to the matching {@link SkillType} {@code EXP_*} constant.
+     *
+     * <p>The two scales count from different places: {@code SkillLevel} starts at None, while
+     * {@code SkillType} starts at Ultra-Green and treats None as {@code -1}. They run in step after that,
+     * so the whole difference is that one step at the bottom.</p>
+     *
+     * @param skillLevel the level to convert, or {@code null} where none was configured
+     *
+     * @return the matching {@code EXP_*} constant, or {@link SkillType#EXP_REGULAR} for no level
      */
-    static int toExperienceLevel(SkillLevel skillLevel) {
-        if (skillLevel == null) {
+    static int toExperienceLevel(@Nullable SkillLevel skillLevel) {
+        // The generator cannot build a support person with no skill at all, so an absent or None level
+        // becomes a Regular one rather than SkillType.EXP_NONE.
+        if ((skillLevel == null) || skillLevel.isNone()) {
             return SkillType.EXP_REGULAR;
         }
-        return switch (skillLevel) {
-            case ULTRA_GREEN -> SkillType.EXP_ULTRA_GREEN;
-            case GREEN -> SkillType.EXP_GREEN;
-            case REGULAR -> SkillType.EXP_REGULAR;
-            case VETERAN -> SkillType.EXP_VETERAN;
-            case ELITE -> SkillType.EXP_ELITE;
-            case HEROIC -> SkillType.EXP_HEROIC;
-            case LEGENDARY -> SkillType.EXP_LEGENDARY;
-            default -> SkillType.EXP_REGULAR;
-        };
+        return skillLevel.getExperienceLevel() - 1;
     }
 
     /**

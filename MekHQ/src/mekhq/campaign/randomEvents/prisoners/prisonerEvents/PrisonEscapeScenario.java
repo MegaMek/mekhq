@@ -62,6 +62,8 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.location.ILocation;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.BotForce;
@@ -134,9 +136,20 @@ public class PrisonEscapeScenario {
             Unit mobUnit = new Unit(mobEntity, campaign);
             mobUnit.clearCrew();
 
+            // A mob only forms from escapees held in the same place, and must stand alongside them to take them on
+            Person anchorEscapee = escapees.iterator().next();
+            ILocation escapeeLocation = anchorEscapee.getParentLocation();
+            if (escapeeLocation != null) {
+                mobUnit.setParent(escapeeLocation);
+            }
+
             Set<Person> assignedEscapees = new HashSet<>();
             int maximumCrewSize = mobUnit.getFullCrewSize();
             for (Person escapee : escapees) {
+                if (!LocationUtils.areSameEffectiveLocation(anchorEscapee, escapee)) {
+                    continue;
+                }
+
                 // If they don't have small arms, they're about to learn fast
                 // We need to give them the skill, as it's required for the SOLDIER role, which is
                 // required for serving in a CI unit, which mobs are.
@@ -158,6 +171,10 @@ public class PrisonEscapeScenario {
             for (Person escapee : assignedEscapees) {
                 mobUnit.addPilotOrSoldier(escapee, null, false);
             }
+
+            // The mob is a scenario-only unit and must not linger in the location tree, where it would show up
+            // amongst the player's own units
+            mobUnit.setParent(null);
 
             mobs.add(mobUnit);
             escapees.removeAll(assignedEscapees);

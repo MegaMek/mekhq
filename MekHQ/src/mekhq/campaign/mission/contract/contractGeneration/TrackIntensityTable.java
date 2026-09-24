@@ -34,6 +34,7 @@ package mekhq.campaign.mission.contract.contractGeneration;
 
 import static megamek.common.compute.Compute.d6;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -158,5 +159,46 @@ public final class TrackIntensityTable {
         }
 
         return Arrays.stream(monthlyTracks).boxed().toList();
+    }
+
+    /**
+     * Rolls a schedule spreading an exact number of items - such as points of interest - across a contract's months,
+     * the way {@link #rollSchedule} spreads its tracks.
+     *
+     * <p>A table's widest column caps how many items one roll can place, and {@link #rollSchedule} clamps anything
+     * above it. So the items are split into batches no larger than that column, one roll per batch, and the batches are
+     * summed month by month. Because each row sums to its column, the result always sums to exactly {@code count}.
+     * Like {@link #rollSchedule}, it spans the chosen table's native length.</p>
+     *
+     * @param lengthInMonths the contract's length in months, choosing which table applies
+     * @param count          how many items to spread
+     *
+     * @return the schedule as per-month item counts, summing to {@code count}; every month zero if {@code count} is not
+     *       positive
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<Integer> rollScheduleForCount(int lengthInMonths, int count) {
+        final int[][][] table = (lengthInMonths <= SHORT_TABLE_MAX_MONTHS) ? THREE_MONTH_TABLE : SIX_MONTH_TABLE;
+        final int nativeMonths = table[0][0].length;
+        final int widestColumn = table[0].length;
+
+        final int[] monthlyItems = new int[nativeMonths];
+        int remaining = count;
+        while (remaining > 0) {
+            int batch = Math.min(remaining, widestColumn);
+            List<Integer> batchSchedule = rollSchedule(lengthInMonths, batch, 1);
+            for (int month = 0; month < nativeMonths; month++) {
+                monthlyItems[month] += batchSchedule.get(month);
+            }
+            remaining -= batch;
+        }
+
+        List<Integer> schedule = new ArrayList<>();
+        for (int items : monthlyItems) {
+            schedule.add(items);
+        }
+        return List.copyOf(schedule);
     }
 }

@@ -35,15 +35,19 @@ package mekhq.campaign;
 
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.PrintWriter;
 import java.time.LocalDate;
+import java.util.Objects;
 import java.util.UUID;
 
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.LithiumFusionBatteryMode;
 import mekhq.campaign.events.LocationChangedEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.events.TransitStatusChangedEvent;
@@ -71,6 +75,10 @@ public class CurrentLocation extends AbstractMobileLocation {
     private double rechargeTime;
     // JumpShip at nadir or zenith
     private boolean jumpZenith;
+    // Lithium-Fusion battery charge, from 0.0 (empty) to 1.0 (holds a full jump charge)
+    private double lithiumFusionBatteryCharge;
+
+    private static final double FULL_BATTERY_CHARGE = 1.0;
 
     public CurrentLocation() {
         this(null, 0d);
@@ -80,6 +88,7 @@ public class CurrentLocation extends AbstractMobileLocation {
         super(system, transitTime);
         this.rechargeTime = 0d;
         this.jumpZenith = true;
+        this.lithiumFusionBatteryCharge = 0.0;
     }
 
     @Override
@@ -179,18 +188,83 @@ public class CurrentLocation extends AbstractMobileLocation {
      */
     @Override
     public boolean isRecharging(Campaign campaign) {
-        return currentSystem.getRechargeTime(campaign.getLocalDate(), campaign.isUseCommandCircuit()) > 0;
+        return getNeededRechargeTime(campaign) > 0;
     }
 
     /**
-     * Marks the JumpShip at the current location to be fully charged, GM action.
+     * Marks the JumpShip at the current location to be fully charged, GM action. This also fully charges any
+     * Lithium-Fusion batteries.
      *
      * @param campaign The campaign object which owns the JumpShip.
      */
     @Override
     public void chargeFully(Campaign campaign) {
-        rechargeTime = currentSystem.getRechargeTime(campaign.getLocalDate(), campaign.isUseCommandCircuit());
+        rechargeTime = getNeededRechargeTime(campaign);
+        lithiumFusionBatteryCharge = FULL_BATTERY_CHARGE;
         MekHQ.triggerEvent(new TransitStatusChangedEvent(this));
+    }
+
+    /**
+     * Returns the hours of recharging the JumpShip drives need at the current system, after any Lithium-Fusion battery
+     * effect has been applied.
+     *
+     * @param campaign The campaign object which owns the JumpShip.
+     *
+     * @return the needed recharge time in hours
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public double getNeededRechargeTime(Campaign campaign) {
+        return getNeededRechargeTime(campaign.getLocalDate(), campaign.isUseCommandCircuit(),
+              getLithiumFusionBatteryMode(campaign));
+    }
+
+    private double getNeededRechargeTime(LocalDate today, boolean isUseCommandCircuit,
+          LithiumFusionBatteryMode batteryMode) {
+        double systemRechargeTime = currentSystem.getRechargeTime(today, isUseCommandCircuit);
+        return JumpDriveProfile.fromMode(batteryMode, false).adjustRechargeTime(systemRechargeTime);
+    }
+
+    /**
+     * Returns the Lithium-Fusion battery mode that applies to this location, treating an unknown mode as disabled.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private LithiumFusionBatteryMode getLithiumFusionBatteryMode(Campaign campaign) {
+        return Objects.requireNonNullElse(campaign.getEffectiveLithiumFusionBatteryMode(this),
+              LithiumFusionBatteryMode.DISABLED);
+    }
+
+    /**
+     * @return how charged the fleet's Lithium-Fusion batteries are, from {@code 0.0} (empty) to {@code 1.0} (full)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public double getLithiumFusionBatteryCharge() {
+        return lithiumFusionBatteryCharge;
+    }
+
+    /**
+     * @param lithiumFusionBatteryCharge the battery charge, clamped to between {@code 0.0} and {@code 1.0}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setLithiumFusionBatteryCharge(double lithiumFusionBatteryCharge) {
+        this.lithiumFusionBatteryCharge = Math.max(0.0, Math.min(FULL_BATTERY_CHARGE, lithiumFusionBatteryCharge));
+    }
+
+    /**
+     * @return {@code true} if the fleet's Lithium-Fusion batteries hold a full jump charge
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isLithiumFusionBatteryCharged() {
+        return lithiumFusionBatteryCharge >= FULL_BATTERY_CHARGE;
     }
 
     /**
@@ -201,26 +275,24 @@ public class CurrentLocation extends AbstractMobileLocation {
         final boolean wasTraveling = !isOnPlanet();
         LocalDate today = campaign.getLocalDate();
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        // Checking eligibility walks the whole hangar, so only do it once
+        final LithiumFusionBatteryMode batteryMode = getLithiumFusionBatteryMode(campaign);
+        final boolean isUseBattery = batteryMode.isDoubleJump();
 
         // recharge even if there is no jump path
         // because JumpShips don't go anywhere
         double hours = 24.0;
-        double neededRechargeTime = currentSystem.getRechargeTime(today, campaign.isUseCommandCircuit());
-        double usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
-        if (usedRechargeTime > 0) {
-            if (!isSilentProcessing) {
-                campaign.addReport(GENERAL, "JumpShips spent " +
-                                                  (Math.round(100.0 * usedRechargeTime) / 100.0) +
-                                                  " hours recharging drives");
-            }
-            rechargeTime += usedRechargeTime;
-            if (rechargeTime >= neededRechargeTime && !isSilentProcessing) {
-                campaign.addReport(GENERAL, "JumpShip drives fully charged");
-            }
-        }
+        double neededRechargeTime = getNeededRechargeTime(today, campaign.isUseCommandCircuit(), batteryMode);
+        // The battery only charges once we know no jump is happening today, so its hours aren't double-counted
+        double usedRechargeTime = rechargeDrives(campaign, hours, neededRechargeTime, false, isSilentProcessing);
         if ((null == jumpPath) || jumpPath.isEmpty()) {
+            if (isUseBattery) {
+                rechargeBattery(campaign, hours - Math.max(0.0, usedRechargeTime), neededRechargeTime,
+                      isSilentProcessing);
+            }
             return;
         }
+        boolean hasJumped = false;
         // if we are not at the final jump point, then check to see if we are transiting
         // or if we can jump
         if (jumpPath.size() > 1) {
@@ -237,42 +309,37 @@ public class CurrentLocation extends AbstractMobileLocation {
                     }
                 }
             }
-            if (isAtJumpPoint() && (rechargeTime >= neededRechargeTime)) {
-                // jump
-                if (campaignOptions.get(CampaignOption.USE_ABILITIES)) {
-                    checkForTransitDisorientationSyndrome(campaign,
-                          campaignOptions.get(CampaignOption.USE_FATIGUE),
-                          campaignOptions.get(CampaignOption.FATIGUE_RATE));
+            boolean isDriveCharged = rechargeTime >= neededRechargeTime;
+            boolean canUseBattery = isUseBattery && isLithiumFusionBatteryCharged();
+            if (isAtJumpPoint() && (isDriveCharged || canUseBattery)) {
+                // jump, drawing on the drive's own charge first and the battery otherwise
+                jump(campaign, campaignOptions, today, isSilentProcessing);
+                hasJumped = true;
+                if (isDriveCharged) {
+                    rechargeTime = 0;
+                } else {
+                    lithiumFusionBatteryCharge = 0.0;
                 }
-                if (!isSilentProcessing) {
-                    campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));
+
+                // A charged battery allows an immediate follow-on jump, so long as there is somewhere to jump to
+                if (isUseBattery && isLithiumFusionBatteryCharged() && (jumpPath.size() > 1)) {
+                    if (!isSilentProcessing) {
+                        campaign.addReport(GENERAL, getTextAt(RESOURCE_BUNDLE, "getReport.jump.battery"));
+                    }
+                    jump(campaign, campaignOptions, today, isSilentProcessing);
+                    lithiumFusionBatteryCharge = 0.0;
                 }
-                currentSystem = jumpPath.get(1);
-                currentPlanet = null;
-                jumpZenith = pickJumpPoint(today);
-                jumpPath.removeFirstSystem();
-                MekHQ.triggerEvent(new LocationChangedEvent(this, true));
+
                 // reduce remaining hours by usedRechargeTime or usedTransitTime, whichever is
                 // greater
                 hours -= Math.max(usedRechargeTime, usedTransitTime);
-                // On arriving at the final system this is the transit to the path's target planet (if any); at an
-                // intermediate system it is the primary-world transit, as before.
-                transitTime = destinationTransitTime();
-                rechargeTime = 0;
                 // if there are hours remaining, then begin recharging jump drive
-                usedRechargeTime = Math.min(hours, neededRechargeTime - rechargeTime);
-                if (usedRechargeTime > 0) {
-                    if (!isSilentProcessing) {
-                        campaign.addReport(GENERAL, "JumpShips spent " +
-                                                          (Math.round(100.0 * usedRechargeTime) / 100.0) +
-                                                          " hours recharging drives");
-                    }
-                    rechargeTime += usedRechargeTime;
-                    if (rechargeTime >= neededRechargeTime && !isSilentProcessing) {
-                        campaign.addReport(GENERAL, "JumpShip drives fully charged");
-                    }
-                }
+                rechargeDrives(campaign, hours, neededRechargeTime, isUseBattery, isSilentProcessing);
             }
+        }
+        if (isUseBattery && !hasJumped) {
+            rechargeBattery(campaign, hours - Math.max(0.0, usedRechargeTime), neededRechargeTime,
+                  isSilentProcessing);
         }
         // if we are now at the final jump point, then lets begin in-system transit
         if (jumpPath.size() == 1) {
@@ -309,6 +376,101 @@ public class CurrentLocation extends AbstractMobileLocation {
         }
     }
 
+    /**
+     * Performs a single jump to the next system on the jump path. The caller is responsible for consuming the charge
+     * that powered it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void jump(Campaign campaign, CampaignOptions campaignOptions, LocalDate today,
+          boolean isSilentProcessing) {
+        if (campaignOptions.get(CampaignOption.USE_ABILITIES)) {
+            checkForTransitDisorientationSyndrome(campaign,
+                  campaignOptions.get(CampaignOption.USE_FATIGUE),
+                  campaignOptions.get(CampaignOption.FATIGUE_RATE));
+        }
+        if (!isSilentProcessing) {
+            campaign.addReport(GENERAL, "Jumping to " + jumpPath.get(1).getPrintableName(today));
+        }
+        currentSystem = jumpPath.get(1);
+        currentPlanet = null;
+        jumpZenith = pickJumpPoint(today);
+        jumpPath.removeFirstSystem();
+        MekHQ.triggerEvent(new LocationChangedEvent(this, true));
+        // On arriving at the final system this is the transit to the path's target planet (if any); at an
+        // intermediate system it is the primary-world transit, as before.
+        transitTime = destinationTransitTime();
+    }
+
+    /**
+     * Spends up to {@code availableHours} recharging. The drive core is recharged first; when Lithium-Fusion batteries
+     * are in use, any hours left over once the drive is full go to recharging the batteries.
+     *
+     * @return the hours spent recharging the drive core
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private double rechargeDrives(Campaign campaign, double availableHours, double neededRechargeTime,
+          boolean isUseBattery, boolean isSilentProcessing) {
+        double usedRechargeTime = Math.min(availableHours, neededRechargeTime - rechargeTime);
+        if (usedRechargeTime > 0) {
+            if (!isSilentProcessing) {
+                campaign.addReport(GENERAL, "JumpShips spent " +
+                                                  (Math.round(100.0 * usedRechargeTime) / 100.0) +
+                                                  " hours recharging drives");
+            }
+            rechargeTime += usedRechargeTime;
+            if (rechargeTime >= neededRechargeTime && !isSilentProcessing) {
+                campaign.addReport(GENERAL, "JumpShip drives fully charged");
+            }
+        }
+
+        if (isUseBattery) {
+            double remainingHours = availableHours - Math.max(0.0, usedRechargeTime);
+            rechargeBattery(campaign, remainingHours, neededRechargeTime, isSilentProcessing);
+        }
+
+        return usedRechargeTime;
+    }
+
+    /**
+     * Spends up to {@code availableHours} recharging the Lithium-Fusion batteries, which take as long to charge as the
+     * drive core itself. The batteries only charge once the drive core is full.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void rechargeBattery(Campaign campaign, double availableHours, double neededRechargeTime,
+          boolean isSilentProcessing) {
+        if ((availableHours <= 0) || isLithiumFusionBatteryCharged() || (rechargeTime < neededRechargeTime)) {
+            return;
+        }
+
+        // Instant recharge (e.g., a recharge station with no wait) fills the battery immediately
+        if (neededRechargeTime <= 0) {
+            lithiumFusionBatteryCharge = FULL_BATTERY_CHARGE;
+            return;
+        }
+
+        double batteryHoursNeeded = (FULL_BATTERY_CHARGE - lithiumFusionBatteryCharge) * neededRechargeTime;
+        double usedBatteryTime = Math.min(availableHours, batteryHoursNeeded);
+        if (usedBatteryTime >= batteryHoursNeeded) {
+            lithiumFusionBatteryCharge = FULL_BATTERY_CHARGE;
+        } else {
+            lithiumFusionBatteryCharge += usedBatteryTime / neededRechargeTime;
+        }
+
+        if (!isSilentProcessing) {
+            campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "getReport.recharge.battery.hours",
+                  Math.round(100.0 * usedBatteryTime) / 100.0));
+            if (isLithiumFusionBatteryCharged()) {
+                campaign.addReport(GENERAL, getTextAt(RESOURCE_BUNDLE, "getReport.recharge.battery.complete"));
+            }
+        }
+    }
+
     public void writeToXML(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "location");
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "currentSystemId", currentSystem.getId());
@@ -320,6 +482,9 @@ public class CurrentLocation extends AbstractMobileLocation {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "transitTime", transitTime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "rechargeTime", rechargeTime);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "jumpZenith", jumpZenith);
+        if (lithiumFusionBatteryCharge > 0) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lithiumFusionBatteryCharge", lithiumFusionBatteryCharge);
+        }
         if (jumpPath != null) {
             jumpPath.writeToXML(pw, indent);
         }
@@ -368,6 +533,8 @@ public class CurrentLocation extends AbstractMobileLocation {
                     retVal.rechargeTime = Double.parseDouble(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("jumpZenith")) {
                     retVal.jumpZenith = Boolean.parseBoolean(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("lithiumFusionBatteryCharge")) {
+                    retVal.setLithiumFusionBatteryCharge(Double.parseDouble(wn2.getTextContent()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("jumpPath")) {
                     retVal.jumpPath = JumpPath.generateInstanceFromXML(wn2, c);
                 } else if (wn2.getNodeName().equalsIgnoreCase("personId")) {

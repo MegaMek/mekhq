@@ -39,6 +39,7 @@ import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.Reinforceme
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResultsType.INTERCEPTED;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.ReinforcementResultsType.SUCCESS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -339,6 +340,32 @@ class StratConDeploymentServiceTest {
         Unit unit = unitWithId(unitId);
         when(unit.isCarrier()).thenReturn(true);
         return unit;
+    }
+
+    // endregion
+
+    // region deployPrimaryForces
+
+    @Test
+    void aFormationFollowingOneThatDealtWithThePointOfInterestJoinsIt() {
+        assertTrue(StratConDeploymentService.isJoiningResolvedPointOfInterest(true, false, false));
+    }
+
+    @Test
+    void aFormationStillFacingTheActivePointOfInterestDeploysNormally() {
+        assertFalse(StratConDeploymentService.isJoiningResolvedPointOfInterest(true, true, false),
+              "one that could not follow it up leaves it for the next formation");
+    }
+
+    @Test
+    void aFormationFollowingIntoAScenarioDeploysNormally() {
+        assertFalse(StratConDeploymentService.isJoiningResolvedPointOfInterest(true, false, true),
+              "it is assigned to the scenario that broke out");
+    }
+
+    @Test
+    void aHexWithNoPointOfInterestIsDeployedToNormally() {
+        assertFalse(StratConDeploymentService.isJoiningResolvedPointOfInterest(false, false, false));
     }
 
     // endregion

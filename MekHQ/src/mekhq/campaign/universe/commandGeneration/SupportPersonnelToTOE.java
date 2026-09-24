@@ -978,7 +978,7 @@ public final class SupportPersonnelToTOE {
      * assigns each crew Person as one of its soldiers, and fluff-names it after the profession it
      * carries. Returns {@code null} if the unit cannot be found or loaded.
      */
-    static Unit createCarrierUnit(Campaign campaign, CarrierSpec spec) {
+    static @Nullable Unit createCarrierUnit(Campaign campaign, CarrierSpec spec) {
         MekSummary mekSummary = MekSummaryCache.getInstance().getMek(spec.unitName());
         if (mekSummary == null) {
             LOGGER.error("Cannot find carrier unit entry for {}", spec.unitName());
