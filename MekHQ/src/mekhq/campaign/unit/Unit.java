@@ -5270,9 +5270,13 @@ public class Unit implements ITechnology, ILocatable {
         final String gunType = SkillType.getGunnerySkillFor(entity);
         final Person commander = getCommander();
 
-        updateCrewNaturalAptitudes(crew, commander, gunType, driveType);
-
         if (crew.getSlotCount() > 1) {
+            // Each crew member brings their own aptitudes via assignToCrewSlot; clear every slot first so temp crew
+            // and empty slots don't keep a previous occupant's aptitudes
+            for (int slot = 0; slot < crew.getSlotCount(); slot++) {
+                updateCrewNaturalAptitudes(crew, slot, null, gunType, driveType);
+            }
+
             if (crew.getCrewType().getPilotPos() == crew.getCrewType().getGunnerPos()) {
                 // Command console; each crew is assigned as both driver and gunner
                 int slot = 0;
@@ -5332,6 +5336,9 @@ public class Unit implements ITechnology, ILocatable {
                 }
             }
         } else {
+            // Single-slot crews, including composite vehicle and vessel crews, use the commander's aptitudes
+            updateCrewNaturalAptitudes(crew, 0, commander, gunType, driveType);
+
             if ((entity.getEntityType() & Entity.ETYPE_LAND_AIR_MEK) == 0) {
                 calcCompositeCrew(isOnlyCommandersMatter);
             } else {
@@ -5364,30 +5371,31 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Copies the commander's Natural Aptitudes onto the entity's crew. If there is no commander, all aptitudes are
-     * cleared so a previous commander's aptitudes don't linger on the unit.
+     * Copies a person's Natural Aptitudes onto one slot of the entity's crew. If there is no person, the slot's
+     * aptitudes are cleared so a previous occupant's aptitudes don't linger on the unit.
      *
      * <p>When the campaign doesn't use the separate Artillery skill, artillery is fired using Gunnery, so the
      * Artillery aptitude mirrors the Gunnery aptitude.</p>
      *
      * @param crew      the entity's crew
-     * @param commander the unit's commander, or {@code null} if there is none
+     * @param slot      the crew slot to update
+     * @param person    the person in that slot (the commander, for single-slot crews), or {@code null} if none
      * @param gunType   the gunnery skill used by this unit
      * @param driveType the piloting or driving skill used by this unit
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private void updateCrewNaturalAptitudes(Crew crew, @Nullable Person commander, String gunType,
+    private void updateCrewNaturalAptitudes(Crew crew, int slot, @Nullable Person person, String gunType,
           String driveType) {
-        boolean hasNaturalAptitudeGunnery = hasNaturalAptitude(commander, gunType);
-        crew.setHasNaturalAptitudeGunnery(hasNaturalAptitudeGunnery);
-        crew.setHasNaturalAptitudePiloting(hasNaturalAptitude(commander, driveType));
+        boolean hasNaturalAptitudeGunnery = hasNaturalAptitude(person, gunType);
+        crew.setHasNaturalAptitudeGunnery(hasNaturalAptitudeGunnery, slot);
+        crew.setHasNaturalAptitudePiloting(hasNaturalAptitude(person, driveType), slot);
 
         boolean isUseArtillerySkill = campaign.getCampaignOptions().get(CampaignOption.USE_ARTILLERY);
         crew.setHasNaturalAptitudeArtillery(isUseArtillerySkill ?
-                                                  hasNaturalAptitude(commander, SkillType.S_ARTILLERY) :
-                                                  hasNaturalAptitudeGunnery);
+                                                  hasNaturalAptitude(person, SkillType.S_ARTILLERY) :
+                                                  hasNaturalAptitudeGunnery, slot);
     }
 
     /**
@@ -6097,6 +6105,7 @@ public class Unit implements ITechnology, ILocatable {
         entity.getCrew().setGunneryB(Math.clamp(gunnery, 0, 8), slot);
         entity.getCrew().setArtillery(Math.clamp(artillery, 0, 8), slot);
         entity.getCrew().setToughness(person.getAdjustedToughness(), slot);
+        updateCrewNaturalAptitudes(entity.getCrew(), slot, person, gunType, driveType);
 
         entity.getCrew().setExternalIdAsString(person.getId().toString(), slot);
         entity.getCrew().setMissing(false, slot);
