@@ -333,7 +333,7 @@ public class Utilities {
             return false;
         } else if (entity1.getClass() != entity2.getClass()) {
             return false;
-        } else if ((entity1.getEngine().getRating() != entity2.getEngine().getRating()) ||
+        } else if ((entity1.getEngine().getRating(entity1) != entity2.getEngine().getRating(entity2)) ||
                          (entity1.getEngine().getEngineType() != entity2.getEngine().getEngineType()) ||
                          (entity1.getEngine().getFlags() != entity2.getEngine().getFlags())) {
             return false;

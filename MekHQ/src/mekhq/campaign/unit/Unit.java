@@ -3516,7 +3516,7 @@ public class Unit implements ITechnology, ILocatable {
         int engineRating = 0;
         int builtInHeatSinks = 0;
         if (!(entity instanceof FighterSquadron) && (null != entity.getEngine())) {
-            engineRating = entity.getEngine().getRating();
+            engineRating = (int) entity.getEngine().getRating(entity);
             if (entity.getEngine().isFusion()) {
                 // 10 weight-free heats inks for fusion engines.
                 // Used for fighters to prevent adding extra parts
