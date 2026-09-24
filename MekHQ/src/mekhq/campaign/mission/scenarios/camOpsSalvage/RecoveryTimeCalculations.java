@@ -62,12 +62,12 @@ import mekhq.campaign.universe.Planet;
 public class RecoveryTimeCalculations {
     private static final MMLogger LOGGER = MMLogger.create(RecoveryTimeCalculations.class);
 
-    // Planetary condition multipliers. CamOps pg193 & pg 209
+    // Planetary condition multipliers. CamOps 5th printing pg 193 & pg 209
     // Heavy Snow, Ice Storm, Lightning Storm, Strong Gale, Torrential Downpour
     private final static double TERRIBLE_WEATHER = 0.25;
     private final static double ZERO_G = 0.5;
     private final static double LOW_G = 0.25; // <0.8G
-    private final static double HIGH_G = 0.5; // >1.25G
+    private final static double HIGH_G = 0.5; // >1.2G
     private final static double VERY_HIGH_G = 1.0; // >=2.0G
     private final static double VACUUM_OR_TAINTED_ATMOSPHERE = 0.5;
     private final static double TRACE_OR_VERY_HIGH_PRESSURE_ATMOSPHERE = 0.25;
@@ -83,7 +83,8 @@ public class RecoveryTimeCalculations {
      * Calculates the total recovery time for an entity based on environmental conditions.
      *
      * <p>This method evaluates all environmental factors present in the scenario and applies appropriate multipliers
-     * to the base recovery time. The calculation follows Campaign Operations rules (pg 214, pg 209), considering:</p>
+     * to the base recovery time. The calculation follows Campaign Operations rules (5th printing pg 193, pg 209),
+     * considering:</p>
      * <ul>
      *   <li>Weather conditions (storms, precipitation)</li>
      *   <li>Wind conditions (tornadoes, hurricanes)</li>
@@ -96,11 +97,16 @@ public class RecoveryTimeCalculations {
      * <p>Each environmental factor contributes an additive multiplier to the base multiplier of 1.0. The final
      * recovery time is calculated as: {@code baseRecoveryTime × totalMultiplier}.</p>
      *
+     * <p>In space, planetary conditions don't apply. Salvage in space is always subject to the zero-G and vacuum
+     * multipliers, except for aerospace units: the environmental multipliers don't apply to airborne aerospace units
+     * in space, so their recovery time is unmodified.</p>
+     *
      * <p>If the calculated recovery time exceeds {@link Integer#MAX_VALUE}, the method logs a warning and returns
      * {@code Integer.MAX_VALUE}.</p>
      *
      * @param entityName       The name of the entity, used for logging purposes.
      * @param baseRecoveryTime The base recovery time in minutes before environmental modifiers are applied.
+     * @param isAerospaceUnit  {@code true} if the entity being salvaged is an aerospace unit.
      * @param scenario         The {@link Scenario} containing the environmental conditions.
      * @param currentPlanet    The {@link Planet} where the scenario takes place, used to determine atmospheric
      *                         properties.
@@ -109,10 +115,15 @@ public class RecoveryTimeCalculations {
      *       minutes.
      */
     public static RecoveryTimeData calculateRecoveryTimeForEntity(String entityName, int baseRecoveryTime,
-          Scenario scenario, @Nullable Planet currentPlanet) {
+          boolean isAerospaceUnit, Scenario scenario, @Nullable Planet currentPlanet) {
         boolean isInSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
 
-        if (isInSpace) {
+        if (isInSpace && isAerospaceUnit) {
+            // Environmental multipliers don't apply to airborne aerospace units in space
+            int totalRecoveryTime = getTotalRecoveryTime(entityName, baseRecoveryTime, BASE_MULTIPLIER);
+            return new RecoveryTimeData(DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER,
+                  DEFAULT_MULTIPLIER, DEFAULT_MULTIPLIER, baseRecoveryTime, totalRecoveryTime);
+        } else if (isInSpace) {
             // Space is always zero-G and vacuum; no other environmental conditions apply
             double totalMultiplier = BASE_MULTIPLIER + ZERO_G + VACUUM_OR_TAINTED_ATMOSPHERE;
             int totalRecoveryTime = getTotalRecoveryTime(entityName, baseRecoveryTime, totalMultiplier);
@@ -202,13 +213,13 @@ public class RecoveryTimeCalculations {
      *
      * <p>Atmospheric conditions that require special equipment or pose hazards increase recovery time:</p>
      * <ul>
-     *   <li><b>Vacuum or Tainted Atmosphere:</b> +0.5 multiplier</li>
+     *   <li><b>Vacuum, Tainted, or Toxic Atmosphere:</b> +0.5 multiplier</li>
      *   <li><b>Trace or Very High Pressure:</b> +0.25 multiplier</li>
      *   <li><b>Standard Atmosphere:</b> No multiplier</li>
      * </ul>
      *
-     * <p>If the planetary atmosphere is tainted, the tainted atmosphere multiplier is applied regardless of the
-     * scenario's atmospheric setting.</p>
+     * <p>If the planetary atmosphere is tainted or toxic, the tainted atmosphere multiplier is applied regardless of
+     * the scenario's atmospheric setting.</p>
      *
      * @param scenarioAtmosphere  The {@link Atmosphere} condition in the scenario, or {@code null} if not specified.
      * @param planetaryAtmosphere The planet's {@link AtmosphericTaint}, used to check for tainted conditions.
@@ -230,7 +241,7 @@ public class RecoveryTimeCalculations {
             };
         }
 
-        if (planetaryAtmosphere != null && planetaryAtmosphere.isTainted()) {
+        if (planetaryAtmosphere != null && planetaryAtmosphere.isTaintedOrToxic()) {
             return VACUUM_OR_TAINTED_ATMOSPHERE;
         }
 
@@ -244,9 +255,9 @@ public class RecoveryTimeCalculations {
      * <ul>
      *   <li><b>Zero-G (≤0.0G):</b> +0.5 multiplier</li>
      *   <li><b>Low-G (&lt;0.8G):</b> +0.25 multiplier</li>
-     *   <li><b>High-G (&gt;1.25G to &lt;2.0G):</b> +0.5 multiplier</li>
+     *   <li><b>High-G (&gt;1.2G to &lt;2.0G):</b> +0.5 multiplier</li>
      *   <li><b>Very High-G (≥2.0G):</b> +1.0 multiplier</li>
-     *   <li><b>Standard Gravity (0.8G to 1.25G):</b> No multiplier</li>
+     *   <li><b>Standard Gravity (0.8G to 1.2G):</b> No multiplier</li>
      * </ul>
      *
      * @param gravity The gravity level as a multiple of standard gravity (1.0G = Earth normal).
@@ -263,7 +274,7 @@ public class RecoveryTimeCalculations {
             return LOW_G;
         } else if (gravity >= 2.0f) {
             return VERY_HIGH_G;
-        } else if (gravity > 1.25) {
+        } else if (gravity > 1.2f) {
             return HIGH_G;
         }
         return DEFAULT_MULTIPLIER;
@@ -298,7 +309,7 @@ public class RecoveryTimeCalculations {
      * <p>Severe wind conditions impair recovery operations:</p>
      * <ul>
      *   <li><b>Strong Gale:</b> +0.25 multiplier</li>
-     *   <li><b>Storm (hurricane) or Tornadoes (F1-F3 or F4):</b> +0.5 multiplier</li>
+     *   <li><b>Tornadoes (F1-F3 or F4):</b> +0.5 multiplier</li>
      *   <li><b>Other wind conditions:</b> No multiplier</li>
      * </ul>
      *
@@ -316,7 +327,7 @@ public class RecoveryTimeCalculations {
 
         return switch (wind) {
             case STRONG_GALE -> TERRIBLE_WEATHER;
-            case STORM, TORNADO_F1_TO_F3, TORNADO_F4 -> HURRICANE_OR_TORNADO;
+            case TORNADO_F1_TO_F3, TORNADO_F4 -> HURRICANE_OR_TORNADO;
             default -> DEFAULT_MULTIPLIER;
         };
     }
