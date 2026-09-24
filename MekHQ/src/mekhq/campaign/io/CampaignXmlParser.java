@@ -398,6 +398,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             performEdgeConversion(campaign, person);
         }
 
+        // <51.01 compatibility handler: the retired Natural Aptitude SPAs were converted as each person loaded; tell
+        // the player about any that couldn't be
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+            person.reportUnresolvedLegacyNaturalAptitudes(campaign);
+        }
+
         // <51.01 compatibility handler: technicians from before the granular Tech/... skills existed carry only their
         // global tech skill, so give them the supplementary specialist skills their profession now expects. Skipped when
         // the campaign uses only the global tech skills, where the granular skills would go unused.
