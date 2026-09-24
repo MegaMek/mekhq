@@ -345,8 +345,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private final JTable personnelTable;
     private final PersonnelTableModel personnelModel;
 
-    @Deprecated(since = "0.50.11", forRemoval = true)
     private static final String GUI_RESOURCE_BUNDLE = "mekhq.resources.GUI";
+    @Deprecated(since = "0.50.11", forRemoval = true)
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
     // endregion Variable Declarations
