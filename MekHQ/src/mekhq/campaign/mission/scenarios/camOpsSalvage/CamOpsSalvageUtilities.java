@@ -41,6 +41,7 @@ import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -432,7 +433,7 @@ public class CamOpsSalvageUtilities {
 
         List<Person> techs = getValidTechs(campaign, techUUIDs);
 
-        boolean didAccidentOccur = false;
+        StringBuilder accidentDetails = new StringBuilder();
         for (int i = 0; i < injuryEvents; i++) {
             if (techs.isEmpty()) {
                 break;
@@ -446,29 +447,69 @@ public class CamOpsSalvageUtilities {
                 }
             }
 
-            injuryVictim(campaign, victim, useInjuryFatigue, fatigueRate, isUseAdvancedMedical);
+            int newHits = injuryVictim(campaign, victim, useInjuryFatigue, fatigueRate, isUseAdvancedMedical);
 
-            testForDeath(campaign, victim, techs);
+            boolean isKilled = testForDeath(campaign, victim, techs);
+            accidentDetails.append(getAccidentDetail(victim, newHits, isKilled));
 
             MekHQ.triggerEvent(new PersonChangedEvent(victim));
-            didAccidentOccur = true;
         }
 
-        if (didAccidentOccur) {
+        if (!accidentDetails.isEmpty()) {
             campaign.addReport(MEDICAL,
                   getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.accident",
-                        spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
+                        spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG) + accidentDetails);
         }
     }
 
-    private static void testForDeath(Campaign campaign, Person victim, List<Person> techs) {
+    /**
+     * Builds the report line describing what happened to a single accident victim.
+     *
+     * @param victim   the tech injured in the accident
+     * @param newHits  the number of hits the tech took in this accident
+     * @param isKilled {@code true} if the accident killed the tech
+     *
+     * @return a report line naming the tech (hyperlinked), the hits they took, and whether they died
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static String getAccidentDetail(Person victim, int newHits, boolean isKilled) {
+        if (isKilled) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.accident.killed",
+                  victim.getHyperlinkedFullTitle(), newHits, spanOpeningWithCustomColor(getNegativeColor()),
+                  CLOSING_SPAN_TAG);
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.accident.injured",
+              victim.getHyperlinkedName(), newHits);
+    }
+
+    /**
+     * Checks whether an accident victim's injuries have killed them, and if so, marks them as dead.
+     *
+     * @param campaign the current campaign
+     * @param victim   the tech injured in the accident
+     * @param techs    the techs still eligible to be injured; the victim is removed if they died
+     *
+     * @return {@code true} if the victim died
+     */
+    private static boolean testForDeath(Campaign campaign, Person victim, List<Person> techs) {
         if (victim.getTotalInjurySeverity() >= DEATH) {
             victim.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACCIDENTAL);
             techs.remove(victim); // We're nice enough that we only kill each tech once
+            return true;
         }
+
+        return false;
     }
 
-    private static void injuryVictim(Campaign campaign, Person victim, boolean useInjuryFatigue, int fatigueRate,
+    /**
+     * Injures an accident victim, applying 1d6 hits adjusted for their SPAs.
+     *
+     * @return the number of hits the victim took
+     */
+    private static int injuryVictim(Campaign campaign, Person victim, boolean useInjuryFatigue, int fatigueRate,
           boolean isUseAdvancedMedical) {
         int newHits = d6(1);
         newHits = InjurySPAUtility.adjustInjuriesAndFatigueForSPAs(victim, useInjuryFatigue, fatigueRate, newHits);
@@ -479,6 +520,8 @@ public class CamOpsSalvageUtilities {
             int priorHits = victim.getHits();
             victim.setHits(priorHits + newHits);
         }
+
+        return newHits;
     }
 
     private static boolean performEdgeReroll(Campaign campaign, Person victim) {
