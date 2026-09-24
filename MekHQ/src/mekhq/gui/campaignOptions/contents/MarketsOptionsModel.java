@@ -62,6 +62,7 @@ class MarketsOptionsModel {
     boolean useTwoWayPay;
     boolean useCamOpsSalvage;
     boolean useRiskySalvage;
+    boolean keepEnemyCamouflageOnSalvage;
     boolean enableSalvageFlagByDefault;
     boolean useDynamicDifficulty;
     boolean useBolsterContractSkill;
@@ -114,6 +115,7 @@ class MarketsOptionsModel {
         useTwoWayPay = options.get(CampaignOption.IS_USE_TWO_WAY_PAY);
         useCamOpsSalvage = options.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE);
         useRiskySalvage = options.get(CampaignOption.IS_USE_RISKY_SALVAGE);
+        keepEnemyCamouflageOnSalvage = options.get(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE);
         enableSalvageFlagByDefault = options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT);
         useDynamicDifficulty = options.get(CampaignOption.USE_DYNAMIC_DIFFICULTY);
         useBolsterContractSkill = options.get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL);
@@ -181,6 +183,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.IS_USE_TWO_WAY_PAY, useTwoWayPay);
         options.set(CampaignOption.IS_USE_CAM_OPS_SALVAGE, useCamOpsSalvage);
         options.set(CampaignOption.IS_USE_RISKY_SALVAGE, useRiskySalvage);
+        options.set(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE, keepEnemyCamouflageOnSalvage);
         options.set(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT, enableSalvageFlagByDefault);
         options.set(CampaignOption.USE_DYNAMIC_DIFFICULTY, useDynamicDifficulty);
         options.set(CampaignOption.USE_BOLSTER_CONTRACT_SKILL, useBolsterContractSkill);

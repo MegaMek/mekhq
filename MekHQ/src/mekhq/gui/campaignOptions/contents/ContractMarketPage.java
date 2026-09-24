@@ -105,6 +105,7 @@ class ContractMarketPage {
     private JCheckBox chkUseTwoWayPay;
     private JCheckBox chkUseCamOpsSalvage;
     private JCheckBox chkUseRiskySalvage;
+    private JCheckBox chkKeepEnemyCamouflageOnSalvage;
     private JCheckBox chkEnableSalvageFlagByDefault;
     private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkUseBolsterContractSkill;
@@ -239,6 +240,10 @@ class ContractMarketPage {
               getMetadata(MILESTONE_BEFORE_METADATA, CUSTOM_SYSTEM));
         chkUseRiskySalvage.addMouseListener(createTipPanelUpdater("UseRiskySalvage"));
 
+        chkKeepEnemyCamouflageOnSalvage = new CampaignOptionsCheckBox("KeepEnemyCamouflageOnSalvage",
+              getMetadata(new Version(0, 51, 1)));
+        chkKeepEnemyCamouflageOnSalvage.addMouseListener(createTipPanelUpdater("KeepEnemyCamouflageOnSalvage"));
+
         chkEnableSalvageFlagByDefault = new CampaignOptionsCheckBox("EnableSalvageFlagByDefault",
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkEnableSalvageFlagByDefault.addMouseListener(createTipPanelUpdater("EnableSalvageFlagByDefault"));
@@ -322,6 +327,7 @@ class ContractMarketPage {
               chkUseTwoWayPay,
               chkUseCamOpsSalvage,
               chkUseRiskySalvage,
+              chkKeepEnemyCamouflageOnSalvage,
               chkEnableSalvageFlagByDefault,
               chkUseDynamicDifficulty,
                 chkUseBolsterContractSkill,
@@ -650,6 +656,7 @@ class ContractMarketPage {
         chkUseTwoWayPay.setSelected(model.useTwoWayPay);
         chkUseCamOpsSalvage.setSelected(model.useCamOpsSalvage);
         chkUseRiskySalvage.setSelected(model.useRiskySalvage);
+        chkKeepEnemyCamouflageOnSalvage.setSelected(model.keepEnemyCamouflageOnSalvage);
         chkEnableSalvageFlagByDefault.setSelected(model.enableSalvageFlagByDefault);
         chkUseDynamicDifficulty.setSelected(model.useDynamicDifficulty);
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
@@ -706,6 +713,7 @@ class ContractMarketPage {
         model.useTwoWayPay = chkUseTwoWayPay.isSelected();
         model.useCamOpsSalvage = chkUseCamOpsSalvage.isSelected();
         model.useRiskySalvage = chkUseRiskySalvage.isSelected();
+        model.keepEnemyCamouflageOnSalvage = chkKeepEnemyCamouflageOnSalvage.isSelected();
         model.enableSalvageFlagByDefault = chkEnableSalvageFlagByDefault.isSelected();
         model.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();

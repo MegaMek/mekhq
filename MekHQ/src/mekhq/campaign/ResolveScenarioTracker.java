@@ -57,6 +57,7 @@ import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.event.PostGameResolution;
+import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.IEntityRemovalConditions;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MULParser;
@@ -275,9 +276,43 @@ public class ResolveScenarioTracker {
         }
     }
 
+    /**
+     * Returns the camouflage MekHQ assigned to an entity before the scenario started.
+     *
+     * <p>The entity is matched to its unit in the scenario's bot forces. That unit's own camouflage is used if it has
+     * one; otherwise the bot force's camouflage is used. Changes made in the MegaMek lobby are deliberately ignored. If
+     * the entity isn't part of a bot force, its in-game camouflage is used.</p>
+     *
+     * @param entity the entity to check
+     *
+     * @return the camouflage assigned before the scenario started
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private Camouflage getPreScenarioCamouflage(Entity entity) {
+        String externalId = entity.getExternalIdAsString();
+        if (!"-1".equals(externalId)) {
+            for (BotForce botForce : scenario.getBotForces()) {
+                for (Entity botEntity : botForce.getFullEntityList(campaign)) {
+                    if ((botEntity != null) && externalId.equals(botEntity.getExternalIdAsString())) {
+                        Camouflage unitCamouflage = botEntity.getCamouflage();
+                        Camouflage forceCamouflage = botForce.getCamouflage();
+                        if (unitCamouflage.hasDefaultCategory() && (forceCamouflage != null)) {
+                            return forceCamouflage;
+                        }
+                        return unitCamouflage;
+                    }
+                }
+            }
+        }
+
+        return entity.getCamouflage();
+    }
+
     private TestUnit generateNewTestUnit(Entity e) {
         TestUnit nu = new TestUnit(e, campaign, true);
-        nu.getEntity().setCamouflage(e.getCamouflage().clone());
+        nu.getEntity().setCamouflage(getPreScenarioCamouflage(e).clone());
         /* AtB uses id to track status of allied units */
         if (e.getExternalIdAsString().equals("-1")) {
             UUID id = UUID.randomUUID();

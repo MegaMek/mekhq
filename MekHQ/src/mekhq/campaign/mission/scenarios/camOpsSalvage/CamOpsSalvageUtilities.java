@@ -58,6 +58,7 @@ import megamek.common.bays.ASFBay;
 import megamek.common.bays.Bay;
 import megamek.common.bays.SmallCraftBay;
 import megamek.common.equipment.Mounted;
+import megamek.common.icons.Camouflage;
 import megamek.common.units.Aero;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
@@ -295,9 +296,14 @@ public class CamOpsSalvageUtilities {
     public static void resolveSalvage(Campaign campaign, AbstractContract mission, Scenario scenario,
           List<TestUnit> keptSalvage, List<TestUnit> soldSalvage, List<TestUnit> employerSalvage) {
         int deliveryTime = getDeploymentTime(scenario.getId(), mission);
+        boolean isKeepEnemyCamouflage = campaign.getCampaignOptions()
+                                              .get(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE);
 
         // now let's take care of salvage
         for (TestUnit salvageUnit : keptSalvage) {
+            // Adding the unit to the campaign resets its camouflage to our own, so grab it first
+            Camouflage fieldedCamouflage = salvageUnit.getEntity().getCamouflage().clone();
+
             ResolveScenarioTracker.UnitStatus salvageStatus = new ResolveScenarioTracker.UnitStatus(salvageUnit);
             if (salvageUnit.getEntity() instanceof Aero) {
                 ((Aero) salvageUnit.getEntity()).setFuelTonnage(((Aero) salvageStatus.getBaseEntity()).getFuelTonnage());
@@ -305,6 +311,9 @@ public class CamOpsSalvageUtilities {
 
             campaign.clearGameData(salvageUnit.getEntity());
             campaign.addTestUnit(salvageUnit, deliveryTime);
+            if (isKeepEnemyCamouflage && !fieldedCamouflage.hasDefaultCategory()) {
+                salvageUnit.getEntity().setCamouflage(fieldedCamouflage);
+            }
             salvageUnit.setSite(ContractRepairLocation.getRepairLocation(mission.getObjectiveType()));
 
             // if this is a contract, add to the salvaged value

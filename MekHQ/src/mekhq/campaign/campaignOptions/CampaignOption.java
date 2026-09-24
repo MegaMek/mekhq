@@ -949,6 +949,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "isUseCamOpsSalvage");
     public static final CampaignOption<Boolean> IS_USE_RISKY_SALVAGE =
           of(Boolean.class, false, "isUseRiskySalvage");
+    public static final CampaignOption<Boolean> IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE =
+          of(Boolean.class, false, "isKeepEnemyCamouflageOnSalvage");
     public static final CampaignOption<Boolean> IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT =
           of(Boolean.class, true, "isEnableSalvageFlagByDefault");
     public static final CampaignOption<Boolean> HAD_AT_B_ENABLED_MARKER =
