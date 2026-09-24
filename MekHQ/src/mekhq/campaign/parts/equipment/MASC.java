@@ -76,7 +76,7 @@ public class MASC extends EquipmentPart {
     public void setUnit(Unit u) {
         super.setUnit(u);
         if (null != unit && null != unit.getEntity().getEngine()) {
-            engineRating = (int) unit.getEntity().getEngine().getRating(unit.getEntity());
+            engineRating = (int) Math.floor(unit.getEntity().getEngine().getRating(unit.getEntity()));
         }
     }
 
