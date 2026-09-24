@@ -41,7 +41,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -51,7 +50,6 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.table.AbstractTableModel;
 
 import megamek.common.equipment.EquipmentType;
-import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -82,19 +80,20 @@ public class ToolKitSection implements KitIssueSection {
     private final transient Campaign campaign;
     private final transient List<Person> technicians;
     private final KitSlot slot;
+    private final transient KitPricing pricing;
     private final transient Runnable onChange;
 
     /** The single active selection: {@code null} = no change, {@link #STRIP} = strip, else a kit internal name. */
     private String selected;
     private final transient List<KitCard> cards = new ArrayList<>();
     private transient RosterModel rosterModel;
-    /** Kit stock tallied once across the technicians' warehouses; see {@link #stockFor(EquipmentType)}. */
-    private transient Map<EquipmentType, Integer> stockCache;
 
-    public ToolKitSection(Campaign campaign, List<Person> technicians, KitSlot slot, Runnable onChange) {
+    public ToolKitSection(Campaign campaign, List<Person> technicians, KitSlot slot, KitPricing pricing,
+          Runnable onChange) {
         this.campaign = campaign;
         this.technicians = technicians;
         this.slot = slot;
+        this.pricing = pricing;
         this.onChange = onChange;
     }
 
@@ -153,9 +152,9 @@ public class ToolKitSection implements KitIssueSection {
         if (effect != null) {
             detail.add(effect);
         }
-        detail.add(acquisitionText(kit));
+        detail.add(pricing.acquisitionText(kit));
         int stock = stockFor(kit);
-        String priceText = EquipmentKitIssuer.unitPrice(kit, campaign).toAmountString()
+        String priceText = pricing.price(kit).toAmountString()
                                  + " " + getTextAt(RESOURCE_BUNDLE, "card.each");
         return new KitCard(ACCENT, kit.getName(), false, detail, List.of(),
               getFormattedTextAt(RESOURCE_BUNDLE, "card.stock", stock), stock < technicians.size(), priceText,
@@ -192,7 +191,7 @@ public class ToolKitSection implements KitIssueSection {
         int need = countLacking(kit);
         int drawn = Math.min(stockFor(kit), need);
         int ordered = need - drawn;
-        Money cost = EquipmentKitIssuer.unitPrice(kit, campaign).multipliedBy(ordered);
+        Money cost = pricing.price(kit).multipliedBy(ordered);
         return new Tally(drawn, ordered, cost);
     }
 
@@ -267,18 +266,6 @@ public class ToolKitSection implements KitIssueSection {
         return isResourceKeyValid(text) ? text : null;
     }
 
-    /** How hard a Regular acquirer would find this kit, rendered for the card (mirrors the armor-kit cards). */
-    private String acquisitionText(EquipmentType kit) {
-        TargetRoll target = EquipmentKitIssuer.acquisitionTarget(kit, campaign);
-        if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
-            return getTextAt(RESOURCE_BUNDLE, "card.acquire.automatic");
-        }
-        if (target.cannotSucceed()) {
-            return getTextAt(RESOURCE_BUNDLE, "card.acquire.unavailable");
-        }
-        return getFormattedTextAt(RESOURCE_BUNDLE, "card.acquire.tn", target.getValue());
-    }
-
     /** Selected technicians who do not yet own the given kit. */
     private int countLacking(EquipmentType kit) {
         int count = 0;
@@ -290,15 +277,9 @@ public class ToolKitSection implements KitIssueSection {
         return count;
     }
 
-    /**
-     * Kit stock across the technicians' distinct local warehouses. Tallied once (a single spare-parts pass) and cached
-     * for the dialog's lifetime, so building all the cards does not rescan each warehouse per kit.
-     */
+    /** Kit stock across the technicians' distinct stores, tallied once and shared with the other tab. */
     private int stockFor(EquipmentType kit) {
-        if (stockCache == null) {
-            stockCache = EquipmentKitIssuer.localStock(technicians, campaign);
-        }
-        return stockCache.getOrDefault(kit, 0);
+        return pricing.stockFor(technicians).getOrDefault(kit, 0);
     }
 
     private static final class RosterModel extends AbstractTableModel {

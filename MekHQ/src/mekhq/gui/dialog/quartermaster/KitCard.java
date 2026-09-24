@@ -51,6 +51,9 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.LookAndFeel;
+import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 
@@ -75,6 +78,12 @@ class KitCard extends JPanel {
     private final JPanel body;
     private final JLabel nameLabel;
     private final Color defaultForeground;
+    /** The selection state last drawn, so a refresh only restyles a card whose state actually changed. */
+    private Boolean drawnSelected;
+
+    /** The muted text color, derived once per look and feel rather than on every call. */
+    private static Color mutedColor;
+    private static LookAndFeel mutedColorLookAndFeel;
 
     /**
      * @param accent    the card's accent color (band, selection highlight, accented badges)
@@ -107,10 +116,10 @@ class KitCard extends JPanel {
         band.setPreferredSize(scaleForGUI(1, 6));
         add(band, BorderLayout.NORTH);
 
-        nameLabel = new JLabel(wordWrap(title, 26));
-        nameLabel.setFont(nameLabel.getFont().deriveFont(Font.BOLD));
-        nameLabel.setAlignmentX(LEFT_ALIGNMENT);
-        this.defaultForeground = nameLabel.getForeground();
+        JLabel probe = new JLabel();
+        this.defaultForeground = probe.getForeground();
+        Font baseFont = probe.getFont();
+        nameLabel = label(title, 26, baseFont.deriveFont(Font.BOLD), defaultForeground);
 
         body = new JPanel();
         body.setLayout(new BoxLayout(body, BoxLayout.Y_AXIS));
@@ -119,13 +128,10 @@ class KitCard extends JPanel {
               scaleForGUI(10)));
         body.add(nameLabel);
 
+        Font detailFont = baseFont.deriveFont(baseFont.getSize2D() - 1f);
         for (String line : detail) {
             body.add(Box.createVerticalStrut(scaleForGUI(3)));
-            JLabel label = new JLabel(wordWrap(line, 34));
-            label.setForeground(mutedColor());
-            label.setFont(label.getFont().deriveFont(label.getFont().getSize2D() - 1f));
-            label.setAlignmentX(LEFT_ALIGNMENT);
-            body.add(label);
+            body.add(label(line, 34, detailFont, mutedColor()));
         }
 
         if ((badges != null) && !badges.isEmpty()) {
@@ -162,15 +168,42 @@ class KitCard extends JPanel {
         refreshSelected();
         addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                onClick.run();
+            public void mouseReleased(MouseEvent e) {
+                // Released, not clicked: a click is lost if the pointer drifts at all between press and release.
+                // Releasing outside the card cancels, as a button would.
+                if (SwingUtilities.isLeftMouseButton(e) && contains(e.getPoint())) {
+                    onClick.run();
+                }
             }
         });
     }
 
-    /** Re-reads the selection state and repaints the highlight; call after the selection changes. */
+    /**
+     * A label with its font and color applied before its text, so an HTML label is parsed once rather than again on
+     * each style change. HTML is only used when the text actually needs wrapping; short text stays plain, which is far
+     * cheaper to build and to restyle.
+     */
+    private static JLabel label(String text, int wrapAt, Font font, Color color) {
+        JLabel label = new JLabel();
+        label.setFont(font);
+        label.setForeground(color);
+        label.setAlignmentX(LEFT_ALIGNMENT);
+        boolean needsWrap = (text.length() > wrapAt) || text.contains("<br>");
+        label.setText(needsWrap ? wordWrap(text, wrapAt) : text);
+        return label;
+    }
+
+    /**
+     * Re-reads the selection state and repaints the highlight; call after the selection changes. A card whose state
+     * is unchanged is left alone, so a click restyles only the cards it selected or deselected.
+     */
     void refreshSelected() {
-        if (selected.getAsBoolean()) {
+        boolean isSelected = selected.getAsBoolean();
+        if (Boolean.valueOf(isSelected).equals(drawnSelected)) {
+            return;
+        }
+        drawnSelected = isSelected;
+        if (isSelected) {
             Color tint = blend(accent, baseBackground, 0.72f);
             setBackground(tint);
             body.setOpaque(true);
@@ -214,7 +247,12 @@ class KitCard extends JPanel {
 
     /** A foreground/background blend used for the muted detail text and the selected tint. */
     static Color mutedColor() {
-        return blend(new JLabel().getForeground(), new JPanel().getBackground(), 0.45f);
+        LookAndFeel lookAndFeel = UIManager.getLookAndFeel();
+        if ((mutedColor == null) || (mutedColorLookAndFeel != lookAndFeel)) {
+            mutedColor = blend(new JLabel().getForeground(), new JPanel().getBackground(), 0.45f);
+            mutedColorLookAndFeel = lookAndFeel;
+        }
+        return mutedColor;
     }
 
     static Color blend(Color a, Color b, float t) {

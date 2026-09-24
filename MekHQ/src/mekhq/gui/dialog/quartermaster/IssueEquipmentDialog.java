@@ -41,7 +41,15 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.EnumMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import javax.swing.*;
 import javax.swing.table.AbstractTableModel;
 
@@ -50,12 +58,10 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.enums.MiscTypeFlag;
-import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.finances.Money;
@@ -96,9 +102,10 @@ public class IssueEquipmentDialog extends JDialog {
     private final transient Set<Category> restoreDesigned = new HashSet<>();
     /** The cards drawn for each group, so a click can re-mark the selected one. */
     private final transient Map<Category, List<KitCard>> cardsByCategory = new EnumMap<>(Category.class);
-    /** Per-kit unit price and acquisition-difficulty text, cached so building many cards prices each kit once. */
-    private final transient Map<EquipmentType, Money> priceCache = new HashMap<>();
-    private final transient Map<EquipmentType, String> acquireTextCache = new HashMap<>();
+    /** Per-kit unit price and acquisition-difficulty text, computed once and shared with the equipment-kit tabs. */
+    private final transient KitPricing pricing;
+    /** Each group's kit stock, tallied once when its tab is built, so a click's footer tally does not rescan stores. */
+    private final transient Map<Category, Map<EquipmentType, Integer>> stockByCategory = new EnumMap<>(Category.class);
 
     private transient RosterModel rosterModel;
     private transient JLabel tallyLabel;
@@ -161,6 +168,7 @@ public class IssueEquipmentDialog extends JDialog {
         this.campaign = campaign;
         this.personnel = armorPersonnel;
         this.toolTechnicians = toolTechnicians;
+        this.pricing = new KitPricing(campaign);
 
         for (Person person : armorPersonnel) {
             byCategory.computeIfAbsent(ArmorKitCatalog.categoryFor(person), key -> new ArrayList<>()).add(person);
@@ -170,8 +178,9 @@ public class IssueEquipmentDialog extends JDialog {
             sections.add(armorSection());
         }
         if (!toolTechnicians.isEmpty()) {
-            sections.add(new ToolKitSection(campaign, toolTechnicians, KitSlot.PRIMARY, this::recalculate));
-            sections.add(new ToolKitSection(campaign, toolTechnicians, KitSlot.SECONDARY, this::recalculate));
+            sections.add(new ToolKitSection(campaign, toolTechnicians, KitSlot.PRIMARY, pricing, this::recalculate));
+            sections.add(new ToolKitSection(campaign, toolTechnicians, KitSlot.SECONDARY, pricing,
+                  this::recalculate));
         }
 
         buildUI();
@@ -282,7 +291,7 @@ public class IssueEquipmentDialog extends JDialog {
         kits.sort(Comparator.comparing(this::price));
 
         // Tally this group's warehouse stock once, rather than rescanning per kit inside each card.
-        Map<EquipmentType, Integer> stock = ArmorKitIssuer.localStock(people, campaign);
+        Map<EquipmentType, Integer> stock = stockFor(category);
 
         List<KitCard> cards = new ArrayList<>();
         for (EquipmentType kit : kits) {
@@ -446,7 +455,7 @@ public class IssueEquipmentDialog extends JDialog {
             if (quantity == 0) {
                 continue;
             }
-            int stock = stockFor(entry.getValue(), kit);
+            int stock = stockFor(category).getOrDefault(kit, 0);
             int drawn = Math.min(stock, quantity);
             int ordered = quantity - drawn;
             fromStores += drawn;
@@ -616,17 +625,13 @@ public class IssueEquipmentDialog extends JDialog {
         return kit.getInternalName().equals(worn);
     }
 
-    /** Kits stock is per location, so sum across each distinct local warehouse the group draws from. */
-    private int stockFor(List<Person> people, EquipmentType kit) {
-        Set<LocalWarehouse> counted = new HashSet<>();
-        int total = 0;
-        for (Person person : people) {
-            LocalWarehouse warehouse = ArmorKitIssuer.warehouseFor(person, campaign);
-            if ((warehouse != null) && counted.add(warehouse)) {
-                total += ArmorKitIssuer.localStock(person, kit, campaign);
-            }
-        }
-        return total;
+    /**
+     * A group's kit stock across the distinct stores it draws from, tallied once (a single pass over each warehouse)
+     * and reused for the tab's cards and every later footer tally.
+     */
+    private Map<EquipmentType, Integer> stockFor(Category category) {
+        return stockByCategory.computeIfAbsent(category,
+              key -> ArmorKitIssuer.localStock(byCategory.getOrDefault(key, List.of()), campaign));
     }
     // endregion Actions & totals
 
@@ -643,25 +648,14 @@ public class IssueEquipmentDialog extends JDialog {
         return EquipmentType.get(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME);
     }
 
-    /** The unit price of a kit, cached so repeated card/sort lookups price each kit only once. */
+    /** The unit price of a kit (see {@link KitPricing}). */
     private Money price(EquipmentType kit) {
-        return priceCache.computeIfAbsent(kit, candidate -> ArmorKitIssuer.unitPrice(candidate, campaign));
+        return pricing.price(kit);
     }
 
-    /** How hard a Regular acquirer would find this kit, rendered for the card. Cached per kit (see {@link #price}). */
+    /** How hard a Regular acquirer would find this kit, rendered for the card (see {@link KitPricing}). */
     private String acquisitionText(EquipmentType kit) {
-        return acquireTextCache.computeIfAbsent(kit, this::computeAcquisitionText);
-    }
-
-    private String computeAcquisitionText(EquipmentType kit) {
-        TargetRoll target = ArmorKitIssuer.acquisitionTarget(kit, campaign);
-        if (target.getValue() == TargetRoll.AUTOMATIC_SUCCESS) {
-            return getTextAt(RESOURCE_BUNDLE, "card.acquire.automatic");
-        }
-        if (target.cannotSucceed()) {
-            return getTextAt(RESOURCE_BUNDLE, "card.acquire.unavailable");
-        }
-        return getFormattedTextAt(RESOURCE_BUNDLE, "card.acquire.tn", target.getValue());
+        return pricing.acquisitionText(kit);
     }
 
     private static List<String> survivalBadges(EquipmentType kit) {

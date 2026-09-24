@@ -36,6 +36,7 @@ import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
 
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -73,26 +74,30 @@ public abstract class AbstractKitIssuer {
     /**
      * A single reference acquirer at Regular skill, shared by every kit issuer, so a displayed acquisition difficulty
      * is a fixed benchmark rather than a reading off the current staff. Only its acquisition skill matters to
-     * {@code checkAcquisition} (the campaign supplies every other modifier), and MekHQ only ever has one campaign, so
-     * it is built once and reused rather than reconstructed for every card — a {@link Person} is expensive to build and
-     * a kit dialog builds dozens of cards on the EDT. The acquirer holds no reference back to the campaign.
+     * {@code checkAcquisition} (the campaign supplies every other modifier). A {@link Person} is expensive to build and
+     * a kit dialog builds dozens of cards on the EDT, so it is reused — but rebuilt whenever a different campaign is
+     * loaded, since its skill levels are read from that campaign's skill table.
      */
     private static Person regularAcquirer;
 
+    /** The campaign the acquirer was built for, held weakly so a closed campaign can still be collected. */
+    private static WeakReference<Campaign> regularAcquirerCampaign = new WeakReference<>(null);
+
     /**
-     * The shared Regular-skill reference acquirer, built lazily on first use and reused thereafter.
+     * The shared Regular-skill reference acquirer, built lazily and rebuilt when the campaign changes.
      *
-     * @param campaign the campaign the acquirer is (once) constructed against
+     * @param campaign the campaign the acquirer is constructed against
      *
      * @return the shared reference acquirer
      */
-    protected static Person regularAcquirer(Campaign campaign) {
-        if (regularAcquirer == null) {
+    protected static synchronized Person regularAcquirer(Campaign campaign) {
+        if ((regularAcquirer == null) || (regularAcquirerCampaign.get() != campaign)) {
             Person acquirer = new Person(campaign);
             for (String skill : new String[] { S_NEGOTIATION, S_ADMIN, S_TECH_VEHICLE }) {
                 acquirer.addSkill(skill, SkillType.getType(skill).getRegularLevel(), 0);
             }
             regularAcquirer = acquirer;
+            regularAcquirerCampaign = new WeakReference<>(campaign);
         }
         return regularAcquirer;
     }

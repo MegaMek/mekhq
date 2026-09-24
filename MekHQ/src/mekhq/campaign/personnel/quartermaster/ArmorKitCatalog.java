@@ -93,7 +93,24 @@ public final class ArmorKitCatalog extends AbstractKitCatalog {
         MEKWARRIOR, AIRCRAFT, INFANTRY, SOLDIER
     }
 
+    /**
+     * Every armor kit MegaMek defines. Finding them walks the whole equipment table, and the set never changes once the
+     * equipment types are loaded, so it is found once and reused.
+     */
+    private static volatile List<EquipmentType> allArmorKits;
+
     private ArmorKitCatalog() {
+    }
+
+    private static List<EquipmentType> allArmorKits() {
+        List<EquipmentType> kits = allArmorKits;
+        if (kits == null) {
+            kits = List.copyOf(CrewArmorKitRules.availableArmorKits());
+            if (!kits.isEmpty()) { // an empty result means the equipment types are not loaded yet; try again later
+                allArmorKits = kits;
+            }
+        }
+        return kits;
     }
 
     /**
@@ -205,7 +222,7 @@ public final class ArmorKitCatalog extends AbstractKitCatalog {
 
     public static List<EquipmentType> availableKits(Category category) {
         List<EquipmentType> result = new ArrayList<>();
-        for (EquipmentType kit : CrewArmorKitRules.availableArmorKits()) {
+        for (EquipmentType kit : allArmorKits()) {
             String internalName = kit.getInternalName();
             if (DEFAULT_ARMOR_KIT_NAME.equals(internalName)) {
                 continue;
