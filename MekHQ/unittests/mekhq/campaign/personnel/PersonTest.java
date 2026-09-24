@@ -2462,8 +2462,10 @@ public class PersonTest {
         void failsWithoutConsumingEdgeWhenPermanentInjuriesAreLethal() {
             Person person = new Person("GivenName", "Surname", null, "MERC");
             person.setAttributeScore(SkillAttribute.EDGE, 3);
-            person.addInjury(newConcussion(3, true));
-            person.addInjury(newConcussion(3, true));
+            // Concussions cap at 2 hits, so three are needed to reach the lethal threshold
+            person.addInjury(newConcussion(2, true));
+            person.addInjury(newConcussion(2, true));
+            person.addInjury(newConcussion(2, true));
 
             Campaign campaign = mockCampaignWith(mockTwistOfFateOptions(true));
 
