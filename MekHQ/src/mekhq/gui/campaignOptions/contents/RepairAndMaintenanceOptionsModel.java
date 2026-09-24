@@ -35,6 +35,7 @@ package mekhq.gui.campaignOptions.contents;
 import jakarta.annotation.Nonnull;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.enums.LithiumFusionBatteryMode;
 
 class RepairAndMaintenanceOptionsModel {
     boolean techsUseAdministration;
@@ -62,6 +63,7 @@ class RepairAndMaintenanceOptionsModel {
     boolean useBalancedFabrication;
     boolean maintenanceFabrication;
     boolean useAmmoFabrication;
+    LithiumFusionBatteryMode lithiumFusionBatteryMode;
 
     RepairAndMaintenanceOptionsModel(@Nonnull CampaignOptions options) {
         techsUseAdministration = options.get(CampaignOption.TECHS_USE_ADMINISTRATION);
@@ -89,6 +91,7 @@ class RepairAndMaintenanceOptionsModel {
         useBalancedFabrication = options.get(CampaignOption.USE_BALANCED_FABRICATION);
         maintenanceFabrication = options.get(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY);
         useAmmoFabrication = options.get(CampaignOption.USE_AMMO_FABRICATION);
+        lithiumFusionBatteryMode = options.get(CampaignOption.LITHIUM_FUSION_BATTERY_MODE);
     }
 
     void applyTo(@Nonnull CampaignOptions options) {
@@ -117,5 +120,6 @@ class RepairAndMaintenanceOptionsModel {
         options.set(CampaignOption.USE_BALANCED_FABRICATION, useBalancedFabrication);
         options.set(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY, maintenanceFabrication);
         options.set(CampaignOption.USE_AMMO_FABRICATION, useAmmoFabrication);
+        options.set(CampaignOption.LITHIUM_FUSION_BATTERY_MODE, lithiumFusionBatteryMode);
     }
 }

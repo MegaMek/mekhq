@@ -37,6 +37,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
@@ -158,10 +159,40 @@ public class JumpPath {
      * @return the total recharge time for the route, expressed in days
      */
     public double getTotalRechargeTime(LocalDate when, boolean isUseCommandCircuit) {
+        return getTotalRechargeTime(when, isUseCommandCircuit, JumpDriveProfile.STANDARD);
+    }
+
+    /**
+     * Calculates the total recharge time, in days, required to complete a journey along the path, taking the fleet's
+     * {@link JumpDriveProfile} into account.
+     *
+     * <p>Each intermediate system's recharge time is scaled by the profile's recharge multiplier. Each stored jump
+     * charge (a charged Lithium-Fusion battery) lets the fleet jump on immediately from one intermediate system, so the
+     * recharge wait at the first {@link JumpDriveProfile#storedJumpCharges()} intermediate systems is skipped.</p>
+     *
+     * @param when                the date to use for determining recharge times at each system
+     * @param isUseCommandCircuit {@code true} if command circuits are being utilized during the journey
+     * @param jumpDriveProfile    the fleet's jump drive profile; {@code null} is treated as
+     *                            {@link JumpDriveProfile#STANDARD}
+     *
+     * @return the total recharge time for the route, expressed in days
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public double getTotalRechargeTime(LocalDate when, boolean isUseCommandCircuit,
+          @Nullable JumpDriveProfile jumpDriveProfile) {
+        JumpDriveProfile profile = Objects.requireNonNullElse(jumpDriveProfile, JumpDriveProfile.STANDARD);
         int rechargeTime = 0;
+        int remainingStoredJumpCharges = profile.storedJumpCharges();
         for (int index = 1; index < path.size() - 1; index++) {
+            if (remainingStoredJumpCharges > 0) {
+                remainingStoredJumpCharges--;
+                continue;
+            }
             PlanetarySystem system = path.get(index);
-            rechargeTime += (int) Math.ceil(system.getRechargeTime(when, isUseCommandCircuit));
+            double systemRechargeTime = system.getRechargeTime(when, isUseCommandCircuit);
+            rechargeTime += (int) Math.ceil(profile.adjustRechargeTime(systemRechargeTime));
         }
         return rechargeTime / 24.0;
     }
@@ -199,7 +230,29 @@ public class JumpPath {
      * @return the total time required for the journey, in days
      */
     public double getTotalTime(LocalDate when, double currentTransit, boolean isUseCommandCircuit) {
-        return getTotalRechargeTime(when, isUseCommandCircuit) + getStartTime(currentTransit) + getEndTime();
+        return getTotalTime(when, currentTransit, isUseCommandCircuit, JumpDriveProfile.STANDARD);
+    }
+
+    /**
+     * Calculates the total journey time for the path, including recharge, start, and end times, taking the fleet's
+     * {@link JumpDriveProfile} into account.
+     *
+     * @param when                the date to use for all time calculations in the journey
+     * @param currentTransit      the remaining fraction of the current transit
+     * @param isUseCommandCircuit {@code true} if command circuits are used for the journey
+     * @param jumpDriveProfile    the fleet's jump drive profile; {@code null} is treated as
+     *                            {@link JumpDriveProfile#STANDARD}
+     *
+     * @return the total time required for the journey, in days
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public double getTotalTime(LocalDate when, double currentTransit, boolean isUseCommandCircuit,
+          @Nullable JumpDriveProfile jumpDriveProfile) {
+        return getTotalRechargeTime(when, isUseCommandCircuit, jumpDriveProfile)
+                     + getStartTime(currentTransit)
+                     + getEndTime();
     }
 
     public void addSystem(PlanetarySystem s) {

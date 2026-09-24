@@ -41,21 +41,7 @@ import static mekhq.campaign.mission.contract.utilities.ContractAutomation.outOf
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel.abandonMissingPersonnel;
 
-import java.awt.AlphaComposite;
-import java.awt.BorderLayout;
-import java.awt.CardLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Composite;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
-import java.awt.Point;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -63,20 +49,7 @@ import java.awt.event.FocusEvent;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.ButtonGroup;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JSplitPane;
-import javax.swing.JToggleButton;
-import javax.swing.JViewport;
-import javax.swing.ScrollPaneConstants;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -86,6 +59,7 @@ import megamek.common.event.Subscribe;
 import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
+import mekhq.campaign.JumpDriveProfile;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.NavigationRouteAnalysis.PathAssessment;
 import mekhq.campaign.NavigationRouteAnalysis.Severity;
@@ -1057,7 +1031,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
                       currentLocation.getTransitTime())
                   : currentLocation.getTransitTime());
           int duration = (int) ceil(displayedPath.getTotalTime(getCampaign().getLocalDate(), currentTransit,
-              getCampaign().isUseCommandCircuit()));
+              getCampaign().isUseCommandCircuit(), getCampaign().getJumpDriveProfile()));
           String durationText = MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.duration.text") + "  " + duration + ' '
               + MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.days.text");
           String nextJumpText = createNextJumpText(displayedPath, currentLocation, unavailable, useCampaignProgress);
@@ -1106,9 +1080,14 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
               ? currentLocation.getCurrentSystem()
               : displayedPath.getFirstSystem();
           double elapsedRecharge = useCampaignProgress ? currentLocation.getRechargeTime() : 0.0;
-        double remainingRechargeHours = Math.max(0.0,
-              currentSystem.getRechargeTime(getCampaign().getLocalDate(), getCampaign().isUseCommandCircuit())
-                  - elapsedRecharge);
+          JumpDriveProfile jumpDriveProfile = getCampaign().getJumpDriveProfile();
+          double neededRechargeHours = jumpDriveProfile.adjustRechargeTime(
+              currentSystem.getRechargeTime(getCampaign().getLocalDate(), getCampaign().isUseCommandCircuit()));
+          // A charged Lithium-Fusion battery can power the next jump without waiting for the drive
+          if (useCampaignProgress && (jumpDriveProfile.storedJumpCharges() > 0)) {
+              neededRechargeHours = 0.0;
+          }
+        double remainingRechargeHours = Math.max(0.0, neededRechargeHours - elapsedRecharge);
         double remainingDays = Math.max(remainingTransitDays, remainingRechargeHours / 24.0);
         if (remainingDays <= 0.0) {
             return label + MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "routeStrip.nextJump.ready.text");
@@ -1416,7 +1395,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         boolean isUseCommandCircuits = getCampaign().isUseCommandCircuit();
         int duration = (int) ceil(jumpPath.getTotalTime(getCampaign().getLocalDate(),
               currentLocation.getTransitTime(),
-              isUseCommandCircuits));
+              isUseCommandCircuits,
+              getCampaign().getJumpDriveProfile()));
 
         TransportCostCalculations transportCostCalculations = getCampaign().getTransportCostCalculation(EXP_REGULAR);
         Money journeyCost = transportCostCalculations.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());

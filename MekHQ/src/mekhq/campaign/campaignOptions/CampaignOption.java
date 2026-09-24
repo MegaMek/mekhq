@@ -47,6 +47,7 @@ import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
+import mekhq.campaign.enums.LithiumFusionBatteryMode;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
@@ -116,6 +117,11 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Integer> CHASSIS_FAMILIARITY_SPEED =
           of(Integer.class, 2, "chassisFamiliaritySpeed");
     // endregion Chassis Familiarity
+
+    // region Interstellar Travel
+    public static final CampaignOption<LithiumFusionBatteryMode> LITHIUM_FUSION_BATTERY_MODE =
+          of(LithiumFusionBatteryMode.class, LithiumFusionBatteryMode.DISABLED, "lithiumFusionBatteryMode");
+    // endregion Interstellar Travel
 
     // region Migrated Options (generated storage-only migration)
     public static final CampaignOption<Boolean> REQUIRE_SUPPORT_FORCE_TRANSPORTATION =

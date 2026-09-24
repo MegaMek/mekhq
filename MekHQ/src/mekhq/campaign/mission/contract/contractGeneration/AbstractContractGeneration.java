@@ -530,7 +530,8 @@ public abstract class AbstractContractGeneration {
 
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(overridingCommandCircuitRequirements,
               isGM, factionStandings, employerFactionCode);
-        int journeyTimeInDays = (int) ceil(jumpPath.getTotalTime(currentDate, 0, isUseCommandCircuit));
+        int journeyTimeInDays = (int) ceil(jumpPath.getTotalTime(currentDate, 0, isUseCommandCircuit,
+              campaign.getJumpDriveProfile()));
         return currentDate.plusDays(journeyTimeInDays);
     }
 
