@@ -52,6 +52,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_ADMIN_APPRAISAL_FAIL;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
@@ -136,6 +137,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.enums.LithiumFusionBatteryMode;
 import mekhq.campaign.events.*;
 import mekhq.campaign.events.loans.LoanNewEvent;
 import mekhq.campaign.events.loans.LoanPaidEvent;
@@ -245,6 +247,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumsLibrary;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry;
+import mekhq.campaign.utilities.LithiumFusionBatteries;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
@@ -1167,15 +1170,110 @@ public class Campaign implements ITechManager {
     }
 
     public TransportCostCalculations getTransportCostCalculation(int crewExperienceLevel) {
-        // Units queued for travel elsewhere (e.g. left behind at a base via the jump-blocker prompt) still sit in
-        // the hangar until the queue is dispatched next day, but must not be billed as traveling with the campaign.
-        List<Unit> travelingUnits = getPlayerForce().getHangar().getUnits().stream()
-                                          .filter(unit -> !getCampaignLocationManager().isQueuedForTravel(unit))
-                                          .toList();
+        return getTransportCostCalculation(getTravelingUnits(), crewExperienceLevel);
+    }
+
+    private TransportCostCalculations getTransportCostCalculation(List<Unit> travelingUnits,
+          int crewExperienceLevel) {
         return new TransportCostCalculations(travelingUnits,
               LocalWarehouse.getSpareParts(getParts()),
               getPlayerForce().getHumanResources().getPersonnelFilteringOutDepartedAndAbsent(),
               crewExperienceLevel);
+    }
+
+    /**
+     * Returns the main force's units that travel with it when it jumps.
+     *
+     * <p>Units queued for travel elsewhere (e.g. left behind at a base via the jump-blocker prompt) still sit in the
+     * hangar until the queue is dispatched next day, but don't travel with the campaign.</p>
+     *
+     * @return the traveling units
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<Unit> getTravelingUnits() {
+        CampaignLocationManager campaignLocationManager = getCampaignLocationManager();
+        List<Unit> travelingUnits = new ArrayList<>();
+        for (Unit unit : getPlayerForce().getHangar().getUnits()) {
+            if (!campaignLocationManager.isQueuedForTravel(unit)) {
+                travelingUnits.add(unit);
+            }
+        }
+        return travelingUnits;
+    }
+
+    /**
+     * Returns the Lithium-Fusion battery mode that currently applies to the main force's travel.
+     *
+     * <p>This is the campaign option's mode when the traveling fleet qualifies for it (see
+     * {@link LithiumFusionBatteries#isFleetEligible}), otherwise {@link LithiumFusionBatteryMode#DISABLED}.</p>
+     *
+     * @return the effective Lithium-Fusion battery mode
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public LithiumFusionBatteryMode getEffectiveLithiumFusionBatteryMode() {
+        LithiumFusionBatteryMode mode = getCampaignOptions().get(CampaignOption.LITHIUM_FUSION_BATTERY_MODE);
+        if (!mode.isEnabled()) {
+            return LithiumFusionBatteryMode.DISABLED;
+        }
+
+        List<Unit> travelingUnits = getTravelingUnits();
+        TransportCostCalculations transportCalculations = getTransportCostCalculation(travelingUnits, EXP_REGULAR);
+        return LithiumFusionBatteries.isFleetEligible(travelingUnits, transportCalculations)
+                     ? mode
+                     : LithiumFusionBatteryMode.DISABLED;
+    }
+
+    /**
+     * Returns the Lithium-Fusion battery mode that applies to the given traveling location. Only the main force's own
+     * location can benefit from Lithium-Fusion batteries; every other location gets
+     * {@link LithiumFusionBatteryMode#DISABLED}.
+     *
+     * @param location the traveling location
+     *
+     * @return the effective Lithium-Fusion battery mode for that location
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public LithiumFusionBatteryMode getEffectiveLithiumFusionBatteryMode(@Nullable AbstractLocation location) {
+        if ((location == null) || (location != getPlayerForce().getForceDetachment().getCurrentLocation())) {
+            return LithiumFusionBatteryMode.DISABLED;
+        }
+        return getEffectiveLithiumFusionBatteryMode();
+    }
+
+    /**
+     * Returns the jump drive profile for the main force's current location.
+     *
+     * @return the main force's jump drive profile
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public JumpDriveProfile getJumpDriveProfile() {
+        return getJumpDriveProfile(getPlayerForce().getForceDetachment().getCurrentLocation());
+    }
+
+    /**
+     * Returns the jump drive profile that applies to the given location. Only the main force's own location can benefit
+     * from Lithium-Fusion batteries; every other traveling node uses {@link JumpDriveProfile#STANDARD}.
+     *
+     * @param location the traveling location
+     *
+     * @return the jump drive profile for that location
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public JumpDriveProfile getJumpDriveProfile(@Nullable AbstractLocation location) {
+        LithiumFusionBatteryMode mode = getEffectiveLithiumFusionBatteryMode(location);
+        boolean isBatteryCharged = (location instanceof CurrentLocation currentLocation)
+                                         && currentLocation.isLithiumFusionBatteryCharged();
+        return JumpDriveProfile.fromMode(mode, isBatteryCharged);
     }
 
     /**
