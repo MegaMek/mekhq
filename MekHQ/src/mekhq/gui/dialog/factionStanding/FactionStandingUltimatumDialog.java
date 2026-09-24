@@ -223,12 +223,13 @@ public class FactionStandingUltimatumDialog {
         new NewsDialog(campaign, newsText);
 
         boolean isTrackingFactionStanding = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
-        // A violent transition is treated as a defection
+        // A violent transition is treated as a defection, unless the campaign is staying loyal to its current faction
+        boolean isStayingWithCurrentFaction = chosenFaction.equals(campaign.getPlayerForce().getFaction());
         processGoingRogue(campaign,
               chosenFaction,
               commander,
               supporter,
-              isViolentTransition,
+              isViolentTransition && !isStayingWithCurrentFaction,
               true,
               isTrackingFactionStanding);
 

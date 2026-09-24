@@ -605,8 +605,9 @@ public class FactionStandings {
         factionRegard.put(factionCode, regardValue);
 
         if (includeReport) {
-            double change = regardValue - originalRegard;
+            // Both values must include climate, otherwise the delta can disagree in sign with the reported direction
             double newRegardAdjustedForClimate = getRegardForFaction(factionCode, true);
+            double change = newRegardAdjustedForClimate - originalRegard;
             return getRegardChangedReport(change, gameYear, factionCode, newRegardAdjustedForClimate, originalRegard);
         }
 

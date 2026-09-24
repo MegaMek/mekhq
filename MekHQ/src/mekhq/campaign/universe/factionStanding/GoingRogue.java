@@ -196,7 +196,8 @@ public class GoingRogue {
 
         processMassLoyaltyChange(campaign, true, true);
 
-        if (!isUltimatum) {
+        // Staying with the current faction isn't leaving it, so there is nothing to denounce
+        if (!isUltimatum && !currentFaction.equals(chosenFaction)) {
             new FactionJudgmentNewsArticle(campaign, commander, null, DEFECTION_NEWS_ARTICLE_LOOKUP, currentFaction,
                   FactionStandingJudgmentType.WELCOME, false, chosenFaction);
         }
