@@ -1,0 +1,163 @@
+package mekhq.gui.campaignOptions.optionChangeDialogs;
+
+import static java.lang.Integer.MAX_VALUE;
+import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getText;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getWarningColor;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
+
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import javax.swing.Box;
+import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
+import javax.swing.JDialog;
+import javax.swing.JEditorPane;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
+import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
+import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+
+/**
+ * Confirmation dialog shown when the "require aerospace pilot kit to deploy" option is newly enabled, offering to equip
+ * every player aerospace pilot with the Aerospace Fighter Pilot Kit so the fighters are not immediately grounded.
+ *
+ * @author Illiani
+ * @since 0.51.01
+ */
+public class AerospaceKitCampaignOptionsChangedConfirmationDialog extends JDialog {
+    private static final String RESOURCE_BUNDLE =
+          "mekhq.resources.AerospaceKitCampaignOptionsChangedConfirmationDialog";
+
+    private final int PADDING = scaleForGUI(10);
+    protected static final int IMAGE_WIDTH = scaleForGUI(200);
+    protected static final int CENTER_WIDTH = scaleForGUI(450);
+
+    private ImageIcon campaignIcon;
+    private final Campaign campaign;
+
+    public AerospaceKitCampaignOptionsChangedConfirmationDialog(Campaign campaign) {
+        this.campaignIcon = campaign.getCampaignFactionIcon();
+        this.campaign = campaign;
+
+        populateDialog();
+        initializeDialog();
+    }
+
+    void initializeDialog() {
+        setTitle(getText("accessingTerminal.title"));
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setResizable(false);
+        pack();
+        setLocationRelativeTo(null);
+        setModal(true);
+        setAlwaysOnTop(true);
+        setVisible(true);
+    }
+
+    void populateDialog() {
+        JPanel mainPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
+        constraints.fill = GridBagConstraints.BOTH;
+        constraints.weighty = 1;
+
+        int gridx = 0;
+
+        // Left box for campaign icon
+        JPanel pnlLeft = buildLeftPanel();
+        pnlLeft.setBorder(new EmptyBorder(PADDING, PADDING, PADDING, PADDING));
+        constraints.gridx = gridx;
+        constraints.gridy = 0;
+        constraints.weightx = 1;
+        mainPanel.add(pnlLeft, constraints);
+        gridx++;
+
+        // Center box for the message
+        JPanel pnlCenter = populateCenterPanel();
+        constraints.gridx = gridx;
+        constraints.gridy = 0;
+        constraints.weightx = 2;
+        constraints.weighty = 2;
+        mainPanel.add(pnlCenter, constraints);
+
+        add(mainPanel, BorderLayout.CENTER);
+    }
+
+    private JPanel buildLeftPanel() {
+        JPanel pnlCampaign = new JPanel();
+        pnlCampaign.setLayout(new BoxLayout(pnlCampaign, BoxLayout.Y_AXIS));
+        pnlCampaign.setAlignmentX(Component.CENTER_ALIGNMENT);
+        pnlCampaign.setMaximumSize(new Dimension(IMAGE_WIDTH, scaleForGUI(MAX_VALUE)));
+
+        campaignIcon = scaleImageIcon(campaignIcon, IMAGE_WIDTH, true);
+        JLabel imageLabel = new JLabel();
+        imageLabel.setIcon(campaignIcon);
+        imageLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        pnlCampaign.add(imageLabel);
+
+        return pnlCampaign;
+    }
+
+    private JPanel populateCenterPanel() {
+        JPanel pnlCenter = new JPanel();
+        pnlCenter.setLayout(new BoxLayout(pnlCenter, BoxLayout.Y_AXIS));
+
+        JEditorPane editorPane = new JEditorPane();
+        editorPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
+        editorPane.setContentType("text/html");
+        editorPane.setEditable(false);
+        editorPane.setFocusable(false);
+
+        String description = getFormattedTextAt(RESOURCE_BUNDLE,
+              "AerospaceKitCampaignOptionsChangedConfirmationDialog.description",
+              spanOpeningWithCustomColor(getWarningColor()),
+              CLOSING_SPAN_TAG);
+        String fontStyle = "font-family: Noto Sans;";
+        editorPane.setText(String.format("<div style='width: %s; %s'>%s</div>", CENTER_WIDTH, fontStyle, description));
+        setFontScaling(editorPane, false, 1.1);
+        pnlCenter.add(editorPane);
+
+        pnlCenter.add(Box.createVerticalStrut(PADDING));
+        pnlCenter.add(createButtonPanel());
+
+        return pnlCenter;
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel pnlButtons = new JPanel();
+        pnlButtons.setLayout(new BoxLayout(pnlButtons, BoxLayout.X_AXIS));
+        pnlButtons.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        RoundedJButton btnCancel = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "AerospaceKitCampaignOptionsChangedConfirmationDialog.cancel"));
+        btnCancel.addActionListener(evt -> dispose());
+
+        RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
+              "AerospaceKitCampaignOptionsChangedConfirmationDialog.confirm"));
+        btnConfirm.addActionListener(evt -> {
+            ArmorKitIssuer.equipAllAerospacePilotsWithKit(campaign);
+            dispose();
+        });
+
+        pnlButtons.add(btnCancel);
+        pnlButtons.add(Box.createRigidArea(new Dimension(PADDING, 0)));
+        pnlButtons.add(btnConfirm);
+
+        return pnlButtons;
+    }
+}
