@@ -1065,7 +1065,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean handleSalvageAssignments(Scenario scenario) {
-        if (!getCampaignOptions().get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
+        if (!getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage().isUseSalvageOperations()) {
             return false;
         }
 
@@ -1154,7 +1154,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean displaySalvageFormationPicker(Scenario scenario) {
-        if (!getCampaignOptions().get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
+        if (!getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage().isUseSalvageOperations()) {
             return true;
         }
 
@@ -1243,7 +1243,7 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean displaySalvageTechPicker(Scenario scenario) {
-        if (!getCampaignOptions().get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
+        if (!getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage().isUseSalvageOperations()) {
             return true;
         }
 

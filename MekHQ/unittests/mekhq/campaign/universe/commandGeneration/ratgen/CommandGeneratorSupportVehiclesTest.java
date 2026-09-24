@@ -40,6 +40,7 @@ import static org.mockito.Mockito.never;
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.commandGeneration.SupportCapability;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
@@ -64,7 +65,8 @@ class CommandGeneratorSupportVehiclesTest {
     private static Campaign campaignWith(boolean useSupportTeams, boolean useSalvage, boolean useMedical) {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         campaign.getCampaignOptions().set(CampaignOption.USE_SUPPORT_TEAMS, useSupportTeams);
-        campaign.getCampaignOptions().set(CampaignOption.IS_USE_CAM_OPS_SALVAGE, useSalvage);
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM,
+              useSalvage ? SalvageSystem.CAM_OPS_STRICT : SalvageSystem.LEGACY);
         campaign.getCampaignOptions().set(CampaignOption.USE_MASH_THEATRES, useMedical);
         return campaign;
     }

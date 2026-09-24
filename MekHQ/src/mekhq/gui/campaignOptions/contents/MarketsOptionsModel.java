@@ -44,6 +44,7 @@ import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsRevised;
 import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsStrict;
 import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketMekHQ;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 
 class MarketsOptionsModel {
     @Nullable PersonnelMarketStyle personnelMarketStyle;
@@ -60,7 +61,7 @@ class MarketsOptionsModel {
     int contractSearchRadius;
     boolean variableContractLength;
     boolean useTwoWayPay;
-    boolean useCamOpsSalvage;
+    SalvageSystem salvageSystem;
     boolean useRiskySalvage;
     boolean keepEnemyCamouflageOnSalvage;
     boolean enableSalvageFlagByDefault;
@@ -113,7 +114,7 @@ class MarketsOptionsModel {
         contractSearchRadius = options.get(CampaignOption.CONTRACT_SEARCH_RADIUS);
         variableContractLength = options.get(CampaignOption.VARIABLE_CONTRACT_LENGTH);
         useTwoWayPay = options.get(CampaignOption.IS_USE_TWO_WAY_PAY);
-        useCamOpsSalvage = options.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE);
+        salvageSystem = options.get(CampaignOption.SALVAGE_SYSTEM);
         useRiskySalvage = options.get(CampaignOption.IS_USE_RISKY_SALVAGE);
         keepEnemyCamouflageOnSalvage = options.get(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE);
         enableSalvageFlagByDefault = options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT);
@@ -181,7 +182,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.CONTRACT_SEARCH_RADIUS, contractSearchRadius);
         options.set(CampaignOption.VARIABLE_CONTRACT_LENGTH, variableContractLength);
         options.set(CampaignOption.IS_USE_TWO_WAY_PAY, useTwoWayPay);
-        options.set(CampaignOption.IS_USE_CAM_OPS_SALVAGE, useCamOpsSalvage);
+        options.set(CampaignOption.SALVAGE_SYSTEM, salvageSystem);
         options.set(CampaignOption.IS_USE_RISKY_SALVAGE, useRiskySalvage);
         options.set(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE, keepEnemyCamouflageOnSalvage);
         options.set(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT, enableSalvageFlagByDefault);

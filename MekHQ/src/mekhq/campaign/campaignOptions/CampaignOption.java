@@ -53,6 +53,7 @@ import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
@@ -945,8 +946,8 @@ public final class CampaignOption<T> {
           of(Integer.class, 4, "pityContracts");
     public static final CampaignOption<Boolean> IS_USE_TWO_WAY_PAY =
           of(Boolean.class, true, "isUseTwoWayPay");
-    public static final CampaignOption<Boolean> IS_USE_CAM_OPS_SALVAGE =
-          of(Boolean.class, false, "isUseCamOpsSalvage");
+    public static final CampaignOption<SalvageSystem> SALVAGE_SYSTEM =
+          of(SalvageSystem.class, SalvageSystem.CAM_OPS_STRICT, "salvageSystem");
     public static final CampaignOption<Boolean> IS_USE_RISKY_SALVAGE =
           of(Boolean.class, false, "isUseRiskySalvage");
     public static final CampaignOption<Boolean> IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE =

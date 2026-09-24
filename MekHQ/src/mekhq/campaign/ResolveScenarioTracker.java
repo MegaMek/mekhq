@@ -2255,7 +2255,7 @@ public class ResolveScenarioTracker {
             }
         }
 
-        if (campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
+        if (campaignOptions.get(CampaignOption.SALVAGE_SYSTEM).getSalvage().isUseSalvageOperations()) {
             boolean hasAssignedSalvageForce = !scenario.getSalvageFormations().isEmpty();
             boolean hasAssignedSalvageTechs = !scenario.getSalvageTechs().isEmpty();
 
