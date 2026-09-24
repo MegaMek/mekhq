@@ -43,7 +43,7 @@ import mekhq.campaign.unit.Unit;
 
 public record SalvageTechData(Person tech, UUID techId, String rank, int rankNumeric, PersonnelRole primaryRole,
       PersonnelRole secondaryRole, List<String> techUnits, String firstName, String lastName, int edge,
-      String skillLevelName, int injuries, int minutesAvailable) {
+      String skillLevelName, int minutesAvailable) {
     public static SalvageTechData buildData(Campaign campaign, Person tech) {
         boolean isSecondaryTech = CamOpsSalvageUtilities.isUseSecondaryTechSkill(tech);
         List<String> techUnits = new ArrayList<>();
@@ -61,7 +61,6 @@ public record SalvageTechData(Person tech, UUID techId, String rank, int rankNum
               tech.getLastName(),
               tech.getCurrentEdge(),
               tech.getSkillLevel(campaign, isSecondaryTech, true).toString(),
-              tech.getTotalInjurySeverity(),
               tech.getMinutesLeft());
     }
 }

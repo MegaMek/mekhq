@@ -87,6 +87,7 @@ public class SalvageTechPicker extends JDialog {
     private static final int WIDTH_40 = scaleForGUI(40);
     private static final int WIDTH_60 = scaleForGUI(60);
     private static final int WIDTH_100 = scaleForGUI(100);
+    private static final int WIDTH_200 = scaleForGUI(200);
     private static final int PADDING = scaleForGUI(5);
 
     /**
@@ -312,10 +313,8 @@ public class SalvageTechPicker extends JDialog {
               .setPreferredWidth(WIDTH_100);
         table.getColumnModel().getColumn(SalvageTechTableModel.COL_LAST_NAME)
               .setPreferredWidth(WIDTH_100);
-        table.getColumnModel().getColumn(SalvageTechTableModel.COL_PRIMARY_PROFESSION)
-              .setPreferredWidth(WIDTH_100);
-        table.getColumnModel().getColumn(SalvageTechTableModel.COL_SECONDARY_PROFESSION)
-              .setPreferredWidth(WIDTH_100);
+        table.getColumnModel().getColumn(SalvageTechTableModel.COL_ROLES)
+              .setPreferredWidth(WIDTH_200);
         table.getColumnModel().getColumn(SalvageTechTableModel.COL_UNITS)
               .setPreferredWidth(WIDTH_40);
         if (isUseEdge) {
@@ -330,8 +329,6 @@ public class SalvageTechPicker extends JDialog {
         }
         table.getColumnModel().getColumn(SalvageTechTableModel.COL_SKILL_LEVEL)
               .setPreferredWidth(WIDTH_60);
-        table.getColumnModel().getColumn(SalvageTechTableModel.COL_INJURIES)
-              .setPreferredWidth(WIDTH_40);
         table.getColumnModel().getColumn(
                     SalvageTechTableModel.COL_MINUTES_AVAILABLE)
               .setPreferredWidth(WIDTH_40);
@@ -366,13 +363,9 @@ public class SalvageTechPicker extends JDialog {
                   new NaturalOrderComparator());
             sorter.setComparator(SalvageTechTableModel.COL_SKILL_LEVEL,
                   new LevelSorter());
-            sorter.setComparator(SalvageTechTableModel.COL_PRIMARY_PROFESSION,
-                  new NaturalOrderComparator());
-            sorter.setComparator(SalvageTechTableModel.COL_SECONDARY_PROFESSION,
+            sorter.setComparator(SalvageTechTableModel.COL_ROLES,
                   new NaturalOrderComparator());
             sorter.setComparator(SalvageTechTableModel.COL_EDGE,
-                  Comparator.comparingInt(i -> ((int) i)));
-            sorter.setComparator(SalvageTechTableModel.COL_INJURIES,
                   Comparator.comparingInt(i -> ((int) i)));
             sorter.setComparator(SalvageTechTableModel.COL_UNITS,
                   Comparator.comparingInt(i -> ((int) i)));
@@ -516,18 +509,14 @@ public class SalvageTechPicker extends JDialog {
         private static final int COL_LAST_NAME = 3;
         /** Column index for skill level name. */
         private static final int COL_SKILL_LEVEL = 4;
-        /** Column index for primary profession. */
-        private static final int COL_PRIMARY_PROFESSION = 5;
-        /** Column index for secondary profession. */
-        private static final int COL_SECONDARY_PROFESSION = 6;
+        /** Column index for primary and secondary roles. */
+        private static final int COL_ROLES = 5;
         /** Column index for current/total edge. */
-        private static final int COL_EDGE = 7;
+        private static final int COL_EDGE = 6;
         /** Column index for maintained unit count. */
-        private static final int COL_UNITS = 8;
-        /** Column index for injury count. */
-        private static final int COL_INJURIES = 9;
+        private static final int COL_UNITS = 7;
         /** Column index for available minutes. */
-        private static final int COL_MINUTES_AVAILABLE = 10;
+        private static final int COL_MINUTES_AVAILABLE = 8;
 
         private final List<SalvageTechData> techs;
         private final boolean[] selected;
@@ -539,11 +528,9 @@ public class SalvageTechPicker extends JDialog {
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.firstName"),
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.lastName"),
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.skill"),
-              getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.profession.primary"),
-              getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.profession.secondary"),
+              getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.roles"),
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.edge"),
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.techUnits"),
-              getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.injuries"),
               getTextAt(RESOURCE_BUNDLE, "SalvageTechPicker.column.minutes")
         };
 
@@ -591,9 +578,8 @@ public class SalvageTechPicker extends JDialog {
         public Class<?> getColumnClass(int columnIndex) {
             return switch (columnIndex) {
                 case COL_SELECT -> Boolean.class;
-                case COL_FIRST_NAME, COL_LAST_NAME, COL_SKILL_LEVEL, COL_PRIMARY_PROFESSION,
-                     COL_SECONDARY_PROFESSION -> String.class;
-                case COL_INJURIES, COL_MINUTES_AVAILABLE, COL_UNITS, COL_EDGE -> Integer.class;
+                case COL_FIRST_NAME, COL_LAST_NAME, COL_SKILL_LEVEL, COL_ROLES -> String.class;
+                case COL_MINUTES_AVAILABLE, COL_UNITS, COL_EDGE -> Integer.class;
                 default -> Object.class;
             };
         }
@@ -613,11 +599,9 @@ public class SalvageTechPicker extends JDialog {
                 case COL_FIRST_NAME -> data.firstName();
                 case COL_LAST_NAME -> data.lastName();
                 case COL_SKILL_LEVEL -> data.skillLevelName();
-                case COL_PRIMARY_PROFESSION -> data.primaryRole().getLabel(isClanCampaign);
-                case COL_SECONDARY_PROFESSION -> data.secondaryRole().getLabel(isClanCampaign);
+                case COL_ROLES -> getRolesLabel(data);
                 case COL_EDGE -> data.edge();
                 case COL_UNITS -> data.techUnits().size();
-                case COL_INJURIES -> data.injuries();
                 case COL_MINUTES_AVAILABLE -> data.minutesAvailable();
                 default -> null;
             };
@@ -647,6 +631,24 @@ public class SalvageTechPicker extends JDialog {
                 }
             }
             return selectedTechs;
+        }
+
+        /**
+         * Builds the label for the Roles column: the primary role, followed by the secondary role if there is one.
+         *
+         * @param data the tech's data
+         *
+         * @return a label such as {@code "MekTech / Mechanic"}, or just {@code "MekTech"} with no secondary role
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        private String getRolesLabel(SalvageTechData data) {
+            String primaryRole = data.primaryRole().getLabel(isClanCampaign);
+            if (data.secondaryRole().isNone()) {
+                return primaryRole;
+            }
+            return primaryRole + " / " + data.secondaryRole().getLabel(isClanCampaign);
         }
 
         /**
