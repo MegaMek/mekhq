@@ -90,9 +90,11 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import mekhq.campaign.universe.commandGeneration.EnhancedImagingAugmentor;
 import mekhq.campaign.universe.commandGeneration.LiftTopUp;
 import mekhq.campaign.universe.commandGeneration.ManeiDominiAugmentor;
+import mekhq.campaign.universe.commandGeneration.SupportCapability;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE;
 import mekhq.campaign.universe.commandGeneration.SupportUnitGenerator;
+import mekhq.campaign.universe.enums.ForceNamingMethod;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
 
 /**
@@ -631,35 +633,26 @@ public final class CommandGenerator {
      * crewed from the generated staff, but only while support teams are switched on; with them off, no section is
      * built, so those vehicles are granted here too.
      *
-     * @param campaign the campaign the vehicles are granted to
+     * @param campaign       the campaign the vehicles are granted to
+     * @param supportFaction the faction the command is organised as, which during generation is the faction
+     *                       it is generated for rather than the campaign's own
+     * @param namingMethod   the convention the command's formations are named with, so its support formations
+     *                       read the same way its combat formations do
      */
-    static void grantStandaloneSupportVehicles(Campaign campaign) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        Faction supportFaction = campaign.getPlayerForce().getFaction();
-        boolean useSalvage = campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE);
-        boolean useMedical = campaignOptions.get(CampaignOption.USE_MASH_THEATRES);
-        if (SupportCarrierReconciler.isEnabled(campaign)) {
-            LOGGER.info("[CompanyGen][SupportUnits] support teams are on; recovery vehicles (salvage={}) and MASH"
-                              + " trucks (medical={}) join their support sections", useSalvage, useMedical);
-        } else {
-            LOGGER.info("[CompanyGen][SupportUnits] support teams are off; recovery vehicles (salvage={}) and MASH"
-                              + " trucks (medical={}) are generated standalone", useSalvage, useMedical);
-            if (useSalvage) {
-                SupportUnitGenerator.generateSalvageUnits(campaign, supportFaction, true);
+    static void grantStandaloneSupportVehicles(Campaign campaign, Faction supportFaction,
+          @Nullable ForceNamingMethod namingMethod) {
+        for (SupportCapability capability : SupportCapability.values()) {
+            if (!capability.isEnabled(campaign)) {
+                LOGGER.info("[CompanyGen][SupportUnits] {}: switched off, nothing granted", capability);
+                continue;
             }
-            if (useMedical) {
-                SupportUnitGenerator.generateMedicalUnits(campaign, supportFaction, true);
+            if (capability.joinsSection(campaign)) {
+                LOGGER.info("[CompanyGen][SupportUnits] {}: joins the {} section, crewed from its own staff",
+                      capability, capability.crewSection());
+                continue;
             }
-        }
-
-        if (campaignOptions.isUseStratCon()) {
-            SupportUnitGenerator.generateLogisticsUnits(campaign, supportFaction, true);
-        }
-        if (campaignOptions.get(CampaignOption.USE_FATIGUE)) {
-            SupportUnitGenerator.generateCommissaryUnits(campaign, supportFaction, true);
-        }
-        if (!campaignOptions.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone()) {
-            SupportUnitGenerator.generateSecurityUnits(campaign, supportFaction, true);
+            LOGGER.info("[CompanyGen][SupportUnits] {}: generated standalone with its own crew", capability);
+            SupportUnitGenerator.generate(capability, campaign, supportFaction, true, namingMethod);
         }
     }
 
@@ -686,7 +679,8 @@ public final class CommandGenerator {
         Set<UUID> unitsBeforeSupport = snapshotHangarUnitIds(campaign);
         // The stage's own vehicles - flatbeds, canteens, recovery and MASH trucks - are generated below, after
         // the staff, but they need mechanics like any other vehicle. Count them into the demand now.
-        int vehiclesStillToCome = SupportUnitGenerator.vehiclesStillToGenerate(campaign);
+        Faction commandFaction = SupportPersonnelGenerator.resolveFaction(campaign, options);
+        int vehiclesStillToCome = SupportUnitGenerator.vehiclesStillToGenerate(campaign, commandFaction);
         SupportPersonnelGenerator.Result supportResult =
               SupportPersonnelGenerator.generate(campaign, options, vehiclesStillToCome);
 
@@ -698,13 +692,13 @@ public final class CommandGenerator {
         // on the roster instead of being organized into carriers.
         if (SupportCarrierReconciler.isEnabled(campaign)) {
             SupportPersonnelToTOE.organize(campaign, supportResult.generatedPersons(),
-                  campaign.getPlayerForce().isClanForce());
+                  commandFaction.isClan(), commandFaction);
         } else {
             LOGGER.info("[CompanyGen][SupportTOE] support teams are switched off; {} support person(s) stay unorganized",
                   supportResult.generatedPersons().size());
         }
 
-        grantStandaloneSupportVehicles(campaign);
+        grantStandaloneSupportVehicles(campaign, commandFaction, options.getForceNamingMethod());
 
         // Assign techs to units with MekHQ's own assigner, the one the new day and the Hangar's quick-assign
         // button use, ordered by the Setup tab's three-slot sort grid (Pilot Rank / Unit Weight / Pilot Skill,

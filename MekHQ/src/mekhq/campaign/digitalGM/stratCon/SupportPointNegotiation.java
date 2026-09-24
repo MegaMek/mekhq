@@ -34,6 +34,7 @@ package mekhq.campaign.digitalGM.stratCon;
 
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
@@ -42,10 +43,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ResourceBundle;
 
-import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -74,8 +72,7 @@ import mekhq.utilities.ReportingUtilities;
  * </ul>
  */
 public class SupportPointNegotiation {
-    private static final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AtBStratCon",
-          MekHQ.getMHQOptions().getLocale());
+    private final static String RESOURCE_BUNDLE = "mekhq.resources.AtBStratCon";
 
     /**
      * Negotiates weekly additional support points for all active AtB contracts.
@@ -102,19 +99,13 @@ public class SupportPointNegotiation {
         // Get sorted Admin personnel
         List<Person> adminTransport = getSortedAdminTransportPersonnel(campaign);
 
-        // If no Admin personnel, exit early
-        if (adminTransport.isEmpty()) {
-            addReportNoPersonnel(campaign, null);
-            return;
-        }
-
         // Iterate over contracts and negotiate support points
         for (AbstractContract contract : sortedContracts) {
             if (adminTransport.isEmpty()) {
-                break;
+                addReportNoPersonnel(campaign, contract);
+            } else {
+                processContractSupportPoints(campaign, contract, adminTransport, false);
             }
-
-            processContractSupportPoints(campaign, contract, adminTransport, false);
         }
     }
 
@@ -139,11 +130,9 @@ public class SupportPointNegotiation {
         // If no Admin personnel, exit early
         if (adminTransport.isEmpty()) {
             addReportNoPersonnel(campaign, contract);
-            return;
+        } else {
+            processContractSupportPoints(campaign, contract, adminTransport, true);
         }
-
-        // Negotiate support points for the specific contract
-        processContractSupportPoints(campaign, contract, adminTransport, true);
     }
 
     /**
@@ -179,14 +168,11 @@ public class SupportPointNegotiation {
         int currentSupportPoints = campaignState.getSupportPoints();
 
         if (currentSupportPoints >= maxSupportPoints) {
-            String pluralizer = (maxSupportPoints > 1) || (maxSupportPoints == 0) ? "s" : "";
-
-            campaign.addReport(GENERAL, String.format(resources.getString("supportPoints.maximum"),
+            campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "supportPoints.maximum",
                   contract.getHyperlinkedName(),
                   spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
-                  CLOSING_SPAN_TAG,
                   maxSupportPoints,
-                  pluralizer));
+                  CLOSING_SPAN_TAG));
 
             return;
         }
@@ -197,14 +183,11 @@ public class SupportPointNegotiation {
         }
 
         Iterator<Person> iterator = adminTransport.iterator();
-
-
         while (iterator.hasNext() && ((negotiatedSupportPoints + currentSupportPoints) < maxSupportPoints)) {
             Person admin = iterator.next();
 
             // No forced roll type: the check derives ADVANTAGE from the admin's Natural Aptitude when they have it.
-            SkillCheck skillCheck = admin.checkSkill(S_ADMIN, campaign)
-                                          .withoutLogging();
+            SkillCheck skillCheck = admin.checkSkill(S_ADMIN, campaign);
             if (modifier != 0) {
                 skillCheck.withMiscModifier(-modifier);
             }
@@ -233,22 +216,14 @@ public class SupportPointNegotiation {
         }
 
         // Add a report
-        String pluralizer = (negotiatedSupportPoints > 1) || (negotiatedSupportPoints == 0) ? "s" : "";
-        if (isInitialNegotiation) {
-            campaign.addReport(GENERAL, String.format(resources.getString("supportPoints.initial"),
-                  contract.getHyperlinkedName(),
-                  spanOpeningWithCustomColor(fontColor),
-                  negotiatedSupportPoints,
-                  CLOSING_SPAN_TAG,
-                  pluralizer));
-        } else {
-            campaign.addReport(GENERAL, String.format(resources.getString("supportPoints.weekly"),
-                  spanOpeningWithCustomColor(fontColor),
-                  negotiatedSupportPoints,
-                  CLOSING_SPAN_TAG,
-                  pluralizer,
-                  contract.getHyperlinkedName()));
-        }
+        String reportKey = isInitialNegotiation ? "supportPoints.initial" : "supportPoints.biweekly";
+        String report = getFormattedTextAt(RESOURCE_BUNDLE, reportKey,
+              contract.getHyperlinkedName(),
+              spanOpeningWithCustomColor(fontColor),
+              negotiatedSupportPoints,
+              CLOSING_SPAN_TAG,
+              maxSupportPoints);
+        campaign.addReport(GENERAL, report);
     }
 
     /**
@@ -294,22 +269,14 @@ public class SupportPointNegotiation {
      * (e.g., for weekly negotiations).</p>
      *
      * @param campaign The {@link Campaign} instance managing the current game state.
-     * @param contract An optional {@link AbstractContract} instance representing the affected contract (can be
-     *                 {@code null}).
+     * @param contract An optional {@link AbstractContract} instance representing the affected contract.
      */
-    private static void addReportNoPersonnel(Campaign campaign, @Nullable AbstractContract contract) {
-        String reportKey = String.format("supportPoints.%s.noAdministrators", contract == null ? "weekly" : "initial");
-
-        if (contract == null) {
-            campaign.addReport(GENERAL, String.format(resources.getString(reportKey),
-                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                  CLOSING_SPAN_TAG));
-        } else {
-            campaign.addReport(GENERAL, String.format(resources.getString(reportKey),
-                  contract.getHyperlinkedName(),
-                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                  CLOSING_SPAN_TAG));
-        }
+    private static void addReportNoPersonnel(Campaign campaign, AbstractContract contract) {
+        campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "supportPoints.noAdministrators",
+              contract.getHyperlinkedName(),
+              spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+              CLOSING_SPAN_TAG,
+              contract.getMaximumSupportPoints()));
     }
 
     /**

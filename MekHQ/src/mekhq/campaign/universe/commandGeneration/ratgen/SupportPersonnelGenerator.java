@@ -403,7 +403,7 @@ public final class SupportPersonnelGenerator {
      * honors {@link CommandGenerationOptions#isUseSpecifiedFactionToAssignRanks()} and falls back
      * to the campaign's faction.
      */
-    private static Faction resolveFaction(Campaign campaign, CommandGenerationOptions options) {
+    static Faction resolveFaction(Campaign campaign, CommandGenerationOptions options) {
         Faction specifiedFaction = options.getSpecifiedFaction();
         Faction campaignFaction = campaign.getPlayerForce().getFaction();
         boolean useSpecified = options.isUseSpecifiedFactionToAssignRanks();

@@ -390,7 +390,9 @@ public final class SupportCarrierReconciler {
             // the HQ formation is created too when the campaign never had one, and the player's own formations must
             // keep the icons they have.
             Set<Integer> before = formationIds(campaign);
-            SupportPersonnelToTOE.organize(campaign, loose, campaign.getPlayerForce().isClanForce());
+            // Mid-campaign, so there is no generated faction to follow: the command is the campaign's own.
+            SupportPersonnelToTOE.organize(campaign, loose, campaign.getPlayerForce().isClanForce(),
+                  campaign.getPlayerForce().getFaction());
             List<Formation> built = new ArrayList<>();
             for (Formation formation : campaign.getPlayerForce().getAllFormations()) {
                 if (!before.contains(formation.getId())) {

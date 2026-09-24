@@ -57,13 +57,13 @@ import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore.ButtonLabelTooltipPair;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A dialog that facilitates Attribute checks for a character.
@@ -208,7 +208,7 @@ public class AttributeCheckDialog {
                     .resolve(useEdge, null);
         isSuccess = attributeCheckResult.isSuccess();
 
-        return attributeCheckResult.getReport(true);
+        return attributeCheckResult.getReport();
     }
 
 

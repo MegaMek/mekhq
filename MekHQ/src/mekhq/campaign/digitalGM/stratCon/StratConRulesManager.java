@@ -647,7 +647,8 @@ public class StratConRulesManager {
         final AtBDynamicScenario backingScenario = scenario.getBackingScenario();
 
         // First determine if the scenario is a Turning Point (that win/lose will affect CVP)
-        boolean isCombatChallenge = scenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge();
+        ScenarioType scenarioType = scenario.getBackingScenario().getStratConScenarioType();
+        boolean isCombatChallenge = scenarioType.isOfficialChallenge();
         boolean showNag = !MekHQ.getMHQOptions().getNagDialogIgnore(MHQConstants.NAG_COMBAT_CHALLENGE);
         if (isCombatChallenge && showNag) {
             new CombatChallengeNagDialog(campaign);
@@ -656,13 +657,6 @@ public class StratConRulesManager {
         determineIfTurningPointScenario(contract, scenario, isCombatChallenge);
         if (!scenario.isTurningPoint()) {
             determineIfCrisisScenario(contract.getMoraleLevel(), backingScenario, isCombatChallenge);
-        }
-
-        // Then add any Cadre Duty units
-        if (!isCombatChallenge) {
-            if (contract.getObjectiveType().isCadreDuty()) {
-                addCadreDutyTrainees(backingScenario);
-            }
         }
 
         // Finally, finish scenario set up
@@ -684,38 +678,6 @@ public class StratConRulesManager {
             for (int forceID : scenario.getPrimaryForceIDs()) {
                 processForceDeployment(scenario.getCoords(), forceID, campaign, track, false);
             }
-        }
-    }
-
-    /**
-     * Adds a Cadre Duty trainees modifier to the given scenario based on the location of the battle.
-     *
-     * <p>
-     * This method determines the type of trainees to be added to the scenario by evaluating the map location parameter
-     * of the scenario's template. Depending on whether the battle is an air or space battle versus a ground battle, the
-     * appropriate Cadre Duty trainees scenario modifier is applied to the backing scenario.
-     * </p>
-     *
-     * <p>
-     * The logic is as follows:
-     * <ul>
-     *     <li>If the battle occurs in low atmosphere or space, the air trainees modifier is added.</li>
-     *     <li>If the battle occurs on the ground at any other map location, the ground trainees
-     *     modifier is added.</li>
-     * </ul>
-     *
-     * @param backingScenario The {@link AtBDynamicScenario} representing the current scenario to which the modifier
-     *                        will be applied.
-     */
-    private static void addCadreDutyTrainees(AtBDynamicScenario backingScenario) {
-        final ScenarioTemplate template = backingScenario.getTemplate();
-        final MapLocation mapLocation = template.mapParameters.getMapLocation();
-        boolean isAirBattle = (mapLocation == LowAtmosphere) || (mapLocation == Space);
-
-        if (isAirBattle) {
-            backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_TRAINEES_AIR));
-        } else {
-            backingScenario.addScenarioModifier(AtBScenarioModifier.getScenarioModifier(MHQConstants.SCENARIO_MODIFIER_TRAINEES_GROUND));
         }
     }
 
@@ -744,14 +706,16 @@ public class StratConRulesManager {
 
         ContractCommandRights commandRights = contract.getCommandRights();
         switch (commandRights) {
-            case INTEGRATED -> {
-                scenario.setTurningPoint(true);
-                setAttachedUnitsModifier(scenario, contract);
-            }
-            case HOUSE, LIAISON -> {
+            case INTEGRATED -> scenario.setTurningPoint(true);
+            case HOUSE -> {
                 if (randomInt(3) == 0) {
                     scenario.setTurningPoint(true);
                     setAttachedUnitsModifier(scenario, contract);
+                }
+            }
+            case LIAISON -> {
+                if (randomInt(3) == 0) {
+                    scenario.setTurningPoint(true);
                 }
             }
             case INDEPENDENT -> {
@@ -1771,7 +1735,7 @@ public class StratConRulesManager {
                     if (useAdvancedScouting) {
                         actionCheckResult = scoutData.skillCheck().resolve(
                               isUseEdge, getTextAt(RESOURCE_BUNDLE, "StratConRulesManager.scoutingSkillCheck"));
-                        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(false));
+                        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
                     }
 
                     remainingScans--;
@@ -2224,12 +2188,13 @@ public class StratConRulesManager {
             return DELAYED;
         }
 
-        // FIXME: roll and target number are not present in the template
         campaign.addReport(BATTLE, String.format(resources.getString("reinforcementEvasionUnsuccessful.text"),
               spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
               CLOSING_SPAN_TAG,
               actionCheckResult.getRollResult(),
               9));
+
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
 
         ScenarioTemplate scenarioTemplate = getInterceptionScenarioTemplate(formation,
               campaign.getPlayerForce().getHangar());
@@ -3454,11 +3419,10 @@ public class StratConRulesManager {
             return false;
         }
 
-        // Check the associated combat team and its role
-        CombatTeam combatTeam;
-        combatTeam = formation.isCombatTeam() ?
-                           campaign.getPlayerForce().getCombatTeamsAsMap(campaign).get(forceId) :
-                           null;
+        // Check the associated combat team and its role. The combat team may be the unit's own formation or one of
+        // its parent formations, so we walk up the hierarchy to find it; otherwise units belonging to child
+        // formations of a combat team would be incorrectly treated as ineligible.
+        CombatTeam combatTeam = resolveCombatTeam(formation, campaign);
 
         if (combatTeam == null) {
             return false;
@@ -3472,6 +3436,39 @@ public class StratConRulesManager {
         AbstractContract scenarioContract = currentScenario.getBackingContract(campaign);
 
         return forceContract.equals(scenarioContract);
+    }
+
+    /**
+     * Resolves the {@link CombatTeam} that governs the supplied formation.
+     *
+     * <p>A combat team may be assigned to a formation at any point in the hierarchy. When the combat team tag sits on
+     * a parent formation, the units themselves belong to child formations that are not, in isolation, combat teams.
+     * This method therefore checks the supplied formation first and then walks up its parent formations until a
+     * formation flagged as a combat team is found, so that units in child formations are correctly attributed to the
+     * governing combat team.</p>
+     *
+     * @param formation the formation whose governing combat team should be located
+     * @param campaign  the {@link Campaign} used to resolve the combat team map
+     *
+     * @return the governing {@link CombatTeam}, or {@code null} if no combat team exists in the hierarchy
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nullable CombatTeam resolveCombatTeam(Formation formation, Campaign campaign) {
+        Hashtable<Integer, CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsMap(campaign);
+
+        if (formation.isCombatTeam()) {
+            return combatTeams.get(formation.getId());
+        }
+
+        for (Formation parentFormation : formation.getAllParents()) {
+            if (parentFormation.isCombatTeam()) {
+                return combatTeams.get(parentFormation.getId());
+            }
+        }
+
+        return null;
     }
 
     /**

@@ -32,6 +32,7 @@
  */
 package mekhq.gui.baseComponents.immersiveDialogs;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -39,11 +40,30 @@ import java.awt.Dimension;
 import javax.swing.JEditorPane;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingUtilities;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.html.CSS;
+import javax.swing.text.html.HTMLDocument;
+import javax.swing.text.html.StyleSheet;
 
 import megamek.common.ui.FastJScrollPane;
 import org.junit.jupiter.api.Test;
 
 class ImmersiveDialogSizingTest {
+    @Test
+    void configuredHtmlPreservesSemanticStylesAndParagraphSpacing() throws Exception {
+        SwingUtilities.invokeAndWait(() -> {
+            JEditorPane editorPane = new JEditorPane();
+            ImmersiveDialogCore.configureHtmlEditorPane(editorPane);
+            StyleSheet styleSheet = ((HTMLDocument) editorPane.getDocument()).getStyleSheet();
+
+            assertTrue(StyleConstants.isBold(styleSheet.getRule("h2")));
+            assertTrue(StyleConstants.getFontSize(styleSheet.getRule("h2")) >
+                             StyleConstants.getFontSize(styleSheet.getRule("p")));
+            assertEquals(scaleForGUI(6) + "px",
+                  styleSheet.getRule("p").getAttribute(CSS.Attribute.MARGIN_TOP).toString());
+        });
+    }
+
     @Test
     void naturalContentFitsWithoutScrolling() {
         ImmersiveDialogSizing.SizingResult result = ImmersiveDialogSizing.calculate(600, 320, 120, 900);

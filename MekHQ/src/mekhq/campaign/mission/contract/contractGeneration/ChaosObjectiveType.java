@@ -35,12 +35,13 @@ package mekhq.campaign.mission.contract.contractGeneration;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveSpecialRules.DOUBLE_ALL_COSTS;
-import static mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveSpecialRules.DOUBLE_SUPPORT_PAYOUTS;
-import static mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveSpecialRules.END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS;
-import static mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveSpecialRules.NO_IN_CONTRACT_SUPPORT;
-import static mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveSpecialRules.SIMULATED_DAMAGE;
-import static mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.DOUBLE_ALL_COSTS;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.DOUBLE_SUPPORT_PAYOUTS;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.NO_IN_CONTRACT_SUPPORT;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.REDUCED_COMBAT_PAY;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.SIMULATED_DAMAGE;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +49,7 @@ import java.util.List;
 
 import megamek.codeUtilities.ObjectUtility;
 import megamek.logging.MMLogger;
+import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 
 public enum ChaosObjectiveType {
@@ -60,7 +62,7 @@ public enum ChaosObjectiveType {
     GARRISON(false, 6, -1, 1, 0, 1, -2, 0, 1, false,
           Collections.emptyList()),
     CADRE_DUTY(false, 6, 0, 1, 0, 1, -2, 0, -2, false,
-          List.of(SIMULATED_DAMAGE)),
+          List.of(SIMULATED_DAMAGE, REDUCED_COMBAT_PAY)),
     RAID(true, 3, 2, 0, 0, 0, -1, 0, 0, true,
           Collections.emptyList()),
     INVASION(false, 6, 2, -1, 2, -1, 1, -2, 3, true,

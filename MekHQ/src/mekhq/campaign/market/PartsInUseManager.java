@@ -321,6 +321,11 @@ public class PartsInUseManager {
         // Case 1: Part is associated with a unit or is a MissingPart
         if ((unit != null) || (incomingPart instanceof MissingPart)) {
             partInUse.setUseCount(partInUse.getUseCount() + incomingPart.getQuantityForPartsInUse());
+            // A MissingPart is a destroyed slot awaiting replacement. It needs to be tracked separately, so it can
+            // be given a greater weighting.
+            if (incomingPart instanceof MissingPart) {
+                partInUse.setMissingCount(partInUse.getMissingCount() + incomingPart.getQuantityForPartsInUse());
+            }
             return;
         }
 
@@ -364,6 +369,7 @@ public class PartsInUseManager {
         partInUse.setStoreCount(0);
         partInUse.setTransferCount(0);
         partInUse.setPlannedCount(0);
+        partInUse.setMissingCount(0);
         forEachPartAtPlace(incomingPart -> {
             PartInUse newPartInUse = getPartInUse(incomingPart);
             if (partInUse.equals(newPartInUse)) {

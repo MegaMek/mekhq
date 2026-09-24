@@ -114,13 +114,27 @@ public class ActionCheckResult {
 
     /**
      * Returns a skill check report. It takes resultsText generated during the skill check and extends it with
-     * information about edge usage and, optionally, margin of success.
+     * information about edge usage and the margin of success.
      *
-     * <p>See more in {@link AttributeCheck#generateResultsText}.</p>
+     * <p>See more in {@code AttributeCheck#generateResultsText}.</p>
      *
      * <p>If edge was used to reroll the skill check, the results will include an additional note with
      * information about the reroll. If the caller requests it, margin of success details can also be
-     * appended to the results text.</p>
+     * appended to the result text.</p>
+     */
+    public String getReport() {
+        return getReport(true);
+    }
+
+    /**
+     * Returns a skill check report. It takes resultsText generated during the skill check and extends it with
+     * information about edge usage and, optionally, margin of success.
+     *
+     * <p>See more in {@code AttributeCheck#generateResultsText}.</p>
+     *
+     * <p>If edge was used to reroll the skill check, the results will include an additional note with
+     * information about the reroll. If the caller requests it, margin of success details can also be
+     * appended to the result text.</p>
      *
      * @param includeMarginsOfSuccessText whether to include detailed margins of success information in the results
      */

@@ -30,27 +30,22 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.contract.contractGeneration;
+package mekhq.campaign.digitalGM.stratCon.deployment;
 
-public enum ChaosObjectiveSpecialRules {
-    /* Player gets bonus loot after each track. */
-    USE_PIRATE_LOOTING,
-
-    /* Contract automatically ends once one side has achieved two consecutive victories */
-    END_CONTRACT_AFTER_TWO_CONSECUTIVE_TRACKS,
-
-    /* All costs are doubled */
-    DOUBLE_ALL_COSTS,
-
-    /* No support payments made until end of contract */
-    NO_IN_CONTRACT_SUPPORT,
-
-    /* All support payments doubled */
-    DOUBLE_SUPPORT_PAYOUTS,
-
-    /* All combat damaged removed at the end of each scenario */
-    SIMULATED_DAMAGE,
-
-    /* Combat pay is quartered */
-    REDUCED_COMBAT_PAY,
-}
+/**
+ * The support-point cost of a paid reinforcement attempt, and the target-number modifier the spent points buy.
+ *
+ * <p>Reinforcement pricing works as follows: the player chooses how many support points to spend to improve the roll;
+ * a base cost is added on top (one point for a normal arrival, two for an instant arrival); and the whole thing is
+ * multiplied by the number of forces committed, since each force is a separate attempt. Every point the player chooses
+ * to spend (as opposed to the base cost) lowers the reinforcement target number.</p>
+ *
+ * @param perForceSupportPoints the support points each committed force costs (the player's chosen spend plus the base
+ *                              cost)
+ * @param totalSupportPoints    the total support points the whole attempt costs across every committed force
+ * @param targetNumberModifier  the (non-positive) modifier the chosen spend applies to the reinforcement target number
+ *
+ * @author Illiani
+ * @since 0.51.01
+ */
+public record ReinforcementCost(int perForceSupportPoints, int totalSupportPoints, int targetNumberModifier) {}

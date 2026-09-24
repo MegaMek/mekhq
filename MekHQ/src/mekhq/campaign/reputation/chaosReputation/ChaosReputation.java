@@ -51,7 +51,6 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MAX_CRIME_PENALTY;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
@@ -63,27 +62,20 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
-import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.finances.Loan;
-import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
-import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * Static helpers implementing the Chaos Campaign reputation system (Hot Spots: Draconis Reach).
@@ -110,10 +102,6 @@ public class ChaosReputation {
 
     private static final double BREAKING_CONTRACT_MULTIPLIER = 0.5; // Hot Spots Draconis Reach pg25 1st printing
     private static final int BREAKING_CONTRACT_MIN_DELTA = 3; // Hot Spots Draconis Reach pg25 1st printing
-
-    private static final int PIRACY_AVOIDANCE_TN_SUCCESS = 7; // Hot Spots Draconis Reach pg25 1st printing
-    private static final int PIRACY_AVOIDANCE_TN_FAILURE = 9; // Hot Spots Draconis Reach pg25 1st printing
-    private static final double PIRACY_PENALTY_PROFIT_DIVIDER = 500; // Hot Spots Draconis Reach pg25 1st printing
 
     private static final int GOING_INTO_DEBT_DELTA = -1; // Hot Spots Draconis Reach pg25 1st printing
     private static final double GOING_INT_DEBT_MONTHLY_FREQUENCY = 6.0; // Hot Spots Draconis Reach pg25 1st printing
@@ -716,216 +704,6 @@ public class ChaosReputation {
 
         processChaosCampaignReputationChanges(campaignOptions, playerForce, campaign.getLocalDate());
         campaign.getGUI().refreshAllTabs();
-    }
-
-    /**
-     * Resolves an act of piracy: rolls to avoid getting caught, credits the looted booty to the force's finances, and -
-     * if caught - applies a criminal-record penalty to the force or its personnel. Finally shows a summary dialog.
-     *
-     * @param campaign         the campaign performing the piracy
-     * @param personnel        the personnel involved (penalized in per-character mode)
-     * @param scale            the loot scale factor
-     * @param scenarios        the contract's scenarios, used to value component loot
-     * @param actWasSuccessful whether the underlying act succeeded (affects the avoidance target number)
-     * @param contractName     the contract name, used in the finance and dialog text
-     */
-    public static void resolveActOfPiracy(Campaign campaign, List<Person> personnel, int scale,
-          List<Scenario> scenarios, boolean actWasSuccessful, String contractName) {
-        PlayerForce playerForce = campaign.getPlayerForce();
-        Person commander = playerForce.getHumanResources().getCommander(campaign.getCampaignOptions(),
-              playerForce.isClanForce(),
-              campaign.getLocalDate());
-
-        int roll = d6(2);
-        int targetNumber = actWasSuccessful ? PIRACY_AVOIDANCE_TN_SUCCESS : PIRACY_AVOIDANCE_TN_FAILURE;
-        // A "Slippery" commander makes the force harder to catch; a "Conspicuous" one makes it easier.
-        if (commander != null) {
-            if (commander.getOptions().booleanOption(PersonnelOptions.SLIPPERY)) {
-                targetNumber -= 1;
-            } else if (commander.getOptions().booleanOption(PersonnelOptions.CONSPICUOUS)) {
-                targetNumber += 1;
-            }
-        }
-        boolean gotCaught = roll < targetNumber;
-
-        int supportPointsLoot = determinePiracySP(scale, scenarios, commander);
-        Money booty = ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(supportPointsLoot);
-        creditFinancesForBooty(campaign, contractName, booty);
-
-        int delta = (int) -ceil(supportPointsLoot / PIRACY_PENALTY_PROFIT_DIVIDER);
-
-        if (campaign.getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
-            if (gotCaught) {
-                campaign.getPlayerForce().changeChaosCampaignReputation(delta);
-            }
-        } else {
-            // Always process personnel: the "Loose Lips" SPA records a criminal record even when the detachment was
-            // not caught, so the base delta is 0 for a clean getaway.
-            updatePersonnelForActOfPiracy(personnel, gotCaught ? delta : 0);
-        }
-
-        triggerPiracyDialog(campaign, roll, targetNumber, gotCaught, delta, booty);
-    }
-
-    /**
-     * Credits looted booty to the force's finances as a theft transaction.
-     *
-     * @param campaign     the campaign whose finances are credited
-     * @param contractName the contract name shown on the transaction
-     * @param booty        the amount to credit
-     */
-    private static void creditFinancesForBooty(Campaign campaign, String contractName, Money booty) {
-        campaign.getPlayerForce()
-              .getFinances()
-              .credit(TransactionType.THEFT,
-                    campaign.getLocalDate(),
-                    booty,
-                    getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.piracy.booty", contractName));
-    }
-
-    /**
-     * Shows the in-character summary dialog reporting the outcome of an act of piracy.
-     *
-     * @param campaign     the campaign the dialog belongs to
-     * @param roll         the avoidance roll made
-     * @param targetNumber the target number the roll was compared against
-     * @param gotCaught    whether the force was caught
-     * @param delta        the (negative) reputation/criminal-record delta applied when caught
-     * @param booty        the looted amount
-     */
-    private static void triggerPiracyDialog(Campaign campaign, int roll, int targetNumber, boolean gotCaught, int delta,
-          Money booty) {
-        PlayerForce playerForce = campaign.getPlayerForce();
-        ForceHumanResources forceHumanResources = playerForce.getHumanResources();
-        boolean isClanForce = playerForce.isClanForce();
-        Person seniorAdmin = forceHumanResources.getSeniorAdminPerson(campaign.getCampaignOptions(),
-              isClanForce,
-              campaign.getLocalDate());
-
-        String captureKey = gotCaught ? "caught" : "notCaught";
-        String reportKey = "ChaosReputation.piracy.dialog." + captureKey;
-        String addendum = getTextAt(RESOURCE_BUNDLE, reportKey);
-
-        String inCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE,
-              "ChaosReputation.piracy.dialog.ic",
-              campaign.getCommanderAddress(),
-              booty.toAmountString(),
-              addendum);
-
-        new ImmersiveDialogSimple(campaign,
-              seniorAdmin,
-              inCharacterMessage,
-              null,
-              getFormattedTextAt(RESOURCE_BUNDLE, "ChaosReputation.piracy.dialog.ooc", roll, targetNumber, -delta));
-    }
-
-    /**
-     * Determines the total support-point value of piracy loot: a random contract-loot roll plus component loot earned
-     * from victorious scenarios, each scaled by {@code scale}.
-     *
-     * @param scale             the loot scale factor
-     * @param scenarios         the contract's scenarios
-     * @param campaignCommander the campaign commander
-     *
-     * @return the total looted support points
-     */
-    private static int determinePiracySP(int scale, List<Scenario> scenarios, @Nullable Person campaignCommander) {
-        int roll = d6(1);
-        if (campaignCommander != null && campaignCommander.getOptions().booleanOption(PersonnelOptions.LOOT_GOBLIN)) {
-            roll = min(6, roll + 1);
-        }
-
-        int contractLootSP = determineContractLoot(roll, scale);
-
-        int componentLootSP = determineComponentLoot(scenarios, scale);
-
-        return contractLootSP + componentLootSP;
-    }
-
-    /**
-     * Returns the contract-loot support points for a d6 roll, scaled by {@code scale}.
-     *
-     * @param roll  the 1-6 roll
-     * @param scale the loot scale factor
-     *
-     * @return the scaled contract-loot support points
-     */
-    private static int determineContractLoot(int roll, int scale) {
-        // Hot Spots Draconis Reach, first printing, pg 126
-        int base = switch (roll) {
-            case 1 -> 0;
-            case 2 -> 375;
-            case 3 -> 750;
-            case 4 -> 1250;
-            case 5 -> 1500;
-            case 6 -> 1650;
-            default -> throw new IllegalStateException("Unexpected value: " + roll);
-        };
-
-        return base * scale;
-    }
-
-    /**
-     * Returns the component-loot support points earned from the number of victorious scenarios, scaled by
-     * {@code scale}.
-     *
-     * @param scenarios the contract's scenarios
-     * @param scale     the loot scale factor
-     *
-     * @return the scaled component-loot support points
-     */
-    private static int determineComponentLoot(List<Scenario> scenarios, int scale) {
-        int runningTotal = 0;
-        for (Scenario scenario : scenarios) {
-            if (scenario.getStatus().isVictory()) {
-                runningTotal++;
-            }
-        }
-
-        // Hot Spots Draconis Reach, first printing, pg 126
-        int value = switch (runningTotal) {
-            case 0 -> 0;
-            case 1 -> 250;
-            case 2 -> 300;
-            case 3 -> 400;
-            case 4 -> 500;
-            case 5 -> 550;
-            case 6 -> 600;
-            default -> 650;
-        };
-
-        return value * scale;
-    }
-
-    /**
-     * Applies the per-character criminal-record change for an act of piracy.
-     *
-     * <p>Each employed character receives {@code baseDelta} (the negative penalty when the detachment was caught, or
-     * {@code 0} for a clean getaway), adjusted by their SPAs: "Leaves Paper Trail" always records one extra point of
-     * criminal record (even on a clean getaway), while "Leaves No Trail" reduces the criminal record gained by one, but
-     * never turns a penalty into a bonus.</p>
-     *
-     * @param personnel the personnel involved in the act of piracy
-     * @param baseDelta the base criminal-record change (negative when caught, {@code 0} otherwise)
-     */
-    private static void updatePersonnelForActOfPiracy(List<Person> personnel, int baseDelta) {
-        for (Person person : personnel) {
-            if (!person.isEmployed()) {
-                continue;
-            }
-
-            int criminalRecordDelta = baseDelta;
-            PersonnelOptions options = person.getOptions();
-            if (options.booleanOption(PersonnelOptions.LOOSE_LIPS)) {
-                criminalRecordDelta -= 1;
-            } else if (options.booleanOption(PersonnelOptions.LEAVES_NO_TRAIL)) {
-                criminalRecordDelta = min(criminalRecordDelta + 1, 0);
-            }
-
-            if (criminalRecordDelta != 0) {
-                person.changeCriminalRecord(criminalRecordDelta);
-            }
-        }
     }
 
     /**
