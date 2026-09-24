@@ -6392,9 +6392,9 @@ public class Person implements ILocatable {
     }
 
     /**
-     * <51.01 compatibility handler. Tells the player, with an important report, about any retired Natural Aptitude SPA
-     * this person had that couldn't be converted, so they can give the person a Natural Aptitude by hand. Each is only
-     * reported once.
+     * pre-51.01 compatibility handler. Tells the player, with an important report, about any retired Natural Aptitude
+     * SPA this person had that couldn't be converted, so they can give the person a Natural Aptitude by hand. Each
+     * is only reported once.
      *
      * @param campaign the campaign to report to
      *
