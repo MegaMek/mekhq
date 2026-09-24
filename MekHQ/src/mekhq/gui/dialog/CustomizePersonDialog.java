@@ -2229,10 +2229,14 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
                 int level = (Integer) skillLevels.get(type).getModel().getValue();
                 int bonus = (Integer) skillBonus.get(type).getModel().getValue();
                 boolean hasNaturalAptitude = skillNaturalAptitudes.get(type).isSelected();
-                // Keep any progress towards the next level, which rebuilding the skill would otherwise throw away
-                int xpProgress = person.hasSkill(type) ? person.getSkill(type).getXpProgress() : 0;
+                // Keep any progress towards the next level and towards a Natural Aptitude, which rebuilding the skill
+                // would otherwise throw away
+                Skill existingSkill = person.getSkill(type);
+                int xpProgress = (existingSkill == null) ? 0 : existingSkill.getXpProgress();
+                int naturalAptitudeXpProgress = (existingSkill == null) ? 0 :
+                                                      existingSkill.getNaturalAptitudeXpProgress();
                 person.addSkill(type, new Skill(SkillType.getType(type), level, bonus, xpProgress,
-                      hasNaturalAptitude));
+                      hasNaturalAptitude, naturalAptitudeXpProgress));
             } else {
                 person.removeSkill(type);
             }

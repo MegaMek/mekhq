@@ -51,6 +51,7 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 import megamek.Version;
 import megamek.codeUtilities.MathUtility;
@@ -272,10 +273,15 @@ public class SkillType {
     public static final int SKILL_NONE = 0;
     public static final int DISABLED_SKILL_LEVEL = -1;
     /**
-     * The XP cost of buying a Natural Aptitude in a skill, before the campaign's XP cost multiplier, unless the
-     * campaign sets a different cost for that skill. {@link #DISABLED_SKILL_LEVEL} means it can't be bought.
+     * The default XP cost of buying a Natural Aptitude in a Basic skill (A Time of War complexity SB or CB), before the
+     * campaign's XP cost multiplier. Campaigns can set a different cost per skill.
      */
-    public static final int DEFAULT_NATURAL_APTITUDE_COST = 300;
+    public static final int BASIC_NATURAL_APTITUDE_COST = 300;
+    /**
+     * The default XP cost of buying a Natural Aptitude in an Advanced skill (A Time of War complexity SA or CA), before
+     * the campaign's XP cost multiplier. Campaigns can set a different cost per skill.
+     */
+    public static final int ADVANCED_NATURAL_APTITUDE_COST = 500;
 
     public static final int EXP_NONE = -1;
     public static final int EXP_ULTRA_GREEN = 0;
@@ -299,7 +305,7 @@ public class SkillType {
     private int heroicLvl;
     private int legendaryLvl;
     private Integer[] costs;
-    private int naturalAptitudeCost = DEFAULT_NATURAL_APTITUDE_COST;
+    private int naturalAptitudeCost = BASIC_NATURAL_APTITUDE_COST;
 
     /**
      * @param level skill level integer to get name for
@@ -578,6 +584,7 @@ public class SkillType {
         this.eliteLvl = eliteLvl == null ? 5 : eliteLvl;
         this.heroicLvl = heroicLvl == null ? 6 : heroicLvl;
         this.legendaryLvl = legendaryLvl == null ? 7 : legendaryLvl;
+        this.naturalAptitudeCost = getDefaultNaturalAptitudeCost(name);
 
         // This validates the length of costs to ensure that valid entries exist for all possible skill levels (0-10,
         // inclusive)
@@ -936,6 +943,50 @@ public class SkillType {
      */
     public boolean isNaturalAptitudePurchasable() {
         return naturalAptitudeCost != DISABLED_SKILL_LEVEL;
+    }
+
+    /**
+     * Skill groups whose every specialty is an Advanced skill in A Time of War. Matched by the prefix before the
+     * specialty, e.g. {@code "Science/"}.
+     */
+    private static final List<String> ADVANCED_SKILL_GROUPS = List.of("Piloting/", "Gunnery/", "Tech/", "Art/",
+          "Interest/", "Science/", "Security Systems/");
+
+    /** Individual skills that are Advanced in A Time of War. */
+    private static final Set<String> ADVANCED_SKILLS = Set.of(S_ARTILLERY, S_DEMOLITIONS, S_MARTIAL_ARTS,
+          S_MELEE_WEAPONS, S_SURGERY, S_ADMIN, S_LEADER, S_STRATEGY, S_TACTICS, S_TRAINING, S_ESCAPE_ARTIST,
+          S_FORGERY, S_SENSOR_OPERATIONS, S_STEALTH, S_TRACKING, S_SLEIGHT_OF_HAND, S_COMPUTERS, S_CRYPTOGRAPHY,
+          S_INTERROGATION, S_INVESTIGATION, S_LANGUAGES, S_PROTOCOLS, S_SURVIVAL);
+
+    /**
+     * The default XP cost of buying a Natural Aptitude in a skill, based on its complexity in the A Time of War Master
+     * Skills List: {@link #ADVANCED_NATURAL_APTITUDE_COST} for Advanced skills (SA and CA) and
+     * {@link #BASIC_NATURAL_APTITUDE_COST} for Basic skills (SB and CB). Skills with no A Time of War equivalent, such
+     * as Astech, count as Basic.
+     *
+     * @param skillName the name of the skill
+     *
+     * @return the default cost, before the campaign's XP cost multiplier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getDefaultNaturalAptitudeCost(@Nullable String skillName) {
+        if (skillName == null) {
+            return BASIC_NATURAL_APTITUDE_COST;
+        }
+
+        if (ADVANCED_SKILLS.contains(skillName)) {
+            return ADVANCED_NATURAL_APTITUDE_COST;
+        }
+
+        for (String skillGroup : ADVANCED_SKILL_GROUPS) {
+            if (skillName.startsWith(skillGroup)) {
+                return ADVANCED_NATURAL_APTITUDE_COST;
+            }
+        }
+
+        return BASIC_NATURAL_APTITUDE_COST;
     }
 
     /**
@@ -1422,6 +1473,7 @@ public class SkillType {
         try {
             SkillType skillType = new SkillType();
             NodeList nodeList = workingNode.getChildNodes();
+            boolean hasNaturalAptitudeCost = false;
 
             for (int x = 0; x < nodeList.getLength(); x++) {
                 Node wn2 = nodeList.item(x);
@@ -1469,7 +1521,13 @@ public class SkillType {
                 } else if (wn2.getNodeName().equalsIgnoreCase("naturalAptitudeCost")) {
                     skillType.naturalAptitudeCost = MathUtility.parseInt(wn2.getTextContent(),
                           skillType.naturalAptitudeCost);
+                    hasNaturalAptitudeCost = true;
                 }
+            }
+
+            // Saves and presets from before Natural Aptitude costs existed get the default for the skill
+            if (!hasNaturalAptitudeCost) {
+                skillType.naturalAptitudeCost = getDefaultNaturalAptitudeCost(skillType.name);
             }
 
             lookupHash.put(skillType.name, skillType);
@@ -1484,6 +1542,7 @@ public class SkillType {
         try {
             SkillType skillType = new SkillType();
             NodeList nl = wn.getChildNodes();
+            boolean hasNaturalAptitudeCost = false;
 
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
@@ -1519,7 +1578,13 @@ public class SkillType {
                 } else if (wn2.getNodeName().equalsIgnoreCase("naturalAptitudeCost")) {
                     skillType.naturalAptitudeCost = MathUtility.parseInt(wn2.getTextContent(),
                           skillType.naturalAptitudeCost);
+                    hasNaturalAptitudeCost = true;
                 }
+            }
+
+            // Saves and presets from before Natural Aptitude costs existed get the default for the skill
+            if (!hasNaturalAptitudeCost) {
+                skillType.naturalAptitudeCost = getDefaultNaturalAptitudeCost(skillType.name);
             }
 
             hash.put(skillType.name, skillType);

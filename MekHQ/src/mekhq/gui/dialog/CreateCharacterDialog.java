@@ -1380,12 +1380,15 @@ public class CreateCharacterDialog extends JDialog implements DialogOptionListen
             if (skillChecks.get(type).isSelected()) {
                 int lvl = (Integer) skillLvls.get(type).getModel().getValue();
                 int b = (Integer) skillBonus.get(type).getModel().getValue();
-                // Keep the existing skill's Natural Aptitude and progress towards the next level, which rebuilding
-                // the skill would otherwise throw away
+                // Keep the existing skill's Natural Aptitude and progress towards both the next level and a Natural
+                // Aptitude, which rebuilding the skill would otherwise throw away
                 Skill existingSkill = person.getSkill(type);
                 int xpProgress = (existingSkill == null) ? 0 : existingSkill.getXpProgress();
                 boolean hasNaturalAptitude = (existingSkill != null) && existingSkill.getHasNaturalAptitude();
-                person.addSkill(type, new Skill(SkillType.getType(type), lvl, b, xpProgress, hasNaturalAptitude));
+                int naturalAptitudeXpProgress = (existingSkill == null) ? 0 :
+                                                      existingSkill.getNaturalAptitudeXpProgress();
+                person.addSkill(type, new Skill(SkillType.getType(type), lvl, b, xpProgress, hasNaturalAptitude,
+                      naturalAptitudeXpProgress));
             } else {
                 person.removeSkill(type);
             }

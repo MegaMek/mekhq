@@ -111,6 +111,8 @@ public class Skill {
     private int bonus;
     private int xpProgress;
     private boolean hasNaturalAptitude;
+    /** XP put towards gaining a Natural Aptitude in this skill, which reduces the cost of buying it. */
+    private int naturalAptitudeXpProgress;
 
     protected Skill() {
 
@@ -130,11 +132,28 @@ public class Skill {
     }
 
     public Skill(SkillType type, int level, int bonus, int xpProgress, boolean hasNaturalAptitude) {
+        this(type, level, bonus, xpProgress, hasNaturalAptitude, 0);
+    }
+
+    /**
+     * @param type                      the skill type
+     * @param level                     the skill level
+     * @param bonus                     the skill bonus
+     * @param xpProgress                XP put towards the next skill level
+     * @param hasNaturalAptitude        whether the character has a Natural Aptitude in this skill
+     * @param naturalAptitudeXpProgress XP put towards gaining a Natural Aptitude in this skill
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Skill(SkillType type, int level, int bonus, int xpProgress, boolean hasNaturalAptitude,
+          int naturalAptitudeXpProgress) {
         this.type = type;
         this.level = level;
         this.bonus = bonus;
         this.xpProgress = xpProgress;
         this.hasNaturalAptitude = hasNaturalAptitude;
+        this.naturalAptitudeXpProgress = max(0, naturalAptitudeXpProgress);
     }
 
     /**
@@ -248,6 +267,29 @@ public class Skill {
 
     public void setHasNaturalAptitude(boolean hasNaturalAptitude) {
         this.hasNaturalAptitude = hasNaturalAptitude;
+    }
+
+    /**
+     * @return the XP put towards gaining a Natural Aptitude in this skill
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getNaturalAptitudeXpProgress() {
+        return naturalAptitudeXpProgress;
+    }
+
+    /**
+     * Adds (or, with a negative delta, removes) XP put towards gaining a Natural Aptitude in this skill. Progress never
+     * drops below zero.
+     *
+     * @param delta the XP to add
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void changeNaturalAptitudeXpProgress(int delta) {
+        naturalAptitudeXpProgress = max(0, naturalAptitudeXpProgress + delta);
     }
 
     public SkillType getType() {
@@ -1048,6 +1090,9 @@ public class Skill {
         if (hasNaturalAptitude) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "hasNaturalAptitude", true);
         }
+        if (naturalAptitudeXpProgress > 0) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "naturalAptitudeXpProgress", naturalAptitudeXpProgress);
+        }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "skill");
     }
 
@@ -1074,6 +1119,8 @@ public class Skill {
                     retVal.xpProgress = MathUtility.parseInt(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("hasNaturalAptitude")) {
                     retVal.hasNaturalAptitude = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("naturalAptitudeXpProgress")) {
+                    retVal.naturalAptitudeXpProgress = max(0, MathUtility.parseInt(wn2.getTextContent()));
                 }
             }
         } catch (Exception ex) {
