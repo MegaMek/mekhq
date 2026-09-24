@@ -5377,6 +5377,9 @@ public class Unit implements ITechnology, ILocatable {
      * <p>When the campaign doesn't use the separate Artillery skill, artillery is fired using Gunnery, so the
      * Artillery aptitude mirrors the Gunnery aptitude.</p>
      *
+     * <p>The Small Arms aptitude is sent even though the Small Arms skill itself isn't; MegaMek uses its default
+     * skill for crews on foot, but the aptitude is still the person's own.</p>
+     *
      * @param crew      the entity's crew
      * @param slot      the crew slot to update
      * @param person    the person in that slot (the commander, for single-slot crews), or {@code null} if none
@@ -5396,6 +5399,9 @@ public class Unit implements ITechnology, ILocatable {
         crew.setHasNaturalAptitudeArtillery(isUseArtillerySkill ?
                                                   hasNaturalAptitude(person, SkillType.S_ARTILLERY) :
                                                   hasNaturalAptitudeGunnery, slot);
+
+        // Used by MegaMek once the crew is on foot and fighting with their sidearms
+        crew.setHasNaturalAptitudeSmallArms(hasNaturalAptitude(person, SkillType.S_SMALL_ARMS), slot);
     }
 
     /**
