@@ -592,6 +592,8 @@ public class ResolveScenarioTracker {
                 String uuid = UUID.randomUUID().toString();
                 entity.setExternalIdAsString(uuid);
             }
+            // Clear game setting for entities
+            entity.setGame(campaign.getGame());
         }
     }
 
