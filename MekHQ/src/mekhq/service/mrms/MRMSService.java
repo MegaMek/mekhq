@@ -140,7 +140,7 @@ public class MRMSService {
                     Part part = (Part) partWork;
                     part.resetModeToNormal();
 
-                    List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, true, campaign);
+                    List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, campaign);
 
                     if (validTechs.isEmpty()) {
                         continue;
@@ -882,7 +882,7 @@ public class MRMSService {
             ((Part) partWork).resetModeToNormal();
         }
 
-        List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, false, campaign);
+        List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, campaign);
 
         if (validTechs.isEmpty()) {
             unitAction.addPartAction(MRMSPartAction.createNoTechs(partWork));
@@ -1334,7 +1334,7 @@ public class MRMSService {
     }
 
     private static List<Person> filterTechs(IPartWork partWork, List<Person> techs,
-          Map<PartRepairType, MRMSOption> mrmsOptionsByType, boolean warehouseMode, Campaign campaign) {
+          Map<PartRepairType, MRMSOption> mrmsOptionsByType, Campaign campaign) {
         List<Person> validTechs = new ArrayList<>();
 
         if (techs.isEmpty()) {
@@ -1354,7 +1354,10 @@ public class MRMSService {
                 continue;
             }
 
-            if (warehouseMode && !tech.isRightTechTypeFor(partWork)) {
+            // Only techs with the skill the task requires may be assigned; with granular tech skills a tech lacking
+            // the specialist skill would otherwise fall back to an unrelated skill and trigger the wrong-tech-type
+            // warning
+            if (!tech.isRightTechTypeFor(partWork)) {
                 continue;
             }
 
