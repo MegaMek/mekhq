@@ -332,7 +332,7 @@ public class HudSegmentedControl<T> extends JPanel {
 
         @Override
         protected void paintComponent(Graphics graphics) {
-            Graphics2D g2 = (Graphics2D) graphics.create();
+            Graphics2D graphics2D = (Graphics2D) graphics.create();
             try {
                 int width = getWidth();
                 int height = getHeight();
@@ -343,19 +343,19 @@ public class HudSegmentedControl<T> extends JPanel {
                 } else if (isHovered) {
                     background = style.hoveredBackground();
                 }
-                g2.setColor(background);
-                g2.fillRect(0, 0, width, height);
+                graphics2D.setColor(background);
+                graphics2D.fillRect(0, 0, width, height);
                 if (hasRightBorder) {
-                    g2.setColor(BORDER);
-                    g2.fillRect(width - scaleForGUI(1), 0, scaleForGUI(1), height);
+                    graphics2D.setColor(BORDER);
+                    graphics2D.fillRect(width - scaleForGUI(1), 0, scaleForGUI(1), height);
                 }
                 if (isSelectedCell) {
                     int underline = scaleForGUI(2);
-                    g2.setColor(ACCENT);
-                    g2.fillRect(0, height - underline, width, underline);
+                    graphics2D.setColor(ACCENT);
+                    graphics2D.fillRect(0, height - underline, width, underline);
                 }
             } finally {
-                g2.dispose();
+                graphics2D.dispose();
             }
             super.paintComponent(graphics);
         }
