@@ -74,6 +74,13 @@ public class HudTabStrip extends JPanel {
     private final List<Cell> cells = new ArrayList<>();
     private final transient IntConsumer onSelect;
 
+    /**
+     * Builds a strip with one cell per label, in order.
+     *
+     * @param labels   the cell labels, left to right
+     * @param compact  {@code true} for the smaller cell padding and font
+     * @param onSelect called with the index of the cell the player picks
+     */
     public HudTabStrip(List<String> labels, boolean compact, IntConsumer onSelect) {
         this.onSelect = onSelect;
         setLayout(new GridLayout(1, labels.size(), 0, 0));

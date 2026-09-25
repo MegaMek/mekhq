@@ -38,7 +38,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.annotation.Nullable;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.AeroSpaceFighter;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;

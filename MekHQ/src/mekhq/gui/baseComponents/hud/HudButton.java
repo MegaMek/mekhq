@@ -116,10 +116,18 @@ public class HudButton extends JPanel {
         });
     }
 
+    /**
+     * Adds a listener that is told when the player clicks the button or presses Space or Enter on it while it is armed.
+     *
+     * @param listener the listener to add
+     */
     public void addActionListener(ActionListener listener) {
         listeners.add(listener);
     }
 
+    /**
+     * @param text the button's new label
+     */
     public void setText(String text) {
         label.setText(text);
     }
@@ -131,6 +139,9 @@ public class HudButton extends JPanel {
         repaint();
     }
 
+    /**
+     * @return {@code true} if the button is enabled and will fire
+     */
     public boolean isArmed() {
         return armed;
     }

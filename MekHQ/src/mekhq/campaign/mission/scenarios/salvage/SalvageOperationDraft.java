@@ -36,7 +36,7 @@ import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.isForceDepl
 
 import java.util.*;
 
-import jakarta.annotation.Nullable;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;

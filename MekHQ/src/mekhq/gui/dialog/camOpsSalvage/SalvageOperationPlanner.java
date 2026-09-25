@@ -63,11 +63,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableModel;
 
-import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -144,7 +144,8 @@ public class SalvageOperationPlanner extends JDialog {
     private final JLabel teamCount = countLabel();
     private final DefaultListModel<Object> teamModel = new DefaultListModel<>();
     private final JList<Object> teamList = new JList<>(teamModel);
-    private transient @Nullable TeamOption focusedTeam;
+    /** The team shown in the dossier, or {@code null} while none is focused. */
+    private transient TeamOption focusedTeam;
     private final JPanel teamDossier = Hud.transparentPanel(null);
     private final JLabel teamDossierEmpty = Hud.notice(text("teamDossier.empty"));
     private final JLabel teamTitle = dossierTitleLabel();
@@ -173,7 +174,8 @@ public class SalvageOperationPlanner extends JDialog {
     private final JList<Object> techList = new JList<>(techModel);
     private final JLabel hiddenNote = new JLabel();
     private final HudChip showAllChip = new HudChip(text("showAll"), this::clearTechFilters);
-    private transient @Nullable SalvageTechCandidate focusedTech;
+    /** The tech shown in the dossier, or {@code null} while none is focused. */
+    private transient SalvageTechCandidate focusedTech;
     private final JPanel techDossier = Hud.transparentPanel(null);
     private final JLabel techDossierEmpty = Hud.notice(text("techDossier.empty"));
     private final JLabel techTitle = dossierTitleLabel();
@@ -222,7 +224,8 @@ public class SalvageOperationPlanner extends JDialog {
         HEROIC(SkillLevel.HEROIC),
         LEGENDARY(SkillLevel.LEGENDARY);
 
-        private final @Nullable SkillLevel skillLevel;
+        /** The experience level to show, or {@code null} for {@link #ANY}. */
+        private final SkillLevel skillLevel;
 
         ExperienceFilter(@Nullable SkillLevel skillLevel) {
             this.skillLevel = skillLevel;
@@ -342,7 +345,7 @@ public class SalvageOperationPlanner extends JDialog {
     private String contextText() {
         String system = campaign.getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getLabel();
         String environment = draft.isInSpace() ? text("context.space") : text("context.ground");
-        return system + " · " + environment;
+        return formatted("context", system, environment);
     }
 
     private JComponent buildTeamsPage() {
@@ -1249,8 +1252,8 @@ public class SalvageOperationPlanner extends JDialog {
             preferences.manage(new JToggleButtonPreference(hideUnitTechs));
             preferences.manage(new JComboBoxPreference(experience));
             preferences.manage(new JComboBoxPreference(techSort));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to set user preferences", ex);
+        } catch (Exception exception) {
+            LOGGER.error("Failed to set user preferences", exception);
         }
     }
 

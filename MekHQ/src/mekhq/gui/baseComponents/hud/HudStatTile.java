@@ -55,7 +55,7 @@ import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import jakarta.annotation.Nullable;
+import megamek.common.annotations.Nullable;
 
 /**
  * A deep-surface stat tile - a small key, a large coloured value, and a faint sub-line - matching the debrief
@@ -167,7 +167,8 @@ public class HudStatTile extends JPanel {
     private static final class Meter extends JComponent {
         private double fill;
         private Color fillColor = ACCENT;
-        private @Nullable Double threshold;
+        /** Where the threshold mark sits (0-1), or {@code null} for no mark. */
+        private Double threshold;
 
         private Meter() {
             Dimension size = new Dimension(Short.MAX_VALUE, scaleForGUI(10));

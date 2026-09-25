@@ -36,7 +36,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.annotation.Nullable;
+import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 
 /**

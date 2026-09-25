@@ -59,12 +59,12 @@ import java.util.Set;
 import java.util.UUID;
 import javax.swing.*;
 
-import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.FilteredComboBoxModel;
 import megamek.client.ui.comboBoxes.SearchableComboBox;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -124,11 +124,13 @@ public class SalvageRecoveryConsole extends JDialog {
 
     private final transient Campaign campaign;
     private final boolean isInSpace;
-    private final transient @Nullable SalvageRecoverySession session;
+    /** The recovery being settled, or {@code null} when there is nothing to settle and the console never opens. */
+    private final transient SalvageRecoverySession session;
     private final transient Map<String, Integer> ownedVariantCounts = new HashMap<>();
     private final transient Map<String, Integer> ownedChassisCounts = new HashMap<>();
 
-    private transient @Nullable WreckRecovery focused;
+    /** The wreck shown in the dossier, or {@code null} while none is focused. */
+    private transient WreckRecovery focused;
     private BoardFilter boardFilter = BoardFilter.ALL;
     private boolean isRefreshing;
 
@@ -136,7 +138,8 @@ public class SalvageRecoveryConsole extends JDialog {
     private HudStatTile rightsTile;
     private HudStatTile firstMoneyTile;
     private HudStatTile secondMoneyTile;
-    private @Nullable HudStatTile techTimeTile;
+    /** The tech time tile, or {@code null} under salvage systems that don't use salvage teams. */
+    private HudStatTile techTimeTile;
     private final HudVerdictBanner verdictBanner = new HudVerdictBanner();
 
     // Board
@@ -1189,8 +1192,8 @@ public class SalvageRecoveryConsole extends JDialog {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(SalvageRecoveryConsole.class);
             setName("SalvageRecoveryConsole");
             preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to set user preferences", ex);
+        } catch (Exception exception) {
+            LOGGER.error("Failed to set user preferences", exception);
         }
     }
 
@@ -1299,7 +1302,7 @@ public class SalvageRecoveryConsole extends JDialog {
                     figures.add(formatted("freeCargo",
                           remainingCapacity.freeCargoTons()));
                 }
-                figure = String.join(" · ", figures);
+                figure = String.join(text("capacity.separator"), figures);
                 ringColor = ACCENT;
             } else if (isUsed) {
                 tags.add(new Tag(text("fleet.busy"), ACCENT));

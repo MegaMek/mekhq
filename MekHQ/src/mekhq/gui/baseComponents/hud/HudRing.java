@@ -55,6 +55,7 @@ public class HudRing extends JComponent {
     private Color color = TEXT_MUTED;
     private boolean isFilled;
 
+    /** Builds a small hollow ring in the muted text colour. */
     public HudRing() {
         Dimension size = new Dimension(scaleForGUI(12), scaleForGUI(12));
         setPreferredSize(size);
