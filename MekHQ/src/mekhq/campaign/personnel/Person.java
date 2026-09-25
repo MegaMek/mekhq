@@ -7758,7 +7758,8 @@ public class Person implements ILocatable {
             return getSkill(S_TECH_MEK);
         } else if ((unit.getEntity() instanceof BattleArmor) && hasSkill(S_TECH_BA)) {
             return getSkill(S_TECH_BA);
-        } else if ((unit.getEntity() instanceof Tank) && hasSkill(S_TECH_VEHICLE)) {
+        } else if (((unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof AbstractBuildingEntity)) &&
+                         hasSkill(S_TECH_VEHICLE)) {
             return getSkill(S_TECH_VEHICLE);
         } else if (((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) &&
                          hasSkill(S_TECH_VESSEL)) {
@@ -7834,7 +7835,7 @@ public class Person implements ILocatable {
             return S_TECH_VESSEL;
         } else if (entity instanceof Aero) {
             return S_TECH_AERO;
-        } else if (entity instanceof Tank || entity instanceof Infantry) {
+        } else if (entity instanceof Tank || entity instanceof AbstractBuildingEntity || entity instanceof Infantry) {
             return S_TECH_VEHICLE;
         }
 
