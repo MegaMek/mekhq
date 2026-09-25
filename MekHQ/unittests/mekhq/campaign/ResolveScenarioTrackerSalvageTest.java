@@ -103,6 +103,55 @@ class ResolveScenarioTrackerSalvageTest {
     }
 
     @Nested
+    class SupersededEntities {
+        @Test
+        void entityInALaterListIsSuperseded() {
+            Set<Integer> laterListEntityIds = ResolveScenarioTracker.collectEntityIds(List.of(entity(3, "-1", null)));
+
+            assertTrue(ResolveScenarioTracker.isSupersededEntity(entity(3, "-1", null), laterListEntityIds));
+        }
+
+        @Test
+        void entityOnlyInThisListIsNotSuperseded() {
+            Set<Integer> laterListEntityIds = ResolveScenarioTracker.collectEntityIds(List.of(entity(4, "-1", null)));
+
+            assertFalse(ResolveScenarioTracker.isSupersededEntity(entity(3, "-1", null), laterListEntityIds));
+        }
+
+        @Test
+        void collectsIdsFromEveryList() {
+            Set<Integer> laterListEntityIds = ResolveScenarioTracker.collectEntityIds(List.of(entity(3, "-1", null)),
+                  List.of(entity(4, "-1", null)));
+
+            assertTrue(laterListEntityIds.containsAll(Set.of(3, 4)));
+        }
+
+        @Test
+        void entitiesWithoutAGameIdAreNeverSuperseded() {
+            Set<Integer> laterListEntityIds = ResolveScenarioTracker.collectEntityIds(List.of(entity(Entity.NONE,
+                  "-1",
+                  null)));
+
+            assertTrue(laterListEntityIds.isEmpty());
+            assertFalse(ResolveScenarioTracker.isSupersededEntity(entity(Entity.NONE, "-1", null),
+                  Set.of(Entity.NONE)));
+        }
+
+        @Test
+        void supersededCheckDoesNotClaimTheId() {
+            Set<Integer> processedEntityIds = new HashSet<>();
+            Entity liveReport = entity(3, "-1", null);
+
+            // The live loop skips it without recording it, so the later graveyard report is still processed
+            boolean skipped = ResolveScenarioTracker.isSupersededEntity(liveReport, Set.of(3)) ||
+                                    ResolveScenarioTracker.isDuplicateEntity(liveReport, processedEntityIds);
+
+            assertTrue(skipped);
+            assertFalse(ResolveScenarioTracker.isDuplicateEntity(entity(3, "-1", null), processedEntityIds));
+        }
+    }
+
+    @Nested
     class PreScenarioCamouflage {
         private final Campaign campaign = mockCampaign();
         private final Scenario scenario = mock(Scenario.class);

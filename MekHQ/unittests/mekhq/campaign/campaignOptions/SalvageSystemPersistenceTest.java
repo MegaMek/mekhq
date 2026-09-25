@@ -80,10 +80,10 @@ class SalvageSystemPersistenceTest {
     }
 
     @Test
-    void newCampaignsDefaultToCamOpsStrict() {
+    void newCampaignsDefaultToLegacy() {
         CampaignOptions options = new CampaignOptions();
 
-        assertEquals(SalvageSystem.CAM_OPS_STRICT, options.get(CampaignOption.SALVAGE_SYSTEM));
+        assertEquals(SalvageSystem.LEGACY, options.get(CampaignOption.SALVAGE_SYSTEM));
         assertFalse(options.get(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE));
     }
 
@@ -131,14 +131,14 @@ class SalvageSystemPersistenceTest {
     }
 
     @Test
-    void saveWithoutAnySalvageTagDefaultsToCamOpsStrict() throws Exception {
-        assertEquals(SalvageSystem.CAM_OPS_STRICT, unmarshalTags("").get(CampaignOption.SALVAGE_SYSTEM));
+    void saveWithoutAnySalvageTagDefaultsToLegacy() throws Exception {
+        assertEquals(SalvageSystem.LEGACY, unmarshalTags("").get(CampaignOption.SALVAGE_SYSTEM));
     }
 
     @Test
-    void unknownSalvageSystemFallsBackToCamOpsStrict() throws Exception {
+    void unknownSalvageSystemFallsBackToLegacy() throws Exception {
         CampaignOptions loaded = unmarshalTags("<salvageSystem>NOT_A_SYSTEM</salvageSystem>");
 
-        assertEquals(SalvageSystem.CAM_OPS_STRICT, loaded.get(CampaignOption.SALVAGE_SYSTEM));
+        assertEquals(SalvageSystem.LEGACY, loaded.get(CampaignOption.SALVAGE_SYSTEM));
     }
 }

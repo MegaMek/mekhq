@@ -955,7 +955,7 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Boolean> IS_USE_TWO_WAY_PAY =
           of(Boolean.class, true, "isUseTwoWayPay");
     public static final CampaignOption<SalvageSystem> SALVAGE_SYSTEM =
-          of(SalvageSystem.class, SalvageSystem.CAM_OPS_STRICT, "salvageSystem");
+          of(SalvageSystem.class, SalvageSystem.LEGACY, "salvageSystem");
     public static final CampaignOption<Boolean> IS_USE_RISKY_SALVAGE =
           of(Boolean.class, false, "isUseRiskySalvage");
     public static final CampaignOption<Boolean> IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE =

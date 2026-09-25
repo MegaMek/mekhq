@@ -356,6 +356,55 @@ public class ResolveScenarioTracker {
         return true;
     }
 
+    /**
+     * Checks whether an entity is also reported in an end-of-game list with a more final status, in which case that
+     * later list's report is used instead of this one.
+     *
+     * <p>Lists are ranked devastated, then graveyard/salvage, then retreated, then live. Must be checked before
+     * {@link #isDuplicateEntity(Entity, Set)} so a superseded report doesn't claim the entity's ID.</p>
+     *
+     * @param entity             the entity about to be processed
+     * @param laterListEntityIds the game IDs of entities reported in a list with a more final status
+     *
+     * @return {@code true} if the entity should be skipped here
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isSupersededEntity(Entity entity, Set<Integer> laterListEntityIds) {
+        int entityId = entity.getId();
+        if ((entityId == Entity.NONE) || !laterListEntityIds.contains(entityId)) {
+            return false;
+        }
+
+        logger.warn("Entity {} (id {}) was reported in more than one end-of-game list; using its most final status",
+              entity.getDisplayName(), entityId);
+        return true;
+    }
+
+    /**
+     * Collects the game IDs of every entity in the given end-of-game lists.
+     *
+     * @param entityLists the lists to collect from
+     *
+     * @return the game IDs, excluding {@link Entity#NONE}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @SafeVarargs
+    static Set<Integer> collectEntityIds(Collection<Entity>... entityLists) {
+        Set<Integer> entityIds = new HashSet<>();
+        for (Collection<Entity> entityList : entityLists) {
+            for (Entity entity : entityList) {
+                if (entity.getId() != Entity.NONE) {
+                    entityIds.add(entity.getId());
+                }
+            }
+        }
+        return entityIds;
+    }
+
     public void processGame() {
         int playerId = client.getLocalPlayer().getId();
         int team = client.getLocalPlayer().getTeam();
@@ -363,8 +412,14 @@ public class ResolveScenarioTracker {
         sanitizeAllEntityExternalIds();
 
         // MegaMek can occasionally report the same entity more than once (seen after resuming a saved game), which
-        // would otherwise duplicate salvage and kill credits
+        // would otherwise duplicate salvage and kill credits. When an entity appears in more than one list, the most
+        // final status wins: devastated, then graveyard, then retreated, then live.
         Set<Integer> processedEntityIds = new HashSet<>();
+        Set<Integer> supersededLiveEntityIds = collectEntityIds(Collections.list(victoryEvent.getDevastatedEntities()),
+              Collections.list(victoryEvent.getRetreatedEntities()),
+              Collections.list(victoryEvent.getGraveyardEntities()));
+        Set<Integer> supersededRetreatedEntityIds =
+              collectEntityIds(Collections.list(victoryEvent.getGraveyardEntities()));
 
         for (Enumeration<Entity> entityIterator = victoryEvent.getEntities(); entityIterator.hasMoreElements(); ) {
             Entity entity = entityIterator.nextElement();
@@ -373,7 +428,8 @@ public class ResolveScenarioTracker {
                 continue;
             }
 
-            if (isDuplicateEntity(entity, processedEntityIds)) {
+            if (isSupersededEntity(entity, supersededLiveEntityIds) ||
+                      isDuplicateEntity(entity, processedEntityIds)) {
                 continue;
             }
 
@@ -510,7 +566,8 @@ public class ResolveScenarioTracker {
                 continue;
             }
 
-            if (isDuplicateEntity(entity, processedEntityIds)) {
+            if (isSupersededEntity(entity, supersededRetreatedEntityIds) ||
+                      isDuplicateEntity(entity, processedEntityIds)) {
                 continue;
             }
 
@@ -1630,6 +1687,9 @@ public class ResolveScenarioTracker {
         // MUL files are written from the same end-of-game data as the live path, so the same entity can be listed
         // more than once; see processGame()
         Set<Integer> processedEntityIds = new HashSet<>();
+        Set<Integer> supersededLiveEntityIds = collectEntityIds(parser.getDevastated(),
+              parser.getSalvage(),
+              parser.getRetreated());
 
         // Map everyone's ID to External ID
         for (Entity e : parser.getEntities()) {
@@ -1657,7 +1717,7 @@ public class ResolveScenarioTracker {
         }
 
         for (Entity e : parser.getSurvivors()) {
-            if (isDuplicateEntity(e, processedEntityIds)) {
+            if (isSupersededEntity(e, supersededLiveEntityIds) || isDuplicateEntity(e, processedEntityIds)) {
                 continue;
             }
 
@@ -1690,7 +1750,7 @@ public class ResolveScenarioTracker {
         }
 
         for (Entity e : parser.getAllies()) {
-            if (isDuplicateEntity(e, processedEntityIds)) {
+            if (isSupersededEntity(e, supersededLiveEntityIds) || isDuplicateEntity(e, processedEntityIds)) {
                 continue;
             }
 

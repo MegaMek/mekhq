@@ -36,6 +36,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.function.Supplier;
 
+import megamek.logging.MMLogger;
+
 /**
  * The salvage rulesets a campaign can use to resolve post-scenario salvage.
  *
@@ -56,6 +58,7 @@ public enum SalvageSystem {
     /** An expanded version of Campaign Operations salvage. */
     MEKHQ("MEKHQ", MekHQSalvage::new);
 
+    private static final MMLogger LOGGER = MMLogger.create(SalvageSystem.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.SalvageSystem";
 
     private final String lookupName;
@@ -99,7 +102,7 @@ public enum SalvageSystem {
      *
      * @param lookupName the lookup name, as stored in campaign files
      *
-     * @return the matching salvage system, or {@link #CAM_OPS_STRICT} if none matches
+     * @return the matching salvage system, or {@link #LEGACY} if none matches
      *
      * @author Illiani
      * @since 0.51.01
@@ -111,7 +114,8 @@ public enum SalvageSystem {
             }
         }
 
-        return CAM_OPS_STRICT;
+        LOGGER.warn("Unknown salvage system '{}', defaulting to {}", lookupName, LEGACY);
+        return LEGACY;
     }
 
     @Override

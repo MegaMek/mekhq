@@ -120,10 +120,10 @@ class SalvageRulesTest {
         }
 
         @Test
-        void unknownOrMissingLookupNameFallsBackToCamOpsStrict() {
-            assertEquals(SalvageSystem.CAM_OPS_STRICT, SalvageSystem.fromLookupName("NOT_A_SYSTEM"));
-            assertEquals(SalvageSystem.CAM_OPS_STRICT, SalvageSystem.fromLookupName(""));
-            assertEquals(SalvageSystem.CAM_OPS_STRICT, SalvageSystem.fromLookupName(null));
+        void unknownOrMissingLookupNameFallsBackToLegacy() {
+            assertEquals(SalvageSystem.LEGACY, SalvageSystem.fromLookupName("NOT_A_SYSTEM"));
+            assertEquals(SalvageSystem.LEGACY, SalvageSystem.fromLookupName(""));
+            assertEquals(SalvageSystem.LEGACY, SalvageSystem.fromLookupName(null));
         }
 
         @ParameterizedTest

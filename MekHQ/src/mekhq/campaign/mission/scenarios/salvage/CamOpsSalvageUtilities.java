@@ -246,7 +246,10 @@ public class CamOpsSalvageUtilities {
             if (isKeepEnemyCamouflage && !fieldedCamouflage.hasDefaultCategory()) {
                 salvagedUnit.getEntity().setCamouflage(fieldedCamouflage);
             }
-            salvagedUnit.setSite(ContractRepairLocation.getRepairLocation(mission.getObjectiveType()));
+            // Units still in transit are given the best repair site when they arrive (see LocationNewDayUtil)
+            if (salvagedUnit.isPresent()) {
+                salvagedUnit.setSite(ContractRepairLocation.getRepairLocation(mission.getObjectiveType()));
+            }
 
             // if this is a contract, add to the salvaged value
             mission.changeSalvagedByUnitValue(salvageUnit.getSellValue());

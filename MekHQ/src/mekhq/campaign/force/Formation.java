@@ -585,7 +585,7 @@ public class Formation {
      *
      * @return a list of {@link Unit} objects associated with the formation.
      */
-    public List<Unit> getAllUnitsAsUnits(mekhq.campaign.LocalHangar hangar, boolean standardFormationsOnly) {
+    public List<Unit> getAllUnitsAsUnits(LocalHangar hangar, boolean standardFormationsOnly) {
         List<Unit> allUnits = new ArrayList<>();
 
         for (UUID unitId : getAllUnits(standardFormationsOnly)) {
@@ -615,7 +615,7 @@ public class Formation {
      * @author Illiani
      * @since 0.50.11
      */
-    public List<Unit> getUnitsAsUnits(mekhq.campaign.LocalHangar hangar) {
+    public List<Unit> getUnitsAsUnits(LocalHangar hangar) {
         List<Unit> allUnits = new ArrayList<>();
 
         for (UUID unitId : getUnits()) {
@@ -1335,7 +1335,7 @@ public class Formation {
      *
      * @return {@code true} if all resolved units in the formation are VTOL or WIGE units, {@code false} otherwise.
      */
-    public boolean formationContainsOnlyVTOLForces(mekhq.campaign.LocalHangar hangar, boolean standardFormationsOnly) {
+    public boolean formationContainsOnlyVTOLForces(LocalHangar hangar, boolean standardFormationsOnly) {
         for (UUID unitId : getAllUnits(standardFormationsOnly)) {
             Entity entity = getEntityFromUnitId(hangar, unitId);
 
@@ -1374,7 +1374,7 @@ public class Formation {
      * @return {@code true} if VTOL or WIGE units constitute at least half of the resolved formation units,
      *       {@code false} otherwise.
      */
-    public boolean formationContainsMajorityVTOLForces(mekhq.campaign.LocalHangar hangar,
+    public boolean formationContainsMajorityVTOLForces(LocalHangar hangar,
             boolean standardFormationsOnly) {
         Vector<UUID> allUnits = getAllUnits(standardFormationsOnly);
         int formationSize = allUnits.size();
@@ -1426,7 +1426,7 @@ public class Formation {
      * @return {@code true} if the formation consists only of aerial units (respecting the provided filters),
      *       {@code false} otherwise.
      */
-    public boolean formationContainsOnlyAerialForces(mekhq.campaign.LocalHangar hangar, boolean standardFormationsOnly,
+    public boolean formationContainsOnlyAerialForces(LocalHangar hangar, boolean standardFormationsOnly,
             boolean excludeConventionalFighters) {
         for (UUID unitId : getAllUnits(standardFormationsOnly)) {
             Entity entity = getEntityFromUnitId(hangar, unitId);
@@ -1456,7 +1456,7 @@ public class Formation {
      *
      * @return the number of units available for salvage operations
      */
-    public int getSalvageUnitCount(mekhq.campaign.LocalHangar hangar, boolean isInSpace,
+    public int getSalvageUnitCount(LocalHangar hangar, boolean isInSpace,
           AbstractSalvage salvageRules) {
         List<Unit> unitsInFormation = getAllUnitsAsUnits(hangar, false);
 
