@@ -149,22 +149,24 @@ public class TechTableModel extends DataTableModel<Person> {
         }
         toReturn.append(tech.getFullTitle()).append("</b><br/>");
 
-        boolean first = true;
-        for (String skillName : DISPLAYED_SKILL_LEVELS) {
-            Skill skill = tech.getSkill(skillName);
-            if (null == skill) {
-                continue;
-            } else if (!first) {
-                toReturn.append("; ");
+        SkillModifierData skillModifierData = tech.getSkillModifierData();
+        Skill taskSkill = (null == part) ? null : tech.getSkillForWorkingOn(part);
+        if (null != taskSkill) {
+            // With a task selected, only show the skill that will actually be used for it
+            appendSkillLevel(toReturn, taskSkill, skillModifierData);
+        } else {
+            boolean first = true;
+            for (String skillName : DISPLAYED_SKILL_LEVELS) {
+                Skill skill = tech.getSkill(skillName);
+                if (null == skill) {
+                    continue;
+                } else if (!first) {
+                    toReturn.append("; ");
+                }
+
+                appendSkillLevel(toReturn, skill, skillModifierData);
+                first = false;
             }
-
-            SkillModifierData skillModifierData = tech.getSkillModifierData();
-            int experienceLevel = skill.getExperienceLevel(skillModifierData);
-
-            toReturn.append("<b>")
-                  .append(SkillType.getColoredExperienceLevelName(experienceLevel))
-                  .append("</b> ").append(skillName);
-            first = false;
         }
 
         toReturn.append(String.format(" (%d XP", tech.getXP()));
@@ -212,5 +214,22 @@ public class TechTableModel extends DataTableModel<Person> {
 
         toReturn.append("</font></html>");
         return toReturn.toString();
+    }
+
+    /**
+     * Appends a skill's colored experience level and name (e.g. "<b>Veteran</b> Tech/Aeronautics") to the builder.
+     *
+     * @param builder           the description being built
+     * @param skill             the skill to describe
+     * @param skillModifierData the tech's skill modifiers, used to determine the effective experience level
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void appendSkillLevel(StringBuilder builder, Skill skill, SkillModifierData skillModifierData) {
+        int experienceLevel = skill.getExperienceLevel(skillModifierData);
+        builder.append("<b>")
+              .append(SkillType.getColoredExperienceLevelName(experienceLevel))
+              .append("</b> ").append(skill.getType().getName());
     }
 }

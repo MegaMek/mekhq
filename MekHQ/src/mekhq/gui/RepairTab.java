@@ -448,7 +448,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnShowAllTechs = new RoundedMMToggleButton(resourceMap.getString("btnShowAllTechs.text"));
         btnShowAllTechs.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText"));
         btnShowAllTechs.setName("btnShowAllTechs");
-        btnShowAllTechs.setSelected(true);
+        btnShowAllTechs.setSelected(false);
         btnShowAllTechs.addActionListener(ev -> filterTechs());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
