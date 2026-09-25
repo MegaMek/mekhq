@@ -71,6 +71,7 @@ public class HudVerdictBanner extends JPanel {
     private final JLabel badgeLabel = new JLabel();
     private Color accent = ACCENT;
 
+    /** Builds an empty banner; {@link #setVerdict} fills it in. */
     public HudVerdictBanner() {
         setOpaque(false);
         setLayout(new BorderLayout(scaleForGUI(16), 0));

@@ -54,9 +54,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
-import jakarta.annotation.Nonnull;
-import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.annotations.Nullable;
 import megamek.common.bays.ASFBay;
 import megamek.common.bays.Bay;
 import megamek.common.bays.SmallCraftBay;
@@ -483,7 +482,7 @@ public class CamOpsSalvageUtilities {
         }
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.accident.injured",
-              victim.getHyperlinkedName(), newHits);
+              victim.getHyperlinkedFullTitle(), newHits);
     }
 
     /**
@@ -539,7 +538,7 @@ public class CamOpsSalvageUtilities {
         return false;
     }
 
-    private static @Nonnull List<Person> getValidTechs(Campaign campaign, List<UUID> techUUIDs) {
+    private static List<Person> getValidTechs(Campaign campaign, List<UUID> techUUIDs) {
         List<Person> techs = new ArrayList<>();
         for (UUID uuid : techUUIDs) {
             Person tech = campaign.getPlayerForce().getHumanResources().getPerson(uuid);
