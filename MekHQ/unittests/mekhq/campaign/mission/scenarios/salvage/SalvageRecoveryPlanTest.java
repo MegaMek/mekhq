@@ -37,9 +37,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
 import megamek.common.bays.ASFBay;
@@ -48,6 +52,7 @@ import megamek.common.bays.SmallCraftBay;
 import megamek.common.units.AeroSpaceFighter;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
+import megamek.common.units.Jumpship;
 import megamek.common.units.Mek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
@@ -55,6 +60,7 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 class SalvageRecoveryPlanTest {
     private static final double DELTA = 0.0001;
@@ -472,7 +478,7 @@ class SalvageRecoveryPlanTest {
         /** A carrier with no units assigned to its bays in the TO&E. */
         private static Unit carrierWithBays(Bay... bays) {
             Dropship dropship = mock(Dropship.class);
-            when(dropship.getTransportBays()).thenReturn(new Vector<>(java.util.List.of(bays)));
+            when(dropship.getTransportBays()).thenReturn(new Vector<>(List.of(bays)));
             Unit unit = mock(Unit.class);
             when(unit.getEntity()).thenReturn(dropship);
             when(unit.getCargoCapacityForSalvage()).thenReturn(1000.0);
@@ -622,7 +628,7 @@ class SalvageRecoveryPlanTest {
             // Like a Vengeance's fighter bay: many slots, several doors
             SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
             Unit carrier = carrierWithBays(fighterBay(18, 4));
-            java.util.List<WreckRecovery> recoveries = new java.util.ArrayList<>();
+            List<WreckRecovery> recoveries = new ArrayList<>();
             for (int i = 0; i < 5; i++) {
                 WreckRecovery recovery = plan.addWreck(fighter());
                 recovery.setRecoveryUnits(carrier, null);
@@ -783,7 +789,7 @@ class SalvageRecoveryPlanTest {
         void largeVesselWithTugIsTuggedAndCommitsTheTug() {
             SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
             Unit tug = mock(Unit.class);
-            megamek.common.units.Jumpship tugEntity = mock(megamek.common.units.Jumpship.class);
+            Jumpship tugEntity = mock(Jumpship.class);
             when(tug.getEntity()).thenReturn(tugEntity);
             Dropship dropship = mock(Dropship.class);
             when(dropship.getWeight()).thenReturn(2000.0);
@@ -791,9 +797,9 @@ class SalvageRecoveryPlanTest {
             WreckRecovery other = plan.addWreck(fighter());
             tugged.setRecoveryUnits(tug, null);
 
-            try (org.mockito.MockedStatic<CamOpsSalvageUtilities> utilities =
-                       org.mockito.Mockito.mockStatic(CamOpsSalvageUtilities.class,
-                             org.mockito.Mockito.CALLS_REAL_METHODS)) {
+            try (MockedStatic<CamOpsSalvageUtilities> utilities =
+                       mockStatic(CamOpsSalvageUtilities.class,
+                             CALLS_REAL_METHODS)) {
                 utilities.when(() -> CamOpsSalvageUtilities.hasNavalTug(tugEntity)).thenReturn(true);
 
                 plan.revalidate();
@@ -837,7 +843,7 @@ class SalvageRecoveryPlanTest {
             WreckRecovery first = plan.addWreck(wreck(10.0));
             WreckRecovery second = plan.addWreck(wreck(10.0));
 
-            assertEquals(java.util.List.of(first, second), plan.getRecoveries());
+            assertEquals(List.of(first, second), plan.getRecoveries());
         }
 
         @Test

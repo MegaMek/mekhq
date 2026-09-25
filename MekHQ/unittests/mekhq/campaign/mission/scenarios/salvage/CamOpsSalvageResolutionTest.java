@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -44,6 +45,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -67,10 +69,13 @@ import megamek.common.compute.Compute;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.icons.Camouflage;
+import megamek.common.units.Aero;
+import megamek.common.units.AeroSpaceFighter;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ResolveScenarioTracker;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
@@ -90,12 +95,15 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
+import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 
 /**
@@ -229,6 +237,8 @@ class CamOpsSalvageResolutionTest {
         private final AbstractContract contract = mock(AbstractContract.class);
         private final Scenario scenario = mock(Scenario.class);
         private final List<Unit> addedUnits = new ArrayList<>();
+        // Salvage delivered on the day it is resolved is present; salvage still in transit is not
+        private boolean isAddedUnitPresent = true;
 
         ResolveSalvage() {
             when(campaign.getCampaignOptions()).thenReturn(options);
@@ -242,6 +252,7 @@ class CamOpsSalvageResolutionTest {
                 Entity entity = testUnit.getEntity();
                 Unit unit = mock(Unit.class);
                 when(unit.getEntity()).thenReturn(entity);
+                when(unit.isPresent()).thenReturn(isAddedUnitPresent);
                 addedUnits.add(unit);
                 return unit;
             });
@@ -279,6 +290,17 @@ class CamOpsSalvageResolutionTest {
         }
 
         @Test
+        void keptSalvageStillInTransitIsLeftForItsArrivalToPlace() {
+            isAddedUnitPresent = false;
+            TestUnit wreck = wreck(1000);
+
+            resolve(new CappedSalvageSettlement(0.5), List.of(wreck), List.of(), List.of());
+
+            // A unit in transit is given the best repair site when it arrives (LocationNewDayUtil), not here
+            verify(addedUnits.getFirst(), never()).setSite(anyInt());
+        }
+
+        @Test
         void enemyCamouflageIsDroppedByDefault() {
             Camouflage enemyCamouflage = new Camouflage("Clans", "Wolf.png");
             TestUnit wreck = wreck(1000, enemyCamouflage);
@@ -313,16 +335,16 @@ class CamOpsSalvageResolutionTest {
 
         @Test
         void aerospaceSalvageIsRefueledFromAFreshCopy() {
-            megamek.common.units.Aero aero = mock(megamek.common.units.AeroSpaceFighter.class);
+            Aero aero = mock(AeroSpaceFighter.class);
             when(aero.getCamouflage()).thenReturn(new Camouflage());
             TestUnit wreck = mock(TestUnit.class);
             when(wreck.getEntity()).thenReturn(aero);
             when(wreck.getSellValue()).thenReturn(Money.of(1000));
-            megamek.common.units.Aero freshCopy = mock(megamek.common.units.AeroSpaceFighter.class);
+            Aero freshCopy = mock(AeroSpaceFighter.class);
             when(freshCopy.getFuelTonnage()).thenReturn(5.0);
 
-            try (org.mockito.MockedConstruction<mekhq.campaign.ResolveScenarioTracker.UnitStatus> ignored =
-                       org.mockito.Mockito.mockConstruction(mekhq.campaign.ResolveScenarioTracker.UnitStatus.class,
+            try (MockedConstruction<ResolveScenarioTracker.UnitStatus> ignored =
+                       mockConstruction(ResolveScenarioTracker.UnitStatus.class,
                              (status, context) -> when(status.getBaseEntity()).thenReturn(freshCopy))) {
                 resolve(new CappedSalvageSettlement(0.5), List.of(wreck), List.of(), List.of());
             }
@@ -332,26 +354,26 @@ class CamOpsSalvageResolutionTest {
 
         @Test
         void aerospaceSalvageWithoutAFreshCopyKeepsItsFuel() {
-            megamek.common.units.Aero aero = mock(megamek.common.units.AeroSpaceFighter.class);
+            Aero aero = mock(AeroSpaceFighter.class);
             when(aero.getCamouflage()).thenReturn(new Camouflage());
             TestUnit wreck = mock(TestUnit.class);
             when(wreck.getEntity()).thenReturn(aero);
             when(wreck.getSellValue()).thenReturn(Money.of(1000));
 
             // The unit's file couldn't be found, so there's nothing to refuel from
-            try (org.mockito.MockedConstruction<mekhq.campaign.ResolveScenarioTracker.UnitStatus> ignored =
-                       org.mockito.Mockito.mockConstruction(mekhq.campaign.ResolveScenarioTracker.UnitStatus.class)) {
+            try (MockedConstruction<ResolveScenarioTracker.UnitStatus> ignored =
+                       mockConstruction(ResolveScenarioTracker.UnitStatus.class)) {
                 resolve(new CappedSalvageSettlement(0.5), List.of(wreck), List.of(), List.of());
             }
 
-            verify(aero, never()).setFuelTonnage(org.mockito.ArgumentMatchers.anyDouble());
+            verify(aero, never()).setFuelTonnage(anyDouble());
             verify(campaign).addTestUnit(same(wreck), eq(0));
         }
 
         @Test
         void nonAerospaceSalvageNeverBuildsAUnitStatus() {
-            try (org.mockito.MockedConstruction<mekhq.campaign.ResolveScenarioTracker.UnitStatus> statuses =
-                       org.mockito.Mockito.mockConstruction(mekhq.campaign.ResolveScenarioTracker.UnitStatus.class)) {
+            try (MockedConstruction<ResolveScenarioTracker.UnitStatus> statuses =
+                       mockConstruction(ResolveScenarioTracker.UnitStatus.class)) {
                 resolve(new CappedSalvageSettlement(0.5), List.of(wreck(1000)), List.of(), List.of());
 
                 assertTrue(statuses.constructed().isEmpty());
@@ -452,7 +474,7 @@ class CamOpsSalvageResolutionTest {
             private int deliveryTime() {
                 TestUnit wreck = wreck(1000);
                 resolve(new CappedSalvageSettlement(0.5), List.of(wreck), List.of(), List.of());
-                org.mockito.ArgumentCaptor<Integer> days = org.mockito.ArgumentCaptor.forClass(Integer.class);
+                ArgumentCaptor<Integer> days = ArgumentCaptor.forClass(Integer.class);
                 verify(campaign).addTestUnit(same(wreck), days.capture());
                 return days.getValue();
             }
@@ -655,6 +677,44 @@ class CamOpsSalvageResolutionTest {
         }
 
         @Test
+        void accidentReportNamesTheInjuredTechAndTheirHits() {
+            Person tech = tech(1);
+            // Stub both name forms so the test checks that the tech is named, not which name form the report uses
+            when(tech.getHyperlinkedName()).thenReturn("Kai Allard");
+            when(tech.getHyperlinkedFullTitle()).thenReturn("Kai Allard");
+            ArgumentCaptor<String> report = ArgumentCaptor.forClass(String.class);
+
+            try (MockedStatic<Compute> ignored = snakeEyes(2);
+                  MockedStatic<InjurySPAUtility> ignored2 = noSpaAdjustment()) {
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1);
+
+                verify(campaign).addReport(eq(DailyReportType.MEDICAL), report.capture());
+            }
+
+            String reportText = report.getValue();
+            assertTrue(reportText.contains("Kai Allard took 3 hits."), reportText);
+            assertFalse(reportText.contains("killed"), reportText);
+        }
+
+        @Test
+        void accidentReportNamesTheKilledTech() {
+            Person tech = tech(6);
+            when(tech.getHyperlinkedFullTitle()).thenReturn("Tech Kai Allard");
+            ArgumentCaptor<String> report = ArgumentCaptor.forClass(String.class);
+
+            try (MockedStatic<Compute> ignored = snakeEyes(2);
+                  MockedStatic<InjurySPAUtility> ignored2 = noSpaAdjustment()) {
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1);
+
+                verify(campaign).addReport(eq(DailyReportType.MEDICAL), report.capture());
+            }
+
+            String reportText = report.getValue();
+            assertTrue(reportText.contains("Tech Kai Allard took 3 hits and was"), reportText);
+            assertTrue(reportText.contains("killed"), reportText);
+        }
+
+        @Test
         void techWithFatalInjuriesDiesOnlyOnce() {
             Person tech = tech(6);
 
@@ -726,11 +786,11 @@ class CamOpsSalvageResolutionTest {
 
             try (MockedStatic<Compute> ignored = snakeEyes(2);
                   MockedStatic<InjurySPAUtility> ignored2 = noSpaAdjustment();
-                  MockedStatic<mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil> injuryUtil =
-                        mockStatic(mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil.class)) {
+                  MockedStatic<InjuryUtil> injuryUtil =
+                        mockStatic(InjuryUtil.class)) {
                 CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1);
 
-                injuryUtil.verify(() -> mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil
+                injuryUtil.verify(() -> InjuryUtil
                                               .resolveCombatDamage(campaign, tech, 3));
                 verify(tech, never()).setHits(anyInt());
             }
