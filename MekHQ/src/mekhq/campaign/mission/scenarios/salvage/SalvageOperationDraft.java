@@ -673,14 +673,29 @@ public class SalvageOperationDraft {
 
     /**
      * Writes the plan to the scenario, replacing its salvage formations and techs, and deploys the salvage teams on
-     * StratCon. Without any teams, there is no salvage operation, so no techs are assigned either.
+     * StratCon. Teams from an earlier plan that were left out of this one are released from their StratCon deployment.
+     * Without any teams, there is no salvage operation, so no techs are assigned either.
      *
      * @author Illiani
      * @since 0.51.01
      */
     public void commit() {
+        // Copied before clearing, as the scenario may hand back its own list
+        List<Integer> droppedFormationIds = new ArrayList<>();
+        for (int formationId : scenario.getSalvageFormations()) {
+            if (!stagedFormationIds.contains(formationId)) {
+                droppedFormationIds.add(formationId);
+            }
+        }
+
         scenario.clearSalvageFormations();
         scenario.clearSalvageTechs();
+
+        boolean isUseStratCon = campaign.getCampaignOptions().isUseStratCon();
+        if (isUseStratCon && !droppedFormationIds.isEmpty()) {
+            CamOpsSalvageUtilities.withdrawSalvageTeams(campaign, scenario, droppedFormationIds);
+        }
+
         if (stagedFormationIds.isEmpty()) {
             return;
         }
@@ -692,7 +707,7 @@ public class SalvageOperationDraft {
             scenario.addSalvageTech(techId);
         }
 
-        if (campaign.getCampaignOptions().isUseStratCon()) {
+        if (isUseStratCon) {
             CamOpsSalvageUtilities.deploySalvageTeams(campaign, scenario);
         }
     }

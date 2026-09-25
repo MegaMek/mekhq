@@ -92,6 +92,7 @@ import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.enums.TransporterType;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -177,8 +178,9 @@ class CamOpsSalvageResolutionTest {
             when(dropship.getTransportBays()).thenReturn(bays(bays));
             Unit carrier = mock(Unit.class);
             when(carrier.getEntity()).thenReturn(dropship);
-            when(carrier.getCurrentASFCapacity()).thenReturn(trackedFighterSlots);
-            when(carrier.getCurrentSmallCraftCapacity()).thenReturn(trackedSmallCraftSlots);
+            when(carrier.getCurrentShipTransportCapacity(TransporterType.ASF_BAY)).thenReturn(trackedFighterSlots);
+            when(carrier.getCurrentShipTransportCapacity(TransporterType.SMALL_CRAFT_BAY))
+                  .thenReturn(trackedSmallCraftSlots);
             return carrier;
         }
 
@@ -215,7 +217,7 @@ class CamOpsSalvageResolutionTest {
         @Test
         void carrierWithoutAnEntityHasNoSlots() {
             Unit carrier = mock(Unit.class);
-            when(carrier.getCurrentASFCapacity()).thenReturn(10.0);
+            when(carrier.getCurrentShipTransportCapacity(TransporterType.ASF_BAY)).thenReturn(10.0);
 
             assertEquals(0, CamOpsSalvageUtilities.getFreeFighterBaySlots(carrier));
         }

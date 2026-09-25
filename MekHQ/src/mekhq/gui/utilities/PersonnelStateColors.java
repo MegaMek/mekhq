@@ -61,6 +61,11 @@ public class PersonnelStateColors {
      */
     public static final int FATIGUE_HIGHLIGHT_THRESHOLD = 5;
 
+    /**
+     * The resource key added to the color reasons of an injured person.
+     */
+    public static final String INJURED_REASON_KEY = "colorReason.personnel.injured";
+
     private PersonnelStateColors() {}
 
     /**
@@ -107,7 +112,7 @@ public class PersonnelStateColors {
             cellColors = (cellColors == null) ? mhqOptions.getAwayFromMainForceColors() : cellColors;
         }
         if (campaignOptions.isUseAdvancedMedical() ? person.hasInjuries(true) : (person.getHits() > 0)) {
-            colorReasonKeys.add("colorReason.personnel.injured");
+            colorReasonKeys.add(INJURED_REASON_KEY);
             cellColors = (cellColors == null) ? mhqOptions.getInjuredColors() : cellColors;
         }
         if (person.isPregnant()) {

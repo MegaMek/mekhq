@@ -60,6 +60,8 @@ import java.util.UUID;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
+import megamek.client.ui.comboBoxes.FilteredComboBoxModel;
+import megamek.client.ui.comboBoxes.SearchableComboBox;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -148,8 +150,12 @@ public class SalvageRecoveryConsole extends JDialog {
     private final HudButton readoutButton = new HudButton(text("dossier.readout").toUpperCase(Locale.ROOT), false);
     private final HudButton stripButton = new HudButton(text("dossier.strip").toUpperCase(Locale.ROOT), false);
     private final JPanel assignmentSection = Hud.transparentPanel(null);
-    private final JComboBox<Unit> firstSlot = new JComboBox<>();
-    private final JComboBox<Unit> secondSlot = new JComboBox<>();
+    // Each wreck offers different recovery units, so the searchable slots are rebuilt inside their rows. The slots are
+    // null until the first wreck is shown.
+    private final JPanel firstSlotRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
+    private final JPanel secondSlotRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
+    private SearchableComboBox<SlotChoice> firstSlot;
+    private SearchableComboBox<SlotChoice> secondSlot;
     private final JPanel methodRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
     private final HudSegmentedControl<RecoveryMethod> methodControl = new HudSegmentedControl<>(this::onMethodChosen);
     private final JLabel statusLabel = new JLabel();
@@ -562,9 +568,9 @@ public class SalvageRecoveryConsole extends JDialog {
         if (session.isUsingSalvageOperations()) {
             assignmentSection.setLayout(new BoxLayout(assignmentSection, BoxLayout.Y_AXIS));
             assignmentSection.add(Box.createVerticalStrut(scaleForGUI(12)));
-            assignmentSection.add(leftAligned(slotRow(text("slot.first"), firstSlot)));
+            assignmentSection.add(leftAligned(slotRow(text("slot.first"), firstSlotRow)));
             assignmentSection.add(Box.createVerticalStrut(scaleForGUI(6)));
-            assignmentSection.add(leftAligned(slotRow(text("slot.second"), secondSlot)));
+            assignmentSection.add(leftAligned(slotRow(text("slot.second"), secondSlotRow)));
 
             if (session.getPlan().isRecoveryMethodChoiceOffered()) {
                 JLabel methodLabel = labelFor(text("method"));
@@ -645,13 +651,8 @@ public class SalvageRecoveryConsole extends JDialog {
         return fleet;
     }
 
-    private JComponent slotRow(String label, JComboBox<Unit> slot) {
-        Hud.styleComboBox(slot);
-        slot.setRenderer(new SlotRenderer());
-        slot.addActionListener(event -> onSlotChanged());
-        JPanel row = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
+    private JComponent slotRow(String label, JPanel row) {
         row.add(labelFor(label), BorderLayout.WEST);
-        row.add(slot, BorderLayout.CENTER);
         return stretch(row);
     }
 
@@ -863,8 +864,10 @@ public class SalvageRecoveryConsole extends JDialog {
         dossierSub.setToolTipText((timeData == null) ? null : timeData.getRecoveryTimeBreakdownString(true));
 
         if (session.isUsingSalvageOperations()) {
-            refreshSlot(firstSlot, recovery, recovery.getFirstUnit(), recovery.getSecondUnit());
-            refreshSlot(secondSlot, recovery, recovery.getSecondUnit(), recovery.getFirstUnit());
+            firstSlot = refreshSlot(firstSlotRow, firstSlot, recovery, recovery.getFirstUnit(),
+                  recovery.getSecondUnit());
+            secondSlot = refreshSlot(secondSlotRow, secondSlot, recovery, recovery.getSecondUnit(),
+                  recovery.getFirstUnit());
             refreshMethod(recovery);
         }
 
@@ -883,17 +886,73 @@ public class SalvageRecoveryConsole extends JDialog {
         refreshClaim(recovery);
     }
 
-    private void refreshSlot(JComboBox<Unit> slot, WreckRecovery recovery, @Nullable Unit current,
-          @Nullable Unit otherSlotUnit) {
-        DefaultComboBoxModel<Unit> model = new DefaultComboBoxModel<>();
-        model.addElement(null);
+    /**
+     * Offers a slot the units that can take on the focused wreck, and selects its current unit.
+     *
+     * <p>A searchable slot can't be given new entries, so when the units on offer change, a new slot replaces the old
+     * one in its row. While they stay the same, the slot is kept, so a search the player is typing isn't lost.</p>
+     *
+     * @param slotRow       the row holding the slot
+     * @param slot          the slot now in the row, or {@code null} before the first wreck is shown
+     * @param recovery      the focused wreck
+     * @param current       the unit assigned to this slot, or {@code null} if it is empty
+     * @param otherSlotUnit the unit assigned to the other slot, or {@code null} if it is empty
+     *
+     * @return the slot now in the row
+     */
+    private SearchableComboBox<SlotChoice> refreshSlot(JPanel slotRow, @Nullable SearchableComboBox<SlotChoice> slot,
+          WreckRecovery recovery, @Nullable Unit current, @Nullable Unit otherSlotUnit) {
+        List<SlotChoice> choices = new ArrayList<>();
+        choices.add(SlotChoice.NONE);
         for (Unit unit : requireSession().getRecoveryUnits()) {
             if ((unit == current) || requireSession().getPlan().isOffered(recovery, unit, otherSlotUnit)) {
-                model.addElement(unit);
+                choices.add(new SlotChoice(unit));
             }
         }
-        slot.setModel(model);
-        slot.setSelectedItem(current);
+        SlotChoice currentChoice = new SlotChoice(current);
+
+        boolean isOfferUnchanged = (slot != null)
+              && (slot.getModel() instanceof FilteredComboBoxModel<?> model)
+              && model.getAllItems().equals(choices);
+        if (isOfferUnchanged) {
+            slot.setSelectedItem(currentChoice);
+            return slot;
+        }
+
+        SearchableComboBox<SlotChoice> newSlot = new SearchableComboBox<>("recoveryUnitSlot", choices,
+              SalvageRecoveryConsole::slotChoiceText);
+        Hud.styleComboBox(newSlot);
+        newSlot.setRenderer(new SlotRenderer());
+        Component editor = newSlot.getEditor().getEditorComponent();
+        editor.setBackground(SURFACE_DEEP);
+        editor.setForeground(TEXT);
+        editor.setFont(newSlot.getFont());
+        if (editor instanceof JTextField editorField) {
+            editorField.setCaretColor(TEXT);
+        }
+        // Also puts the tooltip on the editor, which is where the pointer usually is
+        newSlot.setToolTipText(text("slot.tooltip"));
+        newSlot.setSelectedItem(currentChoice);
+        newSlot.addActionListener(event -> onSlotChanged());
+
+        if (slot != null) {
+            slotRow.remove(slot);
+        }
+        slotRow.add(newSlot, BorderLayout.CENTER);
+        slotRow.revalidate();
+        slotRow.repaint();
+        return newSlot;
+    }
+
+    /** The text a slot shows, and searches, for a choice: the unit's name, or "None" for the empty slot. */
+    private static String slotChoiceText(SlotChoice choice) {
+        Unit unit = choice.unit();
+        return (unit == null) ? text("slot.none") : unit.getName();
+    }
+
+    private static @Nullable Unit selectedUnit(@Nullable SearchableComboBox<SlotChoice> slot) {
+        SlotChoice choice = (slot == null) ? null : slot.getSelectedItem();
+        return (choice == null) ? null : choice.unit();
     }
 
     private void refreshMethod(WreckRecovery recovery) {
@@ -972,7 +1031,7 @@ public class SalvageRecoveryConsole extends JDialog {
         if (isRefreshing || (focused == null)) {
             return;
         }
-        requireSession().assign(focused, (Unit) firstSlot.getSelectedItem(), (Unit) secondSlot.getSelectedItem());
+        requireSession().assign(focused, selectedUnit(firstSlot), selectedUnit(secondSlot));
         logRejectedAssignment(focused);
         refreshAll();
     }
@@ -1251,13 +1310,24 @@ public class SalvageRecoveryConsole extends JDialog {
         }
     }
 
+    /**
+     * An entry in a recovery unit slot. The empty slot is an entry of its own, because a searchable slot can't hold a
+     * {@code null} entry.
+     *
+     * @param unit the recovery unit, or {@code null} for the empty slot
+     */
+    private record SlotChoice(@Nullable Unit unit) {
+        private static final SlotChoice NONE = new SlotChoice(null);
+    }
+
     /** Renders a recovery unit in a slot's drop-down: its name and what it can haul. */
-    private final class SlotRenderer implements ListCellRenderer<Unit> {
+    private final class SlotRenderer implements ListCellRenderer<SlotChoice> {
         private final ListCellRenderer<Object> delegate = Hud.comboRenderer();
 
         @Override
-        public Component getListCellRendererComponent(JList<? extends Unit> list, @Nullable Unit unit, int index,
-              boolean isSelected, boolean cellHasFocus) {
+        public Component getListCellRendererComponent(JList<? extends SlotChoice> list, @Nullable SlotChoice choice,
+              int index, boolean isSelected, boolean cellHasFocus) {
+            Unit unit = (choice == null) ? null : choice.unit();
             String label = (unit == null) ? text("slot.none") : unit.getName() + "  ·  " + capacityText(unit);
             return delegate.getListCellRendererComponent(list, label, index, isSelected, cellHasFocus);
         }

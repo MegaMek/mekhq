@@ -764,6 +764,49 @@ class SalvageOperationDraftTest {
         }
 
         @Test
+        void teamsDroppedFromAnEarlierPlanAreReleasedFromStratCon() {
+            options.set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.NORMAL);
+            Formation keptTeam = salvageTeam("Kept", List.of(salvageUnit(List.of(), true)), null);
+            Formation droppedTeam = salvageTeam("Dropped", List.of(salvageUnit(List.of(), true)), null);
+            scenarioFormations.add(keptTeam.getId());
+            scenarioFormations.add(droppedTeam.getId());
+            SalvageOperationDraft draft = draft();
+            draft.unstage(option(draft, droppedTeam));
+
+            try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class,
+                  CALLS_REAL_METHODS)) {
+                utilities.when(() -> CamOpsSalvageUtilities.withdrawSalvageTeams(any(), any(), any()))
+                      .thenAnswer(invocation -> null);
+                utilities.when(() -> CamOpsSalvageUtilities.deploySalvageTeams(campaign, scenario))
+                      .thenAnswer(invocation -> null);
+
+                draft.commit();
+
+                utilities.verify(() -> CamOpsSalvageUtilities.withdrawSalvageTeams(campaign, scenario,
+                      List.of(droppedTeam.getId())));
+                utilities.verify(() -> CamOpsSalvageUtilities.deploySalvageTeams(campaign, scenario));
+            }
+        }
+
+        @Test
+        void keepingEveryTeamReleasesNone() {
+            options.set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.NORMAL);
+            Formation team = salvageTeam("Team", List.of(salvageUnit(List.of(), true)), null);
+            scenarioFormations.add(team.getId());
+            SalvageOperationDraft draft = draft();
+
+            try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class,
+                  CALLS_REAL_METHODS)) {
+                utilities.when(() -> CamOpsSalvageUtilities.deploySalvageTeams(campaign, scenario))
+                      .thenAnswer(invocation -> null);
+
+                draft.commit();
+
+                utilities.verify(() -> CamOpsSalvageUtilities.withdrawSalvageTeams(any(), any(), any()), never());
+            }
+        }
+
+        @Test
         void withoutStratConNothingDeploys() {
             Formation team = salvageTeam("Team", List.of(salvageUnit(List.of(), true)), null);
             SalvageOperationDraft draft = draft();

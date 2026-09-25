@@ -1167,7 +1167,7 @@ public class SalvageOperationPlanner extends JDialog {
         if (reasonKeys.isEmpty()) {
             return READY;
         }
-        return reasonKeys.contains("colorReason.personnel.injured") ? DANGER : CAUTION;
+        return reasonKeys.contains(PersonnelStateColors.INJURED_REASON_KEY) ? DANGER : CAUTION;
     }
 
     private Color techRingColor(SalvageTechCandidate candidate) {
