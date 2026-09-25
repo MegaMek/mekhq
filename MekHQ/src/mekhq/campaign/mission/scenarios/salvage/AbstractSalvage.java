@@ -93,4 +93,21 @@ public abstract class AbstractSalvage {
     public boolean isMultipleSalvagePerUnitAllowed() {
         return false;
     }
+
+    /**
+     * Checks whether the player is paid for salvage, with the option to buy units from the employer.
+     *
+     * <p>Under CamOps rules, the contract's salvage rights cap how much of the salvage the player may claim. When
+     * salvage purchases are used instead, there is no cap: the salvage rights set the player's share of each wreck's
+     * value. For each recovered wreck, the player either receives their share in cash, or buys the unit by paying the
+     * employer's share. Under salvage exchange rights, the player only receives the cash share and can't buy units.</p>
+     *
+     * @return {@code true} if salvage purchases are used
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isUseSalvagePurchases() {
+        return false;
+    }
 }

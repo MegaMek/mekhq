@@ -144,6 +144,14 @@ public class SalvagePostScenarioPicker {
     private final Map<String, Integer> ownedChassisCounts = new HashMap<>();
     private Map<UUID, RecoveryTimeData> recoveryTimeData;
     private boolean isExchangeRights = false;
+    /** The player's share of each wreck's value, used under salvage purchases. */
+    private double playerSalvageShare = 1.0;
+    /** The player's funds when the dialog opened, used to check salvage purchases can be afforded. */
+    private Money availableFunds = Money.zero();
+    /** What the player would pay the employer for the salvage they've chosen to buy. */
+    private Money purchaseCost = Money.zero();
+    /** What the player would be paid for the salvage they've recovered but not bought. */
+    private Money cashShare = Money.zero();
 
     /**
      * Returns the total number of salvage units being tracked in this operation.
@@ -314,6 +322,8 @@ public class SalvagePostScenarioPicker {
         unitSalvageMoneyInitial = mission.getSalvagedByUnitValue();
         unitSalvageMoneyCurrent = unitSalvageMoneyInitial;
         isExchangeRights = mission.isSalvageExchange();
+        playerSalvageShare = CamOpsSalvageUtilities.getPlayerSalvageShare(mission);
+        availableFunds = campaign.getPlayerForce().getFinances().getBalance();
 
         showSalvageDialog(campaign);
 
@@ -501,7 +511,8 @@ public class SalvagePostScenarioPicker {
         // Left column (existing info labels)
         JPanel infoPanel = new JPanel(new GridLayout(4, 1, 5, 5));
 
-        if (isExchangeRights) {
+        // Under exchange rights or salvage purchases, the salvage percent is the player's share, not a cap
+        if (isExchangeRights || salvageRules.isUseSalvagePurchases()) {
             salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
                   "SalvagePostScenarioPicker.salvagePercent.exchange",
                   salvagePercent));
@@ -522,6 +533,11 @@ public class SalvagePostScenarioPicker {
         }
         availableTimeLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
               "SalvagePostScenarioPicker.time", usedSalvageTime, maximumSalvageTime));
+        // Without salvage operations there is no recovery time to track
+        availableTimeLabel.setVisible(salvageRules.isUseSalvageOperations());
+        if (isBuyingSalvage()) {
+            updatePurchaseLabels(employerSalvageLabel, unitSalvageLabel);
+        }
 
         infoPanel.add(salvagePercentLabel);
         infoPanel.add(employerSalvageLabel);
@@ -533,9 +549,18 @@ public class SalvagePostScenarioPicker {
         tutorialPane.setContentType("text/html");
         tutorialPane.setEditable(false);
         tutorialPane.setOpaque(false);
-        String tutorialText = getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.tutorial");
-        if (salvageRules.isMultipleSalvagePerUnitAllowed()) {
-            tutorialText += getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.tutorial.sharedCapacity");
+        String tutorialText;
+        if (salvageRules.isUseSalvageOperations()) {
+            tutorialText = getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.tutorial");
+            if (salvageRules.isMultipleSalvagePerUnitAllowed()) {
+                tutorialText += getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.tutorial.sharedCapacity");
+            }
+        } else {
+            tutorialText = getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.tutorial.automaticRecovery");
+        }
+        if (isBuyingSalvage()) {
+            tutorialText += getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.tutorial.purchases",
+                  salvagePercent);
         }
         tutorialPane.setText(tutorialText);
         tutorialPane.setBorder(RoundedLineBorder.createRoundedLineBorder());
@@ -634,6 +659,20 @@ public class SalvagePostScenarioPicker {
                   "SalvagePostScenarioPicker.unitLabel.sale"));
             claimedSalvageForSale.setEnabled(false);
 
+            // Under salvage purchases, salvage is bought rather than claimed, and there's nothing to sell: salvage
+            // that isn't bought is paid out as the player's share
+            if (salvageRules.isUseSalvagePurchases()) {
+                claimedSalvageForSale.setVisible(false);
+                if (isBuyingSalvage()) {
+                    Money unitPurchaseCost = sellValue.multipliedBy(1.0 - playerSalvageShare);
+                    claimedSalvageForKeeps.setText(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "SalvagePostScenarioPicker.unitLabel.buy", unitPurchaseCost.toAmountString()));
+                    claimedSalvageForKeeps.setToolTipText(wordWrap(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "SalvagePostScenarioPicker.unitLabel.buy.tooltip", unitPurchaseCost.toAmountString(),
+                          sellValue.multipliedBy(playerSalvageShare).toAmountString())));
+                }
+            }
+
             JComboBox<String> comboBox1 = new JComboBox<>();
             fixComboBoxWidth(comboBox1);
             comboBox1.addItem(null); // Allow empty selection
@@ -725,10 +764,13 @@ public class SalvagePostScenarioPicker {
             rowPanel.add(claimedSalvageForKeeps);
             rowPanel.add(claimedSalvageForSale);
             rowPanel.add(unitLabel);
-            rowPanel.add(comboBox1);
-            rowPanel.add(comboBox2);
-            if (group.recoveryMethodBox != null) {
-                rowPanel.add(group.recoveryMethodBox);
+            // Without salvage operations, wrecks are recovered automatically, so there's no one to assign
+            if (salvageRules.isUseSalvageOperations()) {
+                rowPanel.add(comboBox1);
+                rowPanel.add(comboBox2);
+                if (group.recoveryMethodBox != null) {
+                    rowPanel.add(group.recoveryMethodBox);
+                }
             }
             rowPanel.add(validationLabel);
 
@@ -750,7 +792,10 @@ public class SalvagePostScenarioPicker {
 
         dialog.add(buttonPanel, BorderLayout.SOUTH);
 
-        // Initial button state check
+        // Initial state. Without salvage operations, every wreck starts out recovered.
+        revalidateAllGroups(salvageComboBoxGroups);
+        updateSalvageAllocation(salvageComboBoxGroups, finalSalvagePercentLabel, finalEmployerSalvageLabel,
+              finalUnitSalvageLabel, finalAvailableTimeLabel);
         updateConfirmButtonState(salvageComboBoxGroups, confirmButton, finalUnitSalvageLabel, finalAvailableTimeLabel);
 
         dialog.setPreferredSize(DEFAULT_SIZE);
@@ -825,6 +870,26 @@ public class SalvagePostScenarioPicker {
                 return this;
             }
         };
+    }
+
+    /**
+     * Shows the player's cash share and purchase cost, in place of the salvage split, under salvage purchases.
+     *
+     * @param cashShareLabel    label showing the cash the player will be paid (can be null)
+     * @param purchaseCostLabel label showing what the player will pay for the salvage they're buying (can be null)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void updatePurchaseLabels(@Nullable JLabel cashShareLabel, @Nullable JLabel purchaseCostLabel) {
+        if (cashShareLabel != null) {
+            cashShareLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.cashShare",
+                  cashShare.toAmountString()));
+        }
+        if (purchaseCostLabel != null) {
+            purchaseCostLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.purchaseCost",
+                  purchaseCost.toAmountString(), availableFunds.toAmountString()));
+        }
     }
 
     private static int getUnitWeight(TestUnit unit) {
@@ -913,7 +978,9 @@ public class SalvagePostScenarioPicker {
      * <p>The confirm button is disabled if:</p>
      * <ul>
      *   <li>Any salvage assignment has invalid validation (insufficient capacity, missing naval tug)</li>
-     *   <li>For contracts: the player's salvage percentage exceeds the contract limit</li>
+     *   <li>For contracts: the player's salvage percentage exceeds the contract limit (not under salvage
+     *   purchases)</li>
+     *   <li>Under salvage purchases: the player can't afford the salvage they've chosen to buy</li>
      *   <li>The used minutes exceed the available minutes</li>
      * </ul>
      *
@@ -948,10 +1015,18 @@ public class SalvagePostScenarioPicker {
         // Check salvage percentage if this is a contract
         unitSalvageLabel.setForeground(null);
         BigDecimal currentPercent = getCurrentPercentAsBigDecimal();
-        if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && !isExchangeRights) {
+        // Under salvage purchases the salvage rights set the player's share, rather than capping their salvage
+        boolean isSalvageCapped = !isExchangeRights && !salvageRules.isUseSalvagePurchases();
+        if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && isSalvageCapped) {
             disableConfirmAndColorName(confirmButton, unitSalvageLabel);
             // If we've gone over our %, we only block progression if the player is trying to salvage even more.
             shouldEnable &= unitSalvageMoneyCurrent.compareTo(unitSalvageMoneyInitial) <= 0;
+        }
+
+        // Salvage purchases must be affordable
+        if (isBuyingSalvage() && (purchaseCost.compareTo(availableFunds) > 0)) {
+            disableConfirmAndColorName(confirmButton, unitSalvageLabel);
+            shouldEnable = false;
         }
 
         // Time budget check (disable and, ideally, color the time label in updateSalvageAllocation)
@@ -982,6 +1057,35 @@ public class SalvagePostScenarioPicker {
     private Money getExchangeUnitSalvage() {
         Money employerSalvageThisScenario = employerSalvageMoneyCurrent.minus(employerSalvageMoneyInitial);
         return unitSalvageMoneyInitial.plus(employerSalvageThisScenario.multipliedBy(salvageRightsMultiplier));
+    }
+
+    /**
+     * Checks whether the player may buy salvage from the employer. Under salvage purchases the player is paid a share
+     * of each wreck instead, and may buy the unit by paying the employer's share; under salvage exchange rights they
+     * can't buy.
+     *
+     * @return {@code true} if the player may buy salvage
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isBuyingSalvage() {
+        return salvageRules.isUseSalvagePurchases() && !isExchangeRights;
+    }
+
+    /**
+     * Checks whether a row's wreck has been recovered. Without salvage operations, every wreck is recovered
+     * automatically; otherwise it needs a recovery unit assigned.
+     *
+     * @param group the combo box group to check
+     *
+     * @return {@code true} if the wreck has been recovered
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isRecovered(SalvageComboBoxGroup group) {
+        return !salvageRules.isUseSalvageOperations() || hasAssignedUnits(group);
     }
 
     private BigDecimal getCurrentPercentAsBigDecimal() {
@@ -1061,6 +1165,22 @@ public class SalvagePostScenarioPicker {
         employerSalvageMoneyCurrent = employerSalvageMoneyInitial.plus(tempEmployerSalvage);
         unitSalvageMoneyCurrent = unitSalvageMoneyInitial.plus(tempUnitSalvage);
 
+        Money tempKeptSalvage = Money.zero();
+        for (TestUnit keptUnit : keptSalvage) {
+            tempKeptSalvage = tempKeptSalvage.plus(keptUnit.getSellValue());
+        }
+        purchaseCost = tempKeptSalvage.multipliedBy(1.0 - playerSalvageShare);
+        cashShare = tempEmployerSalvage.multipliedBy(playerSalvageShare);
+
+        if (isBuyingSalvage()) {
+            updatePurchaseLabels(employerSalvageLabel, unitSalvageLabel);
+            if (availableTimeLabel != null) {
+                availableTimeLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.time", usedSalvageTime, maximumSalvageTime));
+            }
+            return;
+        }
+
         // Update labels if they exist
         if (salvagePercentLabel != null && !isExchangeRights) {
             salvagePercentLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -1113,7 +1233,7 @@ public class SalvagePostScenarioPicker {
         }
 
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            syncMembershipForGroup(group, hasAssignedUnits(group) && group.isValid);
+            syncMembershipForGroup(group, isRecovered(group) && group.isValid);
         }
     }
 
@@ -1660,6 +1780,13 @@ public class SalvagePostScenarioPicker {
      * @since 0.50.10
      */
     private void updateValidation(SalvageComboBoxGroup group, Map<String, Unit> unitNameMap) {
+        // Without salvage operations, every wreck is recovered automatically
+        if (!salvageRules.isUseSalvageOperations()) {
+            validate(group);
+            group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.recovered"));
+            return;
+        }
+
         String unitNameLeft = (String) group.comboBoxLeft.getSelectedItem();
         String unitNameRight = (String) group.comboBoxRight.getSelectedItem();
 

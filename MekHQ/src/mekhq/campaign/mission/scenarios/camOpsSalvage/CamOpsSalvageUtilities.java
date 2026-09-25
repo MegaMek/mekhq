@@ -377,6 +377,8 @@ public class CamOpsSalvageUtilities {
      *   <li>Adding claimed salvage units to the campaign</li>
      *   <li>Processing sold salvage units and crediting the account</li>
      *   <li>Handling salvage exchange for contracts</li>
+     *   <li>Under salvage purchases (see {@link AbstractSalvage#isUseSalvagePurchases()}): paying the player their
+     *   share of every wreck they don't keep, and charging them the employer's share of every wreck they keep</li>
      *   <li>Updating contract salvage tracking</li>
      *   <li>Setting repair locations for salvaged units</li>
      * </ul>
@@ -384,7 +386,7 @@ public class CamOpsSalvageUtilities {
      * @param campaign        The current {@link Campaign} to add salvage to.
      * @param mission         The {@link AbstractContract} associated with the salvage.
      * @param scenario        The {@link Scenario} that generated the salvage.
-     * @param keptSalvage     The list of units claimed by the player.
+     * @param keptSalvage     The list of units claimed (or, under salvage purchases, bought) by the player.
      * @param soldSalvage     The list of units that were sold instead of claimed.
      * @param employerSalvage The list of units going to the employer or unclaimed.
      *
@@ -394,6 +396,11 @@ public class CamOpsSalvageUtilities {
     public static void resolveSalvage(Campaign campaign, AbstractContract mission, Scenario scenario,
           List<TestUnit> keptSalvage, List<TestUnit> soldSalvage, List<TestUnit> employerSalvage) {
         int deliveryTime = getSalvageDeliveryTime(campaign, scenario, mission);
+        AbstractSalvage salvageRules = campaign.getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage();
+        // Under salvage exchange rights, the player only ever receives the cash share
+        boolean isBuyingSalvage = salvageRules.isUseSalvagePurchases() && !mission.isSalvageExchange();
+        double playerShare = getPlayerSalvageShare(mission);
+        Money purchaseCost = Money.zero();
         boolean isKeepEnemyCamouflage = campaign.getCampaignOptions()
                                               .get(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE);
 
@@ -416,6 +423,21 @@ public class CamOpsSalvageUtilities {
 
             // if this is a contract, add to the salvaged value
             mission.changeSalvagedByUnitValue(salvageUnit.getSellValue());
+
+            if (isBuyingSalvage) {
+                purchaseCost = purchaseCost.plus(salvageUnit.getSellValue().multipliedBy(1.0 - playerShare));
+            }
+        }
+
+        if (purchaseCost.isPositive()) {
+            campaign.getPlayerForce().getFinances()
+                  .debit(TransactionType.UNIT_PURCHASE,
+                        campaign.getLocalDate(),
+                        purchaseCost,
+                        getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.purchase", scenario.getName()));
+            campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
+                  "CamOpsSalvageUtilities.purchase.report",
+                  purchaseCost.toAmountString(), scenario.getHyperlinkedName()));
         }
 
         // And any ransomed salvaged units
@@ -445,27 +467,41 @@ public class CamOpsSalvageUtilities {
             employerTakeHome = employerTakeHome.plus(salvageUnit.getSellValue());
         }
 
-        if (mission.isSalvageExchange()) {
-            double playerPercent = mission.getSalvageRightsMultiplier();
-            Money playerTakeHome = employerTakeHome.multipliedBy(playerPercent);
+        // Under salvage exchange rights, or salvage purchases, the player is paid their share of the employer's salvage
+        if (mission.isSalvageExchange() || salvageRules.isUseSalvagePurchases()) {
+            Money playerTakeHome = employerTakeHome.multipliedBy(playerShare);
             employerTakeHome = employerTakeHome.minus(playerTakeHome);
             mission.changeSalvagedByUnitValue(playerTakeHome);
 
             if (playerTakeHome.isPositive()) {
+                boolean isExchange = mission.isSalvageExchange();
+                String reasonKey = isExchange ? "CamOpsSalvageUtilities.exchange" : "CamOpsSalvageUtilities.share";
                 campaign.getPlayerForce().getFinances()
-                      .credit(TransactionType.SALVAGE_EXCHANGE,
+                      .credit(isExchange ? TransactionType.SALVAGE_EXCHANGE : TransactionType.SALVAGE,
                             campaign.getLocalDate(),
                             playerTakeHome,
-                            getFormattedTextAt(RESOURCE_BUNDLE,
-                                  "CamOpsSalvageUtilities.exchange",
-                                  scenario.getName()));
+                            getFormattedTextAt(RESOURCE_BUNDLE, reasonKey, scenario.getName()));
                 campaign.addReport(FINANCES,
-                      getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.exchange.report",
+                      getFormattedTextAt(RESOURCE_BUNDLE, reasonKey + ".report",
                             playerTakeHome.toAmountString(), scenario.getHyperlinkedName()));
             }
         }
 
         mission.changeSalvagedByEmployerValue(employerTakeHome);
+    }
+
+    /**
+     * Gets the player's share of salvage value under the contract's salvage rights, from 0 to 1.
+     *
+     * @param mission the contract
+     *
+     * @return the player's share of each wreck's value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getPlayerSalvageShare(AbstractContract mission) {
+        return Math.clamp(mission.getSalvageRightsMultiplier(), 0.0, 1.0);
     }
 
     /**

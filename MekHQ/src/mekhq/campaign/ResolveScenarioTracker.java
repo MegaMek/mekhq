@@ -86,6 +86,7 @@ import mekhq.campaign.mission.scenarios.Loot;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
 import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
+import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -2264,7 +2265,8 @@ public class ResolveScenarioTracker {
             }
         }
 
-        if (campaignOptions.get(CampaignOption.SALVAGE_SYSTEM).getSalvage().isUseSalvageOperations()) {
+        AbstractSalvage salvageRules = campaignOptions.get(CampaignOption.SALVAGE_SYSTEM).getSalvage();
+        if (salvageRules.isUseSalvageOperations()) {
             boolean hasAssignedSalvageForce = !scenario.getSalvageFormations().isEmpty();
             boolean hasAssignedSalvageTechs = !scenario.getSalvageTechs().isEmpty();
 
@@ -2284,6 +2286,11 @@ public class ResolveScenarioTracker {
                 }
 
                 CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs, picker.getUsedSalvageTime());
+            }
+        } else if (salvageRules.isUseSalvagePurchases()) {
+            // Without salvage teams, every wreck is recovered automatically; the player only decides what to buy
+            if (control) {
+                new SalvagePostScenarioPicker(campaign, mission, scenario, getActualSalvage(), getSoldSalvage());
             }
         } else {
             CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, getActualSalvage(), getSoldSalvage(),
