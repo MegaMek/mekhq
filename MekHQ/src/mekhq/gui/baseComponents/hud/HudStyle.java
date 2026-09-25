@@ -38,22 +38,15 @@ import java.awt.Font;
 import java.awt.font.TextAttribute;
 import java.util.HashMap;
 import java.util.Map;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.UIManager;
 
-import jakarta.annotation.Nullable;
-import megamek.client.ui.util.UIUtil;
-
 /**
- * The heads-up-display styling for the StratCon deployment wizard: a hardcoded cyan-on-dark palette, letter-tracked
- * fonts, and stat-tile factories that give the wizard the same look as the interstellar-map tab (and the contract
- * debrief console it is modelled on). The palette is deliberately fixed rather than theme-derived, because the map
- * chrome it echoes is always dark.
+ * The shared heads-up-display styling used by the salvage dialogs, the quartermaster kit dialog and the StratCon
+ * deployment wizard: a hardcoded cyan-on-dark palette and letter-tracked fonts that give these screens the same look
+ * as the interstellar-map tab (and the contract debrief console it is modelled on). The palette is deliberately fixed
+ * rather than theme-derived, because the map chrome it echoes is always dark.
  *
  * @author Illiani
  * @since 0.51.01
@@ -107,6 +100,12 @@ public final class HudStyle {
         return sized.deriveFont(attributes);
     }
 
+    /**
+     * @param color the base colour
+     * @param alpha the new alpha, from {@code 0} (fully transparent) to {@code 255} (opaque)
+     *
+     * @return a copy of {@code color} with the given alpha
+     */
     public static Color translucent(Color color, int alpha) {
         return new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha);
     }
@@ -125,38 +124,12 @@ public final class HudStyle {
     }
 
     /**
-     * Builds a stat tile - a deep-surface cell with a small key, a large coloured value, and an optional sub-line -
-     * matching the debrief console's stat tiles. Used for the wizard's budget meters.
+     * Left-aligns a component for use in a vertical {@code BoxLayout}.
      *
-     * @author Illiani
-     * @since 0.51.01
+     * @param component the component to align
+     *
+     * @return the same component, for chaining
      */
-    public static JComponent statTile(String key, String value, @Nullable String sub, Color valueColor) {
-        JPanel tile = new JPanel();
-        tile.setLayout(new BoxLayout(tile, BoxLayout.Y_AXIS));
-        tile.setOpaque(true);
-        tile.setBackground(SURFACE_DEEP);
-        int inset = UIUtil.scaleForGUI(11);
-        tile.setBorder(BorderFactory.createEmptyBorder(inset, inset, inset, inset));
-
-        tile.add(leftAligned(keyLabel(key)));
-        tile.add(Box.createVerticalStrut(UIUtil.scaleForGUI(4)));
-
-        JLabel valueLabel = new JLabel(value);
-        valueLabel.setForeground(valueColor);
-        valueLabel.setFont(hudFont(Font.BOLD, 1.55f, 0.0f));
-        tile.add(leftAligned(valueLabel));
-
-        if (sub != null) {
-            tile.add(Box.createVerticalStrut(UIUtil.scaleForGUI(3)));
-            JLabel subLabel = new JLabel(sub);
-            subLabel.setForeground(TEXT_FAINT);
-            subLabel.setFont(hudFont(Font.PLAIN, 0.78f, 0.0f));
-            tile.add(leftAligned(subLabel));
-        }
-        return tile;
-    }
-
     public static JComponent leftAligned(JComponent component) {
         component.setAlignmentX(Component.LEFT_ALIGNMENT);
         return component;
