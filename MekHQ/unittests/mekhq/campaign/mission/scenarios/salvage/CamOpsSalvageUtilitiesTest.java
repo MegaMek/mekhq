@@ -43,6 +43,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -52,7 +53,14 @@ import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.ITransportAssignment;
@@ -482,6 +490,73 @@ class CamOpsSalvageUtilitiesTest {
 
             // The missing tech isn't counted, so the remaining tech covers all 60 minutes
             verify(tech).setMinutesLeft(420);
+        }
+    }
+
+    @Nested
+    class WithdrawSalvageTeams {
+        private static final int SCENARIO_ID = 7;
+        private static final int FORMATION_ID = 3;
+
+        private final Campaign campaign = mockCampaign();
+        private final Scenario scenario = mock(Scenario.class);
+        private final StratConTrackState track = new StratConTrackState();
+        private final StratConCoords scenarioCoords = new StratConCoords(2, 3);
+        private final Formation formation = mock(Formation.class);
+
+        WithdrawSalvageTeams() {
+            UUID missionId = UUID.randomUUID();
+            when(scenario.getId()).thenReturn(SCENARIO_ID);
+            when(scenario.getMissionId()).thenReturn(missionId);
+            when(scenario.getName()).thenReturn("Raid");
+
+            StratConScenario stratConScenario = mock(StratConScenario.class);
+            when(stratConScenario.getCoords()).thenReturn(scenarioCoords);
+            when(stratConScenario.getBackingScenarioID()).thenReturn(SCENARIO_ID);
+            when(stratConScenario.getReturnDate()).thenReturn(LocalDate.of(3025, 1, 8));
+            track.addScenario(stratConScenario);
+
+            StratConCampaignState state = mock(StratConCampaignState.class);
+            when(state.getTracks()).thenReturn(List.of(track));
+            AbstractContract contract = mock(AbstractContract.class);
+            when(contract.getStratConCampaignState()).thenReturn(state);
+            when(campaign.getContract(missionId)).thenReturn(contract);
+
+            when(formation.getScenarioId()).thenReturn(-1);
+            when(campaign.getPlayerForce().getFormation(FORMATION_ID)).thenReturn(formation);
+        }
+
+        private void deploy(StratConCoords coords) {
+            track.assignForce(FORMATION_ID, coords, LocalDate.of(3025, 1, 1), false);
+        }
+
+        @Test
+        void aDroppedTeamOnTheScenarioHexIsReleased() {
+            deploy(scenarioCoords);
+
+            CamOpsSalvageUtilities.withdrawSalvageTeams(campaign, scenario, List.of(FORMATION_ID));
+
+            assertFalse(track.getAssignedForceCoords().containsKey(FORMATION_ID));
+        }
+
+        @Test
+        void aTeamDeployedElsewhereKeepsItsDeployment() {
+            StratConCoords elsewhere = new StratConCoords(5, 5);
+            deploy(elsewhere);
+
+            CamOpsSalvageUtilities.withdrawSalvageTeams(campaign, scenario, List.of(FORMATION_ID));
+
+            assertEquals(elsewhere, track.getAssignedForceCoords().get(FORMATION_ID));
+        }
+
+        @Test
+        void aTeamFightingInTheScenarioKeepsItsDeployment() {
+            deploy(scenarioCoords);
+            when(formation.getScenarioId()).thenReturn(SCENARIO_ID);
+
+            CamOpsSalvageUtilities.withdrawSalvageTeams(campaign, scenario, List.of(FORMATION_ID));
+
+            assertEquals(scenarioCoords, track.getAssignedForceCoords().get(FORMATION_ID));
         }
     }
 }

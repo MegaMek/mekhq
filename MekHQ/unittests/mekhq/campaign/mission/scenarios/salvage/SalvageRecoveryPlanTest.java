@@ -53,6 +53,7 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.enums.TransporterType;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -485,8 +486,8 @@ class SalvageRecoveryPlanTest {
                     smallCraftSlots += bay.getCapacity();
                 }
             }
-            when(unit.getCurrentASFCapacity()).thenReturn(fighterSlots);
-            when(unit.getCurrentSmallCraftCapacity()).thenReturn(smallCraftSlots);
+            when(unit.getCurrentShipTransportCapacity(TransporterType.ASF_BAY)).thenReturn(fighterSlots);
+            when(unit.getCurrentShipTransportCapacity(TransporterType.SMALL_CRAFT_BAY)).thenReturn(smallCraftSlots);
             return unit;
         }
 
@@ -642,7 +643,7 @@ class SalvageRecoveryPlanTest {
             SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
             Unit carrier = carrierWithBays(fighterBay(2, 1));
             // Both slots are taken by fighters assigned to the carrier in the TO&E
-            when(carrier.getCurrentASFCapacity()).thenReturn(0.0);
+            when(carrier.getCurrentShipTransportCapacity(TransporterType.ASF_BAY)).thenReturn(0.0);
             WreckRecovery recovery = plan.addWreck(fighter());
             recovery.setRecoveryUnits(carrier, null);
 

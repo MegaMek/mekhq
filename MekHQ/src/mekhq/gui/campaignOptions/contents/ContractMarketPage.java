@@ -47,7 +47,16 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -256,6 +265,8 @@ class ContractMarketPage {
         chkEnableSalvageFlagByDefault = new CampaignOptionsCheckBox("EnableSalvageFlagByDefault",
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkEnableSalvageFlagByDefault.addMouseListener(createTipPanelUpdater("EnableSalvageFlagByDefault"));
+
+        comboSalvageSystem.addActionListener(event -> updateSalvageTeamOptionsEnabledState());
 
         // General options that apply regardless of the contract-pay scheme (Chaos or legacy).
         chkBLCSaleValue = new CampaignOptionsCheckBox("BLCSaleValue");
@@ -639,6 +650,17 @@ class ContractMarketPage {
         }
     }
 
+    /**
+     * Greys the options that only matter when salvage teams recover the wrecks. Legacy and Chaos Campaign salvage
+     * have no salvage teams, so they never roll for risky salvage or use the salvage supervisor flag.
+     */
+    private void updateSalvageTeamOptionsEnabledState() {
+        SalvageSystem salvageSystem = comboSalvageSystem.getSelectedItem();
+        boolean isUseSalvageTeams = (salvageSystem != null) && salvageSystem.getSalvage().isUseSalvageOperations();
+        chkUseRiskySalvage.setEnabled(isUseSalvageTeams);
+        chkEnableSalvageFlagByDefault.setEnabled(isUseSalvageTeams);
+    }
+
     private void setContainerEnabled(Container container, boolean enabled) {
         for (Component child : container.getComponents()) {
             child.setEnabled(enabled);
@@ -703,6 +725,7 @@ class ContractMarketPage {
         chkBLCSaleValue.setSelected(model.blcSaleValue);
         chkOverageRepaymentInFinalPayment.setSelected(model.overageRepaymentInFinalPayment);
         updateContractPayModelEnabledState();
+        updateSalvageTeamOptionsEnabledState();
     }
 
     /**

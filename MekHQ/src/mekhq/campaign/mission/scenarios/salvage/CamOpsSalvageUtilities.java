@@ -188,7 +188,7 @@ public class CamOpsSalvageUtilities {
      * @since 0.51.01
      */
     public static int getFreeFighterBaySlots(Unit carrier) {
-        return getFreeBaySlots(carrier, ASFBay.class, carrier.getCurrentASFCapacity());
+        return getFreeBaySlots(carrier, ASFBay.class, carrier.getCurrentShipTransportCapacity(TransporterType.ASF_BAY));
     }
 
     /**
@@ -204,7 +204,8 @@ public class CamOpsSalvageUtilities {
      * @since 0.51.01
      */
     public static int getFreeSmallCraftBaySlots(Unit carrier) {
-        return getFreeBaySlots(carrier, SmallCraftBay.class, carrier.getCurrentSmallCraftCapacity());
+        return getFreeBaySlots(carrier, SmallCraftBay.class,
+              carrier.getCurrentShipTransportCapacity(TransporterType.SMALL_CRAFT_BAY));
     }
 
     /**
@@ -673,5 +674,56 @@ public class CamOpsSalvageUtilities {
                 }
             }
         });
+    }
+
+    /**
+     * Releases formations that an earlier salvage plan deployed on StratCon for this scenario, but which the player
+     * has since left out of the plan.
+     *
+     * <p>Only formations deployed to this scenario's hex are released. A formation deployed anywhere else, or fighting
+     * in this scenario, keeps its deployment.</p>
+     *
+     * @param campaign     the active {@link Campaign}
+     * @param scenario     the scenario the formations were planned to salvage
+     * @param formationIds the formations dropped from the salvage plan
+     *
+     * @since 0.51.01
+     */
+    public static void withdrawSalvageTeams(Campaign campaign, Scenario scenario, List<Integer> formationIds) {
+        final AbstractContract mission = campaign.getContract(scenario.getMissionId());
+        if (mission == null) {
+            LOGGER.debug("[Salvage] {}: no contract, so no salvage teams to release", scenario.getName());
+            return;
+        }
+
+        final StratConCampaignState state = mission.getStratConCampaignState();
+        if (state == null) {
+            LOGGER.debug("[Salvage] {}: contract has no StratCon state, so no salvage teams to release",
+                  scenario.getName());
+            return;
+        }
+
+        Optional<TrackLocation> location = findTrackAndCoords(scenario, state);
+        if (location.isEmpty()) {
+            LOGGER.debug("[Salvage] {}: scenario is not on a StratCon track, so no salvage teams to release",
+                  scenario.getName());
+            return;
+        }
+
+        StratConTrackState track = location.get().track();
+        StratConCoords scenarioCoords = location.get().coords();
+        List<Integer> releasedFormationIds = new ArrayList<>();
+        for (int formationId : formationIds) {
+            boolean isDeployedToScenarioHex = scenarioCoords.equals(track.getAssignedForceCoords().get(formationId));
+            Formation formation = campaign.getPlayerForce().getFormation(formationId);
+            boolean isFightingInScenario = (formation != null) && (formation.getScenarioId() == scenario.getId());
+            if (isDeployedToScenarioHex && !isFightingInScenario) {
+                track.unassignFormation(formationId);
+                releasedFormationIds.add(formationId);
+            }
+        }
+
+        LOGGER.debug("[Salvage] {}: released formations {} of dropped formations {} from StratCon", scenario.getName(),
+              releasedFormationIds, formationIds);
     }
 }
