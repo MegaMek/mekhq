@@ -34,6 +34,7 @@ package mekhq.campaign.mission.scenarios.salvage;
 
 import java.util.List;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.units.Tank;
@@ -265,11 +266,50 @@ public abstract class AbstractSalvage {
      *                              is decided afterward, every wreck
      * @param soldSalvage           the wrecks the player chose to sell in the resolve scenario wizard
      * @param unclaimedSalvage      the wrecks the player left for their employer in the resolve scenario wizard
+     * @param recoveryPresenter     shows the player the salvage recovery, for systems that recover wrecks after the
+     *                              scenario
      *
      * @author Illiani
      * @since 0.51.01
      */
     public abstract void resolveScenarioSalvage(Campaign campaign, AbstractContract contract, Scenario scenario,
           boolean hasBattlefieldControl, List<TestUnit> claimedSalvage, List<TestUnit> soldSalvage,
-          List<TestUnit> unclaimedSalvage);
+          List<TestUnit> unclaimedSalvage, SalvageRecoveryPresenter recoveryPresenter);
+
+    /**
+     * Recovers a scenario's wrecks after the scenario: builds the recovery session, lets the player work through it,
+     * and settles the salvage they confirm.
+     *
+     * @param campaign          the current campaign
+     * @param contract          the contract the scenario belongs to
+     * @param scenario          the scenario being resolved
+     * @param actualSalvage     the wrecks left on the battlefield
+     * @param soldSalvage       the wrecks the resolve wizard marked for sale
+     * @param recoveryPresenter shows the player the recovery
+     *
+     * @return the confirmed session, or {@code null} if there was nothing to recover
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected @Nullable SalvageRecoverySession recoverSalvage(Campaign campaign, AbstractContract contract,
+          Scenario scenario, List<TestUnit> actualSalvage, List<TestUnit> soldSalvage,
+          SalvageRecoveryPresenter recoveryPresenter) {
+        SalvageRecoverySession session = SalvageRecoverySessionFactory.createSession(campaign, this, contract,
+              scenario, actualSalvage, soldSalvage);
+        if (session == null) {
+            return null;
+        }
+
+        LOGGER.debug("[Salvage] {}: showing the player {} wrecks to recover", scenario.getName(),
+              session.getRecoveries().size());
+        recoveryPresenter.presentRecovery(campaign, scenario, session);
+        LOGGER.debug("[Salvage] {}: player confirmed {} kept, {} sold and {} left for the employer",
+              scenario.getName(), session.getKeptSalvage().size(), session.getSoldSalvage().size(),
+              session.getEmployerSalvage().size());
+
+        CamOpsSalvageUtilities.resolveSalvage(campaign, contract, scenario, session.getSettlement(),
+              session.getKeptSalvage(), session.getSoldSalvage(), session.getEmployerSalvage());
+        return session;
+    }
 }

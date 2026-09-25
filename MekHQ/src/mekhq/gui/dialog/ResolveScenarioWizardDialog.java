@@ -99,6 +99,7 @@ import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
+import mekhq.gui.dialog.camOpsSalvage.SalvageRecoveryConsole;
 import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.view.PersonViewPanel;
 import mekhq.utilities.ReportingUtilities;
@@ -1668,7 +1669,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         }
 
         // now process
-        tracker.resolveScenario((ScenarioStatus) choiceStatus.getSelectedItem(), txtReport.getText());
+        tracker.resolveScenario((ScenarioStatus) choiceStatus.getSelectedItem(), txtReport.getText(),
+              SalvageRecoveryConsole::showRecovery);
 
         if (tracker.getScenario().hasObjectives()) {
             // process objectives here

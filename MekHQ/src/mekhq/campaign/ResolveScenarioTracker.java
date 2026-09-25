@@ -85,6 +85,7 @@ import mekhq.campaign.mission.scenarios.BotForce;
 import mekhq.campaign.mission.scenarios.Loot;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
+import mekhq.campaign.mission.scenarios.salvage.SalvageRecoveryPresenter;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -2103,7 +2104,16 @@ public class ResolveScenarioTracker {
         return units;
     }
 
-    public void resolveScenario(ScenarioStatus resolution, String report) {
+    /**
+     * Resolves the scenario: settles the fate of every unit and person in it, then its salvage and loot.
+     *
+     * @param resolution        the scenario's outcome
+     * @param report            the player's after-action report
+     * @param recoveryPresenter shows the player the salvage recovery, for salvage systems that recover wrecks after
+     *                          the scenario
+     */
+    public void resolveScenario(ScenarioStatus resolution, String report,
+          SalvageRecoveryPresenter recoveryPresenter) {
         // let's start by generating a stub file for our records
         scenario.generateStub(campaign);
 
@@ -2325,7 +2335,7 @@ public class ResolveScenarioTracker {
         campaignOptions.get(CampaignOption.SALVAGE_SYSTEM)
               .getSalvage()
               .resolveScenarioSalvage(campaign, mission, scenario, control, getActualSalvage(), getSoldSalvage(),
-                    getLeftoverSalvage());
+                    getLeftoverSalvage(), recoveryPresenter);
 
         for (Loot loot : actualLoot) {
             loot.getLoot(campaign, scenario, unitsStatus);
@@ -2557,8 +2567,8 @@ public class ResolveScenarioTracker {
          *
          * <p>Unlike {@link #getHits()}, which is cumulative and includes any injury severity the person was
          * already carrying when they deployed, this value covers only the new wound. It is populated by
-         * {@link ResolveScenarioTracker#resolveScenario(ScenarioStatus, String)} and is therefore {@code 0} until the
-         * scenario has been resolved.</p>
+         * {@link ResolveScenarioTracker#resolveScenario(ScenarioStatus, String, SalvageRecoveryPresenter)} and is
+         * therefore {@code 0} until the scenario has been resolved.</p>
          *
          * @return the number of hits suffered during this scenario
          */

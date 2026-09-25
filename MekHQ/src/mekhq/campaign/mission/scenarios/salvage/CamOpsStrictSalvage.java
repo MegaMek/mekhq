@@ -40,7 +40,6 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.unit.TestUnit;
-import mekhq.gui.dialog.camOpsSalvage.SalvageRecoveryConsole;
 
 /**
  * The {@link SalvageSystem#CAM_OPS_STRICT CamOps (Strict)} salvage system: salvage as written in Campaign Operations.
@@ -60,8 +59,8 @@ public class CamOpsStrictSalvage extends AbstractSalvage {
     /**
      * {@inheritDoc}
      *
-     * <p>The assigned salvage teams recover the wrecks in the salvage recovery console. Their techs then risk
-     * accidents (if risky salvage is enabled), and spend the time the recovery took.</p>
+     * <p>The assigned salvage teams recover the wrecks, which the player works through in the recovery presenter.
+     * Their techs then risk accidents (if risky salvage is enabled), and spend the time the recovery took.</p>
      *
      * <p>There is nothing to recover if no teams or techs were assigned, or if the player doesn't control the
      * battlefield.</p>
@@ -69,21 +68,23 @@ public class CamOpsStrictSalvage extends AbstractSalvage {
     @Override
     public void resolveScenarioSalvage(Campaign campaign, AbstractContract contract, Scenario scenario,
           boolean hasBattlefieldControl, List<TestUnit> claimedSalvage, List<TestUnit> soldSalvage,
-          List<TestUnit> unclaimedSalvage) {
+          List<TestUnit> unclaimedSalvage, SalvageRecoveryPresenter recoveryPresenter) {
         boolean hasAssignedSalvageFormations = !scenario.getSalvageFormations().isEmpty();
         boolean hasAssignedSalvageTechs = !scenario.getSalvageTechs().isEmpty();
         if (!hasBattlefieldControl || !hasAssignedSalvageFormations || !hasAssignedSalvageTechs) {
             return;
         }
 
-        SalvageRecoveryConsole console = new SalvageRecoveryConsole(campaign, this, contract, scenario,
-              claimedSalvage, soldSalvage);
+        SalvageRecoverySession session = recoverSalvage(campaign, contract, scenario, claimedSalvage, soldSalvage,
+              recoveryPresenter);
+        int recoveredCount = (session == null) ? 0 : session.getRecoveredCount();
+        int usedMinutes = (session == null) ? 0 : session.getUsedMinutes();
 
         List<UUID> techUUIDs = scenario.getSalvageTechs();
         if (campaign.getCampaignOptions().get(CampaignOption.IS_USE_RISKY_SALVAGE)) {
-            CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, techUUIDs, console.getCountOfSalvageUnits());
+            CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, techUUIDs, recoveredCount);
         }
 
-        CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs, console.getUsedSalvageTime());
+        CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs, usedMinutes);
     }
 }
