@@ -448,7 +448,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnShowAllTechs = new RoundedMMToggleButton(resourceMap.getString("btnShowAllTechs.text"));
         btnShowAllTechs.setToolTipText(resourceMap.getString("btnShowAllTechs.toolTipText"));
         btnShowAllTechs.setName("btnShowAllTechs");
-        btnShowAllTechs.setSelected(false);
+        btnShowAllTechs.setSelected(true);
         btnShowAllTechs.addActionListener(ev -> filterTechs());
         gridBagConstraints = new GridBagConstraints();
         gridBagConstraints.gridx = 0;
@@ -844,7 +844,11 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                     return unit.equals(tech.getUnit());
                 } else if (tech.getPrimaryRole().isVesselCrew() && (unit != null) && !unit.isSelfCrewed()) {
                     return false;
-                } else if (!tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
+                } else if (!tech.isRightTechTypeFor(part)) {
+                    // The tech must always hold the skill the task requires
+                    return false;
+                } else if (!btnShowAllTechs.isSelected() && !tech.isTechExpanded()) {
+                    // Otherwise only personnel in a technician role are offered
                     return false;
                 }
                 if (getCampaignOptions().get(CampaignOption.TECHS_NEED_TOOL_KIT) &&
