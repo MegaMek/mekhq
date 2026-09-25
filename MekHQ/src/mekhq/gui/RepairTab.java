@@ -836,23 +836,25 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 if (btnShowOnlyUnitTechs.isSelected() && (unit != null) && !tech.isRightTechProfessionFor(unit)) {
                     return false;
                 }
-                if ((unit != null) && unit.isSelfCrewed()) {
-                    if (!tech.getPrimaryRole().isVesselCrew()) {
-                        return false;
-                    }
-                    // check whether the engineer is assigned to the correct unit
-                    return unit.equals(tech.getUnit());
-                } else if (tech.getPrimaryRole().isVesselCrew() && (unit != null) && !unit.isSelfCrewed()) {
-                    return false;
-                } else if (!tech.isRightTechTypeFor(part)) {
-                    // The tech must always hold the skill the task requires
-                    return false;
-                } else if (!btnShowAllTechs.isSelected() && !tech.isTechExpanded()) {
-                    // Otherwise only personnel in a technician role are offered
+                // Every tech, including a self-crewed unit's engineer, must hold the skill the task requires and,
+                // where the campaign demands one, a tool kit - regardless of the filter toggles
+                if (!tech.isRightTechTypeFor(part)) {
                     return false;
                 }
                 if (getCampaignOptions().get(CampaignOption.TECHS_NEED_TOOL_KIT) &&
                           !EquipmentKitCatalog.hasToolKit(tech)) {
+                    return false;
+                }
+                if ((unit != null) && unit.isSelfCrewed()) {
+                    // Only the vessel crew assigned to this unit may work on it; they then face the same skill-level
+                    // and time checks as any other tech below
+                    if (!tech.getPrimaryRole().isVesselCrew() || !unit.equals(tech.getUnit())) {
+                        return false;
+                    }
+                } else if (tech.getPrimaryRole().isVesselCrew() && (unit != null) && !unit.isSelfCrewed()) {
+                    return false;
+                } else if (!btnShowAllTechs.isSelected() && !tech.isTechExpanded()) {
+                    // Otherwise only personnel in a technician role are offered
                     return false;
                 }
                 Skill skill = tech.getSkillForWorkingOn(part);
