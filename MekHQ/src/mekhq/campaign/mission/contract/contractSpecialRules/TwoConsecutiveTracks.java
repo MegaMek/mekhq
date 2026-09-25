@@ -202,11 +202,11 @@ public final class TwoConsecutiveTracks {
             // early does.
             long remainingMonths = contract.getMonthsLeft(endDate);
             Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
-            contract.changeMorale(endDate, finalPayout);
+            contract.endContractEarly(endDate, finalPayout);
         } else {
             // A zero routed payout overrides the escrow settlement when the contract is completed, so a failure ending
             // renders no outstanding pay.
-            contract.changeMorale(endDate);
+            contract.endContractEarly(endDate, Money.zero());
         }
     }
 }

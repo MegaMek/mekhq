@@ -1266,11 +1266,16 @@ public class ContractEditorDialog extends JDialog {
               intValue(kitchensSpinner), intValue(holdingCellsSpinner)));
 
         // Morale. The rout fields are only written when editable (an accepted contract); on an unstarted offer they
-        // are disabled and the contract's existing rout values (an absent end date, a zero payout) are preserved.
+        // are disabled and the contract's existing rout values (an absent end date, an unset payout) are preserved. A
+        // zero payout from the spinner means none has been set, so the remaining escrow is paid as normal.
         LocalDate routEndDate = routFieldsEditable
                                       ? parseDate(routEndDateField, contract.getRoutEndDate())
                                       : contract.getRoutEndDate();
-        Money routPayout = routFieldsEditable ? moneyValue(routedPayoutSpinner) : contract.getRoutPayout();
+        Money routPayout = contract.getRoutPayout();
+        if (routFieldsEditable) {
+            Money spinnerPayout = moneyValue(routedPayoutSpinner);
+            routPayout = spinnerPayout.isZero() ? null : spinnerPayout;
+        }
         contract.setMoraleData(new MoraleData(enumValue(moraleLevelCombo, contract.getMoraleLevel()),
               routEndDate, routPayout));
 

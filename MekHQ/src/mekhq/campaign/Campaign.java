@@ -5388,8 +5388,8 @@ public class Campaign implements ITechManager {
 
             Money routedPayout = mission.getRoutPayout();
 
-                    remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
-   }
+            remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
+        }
 
         // Shareholders take their cut of the contract's gross final payout, mirroring the monthly share payout.
         final Money grossPayout = remainingMoney;
