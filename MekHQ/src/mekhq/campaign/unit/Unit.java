@@ -1937,8 +1937,9 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public double getCargoCapacityForSalvage() {
-        // Based on the unit's current walk MP, so battle damage limits how much it can haul
-        int currentWalkMP = getEntity().getWalkMP(MPCalculationSetting.PERM_IMMOBILIZED);
+        // Based on the unit's current walk MP, so battle damage limits how much it can haul. Scenario circumstances,
+        // such as the weather and gravity of whatever game the unit was last in, are ignored.
+        int currentWalkMP = getEntity().getWalkMP(MPCalculationSetting.AS_CONVERSION);
         return getCargoCapacity(Math.max(0, currentWalkMP - 1), FormationType.SALVAGE);
     }
 
@@ -2083,10 +2084,12 @@ public class Unit implements ITechnology, ILocatable {
 
         // No using your arms, roof rack, or lift hoists for convoys!
         if (formationType != FormationType.CONVOY) {
-            // Current rather than original MP, so battle damage is taken into account
-            int currentWalkMP = getEntity().getWalkMP(MPCalculationSetting.PERM_IMMOBILIZED);
+            // Current rather than original MP, so battle damage is taken into account (but not the conditions of
+            // whatever game the unit was last in)
+            int currentWalkMP = getEntity().getWalkMP(MPCalculationSetting.AS_CONVERSION);
             if (liftHoistCount > 0) {
-                double maxLiftHoistCapacity = liftHoistCount * getEntity().getTonnage() / 2;
+                // Active TSM doubles what a lift hoist can pick up, so its capacity can exceed the usual limit
+                double maxLiftHoistCapacity = max(liftHoistCount * getEntity().getTonnage() / 2, liftHoistCapacity);
                 // Lift Hoist
                 if (maximumMpPenalty == 0) {
                     capacity += Math.clamp(getEntity().getTonnage() / 2, liftHoistCapacity,

@@ -288,7 +288,7 @@ public class ResolveScenarioTracker {
      * @author Illiani
      * @since 0.51.01
      */
-    private Camouflage getPreScenarioCamouflage(Entity entity) {
+    Camouflage getPreScenarioCamouflage(Entity entity) {
         String externalId = entity.getExternalIdAsString();
         if (!"-1".equals(externalId)) {
             for (BotForce botForce : scenario.getBotForces()) {
@@ -341,7 +341,7 @@ public class ResolveScenarioTracker {
      * @author Illiani
      * @since 0.51.01
      */
-    private static boolean isDuplicateEntity(Entity entity, Set<Integer> processedEntityIds) {
+    static boolean isDuplicateEntity(Entity entity, Set<Integer> processedEntityIds) {
         int entityId = entity.getId();
         if (entityId == Entity.NONE) {
             return false; // Without a game ID we can't tell duplicates apart, so process it

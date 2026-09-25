@@ -4,11 +4,25 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.time.LocalDate;
+
+import mekhq.campaign.Campaign;
+import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.Scenario;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -147,6 +161,113 @@ class SalvageSettlementTest {
             SalvageSettlement fullRights = new PurchaseSalvageSettlement(1.0);
             assertMoney(0, fullRights.getPurchaseCost(Money.of(1_000_000)));
             assertMoney(1_000_000, fullRights.getCashShare(Money.of(1_000_000)));
+        }
+    }
+
+    @Nested
+    class Payments {
+        private static final LocalDate TODAY = LocalDate.of(3025, 1, 1);
+
+        private final Campaign campaign = mockCampaign();
+        private final Finances finances = campaign.getPlayerForce().getFinances();
+        private final Scenario scenario = mock(Scenario.class);
+
+        Payments() {
+            when(campaign.getLocalDate()).thenReturn(TODAY);
+            when(scenario.getName()).thenReturn("Battle of Tukayyid");
+            when(scenario.getHyperlinkedName()).thenReturn("<a>Battle of Tukayyid</a>");
+        }
+
+        private static Money moneyOf(double amount) {
+            return argThat(money -> (money != null) && (money.compareTo(Money.of(amount)) == 0));
+        }
+
+        @Test
+        void purchasesAreChargedAsUnitPurchases() {
+            new PurchaseSalvageSettlement(0.4).chargePurchases(campaign, scenario, Money.of(1_000_000));
+
+            verify(finances).debit(eq(TransactionType.UNIT_PURCHASE), eq(TODAY), moneyOf(600_000),
+                  argThat(reason -> reason.contains("Battle of Tukayyid") && !reason.startsWith("!")));
+            verify(campaign).addReport(eq(DailyReportType.FINANCES),
+                  argThat((String report) -> report.contains("<a>Battle of Tukayyid</a>")));
+        }
+
+        @Test
+        void nothingIsChargedWhenNothingIsBought() {
+            new PurchaseSalvageSettlement(0.4).chargePurchases(campaign, scenario, Money.zero());
+
+            verify(finances, never()).debit(any(), any(), any(), anyString());
+            verify(campaign, never()).addReport(any(DailyReportType.class), anyString());
+        }
+
+        @Test
+        void freeSalvageIsNotCharged() {
+            new PurchaseSalvageSettlement(1.0).chargePurchases(campaign, scenario, Money.of(1_000_000));
+
+            verify(finances, never()).debit(any(), any(), any(), anyString());
+        }
+
+        @Test
+        void cappedAndExchangeSettlementsNeverCharge() {
+            new CappedSalvageSettlement(0.4).chargePurchases(campaign, scenario, Money.of(1_000_000));
+            new ExchangeSalvageSettlement(0.4).chargePurchases(campaign, scenario, Money.of(1_000_000));
+
+            verify(finances, never()).debit(any(), any(), any(), anyString());
+        }
+
+        @Test
+        void purchaseCashShareIsPaidAsSalvage() {
+            Money paid = new PurchaseSalvageSettlement(0.4).payCashShare(campaign, scenario, Money.of(1_000_000));
+
+            assertMoney(400_000, paid);
+            verify(finances).credit(eq(TransactionType.SALVAGE), eq(TODAY), moneyOf(400_000),
+                  argThat(reason -> reason.contains("Battle of Tukayyid") && !reason.startsWith("!")));
+            verify(campaign).addReport(eq(DailyReportType.FINANCES),
+                  argThat((String report) -> report.contains("<a>Battle of Tukayyid</a>")));
+        }
+
+        @Test
+        void exchangeCashShareIsPaidAsSalvageExchange() {
+            Money paid = new ExchangeSalvageSettlement(0.4).payCashShare(campaign, scenario, Money.of(1_000_000));
+
+            assertMoney(400_000, paid);
+            verify(finances).credit(eq(TransactionType.SALVAGE_EXCHANGE), eq(TODAY), moneyOf(400_000),
+                  argThat(reason -> !reason.startsWith("!")));
+        }
+
+        @Test
+        void exchangeAndPurchaseUseDifferentWording() {
+            new ExchangeSalvageSettlement(0.4).payCashShare(campaign, scenario, Money.of(1_000_000));
+            new PurchaseSalvageSettlement(0.4).payCashShare(campaign, scenario, Money.of(1_000_000));
+
+            org.mockito.ArgumentCaptor<String> reasons = org.mockito.ArgumentCaptor.forClass(String.class);
+            verify(finances, org.mockito.Mockito.times(2)).credit(any(), any(), any(), reasons.capture());
+            assertFalse(reasons.getAllValues().get(0).equals(reasons.getAllValues().get(1)));
+        }
+
+        @Test
+        void cappedSettlementPaysNoCashShare() {
+            Money paid = new CappedSalvageSettlement(0.4).payCashShare(campaign, scenario, Money.of(1_000_000));
+
+            assertMoney(0, paid);
+            verify(finances, never()).credit(any(), any(), any(), anyString());
+            verify(campaign, never()).addReport(any(DailyReportType.class), anyString());
+        }
+
+        @Test
+        void noCashShareIsPaidWithoutEmployerSalvage() {
+            Money paid = new ExchangeSalvageSettlement(0.4).payCashShare(campaign, scenario, Money.zero());
+
+            assertMoney(0, paid);
+            verify(finances, never()).credit(any(), any(), any(), anyString());
+        }
+
+        @Test
+        void noCashShareIsPaidWithoutSalvageRights() {
+            Money paid = new PurchaseSalvageSettlement(0.0).payCashShare(campaign, scenario, Money.of(1_000_000));
+
+            assertMoney(0, paid);
+            verify(finances, never()).credit(any(), any(), any(), anyString());
         }
     }
 }

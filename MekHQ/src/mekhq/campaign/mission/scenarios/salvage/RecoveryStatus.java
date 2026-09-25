@@ -25,7 +25,7 @@ public enum RecoveryStatus {
     COMMITTED(true, "valid.committed"),
     /** A DropShip or larger needs a unit with a working naval tug adaptor. */
     NO_NAVAL_TUG(false, "noTug"),
-    /** A fighter or small craft in space needs a unit with a fighter or small craft bay. */
+    /** A fighter in space needs a working fighter or small craft bay; a small craft, a working small craft bay. */
     NO_SUITABLE_BAY_EQUIPMENT(false, "noVesselWithSuitableBayEquipment"),
     /** No assigned unit has enough cargo space for the wreck. */
     NO_CARGO_CAPACITY(false, "noCapacity.cargo"),

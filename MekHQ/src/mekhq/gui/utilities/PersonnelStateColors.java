@@ -4,7 +4,7 @@ import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.getEffective
 
 import java.util.List;
 
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -71,6 +71,7 @@ public class PersonnelStateColors {
             cellColors = (cellColors == null) ? mhqOptions.getQueuedForTravelColors() : cellColors;
         }
         if (PersonnelStatus.computeIsAwayFromMainForce(campaign, person)) {
+            colorReasonKeys.add("colorReason.personnel.awayFromMainForce");
             cellColors = (cellColors == null) ? mhqOptions.getAwayFromMainForceColors() : cellColors;
         }
         if (campaignOptions.isUseAdvancedMedical() ? person.hasInjuries(true) : (person.getHits() > 0)) {

@@ -1,4 +1,4 @@
-package mekhq.campaign.mission.scenarios.camOpsSalvage;
+package mekhq.campaign.mission.scenarios.salvage;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -21,10 +21,6 @@ import megamek.common.units.Mek;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
-import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
-import mekhq.campaign.mission.scenarios.salvage.CamOpsRevisedSalvage;
-import mekhq.campaign.mission.scenarios.salvage.CamOpsSalvageUtilities;
-import mekhq.campaign.mission.scenarios.salvage.CamOpsStrictSalvage;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.ITransportAssignment;
@@ -162,8 +158,9 @@ class CamOpsSalvageUtilitiesTest {
 
         /** A 'Mek whose unit fails the basic capability check, as it lacks two working hands. */
         private static Unit handlessMek(double cargoCapacity, boolean isFullyCrewed) {
+            Mek mek = mekWithHands(false);
             Unit unit = mock(Unit.class);
-            when(unit.getEntity()).thenReturn(mekWithHands(false));
+            when(unit.getEntity()).thenReturn(mek);
             when(unit.canSalvage(anyBoolean())).thenReturn(false);
             when(unit.getCargoCapacityForSalvage()).thenReturn(cargoCapacity);
             when(unit.isFullyCrewed()).thenReturn(isFullyCrewed);

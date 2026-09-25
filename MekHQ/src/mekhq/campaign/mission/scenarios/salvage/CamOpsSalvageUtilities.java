@@ -309,17 +309,22 @@ public class CamOpsSalvageUtilities {
             // Adding the unit to the campaign resets its camouflage to our own, so grab it first
             Camouflage fieldedCamouflage = salvageUnit.getEntity().getCamouflage().clone();
 
-            ResolveScenarioTracker.UnitStatus salvageStatus = new ResolveScenarioTracker.UnitStatus(salvageUnit);
-            if (salvageUnit.getEntity() instanceof Aero) {
-                ((Aero) salvageUnit.getEntity()).setFuelTonnage(((Aero) salvageStatus.getBaseEntity()).getFuelTonnage());
+            if (salvageUnit.getEntity() instanceof Aero aero) {
+                // Refuel from a fresh copy of the unit. This is only needed for aerospace units, and building the
+                // status parses the unit's file, so it isn't done for anything else.
+                ResolveScenarioTracker.UnitStatus salvageStatus = new ResolveScenarioTracker.UnitStatus(salvageUnit);
+                if (salvageStatus.getBaseEntity() instanceof Aero baseAero) {
+                    aero.setFuelTonnage(baseAero.getFuelTonnage());
+                }
             }
 
             campaign.clearGameData(salvageUnit.getEntity());
-            campaign.addTestUnit(salvageUnit, deliveryTime);
+            // The campaign keeps a new unit wrapped around the salvage's entity, so that's the unit to update
+            Unit salvagedUnit = campaign.addTestUnit(salvageUnit, deliveryTime);
             if (isKeepEnemyCamouflage && !fieldedCamouflage.hasDefaultCategory()) {
-                salvageUnit.getEntity().setCamouflage(fieldedCamouflage);
+                salvagedUnit.getEntity().setCamouflage(fieldedCamouflage);
             }
-            salvageUnit.setSite(ContractRepairLocation.getRepairLocation(mission.getObjectiveType()));
+            salvagedUnit.setSite(ContractRepairLocation.getRepairLocation(mission.getObjectiveType()));
 
             // if this is a contract, add to the salvaged value
             mission.changeSalvagedByUnitValue(salvageUnit.getSellValue());

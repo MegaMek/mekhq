@@ -258,7 +258,12 @@ public class SalvageRecoveryPlan {
             }
 
             if (isSmallVessel(targetEntity)) {
-                return (hasSuitableBayEquipment(firstUnit) || hasSuitableBayEquipment(secondUnit)) ?
+                // It needs a suitable bay with working doors: fighters fit in fighter or small craft bays, small
+                // craft only in small craft bays
+                int smallCraftCarried = isSmallCraft(targetEntity) ? 1 : 0;
+                boolean hasSuitableBay = ((firstUnit != null) && hasBaysFor(firstUnit, 1, smallCraftCarried)) ||
+                                               ((secondUnit != null) && hasBaysFor(secondUnit, 1, smallCraftCarried));
+                return hasSuitableBay ?
                              RecoveryStatus.RECOVERED :
                              RecoveryStatus.NO_SUITABLE_BAY_EQUIPMENT;
             }
@@ -572,12 +577,6 @@ public class SalvageRecoveryPlan {
 
     private static boolean hasNavalTug(@Nullable Unit unit) {
         return (unit != null) && (unit.getEntity() != null) && CamOpsSalvageUtilities.hasNavalTug(unit.getEntity());
-    }
-
-    private static boolean hasSuitableBayEquipment(@Nullable Unit unit) {
-        return (unit != null) &&
-                     (unit.getEntity() != null) &&
-                     CamOpsSalvageUtilities.hasSuitableBayEquipment(unit.getEntity());
     }
 
     private static double getCargoCapacity(@Nullable Unit unit) {

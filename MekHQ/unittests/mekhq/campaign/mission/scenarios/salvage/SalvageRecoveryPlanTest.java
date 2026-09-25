@@ -8,9 +8,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Vector;
+
+import megamek.common.bays.ASFBay;
+import megamek.common.bays.Bay;
+import megamek.common.bays.SmallCraftBay;
+import megamek.common.units.AeroSpaceFighter;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
+import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -310,6 +317,352 @@ class SalvageRecoveryPlanTest {
 
             assertFalse(recovery.isRecoveryMethodChoosable());
             assertEquals(RecoveryMethod.CARRY, recovery.getRecoveryMethod());
+        }
+    }
+
+    @Nested
+    class WreckWithoutEntity {
+        @Test
+        void wreckWithoutEntityIsRecoveredByAnyUnit() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), false);
+            WreckRecovery recovery = plan.addWreck(mock(TestUnit.class));
+            recovery.setRecoveryUnits(truck(0.0), null);
+
+            plan.revalidate();
+
+            // It can't take a share of the carrier, as there's nothing to weigh
+            assertEquals(RecoveryStatus.COMMITTED, recovery.getStatus());
+        }
+
+        @Test
+        void wreckWithoutEntityIsNeverCarriedAdditionally() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), false);
+            Unit carrier = truck(100.0);
+            WreckRecovery carried = plan.addWreck(wreck(10.0));
+            WreckRecovery unknown = plan.addWreck(mock(TestUnit.class));
+            carried.setRecoveryUnits(carrier, null);
+
+            plan.revalidate();
+
+            assertFalse(plan.isOffered(unknown, carrier, null));
+        }
+    }
+
+    @Nested
+    class Space {
+        private static Unit carrierWithBays(Bay... bays) {
+            Dropship dropship = mock(Dropship.class);
+            when(dropship.getTransportBays()).thenReturn(new Vector<>(java.util.List.of(bays)));
+            Unit unit = mock(Unit.class);
+            when(unit.getEntity()).thenReturn(dropship);
+            when(unit.getCargoCapacityForSalvage()).thenReturn(1000.0);
+            return unit;
+        }
+
+        private static Bay fighterBay(int doors) {
+            return new ASFBay(2, doors, 1);
+        }
+
+        private static Bay smallCraftBay(int doors) {
+            return new SmallCraftBay(2, doors, 2);
+        }
+
+        private static TestUnit fighter() {
+            AeroSpaceFighter fighter = mock(AeroSpaceFighter.class);
+            when(fighter.getWeight()).thenReturn(50.0);
+            return wreckOf(fighter);
+        }
+
+        private static TestUnit smallCraft() {
+            SmallCraft smallCraft = mock(SmallCraft.class);
+            when(smallCraft.getWeight()).thenReturn(200.0);
+            return wreckOf(smallCraft);
+        }
+
+        @Test
+        void noDraggingInSpace() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsStrictSalvage(), true);
+            WreckRecovery recovery = plan.addWreck(wreck(40.0));
+            recovery.setRecoveryUnits(tank(100.0, 10.0), null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.NO_CARGO_CAPACITY, recovery.getStatus());
+        }
+
+        @Test
+        void otherWrecksInSpaceGoInCargo() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
+            Unit carrier = carrierWithBays();
+            WreckRecovery recovery = plan.addWreck(wreck(40.0));
+            recovery.setRecoveryUnits(carrier, null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.CARRIED_IN_CARGO, recovery.getStatus());
+        }
+
+        @Test
+        void fighterNeedsABay() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsStrictSalvage(), true);
+            WreckRecovery recovery = plan.addWreck(fighter());
+            recovery.setRecoveryUnits(carrierWithBays(), null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.NO_SUITABLE_BAY_EQUIPMENT, recovery.getStatus());
+        }
+
+        @Test
+        void fighterFitsAFighterOrSmallCraftBay() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsStrictSalvage(), true);
+            WreckRecovery inFighterBay = plan.addWreck(fighter());
+            inFighterBay.setRecoveryUnits(carrierWithBays(fighterBay(1)), null);
+            WreckRecovery inSmallCraftBay = plan.addWreck(fighter());
+            inSmallCraftBay.setRecoveryUnits(carrierWithBays(smallCraftBay(1)), null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.RECOVERED, inFighterBay.getStatus());
+            assertEquals(RecoveryStatus.RECOVERED, inSmallCraftBay.getStatus());
+        }
+
+        @Test
+        void smallCraftDoesNotFitAFighterBay() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsStrictSalvage(), true);
+            WreckRecovery recovery = plan.addWreck(smallCraft());
+            recovery.setRecoveryUnits(carrierWithBays(fighterBay(1)), null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.NO_SUITABLE_BAY_EQUIPMENT, recovery.getStatus());
+        }
+
+        @Test
+        void bayWithoutWorkingDoorsCantTakeAWreck() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsStrictSalvage(), true);
+            WreckRecovery recovery = plan.addWreck(fighter());
+            recovery.setRecoveryUnits(carrierWithBays(fighterBay(0)), null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.NO_SUITABLE_BAY_EQUIPMENT, recovery.getStatus());
+        }
+
+        @Test
+        void eitherTeamMemberMayProvideTheBay() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsStrictSalvage(), true);
+            WreckRecovery recovery = plan.addWreck(fighter());
+            recovery.setRecoveryUnits(carrierWithBays(), carrierWithBays(fighterBay(1)));
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.RECOVERED, recovery.getStatus());
+        }
+
+        @Test
+        void eachBayHoldsOneWreck() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
+            Unit carrier = carrierWithBays(fighterBay(1), smallCraftBay(1));
+            WreckRecovery first = plan.addWreck(fighter());
+            WreckRecovery second = plan.addWreck(fighter());
+            WreckRecovery third = plan.addWreck(fighter());
+            first.setRecoveryUnits(carrier, null);
+            second.setRecoveryUnits(carrier, null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.CARRIED_IN_BAY, first.getStatus());
+            assertEquals(RecoveryStatus.CARRIED_IN_BAY, second.getStatus());
+            assertFalse(plan.isOffered(third, carrier, null));
+
+            SalvageRecoveryPlan.RemainingCapacity remainingCapacity = plan.getRemainingCapacity(carrier);
+            assertNotNull(remainingCapacity);
+            assertTrue(remainingCapacity.isBayCapacity());
+            assertEquals(0, remainingCapacity.freeBays());
+        }
+
+        @Test
+        void carrierWithFreeBayIsOfferedForAnotherFighter() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
+            Unit carrier = carrierWithBays(fighterBay(1), fighterBay(1));
+            WreckRecovery first = plan.addWreck(fighter());
+            WreckRecovery second = plan.addWreck(fighter());
+            first.setRecoveryUnits(carrier, null);
+
+            plan.revalidate();
+
+            assertTrue(plan.isOffered(second, carrier, null));
+            assertEquals(1, plan.getRemainingCapacity(carrier).freeBays());
+        }
+
+        @Test
+        void smallCraftTakesTheSmallCraftBayFirst() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
+            Unit carrier = carrierWithBays(fighterBay(1), smallCraftBay(1));
+            WreckRecovery fighter = plan.addWreck(fighter());
+            WreckRecovery smallCraft = plan.addWreck(smallCraft());
+            fighter.setRecoveryUnits(carrier, null);
+            smallCraft.setRecoveryUnits(carrier, null);
+
+            plan.revalidate();
+
+            // The fighter goes in the fighter bay, leaving the small craft bay for the small craft
+            assertEquals(RecoveryStatus.CARRIED_IN_BAY, fighter.getStatus());
+            assertEquals(RecoveryStatus.CARRIED_IN_BAY, smallCraft.getStatus());
+        }
+
+        @Test
+        void twoSmallCraftNeedTwoSmallCraftBays() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
+            Unit carrier = carrierWithBays(fighterBay(1), smallCraftBay(1));
+            WreckRecovery first = plan.addWreck(smallCraft());
+            WreckRecovery second = plan.addWreck(smallCraft());
+            first.setRecoveryUnits(carrier, null);
+            second.setRecoveryUnits(carrier, null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.NO_FREE_BAY, first.getStatus());
+            assertEquals(RecoveryStatus.NO_FREE_BAY, second.getStatus());
+        }
+
+        @Test
+        void carrierFullOfFightersIsNotOfferedAnotherWreckKind() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
+            Unit carrier = carrierWithBays(fighterBay(1), smallCraftBay(1));
+            WreckRecovery fighter = plan.addWreck(fighter());
+            WreckRecovery smallCraft = plan.addWreck(smallCraft());
+            Dropship dropship = mock(Dropship.class);
+            when(dropship.getWeight()).thenReturn(2000.0);
+            WreckRecovery dropshipWreck = plan.addWreck(wreckOf(dropship));
+            WreckRecovery cargoWreck = plan.addWreck(wreck(10.0));
+            fighter.setRecoveryUnits(carrier, null);
+            smallCraft.setRecoveryUnits(carrier, null);
+            cargoWreck.setRecoveryUnits(carrier, null);
+
+            plan.revalidate();
+
+            // Tugging would commit the carrier, so a carrier already carrying wrecks can't take on a DropShip
+            assertFalse(plan.isOffered(dropshipWreck, carrier, null));
+            // Its bays are full, so it can't take another small craft
+            WreckRecovery anotherSmallCraft = plan.addWreck(smallCraft());
+            plan.revalidate();
+            assertFalse(plan.isOffered(anotherSmallCraft, carrier, null));
+            // But a small wreck still fits in its cargo space
+            WreckRecovery anotherCargoWreck = plan.addWreck(wreck(10.0));
+            plan.revalidate();
+            assertTrue(plan.isOffered(anotherCargoWreck, carrier, null));
+        }
+
+        @Test
+        void carrierWithoutEntityHasNoBays() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
+            Unit carrier = mock(Unit.class);
+            WreckRecovery recovery = plan.addWreck(fighter());
+            recovery.setRecoveryUnits(carrier, null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.NO_SUITABLE_BAY_EQUIPMENT, recovery.getStatus());
+        }
+
+        @Test
+        void remainingBaysOfACarrierThatLostItsEntityAreZero() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
+            Unit carrier = carrierWithBays(fighterBay(1), fighterBay(1));
+            WreckRecovery recovery = plan.addWreck(fighter());
+            recovery.setRecoveryUnits(carrier, null);
+            plan.revalidate();
+
+            when(carrier.getEntity()).thenReturn(null);
+
+            assertEquals(0, plan.getRemainingCapacity(carrier).freeBays());
+        }
+
+        @Test
+        void wreckWithoutEntityInSpaceNeedsCargo() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsStrictSalvage(), true);
+            WreckRecovery recovery = plan.addWreck(mock(TestUnit.class));
+            recovery.setRecoveryUnits(carrierWithBays(), null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.RECOVERED, recovery.getStatus());
+        }
+
+        @Test
+        void largeVesselWithTugIsTuggedAndCommitsTheTug() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
+            Unit tug = mock(Unit.class);
+            megamek.common.units.Jumpship tugEntity = mock(megamek.common.units.Jumpship.class);
+            when(tug.getEntity()).thenReturn(tugEntity);
+            Dropship dropship = mock(Dropship.class);
+            when(dropship.getWeight()).thenReturn(2000.0);
+            WreckRecovery tugged = plan.addWreck(wreckOf(dropship));
+            WreckRecovery other = plan.addWreck(fighter());
+            tugged.setRecoveryUnits(tug, null);
+
+            try (org.mockito.MockedStatic<CamOpsSalvageUtilities> utilities =
+                       org.mockito.Mockito.mockStatic(CamOpsSalvageUtilities.class,
+                             org.mockito.Mockito.CALLS_REAL_METHODS)) {
+                utilities.when(() -> CamOpsSalvageUtilities.hasNavalTug(tugEntity)).thenReturn(true);
+
+                plan.revalidate();
+
+                assertEquals(RecoveryStatus.COMMITTED, tugged.getStatus());
+                assertFalse(plan.isOffered(other, tug, null));
+            }
+        }
+    }
+
+    @Nested
+    class Offers {
+        @Test
+        void unassignedUnitIsAlwaysOffered() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsStrictSalvage(), false);
+            WreckRecovery recovery = plan.addWreck(wreck(20.0));
+
+            plan.revalidate();
+
+            assertTrue(plan.isOffered(recovery, truck(0.0), null));
+        }
+
+        @Test
+        void carrierAlreadyInATeamSlotIsNotOfferedForSharing() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), false);
+            Unit carrier = truck(100.0);
+            WreckRecovery carried = plan.addWreck(wreck(10.0));
+            WreckRecovery other = plan.addWreck(wreck(10.0));
+            carried.setRecoveryUnits(carrier, null);
+
+            plan.revalidate();
+
+            // Teaming the carrier up with another unit would commit it, so it can't share
+            assertFalse(plan.isOffered(other, carrier, truck(0.0)));
+            assertTrue(plan.isOffered(other, carrier, null));
+        }
+
+        @Test
+        void recoveriesAreListedInOrder() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsStrictSalvage(), false);
+            WreckRecovery first = plan.addWreck(wreck(10.0));
+            WreckRecovery second = plan.addWreck(wreck(10.0));
+
+            assertEquals(java.util.List.of(first, second), plan.getRecoveries());
+        }
+
+        @Test
+        void recoveriesCantBeChangedFromOutside() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsStrictSalvage(), false);
+
+            org.junit.jupiter.api.Assertions.assertThrows(UnsupportedOperationException.class,
+                  () -> plan.getRecoveries().add(null));
+        }
+
+        @Test
+        void automaticRecoveryNeverOffersAMethodChoice() {
+            assertFalse(new SalvageRecoveryPlan(new ChaosCampaignSalvage(), false).isRecoveryMethodChoiceOffered());
         }
     }
 }
