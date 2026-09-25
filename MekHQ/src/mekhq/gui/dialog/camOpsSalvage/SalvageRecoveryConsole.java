@@ -860,8 +860,15 @@ public class SalvageRecoveryConsole extends JDialog {
         }
 
         RecoveryStatus status = recovery.getStatus();
-        statusLabel.setText(status.getLabel().isEmpty() ? text("tag.unassigned").toUpperCase(Locale.ROOT) :
-                                  status.getLabel().toUpperCase(Locale.ROOT));
+        String statusText;
+        if (status.getLabel().isEmpty()) {
+            statusText = text("tag.unassigned");
+        } else if (status.isProblem()) {
+            statusText = formatted("status.invalid", status.getLabel());
+        } else {
+            statusText = status.getLabel();
+        }
+        statusLabel.setText(statusText.toUpperCase(Locale.ROOT));
         statusLabel.setForeground(statusColor(recovery));
 
         refreshClaim(recovery);
@@ -884,15 +891,14 @@ public class SalvageRecoveryConsole extends JDialog {
         if (!requireSession().getPlan().isRecoveryMethodChoiceOffered()) {
             return;
         }
-        boolean isChoosable = recovery.isRecoveryMethodChoosable();
-        RecoveryMethod method = recovery.getRecoveryMethod();
+        // Both methods stay on offer; a method the units can't manage shows as an invalid status instead
+        boolean hasRecoveryUnits = recovery.hasRecoveryUnits();
         List<Segment<RecoveryMethod>> segments = new ArrayList<>();
         for (RecoveryMethod option : RecoveryMethod.values()) {
-            segments.add(new Segment<>(option, option.toString(), null, isChoosable || (option == method)));
+            segments.add(new Segment<>(option, option.toString(), null, hasRecoveryUnits));
         }
         methodControl.setSegments(segments);
-        methodControl.setSelected(method);
-        methodRow.setVisible(method != null);
+        methodControl.setSelected(recovery.getRecoveryMethod());
     }
 
     private void refreshClaim(WreckRecovery recovery) {

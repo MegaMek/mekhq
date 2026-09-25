@@ -59,7 +59,6 @@ class WreckRecoveryTest {
         assertNull(recovery.getFirstUnit());
         assertNull(recovery.getSecondUnit());
         assertNull(recovery.getRecoveryMethod());
-        assertFalse(recovery.isRecoveryMethodChoosable());
         assertNull(recovery.getPreferredRecoveryMethod());
     }
 
@@ -105,5 +104,15 @@ class WreckRecoveryTest {
     void preferredRecoveryMethodIsStored() {
         recovery.setPreferredRecoveryMethod(RecoveryMethod.DRAG);
         assertEquals(RecoveryMethod.DRAG, recovery.getPreferredRecoveryMethod());
+    }
+
+    @Test
+    void changingTheUnitsForgetsThePreferredRecoveryMethod() {
+        recovery.setRecoveryUnits(mock(Unit.class), null);
+        recovery.setPreferredRecoveryMethod(RecoveryMethod.DRAG);
+
+        recovery.setRecoveryUnits(mock(Unit.class), null);
+
+        assertNull(recovery.getPreferredRecoveryMethod());
     }
 }

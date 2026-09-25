@@ -55,16 +55,13 @@ public class WreckRecovery {
     private @Nullable Unit firstUnit;
     /** The second recovery unit, or {@code null}. */
     private @Nullable Unit secondUnit;
-    /** How the player would like a single unit to recover the wreck, or {@code null} for no preference. */
+    /** How the player would like the assigned units to recover the wreck, or {@code null} for no preference. */
     private @Nullable RecoveryMethod preferredRecoveryMethod;
 
     // Worked out by SalvageRecoveryPlan
     RecoveryStatus status = RecoveryStatus.UNASSIGNED;
-    /** How a single unit recovers the wreck on the ground, or {@code null} if that doesn't apply. */
+    /** How the assigned units recover the wreck on the ground, or {@code null} if that doesn't apply. */
     @Nullable RecoveryMethod recoveryMethod;
-    boolean isRecoveryMethodChoosable;
-    /** The unit the recovery method was chosen for, so the choice resets when the unit changes. */
-    @Nullable Unit recoveryMethodUnit;
     /** What this wreck takes up in its carrier's shared cargo space or bays, or {@code null} if not shared. */
     @Nullable SalvageRecoveryPlan.CarryLoad carryLoad;
 
@@ -77,7 +74,8 @@ public class WreckRecovery {
     }
 
     /**
-     * Assigns the units that will recover the wreck.
+     * Assigns the units that will recover the wreck. Changing the units forgets the player's choice of recovery
+     * method, so the new units start from whichever method suits them.
      *
      * @param firstUnit  the first recovery unit, or {@code null}
      * @param secondUnit the second recovery unit, or {@code null}
@@ -86,12 +84,16 @@ public class WreckRecovery {
      * @since 0.51.01
      */
     public void setRecoveryUnits(@Nullable Unit firstUnit, @Nullable Unit secondUnit) {
+        if ((firstUnit != this.firstUnit) || (secondUnit != this.secondUnit)) {
+            preferredRecoveryMethod = null;
+        }
         this.firstUnit = firstUnit;
         this.secondUnit = secondUnit;
     }
 
     /**
-     * Sets how the player would like a single unit to recover the wreck, where it could either carry or drag it.
+     * Sets how the player would like the assigned units to recover the wreck. The choice is kept even if the units
+     * can't recover the wreck that way, in which case the wreck isn't recovered.
      *
      * @param preferredRecoveryMethod the player's choice, or {@code null} for no preference
      *
@@ -150,16 +152,9 @@ public class WreckRecovery {
     }
 
     /**
-     * @return how a single unit recovers the wreck on the ground, or {@code null} if that doesn't apply
+     * @return how the assigned units recover the wreck on the ground, or {@code null} if that doesn't apply
      */
     public @Nullable RecoveryMethod getRecoveryMethod() {
         return recoveryMethod;
-    }
-
-    /**
-     * @return {@code true} if the assigned unit could either carry or drag the wreck, so the player may choose
-     */
-    public boolean isRecoveryMethodChoosable() {
-        return isRecoveryMethodChoosable;
     }
 }

@@ -63,6 +63,8 @@ public enum RecoveryStatus {
     NO_CARGO_CAPACITY(false, "noCapacity.cargo"),
     /** The assigned units can't drag the wreck between them. */
     NO_TOW_CAPACITY(false, "noCapacity.tow"),
+    /** The player chose to carry a wreck with two units assigned, but only a single unit can carry a wreck. */
+    CARRY_NEEDS_SINGLE_UNIT(false, "carryNeedsSingleUnit"),
     /** The carrier's cargo space is already full of other wrecks. */
     CARGO_FULL(false, "cargoFull"),
     /** The carrier has no free bay with working doors. */

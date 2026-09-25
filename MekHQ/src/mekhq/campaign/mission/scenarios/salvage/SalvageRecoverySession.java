@@ -234,7 +234,8 @@ public class SalvageRecoverySession {
     }
 
     /**
-     * Sets how the player would like a single unit to recover a wreck, where it could either carry or drag it.
+     * Sets how the player would like the assigned units to recover a wreck. If they can't recover it that way, the
+     * wreck's status says why.
      *
      * @param recovery the wreck's recovery
      * @param method   the player's choice

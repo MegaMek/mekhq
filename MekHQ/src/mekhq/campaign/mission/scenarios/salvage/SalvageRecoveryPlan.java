@@ -167,8 +167,8 @@ public class SalvageRecoveryPlan {
      */
     public void revalidate() {
         for (WreckRecovery recovery : recoveries) {
-            recovery.status = getStatusAlone(recovery);
             updateRecoveryMethod(recovery);
+            recovery.status = getStatusAlone(recovery);
             recovery.carryLoad = getSharedCarryLoad(recovery);
         }
 
@@ -303,6 +303,23 @@ public class SalvageRecoveryPlan {
 
         // A single wreck can't be split between two units' cargo space
         double bestCargoCapacity = Math.max(getCargoCapacity(firstUnit), getCargoCapacity(secondUnit));
+        double combinedTowCapacity = getTowCapacity(firstUnit) + getTowCapacity(secondUnit);
+
+        RecoveryMethod recoveryMethod = recovery.getRecoveryMethod();
+        if (recoveryMethod == RecoveryMethod.CARRY) {
+            if ((firstUnit != null) && (secondUnit != null)) {
+                return RecoveryStatus.CARRY_NEEDS_SINGLE_UNIT;
+            }
+            return (bestCargoCapacity >= targetWeight) ?
+                         RecoveryStatus.RECOVERED :
+                         RecoveryStatus.NO_CARGO_CAPACITY;
+        }
+        if (recoveryMethod == RecoveryMethod.DRAG) {
+            return (combinedTowCapacity >= targetWeight) ?
+                         RecoveryStatus.RECOVERED :
+                         RecoveryStatus.NO_TOW_CAPACITY;
+        }
+
         if (bestCargoCapacity >= targetWeight) {
             return RecoveryStatus.RECOVERED;
         }
@@ -312,7 +329,6 @@ public class SalvageRecoveryPlan {
             return RecoveryStatus.NO_CARGO_CAPACITY;
         }
 
-        double combinedTowCapacity = getTowCapacity(firstUnit) + getTowCapacity(secondUnit);
         if (combinedTowCapacity >= targetWeight) {
             return RecoveryStatus.RECOVERED;
         }
@@ -324,10 +340,11 @@ public class SalvageRecoveryPlan {
     }
 
     /**
-     * Works out how a single assigned unit recovers a wreck on the ground, and whether the player may choose.
+     * Works out how the assigned units recover a wreck on the ground.
      *
-     * <p>The player may only choose when the unit could either carry or drag the wreck. When the assigned unit
-     * changes, the choice resets to carrying, as that leaves the unit free to take on more salvage.</p>
+     * <p>The player's choice always stands, even when the units can't recover the wreck that way; the wreck's status
+     * then says why. Without a choice, a single unit carries the wreck if it can, as that leaves it free to take on
+     * more salvage, and otherwise drags it; two units drag it together.</p>
      *
      * @param recovery the wreck's recovery
      *
@@ -336,34 +353,37 @@ public class SalvageRecoveryPlan {
      */
     private void updateRecoveryMethod(WreckRecovery recovery) {
         recovery.recoveryMethod = null;
-        recovery.isRecoveryMethodChoosable = false;
-        if (!isRecoveryMethodChoiceOffered()) {
+        if (!isRecoveryMethodChoiceOffered() || !recovery.hasRecoveryUnits()) {
             return;
         }
 
+        RecoveryMethod preferredMethod = recovery.getPreferredRecoveryMethod();
+        recovery.recoveryMethod = (preferredMethod != null) ? preferredMethod : getDefaultRecoveryMethod(recovery);
+    }
+
+    private RecoveryMethod getDefaultRecoveryMethod(WreckRecovery recovery) {
         List<Unit> recoveryUnits = recovery.getRecoveryUnits();
-        Unit singleUnit = (recoveryUnits.size() == 1) ? recoveryUnits.getFirst() : null;
-        Entity targetEntity = recovery.getWreck().getEntity();
-
-        if ((singleUnit != null) && recovery.isRecovered() && (targetEntity != null)) {
-            double targetWeight = targetEntity.getWeight();
-            boolean canCarry = getCargoCapacity(singleUnit) >= targetWeight;
-            boolean canDrag = getTowCapacity(singleUnit) >= targetWeight;
-            recovery.isRecoveryMethodChoosable = canCarry && canDrag;
-
-            if (recovery.isRecoveryMethodChoosable) {
-                boolean isSameUnit = singleUnit == recovery.recoveryMethodUnit;
-                RecoveryMethod preferredMethod = recovery.getPreferredRecoveryMethod();
-                recovery.recoveryMethod = (isSameUnit && (preferredMethod != null)) ?
-                                                preferredMethod :
-                                                RecoveryMethod.CARRY;
-            } else if (canCarry) {
-                recovery.recoveryMethod = RecoveryMethod.CARRY;
-            } else if (canDrag) {
-                recovery.recoveryMethod = RecoveryMethod.DRAG;
-            }
+        if (recoveryUnits.size() > 1) {
+            return RecoveryMethod.DRAG;
         }
-        recovery.recoveryMethodUnit = singleUnit;
+
+        Entity targetEntity = recovery.getWreck().getEntity();
+        if (targetEntity == null) {
+            return RecoveryMethod.CARRY;
+        }
+
+        Unit unit = recoveryUnits.getFirst();
+        double targetWeight = targetEntity.getWeight();
+        double cargoCapacity = getCargoCapacity(unit);
+        if (cargoCapacity >= targetWeight) {
+            return RecoveryMethod.CARRY;
+        }
+
+        // Dragging if it works; otherwise whichever comes closer, so the status reports the smaller shortfall
+        double towCapacity = getTowCapacity(unit);
+        return ((towCapacity >= targetWeight) || (towCapacity > cargoCapacity)) ?
+                     RecoveryMethod.DRAG :
+                     RecoveryMethod.CARRY;
     }
 
     /**

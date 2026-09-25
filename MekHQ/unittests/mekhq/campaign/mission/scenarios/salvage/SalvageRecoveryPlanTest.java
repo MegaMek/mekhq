@@ -279,15 +279,16 @@ class SalvageRecoveryPlanTest {
 
         @Test
         void twoUnitTeamsAreCommitted() {
-            Unit carrier = truck(100.0);
-            WreckRecovery teamed = plan.addWreck(wreck(20.0));
+            Unit tug = tank(30.0, 100.0);
+            WreckRecovery teamed = plan.addWreck(wreck(40.0));
             WreckRecovery other = plan.addWreck(wreck(20.0));
-            teamed.setRecoveryUnits(carrier, truck(100.0));
+            teamed.setRecoveryUnits(tug, tank(30.0, 0.0));
 
             plan.revalidate();
 
+            assertEquals(RecoveryMethod.DRAG, teamed.getRecoveryMethod());
             assertEquals(RecoveryStatus.COMMITTED, teamed.getStatus());
-            assertFalse(plan.isOffered(other, carrier, null));
+            assertFalse(plan.isOffered(other, tug, null));
         }
     }
 
@@ -308,9 +309,93 @@ class SalvageRecoveryPlanTest {
 
             plan.revalidate();
 
-            assertTrue(recovery.isRecoveryMethodChoosable());
             assertEquals(RecoveryMethod.CARRY, recovery.getRecoveryMethod());
             assertEquals(RecoveryStatus.CARRIED_IN_CARGO, recovery.getStatus());
+        }
+
+        @Test
+        void unitThatCanOnlyDragDefaultsToDragging() {
+            WreckRecovery recovery = plan.addWreck(wreck(20.0));
+            recovery.setRecoveryUnits(tank(60.0, 0.0), null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryMethod.DRAG, recovery.getRecoveryMethod());
+            assertEquals(RecoveryStatus.COMMITTED, recovery.getStatus());
+        }
+
+        @Test
+        void unitThatCanDoNeitherDefaultsToTheCloserMethod() {
+            WreckRecovery towCloser = plan.addWreck(wreck(100.0));
+            towCloser.setRecoveryUnits(tank(40.0, 10.0), null);
+            WreckRecovery cargoCloser = plan.addWreck(wreck(100.0));
+            cargoCloser.setRecoveryUnits(tank(10.0, 40.0), null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.NO_TOW_CAPACITY, towCloser.getStatus());
+            assertEquals(RecoveryStatus.NO_CARGO_CAPACITY, cargoCloser.getStatus());
+        }
+
+        @Test
+        void choosingToDragWithoutTowCapacityIsInvalid() {
+            WreckRecovery recovery = plan.addWreck(wreck(20.0));
+            recovery.setRecoveryUnits(truck(30.0), null);
+            plan.revalidate();
+
+            recovery.setPreferredRecoveryMethod(RecoveryMethod.DRAG);
+            plan.revalidate();
+
+            assertEquals(RecoveryMethod.DRAG, recovery.getRecoveryMethod());
+            assertEquals(RecoveryStatus.NO_TOW_CAPACITY, recovery.getStatus());
+            assertTrue(recovery.getStatus().isProblem());
+        }
+
+        @Test
+        void choosingToCarryWithoutCargoSpaceIsInvalid() {
+            WreckRecovery recovery = plan.addWreck(wreck(20.0));
+            recovery.setRecoveryUnits(tank(60.0, 0.0), null);
+            plan.revalidate();
+
+            recovery.setPreferredRecoveryMethod(RecoveryMethod.CARRY);
+            plan.revalidate();
+
+            assertEquals(RecoveryMethod.CARRY, recovery.getRecoveryMethod());
+            assertEquals(RecoveryStatus.NO_CARGO_CAPACITY, recovery.getStatus());
+        }
+
+        @Test
+        void twoUnitsDragByDefault() {
+            WreckRecovery recovery = plan.addWreck(wreck(50.0));
+            recovery.setRecoveryUnits(tank(30.0, 0.0), tank(30.0, 0.0));
+
+            plan.revalidate();
+
+            assertEquals(RecoveryMethod.DRAG, recovery.getRecoveryMethod());
+            assertEquals(RecoveryStatus.COMMITTED, recovery.getStatus());
+        }
+
+        @Test
+        void choosingToCarryWithTwoUnitsIsInvalid() {
+            WreckRecovery recovery = plan.addWreck(wreck(20.0));
+            recovery.setRecoveryUnits(truck(100.0), tank(30.0, 0.0));
+            plan.revalidate();
+
+            recovery.setPreferredRecoveryMethod(RecoveryMethod.CARRY);
+            plan.revalidate();
+
+            assertEquals(RecoveryMethod.CARRY, recovery.getRecoveryMethod());
+            assertEquals(RecoveryStatus.CARRY_NEEDS_SINGLE_UNIT, recovery.getStatus());
+            assertTrue(recovery.getStatus().isProblem());
+        }
+
+        @Test
+        void unassignedWreckHasNoMethod() {
+            WreckRecovery recovery = plan.addWreck(wreck(20.0));
+
+            plan.revalidate();
+
+            assertNull(recovery.getRecoveryMethod());
         }
 
         @Test
@@ -341,14 +426,16 @@ class SalvageRecoveryPlanTest {
         }
 
         @Test
-        void unitThatCanOnlyCarryIsNotGivenAChoice() {
+        void choiceIsKeptWhileTheUnitsStayTheSame() {
+            Unit tank = tank(60.0, 30.0);
             WreckRecovery recovery = plan.addWreck(wreck(20.0));
-            recovery.setRecoveryUnits(truck(30.0), null);
+            recovery.setRecoveryUnits(tank, null);
+            recovery.setPreferredRecoveryMethod(RecoveryMethod.DRAG);
 
+            recovery.setRecoveryUnits(tank, null);
             plan.revalidate();
 
-            assertFalse(recovery.isRecoveryMethodChoosable());
-            assertEquals(RecoveryMethod.CARRY, recovery.getRecoveryMethod());
+            assertEquals(RecoveryMethod.DRAG, recovery.getRecoveryMethod());
         }
     }
 
