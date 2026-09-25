@@ -60,7 +60,6 @@ import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.scenarios.Scenario;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
@@ -1468,7 +1467,7 @@ public class Formation {
             if (entity != null) {
                 canSurviveInSpace = !entity.doomedInSpace();
             }
-            if (CamOpsSalvageUtilities.isAvailableForSalvage(unit, isInSpace, salvageRules) &&
+            if (salvageRules.isAvailableForSalvage(unit, isInSpace) &&
                       (!isInSpace || canSurviveInSpace)) {
                 unitCount++;
             }

@@ -220,7 +220,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
         loots = tracker.getPotentialLoot();
         salvageableUnites = new ArrayList<>();
         // Other than under Legacy rules, salvage is decided after the wizard, in the post-scenario salvage picker
-        isSalvageDeferred = !campaign.getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).isLegacy();
+        isSalvageDeferred = !campaign.getCampaignOptions()
+                                    .get(CampaignOption.SALVAGE_SYSTEM)
+                                    .getSalvage()
+                                    .isSalvageClaimedInResolveWizard();
         if (tracker.getMission() != null) {
             salvageEmployer = tracker.getMission().getSalvagedByEmployerValue();
             salvageUnit = tracker.getMission().getSalvagedByUnitValue();

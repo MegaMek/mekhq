@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.scenarios.camOpsSalvage;
+package mekhq.campaign.mission.scenarios.salvage;
 
 import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
@@ -54,8 +54,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.ObjectUtility;
-import megamek.common.annotations.Nullable;
 import megamek.common.bays.ASFBay;
 import megamek.common.bays.Bay;
 import megamek.common.bays.SmallCraftBay;
@@ -85,17 +86,14 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.mission.scenarios.Scenario;
-import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
-import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
-import org.jspecify.annotations.NonNull;
 
 public class CamOpsSalvageUtilities {
     private static final MMLogger LOGGER = MMLogger.create(CamOpsSalvageUtilities.class);
@@ -125,7 +123,7 @@ public class CamOpsSalvageUtilities {
         StringBuilder tooltip = new StringBuilder();
 
         for (Unit unit : unitsInForce) {
-            if (canSalvage(unit, isInSpace, salvageRules)) {
+            if (salvageRules.canSalvage(unit, isInSpace)) {
                 Entity entity = unit.getEntity();
                 if (entity != null) {
                     if (!tooltip.isEmpty()) {
@@ -215,101 +213,6 @@ public class CamOpsSalvageUtilities {
     }
 
     /**
-     * Checks whether a unit is capable of salvaging in the current environment.
-     *
-     * <p>This is {@link Unit#canSalvage(boolean)}, plus: where the salvage system allows it, a 'Mek without two working
-     * hands can still salvage on the ground using its cargo space, such as lift hoists (see
-     * {@link AbstractSalvage#isMekCargoSalvageWithoutHandsAllowed()}). Such a 'Mek can't drag salvage.</p>
-     *
-     * @param unit         the unit to check
-     * @param isInSpace    {@code true} if the salvage operation takes place in space
-     * @param salvageRules the rules of the campaign's salvage system
-     *
-     * @return {@code true} if the unit is capable of salvaging
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public static boolean canSalvage(Unit unit, boolean isInSpace, AbstractSalvage salvageRules) {
-        if (unit.canSalvage(isInSpace)) {
-            return true;
-        }
-
-        return !isInSpace &&
-                     salvageRules.isMekCargoSalvageWithoutHandsAllowed() &&
-                     (unit.getEntity() instanceof Mek) &&
-                     unit.isFullyCrewed() &&
-                     (unit.getCargoCapacityForSalvage() > 0.0);
-    }
-
-    /**
-     * Checks whether a unit is able to take part in a salvage operation.
-     *
-     * <p>The unit must:</p>
-     * <ul>
-     *   <li>Be capable of salvaging in the current environment (see
-     *   {@link #canSalvage(Unit, boolean, AbstractSalvage)})</li>
-     *   <li>Be repairable, and not being stripped for parts</li>
-     *   <li>Be able to move (see {@link #isImmobilized(Entity, AbstractSalvage)})</li>
-     * </ul>
-     *
-     * <p>Trailers can't move on their own, so instead they must be hitched to something.</p>
-     *
-     * @param unit         the unit to check
-     * @param isInSpace    {@code true} if the salvage operation takes place in space
-     * @param salvageRules the rules of the campaign's salvage system
-     *
-     * @return {@code true} if the unit can take part in the salvage operation
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public static boolean isAvailableForSalvage(Unit unit, boolean isInSpace, AbstractSalvage salvageRules) {
-        if (!canSalvage(unit, isInSpace, salvageRules)) {
-            return false;
-        }
-
-        // A unit that can't be repaired, or is being stripped for parts, is in no state to recover anything
-        if (unit.isSalvage() || !unit.isRepairable()) {
-            return false;
-        }
-
-        Entity entity = unit.getEntity();
-        if (entity instanceof Tank tank && tank.isTrailer()) {
-            ITransportAssignment transportAssignment = unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT);
-            return transportAssignment != null && transportAssignment.hasTransport();
-        }
-
-        return !isImmobilized(entity, salvageRules);
-    }
-
-    /**
-     * Checks whether damage has left an entity unable to move, and therefore unable to reach or haul salvage.
-     *
-     * <p>Only lasting damage counts, such as a destroyed motive system, gyro, or engine. Under CamOps (Strict), 'Meks
-     * only need working hands to salvage, so their mobility isn't checked; other salvage systems also rule out 'Meks
-     * with a destroyed leg (see {@link AbstractSalvage#isMekMobilityRequiredForSalvage()}).</p>
-     *
-     * @param entity       the entity to check
-     * @param salvageRules the rules of the campaign's salvage system
-     *
-     * @return {@code true} if the entity is immobilized
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private static boolean isImmobilized(Entity entity, AbstractSalvage salvageRules) {
-        if (entity instanceof Mek mek) {
-            if (!salvageRules.isMekMobilityRequiredForSalvage()) {
-                return false;
-            }
-            return mek.atLeastOneBadLeg() || mek.isPermanentlyImmobilized(false);
-        }
-
-        return entity.isPermanentlyImmobilized(false);
-    }
-
-    /**
      * Determines whether a tech's skill level should be taken from their secondary role.
      *
      * <p>The secondary role is only used when the primary role is not a tech role, but the secondary role is.</p>
@@ -376,9 +279,8 @@ public class CamOpsSalvageUtilities {
      * <ul>
      *   <li>Adding claimed salvage units to the campaign</li>
      *   <li>Processing sold salvage units and crediting the account</li>
-     *   <li>Handling salvage exchange for contracts</li>
-     *   <li>Under salvage purchases (see {@link AbstractSalvage#isUseSalvagePurchases()}): paying the player their
-     *   share of every wreck they don't keep, and charging them the employer's share of every wreck they keep</li>
+     *   <li>Charging the player for any salvage they must buy, and paying them any cash share of the employer's
+     *   salvage, as the settlement dictates (see {@link SalvageSettlement})</li>
      *   <li>Updating contract salvage tracking</li>
      *   <li>Setting repair locations for salvaged units</li>
      * </ul>
@@ -386,6 +288,7 @@ public class CamOpsSalvageUtilities {
      * @param campaign        The current {@link Campaign} to add salvage to.
      * @param mission         The {@link AbstractContract} associated with the salvage.
      * @param scenario        The {@link Scenario} that generated the salvage.
+     * @param settlement      How the salvage is divided between the player and their employer.
      * @param keptSalvage     The list of units claimed (or, under salvage purchases, bought) by the player.
      * @param soldSalvage     The list of units that were sold instead of claimed.
      * @param employerSalvage The list of units going to the employer or unclaimed.
@@ -394,13 +297,10 @@ public class CamOpsSalvageUtilities {
      * @since 0.50.10
      */
     public static void resolveSalvage(Campaign campaign, AbstractContract mission, Scenario scenario,
-          List<TestUnit> keptSalvage, List<TestUnit> soldSalvage, List<TestUnit> employerSalvage) {
+          SalvageSettlement settlement, List<TestUnit> keptSalvage, List<TestUnit> soldSalvage,
+          List<TestUnit> employerSalvage) {
         int deliveryTime = getSalvageDeliveryTime(campaign, scenario, mission);
-        AbstractSalvage salvageRules = campaign.getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage();
-        // Under salvage exchange rights, the player only ever receives the cash share
-        boolean isBuyingSalvage = salvageRules.isUseSalvagePurchases() && !mission.isSalvageExchange();
-        double playerShare = getPlayerSalvageShare(mission);
-        Money purchaseCost = Money.zero();
+        Money keptSalvageValue = Money.zero();
         boolean isKeepEnemyCamouflage = campaign.getCampaignOptions()
                                               .get(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE);
 
@@ -423,22 +323,10 @@ public class CamOpsSalvageUtilities {
 
             // if this is a contract, add to the salvaged value
             mission.changeSalvagedByUnitValue(salvageUnit.getSellValue());
-
-            if (isBuyingSalvage) {
-                purchaseCost = purchaseCost.plus(salvageUnit.getSellValue().multipliedBy(1.0 - playerShare));
-            }
+            keptSalvageValue = keptSalvageValue.plus(salvageUnit.getSellValue());
         }
 
-        if (purchaseCost.isPositive()) {
-            campaign.getPlayerForce().getFinances()
-                  .debit(TransactionType.UNIT_PURCHASE,
-                        campaign.getLocalDate(),
-                        purchaseCost,
-                        getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.purchase", scenario.getName()));
-            campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE,
-                  "CamOpsSalvageUtilities.purchase.report",
-                  purchaseCost.toAmountString(), scenario.getHyperlinkedName()));
-        }
+        settlement.chargePurchases(campaign, scenario, keptSalvageValue);
 
         // And any ransomed salvaged units
         if (!soldSalvage.isEmpty()) {
@@ -467,41 +355,12 @@ public class CamOpsSalvageUtilities {
             employerTakeHome = employerTakeHome.plus(salvageUnit.getSellValue());
         }
 
-        // Under salvage exchange rights, or salvage purchases, the player is paid their share of the employer's salvage
-        if (mission.isSalvageExchange() || salvageRules.isUseSalvagePurchases()) {
-            Money playerTakeHome = employerTakeHome.multipliedBy(playerShare);
-            employerTakeHome = employerTakeHome.minus(playerTakeHome);
-            mission.changeSalvagedByUnitValue(playerTakeHome);
-
-            if (playerTakeHome.isPositive()) {
-                boolean isExchange = mission.isSalvageExchange();
-                String reasonKey = isExchange ? "CamOpsSalvageUtilities.exchange" : "CamOpsSalvageUtilities.share";
-                campaign.getPlayerForce().getFinances()
-                      .credit(isExchange ? TransactionType.SALVAGE_EXCHANGE : TransactionType.SALVAGE,
-                            campaign.getLocalDate(),
-                            playerTakeHome,
-                            getFormattedTextAt(RESOURCE_BUNDLE, reasonKey, scenario.getName()));
-                campaign.addReport(FINANCES,
-                      getFormattedTextAt(RESOURCE_BUNDLE, reasonKey + ".report",
-                            playerTakeHome.toAmountString(), scenario.getHyperlinkedName()));
-            }
-        }
+        // Depending on the settlement, the player may be paid a share of the employer's salvage
+        Money playerTakeHome = settlement.payCashShare(campaign, scenario, employerTakeHome);
+        employerTakeHome = employerTakeHome.minus(playerTakeHome);
+        mission.changeSalvagedByUnitValue(playerTakeHome);
 
         mission.changeSalvagedByEmployerValue(employerTakeHome);
-    }
-
-    /**
-     * Gets the player's share of salvage value under the contract's salvage rights, from 0 to 1.
-     *
-     * @param mission the contract
-     *
-     * @return the player's share of each wreck's value
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public static double getPlayerSalvageShare(AbstractContract mission) {
-        return Math.clamp(mission.getSalvageRightsMultiplier(), 0.0, 1.0);
     }
 
     /**
@@ -706,7 +565,7 @@ public class CamOpsSalvageUtilities {
         return false;
     }
 
-    private static @NonNull List<Person> getValidTechs(Campaign campaign, List<UUID> techUUIDs) {
+    private static @Nonnull List<Person> getValidTechs(Campaign campaign, List<UUID> techUUIDs) {
         List<Person> techs = new ArrayList<>();
         for (UUID uuid : techUUIDs) {
             Person tech = campaign.getPlayerForce().getHumanResources().getPerson(uuid);

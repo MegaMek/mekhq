@@ -40,7 +40,6 @@ import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
@@ -59,31 +58,30 @@ import java.util.Map;
 import java.util.UUID;
 import javax.swing.*;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.annotations.Nullable;
-import megamek.common.bays.ASFBay;
-import megamek.common.bays.SmallCraftBay;
-import megamek.common.units.AeroSpaceFighter;
-import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
-import megamek.common.units.Jumpship;
-import megamek.common.units.SmallCraft;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.RecoveryTimeCalculations;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.RecoveryTimeData;
 import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
+import mekhq.campaign.mission.scenarios.salvage.CamOpsSalvageUtilities;
+import mekhq.campaign.mission.scenarios.salvage.RecoveryMethod;
+import mekhq.campaign.mission.scenarios.salvage.RecoveryStatus;
+import mekhq.campaign.mission.scenarios.salvage.RecoveryTimeCalculations;
+import mekhq.campaign.mission.scenarios.salvage.RecoveryTimeData;
+import mekhq.campaign.mission.scenarios.salvage.SalvageRecoveryPlan;
+import mekhq.campaign.mission.scenarios.salvage.SalvageRecoveryPlan.RemainingCapacity;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSettlement;
+import mekhq.campaign.mission.scenarios.salvage.WreckRecovery;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
@@ -121,15 +119,15 @@ public class SalvagePostScenarioPicker {
     private final static Dimension DEFAULT_SIZE = scaleForGUI(1200, 600);
 
     private final static int UNKNOWN_UNIT_WEIGHT = -1;
-    /** Allowance for floating-point error when summing cargo tonnages. */
-    private final static double CAPACITY_TOLERANCE = 0.0001;
 
     private final boolean isInSpace;
     private final AbstractSalvage salvageRules;
+    /** How the salvage is divided between the player and their employer. */
+    private final SalvageSettlement settlement;
+    /** Which units recover which wrecks, and whether that works. */
+    private final SalvageRecoveryPlan recoveryPlan;
     private int maximumSalvageTime = 0;
     private int usedSalvageTime = 0;
-    private int salvagePercent = 100;
-    private double salvageRightsMultiplier = 1.0;
     private Money employerSalvageMoneyInitial = Money.zero();
     private Money employerSalvageMoneyCurrent = Money.zero();
     private Money unitSalvageMoneyInitial = Money.zero();
@@ -143,15 +141,12 @@ public class SalvagePostScenarioPicker {
     private final Map<String, Integer> ownedVariantCounts = new HashMap<>();
     private final Map<String, Integer> ownedChassisCounts = new HashMap<>();
     private Map<UUID, RecoveryTimeData> recoveryTimeData;
-    private boolean isExchangeRights = false;
-    /** The player's share of each wreck's value, used under salvage purchases. */
-    private double playerSalvageShare = 1.0;
     /** The player's funds when the dialog opened, used to check salvage purchases can be afforded. */
     private Money availableFunds = Money.zero();
-    /** What the player would pay the employer for the salvage they've chosen to buy. */
-    private Money purchaseCost = Money.zero();
-    /** What the player would be paid for the salvage they've recovered but not bought. */
-    private Money cashShare = Money.zero();
+    /** The value of the salvage the player has chosen to keep in this scenario. */
+    private Money keptSalvageValue = Money.zero();
+    /** The value of the salvage going to the employer in this scenario. */
+    private Money employerSalvageValue = Money.zero();
 
     /**
      * Returns the total number of salvage units being tracked in this operation.
@@ -207,14 +202,11 @@ public class SalvagePostScenarioPicker {
         final JCheckBox claimedSalvageForKeeps;
         final JCheckBox claimedSalvageForSale;
         final TestUnit targetUnit;
+        /** The plan for recovering the wreck, which decides whether the assigned units can recover it. */
+        final WreckRecovery recovery;
         boolean isUpdating = false;  // Flag to prevent recursive updates
-        boolean isValid = false;
-        /** What this wreck takes up in its carrier's shared cargo space or bays, or {@code null} if not shared. */
-        @Nullable CarryLoad carryLoad = null;
         /** Lets the player choose to carry or drag the wreck, where both are possible; {@code null} if not offered. */
         @Nullable JComboBox<RecoveryMethod> recoveryMethodBox = null;
-        /** The unit the current recovery method choice was made for, so the choice resets when the unit changes. */
-        @Nullable Unit recoveryMethodUnit = null;
 
         /**
          * Creates a new salvage combo box group.
@@ -226,14 +218,14 @@ public class SalvagePostScenarioPicker {
          * @param unitLabel              label displaying the salvage unit name and value
          * @param claimedSalvageForKeeps {@code true} if the player claimed the salvage for keeps
          * @param claimedSalvageForSale  {@code true} if the player claimed the salvage for immediate sale
-         * @param targetUnit             the salvage unit being assigned recovery forces
+         * @param recovery               the plan for recovering the salvage unit
          *
          * @author Illiani
          * @since 0.50.10
          */
         SalvageComboBoxGroup(JButton unitButton, JComboBox<String> comboBoxLeft, JComboBox<String> comboBoxRight,
               JLabel validationLabel, JLabel unitLabel, JCheckBox claimedSalvageForKeeps,
-              JCheckBox claimedSalvageForSale, TestUnit targetUnit) {
+              JCheckBox claimedSalvageForSale, WreckRecovery recovery) {
             this.unitButton = unitButton;
             this.comboBoxLeft = comboBoxLeft;
             this.comboBoxRight = comboBoxRight;
@@ -241,41 +233,8 @@ public class SalvagePostScenarioPicker {
             this.unitLabel = unitLabel;
             this.claimedSalvageForKeeps = claimedSalvageForKeeps;
             this.claimedSalvageForSale = claimedSalvageForSale;
-            this.targetUnit = targetUnit;
-        }
-    }
-
-    /**
-     * The share of a recovery unit's cargo space or bays taken up by a wreck it carries.
-     *
-     * <p>Only used where the salvage system lets a carrying unit recover several wrecks (see
-     * {@link AbstractSalvage#isMultipleSalvagePerUnitAllowed()}).</p>
-     *
-     * @param carrier      the unit carrying the wreck
-     * @param cargoTons    the cargo space the wreck takes up, in tons ({@code 0} if carried in a bay)
-     * @param isBayLoad    {@code true} if the wreck is a fighter or small craft carried in a bay
-     * @param isSmallCraft {@code true} if the wreck is a small craft, which needs a small craft bay
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private record CarryLoad(Unit carrier, double cargoTons, boolean isBayLoad, boolean isSmallCraft) {}
-
-    /**
-     * How a single recovery unit brings in a wreck on the ground, where it could do either.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private enum RecoveryMethod {
-        /** Carried in the unit's cargo space, which can be shared with other wrecks. */
-        CARRY,
-        /** Dragged, which commits the unit to this wreck alone. */
-        DRAG;
-
-        @Override
-        public String toString() {
-            return getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.recoveryMethod." + name());
+            this.targetUnit = recovery.getWreck();
+            this.recovery = recovery;
         }
     }
 
@@ -289,6 +248,7 @@ public class SalvagePostScenarioPicker {
      * <p>If the contract grants no salvage rights, the dialog is skipped and no salvage is processed.</p>
      *
      * @param campaign      the current {@link Campaign} in which the scenario took place
+     * @param salvageRules  the rules of the campaign's salvage system
      * @param mission       the {@link AbstractContract} associated with the scenario
      * @param scenario      the {@link Scenario} that was just completed
      * @param actualSalvage the list of {@link TestUnit}s available as salvage that the player can claim
@@ -297,10 +257,12 @@ public class SalvagePostScenarioPicker {
      * @author Illiani
      * @since 0.50.10
      */
-    public SalvagePostScenarioPicker(Campaign campaign, AbstractContract mission, Scenario scenario,
-          List<TestUnit> actualSalvage, List<TestUnit> soldSalvage) {
+    public SalvagePostScenarioPicker(Campaign campaign, AbstractSalvage salvageRules, AbstractContract mission,
+          Scenario scenario, List<TestUnit> actualSalvage, List<TestUnit> soldSalvage) {
         this.isInSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
-        this.salvageRules = campaign.getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage();
+        this.salvageRules = salvageRules;
+        this.settlement = salvageRules.createSettlement(mission);
+        this.recoveryPlan = new SalvageRecoveryPlan(salvageRules, isInSpace);
 
         setAvailableTechTime(campaign, scenario);
         List<Integer> salvageFormations = setSalvageUnits(campaign, scenario);
@@ -315,21 +277,17 @@ public class SalvagePostScenarioPicker {
             return; // There isn't going to be anything to process
         }
 
-        salvageRightsMultiplier = mission.getSalvageRightsMultiplier();
-        salvagePercent = (int) round(salvageRightsMultiplier * 100);
         employerSalvageMoneyInitial = mission.getSalvagedByEmployerValue();
         employerSalvageMoneyCurrent = employerSalvageMoneyInitial;
         unitSalvageMoneyInitial = mission.getSalvagedByUnitValue();
         unitSalvageMoneyCurrent = unitSalvageMoneyInitial;
-        isExchangeRights = mission.isSalvageExchange();
-        playerSalvageShare = CamOpsSalvageUtilities.getPlayerSalvageShare(mission);
         availableFunds = campaign.getPlayerForce().getFinances().getBalance();
 
         showSalvageDialog(campaign);
 
         // Process selected units
-        CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, this.keptSalvage, this.soldSalvage,
-              this.employerSalvage);
+        CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, settlement, this.keptSalvage,
+              this.soldSalvage, this.employerSalvage);
     }
 
     /**
@@ -420,15 +378,14 @@ public class SalvagePostScenarioPicker {
             }
 
             // Units that fought can't also salvage, unless the salvage system lets Salvage formations do both
-            boolean canCombatUnitsSalvage = salvageRules.isSalvageFormationCombatAllowed() &&
-                                                  formation.getFormationType().isSalvage();
+            boolean canCombatUnitsSalvage = salvageRules.canSalvageAfterFighting(formation);
             for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
                 boolean didFightInScenario = unit.getScenarioId() == scenario.getId();
                 if (didFightInScenario && !canCombatUnitsSalvage) {
                     continue;
                 }
 
-                if (CamOpsSalvageUtilities.isAvailableForSalvage(unit, isInSpace, salvageRules)) {
+                if (salvageRules.isAvailableForSalvage(unit, isInSpace)) {
                     salvageUnits.add(unit);
                 }
             }
@@ -511,20 +468,21 @@ public class SalvagePostScenarioPicker {
         // Left column (existing info labels)
         JPanel infoPanel = new JPanel(new GridLayout(4, 1, 5, 5));
 
-        // Under exchange rights or salvage purchases, the salvage percent is the player's share, not a cap
-        if (isExchangeRights || salvageRules.isUseSalvagePurchases()) {
-            salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "SalvagePostScenarioPicker.salvagePercent.exchange",
-                  salvagePercent));
-        } else {
+        // Unless salvage is capped, the salvage percent is the player's share, not a cap
+        int salvagePercent = settlement.getPlayerSharePercent();
+        if (settlement.isSalvageCapped()) {
             salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
                   "SalvagePostScenarioPicker.salvagePercent.normal",
                   getCurrentPercentAsBigDecimal(),
                   salvagePercent));
+        } else {
+            salvagePercentLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "SalvagePostScenarioPicker.salvagePercent.exchange",
+                  salvagePercent));
         }
         employerSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
               "SalvagePostScenarioPicker.employerSalvage", employerSalvageMoneyCurrent.toAmountString()));
-        if (isExchangeRights) {
+        if (isExchangeRights()) {
             unitSalvageLabel = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
                   "SalvagePostScenarioPicker.unitSalvage", getExchangeUnitSalvage().toAmountString()));
         } else {
@@ -535,7 +493,7 @@ public class SalvagePostScenarioPicker {
               "SalvagePostScenarioPicker.time", usedSalvageTime, maximumSalvageTime));
         // Without salvage operations there is no recovery time to track
         availableTimeLabel.setVisible(salvageRules.isUseSalvageOperations());
-        if (isBuyingSalvage()) {
+        if (settlement.isKeptSalvageBought()) {
             updatePurchaseLabels(employerSalvageLabel, unitSalvageLabel);
         }
 
@@ -558,7 +516,7 @@ public class SalvagePostScenarioPicker {
         } else {
             tutorialText = getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.tutorial.automaticRecovery");
         }
-        if (isBuyingSalvage()) {
+        if (settlement.isKeptSalvageBought()) {
             tutorialText += getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.tutorial.purchases",
                   salvagePercent);
         }
@@ -661,16 +619,14 @@ public class SalvagePostScenarioPicker {
 
             // Under salvage purchases, salvage is bought rather than claimed, and there's nothing to sell: salvage
             // that isn't bought is paid out as the player's share
-            if (salvageRules.isUseSalvagePurchases()) {
+            if (settlement.isKeptSalvageBought()) {
                 claimedSalvageForSale.setVisible(false);
-                if (isBuyingSalvage()) {
-                    Money unitPurchaseCost = sellValue.multipliedBy(1.0 - playerSalvageShare);
-                    claimedSalvageForKeeps.setText(getFormattedTextAt(RESOURCE_BUNDLE,
-                          "SalvagePostScenarioPicker.unitLabel.buy", unitPurchaseCost.toAmountString()));
-                    claimedSalvageForKeeps.setToolTipText(wordWrap(getFormattedTextAt(RESOURCE_BUNDLE,
-                          "SalvagePostScenarioPicker.unitLabel.buy.tooltip", unitPurchaseCost.toAmountString(),
-                          sellValue.multipliedBy(playerSalvageShare).toAmountString())));
-                }
+                Money unitPurchaseCost = settlement.getPurchaseCost(sellValue);
+                claimedSalvageForKeeps.setText(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.unitLabel.buy", unitPurchaseCost.toAmountString()));
+                claimedSalvageForKeeps.setToolTipText(wordWrap(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "SalvagePostScenarioPicker.unitLabel.buy.tooltip", unitPurchaseCost.toAmountString(),
+                      settlement.getCashShare(sellValue).toAmountString())));
             }
 
             JComboBox<String> comboBox1 = new JComboBox<>();
@@ -682,8 +638,8 @@ public class SalvagePostScenarioPicker {
 
             // Carriers can take on several wrecks, so show how much room each has left
             if (salvageRules.isMultipleSalvagePerUnitAllowed()) {
-                comboBox1.setRenderer(createRemainingCapacityRenderer(salvageComboBoxGroups));
-                comboBox2.setRenderer(createRemainingCapacityRenderer(salvageComboBoxGroups));
+                comboBox1.setRenderer(createRemainingCapacityRenderer());
+                comboBox2.setRenderer(createRemainingCapacityRenderer());
             }
 
             // Build the mapping and populate combo boxes
@@ -709,12 +665,12 @@ public class SalvagePostScenarioPicker {
                   unitLabel,
                   claimedSalvageForKeeps,
                   claimedSalvageForSale,
-                  unit);
+                  recoveryPlan.addWreck(unit));
             salvageComboBoxGroups.add(group);
 
             // Where a carrier can take on several wrecks, the player chooses whether a unit carries or drags. There's
             // no dragging in space.
-            if (salvageRules.isMultipleSalvagePerUnitAllowed() && !isInSpace) {
+            if (recoveryPlan.isRecoveryMethodChoiceOffered()) {
                 JComboBox<RecoveryMethod> recoveryMethodBox = new JComboBox<>();
                 recoveryMethodBox.addItem(null);
                 for (RecoveryMethod recoveryMethod : RecoveryMethod.values()) {
@@ -846,15 +802,12 @@ public class SalvagePostScenarioPicker {
      * Creates a renderer for the recovery unit drop-down boxes that shows, before each carrier's name, how much cargo
      * space or how many bays it has left.
      *
-     * @param salvageComboBoxGroups list of all combo box groups
-     *
      * @return the renderer
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private ListCellRenderer<Object> createRemainingCapacityRenderer(
-          List<SalvageComboBoxGroup> salvageComboBoxGroups) {
+    private ListCellRenderer<Object> createRemainingCapacityRenderer() {
         return new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
@@ -862,7 +815,7 @@ public class SalvagePostScenarioPicker {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
                 if (value instanceof String unitName) {
                     Unit unit = unitNameMap.get(unitName);
-                    String prefix = (unit == null) ? null : getRemainingCapacityPrefix(salvageComboBoxGroups, unit);
+                    String prefix = (unit == null) ? null : getRemainingCapacityPrefix(unit);
                     if (prefix != null) {
                         setText(prefix + ' ' + unitName);
                     }
@@ -884,11 +837,11 @@ public class SalvagePostScenarioPicker {
     private void updatePurchaseLabels(@Nullable JLabel cashShareLabel, @Nullable JLabel purchaseCostLabel) {
         if (cashShareLabel != null) {
             cashShareLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.cashShare",
-                  cashShare.toAmountString()));
+                  settlement.getCashShare(employerSalvageValue).toAmountString()));
         }
         if (purchaseCostLabel != null) {
             purchaseCostLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.purchaseCost",
-                  purchaseCost.toAmountString(), availableFunds.toAmountString()));
+                  settlement.getPurchaseCost(keptSalvageValue).toAmountString(), availableFunds.toAmountString()));
         }
     }
 
@@ -998,15 +951,11 @@ public class SalvagePostScenarioPicker {
           JLabel unitSalvageLabel, JLabel salvageTimeLabel) {
         boolean shouldEnable = true;
 
-        // Check for any invalid units
+        // Check for any assignments that can't recover their wreck
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
             group.unitLabel.setForeground(null); // reset
 
-            String unitName1 = (String) group.comboBoxLeft.getSelectedItem();
-            String unitName2 = (String) group.comboBoxRight.getSelectedItem();
-
-            // If units are assigned, check validation state
-            if ((unitName1 != null || unitName2 != null) && !group.isValid) {
+            if (group.recovery.getStatus().isProblem()) {
                 disableConfirmAndColorName(confirmButton, group.unitLabel);
                 shouldEnable = false;
             }
@@ -1015,16 +964,15 @@ public class SalvagePostScenarioPicker {
         // Check salvage percentage if this is a contract
         unitSalvageLabel.setForeground(null);
         BigDecimal currentPercent = getCurrentPercentAsBigDecimal();
-        // Under salvage purchases the salvage rights set the player's share, rather than capping their salvage
-        boolean isSalvageCapped = !isExchangeRights && !salvageRules.isUseSalvagePurchases();
-        if (currentPercent.compareTo(BigDecimal.valueOf(salvagePercent)) > 0 && isSalvageCapped) {
+        boolean isOverSalvageCap = currentPercent.compareTo(BigDecimal.valueOf(settlement.getPlayerSharePercent())) > 0;
+        if (settlement.isSalvageCapped() && isOverSalvageCap) {
             disableConfirmAndColorName(confirmButton, unitSalvageLabel);
             // If we've gone over our %, we only block progression if the player is trying to salvage even more.
             shouldEnable &= unitSalvageMoneyCurrent.compareTo(unitSalvageMoneyInitial) <= 0;
         }
 
         // Salvage purchases must be affordable
-        if (isBuyingSalvage() && (purchaseCost.compareTo(availableFunds) > 0)) {
+        if (!settlement.canAfford(keptSalvageValue, availableFunds)) {
             disableConfirmAndColorName(confirmButton, unitSalvageLabel);
             shouldEnable = false;
         }
@@ -1056,36 +1004,20 @@ public class SalvagePostScenarioPicker {
      */
     private Money getExchangeUnitSalvage() {
         Money employerSalvageThisScenario = employerSalvageMoneyCurrent.minus(employerSalvageMoneyInitial);
-        return unitSalvageMoneyInitial.plus(employerSalvageThisScenario.multipliedBy(salvageRightsMultiplier));
+        return unitSalvageMoneyInitial.plus(settlement.getCashShare(employerSalvageThisScenario));
     }
 
     /**
-     * Checks whether the player may buy salvage from the employer. Under salvage purchases the player is paid a share
-     * of each wreck instead, and may buy the unit by paying the employer's share; under salvage exchange rights they
-     * can't buy.
+     * Checks whether the contract has salvage exchange rights, under which all salvage goes to the employer and the
+     * player is paid a share of its value.
      *
-     * @return {@code true} if the player may buy salvage
+     * @return {@code true} if the player can't keep any salvage
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private boolean isBuyingSalvage() {
-        return salvageRules.isUseSalvagePurchases() && !isExchangeRights;
-    }
-
-    /**
-     * Checks whether a row's wreck has been recovered. Without salvage operations, every wreck is recovered
-     * automatically; otherwise it needs a recovery unit assigned.
-     *
-     * @param group the combo box group to check
-     *
-     * @return {@code true} if the wreck has been recovered
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private boolean isRecovered(SalvageComboBoxGroup group) {
-        return !salvageRules.isUseSalvageOperations() || hasAssignedUnits(group);
+    private boolean isExchangeRights() {
+        return !settlement.canKeepSalvage();
     }
 
     private BigDecimal getCurrentPercentAsBigDecimal() {
@@ -1134,11 +1066,7 @@ public class SalvagePostScenarioPicker {
           @Nullable JLabel unitSalvageLabel, @Nullable JLabel availableTimeLabel) {
         usedSalvageTime = 0;
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            String unitName1 = (String) group.comboBoxLeft.getSelectedItem();
-            String unitName2 = (String) group.comboBoxRight.getSelectedItem();
-            boolean hasAssignedUnits = (unitName1 != null) || (unitName2 != null);
-
-            if (hasAssignedUnits) {
+            if (group.recovery.hasRecoveryUnits()) {
                 RecoveryTimeData timeData = recoveryTimeData.get(group.targetUnit.getId());
                 if (timeData != null) {
                     // Saturate rather than overflow, so an absurd recovery time can't wrap around to negative
@@ -1165,14 +1093,13 @@ public class SalvagePostScenarioPicker {
         employerSalvageMoneyCurrent = employerSalvageMoneyInitial.plus(tempEmployerSalvage);
         unitSalvageMoneyCurrent = unitSalvageMoneyInitial.plus(tempUnitSalvage);
 
-        Money tempKeptSalvage = Money.zero();
+        keptSalvageValue = Money.zero();
         for (TestUnit keptUnit : keptSalvage) {
-            tempKeptSalvage = tempKeptSalvage.plus(keptUnit.getSellValue());
+            keptSalvageValue = keptSalvageValue.plus(keptUnit.getSellValue());
         }
-        purchaseCost = tempKeptSalvage.multipliedBy(1.0 - playerSalvageShare);
-        cashShare = tempEmployerSalvage.multipliedBy(playerSalvageShare);
+        employerSalvageValue = tempEmployerSalvage;
 
-        if (isBuyingSalvage()) {
+        if (settlement.isKeptSalvageBought()) {
             updatePurchaseLabels(employerSalvageLabel, unitSalvageLabel);
             if (availableTimeLabel != null) {
                 availableTimeLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -1182,9 +1109,10 @@ public class SalvagePostScenarioPicker {
         }
 
         // Update labels if they exist
-        if (salvagePercentLabel != null && !isExchangeRights) {
+        if (salvagePercentLabel != null && settlement.isSalvageCapped()) {
             salvagePercentLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
-                  "SalvagePostScenarioPicker.salvagePercent.normal", getCurrentPercentAsBigDecimal(), salvagePercent));
+                  "SalvagePostScenarioPicker.salvagePercent.normal", getCurrentPercentAsBigDecimal(),
+                  settlement.getPlayerSharePercent()));
         }
         if (employerSalvageLabel != null) {
             employerSalvageLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -1192,7 +1120,7 @@ public class SalvagePostScenarioPicker {
         }
         if (unitSalvageLabel != null) {
             String label;
-            if (isExchangeRights) {
+            if (isExchangeRights()) {
                 label = getFormattedTextAt(RESOURCE_BUNDLE,
                       "SalvagePostScenarioPicker.unitSalvage", getExchangeUnitSalvage().toAmountString());
             } else {
@@ -1208,12 +1136,11 @@ public class SalvagePostScenarioPicker {
     }
 
     /**
-     * Revalidates every salvage assignment, then applies the limits of any cargo space or bays shared between rows.
+     * Revalidates every salvage assignment, then shows the result on each row.
      *
-     * <p>Each row is first validated on its own (see {@link #updateValidation(SalvageComboBoxGroup, Map)}). Where the
-     * salvage system lets a carrying unit recover several wrecks, each row's share of its carrier's cargo space or
-     * bays is then worked out, and rows that overload a carrier, or that use a unit committed elsewhere, are
-     * invalidated. Finally, every row's salvage is moved to the matching kept, sold, or employer list.</p>
+     * <p>The rows' selections are copied into the recovery plan, which works out whether each wreck can be recovered
+     * (see {@link SalvageRecoveryPlan#revalidate()}). Each row's salvage is then moved to the matching kept, sold, or
+     * employer list.</p>
      *
      * @param salvageComboBoxGroups list of all combo box groups
      *
@@ -1222,112 +1149,63 @@ public class SalvagePostScenarioPicker {
      */
     private void revalidateAllGroups(List<SalvageComboBoxGroup> salvageComboBoxGroups) {
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            updateValidation(group, unitNameMap);
-            syncRecoveryMethodBox(group);
-            group.carryLoad = getSharedCarryLoad(group);
+            group.recovery.setRecoveryUnits(getSelectedUnit(group.comboBoxLeft), getSelectedUnit(group.comboBoxRight));
+            if (group.recoveryMethodBox != null) {
+                group.recovery.setPreferredRecoveryMethod((RecoveryMethod) group.recoveryMethodBox.getSelectedItem());
+            }
         }
 
-        if (salvageRules.isMultipleSalvagePerUnitAllowed()) {
-            applySharedCapacityLimits(salvageComboBoxGroups);
-            labelRecoveryMethods(salvageComboBoxGroups);
-        }
+        recoveryPlan.revalidate();
 
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            syncMembershipForGroup(group, isRecovered(group) && group.isValid);
+            showRecoveryStatus(group);
+            syncRecoveryMethodBox(group);
+            syncMembershipForGroup(group, group.recovery.isRecovered());
         }
     }
 
     /**
-     * Works out a row's share of its carrier's cargo space or bays.
-     *
-     * <p>A wreck only takes a share when a single unit is assigned, and that unit carries it rather than dragging or
-     * tugging it. Carried wrecks go in the carrier's cargo space, except fighters and small craft in space, which go
-     * in its bays.</p>
-     *
-     * @param group the combo box group to check
-     *
-     * @return the wreck's share of its carrier's capacity, or {@code null} if it doesn't share its carrier
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private @Nullable CarryLoad getSharedCarryLoad(SalvageComboBoxGroup group) {
-        if (!salvageRules.isMultipleSalvagePerUnitAllowed() || !group.isValid) {
-            return null;
-        }
-
-        Unit unitLeft = getSelectedUnit(group.comboBoxLeft);
-        Unit unitRight = getSelectedUnit(group.comboBoxRight);
-        if ((unitLeft == null) == (unitRight == null)) {
-            return null; // Nothing assigned, or a two-unit team, which is committed to this wreck
-        }
-
-        Entity targetEntity = group.targetUnit.getEntity();
-        if (targetEntity == null) {
-            return null;
-        }
-
-        Unit carrier = (unitLeft != null) ? unitLeft : unitRight;
-        if (isInSpace) {
-            if (isLargeVessel(targetEntity)) {
-                return null; // Tugged, which commits the carrier
-            }
-            if (isSmallVessel(targetEntity)) {
-                return new CarryLoad(carrier, 0.0, true, isSmallCraft(targetEntity));
-            }
-        }
-
-        double targetWeight = targetEntity.getWeight();
-        boolean canCarry = getCargoCapacity(carrier) >= targetWeight;
-        boolean isDragChosen = getChosenRecoveryMethod(group) == RecoveryMethod.DRAG;
-        if (canCarry && !isDragChosen) {
-            return new CarryLoad(carrier, targetWeight, false, false);
-        }
-
-        return null; // Dragged, which commits the carrier
-    }
-
-    /**
-     * Updates a row's carry/drag selector to match its current assignment.
-     *
-     * <p>The selector is only enabled when a single unit is assigned and it could either carry or drag the wreck.
-     * Otherwise it shows the only available method, or nothing. When the assigned unit changes, the choice resets to
-     * carrying, as that leaves the unit free to take on more salvage.</p>
+     * Shows a row's recovery status, and enables its claim checkboxes if the wreck will be recovered.
      *
      * @param group the combo box group to update
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private void syncRecoveryMethodBox(SalvageComboBoxGroup group) {
+    private void showRecoveryStatus(SalvageComboBoxGroup group) {
+        RecoveryStatus status = group.recovery.getStatus();
+        group.validationLabel.setText(status.getLabel());
+
+        if (status.isRecovered()) {
+            group.unitLabel.setForeground(null); // Reset to default color
+            group.claimedSalvageForKeeps.setEnabled(settlement.canKeepSalvage());
+            group.claimedSalvageForSale.setEnabled(settlement.canSellSalvage());
+            return;
+        }
+
+        group.unitLabel.setForeground(status.isProblem() ? MekHQ.getMHQOptions().getFontColorNegative() : null);
+        group.claimedSalvageForKeeps.setSelected(false);
+        group.claimedSalvageForKeeps.setEnabled(false);
+        group.claimedSalvageForSale.setSelected(false);
+        group.claimedSalvageForSale.setEnabled(false);
+    }
+
+    /**
+     * Updates a row's carry/drag selector to match the recovery method the plan settled on.
+     *
+     * <p>The selector is only enabled when a single unit is assigned and it could either carry or drag the wreck.
+     * Otherwise it shows the only available method, or nothing.</p>
+     *
+     * @param group the combo box group to update
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void syncRecoveryMethodBox(SalvageComboBoxGroup group) {
         JComboBox<RecoveryMethod> recoveryMethodBox = group.recoveryMethodBox;
         if (recoveryMethodBox == null) {
             return;
         }
-
-        List<Unit> selectedUnits = getSelectedUnits(group);
-        Unit singleUnit = (selectedUnits.size() == 1) ? selectedUnits.getFirst() : null;
-        Entity targetEntity = group.targetUnit.getEntity();
-
-        boolean isChoosable = false;
-        RecoveryMethod recoveryMethod = null;
-        if ((singleUnit != null) && group.isValid && (targetEntity != null)) {
-            double targetWeight = targetEntity.getWeight();
-            boolean canCarry = getCargoCapacity(singleUnit) >= targetWeight;
-            boolean canDrag = getTowCapacity(singleUnit) >= targetWeight;
-            isChoosable = canCarry && canDrag;
-
-            if (isChoosable) {
-                boolean isSameUnit = singleUnit == group.recoveryMethodUnit;
-                RecoveryMethod previousChoice = (RecoveryMethod) recoveryMethodBox.getSelectedItem();
-                recoveryMethod = (isSameUnit && (previousChoice != null)) ? previousChoice : RecoveryMethod.CARRY;
-            } else if (canCarry) {
-                recoveryMethod = RecoveryMethod.CARRY;
-            } else if (canDrag) {
-                recoveryMethod = RecoveryMethod.DRAG;
-            }
-        }
-        group.recoveryMethodUnit = singleUnit;
 
         // Update without re-triggering the listeners
         ActionListener[] listeners = recoveryMethodBox.getActionListeners();
@@ -1335,166 +1213,13 @@ public class SalvagePostScenarioPicker {
             recoveryMethodBox.removeActionListener(listener);
         }
         try {
-            recoveryMethodBox.setSelectedItem(recoveryMethod);
-            recoveryMethodBox.setEnabled(isChoosable);
+            recoveryMethodBox.setSelectedItem(group.recovery.getRecoveryMethod());
+            recoveryMethodBox.setEnabled(group.recovery.isRecoveryMethodChoosable());
         } finally {
             for (ActionListener listener : listeners) {
                 recoveryMethodBox.addActionListener(listener);
             }
         }
-    }
-
-    private static @Nullable RecoveryMethod getChosenRecoveryMethod(SalvageComboBoxGroup group) {
-        return (group.recoveryMethodBox == null) ? null : (RecoveryMethod) group.recoveryMethodBox.getSelectedItem();
-    }
-
-    /**
-     * Invalidates rows that overload a carrier's cargo space or bays, or that use a unit committed elsewhere.
-     *
-     * <p>A unit either carries salvage (sharing its capacity between wrecks) or is committed to a single wreck,
-     * dragging or tugging it alone or as part of a two-unit team. It can never do both.</p>
-     *
-     * @param salvageComboBoxGroups list of all combo box groups
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private void applySharedCapacityLimits(List<SalvageComboBoxGroup> salvageComboBoxGroups) {
-        Color negativeColor = MekHQ.getMHQOptions().getFontColorNegative();
-        String inUseLabel = getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.unitInUse");
-        List<SalvageComboBoxGroup> invalidatedGroups = new ArrayList<>();
-
-        // A committed unit can't be used anywhere else
-        for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            if (!group.isValid || (group.carryLoad != null)) {
-                continue;
-            }
-            for (Unit unit : getSelectedUnits(group)) {
-                for (SalvageComboBoxGroup otherGroup : getGroupsUsing(salvageComboBoxGroups, unit, group)) {
-                    invalidatedGroups.add(group);
-                    invalidatedGroups.add(otherGroup);
-                }
-            }
-        }
-
-        // Carriers can't take on more than fits
-        Map<Unit, List<SalvageComboBoxGroup>> groupsByCarrier = getGroupsByCarrier(salvageComboBoxGroups);
-        for (Map.Entry<Unit, List<SalvageComboBoxGroup>> entry : groupsByCarrier.entrySet()) {
-            Unit carrier = entry.getKey();
-            List<SalvageComboBoxGroup> carriedGroups = entry.getValue();
-
-            List<SalvageComboBoxGroup> cargoGroups = new ArrayList<>();
-            List<SalvageComboBoxGroup> bayGroups = new ArrayList<>();
-            double cargoTonsUsed = 0.0;
-            int smallCraftCarried = 0;
-            for (SalvageComboBoxGroup group : carriedGroups) {
-                if (group.carryLoad.isBayLoad()) {
-                    bayGroups.add(group);
-                    if (group.carryLoad.isSmallCraft()) {
-                        smallCraftCarried++;
-                    }
-                } else {
-                    cargoGroups.add(group);
-                    cargoTonsUsed += group.carryLoad.cargoTons();
-                }
-            }
-
-            if (cargoTonsUsed > getCargoCapacity(carrier) + CAPACITY_TOLERANCE) {
-                for (SalvageComboBoxGroup group : cargoGroups) {
-                    invalidate(group, getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.cargoFull"),
-                          negativeColor);
-                    group.carryLoad = null;
-                }
-            }
-
-            if (!hasBaysFor(carrier, bayGroups.size(), smallCraftCarried)) {
-                for (SalvageComboBoxGroup group : bayGroups) {
-                    invalidate(group, getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noFreeBay"),
-                          negativeColor);
-                    group.carryLoad = null;
-                }
-            }
-        }
-
-        for (SalvageComboBoxGroup group : invalidatedGroups) {
-            invalidate(group, inUseLabel, negativeColor);
-            group.carryLoad = null;
-        }
-    }
-
-    /**
-     * Labels each valid row with how its wreck is recovered: carried in cargo, carried in a bay, or dragged.
-     *
-     * @param salvageComboBoxGroups list of all combo box groups
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private void labelRecoveryMethods(List<SalvageComboBoxGroup> salvageComboBoxGroups) {
-        for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            if (!group.isValid) {
-                continue;
-            }
-
-            String validationKey;
-            if (group.carryLoad != null) {
-                validationKey = group.carryLoad.isBayLoad() ?
-                                      "SalvagePostScenarioPicker.validation.valid.bay" :
-                                      "SalvagePostScenarioPicker.validation.valid.cargo";
-            } else {
-                validationKey = "SalvagePostScenarioPicker.validation.valid.committed";
-            }
-            group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE, validationKey));
-        }
-    }
-
-    /**
-     * Groups the rows that share a carrier's capacity by their carrier.
-     *
-     * @param salvageComboBoxGroups list of all combo box groups
-     *
-     * @return the rows carried by each carrier
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private static Map<Unit, List<SalvageComboBoxGroup>> getGroupsByCarrier(
-          List<SalvageComboBoxGroup> salvageComboBoxGroups) {
-        Map<Unit, List<SalvageComboBoxGroup>> groupsByCarrier = new LinkedHashMap<>();
-        for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            if (group.carryLoad != null) {
-                groupsByCarrier.computeIfAbsent(group.carryLoad.carrier(), carrier -> new ArrayList<>()).add(group);
-            }
-        }
-        return groupsByCarrier;
-    }
-
-    /**
-     * Checks whether a carrier has enough suitable bays with working doors for the fighters and small craft assigned
-     * to it. Fighters fit in fighter or small craft bays; small craft only fit in small craft bays.
-     *
-     * @param carrier           the carrying unit
-     * @param vesselsCarried    the total number of fighters and small craft assigned to the carrier
-     * @param smallCraftCarried how many of those are small craft
-     *
-     * @return {@code true} if every assigned fighter and small craft has a bay
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private static boolean hasBaysFor(Unit carrier, int vesselsCarried, int smallCraftCarried) {
-        if (vesselsCarried == 0) {
-            return true;
-        }
-
-        Entity carrierEntity = carrier.getEntity();
-        if (carrierEntity == null) {
-            return false;
-        }
-
-        int smallCraftBays = CamOpsSalvageUtilities.countBaysWithWorkingDoors(carrierEntity, SmallCraftBay.class);
-        int fighterBays = CamOpsSalvageUtilities.countBaysWithWorkingDoors(carrierEntity, ASFBay.class);
-        return (smallCraftCarried <= smallCraftBays) && (vesselsCarried <= smallCraftBays + fighterBays);
     }
 
     /**
@@ -1507,8 +1232,8 @@ public class SalvagePostScenarioPicker {
      */
     private void updateComboBoxOptions(List<SalvageComboBoxGroup> salvageComboBoxGroups) {
         for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            updateSingleComboBox(salvageComboBoxGroups, group, group.comboBoxLeft, group.comboBoxRight);
-            updateSingleComboBox(salvageComboBoxGroups, group, group.comboBoxRight, group.comboBoxLeft);
+            updateSingleComboBox(group, group.comboBoxLeft, group.comboBoxRight);
+            updateSingleComboBox(group, group.comboBoxRight, group.comboBoxLeft);
         }
     }
 
@@ -1516,20 +1241,20 @@ public class SalvagePostScenarioPicker {
      * Updates a single combo box with available unit options.
      *
      * <p>Repopulates the combo box with the current selection, plus every unit that could legally be assigned there
-     * (see {@link #isOfferedInComboBox(List, SalvageComboBoxGroup, JComboBox, String, Unit)}). Preserves the current
-     * selection after updating.</p>
+     * (see {@link SalvageRecoveryPlan#isOffered(WreckRecovery, Unit, Unit)}). Preserves the current selection after
+     * updating.</p>
      *
-     * @param salvageComboBoxGroups list of all combo box groups
-     * @param group                 the group the combo box belongs to
-     * @param comboBox              the combo box to update
-     * @param otherComboBox         the other combo box in the same group
+     * @param group         the group the combo box belongs to
+     * @param comboBox      the combo box to update
+     * @param otherComboBox the other combo box in the same group
      *
      * @author Illiani
      * @since 0.50.10
      */
-    private void updateSingleComboBox(List<SalvageComboBoxGroup> salvageComboBoxGroups, SalvageComboBoxGroup group,
-          JComboBox<String> comboBox, JComboBox<String> otherComboBox) {
+    private void updateSingleComboBox(SalvageComboBoxGroup group, JComboBox<String> comboBox,
+          JComboBox<String> otherComboBox) {
         String currentSelection = (String) comboBox.getSelectedItem();
+        Unit otherSlotUnit = getSelectedUnit(otherComboBox);
 
         // Temporarily remove all action listeners to prevent recursive calls
         ActionListener[] listeners = comboBox.getActionListeners();
@@ -1544,8 +1269,7 @@ public class SalvagePostScenarioPicker {
             for (Map.Entry<String, Unit> entry : unitNameMap.entrySet()) {
                 String unitName = entry.getKey();
                 if (unitName.equals(currentSelection) ||
-                          isOfferedInComboBox(salvageComboBoxGroups, group, otherComboBox, unitName,
-                                entry.getValue())) {
+                          recoveryPlan.isOffered(group.recovery, entry.getValue(), otherSlotUnit)) {
                     comboBox.addItem(unitName);
                 }
             }
@@ -1561,394 +1285,33 @@ public class SalvagePostScenarioPicker {
     }
 
     /**
-     * Checks whether a unit could be assigned in a combo box.
-     *
-     * <p>A unit not assigned anywhere else is always offered. Where the salvage system lets a carrying unit recover
-     * several wrecks, a unit that is only carrying salvage elsewhere is also offered, provided it would carry this
-     * wreck alone and still has room for it.</p>
-     *
-     * @param salvageComboBoxGroups list of all combo box groups
-     * @param group                 the group the combo box belongs to
-     * @param otherComboBox         the other combo box in the same group
-     * @param unitName              the unit's display name
-     * @param unit                  the unit
-     *
-     * @return {@code true} if the unit should be offered
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private boolean isOfferedInComboBox(List<SalvageComboBoxGroup> salvageComboBoxGroups, SalvageComboBoxGroup group,
-          JComboBox<String> otherComboBox, String unitName, Unit unit) {
-        if (unitName.equals(otherComboBox.getSelectedItem())) {
-            return false; // The same unit can't fill both slots
-        }
-
-        List<SalvageComboBoxGroup> otherUses = getGroupsUsing(salvageComboBoxGroups, unit, group);
-        if (otherUses.isEmpty()) {
-            return true;
-        }
-
-        if (!salvageRules.isMultipleSalvagePerUnitAllowed() || (otherComboBox.getSelectedItem() != null)) {
-            return false; // Two-unit teams are committed to a single wreck
-        }
-
-        for (SalvageComboBoxGroup otherUse : otherUses) {
-            if (otherUse.carryLoad == null) {
-                return false; // Committed elsewhere
-            }
-        }
-
-        return canCarryAdditionally(unit, group.targetUnit, otherUses);
-    }
-
-    /**
-     * Checks whether a carrier has room for another wreck on top of those it already carries.
-     *
-     * @param carrier        the carrying unit
-     * @param target         the additional wreck
-     * @param carriedGroups  the rows the carrier already carries
-     *
-     * @return {@code true} if the additional wreck would fit
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private boolean canCarryAdditionally(Unit carrier, TestUnit target, List<SalvageComboBoxGroup> carriedGroups) {
-        Entity targetEntity = target.getEntity();
-        if (targetEntity == null) {
-            return false;
-        }
-
-        if (isInSpace && isLargeVessel(targetEntity)) {
-            return false; // Tugging commits the carrier
-        }
-
-        if (isInSpace && isSmallVessel(targetEntity)) {
-            int vesselsCarried = 1;
-            int smallCraftCarried = isSmallCraft(targetEntity) ? 1 : 0;
-            for (SalvageComboBoxGroup carriedGroup : carriedGroups) {
-                if (carriedGroup.carryLoad.isBayLoad()) {
-                    vesselsCarried++;
-                    if (carriedGroup.carryLoad.isSmallCraft()) {
-                        smallCraftCarried++;
-                    }
-                }
-            }
-            return hasBaysFor(carrier, vesselsCarried, smallCraftCarried);
-        }
-
-        double cargoTonsUsed = targetEntity.getWeight();
-        for (SalvageComboBoxGroup carriedGroup : carriedGroups) {
-            cargoTonsUsed += carriedGroup.carryLoad.cargoTons();
-        }
-        return cargoTonsUsed <= getCargoCapacity(carrier) + CAPACITY_TOLERANCE;
-    }
-
-    /**
      * Builds the prefix shown before a carrier's name in the drop-down boxes, showing how much room it has left.
      *
-     * @param salvageComboBoxGroups list of all combo box groups
-     * @param carrier               the unit to describe
+     * @param carrier the unit to describe
      *
      * @return the prefix, or {@code null} if the unit isn't carrying anything
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private @Nullable String getRemainingCapacityPrefix(List<SalvageComboBoxGroup> salvageComboBoxGroups,
-          Unit carrier) {
-        double cargoTonsUsed = 0.0;
-        int vesselsCarried = 0;
-        boolean isCarrying = false;
-        for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            if ((group.carryLoad != null) && (group.carryLoad.carrier() == carrier)) {
-                isCarrying = true;
-                if (group.carryLoad.isBayLoad()) {
-                    vesselsCarried++;
-                } else {
-                    cargoTonsUsed += group.carryLoad.cargoTons();
-                }
-            }
-        }
-
-        if (!isCarrying) {
+    private @Nullable String getRemainingCapacityPrefix(Unit carrier) {
+        RemainingCapacity remainingCapacity = recoveryPlan.getRemainingCapacity(carrier);
+        if (remainingCapacity == null) {
             return null;
         }
 
-        if (vesselsCarried > 0) {
-            Entity carrierEntity = carrier.getEntity();
-            int bays = (carrierEntity == null) ? 0 :
-                             CamOpsSalvageUtilities.countBaysWithWorkingDoors(carrierEntity, SmallCraftBay.class) +
-                                   CamOpsSalvageUtilities.countBaysWithWorkingDoors(carrierEntity, ASFBay.class);
+        if (remainingCapacity.isBayCapacity()) {
             return getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.freeBays",
-                  Math.max(0, bays - vesselsCarried));
+                  remainingCapacity.freeBays());
         }
 
-        double freeCargoTons = Math.max(0.0, getCargoCapacity(carrier) - cargoTonsUsed);
-        return getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.freeCargo", freeCargoTons);
-    }
-
-    /**
-     * Finds the other rows that have a unit assigned.
-     *
-     * @param salvageComboBoxGroups list of all combo box groups
-     * @param unit                  the unit to look for
-     * @param excludedGroup         a row to ignore, usually the one being checked
-     *
-     * @return every other row with the unit assigned in either slot
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private List<SalvageComboBoxGroup> getGroupsUsing(List<SalvageComboBoxGroup> salvageComboBoxGroups, Unit unit,
-          SalvageComboBoxGroup excludedGroup) {
-        List<SalvageComboBoxGroup> groupsUsing = new ArrayList<>();
-        for (SalvageComboBoxGroup group : salvageComboBoxGroups) {
-            if ((group != excludedGroup) && getSelectedUnits(group).contains(unit)) {
-                groupsUsing.add(group);
-            }
-        }
-        return groupsUsing;
-    }
-
-    private List<Unit> getSelectedUnits(SalvageComboBoxGroup group) {
-        List<Unit> selectedUnits = new ArrayList<>();
-        Unit unitLeft = getSelectedUnit(group.comboBoxLeft);
-        if (unitLeft != null) {
-            selectedUnits.add(unitLeft);
-        }
-        Unit unitRight = getSelectedUnit(group.comboBoxRight);
-        if (unitRight != null) {
-            selectedUnits.add(unitRight);
-        }
-        return selectedUnits;
+        return getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.freeCargo",
+              remainingCapacity.freeCargoTons());
     }
 
     private @Nullable Unit getSelectedUnit(JComboBox<String> comboBox) {
         String unitName = (String) comboBox.getSelectedItem();
         return (unitName == null) ? null : unitNameMap.get(unitName);
-    }
-
-    private static boolean hasAssignedUnits(SalvageComboBoxGroup group) {
-        return (group.comboBoxLeft.getSelectedItem() != null) || (group.comboBoxRight.getSelectedItem() != null);
-    }
-
-    /** Jumpship includes WarShips. */
-    private static boolean isLargeVessel(Entity entity) {
-        return entity instanceof Dropship || entity instanceof Jumpship;
-    }
-
-    /** Dropship extends SmallCraft, so large vessels must be excluded. */
-    private static boolean isSmallVessel(Entity entity) {
-        return !isLargeVessel(entity) && (entity instanceof SmallCraft || entity instanceof AeroSpaceFighter);
-    }
-
-    private static boolean isSmallCraft(Entity entity) {
-        return !isLargeVessel(entity) && (entity instanceof SmallCraft);
-    }
-
-    /**
-     * Validates the salvage assignment for a combo box group and updates its validation label.
-     *
-     * <p>Checks the following requirements:</p>
-     * <ul>
-     *   <li>Space salvage:
-     *     <ul>
-     *       <li>For large vessels (Dropship or Jumpship): at least one assigned unit must have a naval tug</li>
-     *       <li>For small vessels (Small craft or Aerospace Fighters): at least one assigned unit must have a
-     *       SC or ASF bay</li>
-     *       <li>For anything else: at least one assigned unit's cargo capacity must meet or exceed the salvage
-     *       unit's weight</li>
-     *     </ul>
-     *   </li>
-     *   <li>Ground salvage:
-     *     <ul>
-     *       <li>Either: one assigned unit's cargo capacity must meet or exceed the salvage unit's weight</li>
-     *       <li>Or: the combined tow capacity of the assigned units must meet or exceed the salvage unit's
-     *       weight</li>
-     *     </ul>
-     *   </li>
-     * </ul>
-     *
-     * <p>Updates the validation label with the result and colors the unit label red if validation fails.</p>
-     *
-     * @param group       the combo box group to validate
-     * @param unitNameMap mapping from display names to Unit objects
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private void updateValidation(SalvageComboBoxGroup group, Map<String, Unit> unitNameMap) {
-        // Without salvage operations, every wreck is recovered automatically
-        if (!salvageRules.isUseSalvageOperations()) {
-            validate(group);
-            group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.recovered"));
-            return;
-        }
-
-        String unitNameLeft = (String) group.comboBoxLeft.getSelectedItem();
-        String unitNameRight = (String) group.comboBoxRight.getSelectedItem();
-
-        Unit salvageUnitLeft = unitNameLeft != null ? unitNameMap.get(unitNameLeft) : null;
-        Unit salvageUnitRight = unitNameRight != null ? unitNameMap.get(unitNameRight) : null;
-        TestUnit targetUnit = group.targetUnit;
-
-        // If no units selected, clear validation and reset color
-        if (salvageUnitLeft == null && salvageUnitRight == null) {
-            invalidate(group, "", null);
-            return;
-        }
-
-        Entity targetEntity = targetUnit.getEntity();
-        double targetWeight = 0.0;
-        boolean isLargeVessel = false;
-        boolean isSmallVessel = false;
-        if (targetEntity != null) {
-            targetWeight = targetEntity.getWeight();
-            // Jumpship includes WarShips
-            isLargeVessel = targetEntity instanceof Dropship || targetEntity instanceof Jumpship;
-            isSmallVessel = targetEntity instanceof SmallCraft || targetEntity instanceof AeroSpaceFighter;
-        }
-
-        Entity unitLeftEntity = salvageUnitLeft != null ? salvageUnitLeft.getEntity() : null;
-        Entity unitRightEntity = salvageUnitRight != null ? salvageUnitRight.getEntity() : null;
-        if (isInSpace) {
-            // Dropship extends SmallCraft, so the large vessel check must come first
-            if (isLargeVessel) {
-                if (!checkForNavalTug(group, unitLeftEntity, unitRightEntity)) {
-                    return;
-                }
-            } else if (isSmallVessel) {
-                if (!checkForVesselWithSuitableBayEquipment(group, unitLeftEntity, unitRightEntity)) {
-                    return;
-                }
-            } else if (!isCargoCapacitySufficient(salvageUnitLeft, salvageUnitRight, targetWeight)) {
-                invalidate(group,
-                      getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noCapacity.cargo"),
-                      MekHQ.getMHQOptions().getFontColorNegative());
-                return;
-            }
-        } else if (!checkForGroundCapacity(group, salvageUnitLeft, salvageUnitRight, targetWeight)) {
-            return;
-        }
-
-        validate(group);
-    }
-
-    private static double getCargoCapacity(@Nullable Unit unit) {
-        return unit == null ? 0.0 : unit.getCargoCapacityForSalvage();
-    }
-
-    private static double getTowCapacity(@Nullable Unit unit) {
-        return unit == null ? 0.0 : CamOpsSalvageUtilities.getTowCapacity(unit);
-    }
-
-    /**
-     * Checks whether either assigned unit can carry the salvage in its cargo space. Cargo capacity is not combined, as
-     * a single wreck can't be split between two units.
-     *
-     * @param unitLeft     the first assigned unit, or {@code null}
-     * @param unitRight    the second assigned unit, or {@code null}
-     * @param targetWeight the weight of the salvage
-     *
-     * @return {@code true} if either unit has enough cargo capacity
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private static boolean isCargoCapacitySufficient(@Nullable Unit unitLeft, @Nullable Unit unitRight,
-          double targetWeight) {
-        return Math.max(getCargoCapacity(unitLeft), getCargoCapacity(unitRight)) >= targetWeight;
-    }
-
-    /**
-     * Checks whether the assigned units can recover the salvage during ground operations, invalidating the group if
-     * they can't.
-     *
-     * <p>The salvage can be recovered if either unit can carry it in its cargo space, or if the combined tow
-     * capacity of both units is enough to drag it.</p>
-     *
-     * @param group        the combo box group being validated
-     * @param unitLeft     the first assigned unit, or {@code null}
-     * @param unitRight    the second assigned unit, or {@code null}
-     * @param targetWeight the weight of the salvage
-     *
-     * @return {@code true} if the salvage can be recovered
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    private static boolean checkForGroundCapacity(SalvageComboBoxGroup group, @Nullable Unit unitLeft,
-          @Nullable Unit unitRight, double targetWeight) {
-        if (isCargoCapacitySufficient(unitLeft, unitRight, targetWeight)) {
-            return true;
-        }
-
-        double combinedTowCapacity = getTowCapacity(unitLeft) + getTowCapacity(unitRight);
-        if (combinedTowCapacity >= targetWeight) {
-            return true;
-        }
-
-        // Report whichever option came closest
-        double bestCargoCapacity = Math.max(getCargoCapacity(unitLeft), getCargoCapacity(unitRight));
-        String validationKey = combinedTowCapacity >= bestCargoCapacity ?
-                                     "SalvagePostScenarioPicker.validation.noCapacity.tow" :
-                                     "SalvagePostScenarioPicker.validation.noCapacity.cargo";
-        invalidate(group, getTextAt(RESOURCE_BUNDLE, validationKey), MekHQ.getMHQOptions().getFontColorNegative());
-        return false;
-    }
-
-    private static boolean checkForNavalTug(SalvageComboBoxGroup group, Entity unitLeftEntity, Entity unitRightEntity) {
-        boolean hasNavalTugLeft = null != unitLeftEntity && CamOpsSalvageUtilities.hasNavalTug(unitLeftEntity);
-        boolean hasNavalTugRight = null != unitRightEntity && CamOpsSalvageUtilities.hasNavalTug(unitRightEntity);
-        boolean hasNavalTug = hasNavalTugLeft || hasNavalTugRight;
-
-        if (!hasNavalTug) {
-            invalidate(group, getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.noTug"),
-                  MekHQ.getMHQOptions().getFontColorNegative());
-            return false;
-        }
-
-        return true;
-    }
-
-    private static boolean checkForVesselWithSuitableBayEquipment(SalvageComboBoxGroup group, Entity unitLeftEntity,
-          Entity unitRightEntity) {
-        boolean isSuitableVesselLeft = null != unitLeftEntity &&
-                                             CamOpsSalvageUtilities.hasSuitableBayEquipment(unitLeftEntity);
-        boolean isSuitableVesselRight = null != unitRightEntity &&
-                                              CamOpsSalvageUtilities.hasSuitableBayEquipment(unitRightEntity);
-        boolean isSuitableVessel = isSuitableVesselLeft || isSuitableVesselRight;
-
-        if (!isSuitableVessel) {
-            invalidate(group, getTextAt(RESOURCE_BUNDLE,
-                        "SalvagePostScenarioPicker.validation.noVesselWithSuitableBayEquipment"),
-                  MekHQ.getMHQOptions().getFontColorNegative());
-            return false;
-        }
-
-        return true;
-    }
-
-    private void validate(SalvageComboBoxGroup group) {
-        group.isValid = true;
-        group.validationLabel.setText(getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation.valid"));
-        group.unitLabel.setForeground(null); // Reset to default color
-        if (!isExchangeRights) { // For exchange rights we keep everything disabled
-            group.claimedSalvageForKeeps.setEnabled(true);
-            group.claimedSalvageForSale.setEnabled(true);
-        }
-    }
-
-    private static void invalidate(SalvageComboBoxGroup group, String label, Color FontColorNegative) {
-        group.isValid = false;
-        group.validationLabel.setText(label);
-        group.unitLabel.setForeground(FontColorNegative);
-        group.claimedSalvageForKeeps.setSelected(false);
-        group.claimedSalvageForKeeps.setEnabled(false);
-        group.claimedSalvageForSale.setSelected(false);
-        group.claimedSalvageForSale.setEnabled(false);
     }
 
     /**

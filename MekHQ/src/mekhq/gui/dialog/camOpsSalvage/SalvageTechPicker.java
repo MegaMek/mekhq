@@ -58,7 +58,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageTechData;
+import mekhq.campaign.mission.scenarios.salvage.SalvageTechData;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;

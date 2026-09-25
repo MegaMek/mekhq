@@ -23,6 +23,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.mission.scenarios.salvage.CamOpsRevisedSalvage;
+import mekhq.campaign.mission.scenarios.salvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.scenarios.salvage.CamOpsStrictSalvage;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -174,32 +175,32 @@ class CamOpsSalvageUtilitiesTest {
             Unit unit = mock(Unit.class);
             when(unit.canSalvage(false)).thenReturn(true);
 
-            assertTrue(CamOpsSalvageUtilities.canSalvage(unit, false, STRICT_RULES));
+            assertTrue(STRICT_RULES.canSalvage(unit, false));
         }
 
         @Test
         void strictRulesDontLetAHandlessMekUseCargo() {
-            assertFalse(CamOpsSalvageUtilities.canSalvage(handlessMek(10.0, true), false, STRICT_RULES));
+            assertFalse(STRICT_RULES.canSalvage(handlessMek(10.0, true), false));
         }
 
         @Test
         void otherRulesLetAHandlessMekUseCargo() {
-            assertTrue(CamOpsSalvageUtilities.canSalvage(handlessMek(10.0, true), false, REVISED_RULES));
+            assertTrue(REVISED_RULES.canSalvage(handlessMek(10.0, true), false));
         }
 
         @Test
         void handlessMekWithoutCargoCannotSalvage() {
-            assertFalse(CamOpsSalvageUtilities.canSalvage(handlessMek(0.0, true), false, REVISED_RULES));
+            assertFalse(REVISED_RULES.canSalvage(handlessMek(0.0, true), false));
         }
 
         @Test
         void handlessMekThatIsNotFullyCrewedCannotSalvage() {
-            assertFalse(CamOpsSalvageUtilities.canSalvage(handlessMek(10.0, false), false, REVISED_RULES));
+            assertFalse(REVISED_RULES.canSalvage(handlessMek(10.0, false), false));
         }
 
         @Test
         void handlessMekCannotUseCargoInSpace() {
-            assertFalse(CamOpsSalvageUtilities.canSalvage(handlessMek(10.0, true), true, REVISED_RULES));
+            assertFalse(REVISED_RULES.canSalvage(handlessMek(10.0, true), true));
         }
     }
 
@@ -234,14 +235,14 @@ class CamOpsSalvageUtilitiesTest {
             Unit unit = salvageCapableUnit(tank(false, 50.0));
             when(unit.canSalvage(anyBoolean())).thenReturn(false);
 
-            assertFalse(CamOpsSalvageUtilities.isAvailableForSalvage(unit, false, STRICT_RULES));
+            assertFalse(STRICT_RULES.isAvailableForSalvage(unit, false));
         }
 
         @Test
         void vehicleThatCanSalvageIsAvailable() {
             Unit unit = salvageCapableUnit(tank(false, 50.0));
 
-            assertTrue(CamOpsSalvageUtilities.isAvailableForSalvage(unit, false, STRICT_RULES));
+            assertTrue(STRICT_RULES.isAvailableForSalvage(unit, false));
         }
 
         @Test
@@ -249,7 +250,7 @@ class CamOpsSalvageUtilitiesTest {
             Unit unit = salvageCapableUnit(tank(false, 50.0));
             when(unit.isRepairable()).thenReturn(false);
 
-            assertFalse(CamOpsSalvageUtilities.isAvailableForSalvage(unit, false, STRICT_RULES));
+            assertFalse(STRICT_RULES.isAvailableForSalvage(unit, false));
         }
 
         @Test
@@ -257,7 +258,7 @@ class CamOpsSalvageUtilitiesTest {
             Unit unit = salvageCapableUnit(tank(false, 50.0));
             when(unit.isSalvage()).thenReturn(true);
 
-            assertFalse(CamOpsSalvageUtilities.isAvailableForSalvage(unit, false, STRICT_RULES));
+            assertFalse(STRICT_RULES.isAvailableForSalvage(unit, false));
         }
 
         @Test
@@ -266,7 +267,7 @@ class CamOpsSalvageUtilitiesTest {
             when(tank.isPermanentlyImmobilized(false)).thenReturn(true);
             Unit unit = salvageCapableUnit(tank);
 
-            assertFalse(CamOpsSalvageUtilities.isAvailableForSalvage(unit, false, STRICT_RULES));
+            assertFalse(STRICT_RULES.isAvailableForSalvage(unit, false));
         }
 
         @Test
@@ -275,7 +276,7 @@ class CamOpsSalvageUtilitiesTest {
             when(dropship.isPermanentlyImmobilized(false)).thenReturn(true);
             Unit unit = salvageCapableUnit(dropship);
 
-            assertFalse(CamOpsSalvageUtilities.isAvailableForSalvage(unit, true, STRICT_RULES));
+            assertFalse(STRICT_RULES.isAvailableForSalvage(unit, true));
         }
 
         @Test
@@ -283,7 +284,7 @@ class CamOpsSalvageUtilitiesTest {
             Unit unit = salvageCapableUnit(tank(true, 50.0));
             when(unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT)).thenReturn(null);
 
-            assertFalse(CamOpsSalvageUtilities.isAvailableForSalvage(unit, false, STRICT_RULES));
+            assertFalse(STRICT_RULES.isAvailableForSalvage(unit, false));
         }
 
         @Test
@@ -292,7 +293,7 @@ class CamOpsSalvageUtilitiesTest {
             ITransportAssignment assignment = transportAssignment(false);
             when(unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT)).thenReturn(assignment);
 
-            assertFalse(CamOpsSalvageUtilities.isAvailableForSalvage(unit, false, STRICT_RULES));
+            assertFalse(STRICT_RULES.isAvailableForSalvage(unit, false));
         }
 
         @Test
@@ -301,7 +302,7 @@ class CamOpsSalvageUtilitiesTest {
             ITransportAssignment assignment = transportAssignment(true);
             when(unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT)).thenReturn(assignment);
 
-            assertTrue(CamOpsSalvageUtilities.isAvailableForSalvage(unit, false, STRICT_RULES));
+            assertTrue(STRICT_RULES.isAvailableForSalvage(unit, false));
         }
 
         @Test
@@ -313,7 +314,7 @@ class CamOpsSalvageUtilitiesTest {
             ITransportAssignment assignment = transportAssignment(true);
             when(unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT)).thenReturn(assignment);
 
-            assertTrue(CamOpsSalvageUtilities.isAvailableForSalvage(unit, false, STRICT_RULES));
+            assertTrue(STRICT_RULES.isAvailableForSalvage(unit, false));
         }
 
         @ParameterizedTest
@@ -326,7 +327,7 @@ class CamOpsSalvageUtilitiesTest {
         void strictRulesIgnoreMekMobility(boolean hasBadLeg, boolean isImmobilized) {
             Unit unit = salvageCapableUnit(mek(hasBadLeg, isImmobilized));
 
-            assertTrue(CamOpsSalvageUtilities.isAvailableForSalvage(unit, false, STRICT_RULES));
+            assertTrue(STRICT_RULES.isAvailableForSalvage(unit, false));
         }
 
         @ParameterizedTest
@@ -339,8 +340,7 @@ class CamOpsSalvageUtilitiesTest {
         void otherRulesRequireMekMobility(boolean hasBadLeg, boolean isImmobilized, boolean isExpectedAvailable) {
             Unit unit = salvageCapableUnit(mek(hasBadLeg, isImmobilized));
 
-            assertEquals(isExpectedAvailable, CamOpsSalvageUtilities.isAvailableForSalvage(unit, false,
-                  REVISED_RULES));
+            assertEquals(isExpectedAvailable, REVISED_RULES.isAvailableForSalvage(unit, false));
         }
     }
 

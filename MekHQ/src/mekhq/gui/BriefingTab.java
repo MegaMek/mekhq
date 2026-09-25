@@ -109,10 +109,10 @@ import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageFormationData;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageTechData;
 import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
+import mekhq.campaign.mission.scenarios.salvage.CamOpsSalvageUtilities;
+import mekhq.campaign.mission.scenarios.salvage.SalvageFormationData;
+import mekhq.campaign.mission.scenarios.salvage.SalvageTechData;
 import mekhq.campaign.mission.utilities.MissionCompletionManager;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -1155,18 +1155,13 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean displaySalvageFormationPicker(Scenario scenario) {
-        if (!getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage().isUseSalvageOperations()) {
-            return true;
-        }
-
         boolean isSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
         List<SalvageFormationData> salvageFormationOptions = getSalvageFormations(getCampaign(), scenario, isSpace);
 
-        boolean isSalvageFormationCombatAllowed = getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM)
-                                                        .getSalvage()
-                                                        .isSalvageFormationCombatAllowed();
+        AbstractSalvage salvageRules = getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage();
         SalvageFormationPicker forcePicker = new SalvageFormationPicker(getCampaign(), salvageFormationOptions, isSpace,
-              scenario.getSalvageFormations(), getBattlefieldControlType(scenario), isSalvageFormationCombatAllowed);
+              scenario.getSalvageFormations(), getBattlefieldControlType(scenario),
+              salvageRules.isSalvageFormationCombatAllowed());
 
         boolean wasConfirmed = forcePicker.wasConfirmed();
         if (wasConfirmed) {
@@ -1245,10 +1240,6 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean displaySalvageTechPicker(Scenario scenario) {
-        if (!getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage().isUseSalvageOperations()) {
-            return true;
-        }
-
         List<UUID> priorSelectedTechs = new ArrayList<>();
         List<Integer> forceIds = scenario.getSalvageFormations();
         for (Integer forceId : forceIds) {
@@ -1387,7 +1378,6 @@ public final class BriefingTab extends CampaignGuiTab {
         List<SalvageFormationData> salvageFormationOptions = new ArrayList<>();
         List<Integer> alreadyAssignedForces = scenario.getSalvageFormations();
         AbstractSalvage salvageRules = campaign.getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage();
-        boolean isSalvageFormationCombatAllowed = salvageRules.isSalvageFormationCombatAllowed();
 
         // Collect eligible salvage forces (We want salvage forces first)
         List<AbstractContract> activeContracts = getCampaign().getActiveContracts();
@@ -1410,7 +1400,7 @@ public final class BriefingTab extends CampaignGuiTab {
 
             boolean isIdle = !isDeployedToScenario && !isDeployedToStratCon;
             // Some salvage systems let Salvage formations fight in a scenario and then salvage it
-            boolean isFightingInThisScenario = isSalvageFormationCombatAllowed &&
+            boolean isFightingInThisScenario = salvageRules.canSalvageAfterFighting(formation) &&
                                                      isFormationDeployedToScenario(formation, scenario.getId());
 
             if ((isIdle || isFightingInThisScenario) &&

@@ -85,8 +85,6 @@ import mekhq.campaign.mission.scenarios.BotForce;
 import mekhq.campaign.mission.scenarios.Loot;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
-import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -102,7 +100,6 @@ import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
-import mekhq.gui.dialog.camOpsSalvage.SalvagePostScenarioPicker;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -2265,37 +2262,10 @@ public class ResolveScenarioTracker {
             }
         }
 
-        AbstractSalvage salvageRules = campaignOptions.get(CampaignOption.SALVAGE_SYSTEM).getSalvage();
-        if (salvageRules.isUseSalvageOperations()) {
-            boolean hasAssignedSalvageForce = !scenario.getSalvageFormations().isEmpty();
-            boolean hasAssignedSalvageTechs = !scenario.getSalvageTechs().isEmpty();
-
-            // There is no point presenting the dialog if there are no techs or teams assigned, or if the player
-            // doesn't control the field
-            boolean showSalvageDialog = control && hasAssignedSalvageForce && hasAssignedSalvageTechs;
-
-            if (showSalvageDialog) {
-                SalvagePostScenarioPicker picker = new SalvagePostScenarioPicker(campaign, mission, scenario,
-                      getActualSalvage(), getSoldSalvage());
-
-                List<UUID> techUUIDs = scenario.getSalvageTechs();
-                if (campaignOptions.get(CampaignOption.IS_USE_RISKY_SALVAGE)) {
-                    CamOpsSalvageUtilities.performRiskySalvageChecks(campaign,
-                          techUUIDs,
-                          picker.getCountOfSalvageUnits());
-                }
-
-                CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs, picker.getUsedSalvageTime());
-            }
-        } else if (salvageRules.isUseSalvagePurchases()) {
-            // Without salvage teams, every wreck is recovered automatically; the player only decides what to buy
-            if (control) {
-                new SalvagePostScenarioPicker(campaign, mission, scenario, getActualSalvage(), getSoldSalvage());
-            }
-        } else {
-            CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, getActualSalvage(), getSoldSalvage(),
-                  getLeftoverSalvage());
-        }
+        campaignOptions.get(CampaignOption.SALVAGE_SYSTEM)
+              .getSalvage()
+              .resolveScenarioSalvage(campaign, mission, scenario, control, getActualSalvage(), getSoldSalvage(),
+                    getLeftoverSalvage());
 
         for (Loot loot : actualLoot) {
             loot.getLoot(campaign, scenario, unitsStatus);

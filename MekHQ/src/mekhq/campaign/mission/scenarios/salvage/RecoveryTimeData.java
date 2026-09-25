@@ -30,9 +30,9 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.scenarios.camOpsSalvage;
+package mekhq.campaign.mission.scenarios.salvage;
 
-import static mekhq.campaign.mission.scenarios.camOpsSalvage.RecoveryTimeCalculations.BASE_MULTIPLIER;
+import static mekhq.campaign.mission.scenarios.salvage.RecoveryTimeCalculations.BASE_MULTIPLIER;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 /**

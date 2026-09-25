@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.campaign.mission.scenarios.camOpsSalvage;
+package mekhq.campaign.mission.scenarios.salvage;
 
 import static java.lang.Math.max;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -48,7 +48,6 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
-import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -124,7 +123,7 @@ public record SalvageFormationData(Formation formation, FormationType formationT
         AbstractSalvage salvageRules = campaign.getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage();
         List<Unit> availableUnits = new ArrayList<>();
         for (Unit unit : formation.getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(), false)) {
-            if (CamOpsSalvageUtilities.isAvailableForSalvage(unit, isSpaceScenario, salvageRules)) {
+            if (salvageRules.isAvailableForSalvage(unit, isSpaceScenario)) {
                 availableUnits.add(unit);
             }
         }

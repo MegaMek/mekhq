@@ -7,8 +7,7 @@ import java.util.function.Supplier;
 /**
  * The salvage rulesets a campaign can use to resolve post-scenario salvage.
  *
- * <p>Each system is backed by an {@link AbstractSalvage} implementation, which defines how that ruleset behaves. Any
- * behavior a system doesn't override falls back to {@link CamOpsStrictSalvage CamOps (Strict)}.</p>
+ * <p>Each system is backed by an {@link AbstractSalvage} implementation, which defines how that ruleset behaves.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -61,18 +60,6 @@ public enum SalvageSystem {
      */
     public AbstractSalvage getSalvage() {
         return salvage;
-    }
-
-    /**
-     * Checks whether this is the {@link #LEGACY} salvage system.
-     *
-     * @return {@code true} if this is the legacy system
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public boolean isLegacy() {
-        return this == LEGACY;
     }
 
     /**

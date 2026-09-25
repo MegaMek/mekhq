@@ -13,6 +13,8 @@ import megamek.common.planetaryConditions.Light;
 import megamek.common.planetaryConditions.Weather;
 import megamek.common.planetaryConditions.Wind;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.salvage.RecoveryTimeCalculations;
+import mekhq.campaign.mission.scenarios.salvage.RecoveryTimeData;
 import mekhq.campaign.universe.Planet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
