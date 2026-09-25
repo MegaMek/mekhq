@@ -895,17 +895,12 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
     }
 
     /**
-     * Every equipment kit a person is carrying, listed by display name: the personal armor kit (unless it is the
-     * default coveralls) followed by any tool, medical, computer, or other equipment kits, separated by commas.
-     * Displays "-" when the person carries nothing.
+     * Every equipment kit a person is carrying, listed by display name: any tool, medical, computer, or other equipment
+     * kits, separated by commas. The personal armor kit is excluded, as it has its own column. Displays "-" when the
+     * person carries nothing.
      */
     private static String getEquipment(Person person) {
         List<String> kits = new ArrayList<>();
-
-        String armorKit = person.getArmorKitName();
-        if ((armorKit != null) && !ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(armorKit)) {
-            kits.add(kitDisplayName(armorKit));
-        }
 
         String toolKit = person.getRepairKitName();
         if (toolKit != null) {
