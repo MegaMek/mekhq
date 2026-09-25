@@ -641,7 +641,7 @@ public class ProtoMekLocation extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECHANICAL);
+        return skillType.equals(SkillType.S_TECH_MEK);
     }
 
     @Override
