@@ -172,10 +172,9 @@ class ResolveScenarioTrackerTest {
     void processGameAddsDevastatedEnemyUnitsToDevastatedList() {
         Entity devastatedEnemy = createEnemyEntity("Locust LCT-1V");
 
+        // Every call gets a fresh enumeration, as the real results do; the tracker reads this list more than once
         when(victoryEvent.getDevastatedEntities())
-              .thenReturn(Collections.enumeration(List.of(devastatedEnemy)))
-              // sanitizeAllEntityExternalIds also calls getDevastatedEntities
-              .thenReturn(Collections.enumeration(List.of(devastatedEnemy)));
+              .thenAnswer(invocation -> Collections.enumeration(List.of(devastatedEnemy)));
 
         ResolveScenarioTracker tracker = createTracker();
         tracker.processGame();
@@ -204,10 +203,9 @@ class ResolveScenarioTrackerTest {
         ejectedCrew.getCrew().setExternalIdAsString(ejectedId.toString(), 0);
         ejectedCrew.setCamouflage(new Camouflage());
 
+        // Every call gets a fresh enumeration, as the real results do; the tracker reads this list more than once
         when(victoryEvent.getDevastatedEntities())
-              .thenReturn(Collections.enumeration(List.of(ejectedCrew)))
-              // sanitizeAllEntityExternalIds also calls getDevastatedEntities
-              .thenReturn(Collections.enumeration(List.of(ejectedCrew)));
+              .thenAnswer(invocation -> Collections.enumeration(List.of(ejectedCrew)));
 
         ResolveScenarioTracker tracker = createTracker();
         tracker.processGame();
@@ -300,9 +298,9 @@ class ResolveScenarioTrackerTest {
         // Make the entity appear in the devastated list — it IS in results, genuinely destroyed
         playerEntity.setRemovalCondition(IEntityRemovalConditions.REMOVE_DEVASTATED);
 
+        // Every call gets a fresh enumeration, as the real results do; the tracker reads this list more than once
         when(victoryEvent.getDevastatedEntities())
-              .thenReturn(Collections.enumeration(List.of(playerEntity)))
-              .thenReturn(Collections.enumeration(List.of(playerEntity)));
+              .thenAnswer(invocation -> Collections.enumeration(List.of(playerEntity)));
 
         ResolveScenarioTracker tracker = createTracker();
         tracker.units.add(unit);
