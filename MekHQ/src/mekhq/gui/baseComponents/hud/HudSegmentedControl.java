@@ -35,6 +35,7 @@ package mekhq.gui.baseComponents.hud;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -64,13 +65,30 @@ import megamek.common.annotations.Nullable;
  *
  * <p>Setting the segments or the selection never fires the listener; only the player's choices do.</p>
  *
+ * <p>This is also the one implementation behind {@link HudTabStrip} and {@link HudModeSelector}, which differ only in
+ * their {@link SegmentStyle}, so a change to how segments are drawn or handled is made here once.</p>
+ *
  * @param <T> the type of value each segment stands for
  *
  * @author Illiani
  * @since 0.51.01
  */
 public class HudSegmentedControl<T> extends JPanel {
+    /** The look of a stand-alone choice, such as the salvage console's claim and recovery method controls. */
+    static final SegmentStyle SEGMENTED = new SegmentStyle(6, 0.78f, 0.1f, true, SURFACE_HIGHLIGHT, SURFACE,
+          ACCENT_BRIGHT, true, false);
+    /** The look of a page tab strip. */
+    static final SegmentStyle TABS = new SegmentStyle(10, 0.85f, 0.06f, true, SURFACE, SURFACE_HIGHLIGHT, TEXT,
+          false, true);
+    /** The smaller, lighter look of a second level of tabs. */
+    static final SegmentStyle COMPACT_TABS = new SegmentStyle(7, 0.76f, 0.1f, true, SURFACE, SURFACE_HIGHLIGHT, TEXT,
+          false, true);
+    /** The look of a page selector whose pages are the values of an enum; its labels keep their own case. */
+    static final SegmentStyle MODES = new SegmentStyle(10, 0.85f, 0.06f, false, SURFACE, SURFACE_HIGHLIGHT, TEXT,
+          false, true);
+
     private final transient Consumer<T> onChoose;
+    private final transient SegmentStyle style;
     private final List<Cell> cells = new ArrayList<>();
     /** The chosen value, or {@code null} while nothing is chosen. */
     private transient T selected;
@@ -89,10 +107,37 @@ public class HudSegmentedControl<T> extends JPanel {
     public record Segment<T>(T value, String title, @Nullable String sub, boolean enabled) {}
 
     /**
+     * How a family of segmented controls looks and behaves.
+     *
+     * @param verticalPadding         the padding above and below each segment's text, before GUI scaling
+     * @param titleFontScale          the title font size, relative to the label font
+     * @param titleTracking           the title letter spacing
+     * @param isTitleUppercase        {@code true} to show titles in upper case
+     * @param selectedBackground      the background of the selected segment
+     * @param hoveredBackground       the background of a segment under the pointer
+     * @param selectedTitleColor      the title colour of the selected segment
+     * @param isSelectedOnChoose      {@code true} if choosing a segment selects it; {@code false} if the owner selects
+     *                                it from the listener
+     * @param isDisabledCellFocusable {@code true} if a disabled segment can still take the keyboard focus
+     */
+    record SegmentStyle(int verticalPadding, float titleFontScale, float titleTracking, boolean isTitleUppercase,
+          Color selectedBackground, Color hoveredBackground, Color selectedTitleColor, boolean isSelectedOnChoose,
+          boolean isDisabledCellFocusable) {}
+
+    /**
      * @param onChoose called with the segment's value when the player chooses a segment
      */
     public HudSegmentedControl(Consumer<T> onChoose) {
+        this(onChoose, SEGMENTED);
+    }
+
+    /**
+     * @param onChoose called with the segment's value when the player chooses a segment
+     * @param style    how the segments look and behave
+     */
+    HudSegmentedControl(Consumer<T> onChoose, SegmentStyle style) {
         this.onChoose = onChoose;
+        this.style = style;
         setOpaque(true);
         setBackground(SURFACE_DEEP);
         setBorder(BorderFactory.createLineBorder(BORDER, scaleForGUI(1)));
@@ -130,9 +175,7 @@ public class HudSegmentedControl<T> extends JPanel {
      */
     public void setSelected(@Nullable T value) {
         selected = value;
-        for (Cell cell : cells) {
-            cell.refresh();
-        }
+        refreshCells();
     }
 
     /**
@@ -142,28 +185,68 @@ public class HudSegmentedControl<T> extends JPanel {
         return selected;
     }
 
+    /**
+     * Locks or unlocks the segment for a value. A locked segment is dimmed and ignores clicks and keys.
+     *
+     * @param value   the segment's value; does nothing if no segment has it
+     * @param enabled {@code true} to let the player choose the segment
+     */
+    public void setSegmentEnabled(T value, boolean enabled) {
+        for (Cell cell : cells) {
+            if (Objects.equals(cell.value, value)) {
+                cell.setCellEnabled(enabled);
+            }
+        }
+    }
+
+    /**
+     * Replaces the title of the segment for a value, for example to show a count.
+     *
+     * @param value the segment's value; does nothing if no segment has it
+     * @param title the new title
+     */
+    public void setSegmentTitle(T value, String title) {
+        for (Cell cell : cells) {
+            if (Objects.equals(cell.value, value)) {
+                cell.title.setText(titleText(title));
+            }
+        }
+    }
+
+    private String titleText(String title) {
+        return style.isTitleUppercase() ? title.toUpperCase(Locale.ROOT) : title;
+    }
+
+    private void refreshCells() {
+        for (Cell cell : cells) {
+            cell.refresh();
+        }
+    }
+
     private final class Cell extends JPanel {
-        private final Segment<T> segment;
-        private final boolean rightBorder;
+        private final transient T value;
+        private final boolean hasRightBorder;
         private final JLabel title;
         /** The sub-line under the title, or {@code null} for a segment without one. */
         private final JLabel sub;
-        private boolean hovered;
+        private boolean isCellEnabled;
+        private boolean isHovered;
 
-        private Cell(Segment<T> segment, boolean rightBorder) {
-            this.segment = segment;
-            this.rightBorder = rightBorder;
+        private Cell(Segment<T> segment, boolean hasRightBorder) {
+            this.value = segment.value();
+            this.hasRightBorder = hasRightBorder;
+            this.isCellEnabled = segment.enabled();
             setOpaque(false);
-            setFocusable(segment.enabled());
+            setFocusable(style.isDisabledCellFocusable() || isCellEnabled);
             setLayout(new GridBagLayout());
-            int vertical = scaleForGUI(6);
+            int vertical = scaleForGUI(style.verticalPadding());
             setBorder(BorderFactory.createEmptyBorder(vertical, scaleForGUI(6), vertical, scaleForGUI(6)));
 
             GridBagConstraints constraints = new GridBagConstraints();
             constraints.gridx = 0;
             constraints.gridy = 0;
-            title = new JLabel(segment.title().toUpperCase(Locale.ROOT), SwingConstants.CENTER);
-            title.setFont(hudFont(Font.BOLD, 0.78f, 0.1f));
+            title = new JLabel(titleText(segment.title()), SwingConstants.CENTER);
+            title.setFont(hudFont(Font.BOLD, style.titleFontScale(), style.titleTracking()));
             add(title, constraints);
 
             if (segment.sub() != null) {
@@ -185,14 +268,14 @@ public class HudSegmentedControl<T> extends JPanel {
 
                 @Override
                 public void mouseEntered(MouseEvent event) {
-                    hovered = segment.enabled();
-                    repaint();
+                    isHovered = isCellEnabled;
+                    refresh();
                 }
 
                 @Override
                 public void mouseExited(MouseEvent event) {
-                    hovered = false;
-                    repaint();
+                    isHovered = false;
+                    refresh();
                 }
             });
             addKeyListener(new KeyAdapter() {
@@ -207,53 +290,72 @@ public class HudSegmentedControl<T> extends JPanel {
         }
 
         private boolean isSelectedCell() {
-            return Objects.equals(selected, segment.value());
+            return Objects.equals(selected, value);
         }
 
         private void choose() {
-            if (!segment.enabled()) {
+            if (!isCellEnabled) {
                 return;
             }
             requestFocusInWindow();
-            selected = segment.value();
-            for (Cell cell : cells) {
-                cell.refresh();
+            if (style.isSelectedOnChoose()) {
+                selected = value;
+                refreshCells();
             }
-            onChoose.accept(segment.value());
+            onChoose.accept(value);
+        }
+
+        private void setCellEnabled(boolean isCellEnabled) {
+            this.isCellEnabled = isCellEnabled;
+            if (!isCellEnabled) {
+                isHovered = false;
+            }
+            if (!style.isDisabledCellFocusable()) {
+                setFocusable(isCellEnabled);
+            }
+            refresh();
         }
 
         private void refresh() {
-            if (!segment.enabled()) {
+            if (!isCellEnabled) {
                 title.setForeground(TEXT_FAINT);
+            } else if (isSelectedCell()) {
+                title.setForeground(style.selectedTitleColor());
             } else {
-                title.setForeground(isSelectedCell() ? ACCENT_BRIGHT : (hovered ? TEXT : TEXT_MUTED));
+                title.setForeground(isHovered ? TEXT : TEXT_MUTED);
             }
             if (sub != null) {
-                sub.setForeground(segment.enabled() ? TEXT_MUTED : TEXT_FAINT);
+                sub.setForeground(isCellEnabled ? TEXT_MUTED : TEXT_FAINT);
             }
             repaint();
         }
 
         @Override
         protected void paintComponent(Graphics graphics) {
-            Graphics2D g2 = (Graphics2D) graphics.create();
+            Graphics2D graphics2D = (Graphics2D) graphics.create();
             try {
                 int width = getWidth();
                 int height = getHeight();
                 boolean isSelectedCell = isSelectedCell();
-                g2.setColor(isSelectedCell ? SURFACE_HIGHLIGHT : (hovered ? SURFACE : SURFACE_DEEP));
-                g2.fillRect(0, 0, width, height);
-                if (rightBorder) {
-                    g2.setColor(BORDER);
-                    g2.fillRect(width - scaleForGUI(1), 0, scaleForGUI(1), height);
+                Color background = SURFACE_DEEP;
+                if (isSelectedCell) {
+                    background = style.selectedBackground();
+                } else if (isHovered) {
+                    background = style.hoveredBackground();
+                }
+                graphics2D.setColor(background);
+                graphics2D.fillRect(0, 0, width, height);
+                if (hasRightBorder) {
+                    graphics2D.setColor(BORDER);
+                    graphics2D.fillRect(width - scaleForGUI(1), 0, scaleForGUI(1), height);
                 }
                 if (isSelectedCell) {
                     int underline = scaleForGUI(2);
-                    g2.setColor(ACCENT);
-                    g2.fillRect(0, height - underline, width, underline);
+                    graphics2D.setColor(ACCENT);
+                    graphics2D.fillRect(0, height - underline, width, underline);
                 }
             } finally {
-                g2.dispose();
+                graphics2D.dispose();
             }
             super.paintComponent(graphics);
         }
