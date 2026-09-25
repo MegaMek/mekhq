@@ -106,8 +106,8 @@ import mekhq.gui.utilities.PersonnelStateColors;
  * pages share one plan, a {@link SalvageOperationDraft}, which reaches the scenario only when the player commits.
  * Cancelling leaves the scenario's salvage assignments as they were.</p>
  *
- * <p>The Techs page is built for campaigns with hundreds of techs: filters hide injured and pregnant techs, techs
- * already assigned to units, and techs below an experience level, with a count of what each filter hides. Techs the
+ * <p>The Techs page is built for campaigns with hundreds of techs: filters hide injured and pregnant techs and techs
+ * already assigned to units, or show only one experience level, with a count of what each filter hides. Techs the
  * player has selected are always shown. Filter choices are remembered between scenarios.</p>
  *
  * @author Illiani
@@ -224,16 +224,15 @@ public class SalvageOperationPlanner extends JDialog {
         HEROIC(SkillLevel.HEROIC),
         LEGENDARY(SkillLevel.LEGENDARY);
 
-        private final @Nullable SkillLevel minimumSkill;
+        private final @Nullable SkillLevel skillLevel;
 
-        ExperienceFilter(@Nullable SkillLevel minimumSkill) {
-            this.minimumSkill = minimumSkill;
+        ExperienceFilter(@Nullable SkillLevel skillLevel) {
+            this.skillLevel = skillLevel;
         }
 
         @Override
         public String toString() {
-            return (minimumSkill == null) ? text("filter.experience.any") :
-                         formatted("filter.experience.orBetter", minimumSkill.toString());
+            return (skillLevel == null) ? text("filter.experience.any") : skillLevel.toString();
         }
     }
 
@@ -910,9 +909,9 @@ public class SalvageOperationPlanner extends JDialog {
 
     private SalvageTechFilter currentTechFilter() {
         ExperienceFilter experienceFilter = (ExperienceFilter) experience.getSelectedItem();
-        SkillLevel minimumSkill = (experienceFilter == null) ? null : experienceFilter.minimumSkill;
+        SkillLevel skillLevel = (experienceFilter == null) ? null : experienceFilter.skillLevel;
         return new SalvageTechFilter(hideInjured.isSelected(), hidePregnant.isSelected(), hideUnitTechs.isSelected(),
-              minimumSkill, techSearch.getText());
+              skillLevel, techSearch.getText());
     }
 
     private void refreshTechsBoard() {
@@ -940,12 +939,12 @@ public class SalvageOperationPlanner extends JDialog {
             hiddenNote.setText(" ");
             showAllChip.setVisible(false);
         } else {
-            SkillLevel minimumSkill = filter.minimumSkill();
-            String minimumSkillName = (minimumSkill == null) ? "" : minimumSkill.toString();
+            SkillLevel skillLevel = filter.skillLevel();
+            String skillLevelName = (skillLevel == null) ? "" : skillLevel.toString();
             List<String> reasons = new ArrayList<>();
             for (Map.Entry<HiddenReason, Integer> entry : hiddenCounts.entrySet()) {
                 // Only the experience reason names a level; the others ignore the extra argument
-                reasons.add(formatted("hidden." + entry.getKey().name(), entry.getValue(), minimumSkillName));
+                reasons.add(formatted("hidden." + entry.getKey().name(), entry.getValue(), skillLevelName));
             }
             hiddenNote.setText(formatted("hidden", hiddenCandidates.size(),
                   String.join(text("hidden.separator"), reasons)));

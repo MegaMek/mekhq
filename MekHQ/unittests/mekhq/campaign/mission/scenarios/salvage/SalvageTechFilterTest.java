@@ -94,18 +94,18 @@ class SalvageTechFilterTest {
 
     @ParameterizedTest
     @EnumSource(value = SkillLevel.class, names = "NONE", mode = EnumSource.Mode.EXCLUDE)
-    void experienceFilterIsAMinimum(SkillLevel skillLevel) {
+    void experienceFilterIsAnExactMatch(SkillLevel skillLevel) {
         SalvageTechFilter filter = new SalvageTechFilter(false, false, false, SkillLevel.REGULAR, "");
 
-        boolean isRegularOrBetter = skillLevel.ordinal() >= SkillLevel.REGULAR.ordinal();
-        assertEquals(isRegularOrBetter, filter.shows(healthy(skillLevel)), skillLevel.name());
-        if (!isRegularOrBetter) {
-            assertEquals(HiddenReason.BELOW_EXPERIENCE, filter.getHiddenReason(healthy(skillLevel)));
+        boolean isRegular = skillLevel == SkillLevel.REGULAR;
+        assertEquals(isRegular, filter.shows(healthy(skillLevel)), skillLevel.name());
+        if (!isRegular) {
+            assertEquals(HiddenReason.OTHER_EXPERIENCE, filter.getHiddenReason(healthy(skillLevel)));
         }
     }
 
     @Test
-    void techsWithoutASkillLevelFailAnyMinimum() {
+    void techsWithoutASkillLevelMatchNoLevel() {
         SalvageTechFilter filter = new SalvageTechFilter(false, false, false, SkillLevel.ULTRA_GREEN, "");
 
         assertFalse(filter.shows(healthy(SkillLevel.NONE)));
@@ -133,7 +133,7 @@ class SalvageTechFilterTest {
               "")));
         assertEquals(HiddenReason.UNIT_TECH, filter.getHiddenReason(candidate(SkillLevel.GREEN, false, false, true,
               "")));
-        assertEquals(HiddenReason.BELOW_EXPERIENCE, filter.getHiddenReason(candidate(SkillLevel.GREEN, false, false,
+        assertEquals(HiddenReason.OTHER_EXPERIENCE, filter.getHiddenReason(candidate(SkillLevel.GREEN, false, false,
               false, "")));
     }
 
@@ -154,13 +154,13 @@ class SalvageTechFilterTest {
             candidates.add(candidate(SkillLevel.GREEN, false, false, false, ""));
         }
         for (int i = 0; i < 42; i++) {
-            candidates.add(healthy(SkillLevel.ELITE));
+            candidates.add(healthy(SkillLevel.REGULAR));
         }
 
         Map<HiddenReason, Integer> counts = filter.countHidden(candidates);
 
         assertEquals(Map.of(HiddenReason.INJURED, 19, HiddenReason.PREGNANT, 3, HiddenReason.UNIT_TECH, 211,
-              HiddenReason.BELOW_EXPERIENCE, 43), counts);
+              HiddenReason.OTHER_EXPERIENCE, 43), counts);
     }
 
     @Test

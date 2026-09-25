@@ -146,6 +146,7 @@ public class SalvageRecoveryConsole extends JDialog {
     private final JLabel dossierTitle = new JLabel();
     private final JLabel dossierSub = new JLabel();
     private final HudButton readoutButton = new HudButton(text("dossier.readout").toUpperCase(Locale.ROOT), false);
+    private final HudButton stripButton = new HudButton(text("dossier.strip").toUpperCase(Locale.ROOT), false);
     private final JPanel assignmentSection = Hud.transparentPanel(null);
     private final JComboBox<Unit> firstSlot = new JComboBox<>();
     private final JComboBox<Unit> secondSlot = new JComboBox<>();
@@ -536,7 +537,18 @@ public class SalvageRecoveryConsole extends JDialog {
         dossier.add(leftAligned(dossierSub));
         dossier.add(Box.createVerticalStrut(scaleForGUI(8)));
         readoutButton.addActionListener(event -> showReadout());
-        dossier.add(leftAligned(wrapWest(readoutButton)));
+        // Field stripping isn't implemented yet; the disabled button reserves its place in the dossier
+        stripButton.setArmed(false);
+        stripButton.setToolTipText(text("dossier.strip.tooltip"));
+        stripButton.addActionListener(event -> {
+            if (focused != null) {
+                fieldStrip(focused);
+            }
+        });
+        JPanel dossierButtons = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, scaleForGUI(8), 0));
+        dossierButtons.add(readoutButton);
+        dossierButtons.add(stripButton);
+        dossier.add(leftAligned(wrapWest(dossierButtons)));
 
         if (session.isUsingSalvageOperations()) {
             assignmentSection.setLayout(new BoxLayout(assignmentSection, BoxLayout.Y_AXIS));
@@ -972,6 +984,20 @@ public class SalvageRecoveryConsole extends JDialog {
         }
         requireSession().assignToFreeSlot(focused, unit);
         refreshAll();
+    }
+
+    /**
+     * Strips parts from a wreck in the field. Not implemented yet: the button that calls this is disabled.
+     *
+     * <p>This is the entry point for whoever implements field stripping, so it can be added without first working
+     * out where it fits in the console. For example: open a dialog listing the wreck's parts that could be stripped,
+     * with a way to pick one of the scenario's salvage techs to do it (much like the Repair tab), then refresh the
+     * console.</p>
+     *
+     * @param recovery the wreck to strip
+     */
+    private void fieldStrip(WreckRecovery recovery) {
+        // Not implemented yet
     }
 
     private void showReadout() {

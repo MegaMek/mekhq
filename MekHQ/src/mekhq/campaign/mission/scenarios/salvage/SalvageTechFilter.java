@@ -40,20 +40,20 @@ import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
 
 /**
- * The salvage planner's tech filters: hide injured techs, pregnant techs, or techs already assigned to units, techs
- * below an experience level, and techs that don't match a search.
+ * The salvage planner's tech filters: hide injured techs, pregnant techs, or techs already assigned to units, show
+ * only techs of one experience level, and hide techs that don't match a search.
  *
  * @param isHidingInjured   {@code true} to hide injured techs
  * @param isHidingPregnant  {@code true} to hide pregnant techs
  * @param isHidingUnitTechs {@code true} to hide techs assigned to units as their tech
- * @param minimumSkill      the lowest experience level shown, or {@code null} for any
+ * @param skillLevel        the only experience level shown, or {@code null} for any
  * @param searchText        the search text; blank for no search
  *
  * @author Illiani
  * @since 0.51.01
  */
 public record SalvageTechFilter(boolean isHidingInjured, boolean isHidingPregnant, boolean isHidingUnitTechs,
-      @Nullable SkillLevel minimumSkill, String searchText) {
+      @Nullable SkillLevel skillLevel, String searchText) {
 
     /** A filter that shows every tech. */
     public static final SalvageTechFilter SHOW_ALL = new SalvageTechFilter(false, false, false, null, "");
@@ -65,7 +65,7 @@ public record SalvageTechFilter(boolean isHidingInjured, boolean isHidingPregnan
      * @since 0.51.01
      */
     public enum HiddenReason {
-        INJURED, PREGNANT, UNIT_TECH, BELOW_EXPERIENCE, NO_SEARCH_MATCH
+        INJURED, PREGNANT, UNIT_TECH, OTHER_EXPERIENCE, NO_SEARCH_MATCH
     }
 
     /**
@@ -86,8 +86,8 @@ public record SalvageTechFilter(boolean isHidingInjured, boolean isHidingPregnan
         if (isHidingUnitTechs && candidate.hasTechUnits()) {
             return HiddenReason.UNIT_TECH;
         }
-        if ((minimumSkill != null) && (candidate.skillLevel().ordinal() < minimumSkill.ordinal())) {
-            return HiddenReason.BELOW_EXPERIENCE;
+        if ((skillLevel != null) && (candidate.skillLevel() != skillLevel)) {
+            return HiddenReason.OTHER_EXPERIENCE;
         }
         if (!candidate.matches(searchText)) {
             return HiddenReason.NO_SEARCH_MATCH;
