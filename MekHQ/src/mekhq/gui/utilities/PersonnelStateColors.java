@@ -59,7 +59,7 @@ public class PersonnelStateColors {
     /**
      * A person with at least this much effective fatigue is flagged as fatigued.
      */
-    private static final int FATIGUE_HIGHLIGHT_THRESHOLD = 5;
+    public static final int FATIGUE_HIGHLIGHT_THRESHOLD = 5;
 
     private PersonnelStateColors() {}
 

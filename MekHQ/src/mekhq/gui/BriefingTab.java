@@ -1215,12 +1215,14 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void runAbstractCombatAutoResolve(Scenario scenario) {
-        if (handleSalvageAssignments(scenario)) {
+        // Check for units first, so a salvage plan (which deploys its teams) is never committed for a scenario that
+        // won't run
+        List<Unit> chosen = playerUnits(scenario, new StringBuilder());
+        if (chosen.isEmpty()) {
             return;
         }
 
-        List<Unit> chosen = playerUnits(scenario, new StringBuilder());
-        if (chosen.isEmpty()) {
+        if (handleSalvageAssignments(scenario)) {
             return;
         }
         app.startAutoResolve(scenario, chosen);

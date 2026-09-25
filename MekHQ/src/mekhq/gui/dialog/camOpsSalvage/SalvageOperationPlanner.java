@@ -118,8 +118,6 @@ public class SalvageOperationPlanner extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CamOpsSalvage";
     private static final String KEY = "SalvageOperationPlanner.";
     private static final Dimension DEFAULT_SIZE = scaleForGUI(1100, 740);
-    /** Fatigue at or above this level is flagged, as the personnel table does. */
-    private static final int FATIGUE_HIGHLIGHT_THRESHOLD = 5;
     /** The tech-time meter reads full at twice the low-time warning, or the crew's total if that is larger. */
     private static final int TECH_TIME_METER_SCALE = SalvageOperationDraft.LOW_TECH_MINUTES * 2;
 
@@ -668,19 +666,43 @@ public class SalvageOperationPlanner extends JDialog {
 
     /**
      * Sets up a board: single selection, focusing the selected card, and toggling it on double-click or Space/Enter.
+     *
+     * <p>Section headers can't be selected: selecting one moves the selection on to the nearest card in the direction
+     * the player was moving, so the focused card is always the one highlighted.</p>
      */
     private void configureBoardList(JList<Object> list, Consumer<Object> onFocus, Runnable onToggle) {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setBackground(SURFACE_DEEP);
+        int[] lastCardIndex = { -1 };
         list.addListSelectionListener(event -> {
-            if (!isRefreshing && !event.getValueIsAdjusting() && (list.getSelectedValue() != null)) {
-                onFocus.accept(list.getSelectedValue());
+            if (isRefreshing || event.getValueIsAdjusting()) {
+                return;
             }
+            int selectedIndex = list.getSelectedIndex();
+            if (selectedIndex < 0) {
+                return;
+            }
+            if (list.getSelectedValue() instanceof SectionHeader) {
+                int step = (selectedIndex < lastCardIndex[0]) ? -1 : 1;
+                int cardIndex = findCardIndex(list, selectedIndex, step);
+                if (cardIndex < 0) {
+                    cardIndex = findCardIndex(list, selectedIndex, -step);
+                }
+                if (cardIndex < 0) {
+                    list.clearSelection();
+                } else {
+                    list.setSelectedIndex(cardIndex);
+                    list.ensureIndexIsVisible(cardIndex);
+                }
+                return;
+            }
+            lastCardIndex[0] = selectedIndex;
+            onFocus.accept(list.getSelectedValue());
         });
         list.addMouseListener(new MouseAdapter() {
             @Override
-            public void mouseClicked(MouseEvent event) {
-                if (event.getClickCount() == 2) {
+            public void mouseReleased(MouseEvent event) {
+                if ((event.getClickCount() == 2) && isCardSelected(list)) {
                     onToggle.run();
                 }
             }
@@ -688,11 +710,28 @@ public class SalvageOperationPlanner extends JDialog {
         list.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent event) {
-                if ((event.getKeyCode() == KeyEvent.VK_SPACE) || (event.getKeyCode() == KeyEvent.VK_ENTER)) {
+                boolean isToggleKey = (event.getKeyCode() == KeyEvent.VK_SPACE) ||
+                                            (event.getKeyCode() == KeyEvent.VK_ENTER);
+                if (isToggleKey && isCardSelected(list)) {
                     onToggle.run();
                 }
             }
         });
+    }
+
+    private static boolean isCardSelected(JList<Object> list) {
+        Object selectedValue = list.getSelectedValue();
+        return (selectedValue != null) && !(selectedValue instanceof SectionHeader);
+    }
+
+    /** Finds the nearest card from an index onward in one direction, or -1 if there is none. */
+    private static int findCardIndex(JList<Object> list, int fromIndex, int step) {
+        for (int index = fromIndex + step; (index >= 0) && (index < list.getModel().getSize()); index += step) {
+            if (!(list.getModel().getElementAt(index) instanceof SectionHeader)) {
+                return index;
+            }
+        }
+        return -1;
     }
 
     private static void onSearchChange(JTextField field, Runnable onChange) {
@@ -1015,7 +1054,7 @@ public class SalvageOperationPlanner extends JDialog {
         techStatus.setText(reasonKeys.isEmpty() ?
                                  text("status.ready") :
                                  "<html>" + PersonnelStateColors.getColorReasonsText(reasonKeys) + "</html>");
-        techStatus.setForeground(reasonKeys.isEmpty() ? READY : techRingColor(candidate));
+        techStatus.setForeground(statusColor(reasonKeys));
 
         boolean isSelected = draft.isTechSelected(tech.getId());
         selectButton.setText(upper(isSelected ? text("deselect") : text("select")));
@@ -1098,7 +1137,18 @@ public class SalvageOperationPlanner extends JDialog {
 
     private boolean isFatigued(Person tech) {
         return campaign.getCampaignOptions().get(CampaignOption.USE_FATIGUE) &&
-                     (Fatigue.getEffectiveFatigue(tech, campaign) >= FATIGUE_HIGHLIGHT_THRESHOLD);
+                     (Fatigue.getEffectiveFatigue(tech, campaign) >= PersonnelStateColors.FATIGUE_HIGHLIGHT_THRESHOLD);
+    }
+
+    /**
+     * Colors the tech's status from the same reasons it lists, so every listed reason is flagged: injuries as danger,
+     * anything else as a caution.
+     */
+    private static Color statusColor(List<String> reasonKeys) {
+        if (reasonKeys.isEmpty()) {
+            return READY;
+        }
+        return reasonKeys.contains("colorReason.personnel.injured") ? DANGER : CAUTION;
     }
 
     private Color techRingColor(SalvageTechCandidate candidate) {
