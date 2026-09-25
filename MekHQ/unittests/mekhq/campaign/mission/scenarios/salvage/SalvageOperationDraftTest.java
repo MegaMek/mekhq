@@ -56,6 +56,9 @@ import java.util.List;
 import java.util.UUID;
 
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.MiscMounted;
+import megamek.common.equipment.MiscType;
+import megamek.common.units.Dropship;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -64,7 +67,9 @@ import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.mission.scenarios.salvage.SalvageOperationDraft.TeamAvailability;
 import mekhq.campaign.mission.scenarios.salvage.SalvageOperationDraft.TeamOption;
 import mekhq.campaign.mission.scenarios.salvage.SalvageOperationDraft.TechOrigin;
@@ -662,14 +667,14 @@ class SalvageOperationDraftTest {
         @Test
         void aTugInAStagedTeamIsNoted() {
             when(scenario.getBoardType()).thenReturn(Scenario.T_SPACE);
-            megamek.common.units.Dropship dropship = mock(megamek.common.units.Dropship.class);
-            megamek.common.equipment.MiscType tugType = mock(megamek.common.equipment.MiscType.class);
-            when(tugType.hasFlag(megamek.common.equipment.MiscType.F_NAVAL_TUG_ADAPTOR)).thenReturn(true);
-            megamek.common.equipment.MiscMounted tug = mock(megamek.common.equipment.MiscMounted.class);
+            Dropship dropship = mock(Dropship.class);
+            MiscType tugType = mock(MiscType.class);
+            when(tugType.hasFlag(MiscType.F_NAVAL_TUG_ADAPTOR)).thenReturn(true);
+            MiscMounted tug = mock(MiscMounted.class);
             when(tug.getType()).thenReturn(tugType);
             when(tug.getEntity()).thenReturn(dropship);
             when(tug.isOperable()).thenReturn(true);
-            List<megamek.common.equipment.MiscMounted> misc = List.of(tug);
+            List<MiscMounted> misc = List.of(tug);
             when(dropship.getMisc()).thenReturn(misc);
             Unit unit = mock(Unit.class);
             when(unit.getEntity()).thenReturn(dropship);
@@ -830,28 +835,28 @@ class SalvageOperationDraftTest {
 
         @Test
         void dynamicScenariosWithoutATemplateAssumeTheVictorHoldsTheField() {
-            mekhq.campaign.mission.scenarios.AtBDynamicScenario dynamicScenario =
-                  mock(mekhq.campaign.mission.scenarios.AtBDynamicScenario.class);
+            AtBDynamicScenario dynamicScenario =
+                  mock(AtBDynamicScenario.class);
             when(dynamicScenario.getSalvageFormations()).thenReturn(List.of());
             when(dynamicScenario.getSalvageTechs()).thenReturn(List.of());
 
-            assertEquals(mekhq.campaign.mission.scenarios.ScenarioTemplate.BattlefieldControlType.VICTOR,
+            assertEquals(ScenarioTemplate.BattlefieldControlType.VICTOR,
                   new SalvageOperationDraft(campaign, dynamicScenario).getBattlefieldControlType());
         }
 
         @Test
         void dynamicScenariosUseTheirTemplatesControl() {
-            mekhq.campaign.mission.scenarios.AtBDynamicScenario dynamicScenario =
-                  mock(mekhq.campaign.mission.scenarios.AtBDynamicScenario.class);
+            AtBDynamicScenario dynamicScenario =
+                  mock(AtBDynamicScenario.class);
             when(dynamicScenario.getSalvageFormations()).thenReturn(List.of());
             when(dynamicScenario.getSalvageTechs()).thenReturn(List.of());
-            mekhq.campaign.mission.scenarios.ScenarioTemplate template =
-                  mock(mekhq.campaign.mission.scenarios.ScenarioTemplate.class);
+            ScenarioTemplate template =
+                  mock(ScenarioTemplate.class);
             when(template.getBattlefieldControl())
-                  .thenReturn(mekhq.campaign.mission.scenarios.ScenarioTemplate.BattlefieldControlType.ENEMY);
+                  .thenReturn(ScenarioTemplate.BattlefieldControlType.ENEMY);
             when(dynamicScenario.getTemplate()).thenReturn(template);
 
-            assertEquals(mekhq.campaign.mission.scenarios.ScenarioTemplate.BattlefieldControlType.ENEMY,
+            assertEquals(ScenarioTemplate.BattlefieldControlType.ENEMY,
                   new SalvageOperationDraft(campaign, dynamicScenario).getBattlefieldControlType());
         }
 

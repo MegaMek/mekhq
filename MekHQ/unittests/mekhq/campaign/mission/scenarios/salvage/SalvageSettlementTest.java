@@ -42,6 +42,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -59,6 +60,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.mockito.ArgumentCaptor;
 
 class SalvageSettlementTest {
     private static AbstractContract contract(double salvageRights, boolean isExchange) {
@@ -272,8 +274,8 @@ class SalvageSettlementTest {
             new ExchangeSalvageSettlement(0.4).payCashShare(campaign, scenario, Money.of(1_000_000));
             new PurchaseSalvageSettlement(0.4).payCashShare(campaign, scenario, Money.of(1_000_000));
 
-            org.mockito.ArgumentCaptor<String> reasons = org.mockito.ArgumentCaptor.forClass(String.class);
-            verify(finances, org.mockito.Mockito.times(2)).credit(any(), any(), any(), reasons.capture());
+            ArgumentCaptor<String> reasons = ArgumentCaptor.forClass(String.class);
+            verify(finances, times(2)).credit(any(), any(), any(), reasons.capture());
             assertFalse(reasons.getAllValues().get(0).equals(reasons.getAllValues().get(1)));
         }
 

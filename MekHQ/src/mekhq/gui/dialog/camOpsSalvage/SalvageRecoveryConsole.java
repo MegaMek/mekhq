@@ -77,6 +77,7 @@ import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.mission.scenarios.salvage.CamOpsSalvageUtilities;
+import mekhq.campaign.mission.scenarios.salvage.OwnedUnitCounts;
 import mekhq.campaign.mission.scenarios.salvage.RecoveryMethod;
 import mekhq.campaign.mission.scenarios.salvage.RecoveryStatus;
 import mekhq.campaign.mission.scenarios.salvage.RecoveryTimeCalculations;
@@ -126,8 +127,7 @@ public class SalvageRecoveryConsole extends JDialog {
     private final boolean isInSpace;
     /** The recovery being settled, or {@code null} when there is nothing to settle and the console never opens. */
     private final transient SalvageRecoverySession session;
-    private final transient Map<String, Integer> ownedVariantCounts = new HashMap<>();
-    private final transient Map<String, Integer> ownedChassisCounts = new HashMap<>();
+    private transient OwnedUnitCounts ownedUnitCounts = OwnedUnitCounts.of(List.of());
 
     /** The wreck shown in the dossier, or {@code null} while none is focused. */
     private transient WreckRecovery focused;
@@ -222,7 +222,7 @@ public class SalvageRecoveryConsole extends JDialog {
               getRecoveryTimes(campaign, scenario, wrecks), availableMinutes, contract.getSalvagedByUnitValue(),
               contract.getSalvagedByEmployerValue(), campaign.getPlayerForce().getFinances().getBalance());
 
-        countOwnedUnits();
+        ownedUnitCounts = OwnedUnitCounts.of(campaign.getPlayerForce().getHangar().getUnits());
         buildWindow(scenario);
         focused = session.getRecoveries().isEmpty() ? null : session.getRecoveries().getFirst();
         refreshAll();
@@ -322,24 +322,6 @@ public class SalvageRecoveryConsole extends JDialog {
                   campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet()));
         }
         return recoveryTimes;
-    }
-
-    /**
-     * Counts the units the player already owns, by exact variant and by chassis, so each wreck can show how many of it
-     * the player already has.
-     */
-    private void countOwnedUnits() {
-        for (Unit ownedUnit : campaign.getPlayerForce().getHangar().getUnits()) {
-            Entity ownedEntity = ownedUnit.getEntity();
-            if (ownedEntity != null) {
-                ownedVariantCounts.merge(variantKey(ownedEntity), 1, Integer::sum);
-                ownedChassisCounts.merge(ownedEntity.getChassis(), 1, Integer::sum);
-            }
-        }
-    }
-
-    private static String variantKey(Entity entity) {
-        return entity.getChassis() + ' ' + entity.getModel();
     }
 
     // endregion Setup
@@ -1243,8 +1225,8 @@ public class SalvageRecoveryConsole extends JDialog {
             }
             Entity entity = wreck.getEntity();
             if (entity != null) {
-                sub.append(formatted("card.sub.owned", ownedVariantCounts.getOrDefault(variantKey(entity), 0),
-                      ownedChassisCounts.getOrDefault(entity.getChassis(), 0)));
+                sub.append(formatted("card.sub.owned", ownedUnitCounts.getVariantCount(entity),
+                      ownedUnitCounts.getChassisCount(entity)));
             }
 
             return card.show(statusColor(recovery), recovery.isRecovered(), wreck.getName(), null, tags,
