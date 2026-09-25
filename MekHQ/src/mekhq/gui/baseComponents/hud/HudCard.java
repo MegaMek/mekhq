@@ -56,7 +56,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import jakarta.annotation.Nullable;
+import megamek.common.annotations.Nullable;
 
 /**
  * A board card in the style of the StratCon deployment wizard: a leading status ring, a bold name followed by a muted
@@ -94,6 +94,7 @@ public class HudCard extends JPanel {
      */
     public record Tag(String text, Color color) {}
 
+    /** Builds an empty card; {@link #show} fills it in for each row it renders. */
     public HudCard() {
         super(new BorderLayout(scaleForGUI(10), 0));
 

@@ -45,6 +45,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -120,6 +121,9 @@ public class HudModeSelector<E extends Enum<E>> extends JPanel {
     /**
      * Replaces a page's label, for example to show a count.
      *
+     * @param mode  the page whose label changes; does nothing if the selector has no such page
+     * @param label the new label text
+     *
      * @author Illiani
      * @since 0.51.01
      */
@@ -149,7 +153,7 @@ public class HudModeSelector<E extends Enum<E>> extends JPanel {
             title = new JLabel(label, SwingConstants.CENTER);
             title.setForeground(TEXT_MUTED);
             title.setFont(hudFont(Font.BOLD, 0.85f, 0.06f));
-            setLayout(new java.awt.GridBagLayout());
+            setLayout(new GridBagLayout());
             add(title);
 
             addMouseListener(new MouseAdapter() {

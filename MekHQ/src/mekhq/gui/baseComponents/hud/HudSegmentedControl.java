@@ -55,7 +55,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import jakarta.annotation.Nullable;
+import megamek.common.annotations.Nullable;
 
 /**
  * A segmented, mutually exclusive choice. Each segment has a tracked title and an optional sub-line that explains its
@@ -72,7 +72,8 @@ import jakarta.annotation.Nullable;
 public class HudSegmentedControl<T> extends JPanel {
     private final transient Consumer<T> onChoose;
     private final List<Cell> cells = new ArrayList<>();
-    private transient @Nullable T selected;
+    /** The chosen value, or {@code null} while nothing is chosen. */
+    private transient T selected;
 
     /**
      * One segment of the control.
@@ -145,7 +146,8 @@ public class HudSegmentedControl<T> extends JPanel {
         private final Segment<T> segment;
         private final boolean rightBorder;
         private final JLabel title;
-        private final @Nullable JLabel sub;
+        /** The sub-line under the title, or {@code null} for a segment without one. */
+        private final JLabel sub;
         private boolean hovered;
 
         private Cell(Segment<T> segment, boolean rightBorder) {

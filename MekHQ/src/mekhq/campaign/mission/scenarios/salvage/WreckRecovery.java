@@ -35,7 +35,7 @@ package mekhq.campaign.mission.scenarios.salvage;
 import java.util.ArrayList;
 import java.util.List;
 
-import jakarta.annotation.Nullable;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 
@@ -52,18 +52,18 @@ import mekhq.campaign.unit.Unit;
 public class WreckRecovery {
     private final TestUnit wreck;
     /** The first recovery unit, or {@code null}. */
-    private @Nullable Unit firstUnit;
+    private Unit firstUnit;
     /** The second recovery unit, or {@code null}. */
-    private @Nullable Unit secondUnit;
+    private Unit secondUnit;
     /** How the player would like the assigned units to recover the wreck, or {@code null} for no preference. */
-    private @Nullable RecoveryMethod preferredRecoveryMethod;
+    private RecoveryMethod preferredRecoveryMethod;
 
     // Worked out by SalvageRecoveryPlan
     RecoveryStatus status = RecoveryStatus.UNASSIGNED;
     /** How the assigned units recover the wreck on the ground, or {@code null} if that doesn't apply. */
-    @Nullable RecoveryMethod recoveryMethod;
+    RecoveryMethod recoveryMethod;
     /** What this wreck takes up in its carrier's shared cargo space or bays, or {@code null} if not shared. */
-    @Nullable SalvageRecoveryPlan.CarryLoad carryLoad;
+    SalvageRecoveryPlan.CarryLoad carryLoad;
 
     WreckRecovery(TestUnit wreck) {
         this.wreck = wreck;

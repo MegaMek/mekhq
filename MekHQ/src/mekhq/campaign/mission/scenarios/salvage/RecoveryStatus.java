@@ -34,7 +34,7 @@ package mekhq.campaign.mission.scenarios.salvage;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import jakarta.annotation.Nullable;
+import megamek.common.annotations.Nullable;
 
 /**
  * Whether the units assigned to a wreck can recover it, and if not, why not.
@@ -76,7 +76,7 @@ public enum RecoveryStatus {
 
     private final boolean isRecovered;
     /** The resource key suffix of the status's label, or {@code null} if there is nothing to show. */
-    private final @Nullable String labelKey;
+    private final String labelKey;
 
     RecoveryStatus(boolean isRecovered, @Nullable String labelKey) {
         this.isRecovered = isRecovered;
