@@ -35,6 +35,7 @@ package mekhq.campaign.mission.scenarios.salvage;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -236,6 +237,19 @@ class SalvageOperationDraftTest {
         }
 
         @Test
+        void aCombatTeamContainingASalvageFormationIsNotListedAlongsideIt() {
+            // CombatTeam.isEligible lets a standard combat team contain a Salvage sub-formation
+            Formation parent = combatTeam("Lance", List.of(salvageUnit(List.of(), true)));
+            Formation child = salvageTeam("Recovery", List.of(salvageUnit(List.of(), true)), null);
+            when(child.getParentFormation()).thenReturn(parent);
+
+            List<TeamOption> teamOptions = draft().getTeamOptions();
+
+            assertEquals(1, teamOptions.size());
+            assertSame(child, teamOptions.getFirst().formation());
+        }
+
+        @Test
         void availability() {
             Formation idle = salvageTeam("Idle", List.of(salvageUnit(List.of(), true)), null);
             Formation deployed = salvageTeam("Deployed", List.of(salvageUnit(List.of(), true)), null);
@@ -427,6 +441,57 @@ class SalvageOperationDraftTest {
             draft.unstage(option(draft, first));
 
             assertTrue(draft.isTechSelected(sharedTech.getId()));
+        }
+
+        @Test
+        void techsLeftBehindInACommittedPlanStayBehind() {
+            Person kept = person("Kept", false);
+            Person injured = person("Injured", false);
+            Formation team = salvageTeam("Team", List.of(salvageUnit(List.of(kept, injured), false)), null);
+            scenarioFormations.add(team.getId());
+            scenarioTechs.add(kept.getId());
+
+            SalvageOperationDraft draft = draft();
+
+            assertTrue(draft.isTechSelected(kept.getId()));
+            assertFalse(draft.isTechSelected(injured.getId()));
+        }
+
+        @Test
+        void aHandPickedSupervisorSurvivesUnstagingHerTeam() {
+            Person supervisor = idleTech("Supervisor", true);
+            Formation team = salvageTeam("Team", List.of(salvageUnit(List.of(supervisor), false)), null);
+            SalvageOperationDraft draft = draft();
+            TeamOption option = option(draft, team);
+
+            draft.setTechSelected(supervisor.getId(), true);
+            draft.stage(option);
+            draft.unstage(option);
+
+            assertTrue(draft.isTechSelected(supervisor.getId()));
+            assertEquals(TechOrigin.SUPERVISOR, draft.getTechOrigin(supervisor.getId()));
+        }
+
+        @Test
+        void aPreviouslyPickedSupervisorSurvivesUnstagingHerTeam() {
+            Person supervisor = idleTech("Supervisor", true);
+            Formation team = salvageTeam("Team", List.of(salvageUnit(List.of(supervisor), false)), null);
+            scenarioTechs.add(supervisor.getId());
+            SalvageOperationDraft draft = draft();
+            TeamOption option = option(draft, team);
+
+            draft.stage(option);
+            draft.unstage(option);
+
+            assertTrue(draft.isTechSelected(supervisor.getId()));
+        }
+
+        @Test
+        void teamTechsAreOnlyWorkedOutOnce() {
+            Formation team = salvageTeam("Team", List.of(salvageUnit(List.of(person("Crew", false)), false)), null);
+            SalvageOperationDraft draft = draft();
+
+            assertSame(draft.getTeamTechIds(team), draft.getTeamTechIds(team));
         }
 
         @Test

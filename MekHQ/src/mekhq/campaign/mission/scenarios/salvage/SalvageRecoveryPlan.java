@@ -94,14 +94,18 @@ public class SalvageRecoveryPlan {
     /**
      * How much room a carrier has left for more wrecks.
      *
-     * @param isBayCapacity {@code true} if the carrier is carrying wrecks in its bays, rather than its cargo space
-     * @param freeBays      the number of bays still free, if carrying in bays
-     * @param freeCargoTons the cargo space still free, in tons, if carrying in cargo space
+     * <p>A carrier can carry wrecks in its bays and its cargo space at the same time, so both are reported.</p>
+     *
+     * @param isBayCapacity   {@code true} if the carrier is carrying wrecks in its bays
+     * @param freeBays        the number of bay slots still free, if carrying in bays
+     * @param isCargoCapacity {@code true} if the carrier is carrying wrecks in its cargo space
+     * @param freeCargoTons   the cargo space still free, in tons, if carrying in cargo space
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public record RemainingCapacity(boolean isBayCapacity, int freeBays, double freeCargoTons) {}
+    public record RemainingCapacity(boolean isBayCapacity, int freeBays, boolean isCargoCapacity,
+          double freeCargoTons) {}
 
     /**
      * Creates an empty recovery plan.
@@ -228,30 +232,32 @@ public class SalvageRecoveryPlan {
     public @Nullable RemainingCapacity getRemainingCapacity(Unit carrier) {
         double cargoTonsUsed = 0.0;
         int vesselsCarried = 0;
-        boolean isCarrying = false;
+        boolean isCarryingCargo = false;
         for (WreckRecovery recovery : recoveries) {
             CarryLoad carryLoad = recovery.carryLoad;
             if ((carryLoad != null) && (carryLoad.carrier() == carrier)) {
-                isCarrying = true;
                 if (carryLoad.isBayLoad()) {
                     vesselsCarried++;
                 } else {
+                    isCarryingCargo = true;
                     cargoTonsUsed += carryLoad.cargoTons();
                 }
             }
         }
 
-        if (!isCarrying) {
+        boolean isCarryingInBays = vesselsCarried > 0;
+        if (!isCarryingInBays && !isCarryingCargo) {
             return null;
         }
 
-        if (vesselsCarried > 0) {
+        int freeBays = 0;
+        if (isCarryingInBays) {
             int baySlots = CamOpsSalvageUtilities.getFreeSmallCraftBaySlots(carrier) +
                                  CamOpsSalvageUtilities.getFreeFighterBaySlots(carrier);
-            return new RemainingCapacity(true, Math.max(0, baySlots - vesselsCarried), 0.0);
+            freeBays = Math.max(0, baySlots - vesselsCarried);
         }
-
-        return new RemainingCapacity(false, 0, Math.max(0.0, getCargoCapacity(carrier) - cargoTonsUsed));
+        double freeCargoTons = isCarryingCargo ? Math.max(0.0, getCargoCapacity(carrier) - cargoTonsUsed) : 0.0;
+        return new RemainingCapacity(isCarryingInBays, freeBays, isCarryingCargo, freeCargoTons);
     }
 
     /**

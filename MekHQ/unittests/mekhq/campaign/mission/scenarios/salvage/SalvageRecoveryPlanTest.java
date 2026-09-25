@@ -652,6 +652,25 @@ class SalvageRecoveryPlanTest {
         }
 
         @Test
+        void carrierUsingBaysAndCargoReportsBoth() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
+            Unit carrier = carrierWithBays(fighterBay(2, 1));
+            WreckRecovery fighter = plan.addWreck(fighter());
+            WreckRecovery cargoWreck = plan.addWreck(wreck(10.0));
+            fighter.setRecoveryUnits(carrier, null);
+            cargoWreck.setRecoveryUnits(carrier, null);
+
+            plan.revalidate();
+
+            SalvageRecoveryPlan.RemainingCapacity remainingCapacity = plan.getRemainingCapacity(carrier);
+            assertNotNull(remainingCapacity);
+            assertTrue(remainingCapacity.isBayCapacity());
+            assertEquals(1, remainingCapacity.freeBays());
+            assertTrue(remainingCapacity.isCargoCapacity());
+            assertEquals(990.0, remainingCapacity.freeCargoTons(), DELTA);
+        }
+
+        @Test
         void carrierWithFreeBayIsOfferedForAnotherFighter() {
             SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
             Unit carrier = carrierWithBays(fighterBay(1), fighterBay(1));

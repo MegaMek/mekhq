@@ -124,7 +124,7 @@ public class SalvageRecoverySession {
         this.settlement = settlement;
         this.plan = new SalvageRecoveryPlan(salvageRules, isInSpace);
         this.recoveryUnits = List.copyOf(recoveryUnits);
-        this.recoveryTimes = recoveryTimes;
+        this.recoveryTimes = Map.copyOf(recoveryTimes);
         this.availableMinutes = Math.max(0, availableMinutes);
         this.unitSalvageInitial = unitSalvageInitial;
         this.employerSalvageInitial = employerSalvageInitial;

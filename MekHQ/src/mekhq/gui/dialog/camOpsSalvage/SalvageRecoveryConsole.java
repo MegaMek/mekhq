@@ -51,9 +51,11 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import javax.swing.*;
 
@@ -251,7 +253,8 @@ public class SalvageRecoveryConsole extends JDialog {
      * scenario are left out, unless the salvage system lets their formation fight and then salvage.
      */
     private List<Unit> getRecoveryUnits(Campaign campaign, Scenario scenario, AbstractSalvage salvageRules) {
-        List<Unit> recoveryUnits = new ArrayList<>();
+        // A set, as a formation and one nested inside it can both be assigned, and their units must only be listed once
+        Set<Unit> recoveryUnits = new LinkedHashSet<>();
         LocalHangar hangar = campaign.getPlayerForce().getHangar();
         for (Integer formationId : scenario.getSalvageFormations()) {
             Formation formation = campaign.getPlayerForce().getFormation(formationId);
@@ -270,7 +273,7 @@ public class SalvageRecoveryConsole extends JDialog {
                 recoveryUnits.add(unit);
             }
         }
-        return recoveryUnits;
+        return new ArrayList<>(recoveryUnits);
     }
 
     /**
@@ -1196,11 +1199,16 @@ public class SalvageRecoveryConsole extends JDialog {
                 ringColor = ACCENT;
             } else if (remainingCapacity != null) {
                 tags.add(new Tag(text("fleet.carrying"), ACCENT));
-                figure = remainingCapacity.isBayCapacity() ?
-                               getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.freeBays",
-                                     remainingCapacity.freeBays()) :
-                               getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.freeCargo",
-                                     remainingCapacity.freeCargoTons());
+                List<String> figures = new ArrayList<>();
+                if (remainingCapacity.isBayCapacity()) {
+                    figures.add(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.freeBays",
+                          remainingCapacity.freeBays()));
+                }
+                if (remainingCapacity.isCargoCapacity()) {
+                    figures.add(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.freeCargo",
+                          remainingCapacity.freeCargoTons()));
+                }
+                figure = String.join(" · ", figures);
                 ringColor = ACCENT;
             } else if (isUsed) {
                 tags.add(new Tag(text("fleet.busy"), ACCENT));

@@ -34,15 +34,7 @@ package mekhq.campaign.mission.scenarios.salvage;
 
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 import jakarta.annotation.Nullable;
 import megamek.common.enums.SkillLevel;
@@ -83,6 +75,10 @@ public class SalvageOperationDraft {
     private final List<TeamOption> teamOptions;
     private final Set<Integer> stagedFormationIds = new LinkedHashSet<>();
     private final Set<UUID> selectedTechIds = new LinkedHashSet<>();
+    /** Techs the player chose themselves, rather than being brought by a team; unstaging a team never removes them. */
+    private final Set<UUID> handPickedTechIds = new LinkedHashSet<>();
+    /** Team tech IDs by formation ID. Assignments can't change while the planner is open, so they're only built once. */
+    private final Map<Integer, Set<UUID>> teamTechIdsCache = new HashMap<>();
     private final Map<UUID, SalvageTechCandidate> techPool = new LinkedHashMap<>();
 
     /**
@@ -164,13 +160,21 @@ public class SalvageOperationDraft {
         }
 
         buildTechPool();
-        for (UUID techId : scenario.getSalvageTechs()) {
-            if (techPool.containsKey(techId)) {
-                selectedTechIds.add(techId);
+        Set<UUID> stagedTeamTechIds = getStagedTeamTechIds();
+        List<UUID> priorTechIds = scenario.getSalvageTechs();
+        if (priorTechIds.isEmpty()) {
+            // Nothing committed yet, so the staged teams bring all their techs
+            selectedTechIds.addAll(stagedTeamTechIds);
+        } else {
+            // A previous plan was committed: trust it, so techs the player left behind stay behind
+            for (UUID techId : priorTechIds) {
+                if (techPool.containsKey(techId)) {
+                    selectedTechIds.add(techId);
+                    if (!stagedTeamTechIds.contains(techId)) {
+                        handPickedTechIds.add(techId);
+                    }
+                }
             }
-        }
-        for (TeamOption option : getStagedTeams()) {
-            selectedTechIds.addAll(getTeamTechIds(option.formation()));
         }
     }
 
@@ -228,9 +232,16 @@ public class SalvageOperationDraft {
         List<Formation> combatTeams = new ArrayList<>();
         for (CombatTeam combatTeam : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
             Formation formation = campaign.getPlayerForce().getFormation(combatTeam.getFormationId());
-            if ((formation != null) && listedIds.add(formation.getId())) {
-                combatTeams.add(formation);
+            if ((formation == null) || listedIds.contains(formation.getId())) {
+                continue;
             }
+            // A combat team may contain a Salvage formation (or sit inside one). Listing both would let the player
+            // stage the same units twice.
+            if (isNestedWithAny(formation, salvageFormations) || isNestedWithAny(formation, combatTeams)) {
+                continue;
+            }
+            listedIds.add(formation.getId());
+            combatTeams.add(formation);
         }
 
         salvageFormations.sort(Comparator.comparing(Formation::getFullName));
@@ -246,6 +257,26 @@ public class SalvageOperationDraft {
                   getAvailability(formation, hangar, activeContracts, alreadyAssignedFormations)));
         }
         return options;
+    }
+
+    /** Checks whether a formation contains, or is contained by, any of the given formations. */
+    private static boolean isNestedWithAny(Formation formation, List<Formation> listedFormations) {
+        for (Formation listedFormation : listedFormations) {
+            if (isAncestorOf(listedFormation, formation) || isAncestorOf(formation, listedFormation)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean isAncestorOf(Formation possibleAncestor, Formation formation) {
+        for (Formation current = formation.getParentFormation(); current != null;
+              current = current.getParentFormation()) {
+            if (current.getId() == possibleAncestor.getId()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private TeamAvailability getAvailability(Formation formation, LocalHangar hangar,
@@ -340,7 +371,8 @@ public class SalvageOperationDraft {
     }
 
     /**
-     * Unstages a team. Its techs leave with it, unless another staged team also brings them.
+     * Unstages a team. Its techs leave with it, unless another staged team also brings them, or the player picked them
+     * themselves.
      *
      * @param option the team
      *
@@ -353,12 +385,9 @@ public class SalvageOperationDraft {
         if (!stagedFormationIds.remove(option.formation().getId())) {
             return false;
         }
-        Set<UUID> stillBrought = new LinkedHashSet<>();
-        for (TeamOption stagedTeam : getStagedTeams()) {
-            stillBrought.addAll(getTeamTechIds(stagedTeam.formation()));
-        }
+        Set<UUID> stillBrought = getStagedTeamTechIds();
         for (UUID techId : getTeamTechIds(option.formation())) {
-            if (!stillBrought.contains(techId)) {
+            if (!stillBrought.contains(techId) && !handPickedTechIds.contains(techId)) {
                 selectedTechIds.remove(techId);
             }
         }
@@ -441,6 +470,10 @@ public class SalvageOperationDraft {
      * @since 0.51.01
      */
     public Set<UUID> getTeamTechIds(Formation formation) {
+        return teamTechIdsCache.computeIfAbsent(formation.getId(), formationId -> buildTeamTechIds(formation));
+    }
+
+    private Set<UUID> buildTeamTechIds(Formation formation) {
         Set<UUID> techIds = new LinkedHashSet<>();
         UUID toeTechId = formation.getTechID();
         if (toeTechId != null) {
@@ -460,16 +493,28 @@ public class SalvageOperationDraft {
                 }
             }
         }
+        return Collections.unmodifiableSet(techIds);
+    }
+
+    /** The techs every staged team brings. */
+    private Set<UUID> getStagedTeamTechIds() {
+        Set<UUID> techIds = new LinkedHashSet<>();
+        for (TeamOption option : getStagedTeams()) {
+            techIds.addAll(getTeamTechIds(option.formation()));
+        }
         return techIds;
     }
 
     /**
      * @param techId a tech
      *
-     * @return how the tech comes to be on the operation: brought by a staged team (as its TO&amp;E tech or crew), or
-     *       added as a salvage supervisor
+     * @return how the tech comes to be on the operation: picked by the player, or brought by a staged team (as its
+     *       TO&amp;E tech or crew)
      */
     public TechOrigin getTechOrigin(UUID techId) {
+        if (handPickedTechIds.contains(techId)) {
+            return TechOrigin.SUPERVISOR;
+        }
         for (TeamOption option : getStagedTeams()) {
             Formation formation = option.formation();
             if (techId.equals(formation.getTechID())) {
@@ -494,10 +539,7 @@ public class SalvageOperationDraft {
      * @since 0.51.01
      */
     public List<SalvageTechCandidate> getTechCandidates() {
-        Set<UUID> teamTechIds = new LinkedHashSet<>();
-        for (TeamOption option : getStagedTeams()) {
-            teamTechIds.addAll(getTeamTechIds(option.formation()));
-        }
+        Set<UUID> teamTechIds = getStagedTeamTechIds();
 
         List<SalvageTechCandidate> candidates = new ArrayList<>();
         for (SalvageTechCandidate candidate : techPool.values()) {
@@ -536,7 +578,15 @@ public class SalvageOperationDraft {
         if (!techPool.containsKey(techId)) {
             return false;
         }
-        return isSelected ? selectedTechIds.add(techId) : selectedTechIds.remove(techId);
+        if (!isSelected) {
+            handPickedTechIds.remove(techId);
+            return selectedTechIds.remove(techId);
+        }
+        // Ticking a tech no staged team brings makes them the player's own pick
+        if (!getStagedTeamTechIds().contains(techId)) {
+            handPickedTechIds.add(techId);
+        }
+        return selectedTechIds.add(techId);
     }
 
     /**

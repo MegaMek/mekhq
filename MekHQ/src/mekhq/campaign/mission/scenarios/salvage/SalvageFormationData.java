@@ -47,15 +47,42 @@ import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
+/**
+ * A summary of what a formation can bring to a salvage operation.
+ *
+ * @param formation            the formation
+ * @param formationType        the formation's type
+ * @param tech                 the formation's TO&amp;E tech, if it's a Salvage formation and the tech isn't an engineer;
+ *                             otherwise {@code null}
+ * @param maximumCargoCapacity the largest cargo capacity of any of its units that can salvage, in tons
+ * @param maximumTowCapacity   the largest tow capacity of any of its units that can salvage, in tons; in space, the
+ *                             heaviest such unit's weight
+ * @param salvageCapableUnits  how many of its units can take part in the salvage operation
+ * @param hasTug               {@code true} if one of those units has a working naval tug adaptor (space only)
+ * @param isSpaceScenario      {@code true} if the salvage operation takes place in space
+ */
 public record SalvageFormationData(Formation formation, FormationType formationType, @Nullable Person tech,
       double maximumCargoCapacity,
       double maximumTowCapacity, int salvageCapableUnits, boolean hasTug, boolean isSpaceScenario) {
+    /**
+     * Summarizes a formation's salvage capabilities.
+     *
+     * @param campaign        the current campaign
+     * @param formation       the formation
+     * @param isSpaceScenario {@code true} if the salvage operation takes place in space
+     *
+     * @return the formation's salvage capabilities
+     */
     public static SalvageFormationData buildData(Campaign campaign, Formation formation, boolean isSpaceScenario) {
         FormationType formationType = formation.getFormationType();
         UUID techId = formation.getTechID();
         Person tech;
-        if (techId == null || !formationType.isSalvage()) {tech = null;} else {tech = campaign.getPlayerForce().getHumanResources().getPerson(techId);}
-        if (tech != null && tech.isEngineer()) { // Engineers cannot salvage
+        if ((techId == null) || !formationType.isSalvage()) {
+            tech = null;
+        } else {
+            tech = campaign.getPlayerForce().getHumanResources().getPerson(techId);
+        }
+        if ((tech != null) && tech.isEngineer()) { // Engineers cannot salvage
             tech = null;
         }
 
