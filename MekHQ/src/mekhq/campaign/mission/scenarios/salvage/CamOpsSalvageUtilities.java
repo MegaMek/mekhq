@@ -483,7 +483,7 @@ public class CamOpsSalvageUtilities {
         }
 
         return getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.accident.injured",
-              victim.getHyperlinkedName(), newHits);
+              victim.getHyperlinkedFullTitle(), newHits);
     }
 
     /**

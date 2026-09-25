@@ -1240,7 +1240,7 @@ public class SalvageRecoveryConsole extends JDialog {
                     figures.add(formatted("freeCargo",
                           remainingCapacity.freeCargoTons()));
                 }
-                figure = String.join(" · ", figures);
+                figure = String.join(text("capacity.separator"), figures);
                 ringColor = ACCENT;
             } else if (isUsed) {
                 tags.add(new Tag(text("fleet.busy"), ACCENT));

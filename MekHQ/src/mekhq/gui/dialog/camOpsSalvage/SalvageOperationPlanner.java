@@ -342,7 +342,7 @@ public class SalvageOperationPlanner extends JDialog {
     private String contextText() {
         String system = campaign.getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getLabel();
         String environment = draft.isInSpace() ? text("context.space") : text("context.ground");
-        return system + " · " + environment;
+        return formatted("context", system, environment);
     }
 
     private JComponent buildTeamsPage() {
