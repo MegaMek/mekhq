@@ -166,7 +166,7 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
             if (table == null) {
                 return this;
             }
-            
+
             super.getTableCellRendererComponent(table, value, isSelected, hasFocus, rowIndex, columnIndex);
 
             int modelRow = table.convertRowIndexToModel(rowIndex);
