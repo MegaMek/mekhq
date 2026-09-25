@@ -233,19 +233,22 @@ public abstract sealed class SalvageSettlement
      * @param scenario         the scenario the salvage came from
      * @param keptSalvageValue the total value of the salvage the player keeps
      *
+     * @return the amount charged, which is the employer's share of the kept salvage
+     *
      * @author Illiani
      * @since 0.51.01
      */
-    public void chargePurchases(Campaign campaign, Scenario scenario, Money keptSalvageValue) {
+    public Money chargePurchases(Campaign campaign, Scenario scenario, Money keptSalvageValue) {
         Money purchaseCost = getPurchaseCost(keptSalvageValue);
         if (!purchaseCost.isPositive()) {
-            return;
+            return Money.zero();
         }
 
         campaign.getPlayerForce().getFinances().debit(TransactionType.UNIT_PURCHASE, campaign.getLocalDate(),
               purchaseCost, getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.purchase", scenario.getName()));
         campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.purchase.report",
               purchaseCost.toAmountString(), scenario.getHyperlinkedName()));
+        return purchaseCost;
     }
 
     /**

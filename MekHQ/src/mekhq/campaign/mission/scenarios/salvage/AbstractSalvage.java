@@ -37,6 +37,7 @@ import java.util.List;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.units.Tank;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.force.Formation;
@@ -65,6 +66,8 @@ import mekhq.campaign.unit.Unit;
  * @since 0.51.01
  */
 public abstract class AbstractSalvage {
+    private static final MMLogger LOGGER = MMLogger.create(AbstractSalvage.class);
+
     /**
      * Checks whether salvage is recovered through salvage operations.
      *
@@ -180,21 +183,37 @@ public abstract class AbstractSalvage {
      */
     public final boolean isAvailableForSalvage(Unit unit, boolean isInSpace) {
         if (!canSalvage(unit, isInSpace)) {
+            LOGGER.debug("[Salvage] {} can't salvage {}", unit.getName(), isInSpace ? "in space" : "on the ground");
             return false;
         }
 
         // A unit that can't be repaired, or is being stripped for parts, is in no state to recover anything
-        if (unit.isSalvage() || !unit.isRepairable()) {
+        if (unit.isSalvage()) {
+            LOGGER.debug("[Salvage] {} is being stripped for parts", unit.getName());
+            return false;
+        }
+
+        if (!unit.isRepairable()) {
+            LOGGER.debug("[Salvage] {} isn't repairable", unit.getName());
             return false;
         }
 
         Entity entity = unit.getEntity();
         if (entity instanceof Tank tank && tank.isTrailer()) {
             ITransportAssignment transportAssignment = unit.getTransportAssignment(CampaignTransportType.TOW_TRANSPORT);
-            return transportAssignment != null && transportAssignment.hasTransport();
+            boolean isHitched = (transportAssignment != null) && transportAssignment.hasTransport();
+            if (!isHitched) {
+                LOGGER.debug("[Salvage] {} is a trailer that isn't hitched to anything", unit.getName());
+            }
+            return isHitched;
         }
 
-        return !isImmobilized(entity);
+        if (isImmobilized(entity)) {
+            LOGGER.debug("[Salvage] {} is immobilized", unit.getName());
+            return false;
+        }
+
+        return true;
     }
 
     /**

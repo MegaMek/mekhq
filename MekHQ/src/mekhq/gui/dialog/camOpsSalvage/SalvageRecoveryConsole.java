@@ -61,8 +61,6 @@ import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.bays.ASFBay;
-import megamek.common.bays.SmallCraftBay;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -1074,10 +1072,10 @@ public class SalvageRecoveryConsole extends JDialog {
             if (CamOpsSalvageUtilities.hasNavalTug(entity)) {
                 capacity.append(text("capacity.tug"));
             }
-            int bays = CamOpsSalvageUtilities.countBaysWithWorkingDoors(entity, ASFBay.class) +
-                             CamOpsSalvageUtilities.countBaysWithWorkingDoors(entity, SmallCraftBay.class);
-            if (bays > 0) {
-                capacity.append(formatted("capacity.bays", bays));
+            int baySlots = CamOpsSalvageUtilities.getFreeFighterBaySlots(unit) +
+                                 CamOpsSalvageUtilities.getFreeSmallCraftBaySlots(unit);
+            if (baySlots > 0) {
+                capacity.append(formatted("capacity.bays", baySlots));
             }
         }
         return capacity.toString();

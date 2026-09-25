@@ -174,24 +174,66 @@ public class CamOpsSalvageUtilities {
     }
 
     /**
-     * Counts an entity's bays of a given type that still have at least one working door.
+     * Gets how many more fighter wrecks a carrier's fighter bays can take in.
      *
-     * @param entity  the entity to check
-     * @param bayType the type of bay to count, such as {@link ASFBay} or {@link SmallCraftBay}
+     * <p>Space salvage is limited by free bay slots, not by bays or doors: each recovered wreck fills one slot, and
+     * recovery happens after the battle, so the number of doors doesn't limit it. A bay only counts if at least one
+     * of its doors still works. Slots already taken by fighters assigned to the carrier in the TO&amp;E are not
+     * free.</p>
      *
-     * @return the number of matching bays with working doors
+     * @param carrier the carrying unit
+     *
+     * @return the number of free fighter bay slots
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static int countBaysWithWorkingDoors(Entity entity, Class<? extends Bay> bayType) {
-        int bayCount = 0;
+    public static int getFreeFighterBaySlots(Unit carrier) {
+        return getFreeBaySlots(carrier, ASFBay.class, carrier.getCurrentASFCapacity());
+    }
+
+    /**
+     * Gets how many more small craft or fighter wrecks a carrier's small craft bays can take in.
+     *
+     * <p>Limited by free bay slots in the same way as {@link #getFreeFighterBaySlots(Unit)}.</p>
+     *
+     * @param carrier the carrying unit
+     *
+     * @return the number of free small craft bay slots
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getFreeSmallCraftBaySlots(Unit carrier) {
+        return getFreeBaySlots(carrier, SmallCraftBay.class, carrier.getCurrentSmallCraftCapacity());
+    }
+
+    /**
+     * Gets a carrier's free slots in bays of one type.
+     *
+     * <p>The unit's tracked capacity already excludes slots used by the TO&amp;E's assigned units, but is only
+     * recalculated when those assignments change; the bays' own unused space reflects damage taken since. The smaller
+     * of the two is used, and bays with no working doors are left out.</p>
+     *
+     * @param carrier          the carrying unit
+     * @param bayType          the type of bay to count
+     * @param trackedFreeSlots the unit's tracked free capacity for that type of bay
+     *
+     * @return the number of free slots
+     */
+    private static int getFreeBaySlots(Unit carrier, Class<? extends Bay> bayType, double trackedFreeSlots) {
+        Entity entity = carrier.getEntity();
+        if (entity == null) {
+            return 0;
+        }
+
+        double unusedSlots = 0;
         for (Bay bay : entity.getTransportBays()) {
             if (bayType.isInstance(bay) && (bay.getCurrentDoors() > 0)) {
-                bayCount++;
+                unusedSlots += Math.max(0, bay.getUnused());
             }
         }
-        return bayCount;
+        return (int) Math.floor(Math.max(0, Math.min(unusedSlots, trackedFreeSlots)));
     }
 
     /**
@@ -251,12 +293,14 @@ public class CamOpsSalvageUtilities {
                 salvagedUnit.setSite(ContractRepairLocation.getRepairLocation(mission.getObjectiveType()));
             }
 
-            // if this is a contract, add to the salvaged value
-            mission.changeSalvagedByUnitValue(salvageUnit.getSellValue());
             keptSalvageValue = keptSalvageValue.plus(salvageUnit.getSellValue());
         }
 
-        settlement.chargePurchases(campaign, scenario, keptSalvageValue);
+        // Bought salvage is split: the price paid is the employer's share of it, and only the rest counts as the
+        // player's. Recording the full value as the player's would put them over their salvage rights, and the
+        // overage would be charged again at the end of the contract.
+        Money purchaseCost = settlement.chargePurchases(campaign, scenario, keptSalvageValue);
+        mission.changeSalvagedByUnitValue(keptSalvageValue.minus(purchaseCost));
 
         // And any ransomed salvaged units
         if (!soldSalvage.isEmpty()) {
@@ -287,7 +331,7 @@ public class CamOpsSalvageUtilities {
 
         // Depending on the settlement, the player may be paid a share of the employer's salvage
         Money playerTakeHome = settlement.payCashShare(campaign, scenario, employerTakeHome);
-        employerTakeHome = employerTakeHome.minus(playerTakeHome);
+        employerTakeHome = employerTakeHome.minus(playerTakeHome).plus(purchaseCost);
         mission.changeSalvagedByUnitValue(playerTakeHome);
 
         mission.changeSalvagedByEmployerValue(employerTakeHome);

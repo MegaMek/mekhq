@@ -58,7 +58,9 @@ final class PurchaseSalvageSettlement extends SalvageSettlement {
 
     @Override
     public Money getPurchaseCost(Money keptSalvageValue) {
-        return keptSalvageValue.multipliedBy(1.0 - getPlayerShare());
+        // Subtracting the player's share, rather than multiplying by (1 - share), keeps the player's part of bought
+        // salvage exactly equal to their salvage rights allowance; e.g. 1 - 0.07 is 0.9299999999999999 as a double
+        return keptSalvageValue.minus(keptSalvageValue.multipliedBy(getPlayerShare()));
     }
 
     @Override

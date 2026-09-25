@@ -469,21 +469,37 @@ class SalvageRecoveryPlanTest {
 
     @Nested
     class Space {
+        /** A carrier with no units assigned to its bays in the TO&E. */
         private static Unit carrierWithBays(Bay... bays) {
             Dropship dropship = mock(Dropship.class);
             when(dropship.getTransportBays()).thenReturn(new Vector<>(java.util.List.of(bays)));
             Unit unit = mock(Unit.class);
             when(unit.getEntity()).thenReturn(dropship);
             when(unit.getCargoCapacityForSalvage()).thenReturn(1000.0);
+            double fighterSlots = 0;
+            double smallCraftSlots = 0;
+            for (Bay bay : bays) {
+                if (bay instanceof ASFBay) {
+                    fighterSlots += bay.getCapacity();
+                } else if (bay instanceof SmallCraftBay) {
+                    smallCraftSlots += bay.getCapacity();
+                }
+            }
+            when(unit.getCurrentASFCapacity()).thenReturn(fighterSlots);
+            when(unit.getCurrentSmallCraftCapacity()).thenReturn(smallCraftSlots);
             return unit;
         }
 
         private static Bay fighterBay(int doors) {
-            return new ASFBay(2, doors, 1);
+            return fighterBay(1, doors);
+        }
+
+        private static Bay fighterBay(int slots, int doors) {
+            return new ASFBay(slots, doors, 1);
         }
 
         private static Bay smallCraftBay(int doors) {
-            return new SmallCraftBay(2, doors, 2);
+            return new SmallCraftBay(1, doors, 2);
         }
 
         private static TestUnit fighter() {
@@ -580,7 +596,7 @@ class SalvageRecoveryPlanTest {
         }
 
         @Test
-        void eachBayHoldsOneWreck() {
+        void eachBaySlotHoldsOneWreck() {
             SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
             Unit carrier = carrierWithBays(fighterBay(1), smallCraftBay(1));
             WreckRecovery first = plan.addWreck(fighter());
@@ -599,6 +615,40 @@ class SalvageRecoveryPlanTest {
             assertNotNull(remainingCapacity);
             assertTrue(remainingCapacity.isBayCapacity());
             assertEquals(0, remainingCapacity.freeBays());
+        }
+
+        @Test
+        void multiSlotBayHoldsAWreckPerSlotWhateverItsDoors() {
+            // Like a Vengeance's fighter bay: many slots, several doors
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
+            Unit carrier = carrierWithBays(fighterBay(18, 4));
+            java.util.List<WreckRecovery> recoveries = new java.util.ArrayList<>();
+            for (int i = 0; i < 5; i++) {
+                WreckRecovery recovery = plan.addWreck(fighter());
+                recovery.setRecoveryUnits(carrier, null);
+                recoveries.add(recovery);
+            }
+
+            plan.revalidate();
+
+            for (WreckRecovery recovery : recoveries) {
+                assertEquals(RecoveryStatus.CARRIED_IN_BAY, recovery.getStatus());
+            }
+            assertEquals(13, plan.getRemainingCapacity(carrier).freeBays());
+        }
+
+        @Test
+        void slotsTakenByTheCarriersOwnFightersAreNotFree() {
+            SalvageRecoveryPlan plan = new SalvageRecoveryPlan(new CamOpsRevisedSalvage(), true);
+            Unit carrier = carrierWithBays(fighterBay(2, 1));
+            // Both slots are taken by fighters assigned to the carrier in the TO&E
+            when(carrier.getCurrentASFCapacity()).thenReturn(0.0);
+            WreckRecovery recovery = plan.addWreck(fighter());
+            recovery.setRecoveryUnits(carrier, null);
+
+            plan.revalidate();
+
+            assertEquals(RecoveryStatus.NO_SUITABLE_BAY_EQUIPMENT, recovery.getStatus());
         }
 
         @Test

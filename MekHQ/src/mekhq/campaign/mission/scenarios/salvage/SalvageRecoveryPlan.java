@@ -39,8 +39,6 @@ import java.util.List;
 import java.util.Map;
 
 import jakarta.annotation.Nullable;
-import megamek.common.bays.ASFBay;
-import megamek.common.bays.SmallCraftBay;
 import megamek.common.units.AeroSpaceFighter;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
@@ -248,11 +246,9 @@ public class SalvageRecoveryPlan {
         }
 
         if (vesselsCarried > 0) {
-            Entity carrierEntity = carrier.getEntity();
-            int bays = (carrierEntity == null) ? 0 :
-                             CamOpsSalvageUtilities.countBaysWithWorkingDoors(carrierEntity, SmallCraftBay.class) +
-                                   CamOpsSalvageUtilities.countBaysWithWorkingDoors(carrierEntity, ASFBay.class);
-            return new RemainingCapacity(true, Math.max(0, bays - vesselsCarried), 0.0);
+            int baySlots = CamOpsSalvageUtilities.getFreeSmallCraftBaySlots(carrier) +
+                                 CamOpsSalvageUtilities.getFreeFighterBaySlots(carrier);
+            return new RemainingCapacity(true, Math.max(0, baySlots - vesselsCarried), 0.0);
         }
 
         return new RemainingCapacity(false, 0, Math.max(0.0, getCargoCapacity(carrier) - cargoTonsUsed));
@@ -290,8 +286,8 @@ public class SalvageRecoveryPlan {
             }
 
             if (isSmallVessel(targetEntity)) {
-                // It needs a suitable bay with working doors: fighters fit in fighter or small craft bays, small
-                // craft only in small craft bays
+                // It needs a free slot in a suitable bay with working doors: fighters fit in fighter or small craft
+                // bays, small craft only in small craft bays
                 int smallCraftCarried = isSmallCraft(targetEntity) ? 1 : 0;
                 boolean hasSuitableBay = ((firstUnit != null) && hasBaysFor(firstUnit, 1, smallCraftCarried)) ||
                                                ((secondUnit != null) && hasBaysFor(secondUnit, 1, smallCraftCarried));
@@ -603,28 +599,25 @@ public class SalvageRecoveryPlan {
     }
 
     /**
-     * Checks whether a carrier has enough suitable bays with working doors for the fighters and small craft assigned
-     * to it. Fighters fit in fighter or small craft bays; small craft only fit in small craft bays.
+     * Checks whether a carrier has enough free bay slots for the fighters and small craft assigned to it. Each wreck
+     * fills one slot in a bay with a working door; the number of doors doesn't matter (see
+     * {@link CamOpsSalvageUtilities#getFreeFighterBaySlots(Unit)}). Fighters fit in fighter or small craft bays;
+     * small craft only fit in small craft bays.
      *
      * @param carrier           the carrying unit
      * @param vesselsCarried    the total number of fighters and small craft assigned to the carrier
      * @param smallCraftCarried how many of those are small craft
      *
-     * @return {@code true} if every assigned fighter and small craft has a bay
+     * @return {@code true} if every assigned fighter and small craft has a bay slot
      */
     private static boolean hasBaysFor(Unit carrier, int vesselsCarried, int smallCraftCarried) {
         if (vesselsCarried == 0) {
             return true;
         }
 
-        Entity carrierEntity = carrier.getEntity();
-        if (carrierEntity == null) {
-            return false;
-        }
-
-        int smallCraftBays = CamOpsSalvageUtilities.countBaysWithWorkingDoors(carrierEntity, SmallCraftBay.class);
-        int fighterBays = CamOpsSalvageUtilities.countBaysWithWorkingDoors(carrierEntity, ASFBay.class);
-        return (smallCraftCarried <= smallCraftBays) && (vesselsCarried <= smallCraftBays + fighterBays);
+        int smallCraftSlots = CamOpsSalvageUtilities.getFreeSmallCraftBaySlots(carrier);
+        int fighterSlots = CamOpsSalvageUtilities.getFreeFighterBaySlots(carrier);
+        return (smallCraftCarried <= smallCraftSlots) && (vesselsCarried <= smallCraftSlots + fighterSlots);
     }
 
     private static boolean hasNavalTug(@Nullable Unit unit) {

@@ -42,6 +42,7 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -83,6 +84,7 @@ import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.campaign.mission.contract.utilities.ContractSettlement;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
@@ -170,26 +172,53 @@ class CamOpsSalvageResolutionTest {
 
     @Nested
     class Bays {
-        @Test
-        void onlyBaysOfTheRequestedTypeWithWorkingDoorsAreCounted() {
+        private static Unit carrier(double trackedFighterSlots, double trackedSmallCraftSlots, Bay... bays) {
             Dropship dropship = mock(Dropship.class);
-            when(dropship.getTransportBays()).thenReturn(bays(new ASFBay(2, 1, 1), new ASFBay(2, 0, 2),
-                  new ASFBay(2, 2, 3), new SmallCraftBay(2, 1, 4), new CargoBay(10, 1, 5)));
-
-            assertEquals(2, CamOpsSalvageUtilities.countBaysWithWorkingDoors(dropship, ASFBay.class));
-            assertEquals(1, CamOpsSalvageUtilities.countBaysWithWorkingDoors(dropship, SmallCraftBay.class));
+            when(dropship.getTransportBays()).thenReturn(bays(bays));
+            Unit carrier = mock(Unit.class);
+            when(carrier.getEntity()).thenReturn(dropship);
+            when(carrier.getCurrentASFCapacity()).thenReturn(trackedFighterSlots);
+            when(carrier.getCurrentSmallCraftCapacity()).thenReturn(trackedSmallCraftSlots);
+            return carrier;
         }
 
         @Test
-        void bayWhoseDoorsWereDestroyedIsNotCounted() {
-            Dropship dropship = mock(Dropship.class);
+        void slotsInBaysOfTheRequestedTypeWithWorkingDoorsAreCounted() {
+            Unit carrier = carrier(100, 100, new ASFBay(2, 1, 1), new ASFBay(2, 0, 2), new ASFBay(3, 2, 3),
+                  new SmallCraftBay(2, 1, 4), new CargoBay(10, 1, 5));
+
+            assertEquals(5, CamOpsSalvageUtilities.getFreeFighterBaySlots(carrier));
+            assertEquals(2, CamOpsSalvageUtilities.getFreeSmallCraftBaySlots(carrier));
+        }
+
+        @Test
+        void doorsDoNotLimitSlots() {
+            // A Vengeance's fighter bay: 18 slots behind 4 doors
+            Unit carrier = carrier(18, 0, new ASFBay(18, 4, 1));
+
+            assertEquals(18, CamOpsSalvageUtilities.getFreeFighterBaySlots(carrier));
+        }
+
+        @Test
+        void bayWhoseDoorsWereDestroyedHasNoFreeSlots() {
             ASFBay bay = new ASFBay(2, 1, 1);
             bay.setCurrentDoors(0);
-            when(dropship.getTransportBays()).thenReturn(bays(bay));
 
-            assertEquals(0, CamOpsSalvageUtilities.countBaysWithWorkingDoors(dropship, ASFBay.class));
+            assertEquals(0, CamOpsSalvageUtilities.getFreeFighterBaySlots(carrier(2, 0, bay)));
         }
 
+        @Test
+        void slotsTakenByAssignedFightersAreNotFree() {
+            assertEquals(1, CamOpsSalvageUtilities.getFreeFighterBaySlots(carrier(1, 0, new ASFBay(18, 4, 1))));
+        }
+
+        @Test
+        void carrierWithoutAnEntityHasNoSlots() {
+            Unit carrier = mock(Unit.class);
+            when(carrier.getCurrentASFCapacity()).thenReturn(10.0);
+
+            assertEquals(0, CamOpsSalvageUtilities.getFreeFighterBaySlots(carrier));
+        }
     }
 
     @Nested
@@ -368,7 +397,32 @@ class CamOpsSalvageResolutionTest {
 
             verify(finances).debit(eq(TransactionType.UNIT_PURCHASE), eq(TODAY), moneyOf(750), anyString());
             verify(finances).credit(eq(TransactionType.SALVAGE), eq(TODAY), moneyOf(100), anyString());
-            verify(contract).changeSalvagedByEmployerValue(moneyOf(300));
+            // The kept wreck counts 250 to the player and the 750 paid for it to the employer
+            verify(contract).changeSalvagedByUnitValue(moneyOf(250));
+            verify(contract).changeSalvagedByUnitValue(moneyOf(100));
+            verify(contract).changeSalvagedByEmployerValue(moneyOf(1050));
+        }
+
+        @ParameterizedTest(name = "{0}% salvage rights")
+        @CsvSource({ "30", "7", "50", "100" })
+        void boughtSalvageLeavesNoOverageAtContractEnd(int salvagePercent) {
+            double playerShare = salvagePercent / 100.0;
+            Money[] salvagedByUnit = { Money.zero() };
+            Money[] salvagedByEmployer = { Money.zero() };
+            doAnswer(invocation -> salvagedByUnit[0] = salvagedByUnit[0].plus((Money) invocation.getArgument(0)))
+                  .when(contract).changeSalvagedByUnitValue(any());
+            doAnswer(invocation -> salvagedByEmployer[0] =
+                                         salvagedByEmployer[0].plus((Money) invocation.getArgument(0)))
+                  .when(contract).changeSalvagedByEmployerValue(any());
+            when(contract.getSalvagedByUnitValue()).thenAnswer(invocation -> salvagedByUnit[0]);
+            when(contract.getSalvagedByEmployerValue()).thenAnswer(invocation -> salvagedByEmployer[0]);
+            when(contract.getSalvageRightsMultiplier()).thenReturn(playerShare);
+
+            // e.g. at 30%, buying a 10M wreck costs 7M: 3M is the player's, 7M the employer's
+            resolve(new PurchaseSalvageSettlement(playerShare), List.of(wreck(10_000_000)), List.of(), List.of());
+
+            assertEquals(0, ContractSettlement.salvageOverage(contract).compareTo(Money.zero()));
+            assertEquals(0, salvagedByUnit[0].compareTo(Money.of(10_000_000).multipliedBy(playerShare)));
         }
 
         @Test
