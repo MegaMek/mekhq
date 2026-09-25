@@ -214,6 +214,52 @@ class ContractXmlCodecTest {
         assertEquals(ContractMoraleLevel.STALEMATE, reloaded.getMoraleLevel());
     }
 
+    @Test
+    void anUnsetRoutedPayoutStaysUnsetAcrossARoundTrip() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING));
+
+        AbstractContract reloaded = reparse(write(contract));
+
+        assertNull(reloaded.getRoutPayout(), "an unset payout must not come back as a payout that overrides escrow");
+    }
+
+    @Test
+    void aDeliberateZeroPayoutSurvivesARoundTrip() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, null, Money.zero()));
+
+        AbstractContract reloaded = reparse(write(contract));
+
+        assertEquals(Money.zero(), reloaded.getRoutPayout(), "a zero payout must still block the remaining escrow");
+    }
+
+    /**
+     * Saves written before the routed payout became nullable stored a zero payout on every contract, under the
+     * {@code routedPayout} tag, to mean "not set". Reading that back as a real zero would wipe the remaining escrow of
+     * any contract completed before its end date.
+     */
+    @Test
+    void aZeroRoutedPayoutFromAnOlderSaveIsReadAsUnset() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, null, Money.zero()));
+        String legacyXml = write(contract).replace("finalPayout>", "routedPayout>");
+
+        AbstractContract reloaded = reparse(legacyXml);
+
+        assertNull(reloaded.getRoutPayout());
+    }
+
+    @Test
+    void aNonZeroRoutedPayoutFromAnOlderSaveIsKept() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        String legacyXml = write(contract).replace("finalPayout>", "routedPayout>");
+
+        AbstractContract reloaded = reparse(legacyXml);
+
+        assertEquals(Money.of(90_000), reloaded.getRoutPayout());
+    }
+
     // endregion round trip
 
     // region concrete types

@@ -109,7 +109,22 @@ class AbstractContractTest {
 
         assertEquals(ADVANCING, contract.getMoraleLevel());
         assertNull(contract.getRoutEndDate(), "a morale level change ends any rout in progress");
-        assertTrue(contract.getRoutPayout().isZero(), "a morale level change clears the pending rout payout");
+        assertNull(contract.getRoutPayout(), "a morale level change clears the pending rout payout");
+    }
+
+    @Test
+    void endingAContractEarlyMovesTheEndDateAndSetsThePayout() {
+        AbstractContract contract = contract();
+        contract.changeMorale(ADVANCING, START.plusDays(5));
+
+        contract.endContractEarly(START.plusDays(30), Money.of(4_000));
+
+        assertEquals(START.plusDays(30), contract.getEndingDate());
+        assertEquals(START, contract.getStartDate());
+        assertEquals(6, contract.getLengthInMonths(), "an early finish must not rewrite the contract length");
+        assertEquals(Money.of(4_000), contract.getRoutPayout());
+        assertEquals(ADVANCING, contract.getMoraleLevel(), "ending early must not move the morale level");
+        assertEquals(START.plusDays(5), contract.getRoutEndDate(), "ending early must not touch the rout window");
     }
 
     @Test

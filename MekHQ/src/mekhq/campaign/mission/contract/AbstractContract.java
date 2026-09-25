@@ -454,24 +454,42 @@ public abstract class AbstractContract {
     }
 
     public void changeMorale(ContractMoraleLevel newMoraleLevel) {
-        setMoraleData(new MoraleData(newMoraleLevel, null, Money.zero()));
+        setMoraleData(new MoraleData(newMoraleLevel, null, null));
     }
 
     public void changeMorale(ContractMoraleLevel newMoraleLevel, @Nullable LocalDate newRoutEndDate) {
-        setMoraleData(new MoraleData(newMoraleLevel, newRoutEndDate, Money.zero()));
+        setMoraleData(new MoraleData(newMoraleLevel, newRoutEndDate, null));
     }
 
     public void changeMorale(ContractMoraleLevel newMoraleLevel, @Nullable LocalDate newRoutEndDate,
-          @Nonnull Money newRoutPayout) {
+          @Nullable Money newRoutPayout) {
         setMoraleData(new MoraleData(newMoraleLevel, newRoutEndDate, newRoutPayout));
     }
 
     public void changeMorale(LocalDate newRoutEndDate) {
-        setMoraleData(new MoraleData(moraleData.moraleLevel(), newRoutEndDate, Money.zero()));
+        setMoraleData(new MoraleData(moraleData.moraleLevel(), newRoutEndDate, null));
     }
 
     public void changeMorale(LocalDate newRoutEndDate, Money newRoutPayout) {
         setMoraleData(new MoraleData(moraleData.moraleLevel(), newRoutEndDate, newRoutPayout));
+    }
+
+    /**
+     * Ends this contract early by moving its end date to {@code newEndDate} and storing the final payout that will be
+     * paid on completion in place of the remaining monthly payments.
+     *
+     * <p>The morale level and rout end date are left untouched, and the contract length is preserved so that
+     * length-based calculations are not affected by the early finish.</p>
+     *
+     * @param newEndDate  the day the contract should now end
+     * @param finalPayout the payout to award on completion
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void endContractEarly(LocalDate newEndDate, Money finalPayout) {
+        setMoraleData(new MoraleData(moraleData.moraleLevel(), moraleData.routEndDate(), finalPayout));
+        setScheduleData(new ContractScheduleData(scheduleData.startDate(), newEndDate, scheduleData.lengthInMonths()));
     }
 
     /**
@@ -516,7 +534,7 @@ public abstract class AbstractContract {
         return moraleData.routEndDate();
     }
 
-    public Money getRoutPayout() {
+    public @Nullable Money getRoutPayout() {
         return moraleData.routedPayout();
     }
 

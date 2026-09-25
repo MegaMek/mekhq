@@ -671,7 +671,8 @@ public class MHQMorale {
                 new ImmersiveDialogNotification(campaign, getFormattedTextAt(RESOURCE_BUNDLE,
                       "stratCon.earlyContractEnd.objectives", contract.getName()), true);
                 int remainingMonths = (int) contract.getMonthsLeft(campaign.getLocalDate().plusDays(1));
-                contract.changeMorale(today.plusDays(1), contract.getMonthlyPayOut().multipliedBy(remainingMonths));
+                contract.endContractEarly(today.plusDays(1),
+                      contract.getMonthlyPayOut().multipliedBy(remainingMonths));
             }
         }
     }

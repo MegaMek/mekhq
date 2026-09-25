@@ -1367,7 +1367,7 @@ public class CampaignNewDayManager {
                         LocalDate adjustedDate = today.plusDays(1);
                         long remainingMonths = contract.getMonthsLeft(adjustedDate);
                         Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
-                        contract.changeMorale(adjustedDate, finalPayout);
+                        contract.endContractEarly(adjustedDate, finalPayout);
                     }
                 }
             }

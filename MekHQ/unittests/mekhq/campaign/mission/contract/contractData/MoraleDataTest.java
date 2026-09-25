@@ -34,7 +34,6 @@ package mekhq.campaign.mission.contract.contractData;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import mekhq.campaign.finances.Money;
 import org.junit.jupiter.api.Test;
@@ -54,7 +53,7 @@ class MoraleDataTest {
 
         assertEquals(moraleLevel, data.moraleLevel());
         assertNull(data.routEndDate(), "no rout is in progress");
-        assertTrue(data.routedPayout().isZero(), "nothing is owed for a rout that has not happened");
+        assertNull(data.routedPayout(), "no payout is set for a rout that has not happened");
     }
 
     @Test

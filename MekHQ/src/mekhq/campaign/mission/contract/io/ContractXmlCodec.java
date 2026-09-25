@@ -343,7 +343,7 @@ public final class ContractXmlCodec {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routEndDate", data.routEndDate());
         }
         if (data.routedPayout() != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routedPayout", data.routedPayout());
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "finalPayout", data.routedPayout());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "moraleData");
     }
@@ -979,7 +979,7 @@ public final class ContractXmlCodec {
     private static final class MoraleDataBuilder {
         ContractMoraleLevel moraleLevel;
         LocalDate routEndDate;
-        Money routedPayout = Money.zero();
+        Money routedPayout;
     }
 
     private static final Map<String, FieldBinder<MoraleDataBuilder>> MORALE_BINDERS = createMoraleBinders();
@@ -990,7 +990,15 @@ public final class ContractXmlCodec {
               (builder, node, campaign, version) -> builder.moraleLevel = ContractMoraleLevel.valueOf(text(node)));
         binders.put("routEndDate",
               (builder, node, campaign, version) -> builder.routEndDate = MHQXMLUtility.parseDate(text(node)));
-        binders.put("routedPayout",
+        // Saves written before the routed payout became nullable stored a zero payout on every contract under this
+        // tag, meaning "not set", so a zero here is read back as unset rather than as a deliberate "pay nothing".
+        binders.put("routedPayout", (builder, node, campaign, version) -> {
+            Money routedPayout = Money.fromXmlString(text(node));
+            builder.routedPayout = routedPayout.isZero() ? null : routedPayout;
+        });
+        // Current saves only write this tag when a payout has been set, so its value is always taken as given - a zero
+        // here is a deliberate "pay nothing".
+        binders.put("finalPayout",
               (builder, node, campaign, version) -> builder.routedPayout = Money.fromXmlString(text(node)));
         return binders;
     }

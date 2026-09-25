@@ -38,7 +38,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
@@ -252,7 +251,7 @@ class TwoConsecutiveTracksTest {
         }
 
         assertEquals(2, contract.getConsecutiveTrackResultTally());
-        verify(contract).changeMorale(TODAY.plusDays(1), Money.of(3_000));
+        verify(contract).endContractEarly(TODAY.plusDays(1), Money.of(3_000));
     }
 
     @Test
@@ -272,8 +271,7 @@ class TwoConsecutiveTracksTest {
             assertEquals(1, notification.constructed().size());
         }
 
-        verify(contract).changeMorale(TODAY.plusDays(1));
-        verify(contract, never()).changeMorale(eq(TODAY.plusDays(1)), any(Money.class));
+        verify(contract).endContractEarly(TODAY.plusDays(1), Money.zero());
         verify(contract, never()).getMonthsLeft(any());
     }
 
@@ -288,9 +286,7 @@ class TwoConsecutiveTracksTest {
         TwoConsecutiveTracks.processScenarioResolution(campaign, contract, scenario);
 
         assertEquals(1, contract.getConsecutiveTrackResultTally());
-        verify(contract, never()).changeMorale(any(LocalDate.class));
-        verify(contract, never()).changeMorale(any(LocalDate.class),
-              any(Money.class));
+        verify(contract, never()).endContractEarly(any(LocalDate.class), any(Money.class));
     }
 
     @Test
@@ -305,9 +301,7 @@ class TwoConsecutiveTracksTest {
         TwoConsecutiveTracks.processScenarioResolution(campaign, contract, scenario);
 
         assertEquals(5, contract.getConsecutiveTrackResultTally());
-        verify(contract, never()).changeMorale(any(LocalDate.class));
-        verify(contract, never()).changeMorale(any(LocalDate.class),
-              any(Money.class));
+        verify(contract, never()).endContractEarly(any(LocalDate.class), any(Money.class));
     }
 
     // endregion processScenarioResolution - ending the contract
