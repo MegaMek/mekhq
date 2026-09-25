@@ -44,7 +44,6 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.when;
@@ -52,6 +51,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.UUID;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.units.Tank;
@@ -64,13 +64,11 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.dialog.camOpsSalvage.SalvageRecoveryConsole;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
-import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 
 /**
@@ -265,6 +263,16 @@ class SalvageRulesTest {
         private final List<TestUnit> sold = List.of(mock(TestUnit.class));
         private final List<TestUnit> unclaimed = List.of(mock(TestUnit.class));
 
+        private final List<TestUnit> kept = List.of(mock(TestUnit.class));
+        private final List<TestUnit> keptForSale = List.of(mock(TestUnit.class));
+        private final List<TestUnit> leftForEmployer = List.of(mock(TestUnit.class));
+        private final SalvageSettlement settlement = new CappedSalvageSettlement(0.5);
+
+        /** How many times the rules showed the player a recovery. */
+        private int presentedCount;
+
+        private final SalvageRecoveryPresenter presenter = (campaign, scenario, session) -> presentedCount++;
+
         private static Campaign campaign(boolean isUseRiskySalvage) {
             CampaignOptions options = new CampaignOptions();
             options.set(CampaignOption.IS_USE_RISKY_SALVAGE, isUseRiskySalvage);
@@ -280,11 +288,31 @@ class SalvageRulesTest {
             return scenario;
         }
 
-        private static MockedConstruction<SalvageRecoveryConsole> mockPicker() {
-            return mockConstruction(SalvageRecoveryConsole.class, (picker, context) -> {
-                when(picker.getUsedSalvageTime()).thenReturn(90);
-                when(picker.getCountOfSalvageUnits()).thenReturn(3);
-            });
+        /** A recovery the player has confirmed: 3 wrecks recovered in 90 minutes, split three ways. */
+        private SalvageRecoverySession confirmedSession() {
+            SalvageRecoverySession session = mock(SalvageRecoverySession.class);
+            when(session.getSettlement()).thenReturn(settlement);
+            when(session.getKeptSalvage()).thenReturn(kept);
+            when(session.getSoldSalvage()).thenReturn(keptForSale);
+            when(session.getEmployerSalvage()).thenReturn(leftForEmployer);
+            when(session.getUsedMinutes()).thenReturn(90);
+            when(session.getRecoveredCount()).thenReturn(3);
+            return session;
+        }
+
+        /** Makes the session factory hand back the given session, or {@code null} for nothing to recover. */
+        private static MockedStatic<SalvageRecoverySessionFactory> sessionFactory(
+              @Nullable SalvageRecoverySession session) {
+            MockedStatic<SalvageRecoverySessionFactory> factory = mockStatic(SalvageRecoverySessionFactory.class);
+            factory.when(() -> SalvageRecoverySessionFactory.createSession(any(), any(), any(), any(), anyList(),
+                  anyList())).thenReturn(session);
+            return factory;
+        }
+
+        private void verifyConfirmedSalvageSettled(MockedStatic<CamOpsSalvageUtilities> utilities,
+              Campaign campaign, AbstractContract contract, Scenario scenario) {
+            utilities.verify(() -> CamOpsSalvageUtilities.resolveSalvage(same(campaign), same(contract),
+                  same(scenario), same(settlement), same(kept), same(keptForSale), same(leftForEmployer)));
         }
 
         @Test
@@ -294,13 +322,15 @@ class SalvageRulesTest {
             Scenario scenario = scenario(false, false);
 
             try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
-                  MockedConstruction<SalvageRecoveryConsole> pickers = mockPicker()) {
-                LEGACY.resolveScenarioSalvage(campaign, contract, scenario, true, claimed, sold, unclaimed);
+                  MockedStatic<SalvageRecoverySessionFactory> factory = sessionFactory(confirmedSession())) {
+                LEGACY.resolveScenarioSalvage(campaign, contract, scenario, true, claimed, sold, unclaimed,
+                      presenter);
 
                 utilities.verify(() -> CamOpsSalvageUtilities.resolveSalvage(same(campaign), same(contract),
                       same(scenario), any(CappedSalvageSettlement.class), same(claimed), same(sold),
                       same(unclaimed)));
-                assertTrue(pickers.constructed().isEmpty());
+                factory.verifyNoInteractions();
+                assertEquals(0, presentedCount);
             }
         }
 
@@ -308,7 +338,7 @@ class SalvageRulesTest {
         void legacySettlesEvenWithoutBattlefieldControl() {
             try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class)) {
                 LEGACY.resolveScenarioSalvage(campaign(false), contract(), scenario(false, false), false, claimed,
-                      sold, unclaimed);
+                      sold, unclaimed, presenter);
 
                 utilities.verify(() -> CamOpsSalvageUtilities.resolveSalvage(any(), any(), any(), any(), anyList(),
                       anyList(), anyList()));
@@ -320,33 +350,77 @@ class SalvageRulesTest {
         void salvageOperationsNeedControlTeamsAndTechs(boolean hasControl, boolean hasFormations,
               boolean hasTechs) {
             try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
-                  MockedConstruction<SalvageRecoveryConsole> pickers = mockPicker()) {
+                  MockedStatic<SalvageRecoverySessionFactory> factory = sessionFactory(confirmedSession())) {
                 STRICT.resolveScenarioSalvage(campaign(true), contract(), scenario(hasFormations, hasTechs),
-                      hasControl, claimed, sold, unclaimed);
+                      hasControl, claimed, sold, unclaimed, presenter);
 
-                assertTrue(pickers.constructed().isEmpty());
+                assertEquals(0, presentedCount);
+                factory.verifyNoInteractions();
                 utilities.verifyNoInteractions();
             }
         }
 
         @ParameterizedTest
         @EnumSource(value = SalvageSystem.class, names = { "CAM_OPS_STRICT", "CAM_OPS_REVISED", "MEKHQ" })
-        void salvageTeamsRecoverWrecksAndSpendTheirTime(SalvageSystem salvageSystem) {
+        void salvageTeamsRecoverWrecksSettleThemAndSpendTheirTime(SalvageSystem salvageSystem) {
             Campaign campaign = campaign(false);
+            AbstractContract contract = contract();
             Scenario scenario = scenario(true, true);
 
             try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
-                  MockedConstruction<SalvageRecoveryConsole> pickers = mockPicker()) {
+                  MockedStatic<SalvageRecoverySessionFactory> ignored = sessionFactory(confirmedSession())) {
                 salvageSystem.getSalvage()
-                      .resolveScenarioSalvage(campaign, contract(), scenario, true, claimed, sold, unclaimed);
+                      .resolveScenarioSalvage(campaign, contract, scenario, true, claimed, sold, unclaimed,
+                            presenter);
 
-                assertEquals(1, pickers.constructed().size());
+                assertEquals(1, presentedCount);
+                verifyConfirmedSalvageSettled(utilities, campaign, contract, scenario);
                 List<UUID> techs = scenario.getSalvageTechs();
                 utilities.verify(() -> CamOpsSalvageUtilities.depleteTechMinutes(same(campaign), eq(techs), eq(90)));
                 utilities.verify(() -> CamOpsSalvageUtilities.performRiskySalvageChecks(any(), anyList(), anyInt()),
                       never());
+            }
+        }
+
+        @Test
+        void salvageIsSettledOnlyAfterThePlayerConfirms() {
+            Campaign campaign = campaign(false);
+            AbstractContract contract = contract();
+            Scenario scenario = scenario(true, true);
+
+            try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
+                  MockedStatic<SalvageRecoverySessionFactory> ignored = sessionFactory(confirmedSession())) {
+                SalvageRecoveryPresenter checkingPresenter = (shownCampaign, shownScenario, session) -> {
+                    utilities.verify(() -> CamOpsSalvageUtilities.resolveSalvage(any(), any(), any(), any(),
+                          anyList(), anyList(), anyList()), never());
+                    presentedCount++;
+                };
+
+                STRICT.resolveScenarioSalvage(campaign, contract, scenario, true, claimed, sold, unclaimed,
+                      checkingPresenter);
+
+                assertEquals(1, presentedCount);
+                verifyConfirmedSalvageSettled(utilities, campaign, contract, scenario);
+            }
+        }
+
+        @Test
+        void nothingToRecoverShowsNothingAndSpendsNoTime() {
+            Campaign campaign = campaign(true);
+            Scenario scenario = scenario(true, true);
+
+            try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
+                  MockedStatic<SalvageRecoverySessionFactory> ignored = sessionFactory(null)) {
+                STRICT.resolveScenarioSalvage(campaign, contract(), scenario, true, claimed, sold, unclaimed,
+                      presenter);
+
+                assertEquals(0, presentedCount);
+                List<UUID> techs = scenario.getSalvageTechs();
                 utilities.verify(() -> CamOpsSalvageUtilities.resolveSalvage(any(), any(), any(), any(), anyList(),
                       anyList(), anyList()), never());
+                utilities.verify(() -> CamOpsSalvageUtilities.performRiskySalvageChecks(same(campaign), eq(techs),
+                      eq(0)));
+                utilities.verify(() -> CamOpsSalvageUtilities.depleteTechMinutes(same(campaign), eq(techs), eq(0)));
             }
         }
 
@@ -356,8 +430,9 @@ class SalvageRulesTest {
             Scenario scenario = scenario(true, true);
 
             try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
-                  MockedConstruction<SalvageRecoveryConsole> pickers = mockPicker()) {
-                STRICT.resolveScenarioSalvage(campaign, contract(), scenario, true, claimed, sold, unclaimed);
+                  MockedStatic<SalvageRecoverySessionFactory> ignored = sessionFactory(confirmedSession())) {
+                STRICT.resolveScenarioSalvage(campaign, contract(), scenario, true, claimed, sold, unclaimed,
+                      presenter);
 
                 List<UUID> techs = scenario.getSalvageTechs();
                 utilities.verify(() -> CamOpsSalvageUtilities.performRiskySalvageChecks(same(campaign), eq(techs),
@@ -366,26 +441,44 @@ class SalvageRulesTest {
         }
 
         @Test
-        void chaosCampaignRecoversEverythingWithBattlefieldControl() {
-            try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
-                  MockedConstruction<SalvageRecoveryConsole> pickers = mockPicker()) {
-                // No salvage teams are needed
-                CHAOS.resolveScenarioSalvage(campaign(true), contract(), scenario(false, false), true, claimed,
-                      sold, unclaimed);
+        void chaosCampaignRecoversAndSettlesEverythingWithBattlefieldControl() {
+            Campaign campaign = campaign(true);
+            AbstractContract contract = contract();
+            Scenario scenario = scenario(false, false);
 
-                assertEquals(1, pickers.constructed().size());
-                utilities.verifyNoInteractions();
+            try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
+                  MockedStatic<SalvageRecoverySessionFactory> ignored = sessionFactory(confirmedSession())) {
+                // No salvage teams are needed
+                CHAOS.resolveScenarioSalvage(campaign, contract, scenario, true, claimed, sold, unclaimed, presenter);
+
+                assertEquals(1, presentedCount);
+                verifyConfirmedSalvageSettled(utilities, campaign, contract, scenario);
+                utilities.verify(() -> CamOpsSalvageUtilities.depleteTechMinutes(any(), anyList(), anyInt()),
+                      never());
             }
         }
 
         @Test
         void chaosCampaignRecoversNothingWithoutBattlefieldControl() {
             try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
-                  MockedConstruction<SalvageRecoveryConsole> pickers = mockPicker()) {
+                  MockedStatic<SalvageRecoverySessionFactory> factory = sessionFactory(confirmedSession())) {
                 CHAOS.resolveScenarioSalvage(campaign(true), contract(), scenario(true, true), false, claimed,
-                      sold, unclaimed);
+                      sold, unclaimed, presenter);
 
-                assertTrue(pickers.constructed().isEmpty());
+                assertEquals(0, presentedCount);
+                factory.verifyNoInteractions();
+                utilities.verifyNoInteractions();
+            }
+        }
+
+        @Test
+        void chaosCampaignWithNothingToRecoverSettlesNothing() {
+            try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
+                  MockedStatic<SalvageRecoverySessionFactory> ignored = sessionFactory(null)) {
+                CHAOS.resolveScenarioSalvage(campaign(true), contract(), scenario(false, false), true, claimed,
+                      sold, unclaimed, presenter);
+
+                assertEquals(0, presentedCount);
                 utilities.verifyNoInteractions();
             }
         }

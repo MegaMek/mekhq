@@ -51,12 +51,9 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 import javax.swing.*;
 
 import megamek.client.ui.comboBoxes.FilteredComboBoxModel;
@@ -69,20 +66,16 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.LocalHangar;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.force.Formation;
-import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
-import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.mission.scenarios.salvage.CamOpsSalvageUtilities;
 import mekhq.campaign.mission.scenarios.salvage.OwnedUnitCounts;
 import mekhq.campaign.mission.scenarios.salvage.RecoveryMethod;
 import mekhq.campaign.mission.scenarios.salvage.RecoveryStatus;
-import mekhq.campaign.mission.scenarios.salvage.RecoveryTimeCalculations;
 import mekhq.campaign.mission.scenarios.salvage.RecoveryTimeData;
 import mekhq.campaign.mission.scenarios.salvage.SalvageRecoveryPlan.RemainingCapacity;
+import mekhq.campaign.mission.scenarios.salvage.SalvageRecoveryPresenter;
 import mekhq.campaign.mission.scenarios.salvage.SalvageRecoverySession;
 import mekhq.campaign.mission.scenarios.salvage.SalvageRecoverySession.ConfirmBlocker;
 import mekhq.campaign.mission.scenarios.salvage.SalvageRecoverySession.SalvageClaim;
@@ -111,8 +104,8 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * units, how they recover it, what the player claims, and the recovery fleet with each unit's remaining capacity.</p>
  *
  * <p>The console holds no salvage rules of its own. It renders a {@link SalvageRecoverySession}, which applies the
- * campaign's salvage system and settlement. When the player confirms, the salvage is settled with
- * {@link CamOpsSalvageUtilities#resolveSalvage}. The console can't be cancelled.</p>
+ * campaign's salvage system and settlement, and records the player's choices in it. The salvage rules build the
+ * session and settle it once the console closes. The console can't be cancelled.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -125,7 +118,7 @@ public class SalvageRecoveryConsole extends JDialog {
 
     private final transient Campaign campaign;
     private final boolean isInSpace;
-    /** The recovery being settled, or {@code null} when there is nothing to settle and the console never opens. */
+    /** The recovery the player is working through. */
     private final transient SalvageRecoverySession session;
     private transient OwnedUnitCounts ownedUnitCounts = OwnedUnitCounts.of(List.of());
 
@@ -178,153 +171,32 @@ public class SalvageRecoveryConsole extends JDialog {
     }
 
     /**
-     * Opens the console for a scenario's salvage, and settles the salvage once the player confirms.
+     * Shows a scenario's salvage recovery and returns once the player confirms it. The player's choices are recorded
+     * in the session; the salvage rules settle them afterward.
      *
-     * <p>If the contract grants no salvage rights, the console isn't shown and nothing is settled.</p>
+     * <p>This is the {@link SalvageRecoveryPresenter} the game uses.</p>
      *
-     * @param campaign      the current campaign
-     * @param salvageRules  the rules of the campaign's salvage system
-     * @param contract      the contract the scenario belongs to
-     * @param scenario      the scenario whose salvage is being recovered
-     * @param actualSalvage the wrecks left on the battlefield
-     * @param soldSalvage   wrecks the resolve wizard marked for sale
+     * @param campaign the current campaign
+     * @param scenario the scenario whose salvage is being recovered
+     * @param session  the recovery to show
      */
-    public SalvageRecoveryConsole(Campaign campaign, AbstractSalvage salvageRules, AbstractContract contract,
-          Scenario scenario, List<TestUnit> actualSalvage, List<TestUnit> soldSalvage) {
+    public static void showRecovery(Campaign campaign, Scenario scenario, SalvageRecoverySession session) {
+        new SalvageRecoveryConsole(campaign, scenario, session);
+    }
+
+    private SalvageRecoveryConsole(Campaign campaign, Scenario scenario, SalvageRecoverySession session) {
         super((Frame) null, text("title"), true);
         this.campaign = campaign;
         this.isInSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
-
-        int availableMinutes = getAvailableTechMinutes(campaign, scenario);
-        List<Integer> salvageFormations = new ArrayList<>(scenario.getSalvageFormations());
-        List<Unit> recoveryUnits = getRecoveryUnits(campaign, scenario, salvageRules);
-        sanitizeOtherScenarioAssignments(campaign.getActiveScenarios(), scenario, scenario.getSalvageTechs(),
-              salvageFormations);
-
-        List<TestUnit> wrecks = new ArrayList<>(actualSalvage);
-        wrecks.addAll(soldSalvage);
-
-        if (!contract.canSalvage()) {
-            session = null;
-            return; // There isn't going to be anything to process
-        }
-
-        if (wrecks.isEmpty()) {
-            // Nothing was left on the field, so there's no point making the player confirm an empty board
-            LOGGER.debug("[Salvage] No wrecks to recover after {}; skipping the salvage recovery console",
-                  scenario.getName());
-            session = null;
-            return;
-        }
-
-        SalvageSettlement settlement = salvageRules.createSettlement(contract);
-        session = new SalvageRecoverySession(salvageRules, settlement, isInSpace, wrecks, recoveryUnits,
-              getRecoveryTimes(campaign, scenario, wrecks), availableMinutes, contract.getSalvagedByUnitValue(),
-              contract.getSalvagedByEmployerValue(), campaign.getPlayerForce().getFinances().getBalance());
+        this.session = session;
 
         ownedUnitCounts = OwnedUnitCounts.of(campaign.getPlayerForce().getHangar().getUnits());
         buildWindow(scenario);
         focused = session.getRecoveries().isEmpty() ? null : session.getRecoveries().getFirst();
         refreshAll();
         setVisible(true);
-
-        CamOpsSalvageUtilities.resolveSalvage(campaign, contract, scenario, settlement, session.getKeptSalvage(),
-              session.getSoldSalvage(), session.getEmployerSalvage());
     }
 
-    /**
-     * @return the tech minutes spent recovering salvage; {@code 0} if the console was never shown
-     */
-    public int getUsedSalvageTime() {
-        return (session == null) ? 0 : session.getUsedMinutes();
-    }
-
-    /**
-     * @return the number of wrecks recovered, whatever happens to them; {@code 0} if the console was never shown
-     */
-    public int getCountOfSalvageUnits() {
-        return (session == null) ? 0 : session.getRecoveredCount();
-    }
-
-    // region Setup
-
-    /**
-     * Sums the remaining work time of the techs assigned to the scenario's salvage.
-     */
-    private static int getAvailableTechMinutes(Campaign campaign, Scenario scenario) {
-        int minutes = 0;
-        for (UUID techId : scenario.getSalvageTechs()) {
-            Person tech = campaign.getPlayerForce().getHumanResources().getPerson(techId);
-            if (tech == null) {
-                LOGGER.error("Salvage tech {} not found in campaign", techId);
-                continue;
-            }
-            // I don't expect we'll have negative tech minutes, but you never know
-            minutes += Math.max(0, tech.getMinutesLeft());
-        }
-        return minutes;
-    }
-
-    /**
-     * Collects the units of the scenario's salvage formations that can recover wrecks. Units that fought in the
-     * scenario are left out, unless the salvage system lets their formation fight and then salvage.
-     */
-    private List<Unit> getRecoveryUnits(Campaign campaign, Scenario scenario, AbstractSalvage salvageRules) {
-        // A set, as a formation and one nested inside it can both be assigned, and their units must only be listed once
-        Set<Unit> recoveryUnits = new LinkedHashSet<>();
-        LocalHangar hangar = campaign.getPlayerForce().getHangar();
-        for (Integer formationId : scenario.getSalvageFormations()) {
-            Formation formation = campaign.getPlayerForce().getFormation(formationId);
-            if (formation == null) {
-                LOGGER.error("Force {} not found in campaign", formationId);
-                continue;
-            }
-
-            boolean canCombatUnitsSalvage = salvageRules.canSalvageAfterFighting(formation);
-            for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
-                boolean didFightInScenario = unit.getScenarioId() == scenario.getId();
-                if ((didFightInScenario && !canCombatUnitsSalvage) ||
-                          !salvageRules.isAvailableForSalvage(unit, isInSpace)) {
-                    continue;
-                }
-                recoveryUnits.add(unit);
-            }
-        }
-        return new ArrayList<>(recoveryUnits);
-    }
-
-    /**
-     * A convoluted series of steps can leave the same formation or tech assigned to several salvage operations on the
-     * same day. This removes this operation's formations and techs from every other active scenario.
-     */
-    private static void sanitizeOtherScenarioAssignments(List<Scenario> activeScenarios, Scenario currentScenario,
-          List<UUID> salvageTechs, List<Integer> salvageFormations) {
-        for (Scenario activeScenario : activeScenarios) {
-            if (activeScenario == currentScenario) {
-                continue;
-            }
-            activeScenario.removeSalvageFormation(salvageFormations);
-            activeScenario.removeSalvageTechs(salvageTechs);
-        }
-    }
-
-    private static Map<UUID, RecoveryTimeData> getRecoveryTimes(Campaign campaign, Scenario scenario,
-          List<TestUnit> wrecks) {
-        Map<UUID, RecoveryTimeData> recoveryTimes = new HashMap<>();
-        for (TestUnit wreck : wrecks) {
-            Entity entity = wreck.getEntity();
-            if (entity == null) {
-                LOGGER.error("Entity for unit {} not found in campaign", wreck.getId());
-                continue;
-            }
-            recoveryTimes.put(wreck.getId(), RecoveryTimeCalculations.calculateRecoveryTimeForEntity(
-                  entity.getDisplayName(), entity.getRecoveryTime(), entity.isAero(), scenario,
-                  campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet()));
-        }
-        return recoveryTimes;
-    }
-
-    // endregion Setup
 
     // region Layout
 

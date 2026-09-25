@@ -32,47 +32,28 @@
  */
 package mekhq.campaign.mission.scenarios.salvage;
 
-import java.util.List;
-
 import mekhq.campaign.Campaign;
-import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
-import mekhq.campaign.unit.TestUnit;
 
 /**
- * The {@link SalvageSystem#CHAOS_CAMPAIGN Chaos Campaign} salvage system: a simplified version of Campaign Operations
- * salvage.
+ * Shows the player a scenario's salvage recovery and waits for them to confirm it.
  *
- * <p>Salvage teams aren't used; the player recovers every wreck automatically. The salvage rights set the player's
- * share of each wreck's value, which they receive in cash unless they buy the unit from the employer (see
- * {@link SalvageSettlement#forSalvagePurchases}).</p>
+ * <p>The salvage rules build the {@link SalvageRecoverySession} and settle the salvage afterward; the presenter only
+ * lets the player work through the session. This keeps the rules free of any user interface: the game passes in the
+ * salvage recovery console, and tests pass in a stand-in that makes the player's choices directly.</p>
  *
  * @author Illiani
  * @since 0.51.01
  */
-public class ChaosCampaignSalvage extends AbstractSalvage {
-    @Override
-    public boolean isUseSalvageOperations() {
-        return false;
-    }
-
-    @Override
-    public SalvageSettlement createSettlement(AbstractContract contract) {
-        return SalvageSettlement.forSalvagePurchases(contract);
-    }
-
+@FunctionalInterface
+public interface SalvageRecoveryPresenter {
     /**
-     * {@inheritDoc}
+     * Shows the recovery and returns once the player has confirmed it. The player's choices (which units recover each
+     * wreck, and what happens to it) are recorded in the session.
      *
-     * <p>If the player controls the battlefield, every wreck is recovered, and the player is only asked which
-     * units they want to buy.</p>
+     * @param campaign the current campaign
+     * @param scenario the scenario whose salvage is being recovered
+     * @param session  the recovery to show; it has at least one wreck
      */
-    @Override
-    public void resolveScenarioSalvage(Campaign campaign, AbstractContract contract, Scenario scenario,
-          boolean hasBattlefieldControl, List<TestUnit> claimedSalvage, List<TestUnit> soldSalvage,
-          List<TestUnit> unclaimedSalvage, SalvageRecoveryPresenter recoveryPresenter) {
-        if (hasBattlefieldControl) {
-            recoverSalvage(campaign, contract, scenario, claimedSalvage, soldSalvage, recoveryPresenter);
-        }
-    }
+    void presentRecovery(Campaign campaign, Scenario scenario, SalvageRecoverySession session);
 }

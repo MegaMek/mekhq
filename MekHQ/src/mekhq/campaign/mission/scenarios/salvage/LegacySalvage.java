@@ -65,7 +65,7 @@ public class LegacySalvage extends AbstractSalvage {
     @Override
     public void resolveScenarioSalvage(Campaign campaign, AbstractContract contract, Scenario scenario,
           boolean hasBattlefieldControl, List<TestUnit> claimedSalvage, List<TestUnit> soldSalvage,
-          List<TestUnit> unclaimedSalvage) {
+          List<TestUnit> unclaimedSalvage, SalvageRecoveryPresenter recoveryPresenter) {
         CamOpsSalvageUtilities.resolveSalvage(campaign, contract, scenario, createSettlement(contract), claimedSalvage,
               soldSalvage, unclaimedSalvage);
     }
