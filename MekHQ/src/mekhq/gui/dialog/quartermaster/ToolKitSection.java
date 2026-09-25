@@ -56,6 +56,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitIssuer;
 import mekhq.campaign.personnel.quartermaster.KitSlot;
+import mekhq.gui.baseComponents.hud.Hud;
 
 /**
  * One of the two equipment-kit tabs (primary slot or secondary slot) of the shared kit-issue dialog. It reuses the
@@ -107,7 +108,7 @@ public class ToolKitSection implements KitIssueSection {
         tab.setBackground(GROUND);
         tab.setBorder(IssueEquipmentDialog.pagePadding());
 
-        tab.add(KitHud.hint(getTextAt(RESOURCE_BUNDLE, "tools.hint")), BorderLayout.NORTH);
+        tab.add(Hud.hint(getTextAt(RESOURCE_BUNDLE, "tools.hint")), BorderLayout.NORTH);
 
         cards.clear();
         cards.add(stripCard());
@@ -121,7 +122,7 @@ public class ToolKitSection implements KitIssueSection {
         FastJScrollPane scroll = new FastJScrollPane(KitCard.grid(cards, GROUND),
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        KitHud.styleScroll(scroll, GROUND, false);
+        Hud.styleScroll(scroll, GROUND, false);
         tab.add(scroll, BorderLayout.CENTER);
 
         rosterModel = new RosterModel(technicians, slot);
