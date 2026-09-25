@@ -50,6 +50,6 @@ public enum RecoveryMethod {
 
     @Override
     public String toString() {
-        return getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.recoveryMethod." + name());
+        return getTextAt(RESOURCE_BUNDLE, "RecoveryMethod." + name());
     }
 }

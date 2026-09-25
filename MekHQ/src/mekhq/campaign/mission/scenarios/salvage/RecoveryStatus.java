@@ -102,6 +102,6 @@ public enum RecoveryStatus {
      */
     public String getLabel() {
         return (labelKey == null) ? "" :
-                     getTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.validation." + labelKey);
+                     getTextAt(RESOURCE_BUNDLE, "RecoveryStatus." + labelKey);
     }
 }

@@ -219,7 +219,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
         objectiveProcessor = new ScenarioObjectiveProcessor();
         loots = tracker.getPotentialLoot();
         salvageableUnites = new ArrayList<>();
-        // Other than under Legacy rules, salvage is decided after the wizard, in the post-scenario salvage picker
+        // Other than under Legacy rules, salvage is decided after the wizard, in the salvage recovery console
         isSalvageDeferred = !campaign.getCampaignOptions()
                                     .get(CampaignOption.SALVAGE_SYSTEM)
                                     .getSalvage()

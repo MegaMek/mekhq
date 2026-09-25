@@ -106,6 +106,7 @@ import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.salvage.SalvageOperationDraft;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.mission.utilities.MissionCompletionManager;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -1055,32 +1056,28 @@ public final class BriefingTab extends CampaignGuiTab {
      * @since 0.50.10
      */
     private boolean handleSalvageAssignments(Scenario scenario) {
-        if (!getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM).getSalvage().isUseSalvageOperations()) {
+        SalvageSystem salvageSystem = getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM);
+        if (!salvageSystem.getSalvage().isUseSalvageOperations()) {
+            logger.debug("[Salvage] Skipping the salvage planner for {}: {} doesn't use salvage operations",
+                  scenario.getName(), salvageSystem.getLookupName());
             return false;
         }
 
-        if (!isHasSalvageOpportunity(scenario.getMissionId())) {
+        AbstractContract mission = getCampaign().getContract(scenario.getMissionId());
+        if (mission == null) {
+            logger.debug("[Salvage] Skipping the salvage planner for {}: its mission isn't a contract",
+                  scenario.getName());
+            return false;
+        }
+        if (!mission.canSalvage()) {
+            logger.debug("[Salvage] Skipping the salvage planner for {}: {} has no salvage rights",
+                  scenario.getName(), mission.getName());
             return false;
         }
 
         SalvageOperationDraft draft = new SalvageOperationDraft(getCampaign(), scenario);
         SalvageOperationPlanner planner = new SalvageOperationPlanner(getCampaign(), draft);
         return !planner.wasCommitted();
-    }
-
-    /**
-     * Checks whether the player is able to salvage in the mission associated with the chosen scenario.
-     *
-     * @param missionId the id of the mission being checked.
-     *
-     * @return {@code true} if the player can salvage
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private boolean isHasSalvageOpportunity(UUID missionId) {
-        AbstractContract mission = getCampaign().getContract(missionId);
-        return (mission != null) && mission.canSalvage();
     }
 
     /**

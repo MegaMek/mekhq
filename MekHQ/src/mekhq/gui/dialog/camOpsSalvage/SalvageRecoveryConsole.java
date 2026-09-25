@@ -200,6 +200,14 @@ public class SalvageRecoveryConsole extends JDialog {
             return; // There isn't going to be anything to process
         }
 
+        if (wrecks.isEmpty()) {
+            // Nothing was left on the field, so there's no point making the player confirm an empty board
+            LOGGER.debug("[Salvage] No wrecks to recover after {}; skipping the salvage recovery console",
+                  scenario.getName());
+            session = null;
+            return;
+        }
+
         SalvageSettlement settlement = salvageRules.createSettlement(contract);
         session = new SalvageRecoverySession(salvageRules, settlement, isInSpace, wrecks, recoveryUnits,
               getRecoveryTimes(campaign, scenario, wrecks), availableMinutes, contract.getSalvagedByUnitValue(),
@@ -965,7 +973,16 @@ public class SalvageRecoveryConsole extends JDialog {
             return;
         }
         requireSession().assign(focused, (Unit) firstSlot.getSelectedItem(), (Unit) secondSlot.getSelectedItem());
+        logRejectedAssignment(focused);
         refreshAll();
+    }
+
+    /** Logs why a wreck's assigned units can't recover it, if they can't. */
+    private static void logRejectedAssignment(WreckRecovery recovery) {
+        if (recovery.hasRecoveryUnits() && recovery.getStatus().isProblem()) {
+            LOGGER.debug("[Salvage] Assignment to {} rejected: {}", recovery.getWreck().getName(),
+                  recovery.getStatus().name());
+        }
     }
 
     private void onMethodChosen(RecoveryMethod method) {
@@ -989,7 +1006,12 @@ public class SalvageRecoveryConsole extends JDialog {
         if ((unit == null) || (focused == null)) {
             return;
         }
-        requireSession().assignToFreeSlot(focused, unit);
+        if (requireSession().assignToFreeSlot(focused, unit)) {
+            logRejectedAssignment(focused);
+        } else {
+            LOGGER.debug("[Salvage] {} not assigned to {}: no free slot, or the unit isn't offered for it",
+                  unit.getName(), focused.getWreck().getName());
+        }
         refreshAll();
     }
 
@@ -1008,17 +1030,27 @@ public class SalvageRecoveryConsole extends JDialog {
     }
 
     private void showReadout() {
-        if (focused != null) {
-            new EntityReadoutDialog(null, true, focused.getWreck().getEntity()).setVisible(true);
+        if (focused == null) {
+            return;
         }
+        Entity entity = focused.getWreck().getEntity();
+        if (entity == null) {
+            return;
+        }
+        new EntityReadoutDialog(null, true, entity).setVisible(true);
     }
 
     private void confirm() {
         if (!requireSession().canConfirm()) {
+            LOGGER.debug("[Salvage] Confirm refused: {}", requireSession().getConfirmBlockers());
             return;
         }
         setVisible(false);
-        ImmersiveDialogSimple confirmationDialog = new ImmersiveDialogSimple(campaign, null, null,
+        Person speaker = campaign.getPlayerForce()
+              .getHumanResources()
+              .getSeniorTechPerson(campaign.getCampaignOptions(), campaign.getPlayerForce().isClanForce(),
+                    campaign.getLocalDate());
+        ImmersiveDialogSimple confirmationDialog = new ImmersiveDialogSimple(campaign, speaker, null,
               text("confirmation"), List.of(getText("Cancel.text"), getText("Confirm.text")), null, null, false);
         if (confirmationDialog.getDialogChoice() == 0) { // Cancelled
             setVisible(true);
@@ -1201,11 +1233,11 @@ public class SalvageRecoveryConsole extends JDialog {
                 tags.add(new Tag(text("fleet.carrying"), ACCENT));
                 List<String> figures = new ArrayList<>();
                 if (remainingCapacity.isBayCapacity()) {
-                    figures.add(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.freeBays",
+                    figures.add(formatted("freeBays",
                           remainingCapacity.freeBays()));
                 }
                 if (remainingCapacity.isCargoCapacity()) {
-                    figures.add(getFormattedTextAt(RESOURCE_BUNDLE, "SalvagePostScenarioPicker.freeCargo",
+                    figures.add(formatted("freeCargo",
                           remainingCapacity.freeCargoTons()));
                 }
                 figure = String.join(" · ", figures);

@@ -260,6 +260,10 @@ public class SalvageOperationPlanner extends JDialog {
         buildWindow();
         showPage(Page.TEAMS);
         setVisible(true);
+
+        if (!isCommitted) {
+            LOGGER.debug("[Salvage] Salvage plan for {} cancelled", draft.getScenario().getName());
+        }
     }
 
     /**
@@ -1111,6 +1115,15 @@ public class SalvageOperationPlanner extends JDialog {
         }
         draft.commit();
         isCommitted = true;
+        if (LOGGER.isDebugEnabled()) {
+            List<String> teamNames = new ArrayList<>();
+            for (TeamOption option : draft.getStagedTeams()) {
+                teamNames.add(option.formation().getFullName());
+            }
+            LOGGER.debug("[Salvage] Salvage plan for {} committed: teams {}, {} techs, {} minutes",
+                  draft.getScenario().getName(), teamNames, draft.getSelectedTechs().size(),
+                  draft.getSelectedTechMinutes());
+        }
         dispose();
     }
 
@@ -1121,8 +1134,14 @@ public class SalvageOperationPlanner extends JDialog {
      */
     private boolean isLowTechTimeAccepted() {
         int minutes = draft.getSelectedTechMinutes();
-        String message = (minutes <= 0) ? text("lowMinutes.none") : formatted("lowMinutes.some", minutes);
-        ImmersiveDialogSimple warningDialog = new ImmersiveDialogSimple(campaign, null, null, message,
+        String message = (minutes <= 0) ?
+                               text("lowMinutes.none") :
+                               formatted("lowMinutes.some", minutes, SalvageOperationDraft.LOW_TECH_MINUTES);
+        Person speaker = campaign.getPlayerForce()
+              .getHumanResources()
+              .getSeniorTechPerson(campaign.getCampaignOptions(), campaign.getPlayerForce().isClanForce(),
+                    campaign.getLocalDate());
+        ImmersiveDialogSimple warningDialog = new ImmersiveDialogSimple(campaign, speaker, null, message,
               List.of(getText("Cancel.text"), getText("Confirm.text")), null, null, false);
         return warningDialog.getDialogChoice() != 0; // 0 = Cancel
     }
