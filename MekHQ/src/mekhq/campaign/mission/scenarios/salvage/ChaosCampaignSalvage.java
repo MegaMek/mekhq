@@ -38,7 +38,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.unit.TestUnit;
-import mekhq.gui.dialog.camOpsSalvage.SalvagePostScenarioPicker;
+import mekhq.gui.dialog.camOpsSalvage.SalvageRecoveryConsole;
 
 /**
  * The {@link SalvageSystem#CHAOS_CAMPAIGN Chaos Campaign} salvage system: a simplified version of Campaign Operations
@@ -65,7 +65,7 @@ public class ChaosCampaignSalvage extends AbstractSalvage {
     /**
      * {@inheritDoc}
      *
-     * <p>If the player controls the battlefield, every wreck is recovered, and the post-scenario salvage picker only
+     * <p>If the player controls the battlefield, every wreck is recovered, and the salvage recovery console only
      * asks which units the player wants to buy.</p>
      */
     @Override
@@ -73,7 +73,7 @@ public class ChaosCampaignSalvage extends AbstractSalvage {
           boolean hasBattlefieldControl, List<TestUnit> claimedSalvage, List<TestUnit> soldSalvage,
           List<TestUnit> unclaimedSalvage) {
         if (hasBattlefieldControl) {
-            new SalvagePostScenarioPicker(campaign, this, contract, scenario, claimedSalvage, soldSalvage);
+            new SalvageRecoveryConsole(campaign, this, contract, scenario, claimedSalvage, soldSalvage);
         }
     }
 }

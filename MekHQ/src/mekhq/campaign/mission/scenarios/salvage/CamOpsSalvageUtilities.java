@@ -63,11 +63,9 @@ import megamek.common.bays.SmallCraftBay;
 import megamek.common.equipment.Mounted;
 import megamek.common.icons.Camouflage;
 import megamek.common.units.Aero;
-import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
 import megamek.common.units.Tank;
-import megamek.common.units.Warship;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -98,72 +96,6 @@ import mekhq.campaign.unit.enums.TransporterType;
 public class CamOpsSalvageUtilities {
     private static final MMLogger LOGGER = MMLogger.create(CamOpsSalvageUtilities.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CamOpsSalvage";
-
-    /**
-     * Generates a tooltip string describing the salvage capabilities of units in a force.
-     *
-     * <p>For each unit capable of salvage, the tooltip includes:</p>
-     * <ul>
-     *   <li>Unit name</li>
-     *   <li>Drag/tow capacity in tons (for non-large vessels)</li>
-     *   <li>Cargo capacity in tons (for non-Mek units, and 'Meks with cargo space)</li>
-     *   <li>Naval tug status (for large vessels like DropShips and WarShips)</li>
-     * </ul>
-     *
-     * @param unitsInForce the list of units to analyze for salvage capabilities
-     * @param isInSpace    {@code true} if checking space salvage capabilities, {@code false} for ground operations
-     * @param salvageRules the rules of the campaign's salvage system
-     *
-     * @return an HTML-formatted string describing each salvage-capable unit's capabilities
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    public static String getSalvageTooltip(List<Unit> unitsInForce, boolean isInSpace, AbstractSalvage salvageRules) {
-        StringBuilder tooltip = new StringBuilder();
-
-        for (Unit unit : unitsInForce) {
-            if (salvageRules.canSalvage(unit, isInSpace)) {
-                Entity entity = unit.getEntity();
-                if (entity != null) {
-                    if (!tooltip.isEmpty()) {
-                        tooltip.append("<br>");
-                    }
-
-                    boolean isLargeVessel = entity instanceof Dropship || entity instanceof Warship;
-                    tooltip.append(unit.getName());
-
-                    double towCapacity = getTowCapacity(unit);
-                    if (towCapacity > 0.0) {
-                        tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
-                              "CamOpsSalvageUtilities.tooltip.drag", towCapacity)).append(")");
-                    }
-
-                    double cargoCapacity = unit.getCargoCapacityForSalvage();
-                    boolean isMek = entity instanceof Mek;
-                    if (!isMek || (cargoCapacity > 0.0)) {
-                        tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
-                              "CamOpsSalvageUtilities.tooltip.cargo", cargoCapacity)).append(")");
-                    }
-
-                    if (!isMek) {
-                        if (isLargeVessel) {
-                            if (CamOpsSalvageUtilities.hasNavalTug(entity)) {
-                                tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
-                                      "CamOpsSalvageUtilities.tooltip.tug")).append(")");
-                            }
-                            if (CamOpsSalvageUtilities.hasSuitableBayEquipment(entity)) {
-                                tooltip.append(" (").append(getFormattedTextAt(RESOURCE_BUNDLE,
-                                      "CamOpsSalvageUtilities.tooltip.bayEquipment")).append(")");
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return tooltip.toString();
-    }
 
     /**
      * Checks whether an entity is able to drag or tow salvage during ground salvage operations.
@@ -260,16 +192,6 @@ public class CamOpsSalvageUtilities {
             }
         }
         return bayCount;
-    }
-
-    public static boolean hasSuitableBayEquipment(Entity entity) {
-        for (Bay b : entity.getTransportBays()) {
-            //ASF and SC bays are assumed to have the equipment needed to handle space derelicts
-            if ((b instanceof ASFBay) || (b instanceof SmallCraftBay)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /**

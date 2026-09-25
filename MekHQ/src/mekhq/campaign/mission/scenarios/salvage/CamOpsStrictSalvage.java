@@ -40,7 +40,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.unit.TestUnit;
-import mekhq.gui.dialog.camOpsSalvage.SalvagePostScenarioPicker;
+import mekhq.gui.dialog.camOpsSalvage.SalvageRecoveryConsole;
 
 /**
  * The {@link SalvageSystem#CAM_OPS_STRICT CamOps (Strict)} salvage system: salvage as written in Campaign Operations.
@@ -60,7 +60,7 @@ public class CamOpsStrictSalvage extends AbstractSalvage {
     /**
      * {@inheritDoc}
      *
-     * <p>The assigned salvage teams recover the wrecks in the post-scenario salvage picker. Their techs then risk
+     * <p>The assigned salvage teams recover the wrecks in the salvage recovery console. Their techs then risk
      * accidents (if risky salvage is enabled), and spend the time the recovery took.</p>
      *
      * <p>There is nothing to recover if no teams or techs were assigned, or if the player doesn't control the
@@ -76,14 +76,14 @@ public class CamOpsStrictSalvage extends AbstractSalvage {
             return;
         }
 
-        SalvagePostScenarioPicker picker = new SalvagePostScenarioPicker(campaign, this, contract, scenario,
+        SalvageRecoveryConsole console = new SalvageRecoveryConsole(campaign, this, contract, scenario,
               claimedSalvage, soldSalvage);
 
         List<UUID> techUUIDs = scenario.getSalvageTechs();
         if (campaign.getCampaignOptions().get(CampaignOption.IS_USE_RISKY_SALVAGE)) {
-            CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, techUUIDs, picker.getCountOfSalvageUnits());
+            CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, techUUIDs, console.getCountOfSalvageUnits());
         }
 
-        CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs, picker.getUsedSalvageTime());
+        CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs, console.getUsedSalvageTime());
     }
 }

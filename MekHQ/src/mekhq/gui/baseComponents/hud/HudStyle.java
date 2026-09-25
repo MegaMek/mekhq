@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.stratCon.deployment;
+package mekhq.gui.baseComponents.hud;
 
 import java.awt.Color;
 import java.awt.Component;
@@ -46,8 +46,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
-import megamek.common.annotations.Nullable;
 
 /**
  * The heads-up-display styling for the StratCon deployment wizard: a hardcoded cyan-on-dark palette, letter-tracked
@@ -72,6 +72,8 @@ public final class HudStyle {
     public static final Color TEXT = new Color(218, 231, 235);
     public static final Color TEXT_MUTED = new Color(158, 179, 187);
     public static final Color TEXT_FAINT = new Color(132, 153, 161);
+    /** The scrollbar thumb colour the debrief console uses. */
+    public static final Color SCROLLBAR_THUMB = new Color(54, 101, 113);
 
     // Readiness / status colours, aligned with the debrief console's outcome palette.
     public static final Color READY = new Color(82, 199, 160);

@@ -33,8 +33,8 @@
 package mekhq.gui.dialog.quartermaster;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.stratCon.deployment.HudStyle.ACCENT_BRIGHT;
-import static mekhq.gui.stratCon.deployment.HudStyle.GROUND;
+import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT_BRIGHT;
+import static mekhq.gui.baseComponents.hud.HudStyle.GROUND;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;

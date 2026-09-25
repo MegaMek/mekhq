@@ -179,72 +179,6 @@ class SalvageFormationDataTest {
             assertNull(data.tech());
         }
 
-        @Test
-        void noTechTooltipIsLocalized() {
-            SalvageFormationData data = SalvageFormationData.buildData(campaign,
-                  formation(FormationType.SALVAGE, null), false);
-
-            String tooltip = data.getTechTooltip(campaign, null);
-            assertFalse(tooltip.isBlank());
-            assertFalse(tooltip.startsWith("!"), tooltip);
-        }
-
-        @Test
-        void techTooltipShowsNameSkillAndHits() {
-            Person tech = tech(false);
-            when(tech.getHits()).thenReturn(2);
-            SalvageFormationData data = SalvageFormationData.buildData(campaign,
-                  formation(FormationType.SALVAGE, tech.getId()), false);
-
-            String tooltip = data.getTechTooltip(campaign, tech);
-
-            assertTrue(tooltip.startsWith("Tech Sergeant Smith<br>"), tooltip);
-            assertTrue(tooltip.contains(SkillLevel.VETERAN.toString()), tooltip);
-            assertTrue(tooltip.contains("2"), tooltip);
-        }
-
-        @Test
-        void techTooltipShowsInjurySeverityUnderAdvancedMedical() {
-            options.set(CampaignOption.USE_ADVANCED_MEDICAL, true);
-            Person tech = tech(false);
-            when(tech.getTotalInjurySeverity()).thenReturn(5);
-            SalvageFormationData data = SalvageFormationData.buildData(campaign,
-                  formation(FormationType.SALVAGE, tech.getId()), false);
-
-            assertTrue(data.getTechTooltip(campaign, tech).contains("5"));
-        }
-
-        @Test
-        void crewTechTooltipListsNonEngineerTechCrew() {
-            Unit unit = salvageVehicle("Truck", 40, 10);
-            Person crewTech = tech(false);
-            when(crewTech.isTechExpanded()).thenReturn(true);
-            Person engineer = tech(true);
-            when(engineer.isTechExpanded()).thenReturn(true);
-            Person driver = tech(false);
-            when(unit.getCrew()).thenReturn(List.of(crewTech, engineer, driver));
-            Formation formation = formation(FormationType.SALVAGE, null);
-            SalvageFormationData data = SalvageFormationData.buildData(campaign, formation, false);
-
-            String tooltip = data.getAllCrewTechTooltip(campaign, formation);
-
-            // Only the crew tech is listed
-            assertEquals(1, tooltip.split("Tech Sergeant Smith", -1).length - 1, tooltip);
-        }
-
-        @Test
-        void crewTechsAreSeparated() {
-            Unit unit = salvageVehicle("Truck", 40, 10);
-            Person first = tech(false);
-            when(first.isTechExpanded()).thenReturn(true);
-            Person second = tech(false);
-            when(second.isTechExpanded()).thenReturn(true);
-            when(unit.getCrew()).thenReturn(List.of(first, second));
-            Formation formation = formation(FormationType.SALVAGE, null);
-            SalvageFormationData data = SalvageFormationData.buildData(campaign, formation, false);
-
-            assertEquals(2, data.getAllCrewTechTooltip(campaign, formation).split("<br><br>").length);
-        }
     }
 
     @Nested
@@ -288,56 +222,5 @@ class SalvageFormationDataTest {
             assertEquals(0.0, data.maximumTowCapacity());
         }
 
-        @Test
-        void cargoTooltipListsUnitsWithCapacityAlphabetically() {
-            salvageVehicle("zebra", 10, 5);
-            salvageVehicle("Alpha", 10, 7);
-            salvageVehicle("Mule", 10, 0);
-            SalvageFormationData data = SalvageFormationData.buildData(campaign,
-                  formation(FormationType.SALVAGE, null), false);
-
-            String tooltip = data.getCargoCapacityTooltip(campaign);
-
-            assertTrue(tooltip.indexOf("Alpha") < tooltip.indexOf("zebra"), tooltip);
-            assertFalse(tooltip.contains("Mule"), tooltip);
-        }
-
-        @Test
-        void towTooltipUsesGroundTowCapacity() {
-            salvageVehicle("Tank", 60, 0);
-            SalvageFormationData data = SalvageFormationData.buildData(campaign,
-                  formation(FormationType.SALVAGE, null), false);
-
-            assertTrue(data.getTowCapacityTooltip(campaign).contains("60"));
-        }
-
-        @Test
-        void towTooltipUsesVesselWeightInSpace() {
-            tugShip("Union", 3600);
-            SalvageFormationData data = SalvageFormationData.buildData(campaign,
-                  formation(FormationType.SALVAGE, null), true);
-
-            assertTrue(data.getTowCapacityTooltip(campaign).contains("Union"));
-        }
-
-        @Test
-        void tugTooltipListsTugs() {
-            tugShip("Union", 3600);
-            SalvageFormationData data = SalvageFormationData.buildData(campaign,
-                  formation(FormationType.SALVAGE, null), true);
-
-            assertTrue(data.getTugTooltip(campaign).startsWith("Union"));
-        }
-
-        @Test
-        void tugTooltipExplainsTheLackOfTugs() {
-            salvageVehicle("Truck", 20, 40);
-            SalvageFormationData data = SalvageFormationData.buildData(campaign,
-                  formation(FormationType.SALVAGE, null), true);
-
-            String tooltip = data.getTugTooltip(campaign);
-            assertFalse(tooltip.isBlank());
-            assertFalse(tooltip.startsWith("!"), tooltip);
-        }
     }
 }

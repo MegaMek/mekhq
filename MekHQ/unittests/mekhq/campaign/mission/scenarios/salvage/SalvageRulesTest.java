@@ -64,7 +64,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.dialog.camOpsSalvage.SalvagePostScenarioPicker;
+import mekhq.gui.dialog.camOpsSalvage.SalvageRecoveryConsole;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -280,8 +280,8 @@ class SalvageRulesTest {
             return scenario;
         }
 
-        private static MockedConstruction<SalvagePostScenarioPicker> mockPicker() {
-            return mockConstruction(SalvagePostScenarioPicker.class, (picker, context) -> {
+        private static MockedConstruction<SalvageRecoveryConsole> mockPicker() {
+            return mockConstruction(SalvageRecoveryConsole.class, (picker, context) -> {
                 when(picker.getUsedSalvageTime()).thenReturn(90);
                 when(picker.getCountOfSalvageUnits()).thenReturn(3);
             });
@@ -294,7 +294,7 @@ class SalvageRulesTest {
             Scenario scenario = scenario(false, false);
 
             try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
-                  MockedConstruction<SalvagePostScenarioPicker> pickers = mockPicker()) {
+                  MockedConstruction<SalvageRecoveryConsole> pickers = mockPicker()) {
                 LEGACY.resolveScenarioSalvage(campaign, contract, scenario, true, claimed, sold, unclaimed);
 
                 utilities.verify(() -> CamOpsSalvageUtilities.resolveSalvage(same(campaign), same(contract),
@@ -320,7 +320,7 @@ class SalvageRulesTest {
         void salvageOperationsNeedControlTeamsAndTechs(boolean hasControl, boolean hasFormations,
               boolean hasTechs) {
             try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
-                  MockedConstruction<SalvagePostScenarioPicker> pickers = mockPicker()) {
+                  MockedConstruction<SalvageRecoveryConsole> pickers = mockPicker()) {
                 STRICT.resolveScenarioSalvage(campaign(true), contract(), scenario(hasFormations, hasTechs),
                       hasControl, claimed, sold, unclaimed);
 
@@ -336,7 +336,7 @@ class SalvageRulesTest {
             Scenario scenario = scenario(true, true);
 
             try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
-                  MockedConstruction<SalvagePostScenarioPicker> pickers = mockPicker()) {
+                  MockedConstruction<SalvageRecoveryConsole> pickers = mockPicker()) {
                 salvageSystem.getSalvage()
                       .resolveScenarioSalvage(campaign, contract(), scenario, true, claimed, sold, unclaimed);
 
@@ -356,7 +356,7 @@ class SalvageRulesTest {
             Scenario scenario = scenario(true, true);
 
             try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
-                  MockedConstruction<SalvagePostScenarioPicker> pickers = mockPicker()) {
+                  MockedConstruction<SalvageRecoveryConsole> pickers = mockPicker()) {
                 STRICT.resolveScenarioSalvage(campaign, contract(), scenario, true, claimed, sold, unclaimed);
 
                 List<UUID> techs = scenario.getSalvageTechs();
@@ -368,7 +368,7 @@ class SalvageRulesTest {
         @Test
         void chaosCampaignRecoversEverythingWithBattlefieldControl() {
             try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
-                  MockedConstruction<SalvagePostScenarioPicker> pickers = mockPicker()) {
+                  MockedConstruction<SalvageRecoveryConsole> pickers = mockPicker()) {
                 // No salvage teams are needed
                 CHAOS.resolveScenarioSalvage(campaign(true), contract(), scenario(false, false), true, claimed,
                       sold, unclaimed);
@@ -381,7 +381,7 @@ class SalvageRulesTest {
         @Test
         void chaosCampaignRecoversNothingWithoutBattlefieldControl() {
             try (MockedStatic<CamOpsSalvageUtilities> utilities = mockStatic(CamOpsSalvageUtilities.class);
-                  MockedConstruction<SalvagePostScenarioPicker> pickers = mockPicker()) {
+                  MockedConstruction<SalvageRecoveryConsole> pickers = mockPicker()) {
                 CHAOS.resolveScenarioSalvage(campaign(true), contract(), scenario(true, true), false, claimed,
                       sold, unclaimed);
 

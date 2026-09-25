@@ -69,7 +69,6 @@ import megamek.common.icons.Camouflage;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
-import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -191,125 +190,6 @@ class CamOpsSalvageResolutionTest {
             assertEquals(0, CamOpsSalvageUtilities.countBaysWithWorkingDoors(dropship, ASFBay.class));
         }
 
-        @Test
-        void fighterAndSmallCraftBaysAreSuitableForSpaceSalvage() {
-            Dropship withFighterBay = mock(Dropship.class);
-            when(withFighterBay.getTransportBays()).thenReturn(bays(new ASFBay(2, 1, 1)));
-            Dropship withSmallCraftBay = mock(Dropship.class);
-            when(withSmallCraftBay.getTransportBays()).thenReturn(bays(new SmallCraftBay(2, 1, 1)));
-            Dropship withTroopBay = mock(Dropship.class);
-            when(withTroopBay.getTransportBays()).thenReturn(bays(new CargoBay(10, 1, 1)));
-
-            assertTrue(CamOpsSalvageUtilities.hasSuitableBayEquipment(withFighterBay));
-            assertTrue(CamOpsSalvageUtilities.hasSuitableBayEquipment(withSmallCraftBay));
-            assertFalse(CamOpsSalvageUtilities.hasSuitableBayEquipment(withTroopBay));
-
-            Dropship withoutBays = mock(Dropship.class);
-            when(withoutBays.getTransportBays()).thenReturn(new Vector<>());
-            assertFalse(CamOpsSalvageUtilities.hasSuitableBayEquipment(withoutBays));
-        }
-    }
-
-    @Nested
-    class SalvageTooltip {
-        private static final AbstractSalvage STRICT = new CamOpsStrictSalvage();
-
-        private static Unit unit(String name, Entity entity, boolean canSalvage, double cargoCapacity) {
-            Unit unit = mock(Unit.class);
-            when(unit.getName()).thenReturn(name);
-            when(unit.getEntity()).thenReturn(entity);
-            when(unit.canSalvage(anyBoolean())).thenReturn(canSalvage);
-            when(unit.getCargoCapacityForSalvage()).thenReturn(cargoCapacity);
-            return unit;
-        }
-
-        @Test
-        void unitsThatCantSalvageAreLeftOut() {
-            Unit unit = unit("Locust", mock(Mek.class), false, 0.0);
-
-            assertEquals("", CamOpsSalvageUtilities.getSalvageTooltip(List.of(unit), false, STRICT));
-        }
-
-        @Test
-        void vehicleShowsDragAndCargoCapacity() {
-            Tank tank = mock(Tank.class);
-            when(tank.getWeight()).thenReturn(50.0);
-            String tooltip = CamOpsSalvageUtilities.getSalvageTooltip(List.of(unit("Truck", tank, true, 10.0)), false,
-                  STRICT);
-
-            assertTrue(tooltip.startsWith("Truck"), tooltip);
-            assertTrue(tooltip.contains("50"), tooltip);
-            assertTrue(tooltip.contains("10"), tooltip);
-            assertFalse(tooltip.contains("!"), tooltip);
-        }
-
-        @Test
-        void mekWithoutCargoOnlyShowsDragCapacity() {
-            Mek mek = mock(Mek.class);
-            when(mek.canPerformGroundSalvageOperations()).thenReturn(true);
-            when(mek.getWeight()).thenReturn(55.0);
-            String tooltip = CamOpsSalvageUtilities.getSalvageTooltip(List.of(unit("Griffin", mek, true, 0.0)), false,
-                  STRICT);
-
-            assertEquals(1, tooltip.split("\\(", -1).length - 1, tooltip);
-        }
-
-        @Test
-        void largeVesselShowsItsTugAndBays() {
-            Dropship dropship = mock(Dropship.class);
-            List<MiscMounted> misc = List.of(navalTug(dropship, false, true));
-            when(dropship.getMisc()).thenReturn(misc);
-            when(dropship.getTransportBays()).thenReturn(bays(new ASFBay(2, 1, 1)));
-            String tooltip = CamOpsSalvageUtilities.getSalvageTooltip(
-                  List.of(unit("Union", dropship, true, 100.0)), true, STRICT);
-
-            // Cargo, tug, and bay equipment; there's no dragging in space
-            assertEquals(3, tooltip.split("\\(", -1).length - 1, tooltip);
-        }
-
-        @Test
-        void unitsAreSeparatedByLineBreaks() {
-            Tank tank = mock(Tank.class);
-            String tooltip = CamOpsSalvageUtilities.getSalvageTooltip(List.of(unit("A", tank, true, 1.0),
-                  unit("B", tank, true, 1.0)), false, STRICT);
-
-            assertEquals(2, tooltip.split("<br>").length, tooltip);
-        }
-
-        @Test
-        void mekWithCargoShowsItsCargo() {
-            Mek mek = mock(Mek.class);
-            String tooltip = CamOpsSalvageUtilities.getSalvageTooltip(List.of(unit("Hauler", mek, true, 12.0)), false,
-                  STRICT);
-
-            assertTrue(tooltip.contains("12"), tooltip);
-        }
-
-        @Test
-        void warshipWithoutTugOrBaysOnlyShowsCargo() {
-            megamek.common.units.Warship warship = mock(megamek.common.units.Warship.class);
-            when(warship.getTransportBays()).thenReturn(new Vector<>());
-            String tooltip = CamOpsSalvageUtilities.getSalvageTooltip(
-                  List.of(unit("Aegis", warship, true, 500.0)), true, STRICT);
-
-            assertEquals(1, tooltip.split("\\(", -1).length - 1, tooltip);
-        }
-
-        @Test
-        void smallVesselIsNotCheckedForTugsOrBays() {
-            megamek.common.units.SmallCraft smallCraft = mock(megamek.common.units.SmallCraft.class);
-            String tooltip = CamOpsSalvageUtilities.getSalvageTooltip(
-                  List.of(unit("Mule", smallCraft, true, 50.0)), true, STRICT);
-
-            assertEquals(1, tooltip.split("\\(", -1).length - 1, tooltip);
-        }
-
-        @Test
-        void unitWithoutEntityIsLeftOut() {
-            Unit unit = unit("Ghost", null, true, 0.0);
-
-            assertEquals("", CamOpsSalvageUtilities.getSalvageTooltip(List.of(unit), false, STRICT));
-        }
     }
 
     @Nested

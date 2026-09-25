@@ -30,103 +30,94 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.stratCon.deployment;
+package mekhq.gui.baseComponents.hud;
 
-import static mekhq.gui.stratCon.deployment.HudStyle.ACCENT;
-import static mekhq.gui.stratCon.deployment.HudStyle.BORDER;
-import static mekhq.gui.stratCon.deployment.HudStyle.SURFACE;
-import static mekhq.gui.stratCon.deployment.HudStyle.SURFACE_DEEP;
-import static mekhq.gui.stratCon.deployment.HudStyle.SURFACE_HIGHLIGHT;
-import static mekhq.gui.stratCon.deployment.HudStyle.TEXT;
-import static mekhq.gui.stratCon.deployment.HudStyle.TEXT_FAINT;
-import static mekhq.gui.stratCon.deployment.HudStyle.TEXT_MUTED;
-import static mekhq.gui.stratCon.deployment.HudStyle.hudFont;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT;
+import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
+import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE;
+import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE_DEEP;
+import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE_HIGHLIGHT;
+import static mekhq.gui.baseComponents.hud.HudStyle.TEXT;
+import static mekhq.gui.baseComponents.hud.HudStyle.TEXT_MUTED;
+import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.EnumMap;
-import java.util.Map;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.function.IntConsumer;
 import javax.swing.BorderFactory;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import megamek.client.ui.util.UIUtil;
-import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
-
 /**
- * The wizard's segmented mode selector: one cell per {@link DeploymentMode}, with the interstellar-map tab's glowing
- * accent underline on the selected cell. Choosing a cell notifies the wizard, which switches pages.
+ * A segmented tab strip in the style of the deployment wizard's mode selector: one cell per page, the selected cell
+ * raised to the surface colour with the map's accent underline. Fires on mouse release and on space/enter.
+ * {@code compact} draws a lighter, smaller strip for a second level of tabs.
+ *
+ * <p>Use {@link HudModeSelector} when the pages are the values of an enum.</p>
  *
  * @author Illiani
  * @since 0.51.01
  */
-public class HudModeSelector extends JPanel {
-    private final transient Map<DeploymentMode, Cell> cells = new EnumMap<>(DeploymentMode.class);
-    private final transient Consumer<DeploymentMode> onSelect;
+public class HudTabStrip extends JPanel {
+    private final List<Cell> cells = new ArrayList<>();
+    private final transient IntConsumer onSelect;
 
-    public HudModeSelector(Consumer<DeploymentMode> onSelect) {
+    public HudTabStrip(List<String> labels, boolean compact, IntConsumer onSelect) {
         this.onSelect = onSelect;
-
-        DeploymentMode[] modes = DeploymentMode.values();
-        setLayout(new GridLayout(1, modes.length, 0, 0));
+        setLayout(new GridLayout(1, labels.size(), 0, 0));
         setOpaque(true);
         setBackground(SURFACE_DEEP);
-        setBorder(BorderFactory.createLineBorder(BORDER, UIUtil.scaleForGUI(1)));
-
-        for (int index = 0; index < modes.length; index++) {
-            Cell cell = new Cell(modes[index], index < modes.length - 1);
-            cells.put(modes[index], cell);
+        setBorder(BorderFactory.createLineBorder(BORDER, scaleForGUI(1)));
+        for (int index = 0; index < labels.size(); index++) {
+            Cell cell = new Cell(index, labels.get(index), compact, index < labels.size() - 1);
+            cells.add(cell);
             add(cell);
         }
     }
 
-    /** Highlights the given mode's cell without firing the selection callback. */
-    public void setSelected(DeploymentMode mode) {
-        for (Map.Entry<DeploymentMode, Cell> entry : cells.entrySet()) {
-            entry.getValue().setSelected(entry.getKey() == mode);
+    /** Highlights a cell without firing the selection callback. */
+    public void setSelected(int selectedIndex) {
+        for (int index = 0; index < cells.size(); index++) {
+            cells.get(index).setSelected(index == selectedIndex);
         }
     }
 
-    /**
-     * Locks or unlocks a mode's cell. A locked cell is dimmed and ignores clicks and keys, so the page cannot be
-     * selected.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public void setModeEnabled(DeploymentMode mode, boolean enabled) {
-        Cell cell = cells.get(mode);
-        if (cell != null) {
-            cell.setCellEnabled(enabled);
-        }
+    /** Replaces a cell's label (for example to update a count). */
+    public void setLabel(int index, String label) {
+        cells.get(index).title.setText(label.toUpperCase(Locale.ROOT));
     }
 
     private final class Cell extends JPanel {
-        private final transient DeploymentMode mode;
+        private final int index;
         private final boolean rightBorder;
         private final JLabel title;
         private boolean selected;
         private boolean hovered;
-        private boolean cellEnabled = true;
 
-        private Cell(DeploymentMode mode, boolean rightBorder) {
-            this.mode = mode;
+        private Cell(int index, String label, boolean compact, boolean rightBorder) {
+            this.index = index;
             this.rightBorder = rightBorder;
             setOpaque(false);
             setFocusable(true);
-            setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(10), UIUtil.scaleForGUI(6),
-                  UIUtil.scaleForGUI(10), UIUtil.scaleForGUI(6)));
+            int vertical = scaleForGUI(compact ? 7 : 10);
+            setBorder(BorderFactory.createEmptyBorder(vertical, scaleForGUI(6), vertical, scaleForGUI(6)));
+            setLayout(new GridBagLayout());
 
-            title = new JLabel(mode.getLabel(), SwingConstants.CENTER);
+            title = new JLabel(label.toUpperCase(Locale.ROOT), SwingConstants.CENTER);
             title.setForeground(TEXT_MUTED);
-            title.setFont(hudFont(Font.BOLD, 0.85f, 0.06f));
-            setLayout(new java.awt.GridBagLayout());
+            title.setFont(hudFont(Font.BOLD, compact ? 0.76f : 0.85f, compact ? 0.1f : 0.06f));
             add(title);
 
             addMouseListener(new MouseAdapter() {
@@ -139,9 +130,6 @@ public class HudModeSelector extends JPanel {
 
                 @Override
                 public void mouseEntered(MouseEvent event) {
-                    if (!cellEnabled) {
-                        return;
-                    }
                     hovered = true;
                     refreshTitleColor();
                     repaint();
@@ -154,14 +142,19 @@ public class HudModeSelector extends JPanel {
                     repaint();
                 }
             });
+            addKeyListener(new KeyAdapter() {
+                @Override
+                public void keyPressed(KeyEvent event) {
+                    if ((event.getKeyCode() == KeyEvent.VK_SPACE) || (event.getKeyCode() == KeyEvent.VK_ENTER)) {
+                        choose();
+                    }
+                }
+            });
         }
 
         private void choose() {
-            if (!cellEnabled) {
-                return;
-            }
             requestFocusInWindow();
-            onSelect.accept(mode);
+            onSelect.accept(index);
         }
 
         private void setSelected(boolean selected) {
@@ -170,20 +163,7 @@ public class HudModeSelector extends JPanel {
             repaint();
         }
 
-        private void setCellEnabled(boolean cellEnabled) {
-            this.cellEnabled = cellEnabled;
-            if (!cellEnabled) {
-                hovered = false;
-            }
-            refreshTitleColor();
-            repaint();
-        }
-
         private void refreshTitleColor() {
-            if (!cellEnabled) {
-                title.setForeground(TEXT_FAINT);
-                return;
-            }
             title.setForeground((selected || hovered) ? TEXT : TEXT_MUTED);
         }
 
@@ -195,14 +175,12 @@ public class HudModeSelector extends JPanel {
                 int height = getHeight();
                 g2.setColor(selected ? SURFACE : (hovered ? SURFACE_HIGHLIGHT : SURFACE_DEEP));
                 g2.fillRect(0, 0, width, height);
-
                 if (rightBorder) {
                     g2.setColor(BORDER);
-                    g2.fillRect(width - UIUtil.scaleForGUI(1), 0, UIUtil.scaleForGUI(1), height);
+                    g2.fillRect(width - scaleForGUI(1), 0, scaleForGUI(1), height);
                 }
-
                 if (selected) {
-                    int underline = UIUtil.scaleForGUI(2);
+                    int underline = scaleForGUI(2);
                     g2.setColor(ACCENT);
                     g2.fillRect(0, height - underline, width, underline);
                 }

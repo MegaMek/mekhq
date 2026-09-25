@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.quartermaster;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.stratCon.deployment.HudStyle.*;
+import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -64,7 +64,7 @@ import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.quartermaster.KitSlot;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.stratCon.deployment.HudButton;
+import mekhq.gui.baseComponents.hud.HudButton;
 
 /**
  * The quartermaster's counter for issuing kits: personal armor kits, and the two equipment-kit slots. It takes a

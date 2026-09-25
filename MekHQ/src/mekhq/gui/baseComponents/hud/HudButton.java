@@ -30,9 +30,9 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.stratCon.deployment;
+package mekhq.gui.baseComponents.hud;
 
-import static mekhq.gui.stratCon.deployment.HudStyle.*;
+import static mekhq.gui.baseComponents.hud.HudStyle.*;
 
 import java.awt.Color;
 import java.awt.Font;
