@@ -57,6 +57,7 @@ import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.event.PostGameResolution;
+import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.IEntityRemovalConditions;
 import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MULParser;
@@ -84,7 +85,7 @@ import mekhq.campaign.mission.scenarios.BotForce;
 import mekhq.campaign.mission.scenarios.Loot;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
+import mekhq.campaign.mission.scenarios.salvage.SalvageRecoveryPresenter;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -100,7 +101,6 @@ import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
-import mekhq.gui.dialog.camOpsSalvage.SalvagePostScenarioPicker;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -275,9 +275,43 @@ public class ResolveScenarioTracker {
         }
     }
 
+    /**
+     * Returns the camouflage MekHQ assigned to an entity before the scenario started.
+     *
+     * <p>The entity is matched to its unit in the scenario's bot forces. That unit's own camouflage is used if it has
+     * one; otherwise the bot force's camouflage is used. Changes made in the MegaMek lobby are deliberately ignored. If
+     * the entity isn't part of a bot force, its in-game camouflage is used.</p>
+     *
+     * @param entity the entity to check
+     *
+     * @return the camouflage assigned before the scenario started
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    Camouflage getPreScenarioCamouflage(Entity entity) {
+        String externalId = entity.getExternalIdAsString();
+        if (!"-1".equals(externalId)) {
+            for (BotForce botForce : scenario.getBotForces()) {
+                for (Entity botEntity : botForce.getFullEntityList(campaign)) {
+                    if ((botEntity != null) && externalId.equals(botEntity.getExternalIdAsString())) {
+                        Camouflage unitCamouflage = botEntity.getCamouflage();
+                        Camouflage forceCamouflage = botForce.getCamouflage();
+                        if (unitCamouflage.hasDefaultCategory() && (forceCamouflage != null)) {
+                            return forceCamouflage;
+                        }
+                        return unitCamouflage;
+                    }
+                }
+            }
+        }
+
+        return entity.getCamouflage();
+    }
+
     private TestUnit generateNewTestUnit(Entity e) {
         TestUnit nu = new TestUnit(e, campaign, true);
-        nu.getEntity().setCamouflage(e.getCamouflage().clone());
+        nu.getEntity().setCamouflage(getPreScenarioCamouflage(e).clone());
         /* AtB uses id to track status of allied units */
         if (e.getExternalIdAsString().equals("-1")) {
             UUID id = UUID.randomUUID();
@@ -293,16 +327,110 @@ public class ResolveScenarioTracker {
         return nu;
     }
 
+    /**
+     * Checks whether an entity has already been processed while resolving this scenario, recording it if not.
+     *
+     * <p>MegaMek can occasionally report the same entity more than once at the end of a game (seen after resuming a
+     * saved game). Processing it twice would list its salvage twice, with both copies sharing a unit ID, and would
+     * duplicate kill credits.</p>
+     *
+     * @param entity             the entity about to be processed
+     * @param processedEntityIds the game IDs of entities already processed
+     *
+     * @return {@code true} if the entity is a duplicate and should be skipped
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isDuplicateEntity(Entity entity, Set<Integer> processedEntityIds) {
+        int entityId = entity.getId();
+        if (entityId == Entity.NONE) {
+            return false; // Without a game ID we can't tell duplicates apart, so process it
+        }
+
+        if (processedEntityIds.add(entityId)) {
+            return false;
+        }
+
+        logger.warn("Entity {} (id {}) was reported more than once at the end of the scenario; ignoring the duplicate",
+              entity.getDisplayName(), entityId);
+        return true;
+    }
+
+    /**
+     * Checks whether an entity is also reported in an end-of-game list with a more final status, in which case that
+     * later list's report is used instead of this one.
+     *
+     * <p>Lists are ranked devastated, then graveyard/salvage, then retreated, then live. Must be checked before
+     * {@link #isDuplicateEntity(Entity, Set)} so a superseded report doesn't claim the entity's ID.</p>
+     *
+     * @param entity             the entity about to be processed
+     * @param laterListEntityIds the game IDs of entities reported in a list with a more final status
+     *
+     * @return {@code true} if the entity should be skipped here
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isSupersededEntity(Entity entity, Set<Integer> laterListEntityIds) {
+        int entityId = entity.getId();
+        if ((entityId == Entity.NONE) || !laterListEntityIds.contains(entityId)) {
+            return false;
+        }
+
+        logger.warn("Entity {} (id {}) was reported in more than one end-of-game list; using its most final status",
+              entity.getDisplayName(), entityId);
+        return true;
+    }
+
+    /**
+     * Collects the game IDs of every entity in the given end-of-game lists.
+     *
+     * @param entityLists the lists to collect from
+     *
+     * @return the game IDs, excluding {@link Entity#NONE}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @SafeVarargs
+    static Set<Integer> collectEntityIds(Collection<Entity>... entityLists) {
+        Set<Integer> entityIds = new HashSet<>();
+        for (Collection<Entity> entityList : entityLists) {
+            for (Entity entity : entityList) {
+                if (entity.getId() != Entity.NONE) {
+                    entityIds.add(entity.getId());
+                }
+            }
+        }
+        return entityIds;
+    }
+
     public void processGame() {
         int playerId = client.getLocalPlayer().getId();
         int team = client.getLocalPlayer().getTeam();
 
         sanitizeAllEntityExternalIds();
 
+        // MegaMek can occasionally report the same entity more than once (seen after resuming a saved game), which
+        // would otherwise duplicate salvage and kill credits. When an entity appears in more than one list, the most
+        // final status wins: devastated, then graveyard, then retreated, then live.
+        Set<Integer> processedEntityIds = new HashSet<>();
+        Set<Integer> supersededLiveEntityIds = collectEntityIds(Collections.list(victoryEvent.getDevastatedEntities()),
+              Collections.list(victoryEvent.getRetreatedEntities()),
+              Collections.list(victoryEvent.getGraveyardEntities()));
+        Set<Integer> supersededRetreatedEntityIds =
+              collectEntityIds(Collections.list(victoryEvent.getGraveyardEntities()));
+
         for (Enumeration<Entity> entityIterator = victoryEvent.getEntities(); entityIterator.hasMoreElements(); ) {
             Entity entity = entityIterator.nextElement();
             if (!entity.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
+                continue;
+            }
+
+            if (isSupersededEntity(entity, supersededLiveEntityIds) ||
+                      isDuplicateEntity(entity, processedEntityIds)) {
                 continue;
             }
 
@@ -393,6 +521,10 @@ public class ResolveScenarioTracker {
                 continue;
             }
 
+            if (isDuplicateEntity(entity, processedEntityIds)) {
+                continue;
+            }
+
             entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 
             if ((entity.getOwnerId() == playerId) ||
@@ -435,6 +567,11 @@ public class ResolveScenarioTracker {
                 continue;
             }
 
+            if (isSupersededEntity(entity, supersededRetreatedEntityIds) ||
+                      isDuplicateEntity(entity, processedEntityIds)) {
+                continue;
+            }
+
             entities.put(UUID.fromString(entity.getExternalIdAsString()), entity);
 
             checkForLostLimbs(entity, control);
@@ -468,6 +605,10 @@ public class ResolveScenarioTracker {
             Entity wreck = wrecks.nextElement();
             if (!wreck.getSubEntities().isEmpty()) {
                 // Sub-entities have their own entry in the VictoryEvent data
+                continue;
+            }
+
+            if (isDuplicateEntity(wreck, processedEntityIds)) {
                 continue;
             }
 
@@ -1544,6 +1685,13 @@ public class ResolveScenarioTracker {
 
         killCredits = parser.getKills();
 
+        // MUL files are written from the same end-of-game data as the live path, so the same entity can be listed
+        // more than once; see processGame()
+        Set<Integer> processedEntityIds = new HashSet<>();
+        Set<Integer> supersededLiveEntityIds = collectEntityIds(parser.getDevastated(),
+              parser.getSalvage(),
+              parser.getRetreated());
+
         // Map everyone's ID to External ID
         for (Entity e : parser.getEntities()) {
             idMap.put(e.getId(), UUID.fromString(e.getExternalIdAsString()));
@@ -1570,6 +1718,10 @@ public class ResolveScenarioTracker {
         }
 
         for (Entity e : parser.getSurvivors()) {
+            if (isSupersededEntity(e, supersededLiveEntityIds) || isDuplicateEntity(e, processedEntityIds)) {
+                continue;
+            }
+
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
             checkForLostLimbs(e, control);
             if (!"-1".equals(e.getExternalIdAsString())) {
@@ -1599,6 +1751,10 @@ public class ResolveScenarioTracker {
         }
 
         for (Entity e : parser.getAllies()) {
+            if (isSupersededEntity(e, supersededLiveEntityIds) || isDuplicateEntity(e, processedEntityIds)) {
+                continue;
+            }
+
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
             checkForLostLimbs(e, control);
             if (!"-1".equals(e.getExternalIdAsString())) {
@@ -1627,6 +1783,10 @@ public class ResolveScenarioTracker {
 
         // Utterly destroyed entities
         for (Entity e : parser.getDevastated()) {
+            if (isDuplicateEntity(e, processedEntityIds)) {
+                continue;
+            }
+
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
             UnitStatus status = null;
             if (!"-1".equals(e.getExternalIdAsString())) {
@@ -1645,6 +1805,10 @@ public class ResolveScenarioTracker {
         }
 
         for (Entity e : parser.getSalvage()) {
+            if (isDuplicateEntity(e, processedEntityIds)) {
+                continue;
+            }
+
             entities.put(UUID.fromString(e.getExternalIdAsString()), e);
             checkForLostLimbs(e, control);
             UnitStatus status = null;
@@ -1709,6 +1873,10 @@ public class ResolveScenarioTracker {
         }
 
         for (Entity e : parser.getRetreated()) {
+            if (isDuplicateEntity(e, processedEntityIds)) {
+                continue;
+            }
+
             if (!"-1".equals(e.getExternalIdAsString())) {
                 UnitStatus status = unitsStatus.get(UUID.fromString(e.getExternalIdAsString()));
                 if (null == status && scenario instanceof AtBScenario) {
@@ -1936,7 +2104,16 @@ public class ResolveScenarioTracker {
         return units;
     }
 
-    public void resolveScenario(ScenarioStatus resolution, String report) {
+    /**
+     * Resolves the scenario: settles the fate of every unit and person in it, then its salvage and loot.
+     *
+     * @param resolution        the scenario's outcome
+     * @param report            the player's after-action report
+     * @param recoveryPresenter shows the player the salvage recovery, for salvage systems that recover wrecks after
+     *                          the scenario
+     */
+    public void resolveScenario(ScenarioStatus resolution, String report,
+          SalvageRecoveryPresenter recoveryPresenter) {
         // let's start by generating a stub file for our records
         scenario.generateStub(campaign);
 
@@ -2155,31 +2332,10 @@ public class ResolveScenarioTracker {
             }
         }
 
-        if (campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
-            boolean hasAssignedSalvageForce = !scenario.getSalvageFormations().isEmpty();
-            boolean hasAssignedSalvageTechs = !scenario.getSalvageTechs().isEmpty();
-
-            // There is no point presenting the dialog if there are no techs or teams assigned, or if the player
-            // doesn't control the field
-            boolean showSalvageDialog = control && hasAssignedSalvageForce && hasAssignedSalvageTechs;
-
-            if (showSalvageDialog) {
-                SalvagePostScenarioPicker picker = new SalvagePostScenarioPicker(campaign, mission, scenario,
-                      getActualSalvage(), getSoldSalvage());
-
-                List<UUID> techUUIDs = scenario.getSalvageTechs();
-                if (campaignOptions.get(CampaignOption.IS_USE_RISKY_SALVAGE)) {
-                    CamOpsSalvageUtilities.performRiskySalvageChecks(campaign,
-                          techUUIDs,
-                          picker.getCountOfSalvageUnits());
-                }
-
-                CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs);
-            }
-        } else {
-            CamOpsSalvageUtilities.resolveSalvage(campaign, mission, scenario, getActualSalvage(), getSoldSalvage(),
-                  getLeftoverSalvage());
-        }
+        campaignOptions.get(CampaignOption.SALVAGE_SYSTEM)
+              .getSalvage()
+              .resolveScenarioSalvage(campaign, mission, scenario, control, getActualSalvage(), getSoldSalvage(),
+                    getLeftoverSalvage(), recoveryPresenter);
 
         for (Loot loot : actualLoot) {
             loot.getLoot(campaign, scenario, unitsStatus);
@@ -2411,8 +2567,8 @@ public class ResolveScenarioTracker {
          *
          * <p>Unlike {@link #getHits()}, which is cumulative and includes any injury severity the person was
          * already carrying when they deployed, this value covers only the new wound. It is populated by
-         * {@link ResolveScenarioTracker#resolveScenario(ScenarioStatus, String)} and is therefore {@code 0} until the
-         * scenario has been resolved.</p>
+         * {@link ResolveScenarioTracker#resolveScenario(ScenarioStatus, String, SalvageRecoveryPresenter)} and is
+         * therefore {@code 0} until the scenario has been resolved.</p>
          *
          * @return the number of hits suffered during this scenario
          */

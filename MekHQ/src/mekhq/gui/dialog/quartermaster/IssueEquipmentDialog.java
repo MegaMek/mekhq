@@ -33,7 +33,7 @@
 package mekhq.gui.dialog.quartermaster;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.stratCon.deployment.HudStyle.*;
+import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -64,7 +64,10 @@ import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
 import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.quartermaster.KitSlot;
 import mekhq.campaign.unit.Unit;
-import mekhq.gui.stratCon.deployment.HudButton;
+import mekhq.gui.baseComponents.hud.Hud;
+import mekhq.gui.baseComponents.hud.HudButton;
+import mekhq.gui.baseComponents.hud.HudStatTile;
+import mekhq.gui.baseComponents.hud.HudTabStrip;
 
 /**
  * The quartermaster's counter for issuing kits: personal armor kits, and the two equipment-kit slots. It takes a
@@ -74,7 +77,7 @@ import mekhq.gui.stratCon.deployment.HudButton;
  * after the issue, so a bulk issue is legible before it is committed.
  *
  * <p>The dialog is drawn as a heads-up display in the style of the interstellar-map tab, the StratCon deployment
- * wizard, and the contract debrief console (see {@link KitHud}): a command bar with live procurement tiles and a
+ * wizard, and the contract debrief console (see {@link Hud}): a command bar with live procurement tiles and a
  * segmented section strip, HUD kit cards, and a footer bar with the HUD buttons.</p>
  *
  * @author Illiani
@@ -104,10 +107,10 @@ public class IssueEquipmentDialog extends JDialog {
     private final transient Map<Category, Map<EquipmentType, Integer>> stockByCategory = new EnumMap<>(Category.class);
 
     private transient RosterModel rosterModel;
-    private transient KitHud.TabStrip sectionStrip;
-    private transient KitHud.StatTile fromStoresTile;
-    private transient KitHud.StatTile toProcureTile;
-    private transient KitHud.StatTile costTile;
+    private transient HudTabStrip sectionStrip;
+    private transient HudStatTile fromStoresTile;
+    private transient HudStatTile toProcureTile;
+    private transient HudStatTile costTile;
     private transient JLabel summaryLabel;
     private transient HudButton issueButton;
 
@@ -206,7 +209,7 @@ public class IssueEquipmentDialog extends JDialog {
             titles.add(section.getTitle());
             pages.add(section.getComponent(), Integer.toString(index));
         }
-        sectionStrip = new KitHud.TabStrip(titles, false, index -> {
+        sectionStrip = new HudTabStrip(titles, false, index -> {
             pageLayout.show(pages, Integer.toString(index));
             sectionStrip.setSelected(index);
         });
@@ -224,7 +227,7 @@ public class IssueEquipmentDialog extends JDialog {
      * The command bar across the top, in the style of the deployment wizard's: a faint eyebrow, the tracked title and a
      * muted subtitle on the left, the live procurement tiles on the right, and the section strip beneath.
      */
-    private JPanel buildCommandBar(KitHud.TabStrip sectionStrip) {
+    private JPanel buildCommandBar(HudTabStrip sectionStrip) {
         JPanel commandBar = new JPanel(new BorderLayout(0, scaleForGUI(12)));
         commandBar.setOpaque(true);
         commandBar.setBackground(GROUND);
@@ -239,13 +242,13 @@ public class IssueEquipmentDialog extends JDialog {
         JLabel eyebrow = new JLabel(getTextAt(RESOURCE_BUNDLE, "window.name").toUpperCase(Locale.ROOT));
         eyebrow.setForeground(TEXT_FAINT);
         eyebrow.setFont(hudFont(Font.BOLD, 0.72f, 0.18f));
-        identity.add(KitHud.leftAligned(eyebrow));
+        identity.add(leftAligned(eyebrow));
         identity.add(Box.createVerticalStrut(scaleForGUI(3)));
 
         JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, "title").toUpperCase(Locale.ROOT));
         title.setForeground(ACCENT_BRIGHT);
         title.setFont(hudFont(Font.BOLD, 1.35f, 0.16f));
-        identity.add(KitHud.leftAligned(title));
+        identity.add(leftAligned(title));
         identity.add(Box.createVerticalStrut(scaleForGUI(4)));
 
         Set<Person> everyone = new HashSet<>(personnel);
@@ -253,15 +256,15 @@ public class IssueEquipmentDialog extends JDialog {
         JLabel subtitle = new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "header.subtitle", everyone.size()));
         subtitle.setForeground(TEXT_MUTED);
         subtitle.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
-        identity.add(KitHud.leftAligned(subtitle));
+        identity.add(leftAligned(subtitle));
 
-        fromStoresTile = new KitHud.StatTile(getTextAt(RESOURCE_BUNDLE, "tile.fromStores"),
+        fromStoresTile = new HudStatTile(getTextAt(RESOURCE_BUNDLE, "tile.fromStores"),
               getTextAt(RESOURCE_BUNDLE, "tile.fromStores.sub"));
-        toProcureTile = new KitHud.StatTile(getTextAt(RESOURCE_BUNDLE, "tile.toProcure"),
+        toProcureTile = new HudStatTile(getTextAt(RESOURCE_BUNDLE, "tile.toProcure"),
               getTextAt(RESOURCE_BUNDLE, "tile.toProcure.sub"));
-        costTile = new KitHud.StatTile(getTextAt(RESOURCE_BUNDLE, "tile.cost"),
+        costTile = new HudStatTile(getTextAt(RESOURCE_BUNDLE, "tile.cost"),
               getTextAt(RESOURCE_BUNDLE, "tile.cost.sub"));
-        JPanel tiles = KitHud.tileRow(fromStoresTile, toProcureTile, costTile);
+        JPanel tiles = Hud.tileRow(fromStoresTile, toProcureTile, costTile);
 
         JPanel topRow = new JPanel(new BorderLayout(scaleForGUI(24), 0));
         topRow.setOpaque(false);
@@ -303,8 +306,8 @@ public class IssueEquipmentDialog extends JDialog {
         }
         int opening = Math.max(firstPopulated, 0);
 
-        KitHud.TabStrip[] strip = new KitHud.TabStrip[1];
-        strip[0] = new KitHud.TabStrip(labels, true, index -> {
+        HudTabStrip[] strip = new HudTabStrip[1];
+        strip[0] = new HudTabStrip(labels, true, index -> {
             groupLayout.show(groupPages, TAB_ORDER.get(index).name());
             strip[0].setSelected(index);
         });
@@ -324,13 +327,13 @@ public class IssueEquipmentDialog extends JDialog {
         tab.setBackground(GROUND);
 
         if (people.isEmpty()) {
-            tab.add(KitHud.notice(getFormattedTextAt(RESOURCE_BUNDLE, "tab.empty",
+            tab.add(Hud.notice(getFormattedTextAt(RESOURCE_BUNDLE, "tab.empty",
                   getTextAt(RESOURCE_BUNDLE, "section." + category.name()))), BorderLayout.CENTER);
             return tab;
         }
 
         String hintKey = (category == Category.SOLDIER) ? "soldier.note" : "section.hint";
-        tab.add(KitHud.hint(getTextAt(RESOURCE_BUNDLE, hintKey)), BorderLayout.NORTH);
+        tab.add(Hud.hint(getTextAt(RESOURCE_BUNDLE, hintKey)), BorderLayout.NORTH);
 
         List<EquipmentType> kits = new ArrayList<>(ArmorKitCatalog.availableKits(category));
         kits.sort(Comparator.comparing(this::price));
@@ -352,7 +355,7 @@ public class IssueEquipmentDialog extends JDialog {
         FastJScrollPane scroll = new FastJScrollPane(KitCard.grid(cards, GROUND),
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        KitHud.styleScroll(scroll, GROUND, false);
+        Hud.styleScroll(scroll, GROUND, false);
         tab.add(scroll, BorderLayout.CENTER);
         return tab;
     }
@@ -439,16 +442,16 @@ public class IssueEquipmentDialog extends JDialog {
      */
     static JComponent roster(AbstractTableModel model) {
         JTable table = new JTable(model);
-        KitHud.styleTable(table);
+        Hud.styleTable(table);
         FastJScrollPane scroll = new FastJScrollPane(table,
               ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
               ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-        KitHud.styleScroll(scroll, SURFACE_DEEP, true);
+        Hud.styleScroll(scroll, SURFACE_DEEP, true);
         scroll.setPreferredSize(scaleForGUI(760, 160));
 
         JPanel block = new JPanel(new BorderLayout(0, scaleForGUI(8)));
         block.setOpaque(false);
-        block.add(KitHud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "heading.roster")), BorderLayout.NORTH);
+        block.add(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "heading.roster")), BorderLayout.NORTH);
         block.add(scroll, BorderLayout.CENTER);
         return block;
     }

@@ -103,7 +103,7 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
               !options.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone(),
               options.get(CampaignOption.USE_MASH_THEATRES),
               options.get(CampaignOption.USE_FATIGUE),
-              options.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE),
+              options.get(CampaignOption.SALVAGE_SYSTEM).getSalvage().isUseSalvageOperations(),
               options.isUseStratCon(),
               options.isUseStratConMaplessMode(),
               options.get(CampaignOption.USE_ADVANCED_SCOUTING) && options.isUseStratCon(),

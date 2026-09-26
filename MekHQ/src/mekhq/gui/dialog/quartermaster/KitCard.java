@@ -34,7 +34,7 @@ package mekhq.gui.dialog.quartermaster;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.stratCon.deployment.HudStyle.*;
+import static mekhq.gui.baseComponents.hud.HudStyle.*;
 
 import java.awt.BorderLayout;
 import java.awt.Color;

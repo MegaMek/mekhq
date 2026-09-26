@@ -1383,8 +1383,10 @@ public class Campaign implements ITechManager {
      *
      * @param testUnit     TestUnit to add.
      * @param deliveryTime How many days until the unit arrives
+     *
+     * @return the new unit wrapped around the test unit's entity, which is the unit the campaign keeps
      */
-    public void addTestUnit(TestUnit testUnit, int deliveryTime) {
+    public Unit addTestUnit(TestUnit testUnit, int deliveryTime) {
         // we really just want the entity and the parts so let's just wrap that around a new unit.
         Unit unit = new Unit(testUnit.getEntity(), this);
         getPlayerForce().getHangar().addUnit(unit);
@@ -1417,6 +1419,9 @@ public class Campaign implements ITechManager {
             unit.setSalvage(true);
         }
 
+        // The unit isn't available until it has been delivered, just like its parts
+        unit.setDaysToArrival(Math.max(0, deliveryTime));
+
         // Assign an entity ID to our new unit
         if (Entity.NONE == unit.getEntity().getId()) {
             unit.getEntity().setId(game.getNextEntityId());
@@ -1425,6 +1430,7 @@ public class Campaign implements ITechManager {
 
         checkDuplicateNamesDuringAdd(unit.getEntity());
         addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
+        return unit;
     }
 
     /**

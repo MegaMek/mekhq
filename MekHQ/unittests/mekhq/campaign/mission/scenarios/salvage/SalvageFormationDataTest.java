@@ -1,0 +1,226 @@
+/*
+ * Copyright (C) 2026 The MegaMek Team. All Rights Reserved.
+ *
+ * This file is part of MekHQ.
+ *
+ * MekHQ is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License (GPL),
+ * version 3 or (at your option) any later version,
+ * as published by the Free Software Foundation.
+ *
+ * MekHQ is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty
+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the GNU General Public License for more details.
+ *
+ * A copy of the GPL should have been included with this project;
+ * if not, see <https://www.gnu.org/licenses/>.
+ *
+ * NOTICE: The MegaMek organization is a non-profit group of volunteers
+ * creating free software for the BattleTech community.
+ *
+ * MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+ * of The Topps Company, Inc. All Rights Reserved.
+ *
+ * Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+ * InMediaRes Productions, LLC.
+ *
+ * MechWarrior Copyright Microsoft Corporation. MekHQ was created under
+ * Microsoft's "Game Content Usage Rules"
+ * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+ * affiliated with Microsoft.
+ */
+package mekhq.campaign.mission.scenarios.salvage;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+import static testUtilities.MHQTestUtilities.mockCampaign;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
+
+import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.MiscMounted;
+import megamek.common.equipment.MiscType;
+import megamek.common.units.Dropship;
+import megamek.common.units.Tank;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
+
+class SalvageFormationDataTest {
+    private final Campaign campaign = mockCampaign();
+    private final CampaignOptions options = new CampaignOptions();
+    private final List<Unit> units = new ArrayList<>();
+
+    SalvageFormationDataTest() {
+        options.set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
+        options.set(CampaignOption.USE_ADVANCED_MEDICAL, false);
+        options.set(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL, false);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+    }
+
+    private Formation formation(FormationType formationType, UUID techId) {
+        Formation formation = mock(Formation.class);
+        when(formation.getFormationType()).thenReturn(formationType);
+        when(formation.getTechID()).thenReturn(techId);
+        when(formation.getAllUnitsAsUnits(any(), eq(false))).thenReturn(units);
+        return formation;
+    }
+
+    /** A vehicle able to take part in salvage operations. */
+    private Unit salvageVehicle(String name, double weight, double cargoCapacity) {
+        Tank tank = mock(Tank.class);
+        when(tank.getWeight()).thenReturn(weight);
+        Unit unit = mock(Unit.class);
+        when(unit.getName()).thenReturn(name);
+        when(unit.getEntity()).thenReturn(tank);
+        when(unit.canSalvage(anyBoolean())).thenReturn(true);
+        when(unit.isRepairable()).thenReturn(true);
+        when(unit.getCargoCapacityForSalvage()).thenReturn(cargoCapacity);
+        units.add(unit);
+        return unit;
+    }
+
+    private Unit tugShip(String name, double weight) {
+        Dropship dropship = mock(Dropship.class);
+        when(dropship.getWeight()).thenReturn(weight);
+        MiscType type = mock(MiscType.class);
+        when(type.hasFlag(MiscType.F_NAVAL_TUG_ADAPTOR)).thenReturn(true);
+        MiscMounted tug = mock(MiscMounted.class);
+        when(tug.getType()).thenReturn(type);
+        when(tug.getEntity()).thenReturn(dropship);
+        when(tug.isOperable()).thenReturn(true);
+        List<MiscMounted> misc = List.of(tug);
+        when(dropship.getMisc()).thenReturn(misc);
+        Unit unit = mock(Unit.class);
+        when(unit.getName()).thenReturn(name);
+        when(unit.getEntity()).thenReturn(dropship);
+        when(unit.canSalvage(anyBoolean())).thenReturn(true);
+        when(unit.isRepairable()).thenReturn(true);
+        units.add(unit);
+        return unit;
+    }
+
+    private Person tech(boolean isEngineer) {
+        Person tech = mock(Person.class);
+        UUID id = UUID.randomUUID();
+        when(tech.getId()).thenReturn(id);
+        when(tech.isEngineer()).thenReturn(isEngineer);
+        when(tech.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
+        when(tech.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
+        when(tech.getFullTitle()).thenReturn("Tech Sergeant Smith");
+        when(tech.getSkillLevel(campaign, false, true)).thenReturn(SkillLevel.VETERAN);
+        when(campaign.getPlayerForce().getHumanResources().getPerson(id)).thenReturn(tech);
+        return tech;
+    }
+
+    @Nested
+    class Tech {
+        @Test
+        void salvageFormationsBringTheirTech() {
+            Person tech = tech(false);
+
+            SalvageFormationData data = SalvageFormationData.buildData(campaign,
+                  formation(FormationType.SALVAGE, tech.getId()), false);
+
+            assertSame(tech, data.tech());
+        }
+
+        @Test
+        void otherFormationsDontBringATech() {
+            Person tech = tech(false);
+
+            SalvageFormationData data = SalvageFormationData.buildData(campaign,
+                  formation(FormationType.STANDARD, tech.getId()), false);
+
+            assertNull(data.tech());
+        }
+
+        @Test
+        void engineersCantSalvage() {
+            Person engineer = tech(true);
+
+            SalvageFormationData data = SalvageFormationData.buildData(campaign,
+                  formation(FormationType.SALVAGE, engineer.getId()), false);
+
+            assertNull(data.tech());
+        }
+
+        @Test
+        void formationWithoutTechHasNone() {
+            assertNull(SalvageFormationData.buildData(campaign, formation(FormationType.SALVAGE, null), false).tech());
+        }
+
+        @Test
+        void missingTechIsIgnored() {
+            UUID missingTechId = UUID.randomUUID();
+            when(campaign.getPlayerForce().getHumanResources().getPerson(missingTechId)).thenReturn(null);
+
+            SalvageFormationData data = SalvageFormationData.buildData(campaign,
+                  formation(FormationType.SALVAGE, missingTechId), false);
+
+            assertNull(data.tech());
+        }
+
+    }
+
+    @Nested
+    class Capacity {
+        @Test
+        void groundCapacitiesAreTheBestOfTheAvailableUnits() {
+            salvageVehicle("Truck", 20, 40);
+            salvageVehicle("Tank", 60, 5);
+            Unit unavailable = salvageVehicle("Wreck", 100, 100);
+            when(unavailable.isRepairable()).thenReturn(false);
+
+            SalvageFormationData data = SalvageFormationData.buildData(campaign,
+                  formation(FormationType.SALVAGE, null), false);
+
+            assertEquals(2, data.salvageCapableUnits());
+            assertEquals(40.0, data.maximumCargoCapacity());
+            assertEquals(60.0, data.maximumTowCapacity());
+            assertFalse(data.hasTug());
+            assertFalse(data.isSpaceScenario());
+            assertEquals(FormationType.SALVAGE, data.formationType());
+        }
+
+        @Test
+        void spaceTowCapacityIsVesselWeightAndTugsAreNoted() {
+            tugShip("Union", 3600);
+
+            SalvageFormationData data = SalvageFormationData.buildData(campaign,
+                  formation(FormationType.SALVAGE, null), true);
+
+            assertEquals(3600.0, data.maximumTowCapacity());
+            assertTrue(data.hasTug());
+        }
+
+        @Test
+        void emptyFormationHasNoCapacity() {
+            SalvageFormationData data = SalvageFormationData.buildData(campaign,
+                  formation(FormationType.SALVAGE, null), false);
+
+            assertEquals(0, data.salvageCapableUnits());
+            assertEquals(0.0, data.maximumCargoCapacity());
+            assertEquals(0.0, data.maximumTowCapacity());
+        }
+
+    }
+}

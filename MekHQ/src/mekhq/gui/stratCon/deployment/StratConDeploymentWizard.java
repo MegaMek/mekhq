@@ -86,6 +86,8 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.StratConPanel;
+import mekhq.gui.baseComponents.hud.HudModeSelector;
+import mekhq.gui.baseComponents.hud.HudStyle;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -175,7 +177,8 @@ public class StratConDeploymentWizard extends JDialog {
     private int leadershipPointsUsed;
     private int defensivePoints;
 
-    private final HudModeSelector modeSelector = new HudModeSelector(this::switchMode);
+    private final HudModeSelector<DeploymentMode> modeSelector = new HudModeSelector<>(DeploymentMode.class,
+          DeploymentMode::getLabel, this::switchMode);
     private transient ReinforcementAdvisor reinforcementAdvisor;
 
     private final transient DeploymentInspectorPanel inspector;

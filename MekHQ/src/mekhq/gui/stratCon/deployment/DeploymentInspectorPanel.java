@@ -32,7 +32,7 @@
  */
 package mekhq.gui.stratCon.deployment;
 
-import static mekhq.gui.stratCon.deployment.HudStyle.*;
+import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -75,6 +75,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.baseComponents.hud.HudButton;
+import mekhq.gui.baseComponents.hud.HudStyle;
 
 /**
  * The right-hand HUD panel of the StratCon deployment wizard: a dossier for whichever force the player is looking at,

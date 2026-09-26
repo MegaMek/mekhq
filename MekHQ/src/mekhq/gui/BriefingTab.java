@@ -34,7 +34,6 @@ package mekhq.gui;
 
 import static megamek.client.ratgenerator.ForceDescriptor.RATING_5;
 import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.generateDailyScenariosForTrack;
-import static mekhq.campaign.digitalGM.stratCon.StratConRulesManager.isForceDeployedToStratCon;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.getPlanetOwnerAlignment;
 import static mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory.getPlanetOwnerFaction;
@@ -78,10 +77,8 @@ import megamek.logging.MMLogger;
 import megameklab.util.UnitPrintManager;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.LocalHangar;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOption;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratCon;
@@ -108,10 +105,8 @@ import mekhq.campaign.mission.scenarios.BotForce;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioObjective;
-import mekhq.campaign.mission.scenarios.ScenarioTemplate;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageFormationData;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.SalvageTechData;
+import mekhq.campaign.mission.scenarios.salvage.SalvageOperationDraft;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.mission.utilities.MissionCompletionManager;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -122,8 +117,7 @@ import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.gui.adapter.ScenarioTableMouseAdapter;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.CustomizeScenarioDialog;
-import mekhq.gui.dialog.camOpsSalvage.SalvageFormationPicker;
-import mekhq.gui.dialog.camOpsSalvage.SalvageTechPicker;
+import mekhq.gui.dialog.camOpsSalvage.SalvageOperationPlanner;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.ManualMissionDialog;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
 import mekhq.gui.dialog.markets.contractMarket.ContractEditorDialog;
@@ -1047,360 +1041,43 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     /**
-     * Handles salvage assignment prompts for the supplied scenario before it is started or auto-resolved.
+     * Plans the salvage operation for the supplied scenario before it is started or auto-resolved.
      *
-     * <p>If the scenario's mission allows salvage, this method first displays the salvage formation picker. If the
-     * player cancels that picker or confirms it without selecting any salvage formations, processing should stop. When
-     * salvage formations are selected, the salvage tech picker is displayed next.</p>
+     * <p>If the campaign's salvage system uses salvage operations and the contract allows salvage, the salvage
+     * operation planner is shown, where the player picks the salvage teams and the techs who go with them. Nothing
+     * changes unless the player commits the plan; committing also deploys the salvage teams on StratCon.</p>
      *
-     * @param scenario the scenario whose salvage formations and salvage techs should be assigned
+     * @param scenario the scenario whose salvage operation should be planned
      *
-     * @return {@code true} if the caller should stop initializing the scenario; {@code false} if there is no salvage
-     *       opportunity, or if all required salvage assignment prompts were confirmed
+     * @return {@code true} if the caller should stop initializing the scenario, because the player cancelled the
+     *       planner; {@code false} if there is no salvage operation to plan, or the player committed the plan
      *
      * @author Illiani
      * @since 0.50.10
      */
     private boolean handleSalvageAssignments(Scenario scenario) {
-        if (!getCampaignOptions().get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
+        SalvageSystem salvageSystem = getCampaignOptions().get(CampaignOption.SALVAGE_SYSTEM);
+        if (!salvageSystem.getSalvage().isUseSalvageOperations()) {
+            logger.debug("[Salvage] Skipping the salvage planner for {}: {} doesn't use salvage operations",
+                  scenario.getName(), salvageSystem.getLookupName());
             return false;
         }
 
-        boolean hasSalvageOpportunity = isHasSalvageOpportunity(scenario.getMissionId());
-        if (hasSalvageOpportunity) {
-            if (!displaySalvageFormationPicker(scenario)) {
-                return true;
-            }
-
-            // If we didn't pick any salvage units, there's no point assigning techs
-            if (scenario.getSalvageFormations().isEmpty()) {
-                return false;
-            }
-
-            return !displaySalvageTechPicker(scenario);
+        AbstractContract mission = getCampaign().getContract(scenario.getMissionId());
+        if (mission == null) {
+            logger.debug("[Salvage] Skipping the salvage planner for {}: its mission isn't a contract",
+                  scenario.getName());
+            return false;
+        }
+        if (!mission.canSalvage()) {
+            logger.debug("[Salvage] Skipping the salvage planner for {}: {} has no salvage rights",
+                  scenario.getName(), mission.getName());
+            return false;
         }
 
-        return false;
-    }
-
-    /**
-     * Checks whether the player is able to salvage in the mission associated with the chosen scenario.
-     *
-     * @param missionId the id of the mission being checked.
-     *
-     * @return {@code true} if the player can salvage
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private boolean isHasSalvageOpportunity(UUID missionId) {
-        boolean hasSalvageOpportunity = true;
-        AbstractContract mission = getCampaign().getContract(missionId);
-        hasSalvageOpportunity = mission.canSalvage();
-
-        return hasSalvageOpportunity;
-    }
-
-    /**
-     * Displays a dialog allowing the player to select forces for salvage operations.
-     *
-     * <p>This method gathers all available salvage-capable forces from the campaign and presents
-     * them to the player via a {@link SalvageFormationPicker} dialog. Forces are filtered based on their salvage
-     * capabilities and whether they are deployed.</p>
-     *
-     * @param scenario the scenario for which salvage forces are being selected
-     *
-     * @return {@code true} if the player confirmed their force selection, {@code false} if they canceled
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private boolean displaySalvageFormationPicker(Scenario scenario) {
-        if (!getCampaignOptions().get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
-            return true;
-        }
-
-        boolean isSpace = scenario.getBoardType() == AtBScenario.T_SPACE;
-        List<SalvageFormationData> salvageFormationOptions = getSalvageFormations(getCampaign(),
-              isSpace,
-              scenario.getSalvageFormations());
-
-        SalvageFormationPicker forcePicker = new SalvageFormationPicker(getCampaign(), salvageFormationOptions, isSpace,
-              scenario.getSalvageFormations(), getBattlefieldControlType(scenario));
-
-        boolean wasConfirmed = forcePicker.wasConfirmed();
-        if (wasConfirmed) {
-            scenario.clearSalvageFormations();
-            LocalHangar hangar = getCampaign().getPlayerForce().getHangar();
-            List<Formation> selectedFormations = forcePicker.getSelectedFormations();
-            for (Formation formation : selectedFormations) {
-                scenario.addSalvageFormation(formation.getId());
-                if (formation.getTechID() != null) {
-                    Campaign campaign = getCampaign();
-                    final UUID id = formation.getTechID();
-                    Person tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
-                    if (tech != null && !tech.isEngineer()) {
-                        scenario.addSalvageTech(formation.getTechID());
-                    }
-                }
-
-                for (Unit unit : formation.getAllUnitsAsUnits(hangar, false)) {
-                    if (unit.isSelfCrewed()) {
-                        continue;
-                    }
-
-                    // Add tech crew members (excluding engineers) from non-self-crewed units to the salvage tech list.
-                    // This ensures that all available technical personnel who are not engineers and are not assigned to self-crewed units
-                    // are included for salvage operations, as they may be needed for post-battle recovery and repair tasks.
-                    for (Person person : unit.getCrew()) {
-                        if (person.isTechExpanded() && !person.isEngineer()) {
-                            scenario.addSalvageTech(person.getId());
-                        }
-                    }
-                }
-            }
-
-            if (getCampaignOptions().isUseStratCon()) {
-                CamOpsSalvageUtilities.deploySalvageTeams(getCampaign(), scenario);
-            }
-        }
-
-        return forcePicker.wasConfirmed();
-    }
-
-    private static @Nullable ScenarioTemplate.BattlefieldControlType getBattlefieldControlType(Scenario scenario) {
-        if (scenario instanceof AtBDynamicScenario dynamicScenario) {
-            ScenarioTemplate template = dynamicScenario.getTemplate();
-
-            if (template != null) {
-                return template.getBattlefieldControl();
-            }
-
-            return ScenarioTemplate.BattlefieldControlType.VICTOR;
-        }
-
-        return null;
-    }
-
-
-    /**
-     * Displays a dialog allowing the player to select techs for salvage operations.
-     *
-     * <p>This method gathers all available techs from the campaign and presents them to the player via a
-     * {@link SalvageTechPicker} dialog.</p>
-     *
-     * @param scenario the scenario for which salvage forces are being selected
-     *
-     * @return {@code true} if the player confirmed their tech selection, {@code false} if they canceled
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private boolean displaySalvageTechPicker(Scenario scenario) {
-        if (!getCampaignOptions().get(CampaignOption.IS_USE_CAM_OPS_SALVAGE)) {
-            return true;
-        }
-
-        List<UUID> priorSelectedTechs = new ArrayList<>();
-        List<Integer> forceIds = scenario.getSalvageFormations();
-        for (Integer forceId : forceIds) {
-            Campaign campaign1 = getCampaign();
-            Formation formation = campaign1.getPlayerForce().getFormation(forceId);
-            if (formation != null && formation.getFormationType().isSalvage()) {
-                if (formation.getTechID() != null) {
-                    Campaign campaign = getCampaign();
-                    final UUID id = formation.getTechID();
-                    Person tech = campaign.getPlayerForce().getHumanResources().getPerson(id);
-                    if (tech != null && !tech.isEngineer()) {
-                        priorSelectedTechs.add(formation.getTechID());
-                    }
-                }
-            }
-        }
-
-        List<Person> availableTechs = getAvailableTechs();
-        List<UUID> assignedTechs = scenario.getSalvageTechs();
-        for (UUID techID : assignedTechs) {
-            Campaign campaign = getCampaign();
-            Person tech = campaign.getPlayerForce().getHumanResources().getPerson(techID);
-            if (tech != null && !availableTechs.contains(tech) && !tech.isEngineer()) {
-                availableTechs.addFirst(tech);
-            }
-        }
-
-        List<SalvageTechData> techData = new ArrayList<>();
-        for (Person tech : availableTechs) {
-            if (tech.isSalvageSupervisor()) {
-                SalvageTechData data = SalvageTechData.buildData(getCampaign(), tech);
-                techData.add(data);
-            }
-        }
-
-        // Add any other techs that were previously selected
-        for (UUID techID : scenario.getSalvageTechs()) {
-            if (!priorSelectedTechs.contains(techID)) {
-                Campaign campaign = getCampaign();
-                Person tech = campaign.getPlayerForce().getHumanResources().getPerson(techID);
-                if (tech != null && tech.isSalvageSupervisor()) {
-                    priorSelectedTechs.add(techID);
-                }
-            }
-        }
-
-        Campaign campaign = getCampaign();
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
-        boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE);
-        SalvageTechPicker techPicker = new SalvageTechPicker(techData, priorSelectedTechs,
-              isClanCampaign, getBattlefieldControlType(scenario), isUseEdge);
-        boolean wasConfirmed = techPicker.wasConfirmed();
-        if (wasConfirmed) {
-            scenario.clearSalvageTechs();
-            List<UUID> selectedTechs = techPicker.getSelectedTechs();
-            for (UUID techId : selectedTechs) {
-                scenario.addSalvageTech(techId);
-            }
-        }
-
-        return techPicker.wasConfirmed();
-    }
-
-    /**
-     * Retrieves a list of technicians available for work assignment.
-     *
-     * <p>This method filters the campaign's expanded tech roster to find personnel who meet all availability
-     * criteria. A technician is considered available if they:</p>
-     *
-     * <ul>
-     *   <li>Are not currently deployed</li>
-     *   <li>Have remaining work time available (minutesLeft > 0)</li>
-     *   <li>Are not classified as engineers</li>
-     * </ul>
-     *
-     * @return a list of available technicians meeting all criteria; may be empty if no technicians are available
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private List<Person> getAvailableTechs() {
-        List<Person> availableTechs = new ArrayList<>();
-        Campaign campaign = getCampaign();
-        for (Person tech : campaign.getPlayerForce()
-                                 .getHumanResources()
-                                 .getTechsExpanded(campaign.getPlayerForce().getHangar().getUnits(),
-                                       campaign.getCampaignOptions(),
-                                       campaign.getPlayerForce().isClanForce(),
-                                       campaign.getLocalDate(),
-                                       true,
-                                       false,
-                                       true)) {
-            if (!tech.isDeployed() && tech.getMinutesLeft() > 0 && !tech.isEngineer()) {
-                availableTechs.add(tech);
-            }
-        }
-
-        return availableTechs;
-    }
-
-    /**
-     * Retrieves all available forces capable of performing salvage operations.
-     *
-     * <p>This method collects forces in two passes:</p>
-     * <ol>
-     *   <li>First, it examines all combat teams and their parent forces, adding any undeployed forces
-     *       with salvage-capable units. It tracks visited force IDs to avoid duplication.</li>
-     *   <li>Second, it searches for dedicated salvage forces (non-combat team forces with salvage type)
-     *       that weren't already visited in the first pass.</li>
-     * </ol>
-     *
-     * <p>Forces are filtered to include only those that:</p>
-     * <ul>
-     *   <li>Are not currently deployed</li>
-     *   <li>Have at least one unit capable of salvage operations</li>
-     *   <li>Meet the scenario environment requirements (ground or space)</li>
-     * </ul>
-     *
-     * <p>The returned list is sorted alphabetically by force name.</p>
-     *
-     * @param campaign              the current campaign state
-     * @param isSpaceScenario       {@code true} if checking for space salvage capabilities, {@code false} for ground
-     * @param alreadyAssignedForces a list of salvage forces that have already been assigned to the scenario
-     *
-     * @return a sorted list of forces capable of salvage operations
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private List<SalvageFormationData> getSalvageFormations(Campaign campaign, boolean isSpaceScenario,
-          List<Integer> alreadyAssignedForces) {
-        List<SalvageFormationData> salvageFormationOptions = new ArrayList<>();
-
-        // Collect eligible salvage forces (We want salvage forces first)
-        List<AbstractContract> activeContracts = getCampaign().getActiveContracts();
-        LocalHangar hangar = campaign.getPlayerForce().getHangar();
-        List<Formation> eligibleSalvageFormations = new ArrayList<>();
-        for (Formation formation : getCampaign().getPlayerForce().getAllFormations()) {
-            Formation parentFormation = formation.getParentFormation();
-            if (parentFormation != null && parentFormation.getFormationType().isSalvage()) {
-                continue;
-            }
-
-            boolean isDeployedToScenario = formation.isDeployed();
-            // If the force is already assigned to this scenario, then we bypass the 'is deployed to StratCon' check.
-            // Otherwise, if the player assigns a force and then cancels at the last minute, the already assigned
-            // forces will no longer be available for the salvage operations they were assigned to perform.
-            boolean isDeployedToStratCon = !alreadyAssignedForces.contains(formation.getId()) &&
-                                                 isForceDeployedToStratCon(activeContracts, formation.getId());
-            boolean isSalvageFormation = formation.getFormationType().isSalvage();
-            boolean hasAtLeastOneSalvageUnit = formation.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
-
-            if (!isDeployedToScenario &&
-                      !isDeployedToStratCon &&
-                      isSalvageFormation &&
-                      hasAtLeastOneSalvageUnit) {
-                eligibleSalvageFormations.add(formation);
-            }
-        }
-
-        eligibleSalvageFormations.sort(Comparator.comparing(Formation::getFullName));
-        for (Formation formation : eligibleSalvageFormations) {
-            SalvageFormationData data = SalvageFormationData.buildData(campaign, formation, isSpaceScenario);
-            salvageFormationOptions.add(data);
-        }
-
-        // Collect eligible Combat Teams
-        List<Formation> eligibleCombatTeams = new ArrayList<>();
-        Campaign campaign1 = getCampaign();
-        for (CombatTeam combatTeam : campaign1.getPlayerForce().getCombatTeamsAsList(campaign1)) {
-            int forceId = combatTeam.getFormationId();
-            Campaign campaign2 = getCampaign();
-            Formation formation = campaign2.getPlayerForce().getFormation(forceId);
-            if (formation == null) {
-                continue;
-            }
-
-            boolean isDeployedToScenario = formation.isDeployed();
-            // If the force is already assigned to this scenario, then we bypass the 'is deployed to StratCon' check.
-            // Otherwise, if the player assigns a force and then cancels at the last minute, the already assigned
-            // forces will no longer be available for the salvage operations they were assigned to perform.
-            boolean isDeployedToStratCon = !alreadyAssignedForces.contains(formation.getId()) &&
-                                                 isForceDeployedToStratCon(activeContracts, formation.getId());
-            boolean hasAtLeastOneSalvageUnit = formation.getSalvageUnitCount(hangar, isSpaceScenario) > 0;
-
-            if (!isDeployedToScenario &&
-                      !isDeployedToStratCon &&
-                      hasAtLeastOneSalvageUnit) {
-                eligibleCombatTeams.add(formation);
-            }
-        }
-
-        eligibleCombatTeams.sort(Comparator.comparing(Formation::getFullName));
-        for (Formation formation : eligibleCombatTeams) {
-            SalvageFormationData data = SalvageFormationData.buildData(campaign, formation, isSpaceScenario);
-            salvageFormationOptions.add(data);
-        }
-
-        return salvageFormationOptions;
+        SalvageOperationDraft draft = new SalvageOperationDraft(getCampaign(), scenario);
+        SalvageOperationPlanner planner = new SalvageOperationPlanner(getCampaign(), draft);
+        return !planner.wasCommitted();
     }
 
     /**
@@ -1535,12 +1212,14 @@ public final class BriefingTab extends CampaignGuiTab {
     }
 
     private void runAbstractCombatAutoResolve(Scenario scenario) {
-        if (handleSalvageAssignments(scenario)) {
+        // Check for units first, so a salvage plan (which deploys its teams) is never committed for a scenario that
+        // won't run
+        List<Unit> chosen = playerUnits(scenario, new StringBuilder());
+        if (chosen.isEmpty()) {
             return;
         }
 
-        List<Unit> chosen = playerUnits(scenario, new StringBuilder());
-        if (chosen.isEmpty()) {
+        if (handleSalvageAssignments(scenario)) {
             return;
         }
         app.startAutoResolve(scenario, chosen);

@@ -32,7 +32,7 @@
  */
 package mekhq.gui.stratCon.deployment;
 
-import static mekhq.gui.stratCon.deployment.HudStyle.*;
+import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -64,6 +64,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.baseComponents.hud.HudStyle;
 
 /**
  * Renders a deployment board row as a HUD card: a leading readiness ring, the force or unit name, and a muted sub-line

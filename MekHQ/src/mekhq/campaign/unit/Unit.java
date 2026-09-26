@@ -79,6 +79,7 @@ import megamek.Version;
 import megamek.client.ui.tileset.EntityImage;
 import megamek.codeUtilities.MathUtility;
 import megamek.common.CriticalSlot;
+import megamek.common.MPCalculationSetting;
 import megamek.common.SimpleTechLevel;
 import megamek.common.TechConstants;
 import megamek.common.annotations.Nullable;
@@ -133,7 +134,7 @@ import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.scenarios.Scenario;
-import mekhq.campaign.mission.scenarios.camOpsSalvage.CamOpsSalvageUtilities;
+import mekhq.campaign.mission.scenarios.salvage.CamOpsSalvageUtilities;
 import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.*;
@@ -1936,7 +1937,10 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public double getCargoCapacityForSalvage() {
-        return getCargoCapacity(Math.max(0, getEntity().getOriginalWalkMP() - 1), FormationType.SALVAGE);
+        // Based on the unit's current walk MP, so battle damage limits how much it can haul. Scenario circumstances,
+        // such as the weather and gravity of whatever game the unit was last in, are ignored.
+        int currentWalkMP = getEntity().getWalkMP(MPCalculationSetting.AS_CONVERSION);
+        return getCargoCapacity(Math.max(0, currentWalkMP - 1), FormationType.SALVAGE);
     }
 
     public double getCargoCapacityForConvoy() {
@@ -2080,8 +2084,12 @@ public class Unit implements ITechnology, ILocatable {
 
         // No using your arms, roof rack, or lift hoists for convoys!
         if (formationType != FormationType.CONVOY) {
+            // Current rather than original MP, so battle damage is taken into account (but not the conditions of
+            // whatever game the unit was last in)
+            int currentWalkMP = getEntity().getWalkMP(MPCalculationSetting.AS_CONVERSION);
             if (liftHoistCount > 0) {
-                double maxLiftHoistCapacity = liftHoistCount * getEntity().getTonnage() / 2;
+                // Active TSM doubles what a lift hoist can pick up, so its capacity can exceed the usual limit
+                double maxLiftHoistCapacity = max(liftHoistCount * getEntity().getTonnage() / 2, liftHoistCapacity);
                 // Lift Hoist
                 if (maximumMpPenalty == 0) {
                     capacity += Math.clamp(getEntity().getTonnage() / 2, liftHoistCapacity,
@@ -2096,9 +2104,9 @@ public class Unit implements ITechnology, ILocatable {
 
             if (roofRackCapacity > 0) {
                 if (maximumMpPenalty - currentMpReduction > 2 ||
-                          maximumMpPenalty - currentMpReduction >= getEntity().getOriginalWalkMP() / 2) {
+                          maximumMpPenalty - currentMpReduction >= currentWalkMP / 2) {
                     // If we're okay with the max roof rack penalty, let's take it
-                    if (maximumMpPenalty - currentMpReduction >= getEntity().getOriginalWalkMP() / 2) {
+                    if (maximumMpPenalty - currentMpReduction >= currentWalkMP / 2) {
                         capacity += roofRackCapacity;
                     } else {
                         capacity += Math.max(roofRackCapacity, getEntity().getTonnage() / 4.0);
@@ -8650,7 +8658,8 @@ public class Unit implements ITechnology, ILocatable {
         if (!isMek) {
             boolean hasCargoCapacity = getCargoCapacityForSalvage() > 0;
             boolean hasNavalTugAdaptor = isInSpace && CamOpsSalvageUtilities.hasNavalTug(entity);
-            canSalvage = hasCargoCapacity || hasNavalTugAdaptor;
+            boolean isTowCapable = !isInSpace && CamOpsSalvageUtilities.isTowCapable(entity);
+            canSalvage = hasCargoCapacity || hasNavalTugAdaptor || isTowCapable;
         }
 
         return canSalvage && isFullyCrewed();

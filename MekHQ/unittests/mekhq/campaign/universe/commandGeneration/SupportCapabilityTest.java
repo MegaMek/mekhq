@@ -44,6 +44,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
@@ -153,7 +154,7 @@ class SupportCapabilityTest {
     /** A campaign with every capability switched off, which is what a fresh test campaign starts as. */
     private static Campaign campaignWithEverythingOff() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
-        campaign.getCampaignOptions().set(CampaignOption.IS_USE_CAM_OPS_SALVAGE, false);
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.LEGACY);
         campaign.getCampaignOptions().set(CampaignOption.USE_MASH_THEATRES, false);
         campaign.getCampaignOptions().set(CampaignOption.USE_FATIGUE, false);
         campaign.getCampaignOptions().set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.DISABLED);
@@ -165,7 +166,7 @@ class SupportCapabilityTest {
     /** A campaign with every capability switched on, with support teams as given. */
     private static Campaign campaignWithEverythingOn(boolean useSupportTeams) {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
-        campaign.getCampaignOptions().set(CampaignOption.IS_USE_CAM_OPS_SALVAGE, true);
+        campaign.getCampaignOptions().set(CampaignOption.SALVAGE_SYSTEM, SalvageSystem.CAM_OPS_STRICT);
         campaign.getCampaignOptions().set(CampaignOption.USE_MASH_THEATRES, true);
         campaign.getCampaignOptions().set(CampaignOption.USE_FATIGUE, true);
         campaign.getCampaignOptions().set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.NORMAL);

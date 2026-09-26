@@ -34,8 +34,10 @@ package mekhq.campaign.unit;
 
 import static megamek.common.equipment.MiscType.F_CARGO;
 import static megamek.common.equipment.MiscType.F_LIFT_HOIST;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -45,6 +47,7 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import megamek.common.MPCalculationSetting;
 import megamek.common.bays.Bay;
 import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.Mounted;
@@ -53,12 +56,14 @@ import megamek.common.icons.Portrait;
 import megamek.common.options.GameOptions;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
+import megamek.common.units.Mek;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -400,6 +405,25 @@ class CargoCapacityTest {
      * @param expectedCargoTotal The expected total cargo capacity for the provided entity.
      */
     private void testCargoTotal(Entity entity, double expectedCargoTotal, FormationType formationType) {
+        Unit unit = crewedUnit(entity);
+
+        double cargoCapacity;
+
+        if (formationType == FormationType.SALVAGE) {
+            cargoCapacity = unit.getCargoCapacityForSalvage();
+        } else if (formationType == FormationType.CONVOY) {
+            cargoCapacity = unit.getCargoCapacityForConvoy();
+        } else {
+            cargoCapacity = unit.getCargoCapacity();
+        }
+
+        assertEquals(expectedCargoTotal, cargoCapacity);
+    }
+
+    /**
+     * Wraps an entity in a {@link Unit} and fully crews it with mock {@link Person}s.
+     */
+    private Unit crewedUnit(Entity entity) {
         Unit unit = new Unit(entity, mockCampaign);
 
         while (!unit.isFullyCrewed()) {
@@ -435,16 +459,54 @@ class CargoCapacityTest {
             }
         }
 
-        double cargoCapacity;
+        return unit;
+    }
 
-        if (formationType == FormationType.SALVAGE) {
-            cargoCapacity = unit.getCargoCapacityForSalvage();
-        } else if (formationType == FormationType.CONVOY) {
-            cargoCapacity = unit.getCargoCapacityForConvoy();
-        } else {
-            cargoCapacity = unit.getCargoCapacity();
-        }
+    /**
+     * Destroys a 'Mek's left leg, which leaves it with 1 walk MP.
+     */
+    private static void destroyLeftLeg(Entity entity) {
+        entity.setInternal(IArmorState.ARMOR_DESTROYED, Mek.LOC_LEFT_LEG);
+        assertEquals(1, entity.getWalkMP(MPCalculationSetting.AS_CONVERSION));
+    }
 
-        assertEquals(expectedCargoTotal, cargoCapacity);
+    /**
+     * A slowed 'Mek (2 or less walk MP) with active TSM: TSM doubles what its lift hoist can pick up, which must not
+     * break the lift hoist's capacity limit.
+     */
+    @Test
+    public void testSalvageCapacityOfSlowLiftHoistMekWithActiveTsm() {
+        Entity withoutTsm = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
+        assertNotNull(withoutTsm);
+        destroyLeftLeg(withoutTsm);
+        double capacityWithoutTsm = crewedUnit(withoutTsm).getCargoCapacityForSalvage();
+
+        Entity withTsm = getEntityForUnitTestingCargoCapacity(liftHoistMek.name, false);
+        assertNotNull(withTsm);
+        destroyLeftLeg(withTsm);
+        // The Quickdraw's TSM activates at 9 heat; industrial and prototype TSM are always active
+        withTsm.heat = 9;
+        assertTrue(((Mek) withTsm).hasActiveTSM(true));
+        double capacityWithTsm = assertDoesNotThrow(() -> crewedUnit(withTsm).getCargoCapacityForSalvage());
+
+        // TSM doubles the lift hoist's capacity
+        assertEquals(capacityWithoutTsm + liftHoistMek.liftHoistCapacity(), capacityWithTsm);
+    }
+
+    /**
+     * Salvage capacity is based on the unit's current walk MP, so a 'Mek slowed by damage can't use its roof rack or
+     * lift hoist as well as when it was undamaged.
+     */
+    @Test
+    public void testSalvageCapacityNeverGrowsWhenWalkMpIsLost() {
+        Entity entity = getEntityForUnitTestingCargoCapacity(cargoMek.name, false);
+        assertNotNull(entity);
+        double undamagedCapacity = crewedUnit(entity).getCargoCapacityForSalvage();
+
+        destroyLeftLeg(entity);
+        double slowedCapacity = crewedUnit(entity).getCargoCapacityForSalvage();
+
+        assertTrue(slowedCapacity <= undamagedCapacity,
+              "slowed capacity " + slowedCapacity + " exceeds undamaged capacity " + undamagedCapacity);
     }
 }

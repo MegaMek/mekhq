@@ -59,7 +59,7 @@ import mekhq.campaign.universe.commandGeneration.SupportPersonnelToTOE.SupportSe
  */
 public enum SupportCapability {
     /** Recovery vehicles, crewed by the maintenance section, granted under CamOps salvage rules. */
-    SALVAGE(campaignOptions -> campaignOptions.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE),
+    SALVAGE(campaignOptions -> campaignOptions.get(CampaignOption.SALVAGE_SYSTEM).getSalvage().isUseSalvageOperations(),
           campaign -> null,
           SupportUnitGenerator::salvageUnitCount,
           SupportTOEFormationTypes.SALVAGE_FORMATION,

@@ -60,6 +60,7 @@ import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.campaign.icons.enums.OperationalStatus;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -584,7 +585,7 @@ public class Formation {
      *
      * @return a list of {@link Unit} objects associated with the formation.
      */
-    public List<Unit> getAllUnitsAsUnits(mekhq.campaign.LocalHangar hangar, boolean standardFormationsOnly) {
+    public List<Unit> getAllUnitsAsUnits(LocalHangar hangar, boolean standardFormationsOnly) {
         List<Unit> allUnits = new ArrayList<>();
 
         for (UUID unitId : getAllUnits(standardFormationsOnly)) {
@@ -614,7 +615,7 @@ public class Formation {
      * @author Illiani
      * @since 0.50.11
      */
-    public List<Unit> getUnitsAsUnits(mekhq.campaign.LocalHangar hangar) {
+    public List<Unit> getUnitsAsUnits(LocalHangar hangar) {
         List<Unit> allUnits = new ArrayList<>();
 
         for (UUID unitId : getUnits()) {
@@ -1334,7 +1335,7 @@ public class Formation {
      *
      * @return {@code true} if all resolved units in the formation are VTOL or WIGE units, {@code false} otherwise.
      */
-    public boolean formationContainsOnlyVTOLForces(mekhq.campaign.LocalHangar hangar, boolean standardFormationsOnly) {
+    public boolean formationContainsOnlyVTOLForces(LocalHangar hangar, boolean standardFormationsOnly) {
         for (UUID unitId : getAllUnits(standardFormationsOnly)) {
             Entity entity = getEntityFromUnitId(hangar, unitId);
 
@@ -1373,7 +1374,7 @@ public class Formation {
      * @return {@code true} if VTOL or WIGE units constitute at least half of the resolved formation units,
      *       {@code false} otherwise.
      */
-    public boolean formationContainsMajorityVTOLForces(mekhq.campaign.LocalHangar hangar,
+    public boolean formationContainsMajorityVTOLForces(LocalHangar hangar,
             boolean standardFormationsOnly) {
         Vector<UUID> allUnits = getAllUnits(standardFormationsOnly);
         int formationSize = allUnits.size();
@@ -1425,7 +1426,7 @@ public class Formation {
      * @return {@code true} if the formation consists only of aerial units (respecting the provided filters),
      *       {@code false} otherwise.
      */
-    public boolean formationContainsOnlyAerialForces(mekhq.campaign.LocalHangar hangar, boolean standardFormationsOnly,
+    public boolean formationContainsOnlyAerialForces(LocalHangar hangar, boolean standardFormationsOnly,
             boolean excludeConventionalFighters) {
         for (UUID unitId : getAllUnits(standardFormationsOnly)) {
             Entity entity = getEntityFromUnitId(hangar, unitId);
@@ -1446,7 +1447,17 @@ public class Formation {
         return true;
     }
 
-    public int getSalvageUnitCount(mekhq.campaign.LocalHangar hangar, boolean isInSpace) {
+    /**
+     * Counts the units in this formation that can take part in salvage operations.
+     *
+     * @param hangar       the hangar containing the formation's units
+     * @param isInSpace    {@code true} if the salvage operation takes place in space
+     * @param salvageRules the rules of the campaign's salvage system
+     *
+     * @return the number of units available for salvage operations
+     */
+    public int getSalvageUnitCount(LocalHangar hangar, boolean isInSpace,
+          AbstractSalvage salvageRules) {
         List<Unit> unitsInFormation = getAllUnitsAsUnits(hangar, false);
 
         int unitCount = 0;
@@ -1456,7 +1467,8 @@ public class Formation {
             if (entity != null) {
                 canSurviveInSpace = !entity.doomedInSpace();
             }
-            if (unit.canSalvage(isInSpace) && (!isInSpace || canSurviveInSpace)) {
+            if (salvageRules.isAvailableForSalvage(unit, isInSpace) &&
+                      (!isInSpace || canSurviveInSpace)) {
                 unitCount++;
             }
         }

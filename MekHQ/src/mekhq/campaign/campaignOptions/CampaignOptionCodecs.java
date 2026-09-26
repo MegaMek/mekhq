@@ -60,6 +60,7 @@ import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
@@ -177,6 +178,8 @@ final class CampaignOptionCodecs {
               enumCodec(EdgeRefreshPeriod::fromString, EdgeRefreshPeriod::getLookupKey));
         register(CampaignOption.STRAT_CON_PLAY_TYPE,
               enumCodec(StratConPlayType::fromLookupName, StratConPlayType::getLookupName));
+        register(CampaignOption.SALVAGE_SYSTEM,
+              enumCodec(SalvageSystem::fromLookupName, SalvageSystem::getLookupName));
         register(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD,
               enumCodec(StratConSectorCountMethod::fromLookupName, StratConSectorCountMethod::getLookupName));
     }
