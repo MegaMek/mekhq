@@ -97,6 +97,7 @@ import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.roleplay.RandomOracleGenerator;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Systems;
@@ -311,6 +312,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             RandomNameGenerator.getInstance();
             RandomCallsignGenerator.getInstance();
             RandomCompanyNameGenerator.getInstance();
+            RandomOracleGenerator.getInstance();
             Bloodname.loadBloodnameData();
             // endregion Progress 2
 
