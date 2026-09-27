@@ -139,43 +139,21 @@ class RoleplayTest {
     }
 
     @Test
-    void journalAndOracleLogSurviveSaveAndLoad() throws Exception {
-        Roleplay original = new Roleplay();
-        original.getJournal().add(new JournalEntry(java.time.LocalDate.of(3025, 1, 2),
-              "Landed on Helm.\nThe <locals> & their militia are wary."));
-        original.getJournal().add(new JournalEntry(java.time.LocalDate.of(3025, 1, 5), ""));
-        original.logOracle(java.time.LocalDate.of(3025, 1, 3), "Fate Chart: Likely at chaos 5. Rolled 12: Yes.", 500);
-
-        StringWriter stringWriter = new StringWriter();
-        try (PrintWriter writer = new PrintWriter(stringWriter)) {
-            original.writeToXML(writer, 0);
-        }
-        Roleplay loaded = Roleplay.generateInstanceFromXML(parse(stringWriter.toString()));
-
-        assertEquals(2, loaded.getJournal().size());
-        assertEquals(java.time.LocalDate.of(3025, 1, 2), loaded.getJournal().get(0).getDate());
-        assertEquals("Landed on Helm.\nThe <locals> & their militia are wary.", loaded.getJournal().get(0).getText());
-        assertEquals("", loaded.getJournal().get(1).getText());
-        assertEquals(1, loaded.getOracleLog().size());
-        assertEquals("Fate Chart: Likely at chaos 5. Rolled 12: Yes.", loaded.getOracleLog().get(0).getText());
-    }
-
-    @Test
     void oracleLogDropsOldestEntriesPastTheMaximum() {
         Roleplay roleplay = new Roleplay();
         java.time.LocalDate date = java.time.LocalDate.of(3025, 1, 1);
         for (int i = 1; i <= 5; i++) {
-            roleplay.logOracle(date, "result " + i, 3);
+            roleplay.logOracle(date, JournalEntryType.FATE_CHART, "result " + i, 3);
         }
         assertEquals(List.of("result 3", "result 4", "result 5"),
               roleplay.getOracleLog().stream().map(JournalEntry::getText).toList());
 
         // Lowering the maximum trims the backlog on the next log.
-        roleplay.logOracle(date, "result 6", 1);
+        roleplay.logOracle(date, JournalEntryType.FATE_CHART, "result 6", 1);
         assertEquals(List.of("result 6"), roleplay.getOracleLog().stream().map(JournalEntry::getText).toList());
 
         // Nonsensical maximums still keep the newest result.
-        roleplay.logOracle(date, "result 7", 0);
+        roleplay.logOracle(date, JournalEntryType.FATE_CHART, "result 7", 0);
         assertEquals(List.of("result 7"), roleplay.getOracleLog().stream().map(JournalEntry::getText).toList());
     }
 

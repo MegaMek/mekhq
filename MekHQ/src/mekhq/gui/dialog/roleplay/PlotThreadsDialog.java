@@ -62,6 +62,7 @@ import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.roleplay.JournalEntryType;
 import mekhq.campaign.roleplay.PlotThread;
 import mekhq.campaign.roleplay.PlotThreadLength;
 import mekhq.campaign.roleplay.PlotThreadStep;
@@ -168,8 +169,8 @@ public class PlotThreadsDialog extends JDialog {
         PlotThread thread = PlotThread.create(txtName.getText().trim(),
               length == null ? PlotThreadLength.SHORT : length, RandomOracleGenerator.getInstance());
         roleplay.getPlotThreads().add(thread);
-        OracleDialog.logOracle(campaign, getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.threadCreated", thread.getName(),
-              thread.getLength().getLabel()));
+        OracleDialog.logOracle(campaign, JournalEntryType.THREAD, getFormattedTextAt(RESOURCE_BUNDLE,
+              "OracleLog.threadCreated", thread.getName(), thread.getLength().getLabel())).tagThread(thread);
         refreshThreads(roleplay.getPlotThreads().size() - 1);
     }
 
@@ -241,8 +242,9 @@ public class PlotThreadsDialog extends JDialog {
             String key = step.conclusion() ? "OracleLog.threadRevealedConclusion"
                                : step.majorRevelation() ? "OracleLog.threadRevealedMajorRevelation"
                                        : "OracleLog.threadRevealed";
-            OracleDialog.logOracle(campaign, getFormattedTextAt(RESOURCE_BUNDLE, key, thread.getName(), step.number())
-                                            + '\n' + OracleDialog.logConcepts(step.concepts()));
+            OracleDialog.logOracle(campaign, JournalEntryType.THREAD,
+                  getFormattedTextAt(RESOURCE_BUNDLE, key, thread.getName(), step.number()) + '\n'
+                        + OracleDialog.logConcepts(step.concepts())).tagThread(thread);
         }
         refreshTrack();
     }

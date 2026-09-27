@@ -65,6 +65,7 @@ import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.roleplay.Concepts;
@@ -72,7 +73,10 @@ import mekhq.campaign.roleplay.Concepts.Concept;
 import mekhq.campaign.roleplay.FateChart;
 import mekhq.campaign.roleplay.FateChartOdds;
 import mekhq.campaign.roleplay.FateChartResult;
+import mekhq.campaign.roleplay.JournalEntry;
+import mekhq.campaign.roleplay.JournalEntryType;
 import mekhq.campaign.roleplay.OracleTable;
+import mekhq.campaign.roleplay.PlotThread;
 import mekhq.campaign.roleplay.PlotThreadStep;
 import mekhq.campaign.roleplay.RandomOracleGenerator;
 import mekhq.campaign.roleplay.RandomEventFocus;
@@ -264,7 +268,8 @@ public class OracleDialog extends JDialog {
         }
 
         lblConcepts.setText("<html>" + describeConcepts(concepts) + "</html>");
-        logOracle(campaign, getTextAt(RESOURCE_BUNDLE, "OracleLog.concepts") + '\n' + logConcepts(concepts));
+        logOracle(campaign, JournalEntryType.CONCEPTS,
+              getTextAt(RESOURCE_BUNDLE, "OracleLog.concepts") + '\n' + logConcepts(concepts));
         pack();
     }
 
@@ -358,11 +363,8 @@ public class OracleDialog extends JDialog {
             return;
         }
 
-        String name = input.toString().trim();
-        if (!name.equals(characters.get(index)) && characters.contains(name)) {
-            return;
-        }
-        characters.set(index, name);
+        // Renaming through the roleplay keeps journal tags pointing at the character.
+        roleplay.renameCharacter(characters.get(index), input.toString());
         refreshCharacters(index);
     }
 
@@ -438,9 +440,10 @@ public class OracleDialog extends JDialog {
               result.roll(), result.answer().getLabel()));
 
         String html;
+        FocusDetails details = FocusDetails.NONE;
         if (result.hasRandomEvent()) {
             RandomEventFocus focus = result.randomEventFocus();
-            FocusDetails details = applyFocus(focus);
+            details = applyFocus(focus);
             html = getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.randomEvent",
                   result.answer().getLabel(), result.roll(), odds.getLabel(), chaosFactor,
                   focus.getLabel(), result.randomEventRoll(), focus.getDescription(), details.html());
@@ -460,15 +463,20 @@ public class OracleDialog extends JDialog {
                          + html.substring("<html>".length());
         }
         lblResult.setText(html);
-        logOracle(campaign, log.toString());
+        logOracle(campaign, result.hasRandomEvent() ? JournalEntryType.RANDOM_EVENT : JournalEntryType.FATE_CHART,
+              log.toString()).tagThread(details.thread()).tagCharacter(details.character());
         pack();
     }
 
     /**
      * The extra effect of a random event, described for the dialog (HTML) and for the Oracle log (plain text).
      */
-    private record FocusDetails(String html, String log) {
-        static final FocusDetails NONE = new FocusDetails("", "");
+    private record FocusDetails(String html, String log, @Nullable PlotThread thread, @Nullable String character) {
+        static final FocusDetails NONE = new FocusDetails("", "", null, null);
+
+        FocusDetails(String html, String log) {
+            this(html, log, null, null);
+        }
     }
 
     /**
@@ -499,7 +507,7 @@ public class OracleDialog extends JDialog {
               change.stepNumber(), describeConcepts(step.concepts()));
         String log = getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog." + suffix, name, change.stepNumber()) + '\n'
                            + logConcepts(step.concepts());
-        return new FocusDetails(html, log);
+        return new FocusDetails(html, log, change.thread(), null);
     }
 
     private FocusDetails setBackThread() {
@@ -512,7 +520,8 @@ public class OracleDialog extends JDialog {
         String name = change.thread().getName();
         return new FocusDetails(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.threadLost",
               escapeHtml(name), change.stepNumber()),
-              getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.threadLost", name, change.stepNumber()));
+              getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.threadLost", name, change.stepNumber()), change.thread(),
+              null);
     }
 
     private FocusDetails pickCharacter() {
@@ -522,7 +531,8 @@ public class OracleDialog extends JDialog {
                   getTextAt(RESOURCE_BUNDLE, "OracleLog.noCharacter"));
         }
         return new FocusDetails(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.character",
-              escapeHtml(character)), getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.character", character));
+              escapeHtml(character)), getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.character", character), null,
+              character);
     }
 
     /**
@@ -557,9 +567,11 @@ public class OracleDialog extends JDialog {
     /**
      * Records a result in the campaign's Oracle log, dated today and trimmed to the campaign's
      * {@link CampaignOption#MAXIMUM_ORACLE_LOG_ENTRIES} option.
+     *
+     * @return the new record, for tagging with the threads and characters involved
      */
-    static void logOracle(final Campaign campaign, final String text) {
-        campaign.getRoleplay().logOracle(campaign.getLocalDate(), text,
+    static JournalEntry logOracle(final Campaign campaign, final JournalEntryType type, final String text) {
+        return campaign.getRoleplay().logOracle(campaign.getLocalDate(), type, text,
               campaign.getCampaignOptions().get(CampaignOption.MAXIMUM_ORACLE_LOG_ENTRIES));
     }
 

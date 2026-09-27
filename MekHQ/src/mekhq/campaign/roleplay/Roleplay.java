@@ -37,7 +37,10 @@ import static megamek.common.compute.Compute.randomInt;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -155,15 +158,99 @@ public class Roleplay {
      * {@code maximumEntries} remain.
      *
      * @param date           the in-game date of the result
+     * @param type           what kind of result this is
      * @param text           a plain-text description of the result
      * @param maximumEntries the most records to keep; values below 1 are treated as 1
+     *
+     * @return the new record, so the caller can tag it with the threads and characters involved
      */
-    public void logOracle(final LocalDate date, final String text, final int maximumEntries) {
-        oracleLog.add(new JournalEntry(date, text));
+    public JournalEntry logOracle(final LocalDate date, final JournalEntryType type, final String text,
+          final int maximumEntries) {
+        final JournalEntry entry = new JournalEntry(date, type, text);
+        oracleLog.add(entry);
+        trimOracleLog(maximumEntries);
+        return entry;
+    }
+
+    private void trimOracleLog(final int maximumEntries) {
         final int excess = oracleLog.size() - Math.max(1, maximumEntries);
         if (excess > 0) {
             oracleLog.subList(0, excess).clear();
         }
+    }
+
+    /**
+     * Builds the combined timeline: the player's notes and the Oracle log, merged in date order. On the same date,
+     * Oracle records come before notes, since a note usually reflects on what the Oracle said.
+     *
+     * @param filter which entries to include
+     *
+     * @return the matching entries, oldest first
+     */
+    public List<JournalEntry> getTimeline(final JournalFilter filter) {
+        final List<JournalEntry> timeline = new ArrayList<>();
+        oracleLog.stream().filter(filter::matches).forEach(timeline::add);
+        journal.stream().filter(filter::matches).forEach(timeline::add);
+        // A stable sort keeps each list's own order within a date.
+        timeline.sort(Comparator.comparing(JournalEntry::getDate));
+        return timeline;
+    }
+
+    /**
+     * @param id a plot thread id
+     *
+     * @return the thread with that id, or {@code null} if there is none (for example, it was deleted)
+     */
+    public @Nullable PlotThread getPlotThread(final @Nullable UUID id) {
+        return plotThreads.stream().filter(thread -> thread.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    /**
+     * Renames an Oracle character, keeping its place in the list and updating every journal tag that names it.
+     *
+     * @param oldName the current name
+     * @param newName the new name
+     *
+     * @return {@code true} if the character was renamed; {@code false} if it was not on the list, the new name is
+     *       blank, or another character already has the new name
+     */
+    public boolean renameCharacter(final String oldName, final @Nullable String newName) {
+        final int index = characters.indexOf(oldName);
+        if (index < 0 || newName == null || newName.isBlank()) {
+            return false;
+        }
+
+        final String trimmed = newName.trim();
+        if (trimmed.equals(oldName)) {
+            return true;
+        }
+        if (characters.contains(trimmed)) {
+            return false;
+        }
+
+        characters.set(index, trimmed);
+        for (JournalEntry entry : allEntries()) {
+            if (entry.getCharacters().remove(oldName)) {
+                entry.getCharacters().add(trimmed);
+            }
+        }
+        return true;
+    }
+
+    private List<JournalEntry> allEntries() {
+        final List<JournalEntry> entries = new ArrayList<>(journal);
+        entries.addAll(oracleLog);
+        return entries;
+    }
+
+    /**
+     * @param id a plot thread id
+     *
+     * @return the thread's name, or {@code null} if the thread no longer exists
+     */
+    public @Nullable String getPlotThreadName(final @Nullable UUID id) {
+        final PlotThread thread = getPlotThread(id);
+        return (thread == null) ? null : Objects.requireNonNull(thread.getName());
     }
 
     /**
@@ -267,9 +354,9 @@ public class Roleplay {
                         }
                     }
                 } else if (child.getNodeName().equalsIgnoreCase("journal")) {
-                    roleplay.journal.addAll(JournalEntry.parseList(child));
+                    roleplay.journal.addAll(JournalEntry.parseList(child, JournalEntryType.NOTE));
                 } else if (child.getNodeName().equalsIgnoreCase("oracleLog")) {
-                    roleplay.oracleLog.addAll(JournalEntry.parseList(child));
+                    roleplay.oracleLog.addAll(JournalEntry.parseList(child, JournalEntryType.FATE_CHART));
                 } else if (child.getNodeName().equalsIgnoreCase("plotThreads")) {
                     final NodeList threadNodes = child.getChildNodes();
                     for (int j = 0; j < threadNodes.getLength(); j++) {

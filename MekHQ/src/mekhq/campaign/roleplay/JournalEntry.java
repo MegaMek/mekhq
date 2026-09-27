@@ -35,7 +35,11 @@ package mekhq.campaign.roleplay;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -44,21 +48,42 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * One dated entry in the roleplay journal: either a note the player wrote, or an automatic Oracle log record.
+ * One dated entry in the roleplay journal: either a rich-text note the player wrote, or an automatic Oracle log
+ * record. Entries can be tagged with the plot threads and Oracle characters they involve, so a storyline can be read
+ * on its own.
+ *
+ * <p>Notes are stored as HTML; Oracle log records are plain text. {@link #getPlainText()} gives either as plain
+ * text.</p>
  */
 public class JournalEntry {
     private static final MMLogger LOGGER = MMLogger.create(JournalEntry.class);
 
     private LocalDate date;
+    private final JournalEntryType type;
     private String text;
+    private final Set<UUID> threads = new LinkedHashSet<>();
+    private final Set<String> characters = new LinkedHashSet<>();
 
     /**
      * @param date the in-game date of the entry
-     * @param text the entry's text
+     * @param type what kind of entry this is
+     * @param text the entry's text: HTML for a {@link JournalEntryType#NOTE}, plain text otherwise
      */
-    public JournalEntry(final LocalDate date, final String text) {
+    public JournalEntry(final LocalDate date, final JournalEntryType type, final String text) {
         this.date = date;
+        this.type = type;
         this.text = text;
+    }
+
+    /**
+     * Creates an empty note.
+     *
+     * @param date the in-game date of the note
+     *
+     * @return the note
+     */
+    public static JournalEntry newNote(final LocalDate date) {
+        return new JournalEntry(date, JournalEntryType.NOTE, JournalText.plainToHtml(""));
     }
 
     public LocalDate getDate() {
@@ -69,12 +94,82 @@ public class JournalEntry {
         this.date = date;
     }
 
+    public JournalEntryType getType() {
+        return type;
+    }
+
+    /**
+     * @return {@code true} if this is a note the player wrote, rather than an Oracle log record
+     */
+    public boolean isNote() {
+        return type == JournalEntryType.NOTE;
+    }
+
+    /**
+     * @return the stored text: HTML for a note, plain text for an Oracle log record
+     */
     public String getText() {
         return text;
     }
 
     public void setText(final String text) {
         this.text = text;
+    }
+
+    /**
+     * @return the entry's text with any formatting removed
+     */
+    public String getPlainText() {
+        return isNote() ? JournalText.htmlToPlain(text) : text;
+    }
+
+    /**
+     * @return the entry's text as an HTML fragment, suitable for placing inside a larger HTML document
+     */
+    public String getHtmlBody() {
+        return isNote() ? JournalText.bodyOf(text) : JournalText.escapeHtml(text).replace("\n", "<br>");
+    }
+
+    /**
+     * @return the live set of ids of the plot threads this entry is tagged with
+     */
+    public Set<UUID> getThreads() {
+        return threads;
+    }
+
+    /**
+     * @return the live set of names of the Oracle characters this entry is tagged with
+     */
+    public Set<String> getCharacters() {
+        return characters;
+    }
+
+    /**
+     * Tags this entry with a plot thread.
+     *
+     * @param thread the thread, or {@code null} to do nothing
+     *
+     * @return this entry, for chaining
+     */
+    public JournalEntry tagThread(final @Nullable PlotThread thread) {
+        if (thread != null) {
+            threads.add(thread.getId());
+        }
+        return this;
+    }
+
+    /**
+     * Tags this entry with an Oracle character.
+     *
+     * @param character the character's name, or {@code null} to do nothing
+     *
+     * @return this entry, for chaining
+     */
+    public JournalEntry tagCharacter(final @Nullable String character) {
+        if (character != null && !character.isBlank()) {
+            characters.add(character);
+        }
+        return this;
     }
 
     /**
@@ -95,7 +190,14 @@ public class JournalEntry {
         for (JournalEntry entry : entries) {
             MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "entry");
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "date", entry.date);
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "type", entry.type.name());
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "text", entry.text);
+            for (UUID thread : entry.threads) {
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "thread", thread);
+            }
+            for (String character : entry.characters) {
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "character", character);
+            }
             MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "entry");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, tag);
@@ -105,17 +207,18 @@ public class JournalEntry {
      * Reads the {@code <entry>} children of a list element written by
      * {@link #writeListToXML(PrintWriter, int, String, List)}. Entries that cannot be read are logged and skipped.
      *
-     * @param node the list element
+     * @param node        the list element
+     * @param defaultType the type to give entries saved before entries had types
      *
      * @return the entries, in saved order
      */
-    static List<JournalEntry> parseList(final Node node) {
+    static List<JournalEntry> parseList(final Node node, final JournalEntryType defaultType) {
         final List<JournalEntry> entries = new ArrayList<>();
         final NodeList entryNodes = node.getChildNodes();
         for (int i = 0; i < entryNodes.getLength(); i++) {
             final Node entryNode = entryNodes.item(i);
             if (entryNode.getNodeName().equals("entry")) {
-                final JournalEntry entry = parse(entryNode);
+                final JournalEntry entry = parse(entryNode, defaultType);
                 if (entry != null) {
                     entries.add(entry);
                 }
@@ -124,23 +227,48 @@ public class JournalEntry {
         return entries;
     }
 
-    private static @Nullable JournalEntry parse(final Node node) {
+    private static @Nullable JournalEntry parse(final Node node, final JournalEntryType defaultType) {
         try {
             LocalDate date = null;
+            JournalEntryType type = defaultType;
             String text = "";
+            final List<UUID> threads = new ArrayList<>();
+            final List<String> characters = new ArrayList<>();
+
             final NodeList fields = node.getChildNodes();
             for (int i = 0; i < fields.getLength(); i++) {
                 final Node field = fields.item(i);
-                if (field.getNodeName().equals("date")) {
-                    date = MHQXMLUtility.parseDate(field.getTextContent().trim());
-                } else if (field.getNodeName().equals("text")) {
-                    text = field.getTextContent();
+                switch (field.getNodeName()) {
+                    case "date" -> date = MHQXMLUtility.parseDate(field.getTextContent().trim());
+                    case "type" -> type = JournalEntryType.valueOf(field.getTextContent().trim());
+                    case "text" -> text = field.getTextContent();
+                    case "thread" -> threads.add(UUID.fromString(field.getTextContent().trim()));
+                    case "character" -> characters.add(field.getTextContent());
+                    default -> { }
                 }
             }
-            return (date == null) ? null : new JournalEntry(date, text);
+            if (date == null) {
+                return null;
+            }
+
+            // Notes saved before the journal had rich text are plain; convert them so every note is HTML.
+            if (type == JournalEntryType.NOTE && !JournalText.isHtml(text)) {
+                text = JournalText.plainToHtml(text);
+            }
+
+            final JournalEntry entry = new JournalEntry(date, type, text);
+            entry.threads.addAll(threads);
+            addCharacters(entry, characters);
+            return entry;
         } catch (Exception e) {
             LOGGER.error("Failed to load journal entry", e);
             return null;
+        }
+    }
+
+    private static void addCharacters(final JournalEntry entry, final Collection<String> characters) {
+        for (String character : characters) {
+            entry.tagCharacter(character);
         }
     }
 }

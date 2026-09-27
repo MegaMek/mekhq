@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -73,6 +74,7 @@ public class PlotThread {
     static final List<OracleTable> CONCLUSION_TABLES = List.of(OracleTable.ADVENTURE_STAKES,
           OracleTable.ADVENTURE_COST, OracleTable.ADVENTURE_AFTERMATH);
 
+    private UUID id = UUID.randomUUID();
     private String name;
     private PlotThreadLength length;
     private final List<PlotThreadStep> steps = new ArrayList<>();
@@ -157,6 +159,13 @@ public class PlotThread {
         final List<OracleTable> tables = new ArrayList<>(getAdventureTables());
         Collections.shuffle(tables);
         return tables.subList(0, ADVENTURE_ROLLS);
+    }
+
+    /**
+     * @return the thread's permanent id, used to tag journal entries so the tags survive a rename
+     */
+    public UUID getId() {
+        return id;
     }
 
     public String getName() {
@@ -250,6 +259,7 @@ public class PlotThread {
      */
     public void writeToXML(final PrintWriter writer, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "plotThread");
+        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "id", id);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "length", length.name());
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "revealedSteps", revealedSteps);
@@ -279,6 +289,7 @@ public class PlotThread {
      */
     public static @Nullable PlotThread generateInstanceFromXML(final Node node) {
         try {
+            UUID id = null;
             String name = "";
             PlotThreadLength length = PlotThreadLength.SHORT;
             int revealedSteps = 0;
@@ -288,6 +299,7 @@ public class PlotThread {
             for (int i = 0; i < children.getLength(); i++) {
                 final Node child = children.item(i);
                 switch (child.getNodeName()) {
+                    case "id" -> id = UUID.fromString(child.getTextContent().trim());
                     case "name" -> name = child.getTextContent();
                     case "length" -> length = PlotThreadLength.valueOf(child.getTextContent().trim());
                     case "revealedSteps" -> revealedSteps = Integer.parseInt(child.getTextContent().trim());
@@ -297,6 +309,9 @@ public class PlotThread {
             }
 
             final PlotThread thread = new PlotThread(name, length);
+            if (id != null) {
+                thread.id = id;
+            }
             if (stepsNode != null) {
                 final NodeList stepNodes = stepsNode.getChildNodes();
                 for (int i = 0; i < stepNodes.getLength(); i++) {
