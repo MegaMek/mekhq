@@ -41,6 +41,12 @@ import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
 public final class CheckOdds {
     private static final int SUMS = 13;
 
+    // How many ways each total from 2 to 12 can be rolled: 2d6 out of 36, and 3d6 keeping the highest or lowest two
+    // out of 216. CheckOddsTest checks these against every possible roll.
+    private static final int[] NORMAL_WAYS = { 1, 2, 3, 4, 5, 6, 5, 4, 3, 2, 1 };
+    private static final int[] ADVANTAGE_WAYS = { 1, 3, 7, 12, 19, 27, 34, 36, 34, 27, 16 };
+    private static final int[] DISADVANTAGE_WAYS = { 16, 27, 34, 36, 34, 27, 19, 12, 7, 3, 1 };
+
     private CheckOdds() {}
 
     /**
@@ -49,23 +55,15 @@ public final class CheckOdds {
      * @return the chance of each total from 2 to 12, indexed by the total
      */
     static double[] totals(final RollType rollType) {
-        double[] chances = new double[SUMS];
-        if (rollType == RollType.NORMAL) {
-            for (int first = 1; first <= 6; first++) {
-                for (int second = 1; second <= 6; second++) {
-                    chances[first + second] += 1.0 / 36;
-                }
-            }
-            return chances;
-        }
-        for (int first = 1; first <= 6; first++) {
-            for (int second = 1; second <= 6; second++) {
-                for (int third = 1; third <= 6; third++) {
-                    int dropped = (rollType == RollType.ADVANTAGE) ? Math.min(first, Math.min(second, third))
-                                        : Math.max(first, Math.max(second, third));
-                    chances[first + second + third - dropped] += 1.0 / 216;
-                }
-            }
+        final int[] ways = switch (rollType) {
+            case NORMAL -> NORMAL_WAYS;
+            case ADVANTAGE -> ADVANTAGE_WAYS;
+            case DISADVANTAGE -> DISADVANTAGE_WAYS;
+        };
+        final double outcomes = (rollType == RollType.NORMAL) ? 36 : 216;
+        final double[] chances = new double[SUMS];
+        for (int total = 2; total < SUMS; total++) {
+            chances[total] = ways[total - 2] / outcomes;
         }
         return chances;
     }
@@ -103,23 +101,25 @@ public final class CheckOdds {
           final CheckTarget defending, final boolean defendingEdge) {
         final boolean actingRerolls = actingEdge && !acting.impossible();
         final boolean defendingRerolls = defendingEdge && !defending.impossible();
-        double[] actingTotals = totals(acting.rollType());
-        double[] defendingTotals = totals(defending.rollType());
+        // Rather than pairing every roll with every other, sum over one side's roll at a time: given that roll, the
+        // chance of the other side's first roll (and any re-roll, which is independent) follows from one lookup.
         double wins = 0;
+        double[] actingTotals = totals(acting.rollType());
         for (int actingRoll = 2; actingRoll < SUMS; actingRoll++) {
+            if (actingTotals[actingRoll] == 0) {
+                continue;
+            }
+            // The acting side is ahead when the defender's margin falls short; a losing defender may re-roll, and
+            // must fall short again.
+            double defenderShort = 1 - chanceToReach(defending, acting.margin(actingRoll), true);
+            wins += actingTotals[actingRoll] * defenderShort * (defendingRerolls ? defenderShort : 1);
+        }
+        if (actingRerolls) {
+            double[] defendingTotals = totals(defending.rollType());
             for (int defendingRoll = 2; defendingRoll < SUMS; defendingRoll++) {
-                double chance = actingTotals[actingRoll] * defendingTotals[defendingRoll];
-                if (chance == 0) {
-                    continue;
-                }
-                int actingMargin = acting.margin(actingRoll);
-                int defendingMargin = defending.margin(defendingRoll);
-                if (actingMargin > defendingMargin) {
-                    // The defender is losing, so may re-roll against the acting side's margin.
-                    wins += chance * (defendingRerolls ? 1 - chanceToReach(defending, actingMargin, true) : 1);
-                } else if (actingRerolls) {
-                    wins += chance * chanceToReach(acting, defendingMargin, false);
-                }
+                // The acting side is behind when its margin is no better; its re-roll must then beat the defender's.
+                double actingBeats = chanceToReach(acting, defending.margin(defendingRoll), false);
+                wins += defendingTotals[defendingRoll] * (1 - actingBeats) * actingBeats;
             }
         }
         return wins;

@@ -44,6 +44,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
@@ -464,7 +465,8 @@ public class Roleplay {
 
             try {
                 if (child.getNodeName().equalsIgnoreCase("chaosFactor")) {
-                    roleplay.setChaosFactor(Integer.parseInt(child.getTextContent().trim()));
+                    roleplay.setChaosFactor(MathUtility.parseInt(child.getTextContent().trim(),
+                          DEFAULT_CHAOS_FACTOR));
                 } else if (child.getNodeName().equalsIgnoreCase("characters")) {
                     final NodeList characterNodes = child.getChildNodes();
                     for (int j = 0; j < characterNodes.getLength(); j++) {

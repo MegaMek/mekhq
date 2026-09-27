@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
@@ -273,7 +274,7 @@ public class TravelRecord {
                 case "otherSystemId" -> otherSystemId = text;
                 case "otherSystemName" -> otherSystemName = text;
                 case "cast" -> characters.add(UUID.fromString(text));
-                case "reconstructed" -> reconstructed = Boolean.parseBoolean(text);
+                case "reconstructed" -> reconstructed = MathUtility.parseBoolean(text);
                 default -> { }
             }
         }

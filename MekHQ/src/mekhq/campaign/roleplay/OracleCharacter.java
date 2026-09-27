@@ -35,6 +35,7 @@ package mekhq.campaign.roleplay;
 import java.io.PrintWriter;
 import java.util.UUID;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -176,7 +177,7 @@ public class OracleCharacter {
                 case "id" -> character.id = UUID.fromString(text.trim());
                 case "name" -> character.name = text;
                 case "person" -> character.personId = UUID.fromString(text.trim());
-                case "active" -> character.active = Boolean.parseBoolean(text.trim());
+                case "active" -> character.active = MathUtility.parseBoolean(text.trim());
                 case "rating" -> character.rating = parseRating(text.trim());
                 case "notes" -> character.notes = text.strip();
                 default -> { }
