@@ -49,6 +49,9 @@ import static megamek.common.compute.Compute.randomInt;
  *
  * <p>Every cell of the chart is one of thirteen threshold triples. Moving one step up in odds, or one step up in chaos,
  * moves one step along that sequence, so a cell's triple is found by adding the odds and chaos indices together.</p>
+ *
+ * <p>A roll that is a multiple of 11, or a roll of 100, also triggers a random event: a follow-up d100 is rolled on
+ * the {@link RandomEventFocus} table.</p>
  */
 public final class FateChart {
     public static final int MINIMUM_CHAOS_FACTOR = 1;
@@ -86,15 +89,45 @@ public final class FateChart {
     private FateChart() {}
 
     /**
-     * Rolls a d100 and consults the Fate Chart.
+     * Rolls a d100 and consults the Fate Chart, rolling on the {@link RandomEventFocus} table if a random event is
+     * triggered.
      *
      * @param odds        the player's chosen odds of the answer being yes
      * @param chaosFactor the current chaos factor; values outside the valid range are clamped
      *
-     * @return the answer
+     * @return the result, including any random event
      */
-    public static FateChartAnswer consult(final FateChartOdds odds, final int chaosFactor) {
-        return resolve(odds, chaosFactor, rollD100());
+    public static FateChartResult consult(final FateChartOdds odds, final int chaosFactor) {
+        final int roll = rollD100();
+        return consult(odds, chaosFactor, roll, isRandomEvent(roll) ? rollD100() : 0);
+    }
+
+    /**
+     * Consults the Fate Chart using given rolls.
+     *
+     * @param odds            the player's chosen odds of the answer being yes
+     * @param chaosFactor     the current chaos factor; values outside the valid range are clamped
+     * @param roll            the d100 roll (1-100)
+     * @param randomEventRoll the follow-up d100 roll (1-100) used only if {@code roll} triggers a random event
+     *
+     * @return the result, including any random event
+     */
+    public static FateChartResult consult(final FateChartOdds odds, final int chaosFactor, final int roll,
+          final int randomEventRoll) {
+        final FateChartAnswer answer = resolve(odds, chaosFactor, roll);
+        if (!isRandomEvent(roll)) {
+            return new FateChartResult(answer, roll, null, 0);
+        }
+        return new FateChartResult(answer, roll, RandomEventFocus.fromRoll(randomEventRoll), randomEventRoll);
+    }
+
+    /**
+     * @param roll a d100 roll
+     *
+     * @return {@code true} if the roll is a multiple of 11 or is 100, triggering a random event
+     */
+    public static boolean isRandomEvent(final int roll) {
+        return roll == 100 || (roll > 0 && roll % 11 == 0);
     }
 
     /**

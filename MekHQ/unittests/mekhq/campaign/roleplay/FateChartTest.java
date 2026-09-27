@@ -36,7 +36,10 @@ import static mekhq.campaign.roleplay.FateChart.NO_EXCEPTIONAL_NO;
 import static mekhq.campaign.roleplay.FateChart.NO_EXCEPTIONAL_YES;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -122,7 +125,63 @@ class FateChartTest {
     @Test
     void consultAlwaysReturnsAnAnswer() {
         for (int i = 0; i < 1000; i++) {
-            assertNotNull(FateChart.consult(FateChartOdds.FIFTY_FIFTY, 5));
+            FateChartResult result = FateChart.consult(FateChartOdds.FIFTY_FIFTY, 5);
+            assertNotNull(result.answer());
+            assertEquals(FateChart.isRandomEvent(result.roll()), result.hasRandomEvent());
+        }
+    }
+
+    @Test
+    void randomEventsTriggerOnMultiplesOfElevenAndOneHundred() {
+        for (int roll = 1; roll <= 100; roll++) {
+            boolean expected = roll == 100 || roll % 11 == 0;
+            assertEquals(expected, FateChart.isRandomEvent(roll), "roll " + roll);
+        }
+    }
+
+    @Test
+    void consultIncludesRandomEventOnlyWhenTriggered() {
+        FateChartResult withEvent = FateChart.consult(FateChartOdds.FIFTY_FIFTY, 5, 22, 60);
+        assertEquals(FateChartAnswer.NORMAL_YES, withEvent.answer());
+        assertTrue(withEvent.hasRandomEvent());
+        assertEquals(RandomEventFocus.MOVE_AWAY_FROM_A_THREAD, withEvent.randomEventFocus());
+        assertEquals(60, withEvent.randomEventRoll());
+
+        FateChartResult withoutEvent = FateChart.consult(FateChartOdds.FIFTY_FIFTY, 5, 23, 60);
+        assertFalse(withoutEvent.hasRandomEvent());
+        assertNull(withoutEvent.randomEventFocus());
+        assertEquals(0, withoutEvent.randomEventRoll());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+          "1, REMOTE_EVENT", "5, REMOTE_EVENT",
+          "6, AMBIGUOUS_EVENT", "10, AMBIGUOUS_EVENT",
+          "11, NEW_NPC", "20, NEW_NPC",
+          "21, NPC_ACTION", "40, NPC_ACTION",
+          "41, NPC_NEGATIVE", "45, NPC_NEGATIVE",
+          "46, NPC_POSITIVE", "50, NPC_POSITIVE",
+          "51, MOVE_TOWARD_A_THREAD", "55, MOVE_TOWARD_A_THREAD",
+          "56, MOVE_AWAY_FROM_A_THREAD", "65, MOVE_AWAY_FROM_A_THREAD",
+          "66, CLOSE_A_THREAD", "70, CLOSE_A_THREAD",
+          "71, PC_NEGATIVE", "80, PC_NEGATIVE",
+          "81, PC_POSITIVE", "85, PC_POSITIVE",
+          "86, CURRENT_CONTEXT", "100, CURRENT_CONTEXT"
+    })
+    void randomEventFocusMatchesThePublishedTable(final int roll, final RandomEventFocus expected) {
+        assertEquals(expected, RandomEventFocus.fromRoll(roll));
+    }
+
+    @Test
+    void everyLabelIsPresent() {
+        for (FateChartOdds odds : FateChartOdds.values()) {
+            assertFalse(odds.getLabel().startsWith("!"), odds.name());
+        }
+        for (FateChartAnswer answer : FateChartAnswer.values()) {
+            assertFalse(answer.getLabel().startsWith("!"), answer.name());
+        }
+        for (RandomEventFocus focus : RandomEventFocus.values()) {
+            assertFalse(focus.getLabel().startsWith("!"), focus.name());
         }
     }
 }
