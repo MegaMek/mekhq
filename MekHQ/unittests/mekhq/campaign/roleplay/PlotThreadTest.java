@@ -99,6 +99,9 @@ class PlotThreadTest {
             if (flashpoint) {
                 assertEquals(PlotThread.MAJOR_REVELATION_TABLES, adventure);
             }
+            if (step.conclusion()) {
+                assertEquals(PlotThread.CONCLUSION_TABLES, adventure);
+            }
             concepts.forEach(concept -> assertNotNull(concept.meaning()));
         }
     }

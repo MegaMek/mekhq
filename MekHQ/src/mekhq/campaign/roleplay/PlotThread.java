@@ -53,7 +53,8 @@ import org.w3c.dom.NodeList;
  *
  * <p>Every fifth step before the last is a flashpoint, which is a Major Revelation. A normal step's concept is a
  * random theme plus three different random adventure tables; a Major Revelation's is a random theme plus the
- * revelation, secret and twist tables. The final step is the thread's conclusion.</p>
+ * revelation, secret and twist tables. The final step is the thread's conclusion, rolled on a random theme plus the
+ * stakes, cost and aftermath tables.</p>
  */
 public class PlotThread {
     private static final MMLogger LOGGER = MMLogger.create(PlotThread.class);
@@ -67,6 +68,10 @@ public class PlotThread {
     /** The adventure tables a Major Revelation rolls on. */
     static final List<OracleTable> MAJOR_REVELATION_TABLES = List.of(OracleTable.ADVENTURE_REVELATION,
           OracleTable.ADVENTURE_SECRET, OracleTable.ADVENTURE_TWIST);
+
+    /** The adventure tables the conclusion rolls on: what is at stake, what it costs, and what follows. */
+    static final List<OracleTable> CONCLUSION_TABLES = List.of(OracleTable.ADVENTURE_STAKES,
+          OracleTable.ADVENTURE_COST, OracleTable.ADVENTURE_AFTERMATH);
 
     private String name;
     private PlotThreadLength length;
@@ -92,15 +97,22 @@ public class PlotThread {
         final PlotThread thread = new PlotThread(name, length);
         for (int number = 1; number <= length.getSteps(); number++) {
             final boolean majorRevelation = isFlashpoint(number, length);
+            final boolean conclusion = number == length.getSteps();
             final List<OracleTable> tables = new ArrayList<>();
             tables.add(randomTable(getThemeTables()));
-            tables.addAll(majorRevelation ? MAJOR_REVELATION_TABLES : randomAdventureTables());
+            if (conclusion) {
+                tables.addAll(CONCLUSION_TABLES);
+            } else if (majorRevelation) {
+                tables.addAll(MAJOR_REVELATION_TABLES);
+            } else {
+                tables.addAll(randomAdventureTables());
+            }
 
             final List<Concept> concepts = new ArrayList<>();
             for (OracleTable table : tables) {
                 concepts.add(new Concept(table, generator.generate(table)));
             }
-            thread.steps.add(new PlotThreadStep(number, majorRevelation, number == length.getSteps(), concepts));
+            thread.steps.add(new PlotThreadStep(number, majorRevelation, conclusion, concepts));
         }
         return thread;
     }
