@@ -151,13 +151,19 @@ public class Roleplay {
     }
 
     /**
-     * Records an Oracle result in the Oracle log.
+     * Records an Oracle result in the Oracle log, then removes the oldest records until at most
+     * {@code maximumEntries} remain.
      *
-     * @param date the in-game date of the result
-     * @param text a plain-text description of the result
+     * @param date           the in-game date of the result
+     * @param text           a plain-text description of the result
+     * @param maximumEntries the most records to keep; values below 1 are treated as 1
      */
-    public void logOracle(final LocalDate date, final String text) {
+    public void logOracle(final LocalDate date, final String text, final int maximumEntries) {
         oracleLog.add(new JournalEntry(date, text));
+        final int excess = oracleLog.size() - Math.max(1, maximumEntries);
+        if (excess > 0) {
+            oracleLog.subList(0, excess).clear();
+        }
     }
 
     /**

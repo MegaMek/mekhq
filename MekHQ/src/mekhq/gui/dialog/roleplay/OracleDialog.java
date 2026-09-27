@@ -66,6 +66,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.roleplay.Concepts;
 import mekhq.campaign.roleplay.Concepts.Concept;
 import mekhq.campaign.roleplay.FateChart;
@@ -88,6 +89,7 @@ public class OracleDialog extends JDialog {
 
     private final Roleplay roleplay;
 
+    private final Campaign campaign;
     private final LocalDate today;
 
     private JTextField txtQuestion;
@@ -106,6 +108,7 @@ public class OracleDialog extends JDialog {
 
     public OracleDialog(final JFrame frame, final Campaign campaign) {
         super(frame, getTextAt(RESOURCE_BUNDLE, "OracleDialog.title"), true);
+        this.campaign = campaign;
         this.roleplay = campaign.getRoleplay();
         this.today = campaign.getLocalDate();
         initialize();
@@ -172,7 +175,7 @@ public class OracleDialog extends JDialog {
         btnClose.addActionListener(event -> dispose());
         pnlButtons.add(btnRoll);
         JButton btnPlotThreads = new JButton(getTextAt(RESOURCE_BUNDLE, "OracleDialog.plotThreads"));
-        btnPlotThreads.addActionListener(event -> new PlotThreadsDialog(this, roleplay, today).setVisible(true));
+        btnPlotThreads.addActionListener(event -> new PlotThreadsDialog(this, campaign).setVisible(true));
         pnlButtons.add(btnPlotThreads);
         JButton btnJournal = new JButton(getTextAt(RESOURCE_BUNDLE, "OracleDialog.journal"));
         btnJournal.addActionListener(event -> new JournalDialog(this, roleplay, today).setVisible(true));
@@ -261,7 +264,7 @@ public class OracleDialog extends JDialog {
         }
 
         lblConcepts.setText("<html>" + describeConcepts(concepts) + "</html>");
-        roleplay.logOracle(today, getTextAt(RESOURCE_BUNDLE, "OracleLog.concepts") + '\n' + logConcepts(concepts));
+        logOracle(campaign, getTextAt(RESOURCE_BUNDLE, "OracleLog.concepts") + '\n' + logConcepts(concepts));
         pack();
     }
 
@@ -457,7 +460,7 @@ public class OracleDialog extends JDialog {
                          + html.substring("<html>".length());
         }
         lblResult.setText(html);
-        roleplay.logOracle(today, log.toString());
+        logOracle(campaign, log.toString());
         pack();
     }
 
@@ -549,6 +552,15 @@ public class OracleDialog extends JDialog {
             lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.concept", concept.table().getLabel(), meaning));
         }
         return String.join("\n", lines);
+    }
+
+    /**
+     * Records a result in the campaign's Oracle log, dated today and trimmed to the campaign's
+     * {@link CampaignOption#MAXIMUM_ORACLE_LOG_ENTRIES} option.
+     */
+    static void logOracle(final Campaign campaign, final String text) {
+        campaign.getRoleplay().logOracle(campaign.getLocalDate(), text,
+              campaign.getCampaignOptions().get(CampaignOption.MAXIMUM_ORACLE_LOG_ENTRIES));
     }
 
     static String escapeHtml(final String text) {

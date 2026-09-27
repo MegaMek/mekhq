@@ -141,6 +141,9 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "campaignLevelChaosReputation");
     public static final CampaignOption<Integer> CHAOS_REPUTATION_CAP =
           of(Integer.class, 0, "chaosReputationCap");
+    /** The most Oracle log records kept; once reached, the oldest are removed as new ones are added. */
+    public static final CampaignOption<Integer> MAXIMUM_ORACLE_LOG_ENTRIES =
+          of(Integer.class, 500, "maximumOracleLogEntries");
     public static final CampaignOption<Boolean> CHAOS_DEBT_PENALTIES_STACK =
           of(Boolean.class, false, "chaosDebtPenaltiesStack");
     public static final CampaignOption<Boolean> CHAOS_NO_PARTIAL_SUCCESS_REPUTATION =

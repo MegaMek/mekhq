@@ -50,6 +50,7 @@ class AttributesAndTraitsOptionsModel {
     boolean useAgeEffects;
     boolean randomizeTraits;
     boolean useSmallArmsOnly;
+    int maximumOracleLogEntries;
 
     AttributesAndTraitsOptionsModel(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
         useAttributes = skillPreferences.isUseAttributes();
@@ -58,6 +59,7 @@ class AttributesAndTraitsOptionsModel {
         useAgeEffects = options.get(CampaignOption.USE_AGE_EFFECTS);
         randomizeTraits = skillPreferences.isRandomizeTraits();
         useSmallArmsOnly = options.get(CampaignOption.USE_SMALL_ARMS_ONLY);
+        maximumOracleLogEntries = options.get(CampaignOption.MAXIMUM_ORACLE_LOG_ENTRIES);
     }
 
     void applyTo(@Nonnull CampaignOptions options, @Nonnull RandomSkillPreferences skillPreferences) {
@@ -67,5 +69,6 @@ class AttributesAndTraitsOptionsModel {
         options.set(CampaignOption.USE_AGE_EFFECTS, useAgeEffects);
         skillPreferences.setRandomizeTraits(randomizeTraits);
         options.set(CampaignOption.USE_SMALL_ARMS_ONLY, useSmallArmsOnly);
+        options.set(CampaignOption.MAXIMUM_ORACLE_LOG_ENTRIES, maximumOracleLogEntries);
     }
 }

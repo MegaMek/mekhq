@@ -39,7 +39,9 @@ import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirecto
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -47,7 +49,10 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
+import megamek.Version;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
+import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
+import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -83,6 +88,7 @@ public class AttributesAndTraitsPage {
     private JCheckBox chkUseAgeEffects;
     private JCheckBox chkRandomizeTraits;
     private JCheckBox chkUseSmallArmsOnly;
+    private JSpinner spnMaximumOracleLogEntries;
 
     private boolean created;
 
@@ -110,6 +116,7 @@ public class AttributesAndTraitsPage {
 
         // Contents
         JPanel pnlAttributesAndTraits = createAttributesAndTraitsPanel();
+        JPanel pnlOracle = createOraclePanel();
 
         // Layout the Panel
         final JPanel panel = CampaignOptionsPagePanel.builder("AttributesAndTraitsPage", "AttributesAndTraitsPage",
@@ -119,6 +126,9 @@ public class AttributesAndTraitsPage {
                 .section("lblAttributesAndTraitsSection.text",
                         "lblAttributesAndTraitsSection.summary",
                         pnlAttributesAndTraits)
+                .section("lblOracleSection.text",
+                        "lblOracleSection.summary",
+                        pnlOracle)
                 .build();
 
         created = true;
@@ -162,6 +172,25 @@ public class AttributesAndTraitsPage {
                 chkRandomizeTraits,
                 chkUseSmallArmsOnly);
 
+        return panel;
+    }
+
+    /**
+     * Creates and returns the panel holding the solo-roleplay Oracle options.
+     *
+     * @return a {@link JPanel} containing the configuration options
+     */
+    private @Nonnull JPanel createOraclePanel() {
+        JLabel lblMaximumOracleLogEntries = new CampaignOptionsLabel("MaximumOracleLogEntries",
+                getMetadata(new Version(0, 51, 1)));
+        lblMaximumOracleLogEntries.addMouseListener(createTipPanelUpdater("MaximumOracleLogEntries"));
+        spnMaximumOracleLogEntries = new CampaignOptionsSpinner("MaximumOracleLogEntries", 500, 1, 100000, 50);
+        spnMaximumOracleLogEntries.addMouseListener(createTipPanelUpdater("MaximumOracleLogEntries"));
+
+        final SettingsFormPanel panel = new SettingsFormPanel("OraclePanel",
+                FORM_LABEL_COLUMN_WIDTH,
+                FORM_CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblMaximumOracleLogEntries, spnMaximumOracleLogEntries);
         return panel;
     }
 
@@ -223,6 +252,7 @@ public class AttributesAndTraitsPage {
         chkUseAgeEffects.setSelected(model.useAgeEffects);
         chkRandomizeTraits.setSelected(model.randomizeTraits);
         chkUseSmallArmsOnly.setSelected(model.useSmallArmsOnly);
+        spnMaximumOracleLogEntries.setValue(model.maximumOracleLogEntries);
     }
 
     private void writeToModel() {
@@ -236,5 +266,6 @@ public class AttributesAndTraitsPage {
         model.useAgeEffects = chkUseAgeEffects.isSelected();
         model.randomizeTraits = chkRandomizeTraits.isSelected();
         model.useSmallArmsOnly = chkUseSmallArmsOnly.isSelected();
+        model.maximumOracleLogEntries = (int) spnMaximumOracleLogEntries.getValue();
     }
 }

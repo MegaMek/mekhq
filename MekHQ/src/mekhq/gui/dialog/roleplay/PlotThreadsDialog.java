@@ -44,7 +44,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.time.LocalDate;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -62,6 +61,7 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.roleplay.PlotThread;
 import mekhq.campaign.roleplay.PlotThreadLength;
 import mekhq.campaign.roleplay.PlotThreadStep;
@@ -76,8 +76,8 @@ public class PlotThreadsDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Roleplay";
     private static final int CELLS_PER_ROW = 5;
 
+    private final Campaign campaign;
     private final Roleplay roleplay;
-    private final LocalDate today;
 
     private DefaultListModel<PlotThread> threadModel;
     private JList<PlotThread> lstThreads;
@@ -86,10 +86,10 @@ public class PlotThreadsDialog extends JDialog {
     private JButton btnReveal;
     private JEditorPane txtRevealed;
 
-    public PlotThreadsDialog(final JDialog owner, final Roleplay roleplay, final LocalDate today) {
+    public PlotThreadsDialog(final JDialog owner, final Campaign campaign) {
         super(owner, getTextAt(RESOURCE_BUNDLE, "PlotThreadsDialog.title"), true);
-        this.roleplay = roleplay;
-        this.today = today;
+        this.campaign = campaign;
+        this.roleplay = campaign.getRoleplay();
         initialize();
         refreshThreads(roleplay.getPlotThreads().isEmpty() ? -1 : 0);
         setSize(new Dimension(800, 560));
@@ -168,7 +168,7 @@ public class PlotThreadsDialog extends JDialog {
         PlotThread thread = PlotThread.create(txtName.getText().trim(),
               length == null ? PlotThreadLength.SHORT : length, RandomOracleGenerator.getInstance());
         roleplay.getPlotThreads().add(thread);
-        roleplay.logOracle(today, getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.threadCreated", thread.getName(),
+        OracleDialog.logOracle(campaign, getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.threadCreated", thread.getName(),
               thread.getLength().getLabel()));
         refreshThreads(roleplay.getPlotThreads().size() - 1);
     }
@@ -241,7 +241,7 @@ public class PlotThreadsDialog extends JDialog {
             String key = step.conclusion() ? "OracleLog.threadRevealedConclusion"
                                : step.majorRevelation() ? "OracleLog.threadRevealedMajorRevelation"
                                        : "OracleLog.threadRevealed";
-            roleplay.logOracle(today, getFormattedTextAt(RESOURCE_BUNDLE, key, thread.getName(), step.number())
+            OracleDialog.logOracle(campaign, getFormattedTextAt(RESOURCE_BUNDLE, key, thread.getName(), step.number())
                                             + '\n' + OracleDialog.logConcepts(step.concepts()));
         }
         refreshTrack();
