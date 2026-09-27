@@ -138,6 +138,28 @@ class RoleplayTest {
         }
     }
 
+    @Test
+    void journalAndOracleLogSurviveSaveAndLoad() throws Exception {
+        Roleplay original = new Roleplay();
+        original.getJournal().add(new JournalEntry(java.time.LocalDate.of(3025, 1, 2),
+              "Landed on Helm.\nThe <locals> & their militia are wary."));
+        original.getJournal().add(new JournalEntry(java.time.LocalDate.of(3025, 1, 5), ""));
+        original.logOracle(java.time.LocalDate.of(3025, 1, 3), "Fate Chart: Likely at chaos 5. Rolled 12: Yes.");
+
+        StringWriter stringWriter = new StringWriter();
+        try (PrintWriter writer = new PrintWriter(stringWriter)) {
+            original.writeToXML(writer, 0);
+        }
+        Roleplay loaded = Roleplay.generateInstanceFromXML(parse(stringWriter.toString()));
+
+        assertEquals(2, loaded.getJournal().size());
+        assertEquals(java.time.LocalDate.of(3025, 1, 2), loaded.getJournal().get(0).getDate());
+        assertEquals("Landed on Helm.\nThe <locals> & their militia are wary.", loaded.getJournal().get(0).getText());
+        assertEquals("", loaded.getJournal().get(1).getText());
+        assertEquals(1, loaded.getOracleLog().size());
+        assertEquals("Fate Chart: Likely at chaos 5. Rolled 12: Yes.", loaded.getOracleLog().get(0).getText());
+    }
+
     private static Node parse(final String xml) throws Exception {
         return DocumentBuilderFactory.newInstance()
                      .newDocumentBuilder()

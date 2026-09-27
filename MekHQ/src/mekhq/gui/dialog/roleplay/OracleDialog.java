@@ -44,6 +44,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -87,6 +88,9 @@ public class OracleDialog extends JDialog {
 
     private final Roleplay roleplay;
 
+    private final LocalDate today;
+
+    private JTextField txtQuestion;
     private JComboBox<FateChartOdds> cboOdds;
     private JLabel lblChaosValue;
     private JButton btnDecreaseChaos;
@@ -103,6 +107,7 @@ public class OracleDialog extends JDialog {
     public OracleDialog(final JFrame frame, final Campaign campaign) {
         super(frame, getTextAt(RESOURCE_BUNDLE, "OracleDialog.title"), true);
         this.roleplay = campaign.getRoleplay();
+        this.today = campaign.getLocalDate();
         initialize();
         pack();
         setLocationRelativeTo(frame);
@@ -118,6 +123,17 @@ public class OracleDialog extends JDialog {
         constraints.anchor = GridBagConstraints.WEST;
         constraints.fill = GridBagConstraints.HORIZONTAL;
 
+        // Question (optional)
+        JLabel lblQuestion = new JLabel(getTextAt(RESOURCE_BUNDLE, "OracleDialog.question.label"));
+        txtQuestion = new JTextField(20);
+        txtQuestion.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleDialog.question.toolTipText"));
+        lblQuestion.setLabelFor(txtQuestion);
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        pnlMain.add(lblQuestion, constraints);
+        constraints.gridx = 1;
+        pnlMain.add(txtQuestion, constraints);
+
         // Odds
         JLabel lblOdds = new JLabel(getTextAt(RESOURCE_BUNDLE, "OracleDialog.odds.label"));
         cboOdds = new JComboBox<>(FateChartOdds.values());
@@ -125,7 +141,7 @@ public class OracleDialog extends JDialog {
         cboOdds.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleDialog.odds.toolTipText"));
         lblOdds.setLabelFor(cboOdds);
         constraints.gridx = 0;
-        constraints.gridy = 0;
+        constraints.gridy = 1;
         pnlMain.add(lblOdds, constraints);
         constraints.gridx = 1;
         pnlMain.add(cboOdds, constraints);
@@ -134,7 +150,7 @@ public class OracleDialog extends JDialog {
         JLabel lblChaos = new JLabel(getTextAt(RESOURCE_BUNDLE, "OracleDialog.chaos.label"));
         lblChaos.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleDialog.chaos.toolTipText"));
         constraints.gridx = 0;
-        constraints.gridy = 1;
+        constraints.gridy = 2;
         pnlMain.add(lblChaos, constraints);
         constraints.gridx = 1;
         pnlMain.add(createChaosPanel(), constraints);
@@ -143,7 +159,7 @@ public class OracleDialog extends JDialog {
         lblResult = new JLabel(getTextAt(RESOURCE_BUNDLE, "OracleDialog.prompt"), SwingConstants.CENTER);
         lblResult.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
         constraints.gridx = 0;
-        constraints.gridy = 2;
+        constraints.gridy = 3;
         constraints.gridwidth = 2;
         constraints.anchor = GridBagConstraints.CENTER;
         pnlMain.add(lblResult, constraints);
@@ -156,8 +172,11 @@ public class OracleDialog extends JDialog {
         btnClose.addActionListener(event -> dispose());
         pnlButtons.add(btnRoll);
         JButton btnPlotThreads = new JButton(getTextAt(RESOURCE_BUNDLE, "OracleDialog.plotThreads"));
-        btnPlotThreads.addActionListener(event -> new PlotThreadsDialog(this, roleplay).setVisible(true));
+        btnPlotThreads.addActionListener(event -> new PlotThreadsDialog(this, roleplay, today).setVisible(true));
         pnlButtons.add(btnPlotThreads);
+        JButton btnJournal = new JButton(getTextAt(RESOURCE_BUNDLE, "OracleDialog.journal"));
+        btnJournal.addActionListener(event -> new JournalDialog(this, roleplay, today).setVisible(true));
+        pnlButtons.add(btnJournal);
         pnlButtons.add(btnClose);
         getRootPane().setDefaultButton(btnRoll);
 
@@ -241,15 +260,8 @@ public class OracleDialog extends JDialog {
             return;
         }
 
-        StringBuilder text = new StringBuilder("<html>");
-        for (Concept concept : concepts) {
-            String meaning = (concept.meaning() == null)
-                                   ? getTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.empty")
-                                   : escapeHtml(concept.meaning());
-            text.append(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.result",
-                  concept.table().getLabel(), meaning)).append("<br>");
-        }
-        lblConcepts.setText(text.append("</html>").toString());
+        lblConcepts.setText("<html>" + describeConcepts(concepts) + "</html>");
+        roleplay.logOracle(today, getTextAt(RESOURCE_BUNDLE, "OracleLog.concepts") + '\n' + logConcepts(concepts));
         pack();
     }
 
@@ -411,76 +423,135 @@ public class OracleDialog extends JDialog {
             return;
         }
 
+        String question = txtQuestion.getText().strip();
         int chaosFactor = roleplay.getChaosFactor();
         FateChartResult result = FateChart.consult(odds, chaosFactor);
 
+        StringBuilder log = new StringBuilder();
+        if (!question.isEmpty()) {
+            log.append(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.fateChart.question", question)).append('\n');
+        }
+        log.append(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.fateChart", odds.getLabel(), chaosFactor,
+              result.roll(), result.answer().getLabel()));
+
+        String html;
         if (result.hasRandomEvent()) {
             RandomEventFocus focus = result.randomEventFocus();
-            lblResult.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.randomEvent",
+            FocusDetails details = applyFocus(focus);
+            html = getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.randomEvent",
                   result.answer().getLabel(), result.roll(), odds.getLabel(), chaosFactor,
-                  focus.getLabel(), result.randomEventRoll(), focus.getDescription(), getFocusDetails(focus)));
+                  focus.getLabel(), result.randomEventRoll(), focus.getDescription(), details.html());
+            log.append('\n').append(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.randomEvent", focus.getLabel(),
+                  result.randomEventRoll()));
+            if (!details.log().isEmpty()) {
+                log.append('\n').append(details.log());
+            }
         } else {
-            lblResult.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result",
-                  result.answer().getLabel(), result.roll(), odds.getLabel(), chaosFactor));
+            html = getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result",
+                  result.answer().getLabel(), result.roll(), odds.getLabel(), chaosFactor);
         }
+
+        if (!question.isEmpty()) {
+            // Both result templates open with <html>; slot the question in straight after it.
+            html = "<html>" + getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.question", escapeHtml(question))
+                         + html.substring("<html>".length());
+        }
+        lblResult.setText(html);
+        roleplay.logOracle(today, log.toString());
         pack();
+    }
+
+    /**
+     * The extra effect of a random event, described for the dialog (HTML) and for the Oracle log (plain text).
+     */
+    private record FocusDetails(String html, String log) {
+        static final FocusDetails NONE = new FocusDetails("", "");
     }
 
     /**
      * Applies and describes any extra effect of a random event: naming an Oracle character for NPC events, or
      * progressing or setting back a random plot thread for thread events.
-     *
-     * @return the extra lines for the result, or an empty string if the focus has no extra effect
      */
-    private String getFocusDetails(final RandomEventFocus focus) {
+    private FocusDetails applyFocus(final RandomEventFocus focus) {
         return switch (focus) {
-            case NPC_ACTION, NPC_NEGATIVE, NPC_POSITIVE -> getCharacterLine();
+            case NPC_ACTION, NPC_NEGATIVE, NPC_POSITIVE -> pickCharacter();
             case MOVE_TOWARD_A_THREAD -> progressThread();
             case MOVE_AWAY_FROM_A_THREAD -> setBackThread();
-            default -> "";
+            default -> FocusDetails.NONE;
         };
     }
 
-    private String progressThread() {
+    private FocusDetails progressThread() {
         PlotThreadChange change = roleplay.progressRandomThread();
         if (change == null) {
-            return getTextAt(RESOURCE_BUNDLE, "OracleDialog.result.noThreadToProgress");
+            return new FocusDetails(getTextAt(RESOURCE_BUNDLE, "OracleDialog.result.noThreadToProgress"),
+                  getTextAt(RESOURCE_BUNDLE, "OracleLog.noThreadToProgress"));
         }
 
         PlotThreadStep step = change.revealed();
-        String key = step.conclusion() ? "OracleDialog.result.threadConclusion"
-                           : step.majorRevelation() ? "OracleDialog.result.threadMajorRevelation"
-                                   : "OracleDialog.result.threadProgress";
-        StringBuilder concepts = new StringBuilder();
-        for (Concept concept : step.concepts()) {
+        String suffix = step.conclusion() ? "threadConclusion"
+                              : step.majorRevelation() ? "threadMajorRevelation" : "threadProgress";
+        String name = change.thread().getName();
+        String html = getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result." + suffix, escapeHtml(name),
+              change.stepNumber(), describeConcepts(step.concepts()));
+        String log = getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog." + suffix, name, change.stepNumber()) + '\n'
+                           + logConcepts(step.concepts());
+        return new FocusDetails(html, log);
+    }
+
+    private FocusDetails setBackThread() {
+        PlotThreadChange change = roleplay.loseRandomThreadProgress(RandomOracleGenerator.getInstance());
+        if (change == null) {
+            return new FocusDetails(getTextAt(RESOURCE_BUNDLE, "OracleDialog.result.noThreadToLose"),
+                  getTextAt(RESOURCE_BUNDLE, "OracleLog.noThreadToLose"));
+        }
+
+        String name = change.thread().getName();
+        return new FocusDetails(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.threadLost",
+              escapeHtml(name), change.stepNumber()),
+              getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.threadLost", name, change.stepNumber()));
+    }
+
+    private FocusDetails pickCharacter() {
+        String character = roleplay.pickRandomCharacter();
+        if (character == null) {
+            return new FocusDetails(getTextAt(RESOURCE_BUNDLE, "OracleDialog.result.noCharacter"),
+                  getTextAt(RESOURCE_BUNDLE, "OracleLog.noCharacter"));
+        }
+        return new FocusDetails(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.character",
+              escapeHtml(character)), getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.character", character));
+    }
+
+    /**
+     * @return the concepts as HTML lines, each ending in {@code <br>}
+     */
+    static String describeConcepts(final List<Concept> concepts) {
+        StringBuilder text = new StringBuilder();
+        for (Concept concept : concepts) {
             String meaning = (concept.meaning() == null)
                                    ? getTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.empty")
                                    : escapeHtml(concept.meaning());
-            concepts.append(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.result",
+            text.append(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.result",
                   concept.table().getLabel(), meaning)).append("<br>");
         }
-        return getFormattedTextAt(RESOURCE_BUNDLE, key, escapeHtml(change.thread().getName()), change.stepNumber(),
-              concepts.toString());
+        return text.toString();
     }
 
-    private String setBackThread() {
-        PlotThreadChange change = roleplay.loseRandomThreadProgress(RandomOracleGenerator.getInstance());
-        if (change == null) {
-            return getTextAt(RESOURCE_BUNDLE, "OracleDialog.result.noThreadToLose");
+    /**
+     * @return the concepts as plain-text lines for the Oracle log
+     */
+    static String logConcepts(final List<Concept> concepts) {
+        List<String> lines = new ArrayList<>();
+        for (Concept concept : concepts) {
+            String meaning = (concept.meaning() == null)
+                                   ? getTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.empty")
+                                   : concept.meaning();
+            lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.concept", concept.table().getLabel(), meaning));
         }
-        return getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.threadLost",
-              escapeHtml(change.thread().getName()), change.stepNumber());
+        return String.join("\n", lines);
     }
 
-    private String getCharacterLine() {
-        String character = roleplay.pickRandomCharacter();
-        if (character == null) {
-            return getTextAt(RESOURCE_BUNDLE, "OracleDialog.result.noCharacter");
-        }
-        return getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.character", escapeHtml(character));
-    }
-
-    private static String escapeHtml(final String text) {
+    static String escapeHtml(final String text) {
         return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 }

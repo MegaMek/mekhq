@@ -44,6 +44,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
+import java.time.LocalDate;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
@@ -61,7 +62,6 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 import javax.swing.UIManager;
 
-import mekhq.campaign.roleplay.Concepts.Concept;
 import mekhq.campaign.roleplay.PlotThread;
 import mekhq.campaign.roleplay.PlotThreadLength;
 import mekhq.campaign.roleplay.PlotThreadStep;
@@ -77,6 +77,7 @@ public class PlotThreadsDialog extends JDialog {
     private static final int CELLS_PER_ROW = 5;
 
     private final Roleplay roleplay;
+    private final LocalDate today;
 
     private DefaultListModel<PlotThread> threadModel;
     private JList<PlotThread> lstThreads;
@@ -85,9 +86,10 @@ public class PlotThreadsDialog extends JDialog {
     private JButton btnReveal;
     private JEditorPane txtRevealed;
 
-    public PlotThreadsDialog(final JDialog owner, final Roleplay roleplay) {
+    public PlotThreadsDialog(final JDialog owner, final Roleplay roleplay, final LocalDate today) {
         super(owner, getTextAt(RESOURCE_BUNDLE, "PlotThreadsDialog.title"), true);
         this.roleplay = roleplay;
+        this.today = today;
         initialize();
         refreshThreads(roleplay.getPlotThreads().isEmpty() ? -1 : 0);
         setSize(new Dimension(800, 560));
@@ -163,8 +165,11 @@ public class PlotThreadsDialog extends JDialog {
         }
 
         PlotThreadLength length = (PlotThreadLength) cboLength.getSelectedItem();
-        roleplay.getPlotThreads().add(PlotThread.create(txtName.getText().trim(),
-              length == null ? PlotThreadLength.SHORT : length, RandomOracleGenerator.getInstance()));
+        PlotThread thread = PlotThread.create(txtName.getText().trim(),
+              length == null ? PlotThreadLength.SHORT : length, RandomOracleGenerator.getInstance());
+        roleplay.getPlotThreads().add(thread);
+        roleplay.logOracle(today, getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.threadCreated", thread.getName(),
+              thread.getLength().getLabel()));
         refreshThreads(roleplay.getPlotThreads().size() - 1);
     }
 
@@ -227,10 +232,19 @@ public class PlotThreadsDialog extends JDialog {
 
     private void revealNextStep() {
         PlotThread thread = lstThreads.getSelectedValue();
-        if (thread != null) {
-            thread.revealNextStep();
-            refreshTrack();
+        if (thread == null) {
+            return;
         }
+
+        PlotThreadStep step = thread.revealNextStep();
+        if (step != null) {
+            String key = step.conclusion() ? "OracleLog.threadRevealedConclusion"
+                               : step.majorRevelation() ? "OracleLog.threadRevealedMajorRevelation"
+                                       : "OracleLog.threadRevealed";
+            roleplay.logOracle(today, getFormattedTextAt(RESOURCE_BUNDLE, key, thread.getName(), step.number())
+                                            + '\n' + OracleDialog.logConcepts(step.concepts()));
+        }
+        refreshTrack();
     }
 
     private void refreshTrack() {
@@ -299,21 +313,14 @@ public class PlotThreadsDialog extends JDialog {
             String key = step.conclusion() ? "PlotThreadsDialog.step.conclusion"
                                : step.majorRevelation() ? "PlotThreadsDialog.step.majorRevelation"
                                        : "PlotThreadsDialog.step";
-            text.append("<p><b>").append(getFormattedTextAt(RESOURCE_BUNDLE, key, step.number())).append("</b><br>");
-            for (Concept concept : step.concepts()) {
-                String meaning = concept.meaning() == null
-                                       ? getTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.empty")
-                                       : escapeHtml(concept.meaning());
-                text.append(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.result",
-                      concept.table().getLabel(), meaning)).append("<br>");
-            }
-            text.append("</p>");
+            text.append("<p><b>").append(getFormattedTextAt(RESOURCE_BUNDLE, key, step.number())).append("</b><br>")
+                  .append(OracleDialog.describeConcepts(step.concepts())).append("</p>");
         }
         return text.append("</html>").toString();
     }
     // endregion Track
 
     private static String escapeHtml(final String text) {
-        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
+        return OracleDialog.escapeHtml(text);
     }
 }

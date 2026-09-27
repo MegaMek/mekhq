@@ -35,6 +35,7 @@ package mekhq.campaign.roleplay;
 import static megamek.common.compute.Compute.randomInt;
 
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +48,7 @@ import org.w3c.dom.NodeList;
 /**
  * Holds the campaign's solo-roleplay state: the current chaos factor used by the {@link FateChart}, the ordered
  * list of characters the Oracle can pick from when a random event involves an NPC, and the campaign's
- * {@link PlotThread}s.
+ * {@link PlotThread}s, and the journal: the player's own notes plus an automatic log of Oracle results.
  */
 public class Roleplay {
     private static final MMLogger LOGGER = MMLogger.create(Roleplay.class);
@@ -57,6 +58,8 @@ public class Roleplay {
     private int chaosFactor = DEFAULT_CHAOS_FACTOR;
     private final List<String> characters = new ArrayList<>();
     private final List<PlotThread> plotThreads = new ArrayList<>();
+    private final List<JournalEntry> journal = new ArrayList<>();
+    private final List<JournalEntry> oracleLog = new ArrayList<>();
 
     /**
      * @return the current chaos factor
@@ -134,6 +137,30 @@ public class Roleplay {
     }
 
     /**
+     * @return the live list of the player's journal notes, oldest first; changes to it are saved with the campaign
+     */
+    public List<JournalEntry> getJournal() {
+        return journal;
+    }
+
+    /**
+     * @return the live list of automatic Oracle log records, oldest first; changes to it are saved with the campaign
+     */
+    public List<JournalEntry> getOracleLog() {
+        return oracleLog;
+    }
+
+    /**
+     * Records an Oracle result in the Oracle log.
+     *
+     * @param date the in-game date of the result
+     * @param text a plain-text description of the result
+     */
+    public void logOracle(final LocalDate date, final String text) {
+        oracleLog.add(new JournalEntry(date, text));
+    }
+
+    /**
      * Reveals the next step of a random unconcluded plot thread.
      *
      * @return the change made, or {@code null} if every thread is concluded (or there are none)
@@ -200,6 +227,8 @@ public class Roleplay {
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "plotThreads");
         }
+        JournalEntry.writeListToXML(writer, indent, "journal", journal);
+        JournalEntry.writeListToXML(writer, indent, "oracleLog", oracleLog);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "roleplay");
     }
 
@@ -231,6 +260,10 @@ public class Roleplay {
                             roleplay.addCharacter(characterNode.getTextContent());
                         }
                     }
+                } else if (child.getNodeName().equalsIgnoreCase("journal")) {
+                    roleplay.journal.addAll(JournalEntry.parseList(child));
+                } else if (child.getNodeName().equalsIgnoreCase("oracleLog")) {
+                    roleplay.oracleLog.addAll(JournalEntry.parseList(child));
                 } else if (child.getNodeName().equalsIgnoreCase("plotThreads")) {
                     final NodeList threadNodes = child.getChildNodes();
                     for (int j = 0; j < threadNodes.getLength(); j++) {
