@@ -143,6 +143,11 @@ class ChecksPage implements ConsoleSection {
     private final JList<Person> peopleList = new JList<>(peopleModel);
     private final JLabel peopleHint = Hud.hint("");
     private final Set<UUID> picked = new LinkedHashSet<>();
+    /**
+     * People chosen from the Personnel tab who are not active, such as prisoners or the retired. The company list
+     * leaves them out, so they are added to it; otherwise the check would quietly roll for someone else.
+     */
+    private final List<Person> presetOutsiders = new ArrayList<>();
     private boolean updatingPeople;
 
     // What
@@ -346,7 +351,8 @@ class ChecksPage implements ConsoleSection {
         refreshOther();
 
         useEdge = new HudCheckBox(text("ChecksPage.edge"));
-        useEdge.setSelected(true);
+        // Off by default: Edge is a limited resource, so spending it is the player's choice.
+        useEdge.setSelected(false);
         useEdge.setToolTipText(text("ChecksPage.edge.toolTipText"));
         useEdge.addActionListener(event -> refreshPreview());
 
@@ -454,9 +460,14 @@ class ChecksPage implements ConsoleSection {
      */
     void preset(final List<Person> people, final boolean attribute) {
         picked.clear();
+        presetOutsiders.clear();
+        final List<Person> company = companyPeople();
         boolean allInCast = true;
         for (Person person : people) {
             picked.add(person.getId());
+            if (!company.contains(person)) {
+                presetOutsiders.add(person);
+            }
             allInCast &= castMember(person.getId()) != null;
         }
         setWholeCompanyChips(!allInCast);
@@ -509,6 +520,7 @@ class ChecksPage implements ConsoleSection {
         List<Person> shown = new ArrayList<>();
         if (wholeCompany) {
             shown.addAll(companyPeople());
+            shown.addAll(presetOutsiders);
         } else {
             for (OracleCharacter character : console.roleplay().getActiveCharacters()) {
                 Person person = personOf(character);
@@ -1063,7 +1075,7 @@ class ChecksPage implements ConsoleSection {
                                                    index, isSelected, cellHasFocus));
             sideDifficulty.setSelectedItem(CheckDifficulty.NORMAL);
             rating.setSelectedItem(NpcRating.REGULAR);
-            sideEdge.setSelected(true);
+            sideEdge.setSelected(false);
             who.addActionListener(event -> {
                 if (!filling) {
                     changedWho();

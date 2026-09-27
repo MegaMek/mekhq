@@ -282,11 +282,16 @@ public class RoleplayChecks {
 
         boolean actingEdge = false;
         boolean defendingEdge = false;
-        if (!actingWins && rerolls(acting, actingTarget)) {
+        // Edge is only spent when a re-roll could change the outcome: the acting side must be able to beat the
+        // defender's margin, and the defender to at least tie the acting side's.
+        final int actingMargin = actingTarget.margin(actingRoll.result());
+        final int defendingMargin = defendingTarget.margin(defendingRoll.result());
+        if (!actingWins && rerolls(acting, actingTarget) && actingTarget.bestMargin() > defendingMargin) {
             actingRoll = roller.apply(actingTarget.rollType());
             actingEdge = true;
             Objects.requireNonNull(acting.person()).spendEdge();
-        } else if (actingWins && rerolls(defending, defendingTarget)) {
+        } else if (actingWins && rerolls(defending, defendingTarget)
+                         && defendingTarget.bestMargin() >= actingMargin) {
             defendingRoll = roller.apply(defendingTarget.rollType());
             defendingEdge = true;
             Objects.requireNonNull(defending.person()).spendEdge();
@@ -342,7 +347,7 @@ public class RoleplayChecks {
      * @param difficulty how hard the situation makes it
      * @param other      any other modifier
      *
-     * @return the action as the log shows it, such as "Negotiation (Hard +2, other −1)"
+     * @return the action as the log shows it, such as "Negotiation (Hard +2, other -1)"
      */
     static String describeAction(final String label, final CheckDifficulty difficulty, final int other) {
         String conditions = difficulty.getLabel() + (difficulty.getModifier() == 0 ? ""

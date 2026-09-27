@@ -67,7 +67,7 @@ public enum CheckDifficulty {
     }
 
     /**
-     * @return the modifier with its sign, such as "+2", "−1" or "±0"
+     * @return the modifier with its sign, such as "+2", "-1" or "+0"
      */
     public String getSignedModifier() {
         return signed(modifier);
@@ -76,10 +76,10 @@ public enum CheckDifficulty {
     /**
      * @param value a modifier
      *
-     * @return the modifier with its sign, such as "+2", "−1" or "±0"
+     * @return the modifier with its sign, such as "+2", "-1" or "+0"
      */
     public static String signed(final int value) {
-        return (value > 0) ? "+" + value : (value < 0) ? "−" + Math.abs(value) : "±0";
+        return (value > 0) ? "+" + value : (value < 0) ? "-" + Math.abs(value) : "+0";
     }
 
     @Override

@@ -162,6 +162,19 @@ class RoleplayChecksTest {
     }
 
     @Test
+    void edgeIsNotSpentOnAReRollThatCannotWin() {
+        Person natasha = person("Natasha", 2);
+        // Natasha needs 12 or more, so her best margin is 0; the guard beats that by rolling 12 against 8+.
+        rolls.addAll(List.of(10, 12));
+        CheckRecord record = checks.opposed(Opponent.person(natasha, null, WILLPOWER, CheckDifficulty.NORMAL, 5,
+              true), rated("Guard", NpcRating.REGULAR, CheckDifficulty.NORMAL), "", roleplay.getCharacters(), null);
+
+        verify(natasha, never()).spendEdge();
+        assertFalse(record.sides().get(0).usedEdge());
+        assertFalse(record.sides().get(0).won());
+    }
+
+    @Test
     void noEdgeWhenTheCampaignDoesNotUseIt() {
         edgeAllowed = false;
         Person natasha = person("Natasha", 2);
@@ -273,7 +286,7 @@ class RoleplayChecksTest {
 
         verify(natasha, never()).spendEdge();
         assertEquals(-10, record.sides().get(0).margin());
-        assertEquals("–", record.sides().get(0).target());
+        assertEquals("X", record.sides().get(0).target());
         assertFalse(record.sides().get(0).won());
     }
 

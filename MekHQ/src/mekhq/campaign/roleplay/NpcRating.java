@@ -70,6 +70,6 @@ public enum NpcRating {
 
     @Override
     public String toString() {
-        return label + " · " + targetNumber + "+";
+        return label + " (" + targetNumber + "+)";
     }
 }

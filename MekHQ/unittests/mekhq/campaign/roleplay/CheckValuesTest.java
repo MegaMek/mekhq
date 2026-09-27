@@ -53,7 +53,7 @@ class CheckValuesTest {
     void targetsReadAsPlayersExpect() {
         assertEquals("7+", CheckTarget.of(7).describe());
         assertEquals("7-", new CheckTarget(7, true, false, RollType.NORMAL).describe());
-        assertEquals("–", new CheckTarget(7, false, true, RollType.NORMAL).describe());
+        assertEquals("X", new CheckTarget(7, false, true, RollType.NORMAL).describe());
     }
 
     @Test
@@ -103,8 +103,8 @@ class CheckValuesTest {
     void difficultyLevelsMatchTheAgreedModifiers() {
         assertEquals(List.of(-3, -1, 0, 2, 4),
               Arrays.stream(CheckDifficulty.values()).map(CheckDifficulty::getModifier).toList());
-        assertEquals("−3", CheckDifficulty.VERY_EASY.getSignedModifier());
-        assertEquals("±0", CheckDifficulty.NORMAL.getSignedModifier());
+        assertEquals("-3", CheckDifficulty.VERY_EASY.getSignedModifier());
+        assertEquals("+0", CheckDifficulty.NORMAL.getSignedModifier());
         assertEquals("+4", CheckDifficulty.VERY_HARD.getSignedModifier());
         for (CheckDifficulty difficulty : CheckDifficulty.values()) {
             assertFalse(difficulty.getLabel().startsWith("!"), difficulty.name());
@@ -115,7 +115,7 @@ class CheckValuesTest {
     void ratingsRunFromUltraGreenToLegendary() {
         assertEquals(List.of(10, 9, 8, 7, 6, 5, 4),
               Arrays.stream(NpcRating.values()).map(NpcRating::getTargetNumber).toList());
-        assertEquals(NpcRating.VETERAN.getLabel() + " · 7+", NpcRating.VETERAN.toString());
+        assertEquals(NpcRating.VETERAN.getLabel() + " (7+)", NpcRating.VETERAN.toString());
         for (NpcRating rating : NpcRating.values()) {
             assertFalse(rating.getLabel().startsWith("!"), rating.name());
         }
@@ -171,7 +171,7 @@ class CheckValuesTest {
     void actionsSpellOutTheSituation() {
         assertEquals("Stealth (Normal)", RoleplayChecks.describeAction("Stealth", CheckDifficulty.NORMAL, 0));
         assertEquals("Stealth (Hard +2)", RoleplayChecks.describeAction("Stealth", CheckDifficulty.HARD, 0));
-        assertEquals("Stealth (Easy −1, other +3)",
+        assertEquals("Stealth (Easy -1, other +3)",
               RoleplayChecks.describeAction("Stealth", CheckDifficulty.EASY, 3));
     }
 

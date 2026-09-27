@@ -85,11 +85,18 @@ public record CheckTarget(int value, boolean countUp, boolean impossible, RollTy
     }
 
     /**
+     * @return the best margin any roll of the dice can reach
+     */
+    public int bestMargin() {
+        return margin(countUp ? 2 : 12);
+    }
+
+    /**
      * @return the target as players read it, such as "7+", or "7-" for a skill that counts up
      */
     public String describe() {
         if (impossible) {
-            return "–";
+            return "X";
         }
         return value + (countUp ? "-" : "+");
     }
