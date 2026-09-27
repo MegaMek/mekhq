@@ -67,7 +67,6 @@ import javax.swing.JTextField;
 import javax.swing.Scrollable;
 
 import megamek.common.annotations.Nullable;
-import mekhq.MekHQ;
 import mekhq.campaign.roleplay.Concepts;
 import mekhq.campaign.roleplay.Concepts.Concept;
 import mekhq.campaign.roleplay.FateChart;
