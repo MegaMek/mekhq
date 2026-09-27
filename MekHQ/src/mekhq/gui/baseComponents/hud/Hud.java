@@ -37,13 +37,22 @@ import static mekhq.gui.baseComponents.hud.HudStyle.*;
 
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.RenderingHints;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Locale;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -149,6 +158,94 @@ public final class Hud {
         label.setForeground(TEXT_FAINT);
         label.setFont(hudFont(Font.PLAIN, 0.95f, 0.0f));
         return label;
+    }
+
+    /**
+     * A clickable accent-coloured link, for jumping to related content.
+     *
+     * @param text     the link text
+     * @param onChoose called when the link is clicked, or activated with Space or Enter
+     *
+     * @return the link
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JLabel link(String text, Runnable onChoose) {
+        JLabel label = new JLabel(text);
+        label.setForeground(ACCENT_BRIGHT);
+        label.setFont(hudFont(Font.PLAIN, 0.88f, 0.0f));
+        label.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        label.setFocusable(true);
+        label.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent event) {
+                if (label.isEnabled() && label.contains(event.getPoint())) {
+                    onChoose.run();
+                }
+            }
+
+            @Override
+            public void mouseEntered(MouseEvent event) {
+                if (label.isEnabled()) {
+                    label.setForeground(TEXT);
+                }
+            }
+
+            @Override
+            public void mouseExited(MouseEvent event) {
+                if (label.isEnabled()) {
+                    label.setForeground(ACCENT_BRIGHT);
+                }
+            }
+        });
+        label.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent event) {
+                if (label.isEnabled() && (event.getKeyCode() == KeyEvent.VK_SPACE
+                                                || event.getKeyCode() == KeyEvent.VK_ENTER)) {
+                    onChoose.run();
+                }
+            }
+        });
+        return label;
+    }
+
+    /**
+     * A small circled question mark that explains a term on hover.
+     *
+     * @param tooltip the explanation; wrapped to a comfortable width
+     *
+     * @return the mark
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JComponent helpMark(String tooltip) {
+        JComponent mark = new JComponent() {
+            @Override
+            protected void paintComponent(Graphics graphics) {
+                Graphics2D canvas = (Graphics2D) graphics.create();
+                try {
+                    canvas.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                          RenderingHints.VALUE_ANTIALIAS_ON);
+                    int size = Math.min(getWidth(), getHeight()) - 1;
+                    canvas.setColor(TEXT_FAINT);
+                    canvas.drawOval(0, 0, size, size);
+                    canvas.setFont(hudFont(Font.BOLD, 0.62f, 0.0f));
+                    FontMetrics metrics = canvas.getFontMetrics();
+                    canvas.drawString("?", (size + 1 - metrics.stringWidth("?")) / 2,
+                          (size + 1 + metrics.getAscent() - metrics.getDescent()) / 2);
+                } finally {
+                    canvas.dispose();
+                }
+            }
+        };
+        int size = scaleForGUI(14);
+        mark.setPreferredSize(new Dimension(size, size));
+        mark.setMaximumSize(new Dimension(size, size));
+        mark.setToolTipText("<html><div style='width:" + scaleForGUI(260) + "px'>" + tooltip + "</div></html>");
+        return mark;
     }
 
     // endregion Text

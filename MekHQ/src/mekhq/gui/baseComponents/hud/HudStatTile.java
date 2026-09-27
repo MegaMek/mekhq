@@ -69,6 +69,7 @@ public class HudStatTile extends JPanel {
     private final JLabel valueLabel = new JLabel();
     private final JLabel subLabel = new JLabel();
     private final Meter meter = new Meter();
+    private final JPanel valueRow = new JPanel();
 
     /**
      * @param key the tile's caption
@@ -89,7 +90,11 @@ public class HudStatTile extends JPanel {
 
         valueLabel.setFont(hudFont(Font.BOLD, 1.45f, 0.0f));
         valueLabel.setForeground(TEXT);
-        add(leftAligned(valueLabel));
+        valueRow.setOpaque(false);
+        valueRow.setLayout(new BoxLayout(valueRow, BoxLayout.X_AXIS));
+        valueRow.add(valueLabel);
+        valueRow.add(Box.createHorizontalGlue());
+        add(leftAligned(valueRow));
 
         // Hidden until a meter is set, so tiles without one keep the debrief console's spacing
         meter.setVisible(false);
@@ -144,6 +149,33 @@ public class HudStatTile extends JPanel {
         meter.threshold = (threshold == null) ? null : Math.clamp(threshold, 0.0, 1.0);
         meter.setVisible(true);
         meter.repaint();
+    }
+
+    /**
+     * Places a control to the right of the value, such as a stepper for adjusting it.
+     *
+     * @param accessory the control
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setValueAccessory(JComponent accessory) {
+        valueRow.add(accessory);
+        revalidate();
+    }
+
+    /**
+     * Adds a component beneath the sub-line, such as a link to a related action.
+     *
+     * @param footer the component
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addFooter(JComponent footer) {
+        add(Box.createVerticalStrut(scaleForGUI(3)));
+        add(leftAligned(footer));
+        revalidate();
     }
 
     /**

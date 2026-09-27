@@ -106,6 +106,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.roleplay.CampaignChronicleListener;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
@@ -134,6 +135,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.gui.roleplay.OracleConsole;
 import mekhq.gui.view.AdvanceTimePanel;
 import mekhq.gui.view.CommandSummaryPanel;
 import mekhq.gui.view.CurrentLocationPanel;
@@ -205,6 +207,8 @@ public class CampaignGUI extends JPanel {
     /* Top Panel */
     private JPanel pnlTop;
     private AccentRoundedJButton btnCommandGenerator;
+    private RoundedJButton btnOracle;
+    private CampaignChronicleListener chronicleListener;
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
@@ -257,11 +261,19 @@ public class CampaignGUI extends JPanel {
     public void addNotify() {
         super.addNotify();
         MekHQ.registerHandler(this);
+        // The chronicle writes campaign events into the Oracle journal while this campaign is open.
+        if (chronicleListener == null) {
+            chronicleListener = new CampaignChronicleListener(getCampaign());
+        }
+        MekHQ.registerHandler(chronicleListener);
     }
 
     @Override
     public void removeNotify() {
         MekHQ.unregisterHandler(this);
+        if (chronicleListener != null) {
+            MekHQ.unregisterHandler(chronicleListener);
+        }
         super.removeNotify();
     }
 
@@ -492,6 +504,8 @@ public class CampaignGUI extends JPanel {
               getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
         pnlTop.add(createCommandGeneratorButton());
         pnlTop.add(Box.createHorizontalStrut(SMALL_GAP));
+        pnlTop.add(createOracleButton());
+        pnlTop.add(Box.createHorizontalStrut(SMALL_GAP));
         pnlTop.add(advanceTimePanel);
         pnlTop.add(createCampaignControlPanel(140, 170));
 
@@ -501,6 +515,25 @@ public class CampaignGUI extends JPanel {
         btnCommandGenerator.setMinimumSize(new Dimension(side, side));
         btnCommandGenerator.setPreferredSize(new Dimension(side, side));
         btnCommandGenerator.setMaximumSize(new Dimension(side, side));
+        btnOracle.setMinimumSize(new Dimension(side, side));
+        btnOracle.setPreferredSize(new Dimension(side, side));
+        btnOracle.setMaximumSize(new Dimension(side, side));
+    }
+
+    /**
+     * Creates the Oracle button that sits between the Command Generator button and the Advance Day panel. It opens
+     * the {@link OracleConsole}, the solo-roleplay console for the Fate Chart, plot threads, cast and journal. It is
+     * squared to the top panel's height by {@link #initTopPanel()}.
+     *
+     * @return the button
+     */
+    private RoundedJButton createOracleButton() {
+        btnOracle = new RoundedJButton(resourceMap.getString("btnOracle.text"));
+        btnOracle.setToolTipText(resourceMap.getString("btnOracle.toolTipText"));
+        btnOracle.setHorizontalAlignment(SwingConstants.CENTER);
+        btnOracle.setFont(btnOracle.getFont().deriveFont(Font.BOLD));
+        btnOracle.addActionListener(event -> OracleConsole.showFor(getFrame(), getCampaign()));
+        return btnOracle;
     }
 
     /**

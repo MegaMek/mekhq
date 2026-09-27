@@ -485,6 +485,11 @@ public final class MHQConstants extends SuiteConstants {
           "userdata/data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
     // endregion Backgrounds
 
+    // region Oracles
+    public static final String ORACLE_DIRECTORY = Paths.get("data/oracles").toString();
+    public static final String ORACLE_DIRECTORY_USER = Paths.get("userdata/data/oracles").toString();
+    // endregion Oracles
+
     // region Operation Names
     public static final String OPERATION_NAME_DESCRIPTOR = Paths.get(
           "data/universe/contracts/randomOperationNameGenerator/descriptor.csv").toString();

@@ -70,15 +70,28 @@ public class HudButton extends JPanel {
     private final transient List<ActionListener> listeners = new ArrayList<>();
 
     public HudButton(String text, boolean primary) {
+        this(text, primary, false);
+    }
+
+    /**
+     * @param text    the button's label
+     * @param primary {@code true} for the translucent cyan primary look; {@code false} for the flat secondary look
+     * @param compact {@code true} for a smaller button, for toolbars and rows of secondary actions
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public HudButton(String text, boolean primary, boolean compact) {
         this.primary = primary;
         setOpaque(false);
         setLayout(new GridBagLayout());
-        setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(9), UIUtil.scaleForGUI(22),
-              UIUtil.scaleForGUI(9), UIUtil.scaleForGUI(22)));
+        int vertical = UIUtil.scaleForGUI(compact ? 5 : 9);
+        int horizontal = UIUtil.scaleForGUI(compact ? 11 : 22);
+        setBorder(BorderFactory.createEmptyBorder(vertical, horizontal, vertical, horizontal));
         setFocusable(true);
 
         label = new JLabel(text);
-        label.setFont(hudFont(Font.BOLD, 0.82f, 0.12f));
+        label.setFont(hudFont(Font.BOLD, compact ? 0.74f : 0.82f, 0.12f));
         label.setForeground(primary ? ACCENT_BRIGHT : TEXT_MUTED);
         add(label);
 

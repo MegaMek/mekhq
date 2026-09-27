@@ -39,6 +39,8 @@ import static mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry.build
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -97,6 +99,8 @@ import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.roleplay.JournalRescue;
+import mekhq.campaign.roleplay.RandomOracleGenerator;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Systems;
@@ -311,6 +315,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             RandomNameGenerator.getInstance();
             RandomCallsignGenerator.getInstance();
             RandomCompanyNameGenerator.getInstance();
+            RandomOracleGenerator.getInstance();
             Bloodname.loadBloodnameData();
             // endregion Progress 2
 
@@ -627,6 +632,34 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
         }
 
         /**
+         * When a save fails to load, saves its Oracle journal next to it so the player's story isn't lost, and tells
+         * them where it is. The save is read again on a background thread so the interface stays responsive.
+         */
+        private void rescueJournal() {
+            final File save = getCampaignFile();
+            if (save == null) {
+                return;
+            }
+            final Thread rescuer = new Thread(() -> {
+                try {
+                    final File rescued = JournalRescue.rescue(save,
+                          date -> MekHQ.getMHQOptions().getDisplayFormattedDate(date));
+                    if (rescued != null) {
+                        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null,
+                              getFormattedTextAt("mekhq.resources.Roleplay", "JournalRescue.saved",
+                                    rescued.getAbsolutePath()),
+                              getTextAt("mekhq.resources.Roleplay", "JournalRescue.savedTitle"),
+                              JOptionPane.INFORMATION_MESSAGE));
+                    }
+                } catch (Throwable throwable) {
+                    LOGGER.error("Failed to rescue the journal from {}", save, throwable);
+                }
+            }, "Journal rescue");
+            rescuer.setDaemon(true);
+            rescuer.start();
+        }
+
+        /**
          * Executed in event dispatching thread
          */
         @Override
@@ -662,7 +695,15 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                           resources.getString("DataLoadingDialog.ExecutionException.title"),
                           JOptionPane.ERROR_MESSAGE);
                 }
-                completionHandler.accept(null);
+                try {
+                    // After the error, so the player learns the save failed before being told the journal is safe.
+                    // Out of memory, reading the save again would only fail the same way.
+                    if (!(ex.getCause() instanceof OutOfMemoryError)) {
+                        rescueJournal();
+                    }
+                } finally {
+                    completionHandler.accept(null);
+                }
             }
         }
     }

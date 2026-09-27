@@ -266,12 +266,14 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
 
         // A check that cannot be beaten (AUTOMATIC_FAIL, IMPOSSIBLE) never re-rolls, so edge is never wasted on it -
         // this guard applies to a caller-supplied condition as well, which may only narrow it further.
-        boolean canSucceed = !targetNumber.cannotSucceed() && targetNumber.getValue() <= 12;
+        // Count-up checks succeed at or under the target number, so the achievable range runs the other way.
+        int target = targetNumber.getValue();
+        boolean canSucceed = !targetNumber.cannotSucceed() && (isCountUp() ? target >= 2 : target <= 12);
         final boolean shouldReroll;
         if (edgeRerollCondition != null) {
             shouldReroll = canSpendEdge && canSucceed && edgeRerollCondition.test(roll);
         } else {
-            boolean failed = roll.result() < targetNumber.getValue();
+            boolean failed = isCountUp() ? roll.result() > target : roll.result() < target;
             shouldReroll = failed && canSucceed && canSpendEdge;
         }
 

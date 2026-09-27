@@ -69,6 +69,13 @@ public class ActionCheckResult {
         this.resultsText = resultsText;
     }
 
+    /**
+     * @return the roll, including every die thrown
+     */
+    public ActionCheckRoll getRoll() {
+        return roll;
+    }
+
     public int getRollResult() {
         return roll.result();
     }

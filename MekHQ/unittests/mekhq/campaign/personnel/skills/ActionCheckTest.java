@@ -195,6 +195,55 @@ class ActionCheckTest {
     }
 
     @Test
+    void testResolve_CountUpSuccessDoesNotSpendEdge() {
+        // Count-up checks succeed by rolling at or under the target number.
+        Person person = mock(Person.class);
+        when(person.getHyperlinkedFullTitle()).thenReturn("Person");
+        when(person.getGender()).thenReturn(Gender.FEMALE);
+        when(person.getCurrentEdge()).thenReturn(1);
+        TargetRoll target = new TargetRoll(7, "");
+        ConcreteActionCheck check = new ConcreteActionCheck(person, target, true, false, "Action");
+        ActionCheckResult result = resolveWithFixedRoll(check, true, 2, 2, 6, 6);
+
+        assertTrue(result.isSuccess());
+        assertFalse(result.hasUsedEdge());
+        assertEquals(4, result.getRollResult());
+        verify(person, never()).spendEdge();
+    }
+
+    @Test
+    void testResolve_CountUpFailureSpendsEdge() {
+        Person person = mock(Person.class);
+        when(person.getHyperlinkedFullTitle()).thenReturn("Person");
+        when(person.getGender()).thenReturn(Gender.FEMALE);
+        when(person.getCurrentEdge()).thenReturn(1);
+        TargetRoll target = new TargetRoll(7, "");
+        ConcreteActionCheck check = new ConcreteActionCheck(person, target, true, false, "Action");
+        ActionCheckResult result = resolveWithFixedRoll(check, true, 5, 5, 1, 2);
+
+        assertTrue(result.isSuccess());
+        assertTrue(result.hasUsedEdge());
+        assertEquals(3, result.getRollResult());
+        verify(person).spendEdge();
+    }
+
+    @Test
+    void testResolve_CountUpTargetBelowTwoNeverSpendsEdge() {
+        // No 2d6 roll can come in under a count-up target of 1, so edge would be wasted.
+        Person person = mock(Person.class);
+        when(person.getHyperlinkedFullTitle()).thenReturn("Person");
+        when(person.getGender()).thenReturn(Gender.FEMALE);
+        when(person.getCurrentEdge()).thenReturn(1);
+        TargetRoll target = new TargetRoll(1, "");
+        ConcreteActionCheck check = new ConcreteActionCheck(person, target, true, false, "Action");
+        ActionCheckResult result = resolveWithFixedRoll(check, true, 3, 3, 1, 1);
+
+        assertFalse(result.isSuccess());
+        assertFalse(result.hasUsedEdge());
+        verify(person, never()).spendEdge();
+    }
+
+    @Test
     void testResolve_UsesEdgeAndSucceeds() {
         Person person = mock(Person.class);
         when(person.getHyperlinkedFullTitle()).thenReturn("Person");

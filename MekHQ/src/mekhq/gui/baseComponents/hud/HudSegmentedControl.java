@@ -92,6 +92,8 @@ public class HudSegmentedControl<T> extends JPanel {
     private final List<Cell> cells = new ArrayList<>();
     /** The chosen value, or {@code null} while nothing is chosen. */
     private transient T selected;
+    /** How many segments sit in a row before wrapping, or {@code 0} to keep every segment in one row. */
+    private int columns;
 
     /**
      * One segment of the control.
@@ -154,11 +156,23 @@ public class HudSegmentedControl<T> extends JPanel {
     public void setSegments(List<Segment<T>> segments) {
         removeAll();
         cells.clear();
-        setLayout(new GridLayout(1, Math.max(1, segments.size()), 0, 0));
+        int count = Math.max(1, segments.size());
+        int perRow = (columns > 0) ? Math.min(columns, count) : count;
+        int rows = (count + perRow - 1) / perRow;
+        setLayout(new GridLayout(rows, perRow, 0, 0));
         for (int index = 0; index < segments.size(); index++) {
-            Cell cell = new Cell(segments.get(index), index < segments.size() - 1);
+            boolean isRowEnd = (index % perRow == perRow - 1) || (index == segments.size() - 1);
+            boolean isLastRow = index / perRow == rows - 1;
+            Cell cell = new Cell(segments.get(index), !isRowEnd, !isLastRow);
             cells.add(cell);
             add(cell);
+        }
+        // Fill out a short last row so its cells keep the same width as the rows above.
+        for (int index = segments.size(); index < rows * perRow; index++) {
+            JPanel filler = new JPanel();
+            filler.setOpaque(true);
+            filler.setBackground(SURFACE_DEEP);
+            add(filler);
         }
         setSelected(selected);
         revalidate();
@@ -213,6 +227,36 @@ public class HudSegmentedControl<T> extends JPanel {
         }
     }
 
+    /**
+     * Wraps the segments onto several rows. Call before {@link #setSegments(List)}.
+     *
+     * @param columns how many segments sit in each row, or {@code 0} for a single row
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setColumns(int columns) {
+        this.columns = Math.max(0, columns);
+    }
+
+    /**
+     * Replaces the sub-line of the segment for a value, for example when the effect it describes changes.
+     *
+     * @param value the segment's value; does nothing if no segment has it, or if the segment was made without a
+     *              sub-line
+     * @param sub   the new sub-line
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setSegmentSub(T value, String sub) {
+        for (Cell cell : cells) {
+            if (Objects.equals(cell.value, value) && cell.sub != null) {
+                cell.sub.setText(sub);
+            }
+        }
+    }
+
     private String titleText(String title) {
         return style.isTitleUppercase() ? title.toUpperCase(Locale.ROOT) : title;
     }
@@ -226,15 +270,17 @@ public class HudSegmentedControl<T> extends JPanel {
     private final class Cell extends JPanel {
         private final transient T value;
         private final boolean hasRightBorder;
+        private final boolean hasBottomBorder;
         private final JLabel title;
         /** The sub-line under the title, or {@code null} for a segment without one. */
         private final JLabel sub;
         private boolean isCellEnabled;
         private boolean isHovered;
 
-        private Cell(Segment<T> segment, boolean hasRightBorder) {
+        private Cell(Segment<T> segment, boolean hasRightBorder, boolean hasBottomBorder) {
             this.value = segment.value();
             this.hasRightBorder = hasRightBorder;
+            this.hasBottomBorder = hasBottomBorder;
             this.isCellEnabled = segment.enabled();
             setOpaque(false);
             setFocusable(style.isDisabledCellFocusable() || isCellEnabled);
@@ -348,6 +394,10 @@ public class HudSegmentedControl<T> extends JPanel {
                 if (hasRightBorder) {
                     graphics2D.setColor(BORDER);
                     graphics2D.fillRect(width - scaleForGUI(1), 0, scaleForGUI(1), height);
+                }
+                if (hasBottomBorder) {
+                    graphics2D.setColor(BORDER);
+                    graphics2D.fillRect(0, height - scaleForGUI(1), width, scaleForGUI(1));
                 }
                 if (isSelectedCell) {
                     int underline = scaleForGUI(2);
