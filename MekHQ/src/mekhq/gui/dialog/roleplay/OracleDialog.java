@@ -36,6 +36,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
@@ -43,6 +44,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import javax.swing.BorderFactory;
@@ -50,6 +52,8 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JLabel;
 import javax.swing.JList;
@@ -61,9 +65,13 @@ import javax.swing.ListSelectionModel;
 import javax.swing.SwingConstants;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.roleplay.Concepts;
+import mekhq.campaign.roleplay.Concepts.Concept;
 import mekhq.campaign.roleplay.FateChart;
 import mekhq.campaign.roleplay.FateChartOdds;
 import mekhq.campaign.roleplay.FateChartResult;
+import mekhq.campaign.roleplay.OracleTable;
+import mekhq.campaign.roleplay.RandomOracleGenerator;
 import mekhq.campaign.roleplay.RandomEventFocus;
 import mekhq.campaign.roleplay.Roleplay;
 
@@ -86,6 +94,9 @@ public class OracleDialog extends JDialog {
     private DefaultListModel<String> characterModel;
     private JList<String> lstCharacters;
     private JTextField txtNewCharacter;
+
+    private final List<JComboBox<OracleTable>> conceptTableBoxes = new ArrayList<>();
+    private JLabel lblConcepts;
 
     public OracleDialog(final JFrame frame, final Campaign campaign) {
         super(frame, getTextAt(RESOURCE_BUNDLE, "OracleDialog.title"), true);
@@ -148,7 +159,93 @@ public class OracleDialog extends JDialog {
         getContentPane().setLayout(new BorderLayout());
         getContentPane().add(pnlMain, BorderLayout.CENTER);
         getContentPane().add(createCharacterPanel(), BorderLayout.EAST);
-        getContentPane().add(pnlButtons, BorderLayout.SOUTH);
+        JPanel pnlSouth = new JPanel(new BorderLayout());
+        pnlSouth.add(createConceptsPanel(), BorderLayout.CENTER);
+        pnlSouth.add(pnlButtons, BorderLayout.SOUTH);
+        getContentPane().add(pnlSouth, BorderLayout.SOUTH);
+    }
+
+    private JPanel createConceptsPanel() {
+        JPanel pnlConcepts = new JPanel(new GridBagLayout());
+        pnlConcepts.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10),
+              BorderFactory.createTitledBorder(getTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.title"))));
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(3, 5, 3, 5);
+        constraints.anchor = GridBagConstraints.WEST;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+
+        for (int i = 0; i < Concepts.MAXIMUM_TABLES; i++) {
+            DefaultComboBoxModel<OracleTable> model = new DefaultComboBoxModel<>();
+            model.addElement(null);
+            for (OracleTable table : OracleTable.values()) {
+                model.addElement(table);
+            }
+            JComboBox<OracleTable> cboTable = new JComboBox<>(model);
+            cboTable.setMaximumRowCount(20);
+            cboTable.setRenderer(new DefaultListCellRenderer() {
+                @Override
+                public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                      boolean isSelected, boolean cellHasFocus) {
+                    Object display = (value == null) ? getTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.none") : value;
+                    return super.getListCellRendererComponent(list, display, index, isSelected, cellHasFocus);
+                }
+            });
+            conceptTableBoxes.add(cboTable);
+
+            constraints.gridx = 0;
+            constraints.gridy = i;
+            constraints.weightx = 0;
+            pnlConcepts.add(new JLabel(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.table", i + 1)),
+                  constraints);
+            constraints.gridx = 1;
+            constraints.weightx = 1;
+            pnlConcepts.add(cboTable, constraints);
+        }
+
+        JButton btnRollConcepts = new JButton(getTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.roll"));
+        btnRollConcepts.addActionListener(event -> rollConcepts());
+        constraints.gridx = 2;
+        constraints.gridy = 0;
+        constraints.weightx = 0;
+        constraints.gridheight = Concepts.MAXIMUM_TABLES;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.anchor = GridBagConstraints.CENTER;
+        pnlConcepts.add(btnRollConcepts, constraints);
+
+        lblConcepts = new JLabel(getTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.prompt"));
+        constraints.gridx = 0;
+        constraints.gridy = Concepts.MAXIMUM_TABLES;
+        constraints.gridwidth = 3;
+        constraints.gridheight = 1;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.anchor = GridBagConstraints.WEST;
+        pnlConcepts.add(lblConcepts, constraints);
+
+        return pnlConcepts;
+    }
+
+    private void rollConcepts() {
+        List<OracleTable> tables = new ArrayList<>();
+        for (JComboBox<OracleTable> cboTable : conceptTableBoxes) {
+            tables.add((OracleTable) cboTable.getSelectedItem());
+        }
+
+        List<Concept> concepts = Concepts.roll(tables, RandomOracleGenerator.getInstance());
+        if (concepts.isEmpty()) {
+            lblConcepts.setText(getTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.noneSelected"));
+            return;
+        }
+
+        StringBuilder text = new StringBuilder("<html>");
+        for (Concept concept : concepts) {
+            String meaning = (concept.meaning() == null)
+                                   ? getTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.empty")
+                                   : escapeHtml(concept.meaning());
+            text.append(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.result",
+                  concept.table().getLabel(), meaning)).append("<br>");
+        }
+        lblConcepts.setText(text.append("</html>").toString());
+        pack();
     }
 
     private JPanel createCharacterPanel() {

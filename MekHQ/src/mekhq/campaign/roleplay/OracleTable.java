@@ -109,6 +109,30 @@ public enum OracleTable {
     }
 
     /**
+     * Builds a display label from the constant's name: the category, then the rest of the name. For example,
+     * {@code ENVIRONMENTS_NATURAL_WEATHER} becomes "Environments: Natural Weather".
+     *
+     * @return the display label
+     */
+    public String getLabel() {
+        final String[] words = name().split("_");
+        final StringBuilder label = new StringBuilder(capitalize(words[0])).append(':');
+        for (int i = 1; i < words.length; i++) {
+            label.append(' ').append(capitalize(words[i]));
+        }
+        return label.toString();
+    }
+
+    private static String capitalize(final String word) {
+        return word.charAt(0) + word.substring(1).toLowerCase();
+    }
+
+    @Override
+    public String toString() {
+        return getLabel();
+    }
+
+    /**
      * @return the table's path relative to the oracle directory, without the {@code .csv} extension
      */
     public String getRelativePath() {
