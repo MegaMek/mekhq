@@ -45,6 +45,7 @@ import java.nio.file.Path;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -94,6 +95,18 @@ class RandomOracleGeneratorTest {
 
         assertEquals("dread", generator.generate(OracleTable.THEMES_FEAR));
         assertEquals("faith", generator.generate(OracleTable.THEMES_TRUST));
+    }
+
+    @Test
+    void tablesAreReadyOnlyWhenEveryOneHasEntries() {
+        Map<OracleTable, WeightedIntMap<String>> pools = new EnumMap<>(OracleTable.class);
+        pools.put(OracleTable.THEMES_FEAR, pool("dread"));
+        pools.put(OracleTable.THEMES_TRUST, new WeightedIntMap<>());
+        RandomOracleGenerator generator = RandomOracleGenerator.createForTesting(pools);
+
+        assertTrue(generator.isReady(List.of(OracleTable.THEMES_FEAR)));
+        assertFalse(generator.isReady(List.of(OracleTable.THEMES_FEAR, OracleTable.THEMES_TRUST)));
+        assertFalse(generator.isReady(List.of(OracleTable.ADVENTURE_TWIST)));
     }
 
     @Test

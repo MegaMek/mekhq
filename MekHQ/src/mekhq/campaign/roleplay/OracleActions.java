@@ -38,6 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.IntSupplier;
 import java.util.function.IntUnaryOperator;
@@ -132,7 +133,7 @@ public class OracleActions {
      *
      * @return the outcome
      */
-    public AskOutcome ask(final String question, final FateChartOdds odds) {
+    public AskOutcome ask(final @Nullable String question, final FateChartOdds odds) {
         final int roll = randomInt(100) + 1;
         return ask(question, odds, roll, randomInt(100) + 1);
     }
@@ -147,7 +148,8 @@ public class OracleActions {
      *
      * @return the outcome
      */
-    public AskOutcome ask(final String question, final FateChartOdds odds, final int roll, final int randomEventRoll) {
+    public AskOutcome ask(final @Nullable String question, final FateChartOdds odds, final int roll,
+          final int randomEventRoll) {
         final int chaos = roleplay.getChaosFactor();
         final FateChartResult fate = FateChart.consult(odds, chaos, roll, randomEventRoll);
         final String trimmedQuestion = (question == null) ? "" : question.strip();
@@ -236,6 +238,15 @@ public class OracleActions {
      *
      * @return the new thread
      */
+    /**
+     * @param tables the tables about to be rolled on
+     *
+     * @return {@code true} if they have loaded and all have entries, so rolling on them gives real results
+     */
+    public boolean tablesReady(final Collection<OracleTable> tables) {
+        return generator.get().isReady(tables);
+    }
+
     public PlotThread createThread(final String name, final PlotThreadLength length) {
         final PlotThread thread = PlotThread.create(name.strip(), length, generator.get());
         roleplay.getPlotThreads().add(thread);
@@ -393,7 +404,7 @@ public class OracleActions {
      * @return the new character, or {@code null} if the name is blank or already in the cast, even as a removed
      *       character
      */
-    public @Nullable OracleCharacter generateNpc(final String name) {
+    public @Nullable OracleCharacter generateNpc(final @Nullable String name) {
         // A removed character with this name would be restored and given someone else's profile, so refuse it.
         if (name == null || roleplay.getCharacters().stream()
                                   .anyMatch(existing -> existing.getName().equals(name.strip()))) {
@@ -428,7 +439,8 @@ public class OracleActions {
         for (Concept concept : concepts) {
             final String meaning = (concept.meaning() == null) ? getTextAt(RESOURCE_BUNDLE, "OracleLog.noConcept")
                                          : concept.meaning();
-            lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.concept", concept.table().getTableLabel(), meaning));
+            lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.concept", concept.table().getTableLabel(),
+                  meaning));
         }
         return String.join("\n", lines);
     }

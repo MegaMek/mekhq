@@ -36,6 +36,7 @@ import java.io.PrintWriter;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -50,6 +51,8 @@ import org.w3c.dom.NodeList;
  * @param answer   the answer
  */
 public record OracleAnswer(String question, FateChartOdds odds, int chaos, int roll, FateChartAnswer answer) {
+    private static final MMLogger LOGGER = MMLogger.create(OracleAnswer.class);
+
     void writeToXML(final PrintWriter writer, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "answer");
         if (!question.isBlank()) {
@@ -69,17 +72,23 @@ public record OracleAnswer(String question, FateChartOdds odds, int chaos, int r
         int roll = 0;
         FateChartAnswer answer = null;
         final NodeList fields = node.getChildNodes();
-        for (int i = 0; i < fields.getLength(); i++) {
-            final Node field = fields.item(i);
-            final String text = field.getTextContent().trim();
-            switch (field.getNodeName()) {
-                case "question" -> question = field.getTextContent();
-                case "odds" -> odds = FateChartOdds.valueOf(text);
-                case "chaos" -> chaos = MathUtility.parseInt(text, Roleplay.DEFAULT_CHAOS_FACTOR);
-                case "roll" -> roll = MathUtility.parseInt(text);
-                case "result" -> answer = FateChartAnswer.valueOf(text);
-                default -> { }
+        try {
+            for (int i = 0; i < fields.getLength(); i++) {
+                final Node field = fields.item(i);
+                final String text = field.getTextContent().trim();
+                switch (field.getNodeName()) {
+                    case "question" -> question = field.getTextContent();
+                    case "odds" -> odds = FateChartOdds.valueOf(text);
+                    case "chaos" -> chaos = MathUtility.parseInt(text, Roleplay.DEFAULT_CHAOS_FACTOR);
+                    case "roll" -> roll = MathUtility.parseInt(text);
+                    case "result" -> answer = FateChartAnswer.valueOf(text);
+                    default -> { }
+                }
             }
+        } catch (IllegalArgumentException unknown) {
+            // Odds or an answer this version doesn't know; the entry keeps its text without the details.
+            LOGGER.warn("Skipped the Fate Chart details of a journal entry: {}", unknown.getMessage());
+            return null;
         }
         return (odds == null || answer == null) ? null : new OracleAnswer(question, odds, chaos, roll, answer);
     }

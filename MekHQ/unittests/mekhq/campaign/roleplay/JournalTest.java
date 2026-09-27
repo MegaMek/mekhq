@@ -220,6 +220,19 @@ class JournalTest {
     }
 
     @Test
+    void anUnknownFateChartAnswerKeepsTheEntryText() throws Exception {
+        Roleplay original = new Roleplay();
+        original.logOracle(DAY_ONE, JournalEntryType.FATE_CHART, "Asked: Is it safe?", 500)
+              .setAnswer(new OracleAnswer("Is it safe?", FateChartOdds.LIKELY, 5, 12, FateChartAnswer.NORMAL_YES));
+
+        Roleplay loaded = Roleplay.generateInstanceFromXML(parse(write(original).replace("LIKELY", "RENAMED")));
+
+        JournalEntry entry = loaded.getOracleLog().get(0);
+        assertEquals("Asked: Is it safe?", entry.getText());
+        assertNull(entry.getAnswer());
+    }
+
+    @Test
     void plainNotesFromOlderSavesBecomeRichText() throws Exception {
         String xml = "<roleplay><journal><entry><date>3025-01-02</date><text>Old note &lt;1&gt;\nLine two</text>"
                            + "</entry></journal></roleplay>";

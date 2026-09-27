@@ -37,7 +37,6 @@ import static mekhq.campaign.roleplay.FateChart.NO_EXCEPTIONAL_YES;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -120,15 +119,6 @@ class FateChartTest {
               FateChart.getThresholds(FateChartOdds.LIKELY, -4));
         assertArrayEquals(FateChart.getThresholds(FateChartOdds.LIKELY, 9),
               FateChart.getThresholds(FateChartOdds.LIKELY, 15));
-    }
-
-    @Test
-    void consultAlwaysReturnsAnAnswer() {
-        for (int i = 0; i < 1000; i++) {
-            FateChartResult result = FateChart.consult(FateChartOdds.FIFTY_FIFTY, 5);
-            assertNotNull(result.answer());
-            assertEquals(FateChart.isRandomEvent(result.roll()), result.hasRandomEvent());
-        }
     }
 
     @Test

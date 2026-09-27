@@ -52,6 +52,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Locale;
@@ -66,6 +67,7 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
@@ -91,7 +93,9 @@ import mekhq.campaign.roleplay.JournalEntry;
 import mekhq.campaign.roleplay.OracleActions;
 import mekhq.campaign.roleplay.OracleAnswer;
 import mekhq.campaign.roleplay.OracleCharacter;
+import mekhq.campaign.roleplay.OracleTable;
 import mekhq.campaign.roleplay.PlotThread;
+import mekhq.campaign.roleplay.RandomOracleGenerator;
 import mekhq.campaign.roleplay.Roleplay;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.hud.Hud;
@@ -466,6 +470,9 @@ public class OracleConsole extends JDialog {
      * the Cast page.
      */
     void generateNpc() {
+        if (!tablesReady(OracleActions.NPC_PROFILE_TABLES)) {
+            return;
+        }
         OracleCharacter character = null;
         // A name already in the cast is refused, so try a few.
         for (int attempt = 0; attempt < 5 && character == null; attempt++) {
@@ -478,6 +485,24 @@ public class OracleConsole extends JDialog {
         }
         changed();
         showCharacter(character.getId());
+    }
+
+    /**
+     * Checks that the oracle tables about to be rolled on have loaded, telling the player why not if they haven't.
+     *
+     * @param tables the tables about to be rolled on
+     *
+     * @return {@code true} if they are ready
+     */
+    boolean tablesReady(final Collection<OracleTable> tables) {
+        if (actions.tablesReady(tables)) {
+            return true;
+        }
+        JOptionPane.showMessageDialog(this, getTextAt(RESOURCE_BUNDLE, RandomOracleGenerator.isInitialized()
+                                                                             ? "OracleConsole.tablesMissing"
+                                                                             : "OracleConsole.tablesLoading"),
+              getTextAt(RESOURCE_BUNDLE, "OracleConsole.tablesUnavailable"), JOptionPane.WARNING_MESSAGE);
+        return false;
     }
 
     private String randomName() {

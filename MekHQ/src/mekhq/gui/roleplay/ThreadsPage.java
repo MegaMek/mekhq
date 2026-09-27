@@ -406,6 +406,10 @@ class ThreadsPage implements ConsoleSection {
             createName.requestFocusInWindow();
             return;
         }
+        // Every step is rolled now, so empty tables would leave the thread without prompts for good.
+        if (!console.tablesReady(PlotThread.getThreadTables())) {
+            return;
+        }
         PlotThread thread = console.actions().createThread(name, length);
         showCreateForm(false);
         selectedId = thread.getId();

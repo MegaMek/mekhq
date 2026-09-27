@@ -150,6 +150,15 @@ public class PlotThread {
         return number % FLASHPOINT_INTERVAL == 0 && number < length.getSteps();
     }
 
+    /**
+     * @return every table a thread's steps can roll on
+     */
+    public static List<OracleTable> getThreadTables() {
+        return Arrays.stream(OracleTable.values())
+                     .filter(table -> table.name().startsWith("THEMES_") || table.name().startsWith("ADVENTURE_"))
+                     .toList();
+    }
+
     static List<OracleTable> getThemeTables() {
         return Arrays.stream(OracleTable.values()).filter(table -> table.name().startsWith("THEMES_")).toList();
     }

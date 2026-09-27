@@ -42,6 +42,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import megamek.codeUtilities.MathUtility;
+import megamek.common.annotations.Nullable;
 
 /**
  * A dice expression such as {@code 2d6+1}, {@code d100}, {@code 4d6kh3} or {@code 1d20+1d4-2}, for rules from other
@@ -136,7 +137,7 @@ public final class DiceExpression {
      *
      * @throws IllegalArgumentException if the text is not a valid expression or asks for too many dice
      */
-    public static DiceExpression parse(final String text) {
+    public static DiceExpression parse(final @Nullable String text) {
         if (text == null || text.isBlank()) {
             throw new IllegalArgumentException("empty");
         }
@@ -183,11 +184,11 @@ public final class DiceExpression {
      *
      * @return {@code true} if {@link #parse(String)} would accept it
      */
-    public static boolean isValid(final String text) {
+    public static boolean isValid(final @Nullable String text) {
         try {
             parse(text);
             return true;
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException invalid) {
             return false;
         }
     }

@@ -36,11 +36,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.Set;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
@@ -80,6 +85,25 @@ public class RandomOracleGenerator {
 
     public static boolean isInitialized() {
         return initialized;
+    }
+
+    /**
+     * @param tables the tables about to be rolled on
+     *
+     * @return {@code true} once the tables have loaded and every one of them has entries; {@code false} while they
+     *       are still loading, or if the oracle data is missing or out of date
+     */
+    public boolean isReady(final Collection<OracleTable> tables) {
+        if (!initialized) {
+            return false;
+        }
+        for (OracleTable table : tables) {
+            final WeightedIntMap<String> pool = weightedMeanings.get(table);
+            if (pool == null || pool.isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
     //endregion Getters/Setters
 
@@ -144,26 +168,33 @@ public class RandomOracleGenerator {
     }
 
     private void populateAll() {
+        final List<OracleTable> empty = new ArrayList<>();
         for (final OracleTable table : OracleTable.values()) {
-            populate(table);
+            if (!populate(table)) {
+                empty.add(table);
+            }
+        }
+        if (!empty.isEmpty()) {
+            logger.warn("No meanings loaded for {} of {} oracle tables; the oracle data may be missing or out of date: {}",
+                  empty.size(), OracleTable.values().length, empty);
         }
 
         initialized = true;
     }
 
-    private void populate(final OracleTable table) {
+    /**
+     * @return {@code true} if the table has at least one meaning
+     */
+    private boolean populate(final OracleTable table) {
         final Map<String, Integer> meanings = new HashMap<>();
         loadMeanings(new File(table.getFilePath()), meanings);
         loadMeanings(new File(table.getUserFilePath()), meanings);
-
-        if (meanings.isEmpty()) {
-            logger.warn("No meanings loaded for oracle table {}", table);
-        }
 
         final WeightedIntMap<String> pool = weightedMeanings.get(table);
         for (final Entry<String, Integer> entry : meanings.entrySet()) {
             pool.add(entry.getValue(), entry.getKey());
         }
+        return !meanings.isEmpty();
     }
 
     /**
@@ -179,9 +210,11 @@ public class RandomOracleGenerator {
         }
 
         int lineNumber = 0;
+        // Within one file a repeat is a mistake; across files it is the userdata override replacing a weight.
+        final Set<String> seen = new HashSet<>();
 
-        try (InputStream is = new FileInputStream(file);
-              Scanner input = new Scanner(is, StandardCharsets.UTF_8)) {
+        try (InputStream inputStream = new FileInputStream(file);
+              Scanner input = new Scanner(inputStream, StandardCharsets.UTF_8)) {
             // skip the first line, as that's the header
             lineNumber++;
             input.nextLine();
@@ -199,7 +232,12 @@ public class RandomOracleGenerator {
                     if (weight == Integer.MIN_VALUE) {
                         logger.error("Weight is not a number in {} on {}", file, lineNumber);
                     } else {
-                        meanings.put(values[0].trim(), weight);
+                        final String meaning = values[0].trim();
+                        if (!seen.add(meaning)) {
+                            logger.warn("{} lists {} more than once on {}; only the last weight is used", file,
+                                  meaning, lineNumber);
+                        }
+                        meanings.put(meaning, weight);
                     }
                 } else if (values.length < 2) {
                     logger.error("Not enough fields in {} on {}", file, lineNumber);
@@ -207,8 +245,8 @@ public class RandomOracleGenerator {
                     logger.error("Too many fields in {} on {}", file, lineNumber);
                 }
             }
-        } catch (Exception e) {
-            logger.error("Failed to populate oracle table from {}", file, e);
+        } catch (Exception exception) {
+            logger.error("Failed to populate oracle table from {}", file, exception);
         }
     }
     //endregion Initialization

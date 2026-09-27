@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.roleplay;
 
-import static megamek.common.compute.Compute.randomInt;
-
 /**
  * Implements the Fate Chart used to answer yes/no questions in the solo-roleplay oracle system.
  *
@@ -87,20 +85,6 @@ public final class FateChart {
     private static final int INDEX_OFFSET = 3;
 
     private FateChart() {}
-
-    /**
-     * Rolls a d100 and consults the Fate Chart, rolling on the {@link RandomEventFocus} table if a random event is
-     * triggered.
-     *
-     * @param odds        the player's chosen odds of the answer being yes
-     * @param chaosFactor the current chaos factor; values outside the valid range are clamped
-     *
-     * @return the result, including any random event
-     */
-    public static FateChartResult consult(final FateChartOdds odds, final int chaosFactor) {
-        final int roll = rollD100();
-        return consult(odds, chaosFactor, roll, isRandomEvent(roll) ? rollD100() : 0);
-    }
 
     /**
      * Consults the Fate Chart using given rolls.
@@ -174,9 +158,5 @@ public final class FateChart {
      */
     public static int clampChaosFactor(final int chaosFactor) {
         return Math.clamp(chaosFactor, MINIMUM_CHAOS_FACTOR, MAXIMUM_CHAOS_FACTOR);
-    }
-
-    private static int rollD100() {
-        return randomInt(100) + 1;
     }
 }

@@ -510,6 +510,9 @@ class AskPage implements ConsoleSection {
         for (ConceptRow row : rows) {
             tables.add((OracleTable) row.table.getSelectedItem());
         }
+        if (!console.tablesReady(tables)) {
+            return;
+        }
         List<Concept> concepts = console.actions().rollConcepts(tables);
         conceptResults.removeAll();
         conceptResults.setLayout(new GridLayout(1, Math.max(1, concepts.size()), scaleForGUI(1), 0));

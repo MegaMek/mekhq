@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.roleplay;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
@@ -52,7 +54,7 @@ public enum OracleTable {
     ADVENTURE_COMPLICATION("adventure/complication"),
     ADVENTURE_CONFLICT("adventure/conflict"),
     ADVENTURE_COST("adventure/cost"),
-    ADVENTURE_DILEMMA("adventure/dilema"),
+    ADVENTURE_DILEMMA("adventure/dilemma"),
     ADVENTURE_ESCALATION("adventure/escalation"),
     ADVENTURE_INFORMATION("adventure/information"),
     ADVENTURE_LOCATION("adventure/location"),
@@ -103,6 +105,8 @@ public enum OracleTable {
     THEMES_TRADITION("themes/tradition"),
     THEMES_TRUST("themes/trust");
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Roleplay";
+
     /** The table's path relative to the oracle directory, without the {@code .csv} extension. */
     private final String relativePath;
 
@@ -111,33 +115,24 @@ public enum OracleTable {
     }
 
     /**
-     * Builds a display label from the constant's name: the category, then the rest of the name. For example,
-     * {@code ENVIRONMENTS_NATURAL_WEATHER} becomes "Environments: Natural Weather".
-     *
-     * @return the display label
+     * @return the display label: the category, then the table, such as "Environments: Natural Weather"
      */
     public String getLabel() {
-        final String[] words = name().split("_");
-        final StringBuilder label = new StringBuilder(capitalize(words[0])).append(':');
-        for (int i = 1; i < words.length; i++) {
-            label.append(' ').append(capitalize(words[i]));
-        }
-        return label.toString();
+        return getCategory() + ": " + getTableLabel();
     }
 
     /**
-     * @return the table's category, the first word of its name, such as "Adventure" or "Themes"
+     * @return the table's category, such as "Adventure" or "Themes"
      */
     public String getCategory() {
-        return capitalize(name().split("_")[0]);
+        return getTextAt(RESOURCE_BUNDLE, "OracleTable.category." + name().substring(0, name().indexOf('_')));
     }
 
     /**
      * @return the table's label without its category, such as "Natural Weather"
      */
     public String getTableLabel() {
-        final String label = getLabel();
-        return label.substring(label.indexOf(':') + 1).strip();
+        return getTextAt(RESOURCE_BUNDLE, "OracleTable." + name());
     }
 
     /**
@@ -154,10 +149,6 @@ public enum OracleTable {
      */
     public static List<OracleTable> getTables(final String category) {
         return Arrays.stream(values()).filter(table -> table.getCategory().equals(category)).toList();
-    }
-
-    private static String capitalize(final String word) {
-        return word.charAt(0) + word.substring(1).toLowerCase();
     }
 
     @Override
