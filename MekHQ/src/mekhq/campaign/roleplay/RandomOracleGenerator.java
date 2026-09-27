@@ -175,7 +175,8 @@ public class RandomOracleGenerator {
             }
         }
         if (!empty.isEmpty()) {
-            logger.warn("No meanings loaded for {} of {} oracle tables; the oracle data may be missing or out of date: {}",
+            logger.warn("No meanings loaded for {} of {} oracle tables; the oracle data may be missing or out of "
+                              + "date: {}",
                   empty.size(), OracleTable.values().length, empty);
         }
 

@@ -54,9 +54,9 @@ import mekhq.campaign.roleplay.CampaignChronicle.PersonChange;
 import mekhq.campaign.universe.PlanetarySystem;
 
 /**
- * Passes MekHQ's campaign events to a {@link CampaignChronicle} and keeps the {@link TravelLog} up to date. Register it on the event bus while a campaign is open
- * and unregister it when the campaign closes. Events about anything that is not in this campaign are ignored, so a
- * campaign being loaded never writes into another's journal.
+ * Passes MekHQ's campaign events to a {@link CampaignChronicle} and keeps the {@link TravelLog} up to date. Register
+ * it on the event bus while a campaign is open and unregister it when the campaign closes. Events about anything that
+ * is not in this campaign are ignored, so a campaign being loaded never writes into another's journal.
  */
 public class CampaignChronicleListener {
     private static final MMLogger LOGGER = MMLogger.create(CampaignChronicleListener.class);
@@ -82,11 +82,14 @@ public class CampaignChronicleListener {
     public void updateTravelLog() {
         guard(() -> {
             TravelLog log = campaign.getRoleplay().getTravelLog();
-            log.fillHistory(TravelSnapshots.contracts(campaign));
+            if (!log.isHistoryFilled()) {
+                log.fillHistory(TravelSnapshots.contracts(campaign), campaign.getLocalDate());
+            }
             log.observe(campaign.getLocalDate(), TravelSnapshots.capture(campaign));
         });
     }
 
+    /** Records travel at the start of each day. */
     @Subscribe
     public void handle(final NewDayEvent event) {
         if (event.getCampaign() == campaign) {
@@ -94,38 +97,44 @@ public class CampaignChronicleListener {
         }
     }
 
+    /** Records a new base. */
     @Subscribe
     public void handle(final LocationAddedEvent event) {
         updateTravelLog();
     }
 
+    /** Records a base closing. */
     @Subscribe
     public void handle(final LocationRemovedEvent event) {
         updateTravelLog();
     }
 
+    /** Records a contract being accepted. */
     @Subscribe
     public void handle(final MissionNewEvent event) {
         guard(() -> {
-            AbstractContract contract = event.getMission();
-            if (contract != null && campaign.getContractHistoryAsMap().containsKey(contract.getId())) {
+            AbstractContract contract = ourContract(event.getMission());
+            if (contract != null) {
                 chronicle.contractStarted(contract.getId(), contract.getName(), contract.getEmployerDisplayName(),
-                      contract.getTargetSystemName(campaign.getLocalDate()));
+                      (contract.getTargetSystem() == null) ? null
+                            : contract.getTargetSystemName(campaign.getLocalDate()));
             }
         });
     }
 
+    /** Records a contract ending, and the day it really ended for the travel log. */
     @Subscribe
     public void handle(final MissionCompletedEvent event) {
         guard(() -> {
-            AbstractContract contract = event.getMission();
-            if (contract != null && contract.getStatus() != null
-                      && campaign.getContractHistoryAsMap().containsKey(contract.getId())) {
+            AbstractContract contract = ourContract(event.getMission());
+            if (contract != null && contract.getStatus() != null) {
+                campaign.getRoleplay().getTravelLog().recordContractEnd(contract.getId(), campaign.getLocalDate());
                 chronicle.contractEnded(contract.getId(), contract.getName(), contract.getStatus().toString());
             }
         });
     }
 
+    /** Records a battle being resolved. */
     @Subscribe
     public void handle(final ScenarioResolvedEvent event) {
         guard(() -> {
@@ -136,6 +145,7 @@ public class CampaignChronicleListener {
         });
     }
 
+    /** Records the company arriving at the end of a journey. */
     @Subscribe
     public void handle(final TransitCompleteEvent event) {
         guard(() -> {
@@ -151,6 +161,7 @@ public class CampaignChronicleListener {
         updateTravelLog();
     }
 
+    /** Records someone joining or being born; prisoners are left out. */
     @Subscribe
     public void handle(final PersonNewEvent event) {
         guard(() -> {
@@ -164,6 +175,7 @@ public class CampaignChronicleListener {
         });
     }
 
+    /** Records someone dying, going missing, being captured or leaving. */
     @Subscribe
     public void handle(final PersonStatusChangedEvent event) {
         guard(() -> {
@@ -200,6 +212,16 @@ public class CampaignChronicleListener {
         return null;
     }
 
+    /**
+     * Matching the object, not just the id, keeps out a copy of this campaign being loaded alongside it.
+     *
+     * @return the contract if it is this campaign's, otherwise {@code null}
+     */
+    private @Nullable AbstractContract ourContract(final @Nullable AbstractContract contract) {
+        return (contract != null && campaign.getContractHistoryAsMap().get(contract.getId()) == contract)
+                     ? contract : null;
+    }
+
     private @Nullable Person ourPerson(final @Nullable Person person) {
         return (person != null && campaign.getPlayerForce().getHumanResources().getPerson(person.getId()) == person)
                      ? person : null;
@@ -209,8 +231,8 @@ public class CampaignChronicleListener {
     private static void guard(final Runnable action) {
         try {
             action.run();
-        } catch (Exception e) {
-            LOGGER.error("Failed to record a campaign event in the Oracle journal", e);
+        } catch (Exception exception) {
+            LOGGER.error("Failed to record a campaign event in the Oracle journal", exception);
         }
     }
 }

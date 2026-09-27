@@ -109,9 +109,13 @@ public final class TravelSnapshots {
     public static List<ContractInfo> contracts(final Campaign campaign) {
         final LocalDate today = campaign.getLocalDate();
         final List<ContractInfo> contracts = new ArrayList<>();
+        final TravelLog log = campaign.getRoleplay().getTravelLog();
         for (AbstractContract contract : campaign.getContractHistoryAsMap().values()) {
             final boolean ended = contract.getStatus() != null && !contract.getStatus().isActive();
-            final LocalDate end = ended ? contract.getEndingDate() : null;
+            // A contract that ended early (breached or cancelled) ended on the day that was recorded, not its
+            // scheduled end; contracts that ended before that was recorded fall back to the schedule.
+            final LocalDate recordedEnd = log.getContractEnd(contract.getId());
+            final LocalDate end = !ended ? null : (recordedEnd != null) ? recordedEnd : contract.getEndingDate();
             contracts.add(new ContractInfo(contract.getId(), contract.getName(), contract.getTargetSystemId(),
                   contract.getTargetSystemName(today), contract.getStartDate(),
                   (end != null && end.isAfter(today)) ? today : end));
@@ -128,7 +132,8 @@ public final class TravelSnapshots {
         final JumpPath path = location.getJumpPath();
         final PlanetarySystem destination = (path == null || path.isEmpty()) ? null : path.getLastSystem();
         return new Observation(null, "", system.getId(), system.getName(today), destination != null,
-              destination == null ? null : destination.getId(), destination == null ? null : destination.getName(today));
+              destination == null ? null : destination.getId(),
+              destination == null ? null : destination.getName(today));
     }
 
     private static @Nullable Observation observe(final UUID id, final String name,
@@ -144,6 +149,7 @@ public final class TravelSnapshots {
             destination = (path == null || path.isEmpty()) ? system : path.getLastSystem();
         }
         return new Observation(id, name, system.getId(), system.getName(today), travelling,
-              destination == null ? null : destination.getId(), destination == null ? null : destination.getName(today));
+              destination == null ? null : destination.getId(),
+              destination == null ? null : destination.getName(today));
     }
 }

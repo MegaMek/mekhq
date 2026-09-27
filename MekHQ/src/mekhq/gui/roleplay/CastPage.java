@@ -136,8 +136,10 @@ class CastPage implements ConsoleSection {
         addRow.add(addField, BorderLayout.CENTER);
         addRow.add(addButtons, BorderLayout.EAST);
 
-        inCastChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.filter.active"), () -> setRemoved(false));
-        removedChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.filter.removed"), () -> setRemoved(true));
+        inCastChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.filter.active"),
+              () -> setRemoved(false));
+        removedChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.filter.removed"),
+              () -> setRemoved(true));
         JPanel chips = Hud.transparentPanel(null);
         chips.setLayout(new BoxLayout(chips, BoxLayout.X_AXIS));
         chips.add(inCastChip);

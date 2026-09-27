@@ -120,6 +120,8 @@ public class TravelLog {
 
     private final List<TravelRecord> records = new ArrayList<>();
     private boolean historyFilled;
+    /** When each finished contract really ended, which can be long before its scheduled end. */
+    private final Map<UUID, LocalDate> contractEnds = new HashMap<>();
     /** The last snapshot seen, keyed by party; {@code null} until the first snapshot after loading. */
     private Map<String, Observation> last;
     private Observation lastForce;
@@ -139,7 +141,26 @@ public class TravelLog {
         return historyFilled;
     }
 
+    /**
+     * @param contractId a contract's id
+     *
+     * @return the day the contract really ended, or {@code null} if it hasn't, or ended before this was recorded
+     */
+    public @Nullable LocalDate getContractEnd(final UUID contractId) {
+        return contractEnds.get(contractId);
+    }
+
     // region Recording
+
+    /**
+     * Notes the day a contract really ended, as a breached or cancelled contract ends before its scheduled end.
+     *
+     * @param contractId the contract's id
+     * @param date       the day it ended
+     */
+    public void recordContractEnd(final UUID contractId, final LocalDate date) {
+        contractEnds.putIfAbsent(contractId, date);
+    }
 
     /**
      * Rebuilds the main force's history from the campaign's contracts, once per campaign: an arrival in each
@@ -147,8 +168,10 @@ public class TravelLog {
      * marked as reconstructed, since the real travel dates can't be recovered.
      *
      * @param contracts the campaign's contracts
+     * @param today     the current date; contracts that haven't started yet are left out, as the company may never
+     *                  get there
      */
-    public void fillHistory(final List<ContractInfo> contracts) {
+    public void fillHistory(final List<ContractInfo> contracts, final LocalDate today) {
         if (historyFilled) {
             return;
         }
@@ -161,7 +184,8 @@ public class TravelLog {
         final List<ContractInfo> earlier = contracts.stream()
                                                  .filter(contract -> contract.start() != null
                                                                            && contract.systemId() != null
-                                                                           && contract.start().isBefore(firstRecord))
+                                                                           && contract.start().isBefore(firstRecord)
+                                                                           && !contract.start().isAfter(today))
                                                  .sorted(Comparator.comparing(ContractInfo::start))
                                                  .toList();
         String previous = null;
@@ -331,7 +355,7 @@ public class TravelLog {
         }
     }
 
-    private TravelRecord lastMovement(final Party party, final @Nullable UUID id) {
+    private @Nullable TravelRecord lastMovement(final Party party, final @Nullable UUID id) {
         for (int i = records.size() - 1; i >= 0; i--) {
             final TravelRecord record = records.get(i);
             if (record.concerns(party, id)) {
@@ -344,7 +368,7 @@ public class TravelLog {
     /**
      * @return the system a party's last record leaves it in, or {@code null} if unknown
      */
-    private String lastPlace(final Party party, final @Nullable UUID id) {
+    private @Nullable String lastPlace(final Party party, final @Nullable UUID id) {
         return placeOf(lastMovement(party, id));
     }
 
@@ -441,8 +465,8 @@ public class TravelLog {
                 continue;
             }
             names.putIfAbsent(id, record.getSystemName());
-            first.merge(id, record.getDate(), (a, b) -> a.isBefore(b) ? a : b);
-            latest.merge(id, record.getDate(), (a, b) -> a.isAfter(b) ? a : b);
+            first.merge(id, record.getDate(), (earlier, later) -> earlier.isBefore(later) ? earlier : later);
+            latest.merge(id, record.getDate(), (earlier, later) -> earlier.isAfter(later) ? earlier : later);
             if (record.getKind() == Kind.CONTRACT_STARTED) {
                 contractCounts.merge(id, 1, Integer::sum);
             }
@@ -528,11 +552,21 @@ public class TravelLog {
     // region XML
 
     void writeToXML(final PrintWriter writer, int indent) {
-        if (records.isEmpty() && !historyFilled) {
+        if (records.isEmpty() && !historyFilled && contractEnds.isEmpty()) {
             return;
         }
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "travelLog");
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "historyFilled", historyFilled);
+        if (!contractEnds.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "contractEnds");
+            for (Map.Entry<UUID, LocalDate> end : contractEnds.entrySet()) {
+                MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "contractEnd");
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "id", end.getKey());
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "date", end.getValue());
+                MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "contractEnd");
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "contractEnds");
+        }
         TravelRecord.writeListToXML(writer, indent, records);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "travelLog");
     }
@@ -546,10 +580,40 @@ public class TravelLog {
                 log.historyFilled = MathUtility.parseBoolean(child.getTextContent().trim());
             } else if (child.getNodeName().equalsIgnoreCase("records")) {
                 log.records.addAll(TravelRecord.parseList(child));
+            } else if (child.getNodeName().equalsIgnoreCase("contractEnds")) {
+                parseContractEnds(child, log.contractEnds);
             }
         }
         log.records.sort(Comparator.comparing(TravelRecord::getDate));
         return log;
+    }
+
+    private static void parseContractEnds(final Node node, final Map<UUID, LocalDate> ends) {
+        final NodeList children = node.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            final Node child = children.item(i);
+            if (!child.getNodeName().equalsIgnoreCase("contractEnd")) {
+                continue;
+            }
+            UUID id = null;
+            LocalDate date = null;
+            try {
+                final NodeList fields = child.getChildNodes();
+                for (int j = 0; j < fields.getLength(); j++) {
+                    final Node field = fields.item(j);
+                    if (field.getNodeName().equals("id")) {
+                        id = UUID.fromString(field.getTextContent().trim());
+                    } else if (field.getNodeName().equals("date")) {
+                        date = MHQXMLUtility.parseDate(field.getTextContent().trim());
+                    }
+                }
+                if (id != null && date != null) {
+                    ends.put(id, date);
+                }
+            } catch (Exception unreadable) {
+                // Only a display date is lost; the scheduled end is used instead.
+            }
+        }
     }
 
     // endregion XML

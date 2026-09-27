@@ -119,15 +119,18 @@ public final class JournalExporter {
 
             String tags = describeTags(entry, threadNames, castNames);
             if (!tags.isEmpty()) {
-                out.append(markdown ? "*" + tags + "*" : tags).append(markdown ? "\n\n" : "\n");
+                out.append(markdown ? "*" + JournalText.escapeMarkdown(tags) + "*" : tags)
+                      .append(markdown ? "\n\n" : "\n");
             }
 
             String body;
             if (entry.isNote()) {
-                body = markdown ? JournalText.htmlToMarkdown(entry.getText()) : JournalText.htmlToPlain(entry.getText());
+                body = markdown ? JournalText.htmlToMarkdown(entry.getText())
+                             : JournalText.htmlToPlain(entry.getText());
             } else {
                 // Oracle records are plain text; in Markdown, keep their line breaks with hard breaks.
-                body = markdown ? entry.getText().strip().replace("\n", "  \n") : entry.getText().strip();
+                body = markdown ? JournalText.escapeMarkdown(entry.getText().strip()).replace("\n", "  \n")
+                             : entry.getText().strip();
             }
             out.append(body).append("\n\n");
         }

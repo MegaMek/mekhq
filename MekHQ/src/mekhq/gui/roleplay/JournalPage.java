@@ -203,8 +203,10 @@ class JournalPage implements ConsoleSection {
               this::filtersChanged);
         from.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.date.toolTipText"));
         to.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.date.toolTipText"));
-        newestChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.newest"), () -> setOldestFirst(false));
-        oldestChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.oldest"), () -> setOldestFirst(true));
+        newestChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.newest"),
+              () -> setOldestFirst(false));
+        oldestChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.oldest"),
+              () -> setOldestFirst(true));
         JPanel sortRow = Hud.transparentPanel(null);
         sortRow.setLayout(new BoxLayout(sortRow, BoxLayout.X_AXIS));
         sortRow.add(newestChip);

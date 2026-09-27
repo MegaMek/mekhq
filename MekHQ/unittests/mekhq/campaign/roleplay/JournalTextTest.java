@@ -45,6 +45,22 @@ class JournalTextTest {
     }
 
     @Test
+    void markdownExportsEscapeThePlayersText() {
+        String markdown = JournalText.htmlToMarkdown("<html><body><p>Use &lt;ECM&gt; with Kell_Hounds_Two [now]</p>"
+                                                           + "<p># not a heading</p><p>- not a list</p>"
+                                                           + "<p><b>bold 2*3</b></p></body></html>");
+
+        assertEquals("Use \\<ECM\\> with Kell\\_Hounds\\_Two \\[now\\]\n\\# not a heading\n\\- not a list\n"
+                           + "**bold 2\\*3**", markdown);
+    }
+
+    @Test
+    void escapedMarkdownReadsBackAsWritten() {
+        String text = "Rolled 2*3 on <ECM> for Kell_Hounds\n# 1. [x]\n- no";
+        assertEquals(text, JournalText.unescapeMarkdown(JournalText.escapeMarkdown(text)));
+    }
+
+    @Test
     void recognisesHtml() {
         assertTrue(JournalText.isHtml("  <HTML><body>x</body></HTML>"));
         assertFalse(JournalText.isHtml("plain <b>text</b>"));

@@ -43,14 +43,29 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import megamek.common.annotations.Nullable;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.TransitCompleteEvent;
+import mekhq.campaign.events.missions.MissionCompletedEvent;
+import mekhq.campaign.events.missions.MissionNewEvent;
+import mekhq.campaign.events.persons.PersonNewEvent;
+import mekhq.campaign.events.persons.PersonStatusChangedEvent;
+import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.roleplay.CampaignChronicle.PersonChange;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -92,7 +107,7 @@ class CampaignChronicleTest {
 
     @Test
     void aContractWithNoSystemLeavesItOut() {
-        chronicle.contractStarted(UUID.randomUUID(), "Garrison", "ComStar", " ");
+        chronicle.contractStarted(UUID.randomUUID(), "Garrison", "ComStar", null);
         assertEquals("Contract accepted: Garrison, for ComStar.", roleplay.getOracleLog().get(0).getText());
     }
 
@@ -209,4 +224,143 @@ class CampaignChronicleTest {
         assertEquals(1, roleplay.getOracleLog().stream()
                               .filter(entry -> entry.getType() == JournalEntryType.CHRONICLE).count());
     }
+
+    // region Listener
+
+    private static final LocalDate TODAY = LocalDate.of(3025, 1, 1);
+
+    private Campaign campaign;
+    private Roleplay journal;
+    private final Map<UUID, AbstractContract> contracts = new LinkedHashMap<>();
+    private final Map<UUID, Person> personnel = new HashMap<>();
+
+    private CampaignChronicleListener listener() {
+        campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
+        journal = new Roleplay();
+        when(campaign.getRoleplay()).thenReturn(journal);
+        when(campaign.getLocalDate()).thenReturn(TODAY);
+        when(campaign.getCampaignOptions().get(CampaignOption.USE_ORACLE_CHRONICLE)).thenReturn(true);
+        when(campaign.getCampaignOptions().get(CampaignOption.MAXIMUM_ORACLE_LOG_ENTRIES)).thenReturn(100);
+        when(campaign.getContractHistoryAsMap()).thenAnswer(invocation -> new LinkedHashMap<>(contracts));
+        when(campaign.getPlayerForce().getHumanResources().getPerson(any()))
+              .thenAnswer(invocation -> personnel.get(invocation.<UUID>getArgument(0)));
+        return new CampaignChronicleListener(campaign);
+    }
+
+    private List<String> chronicled() {
+        return journal.getOracleLog().stream().filter(entry -> entry.getType() == JournalEntryType.CHRONICLE)
+                     .map(JournalEntry::getText).toList();
+    }
+
+    private static AbstractContract contract(final String name, final @Nullable PlanetarySystem system) {
+        AbstractContract contract = mock(AbstractContract.class);
+        UUID id = UUID.randomUUID();
+        when(contract.getId()).thenReturn(id);
+        when(contract.getName()).thenReturn(name);
+        when(contract.getEmployerDisplayName()).thenReturn("ComStar");
+        when(contract.getTargetSystem()).thenReturn(system);
+        when(contract.getTargetSystemName(any())).thenReturn(system == null ? "-" : "Helm");
+        when(contract.getStatus()).thenReturn(MissionStatus.BREACH);
+        return contract;
+    }
+
+    private static Person person(final String name, final boolean prisoner, final LocalDate born) {
+        Person person = mock(Person.class, RETURNS_DEEP_STUBS);
+        when(person.getId()).thenReturn(UUID.randomUUID());
+        when(person.getFullName()).thenReturn(name);
+        when(person.getPrisonerStatus().isCurrentPrisoner()).thenReturn(prisoner);
+        when(person.getDateOfBirth()).thenReturn(born);
+        when(person.getPrimaryRoleDesc()).thenReturn("MekWarrior");
+        when(person.getStatus()).thenReturn(PersonnelStatus.KIA);
+        return person;
+    }
+
+    @Test
+    void contractsInThisCampaignAreChronicled() {
+        CampaignChronicleListener listener = listener();
+        AbstractContract hammer = contract("Hammer", mock(PlanetarySystem.class));
+        AbstractContract garrison = contract("Garrison", null);
+        contracts.put(hammer.getId(), hammer);
+        contracts.put(garrison.getId(), garrison);
+
+        listener.handle(new MissionNewEvent(hammer));
+        listener.handle(new MissionNewEvent(garrison));
+        listener.handle(new MissionCompletedEvent(hammer));
+
+        assertEquals(List.of("Contract accepted: Hammer, for ComStar, at Helm.",
+              "Contract accepted: Garrison, for ComStar.", "Contract ended: Hammer (" + MissionStatus.BREACH + ")."),
+              chronicled());
+        assertEquals(TODAY, journal.getTravelLog().getContractEnd(hammer.getId()));
+    }
+
+    @Test
+    void contractsFromAnotherCampaignAreIgnored() {
+        CampaignChronicleListener listener = listener();
+        AbstractContract ours = contract("Hammer", null);
+        contracts.put(ours.getId(), ours);
+        // The same contract loaded into another copy of the campaign shares its id but is another object.
+        UUID id = ours.getId();
+        AbstractContract copy = contract("Hammer", null);
+        when(copy.getId()).thenReturn(id);
+
+        listener.handle(new MissionNewEvent(copy));
+        listener.handle(new MissionCompletedEvent(copy));
+        listener.handle(new MissionNewEvent(contract("Stranger", null)));
+
+        assertTrue(chronicled().isEmpty());
+        assertNull(journal.getTravelLog().getContractEnd(ours.getId()));
+    }
+
+    @Test
+    void onlyThisCampaignsBattlesAreChronicled() {
+        CampaignChronicleListener listener = listener();
+        Scenario ours = mock(Scenario.class, RETURNS_DEEP_STUBS);
+        when(ours.getId()).thenReturn(7);
+        when(ours.getName()).thenReturn("Ridge Assault");
+        Scenario copy = mock(Scenario.class, RETURNS_DEEP_STUBS);
+        when(copy.getId()).thenReturn(7);
+        when(campaign.getScenario(7)).thenReturn(ours);
+
+        listener.handle(new ScenarioResolvedEvent(copy));
+        assertTrue(chronicled().isEmpty());
+        listener.handle(new ScenarioResolvedEvent(ours));
+        assertEquals(1, chronicled().size());
+        assertTrue(chronicled().get(0).startsWith("Battle fought: Ridge Assault"), chronicled().get(0));
+    }
+
+    @Test
+    void newPeopleAreChronicledButPrisonersAreNot() {
+        CampaignChronicleListener listener = listener();
+        Person recruit = person("Ana", false, TODAY.minusYears(20));
+        Person baby = person("Ben", false, TODAY);
+        Person prisoner = person("Cole", true, TODAY.minusYears(30));
+        for (Person person : List.of(recruit, baby, prisoner)) {
+            personnel.put(person.getId(), person);
+            listener.handle(new PersonNewEvent(person));
+        }
+
+        assertEquals(2, chronicled().size());
+        assertTrue(chronicled().stream().anyMatch(text -> text.contains("Ana (MekWarrior)")), chronicled().toString());
+        assertTrue(chronicled().stream().anyMatch(text -> text.contains("Ben") && !text.contains("Ana")),
+              chronicled().toString());
+        assertTrue(chronicled().stream().noneMatch(text -> text.contains("Cole")), chronicled().toString());
+    }
+
+    @Test
+    void statusChangesForPeopleFromAnotherCampaignAreIgnored() {
+        CampaignChronicleListener listener = listener();
+        Person ours = person("Ana", false, TODAY.minusYears(20));
+        personnel.put(ours.getId(), ours);
+        UUID id = ours.getId();
+        Person copy = person("Ana", false, TODAY.minusYears(20));
+        when(copy.getId()).thenReturn(id);
+
+        listener.handle(new PersonStatusChangedEvent(copy));
+        listener.handle(new PersonStatusChangedEvent(person("Stranger", false, TODAY.minusYears(20))));
+        assertTrue(chronicled().isEmpty());
+        listener.handle(new PersonStatusChangedEvent(ours));
+        assertEquals(1, chronicled().size());
+    }
+
+    // endregion Listener
 }

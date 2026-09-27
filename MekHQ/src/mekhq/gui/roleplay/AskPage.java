@@ -316,7 +316,8 @@ class AskPage implements ConsoleSection {
         if (outcome.thread() != null) {
             String name = outcome.thread().thread().getName();
             PlotThreadStep step = outcome.thread().revealed();
-            String key = (step == null) ? "OracleConsole.ask.effect.threadLost" : "OracleConsole.ask.effect.threadProgress";
+            String key = (step == null) ? "OracleConsole.ask.effect.threadLost"
+                               : "OracleConsole.ask.effect.threadProgress";
             JPanel effect = column();
             effect.add(leftAligned(Hud.link(getFormattedTextAt(RESOURCE_BUNDLE, key, name,
                   outcome.thread().stepNumber()), () -> console.showThread(outcome.thread().thread().getId()))));

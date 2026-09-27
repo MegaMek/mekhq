@@ -196,8 +196,8 @@ public class OracleConsole extends JDialog {
 
         autoOpenGuides = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide.autoOpen"));
         autoOpenGuides.setSelected(OracleGuidePreferences.getInstance().isGuideAutoOpen());
-        autoOpenGuides.addActionListener(event ->
-                                               OracleGuidePreferences.getInstance().setGuideAutoOpen(autoOpenGuides.isSelected()));
+        autoOpenGuides.addActionListener(event -> OracleGuidePreferences.getInstance()
+                                                        .setGuideAutoOpen(autoOpenGuides.isSelected()));
         guideDrawer = new HudGuideDrawer(List.of(getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide.tab.steps"),
               getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide.tab.example"),
               getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide.tab.terms")), autoOpenGuides,

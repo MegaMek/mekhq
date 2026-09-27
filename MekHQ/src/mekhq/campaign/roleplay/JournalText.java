@@ -43,6 +43,13 @@ import megamek.codeUtilities.MathUtility;
  * are stored as.
  */
 public final class JournalText {
+    private static final String BULLET = "\uE000";
+    private static final String HEADING = "\uE001";
+    private static final String BOLD = "\uE002";
+    private static final String ITALIC = "\uE003";
+    private static final Pattern MARKDOWN_SPECIAL = Pattern.compile("[\\\\`*_#<>\\[\\]]");
+    private static final Pattern MARKDOWN_ESCAPE = Pattern.compile("\\\\([\\\\`*_#<>\\[\\]+.-])");
+    private static final Pattern LIST_START = Pattern.compile("(?m)^(\\s*)([-+]|\\d+\\.)(?=\\s)");
     private static final Pattern HEAD = Pattern.compile("(?is)<head>.*?</head>");
     private static final Pattern BODY = Pattern.compile("(?is)<body[^>]*>(.*)</body>");
     private static final Pattern TAG = Pattern.compile("(?s)<[^>]+>");
@@ -117,24 +124,55 @@ public final class JournalText {
     private static String convert(final String html, final boolean markdown) {
         // Swing's HTML writer wraps long lines, so source line breaks mean nothing: only tags make new lines.
         String text = bodyOf(html).replaceAll("\\s*\\n\\s*", " ");
+        // Markers stand in for the formatting until the player's own text has been escaped, so only their text is.
         text = text.replaceAll("(?i)<br\\s*/?>", "\n")
                      .replaceAll("(?i)</(p|div|ul|ol)>", "\n")
-                     .replaceAll("(?i)<li[^>]*>", "\n- ")
+                     .replaceAll("(?i)<li[^>]*>", "\n" + BULLET + " ")
                      .replaceAll("(?i)</li>", "");
         if (markdown) {
-            text = text.replaceAll("(?i)<h[1-6][^>]*>", "\n### ")
+            text = text.replaceAll("(?i)<h[1-6][^>]*>", "\n" + HEADING + " ")
                          .replaceAll("(?i)</h[1-6]>", "\n")
-                         .replaceAll("(?i)<(b|strong)(\\s[^>]*)?>|</(b|strong)>", "**")
-                         .replaceAll("(?i)<(i|em)(\\s[^>]*)?>|</(i|em)>", "*");
+                         .replaceAll("(?i)<(b|strong)(\\s[^>]*)?>|</(b|strong)>", BOLD)
+                         .replaceAll("(?i)<(i|em)(\\s[^>]*)?>|</(i|em)>", ITALIC);
         } else {
             text = text.replaceAll("(?i)</h[1-6]>", "\n");
         }
         text = TAG.matcher(text).replaceAll("");
         text = unescape(text);
+        if (markdown) {
+            text = escapeMarkdown(text);
+        }
         text = text.lines().map(String::strip).reduce((first, second) -> first + "\n" + second).orElse("");
         // Swing indents block content, which leaves extra spaces after a bullet or heading marker.
-        text = text.replaceAll("(?m)^- +", "- ").replaceAll("(?m)^### +", "### ");
+        text = text.replaceAll("(?m)^" + BULLET + " +", "- ").replaceAll("(?m)^" + HEADING + " +", "### ")
+                     .replace(BULLET, "-").replace(HEADING, "###").replace(BOLD, markdown ? "**" : "")
+                     .replace(ITALIC, markdown ? "*" : "");
         return BLANK_LINES.matcher(text).replaceAll("\n\n").strip();
+    }
+
+    /**
+     * Escapes the characters Markdown would read as formatting, so text such as "&lt;ECM&gt;", "Kell_Hounds_Two" or a
+     * line starting "# " reads as written.
+     *
+     * @param text plain text
+     *
+     * @return the text, safe to place in a Markdown document
+     */
+    public static String escapeMarkdown(final String text) {
+        String escaped = MARKDOWN_SPECIAL.matcher(text).replaceAll("\\\\$0");
+        // A line starting with a list marker would become a list.
+        return LIST_START.matcher(escaped).replaceAll("$1\\\\$2");
+    }
+
+    /**
+     * Reverses {@link #escapeMarkdown(String)}.
+     *
+     * @param text Markdown text
+     *
+     * @return the text with its escaping backslashes removed
+     */
+    public static String unescapeMarkdown(final String text) {
+        return MARKDOWN_ESCAPE.matcher(text).replaceAll("$1");
     }
 
     /** @return the character a numeric entity stands for, or the entity unchanged if it is not a valid one */

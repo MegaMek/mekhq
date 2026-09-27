@@ -347,7 +347,8 @@ class ThreadsPage implements ConsoleSection {
         if (next.majorRevelation()) {
             return getTextAt(RESOURCE_BUNDLE, "OracleConsole.threads.progress.flashpointNext");
         }
-        int toFlashpoint = PlotThread.FLASHPOINT_INTERVAL - (thread.getRevealedSteps() % PlotThread.FLASHPOINT_INTERVAL);
+        int toFlashpoint = PlotThread.FLASHPOINT_INTERVAL
+                                 - (thread.getRevealedSteps() % PlotThread.FLASHPOINT_INTERVAL);
         boolean nextMarkIsConclusion = thread.getRevealedSteps() + toFlashpoint >= thread.getSteps().size();
         return getFormattedTextAt(RESOURCE_BUNDLE, nextMarkIsConclusion ? "OracleConsole.threads.progress.toConclusion"
                                                            : "OracleConsole.threads.progress.toFlashpoint",
@@ -490,10 +491,10 @@ class ThreadsPage implements ConsoleSection {
         }
         PlotThreadStep step = console.actions().revealNextStep(thread);
         if (step != null && (step.majorRevelation() || step.conclusion())) {
-            revelation.setVerdict(getTextAt(RESOURCE_BUNDLE, step.conclusion() ? "OracleConsole.threads.banner.conclusion"
-                                                                    : "OracleConsole.threads.banner.major"),
-                  getFormattedTextAt(RESOURCE_BUNDLE, step.conclusion() ? "OracleConsole.threads.banner.conclusion.reason"
-                                                            : "OracleConsole.threads.banner.major.reason",
+            String banner = step.conclusion() ? "OracleConsole.threads.banner.conclusion"
+                                  : "OracleConsole.threads.banner.major";
+            revelation.setVerdict(getTextAt(RESOURCE_BUNDLE, banner),
+                  getFormattedTextAt(RESOURCE_BUNDLE, banner + ".reason",
                         OracleConsole.escape(thread.getName()), step.number()),
                   getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.threads.banner.badge", step.number()),
                   step.conclusion() ? READY : AMBER);

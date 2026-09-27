@@ -194,6 +194,21 @@ class JournalArchiveTest {
     }
 
     @Test
+    void textOnlyImportsUndoTheExportsEscaping() {
+        Roleplay roleplay = new Roleplay();
+        roleplay.getJournal().add(new JournalEntry(DAY_ONE, JournalEntryType.NOTE,
+              "<html><body><p>Use &lt;ECM&gt; on Kell_Hounds, 2*3 <b>now</b></p></body></html>"));
+        roleplay.getOracleLog().add(new JournalEntry(DAY_TWO, JournalEntryType.DICE, "Rolled 2*3: <6>"));
+        String document = export(roleplay);
+        String textOnly = document.substring(0, document.indexOf(JournalArchive.START)) + "\n";
+
+        Archive archive = JournalArchive.read(textOnly, LocalDate::parse);
+        assertFalse(archive.exact());
+        assertEquals("Use <ECM> on Kell_Hounds, 2*3 now", JournalText.htmlToPlain(archive.entries().get(0).getText()));
+        assertEquals("Rolled 2*3: <6>", archive.entries().get(1).getText());
+    }
+
+    @Test
     void anItalicFirstLineIsNotMistakenForTags() {
         String document = "# Journal\n\n## 3025-01-01 - Note\n\n*It rained all night.*\n\nWe waited.\n";
         Archive archive = JournalArchive.read(document, LocalDate::parse);

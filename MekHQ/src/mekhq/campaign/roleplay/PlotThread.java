@@ -318,7 +318,8 @@ public class PlotThread {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "length", length.name());
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "revealedSteps", revealedSteps);
         for (LocalDate date : revealDates) {
-            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "revealedOn", date == null ? UNKNOWN_DATE : date.toString());
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "revealedOn",
+                  date == null ? UNKNOWN_DATE : date.toString());
         }
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "steps");
         for (PlotThreadStep step : steps) {

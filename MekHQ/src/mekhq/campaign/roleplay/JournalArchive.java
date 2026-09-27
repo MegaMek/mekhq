@@ -319,7 +319,7 @@ public final class JournalArchive {
             return new JournalEntry(date, type, markdownToHtml(body));
         }
         // Records were written with Markdown hard breaks.
-        return new JournalEntry(date, type, body.replaceAll(" {2}\\n", "\n"));
+        return new JournalEntry(date, type, JournalText.unescapeMarkdown(body.replaceAll(" {2}\\n", "\n")));
     }
 
     /**
@@ -331,7 +331,7 @@ public final class JournalArchive {
         if (!matcher.matches()) {
             return;
         }
-        for (String name : matcher.group(1).split(", ")) {
+        for (String name : JournalText.unescapeMarkdown(matcher.group(1)).split(", ")) {
             if (name.isBlank()) {
                 continue;
             }
@@ -393,9 +393,13 @@ public final class JournalArchive {
     }
 
     private static String inline(final String text) {
-        return JournalText.escapeHtml(text)
+        // An escaped asterisk is the player's own, not formatting.
+        final String literalAsterisk = "\uE004";
+        final String plain = JournalText.unescapeMarkdown(text.replace("\\*", literalAsterisk));
+        return JournalText.escapeHtml(plain)
                      .replaceAll("\\*\\*(.+?)\\*\\*", "<b>$1</b>")
-                     .replaceAll("\\*(.+?)\\*", "<i>$1</i>");
+                     .replaceAll("\\*(.+?)\\*", "<i>$1</i>")
+                     .replace(literalAsterisk, "*");
     }
 
     // endregion Reading

@@ -70,7 +70,10 @@ public class CampaignChronicle {
     private final IntSupplier maximumLogEntries;
     private final BooleanSupplier enabled;
     private final Map<PersonChange, Group> groups = new EnumMap<>(PersonChange.class);
-    /** What has been recorded today, so an event MekHQ announces twice is written once. */
+    /**
+     * What has been recorded today, so an event MekHQ announces twice is written once. This and the day's groups are
+     * kept in memory only, so after a same-day save and reload the next change starts a fresh entry. That's harmless.
+     */
     private final Set<String> recorded = new HashSet<>();
     private LocalDate recordedOn;
 
@@ -117,7 +120,8 @@ public class CampaignChronicle {
           final @Nullable String system) {
         String text = (system == null || system.isBlank())
                             ? getFormattedTextAt(RESOURCE_BUNDLE, "Chronicle.contractStarted", name, employer)
-                            : getFormattedTextAt(RESOURCE_BUNDLE, "Chronicle.contractStartedAt", name, employer, system);
+                            : getFormattedTextAt(RESOURCE_BUNDLE, "Chronicle.contractStartedAt", name, employer,
+                                  system);
         return record("contract-new:" + id, text);
     }
 

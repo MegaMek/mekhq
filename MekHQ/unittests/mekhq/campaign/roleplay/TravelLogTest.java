@@ -194,14 +194,36 @@ class TravelLogTest {
     }
 
     @Test
+    void contractsThatHaveNotStartedAreLeftOutOfTheHistory() {
+        TravelLog log = new TravelLog();
+        // The company is still flying to Tharkad; the contract starts on arrival.
+        log.fillHistory(List.of(new ContractInfo(UUID.randomUUID(), "Raid", "Galax", "Galax", day(0), day(30)),
+              new ContractInfo(UUID.randomUUID(), "Defence", "Tharkad", "Tharkad", day(60), null)), day(40));
+
+        assertEquals(1, log.getRecords().size());
+        assertEquals("Galax", log.getRecords().get(0).getSystemId());
+    }
+
+    @Test
+    void theRealEndOfAContractIsKept() {
+        TravelLog log = new TravelLog();
+        UUID contract = UUID.randomUUID();
+        log.recordContractEnd(contract, day(5));
+        log.recordContractEnd(contract, day(9));
+
+        assertEquals(day(5), log.getContractEnd(contract));
+        assertEquals(day(5), roundTrip(log).getContractEnd(contract));
+    }
+
+    @Test
     void historyIsRebuiltFromContractsOnce() {
         TravelLog log = new TravelLog();
         List<ContractInfo> contracts = List.of(
               new ContractInfo(UUID.randomUUID(), "Raid", "Galax", "Galax", day(0), day(30)),
               new ContractInfo(UUID.randomUUID(), "Garrison", "Galax", "Galax", day(31), day(90)),
               new ContractInfo(UUID.randomUUID(), "Defence", "Tharkad", "Tharkad", day(100), null));
-        log.fillHistory(contracts);
-        log.fillHistory(contracts);
+        log.fillHistory(contracts, day(110));
+        log.fillHistory(contracts, day(110));
 
         // Back-to-back contracts in one system are one stay.
         assertEquals(2, log.getRecords().size());
