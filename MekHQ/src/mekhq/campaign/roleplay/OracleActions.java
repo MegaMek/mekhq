@@ -231,14 +231,6 @@ public class OracleActions {
     }
 
     /**
-     * Creates a plot thread, secretly rolling its steps, and logs it.
-     *
-     * @param name   the thread's name
-     * @param length the length of its track
-     *
-     * @return the new thread
-     */
-    /**
      * @param tables the tables about to be rolled on
      *
      * @return {@code true} if they have loaded and all have entries, so rolling on them gives real results
@@ -247,6 +239,14 @@ public class OracleActions {
         return generator.get().isReady(tables);
     }
 
+    /**
+     * Creates a plot thread, secretly rolling its steps, and logs it.
+     *
+     * @param name   the thread's name
+     * @param length the length of its track
+     *
+     * @return the new thread
+     */
     public PlotThread createThread(final String name, final PlotThreadLength length) {
         final PlotThread thread = PlotThread.create(name.strip(), length, generator.get());
         roleplay.getPlotThreads().add(thread);
