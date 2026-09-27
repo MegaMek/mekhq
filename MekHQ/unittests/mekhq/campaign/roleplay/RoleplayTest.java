@@ -33,11 +33,15 @@
 package mekhq.campaign.roleplay;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.junit.jupiter.api.Test;
@@ -85,6 +89,53 @@ class RoleplayTest {
         Roleplay loaded = Roleplay.generateInstanceFromXML(
               parse("<roleplay><chaosFactor>banana</chaosFactor></roleplay>"));
         assertEquals(Roleplay.DEFAULT_CHAOS_FACTOR, loaded.getChaosFactor());
+    }
+
+    @Test
+    void addCharacterIgnoresBlanksAndDuplicates() {
+        Roleplay roleplay = new Roleplay();
+        assertTrue(roleplay.addCharacter("  Natasha Kerensky "));
+        assertFalse(roleplay.addCharacter("Natasha Kerensky"));
+        assertFalse(roleplay.addCharacter("   "));
+        assertFalse(roleplay.addCharacter(null));
+        assertEquals(List.of("Natasha Kerensky"), roleplay.getCharacters());
+    }
+
+    @Test
+    void pickRandomCharacterDrawsFromTheList() {
+        Roleplay roleplay = new Roleplay();
+        assertNull(roleplay.pickRandomCharacter());
+
+        roleplay.addCharacter("Grayson Carlyle");
+        roleplay.addCharacter("Lori Kalmar");
+        for (int i = 0; i < 100; i++) {
+            assertTrue(roleplay.getCharacters().contains(roleplay.pickRandomCharacter()));
+        }
+    }
+
+    @Test
+    void charactersSurviveSaveAndLoadInOrder() throws Exception {
+        Roleplay original = new Roleplay();
+        original.addCharacter("Zeta <Ace> & Co, Ltd");
+        original.addCharacter("Alpha");
+
+        StringWriter stringWriter = new StringWriter();
+        try (PrintWriter writer = new PrintWriter(stringWriter)) {
+            original.writeToXML(writer, 0);
+        }
+
+        Roleplay loaded = Roleplay.generateInstanceFromXML(parse(stringWriter.toString()));
+        assertEquals(List.of("Zeta <Ace> & Co, Ltd", "Alpha"), loaded.getCharacters());
+    }
+
+    @Test
+    void onlyNpcFocusesInvolveNpcs() {
+        for (RandomEventFocus focus : RandomEventFocus.values()) {
+            boolean expected = focus == RandomEventFocus.NPC_ACTION
+                                     || focus == RandomEventFocus.NPC_NEGATIVE
+                                     || focus == RandomEventFocus.NPC_POSITIVE;
+            assertEquals(expected, focus.involvesNPC(), focus.name());
+        }
     }
 
     private static Node parse(final String xml) throws Exception {

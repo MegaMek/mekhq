@@ -208,6 +208,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
     // region Variable Declarations
     private static final String CMD_SKILL_CHECK = "SKILL_CHECK";
+    private static final String CMD_ADD_TO_ORACLE_LIST = "ADD_TO_ORACLE_LIST";
     private static final String CMD_ATTRIBUTE_CHECK = "ATTRIBUTE_CHECK";
     private static final String CMD_MEDICAL_RECORDS = "MEDICAL_RECORDS";
     private static final String CMD_RANK_SYSTEM = "RANK_SYSTEM";
@@ -414,6 +415,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         String[] data = action.getActionCommand().split(SEPARATOR, -1);
 
         switch (data[0]) {
+            case CMD_ADD_TO_ORACLE_LIST: {
+                for (final Person person : people) {
+                    getCampaign().getRoleplay().addCharacter(person.getFullName());
+                }
+                break;
+            }
             case CMD_SKILL_CHECK: {
                 for (final Person person : people) {
                     new SkillCheckDialog(getCampaign(), person);
@@ -4444,6 +4451,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         menuItem = new JMenuItem(resources.getString("makeAttributeCheck.text"));
         menuItem.setActionCommand(makeCommand(CMD_ATTRIBUTE_CHECK));
+        menuItem.addActionListener(this);
+        roleplayMenu.add(menuItem);
+
+        menuItem = new JMenuItem(resources.getString("addToOracleList.text"));
+        menuItem.setActionCommand(makeCommand(CMD_ADD_TO_ORACLE_LIST));
         menuItem.addActionListener(this);
         roleplayMenu.add(menuItem);
 

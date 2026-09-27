@@ -107,6 +107,13 @@ public enum RandomEventFocus {
     }
 
     /**
+     * @return {@code true} if this focus is about an NPC, so a character should be drawn from the Oracle list
+     */
+    public boolean involvesNPC() {
+        return this == NPC_ACTION || this == NPC_NEGATIVE || this == NPC_POSITIVE;
+    }
+
+    /**
      * @return the localized explanation of what this focus means for the story
      */
     public String getDescription() {

@@ -32,15 +32,21 @@
  */
 package mekhq.campaign.roleplay;
 
-import java.io.PrintWriter;
+import static megamek.common.compute.Compute.randomInt;
 
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Holds the campaign's solo-roleplay state, such as the current chaos factor used by the {@link FateChart}.
+ * Holds the campaign's solo-roleplay state: the current chaos factor used by the {@link FateChart}, and the ordered
+ * list of characters the Oracle can pick from when a random event involves an NPC.
  */
 public class Roleplay {
     private static final MMLogger LOGGER = MMLogger.create(Roleplay.class);
@@ -48,6 +54,7 @@ public class Roleplay {
     public static final int DEFAULT_CHAOS_FACTOR = 5;
 
     private int chaosFactor = DEFAULT_CHAOS_FACTOR;
+    private final List<String> characters = new ArrayList<>();
 
     /**
      * @return the current chaos factor
@@ -80,6 +87,44 @@ public class Roleplay {
     }
 
     /**
+     * @return the live, ordered list of Oracle characters; changes to it are saved with the campaign
+     */
+    public List<String> getCharacters() {
+        return characters;
+    }
+
+    /**
+     * Adds a character to the end of the Oracle list. Blank names, and names already on the list, are ignored.
+     *
+     * @param name the character's name
+     *
+     * @return {@code true} if the character was added
+     */
+    public boolean addCharacter(final @Nullable String name) {
+        if (name == null || name.isBlank()) {
+            return false;
+        }
+
+        final String trimmed = name.trim();
+        if (characters.contains(trimmed)) {
+            return false;
+        }
+        return characters.add(trimmed);
+    }
+
+    /**
+     * Picks a random character from the Oracle list.
+     *
+     * @return a random character, or {@code null} if the list is empty
+     */
+    public @Nullable String pickRandomCharacter() {
+        if (characters.isEmpty()) {
+            return null;
+        }
+        return characters.get(randomInt(characters.size()));
+    }
+
+    /**
      * Writes this object to the campaign save as a {@code <roleplay>} element.
      *
      * @param writer the writer to output to
@@ -88,6 +133,13 @@ public class Roleplay {
     public void writeToXML(final PrintWriter writer, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "roleplay");
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "chaosFactor", chaosFactor);
+        if (!characters.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "characters");
+            for (String character : characters) {
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "character", character);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "characters");
+        }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "roleplay");
     }
 
@@ -111,6 +163,14 @@ public class Roleplay {
             try {
                 if (child.getNodeName().equalsIgnoreCase("chaosFactor")) {
                     roleplay.setChaosFactor(Integer.parseInt(child.getTextContent().trim()));
+                } else if (child.getNodeName().equalsIgnoreCase("characters")) {
+                    final NodeList characterNodes = child.getChildNodes();
+                    for (int j = 0; j < characterNodes.getLength(); j++) {
+                        final Node characterNode = characterNodes.item(j);
+                        if (characterNode.getNodeName().equalsIgnoreCase("character")) {
+                            roleplay.addCharacter(characterNode.getTextContent());
+                        }
+                    }
                 }
             } catch (Exception e) {
                 LOGGER.error("Failed to parse roleplay element {}", child.getNodeName(), e);
