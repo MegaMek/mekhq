@@ -87,44 +87,6 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.DISPLAY_NODE).putBoolean(MHQConstants.HIDE_UNIT_FLUFF, value);
     }
 
-    // region Oracle console
-    /**
-     * @return {@code true} once the player has dismissed the Oracle console's welcome banner
-     */
-    public boolean getOracleWelcomeDismissed() {
-        return userPreferences.node(MHQConstants.ORACLE_NODE).getBoolean(MHQConstants.ORACLE_WELCOME_DISMISSED, false);
-    }
-
-    public void setOracleWelcomeDismissed(boolean value) {
-        userPreferences.node(MHQConstants.ORACLE_NODE).putBoolean(MHQConstants.ORACLE_WELCOME_DISMISSED, value);
-    }
-
-    /**
-     * @return {@code true} if an Oracle console page's guide opens by itself the first time the page is visited
-     */
-    public boolean getOracleGuideAutoOpen() {
-        return userPreferences.node(MHQConstants.ORACLE_NODE).getBoolean(MHQConstants.ORACLE_GUIDE_AUTO_OPEN, true);
-    }
-
-    public void setOracleGuideAutoOpen(boolean value) {
-        userPreferences.node(MHQConstants.ORACLE_NODE).putBoolean(MHQConstants.ORACLE_GUIDE_AUTO_OPEN, value);
-    }
-
-    /**
-     * @param page the console page's name
-     *
-     * @return {@code true} if the player has already seen that page's guide
-     */
-    public boolean getOracleGuideSeen(String page) {
-        return userPreferences.node(MHQConstants.ORACLE_NODE)
-                     .getBoolean(MHQConstants.ORACLE_GUIDE_SEEN_PREFIX + page, false);
-    }
-
-    public void setOracleGuideSeen(String page, boolean value) {
-        userPreferences.node(MHQConstants.ORACLE_NODE).putBoolean(MHQConstants.ORACLE_GUIDE_SEEN_PREFIX + page, value);
-    }
-    // endregion Oracle console
-
     public boolean getHistoricalDailyLog() {
         return userPreferences.node(MHQConstants.DISPLAY_NODE).getBoolean(MHQConstants.HISTORICAL_DAILY_LOG, false);
     }

@@ -170,9 +170,9 @@ public class OracleConsole extends JDialog {
         modeSelector.setSelected(ConsolePage.ASK);
 
         autoOpenGuides = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide.autoOpen"));
-        autoOpenGuides.setSelected(MekHQ.getMHQOptions().getOracleGuideAutoOpen());
+        autoOpenGuides.setSelected(OracleGuidePreferences.getInstance().isGuideAutoOpen());
         autoOpenGuides.addActionListener(event ->
-                                               MekHQ.getMHQOptions().setOracleGuideAutoOpen(autoOpenGuides.isSelected()));
+                                               OracleGuidePreferences.getInstance().setGuideAutoOpen(autoOpenGuides.isSelected()));
         guideDrawer = new HudGuideDrawer(List.of(getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide.tab.steps"),
               getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide.tab.example"),
               getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide.tab.terms")), autoOpenGuides,
@@ -481,9 +481,9 @@ public class OracleConsole extends JDialog {
         if (!isShowing()) {
             return;
         }
-        boolean seen = MekHQ.getMHQOptions().getOracleGuideSeen(page.guideKey());
+        boolean seen = OracleGuidePreferences.getInstance().isGuideSeen(page);
         // The Ask page has its own welcome banner, so its guide only opens from the banner or the button.
-        if (!seen && page != ConsolePage.ASK && MekHQ.getMHQOptions().getOracleGuideAutoOpen()) {
+        if (!seen && page != ConsolePage.ASK && OracleGuidePreferences.getInstance().isGuideAutoOpen()) {
             openGuide(page);
         }
     }
@@ -494,7 +494,7 @@ public class OracleConsole extends JDialog {
      * @param page the page
      */
     void openGuide(final ConsolePage page) {
-        MekHQ.getMHQOptions().setOracleGuideSeen(page.guideKey(), true);
+        OracleGuidePreferences.getInstance().setGuideSeen(page, true);
         guideDrawer.showGuide(ConsoleGuides.build(page, this));
         scrim.setVisible(true);
         guideDrawer.setVisible(true);

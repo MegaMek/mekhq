@@ -210,7 +210,7 @@ class AskPage implements ConsoleSection {
         for (FateChartOdds value : FateChartOdds.values()) {
             odds.setSegmentSub(value, "≤ " + FateChart.getThresholds(value, chaos)[1]);
         }
-        welcome.setVisible(!MekHQ.getMHQOptions().getOracleWelcomeDismissed());
+        welcome.setVisible(!OracleGuidePreferences.getInstance().isWelcomeDismissed());
         refreshRecent();
     }
 
@@ -411,7 +411,7 @@ class AskPage implements ConsoleSection {
     }
 
     private void dismissWelcome() {
-        MekHQ.getMHQOptions().setOracleWelcomeDismissed(true);
+        OracleGuidePreferences.getInstance().setWelcomeDismissed(true);
         welcome.setVisible(false);
     }
 

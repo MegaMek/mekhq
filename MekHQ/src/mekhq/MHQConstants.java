@@ -71,10 +71,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String DISPLAY_DATE_FORMAT = "displayDateFormat";
     public static final String LONG_DISPLAY_DATE_FORMAT = "longDisplayDateFormat";
     public static final String HIDE_UNIT_FLUFF = "hideUnitFluff";
-    public static final String ORACLE_NODE = "mekhq/prefs/oracle";
-    public static final String ORACLE_WELCOME_DISMISSED = "welcomeDismissed";
-    public static final String ORACLE_GUIDE_AUTO_OPEN = "guideAutoOpen";
-    public static final String ORACLE_GUIDE_SEEN_PREFIX = "guideSeen.";
     public static final String HISTORICAL_DAILY_LOG = "historicalDailyLog";
     public static final int MAX_HISTORICAL_LOG_DAYS = 120; // max number of days that will be stored in the history,
     // also used as a limit in the UI
