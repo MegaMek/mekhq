@@ -51,7 +51,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
-
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.GroundTransitLocation;
