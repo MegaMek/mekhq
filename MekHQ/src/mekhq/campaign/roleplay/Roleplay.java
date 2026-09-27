@@ -134,6 +134,50 @@ public class Roleplay {
     }
 
     /**
+     * Reveals the next step of a random unconcluded plot thread.
+     *
+     * @return the change made, or {@code null} if every thread is concluded (or there are none)
+     */
+    public @Nullable PlotThreadChange progressRandomThread() {
+        final PlotThread thread = pickRandom(plotThreads.stream().filter(candidate -> !candidate.isComplete())
+                                                   .toList());
+        if (thread == null) {
+            return null;
+        }
+        final PlotThreadStep step = thread.revealNextStep();
+        return new PlotThreadChange(thread, step.number(), step);
+    }
+
+    /**
+     * Loses the latest revealed step of a random unconcluded plot thread that has progress to lose. The step is
+     * hidden again and re-rolled.
+     *
+     * @param generator the generator supplying the oracle tables for the re-roll
+     *
+     * @return the change made, or {@code null} if no thread has progress that can be lost
+     */
+    public @Nullable PlotThreadChange loseRandomThreadProgress(final RandomOracleGenerator generator) {
+        final PlotThread thread = pickRandom(plotThreads.stream().filter(PlotThread::canLoseProgress).toList());
+        if (thread == null) {
+            return null;
+        }
+        return new PlotThreadChange(thread, thread.loseProgress(generator), null);
+    }
+
+    private static <T> @Nullable T pickRandom(final List<T> candidates) {
+        return candidates.isEmpty() ? null : candidates.get(randomInt(candidates.size()));
+    }
+
+    /**
+     * A change a random event made to a plot thread.
+     *
+     * @param thread     the thread changed
+     * @param stepNumber the step revealed or lost
+     * @param revealed   the step revealed, or {@code null} if progress was lost
+     */
+    public record PlotThreadChange(PlotThread thread, int stepNumber, @Nullable PlotThreadStep revealed) {}
+
+    /**
      * Writes this object to the campaign save as a {@code <roleplay>} element.
      *
      * @param writer the writer to output to

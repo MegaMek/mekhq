@@ -96,25 +96,39 @@ public class PlotThread {
           final RandomOracleGenerator generator) {
         final PlotThread thread = new PlotThread(name, length);
         for (int number = 1; number <= length.getSteps(); number++) {
-            final boolean majorRevelation = isFlashpoint(number, length);
-            final boolean conclusion = number == length.getSteps();
-            final List<OracleTable> tables = new ArrayList<>();
-            tables.add(randomTable(getThemeTables()));
-            if (conclusion) {
-                tables.addAll(CONCLUSION_TABLES);
-            } else if (majorRevelation) {
-                tables.addAll(MAJOR_REVELATION_TABLES);
-            } else {
-                tables.addAll(randomAdventureTables());
-            }
-
-            final List<Concept> concepts = new ArrayList<>();
-            for (OracleTable table : tables) {
-                concepts.add(new Concept(table, generator.generate(table)));
-            }
-            thread.steps.add(new PlotThreadStep(number, majorRevelation, conclusion, concepts));
+            thread.steps.add(rollStep(number, length, generator));
         }
         return thread;
+    }
+
+    /**
+     * Rolls a fresh concept for one step of the track.
+     *
+     * @param number    the step's number, starting at 1
+     * @param length    the thread's length
+     * @param generator the generator supplying the oracle tables
+     *
+     * @return the rolled step
+     */
+    static PlotThreadStep rollStep(final int number, final PlotThreadLength length,
+          final RandomOracleGenerator generator) {
+        final boolean majorRevelation = isFlashpoint(number, length);
+        final boolean conclusion = number == length.getSteps();
+        final List<OracleTable> tables = new ArrayList<>();
+        tables.add(randomTable(getThemeTables()));
+        if (conclusion) {
+            tables.addAll(CONCLUSION_TABLES);
+        } else if (majorRevelation) {
+            tables.addAll(MAJOR_REVELATION_TABLES);
+        } else {
+            tables.addAll(randomAdventureTables());
+        }
+
+        final List<Concept> concepts = new ArrayList<>();
+        for (OracleTable table : tables) {
+            concepts.add(new Concept(table, generator.generate(table)));
+        }
+        return new PlotThreadStep(number, majorRevelation, conclusion, concepts);
     }
 
     /**
@@ -195,6 +209,32 @@ public class PlotThread {
             return null;
         }
         return steps.get(revealedSteps++);
+    }
+
+    /**
+     * @return {@code true} if at least one step is revealed and the thread is not yet concluded, so it has progress
+     *       that can be lost
+     */
+    public boolean canLoseProgress() {
+        return revealedSteps > 0 && !isComplete();
+    }
+
+    /**
+     * Loses the most recently revealed step: it is hidden again and its concept is rolled afresh, so the player gets
+     * a new surprise when they next progress the thread.
+     *
+     * @param generator the generator supplying the oracle tables
+     *
+     * @return the number of the step that was lost, or {@code 0} if the thread had no progress that could be lost
+     */
+    public int loseProgress(final RandomOracleGenerator generator) {
+        if (!canLoseProgress()) {
+            return 0;
+        }
+
+        final int index = --revealedSteps;
+        steps.set(index, rollStep(index + 1, length, generator));
+        return index + 1;
     }
 
     @Override

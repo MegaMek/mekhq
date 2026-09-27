@@ -71,9 +71,11 @@ import mekhq.campaign.roleplay.FateChart;
 import mekhq.campaign.roleplay.FateChartOdds;
 import mekhq.campaign.roleplay.FateChartResult;
 import mekhq.campaign.roleplay.OracleTable;
+import mekhq.campaign.roleplay.PlotThreadStep;
 import mekhq.campaign.roleplay.RandomOracleGenerator;
 import mekhq.campaign.roleplay.RandomEventFocus;
 import mekhq.campaign.roleplay.Roleplay;
+import mekhq.campaign.roleplay.Roleplay.PlotThreadChange;
 
 /**
  * Lets the player ask the {@link FateChart} a yes/no question. The player chooses the odds, adjusts the campaign's
@@ -416,7 +418,7 @@ public class OracleDialog extends JDialog {
             RandomEventFocus focus = result.randomEventFocus();
             lblResult.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.randomEvent",
                   result.answer().getLabel(), result.roll(), odds.getLabel(), chaosFactor,
-                  focus.getLabel(), result.randomEventRoll(), focus.getDescription(), getCharacterLine(focus)));
+                  focus.getLabel(), result.randomEventRoll(), focus.getDescription(), getFocusDetails(focus)));
         } else {
             lblResult.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result",
                   result.answer().getLabel(), result.roll(), odds.getLabel(), chaosFactor));
@@ -425,14 +427,52 @@ public class OracleDialog extends JDialog {
     }
 
     /**
-     * @return the line naming a randomly chosen Oracle character if the focus involves an NPC, otherwise an empty
-     *       string
+     * Applies and describes any extra effect of a random event: naming an Oracle character for NPC events, or
+     * progressing or setting back a random plot thread for thread events.
+     *
+     * @return the extra lines for the result, or an empty string if the focus has no extra effect
      */
-    private String getCharacterLine(final RandomEventFocus focus) {
-        if (!focus.involvesNPC()) {
-            return "";
+    private String getFocusDetails(final RandomEventFocus focus) {
+        return switch (focus) {
+            case NPC_ACTION, NPC_NEGATIVE, NPC_POSITIVE -> getCharacterLine();
+            case MOVE_TOWARD_A_THREAD -> progressThread();
+            case MOVE_AWAY_FROM_A_THREAD -> setBackThread();
+            default -> "";
+        };
+    }
+
+    private String progressThread() {
+        PlotThreadChange change = roleplay.progressRandomThread();
+        if (change == null) {
+            return getTextAt(RESOURCE_BUNDLE, "OracleDialog.result.noThreadToProgress");
         }
 
+        PlotThreadStep step = change.revealed();
+        String key = step.conclusion() ? "OracleDialog.result.threadConclusion"
+                           : step.majorRevelation() ? "OracleDialog.result.threadMajorRevelation"
+                                   : "OracleDialog.result.threadProgress";
+        StringBuilder concepts = new StringBuilder();
+        for (Concept concept : step.concepts()) {
+            String meaning = (concept.meaning() == null)
+                                   ? getTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.empty")
+                                   : escapeHtml(concept.meaning());
+            concepts.append(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.concepts.result",
+                  concept.table().getLabel(), meaning)).append("<br>");
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, key, escapeHtml(change.thread().getName()), change.stepNumber(),
+              concepts.toString());
+    }
+
+    private String setBackThread() {
+        PlotThreadChange change = roleplay.loseRandomThreadProgress(RandomOracleGenerator.getInstance());
+        if (change == null) {
+            return getTextAt(RESOURCE_BUNDLE, "OracleDialog.result.noThreadToLose");
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.threadLost",
+              escapeHtml(change.thread().getName()), change.stepNumber());
+    }
+
+    private String getCharacterLine() {
         String character = roleplay.pickRandomCharacter();
         if (character == null) {
             return getTextAt(RESOURCE_BUNDLE, "OracleDialog.result.noCharacter");

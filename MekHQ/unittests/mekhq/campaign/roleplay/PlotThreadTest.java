@@ -131,6 +131,74 @@ class PlotThreadTest {
     }
 
     @Test
+    void losingProgressHidesAndRerollsTheLatestStep() {
+        PlotThread thread = PlotThread.create("Hunt", PlotThreadLength.SHORT, generator);
+        assertFalse(thread.canLoseProgress());
+        assertEquals(0, thread.loseProgress(generator));
+
+        thread.revealNextStep();
+        thread.revealNextStep();
+        PlotThreadStep before = thread.getSteps().get(1);
+
+        // Swap in pools with different meanings so the re-roll is visible.
+        Map<OracleTable, WeightedIntMap<String>> pools = new EnumMap<>(OracleTable.class);
+        for (OracleTable table : OracleTable.values()) {
+            WeightedIntMap<String> pool = new WeightedIntMap<>();
+            pool.add(1, "rerolled");
+            pools.put(table, pool);
+        }
+        RandomOracleGenerator rerollGenerator = RandomOracleGenerator.createForTesting(pools);
+
+        assertEquals(2, thread.loseProgress(rerollGenerator));
+        assertEquals(1, thread.getRevealedSteps());
+        PlotThreadStep after = thread.getSteps().get(1);
+        assertEquals(2, after.number());
+        assertTrue(after.concepts().stream().allMatch(concept -> "rerolled".equals(concept.meaning())));
+        assertFalse(before.equals(after));
+        assertEquals(2, thread.revealNextStep().number());
+    }
+
+    @Test
+    void concludedThreadsCannotLoseProgress() {
+        PlotThread thread = PlotThread.create("Hunt", PlotThreadLength.SHORT, generator);
+        while (!thread.isComplete()) {
+            thread.revealNextStep();
+        }
+        assertFalse(thread.canLoseProgress());
+        assertEquals(0, thread.loseProgress(generator));
+        assertEquals(10, thread.getRevealedSteps());
+    }
+
+    @Test
+    void randomEventsOnlyTouchEligibleThreads() {
+        Roleplay roleplay = new Roleplay();
+        assertNull(roleplay.progressRandomThread());
+        assertNull(roleplay.loseRandomThreadProgress(generator));
+
+        PlotThread concluded = PlotThread.create("Done", PlotThreadLength.SHORT, generator);
+        while (!concluded.isComplete()) {
+            concluded.revealNextStep();
+        }
+        PlotThread fresh = PlotThread.create("Fresh", PlotThreadLength.SHORT, generator);
+        roleplay.getPlotThreads().add(concluded);
+        roleplay.getPlotThreads().add(fresh);
+
+        // Only the fresh thread is unresolved, and nothing has progress that can be lost yet.
+        assertNull(roleplay.loseRandomThreadProgress(generator));
+        Roleplay.PlotThreadChange progress = roleplay.progressRandomThread();
+        assertEquals(fresh, progress.thread());
+        assertEquals(1, progress.stepNumber());
+        assertEquals(1, fresh.getRevealedSteps());
+
+        Roleplay.PlotThreadChange loss = roleplay.loseRandomThreadProgress(generator);
+        assertEquals(fresh, loss.thread());
+        assertEquals(1, loss.stepNumber());
+        assertNull(loss.revealed());
+        assertEquals(0, fresh.getRevealedSteps());
+        assertEquals(10, concluded.getRevealedSteps());
+    }
+
+    @Test
     void threadsSurviveSaveAndLoad() throws Exception {
         Roleplay original = new Roleplay();
         PlotThread thread = PlotThread.create("The <Long> Hunt & more", PlotThreadLength.MEDIUM, generator);
