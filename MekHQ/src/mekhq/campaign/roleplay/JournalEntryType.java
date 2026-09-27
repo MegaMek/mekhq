@@ -44,7 +44,9 @@ public enum JournalEntryType {
     RANDOM_EVENT("RANDOM_EVENT"),
     CONCEPTS("CONCEPTS"),
     THREAD("THREAD"),
-    CHECK("CHECK");
+    CHECK("CHECK"),
+    DICE("DICE"),
+    CHRONICLE("CHRONICLE");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Roleplay";
 

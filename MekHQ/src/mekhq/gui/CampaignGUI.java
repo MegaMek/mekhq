@@ -106,6 +106,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.roleplay.CampaignChronicleListener;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
@@ -207,6 +208,7 @@ public class CampaignGUI extends JPanel {
     private JPanel pnlTop;
     private AccentRoundedJButton btnCommandGenerator;
     private RoundedJButton btnOracle;
+    private CampaignChronicleListener chronicleListener;
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
@@ -259,11 +261,19 @@ public class CampaignGUI extends JPanel {
     public void addNotify() {
         super.addNotify();
         MekHQ.registerHandler(this);
+        // The chronicle writes campaign events into the Oracle journal while this campaign is open.
+        if (chronicleListener == null) {
+            chronicleListener = new CampaignChronicleListener(getCampaign());
+        }
+        MekHQ.registerHandler(chronicleListener);
     }
 
     @Override
     public void removeNotify() {
         MekHQ.unregisterHandler(this);
+        if (chronicleListener != null) {
+            MekHQ.unregisterHandler(chronicleListener);
+        }
         super.removeNotify();
     }
 

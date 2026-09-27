@@ -53,6 +53,7 @@ public class OracleCharacter {
     private UUID personId;
     private boolean active = true;
     private NpcRating rating;
+    private String notes = "";
 
     /**
      * @param name     the character's name
@@ -114,6 +115,17 @@ public class OracleCharacter {
         this.rating = rating;
     }
 
+    /**
+     * @return the player's notes on this character, such as a generated profile; plain text, possibly empty
+     */
+    public String getNotes() {
+        return notes;
+    }
+
+    public void setNotes(final @Nullable String notes) {
+        this.notes = (notes == null) ? "" : notes.strip();
+    }
+
     @Override
     public String toString() {
         return name;
@@ -131,6 +143,9 @@ public class OracleCharacter {
         }
         if (rating != null) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "rating", rating.name());
+        }
+        if (!notes.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "notes", notes);
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "character");
     }
@@ -163,6 +178,7 @@ public class OracleCharacter {
                 case "person" -> character.personId = UUID.fromString(text.trim());
                 case "active" -> character.active = Boolean.parseBoolean(text.trim());
                 case "rating" -> character.rating = parseRating(text.trim());
+                case "notes" -> character.notes = text.strip();
                 default -> { }
             }
         }

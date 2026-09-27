@@ -144,6 +144,9 @@ public final class CampaignOption<T> {
     /** The most Oracle log records kept; once reached, the oldest are removed as new ones are added. */
     public static final CampaignOption<Integer> MAXIMUM_ORACLE_LOG_ENTRIES =
           of(Integer.class, 500, "maximumOracleLogEntries");
+    /** Whether contracts, battles, arrivals and personnel changes are written into the Oracle journal. */
+    public static final CampaignOption<Boolean> USE_ORACLE_CHRONICLE =
+          of(Boolean.class, true, "useOracleChronicle");
     public static final CampaignOption<Boolean> CHAOS_DEBT_PENALTIES_STACK =
           of(Boolean.class, false, "chaosDebtPenaltiesStack");
     public static final CampaignOption<Boolean> CHAOS_NO_PARTIAL_SUCCESS_REPUTATION =

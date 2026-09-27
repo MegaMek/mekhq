@@ -69,6 +69,7 @@ import javax.swing.Scrollable;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.roleplay.Concepts;
+import mekhq.campaign.roleplay.DiceExpression;
 import mekhq.campaign.roleplay.Concepts.Concept;
 import mekhq.campaign.roleplay.FateChart;
 import mekhq.campaign.roleplay.FateChartAnswer;
@@ -83,6 +84,7 @@ import mekhq.campaign.roleplay.RandomEventFocus;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCard;
+import mekhq.gui.baseComponents.hud.HudChip;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
 import mekhq.gui.baseComponents.hud.HudVerdictBanner;
@@ -110,6 +112,10 @@ class AskPage implements ConsoleSection {
     private final List<ConceptRow> rows = new ArrayList<>();
     private final HudButton addConcept;
     private final JPanel conceptResults = new JPanel(new GridLayout(1, 1, scaleForGUI(1), 0));
+
+    private static final List<String> QUICK_DICE = List.of("d6", "2d6", "d10", "d20", "d100");
+    private final JTextField diceField = new JTextField();
+    private final JLabel diceResult = new JLabel();
 
     AskPage(final OracleConsole console) {
         this.console = console;
@@ -175,6 +181,14 @@ class AskPage implements ConsoleSection {
         left.add(leftAligned(conceptButtons));
         left.add(Box.createVerticalStrut(scaleForGUI(10)));
         left.add(leftAligned(conceptResults));
+        left.add(Box.createVerticalStrut(scaleForGUI(20)));
+        left.add(heading("OracleConsole.dice", "OracleConsole.dice.help"));
+        left.add(Box.createVerticalStrut(scaleForGUI(6)));
+        left.add(leftAligned(buildDiceRow()));
+        left.add(Box.createVerticalStrut(scaleForGUI(6)));
+        left.add(leftAligned(buildQuickDice()));
+        left.add(Box.createVerticalStrut(scaleForGUI(8)));
+        left.add(leftAligned(diceResult));
 
         // Right column: the answer, the random event, the recent answers.
         JPanel right = column();
@@ -322,6 +336,9 @@ class AskPage implements ConsoleSection {
                 effect.add(leftAligned(conceptTiles(step.concepts(), 2)));
             }
             return effect;
+        }
+        if (focus == RandomEventFocus.NEW_NPC) {
+            return Hud.link(getTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.effect.generateNpc"), console::generateNpc);
         }
         if (outcome.isMissingCharacter()) {
             return wrapped(getTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.effect.noCharacter"), TEXT_FAINT);
@@ -562,6 +579,62 @@ class AskPage implements ConsoleSection {
     }
 
     // endregion Concepts
+
+    // region Dice
+
+    private JPanel buildDiceRow() {
+        Hud.styleField(diceField);
+        diceField.setText("2d6");
+        diceField.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.dice.field.toolTipText"));
+        diceField.addActionListener(event -> rollDice(diceField.getText()));
+        HudButton roll = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.dice.roll").toUpperCase(Locale.ROOT),
+              true, true);
+        roll.addActionListener(event -> rollDice(diceField.getText()));
+        JPanel row = Hud.transparentPanel(new BorderLayout(scaleForGUI(6), 0));
+        row.add(diceField, BorderLayout.CENTER);
+        row.add(roll, BorderLayout.EAST);
+        diceResult.setFont(hudFont(Font.PLAIN, 0.95f, 0.0f));
+        diceResult.setVisible(false);
+        return row;
+    }
+
+    private JPanel buildQuickDice() {
+        JPanel row = Hud.transparentPanel(null);
+        row.setLayout(new BoxLayout(row, BoxLayout.X_AXIS));
+        for (String dice : QUICK_DICE) {
+            if (row.getComponentCount() > 0) {
+                row.add(Box.createHorizontalStrut(scaleForGUI(4)));
+            }
+            HudChip chip = new HudChip(dice, () -> {
+                diceField.setText(dice);
+                rollDice(dice);
+            });
+            chip.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.dice.quick.toolTipText", dice));
+            row.add(chip);
+        }
+        return row;
+    }
+
+    private void rollDice(final String expression) {
+        diceResult.setVisible(true);
+        if (!DiceExpression.isValid(expression)) {
+            diceResult.setForeground(DANGER);
+            diceResult.setText(wrappedHtml(getTextAt(RESOURCE_BUNDLE, "OracleConsole.dice.invalid")));
+            return;
+        }
+        DiceExpression.Roll roll = console.actions().rollDice(expression);
+        diceResult.setForeground(TEXT_MUTED);
+        diceResult.setText("<html><b><font color='" + hex(ACCENT_BRIGHT) + "' size='+2'>" + roll.total()
+                                 + "</font></b>&nbsp;&nbsp;" + escape(roll.expression()) + "&nbsp;&nbsp;·&nbsp;&nbsp;"
+                                 + escape(roll.describeWorking()) + "</html>");
+        console.changed();
+    }
+
+    private static String wrappedHtml(final String text) {
+        return "<html><div style='width:" + scaleForGUI(300) + "px'>" + escape(text) + "</div></html>";
+    }
+
+    // endregion Dice
 
     // region Layout helpers
 

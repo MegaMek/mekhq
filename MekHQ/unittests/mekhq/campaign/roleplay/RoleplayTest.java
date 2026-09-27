@@ -252,4 +252,25 @@ class RoleplayTest {
                      .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)))
                      .getDocumentElement();
     }
+
+    @Test
+    void notesSurviveSaveAndLoad() throws Exception {
+        Roleplay original = new Roleplay();
+        OracleCharacter kai = original.addCharacter("Kai");
+        kai.setNotes("  Characters: Appearance: scarred\nCharacters: Motive: <revenge> & glory  ");
+        original.addCharacter("Plain");
+
+        StringWriter text = new StringWriter();
+        try (PrintWriter writer = new PrintWriter(text)) {
+            original.writeToXML(writer, 0);
+        }
+        Node node = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                          .parse(new ByteArrayInputStream(text.toString().getBytes(StandardCharsets.UTF_8)))
+                          .getDocumentElement();
+        Roleplay loaded = Roleplay.generateInstanceFromXML(node);
+
+        assertEquals("Characters: Appearance: scarred\nCharacters: Motive: <revenge> & glory",
+              loaded.getCharacters().get(0).getNotes());
+        assertEquals("", loaded.getCharacters().get(1).getNotes());
+    }
 }

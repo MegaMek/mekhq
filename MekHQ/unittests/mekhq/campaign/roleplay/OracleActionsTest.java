@@ -36,9 +36,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalDate;
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
@@ -165,5 +168,47 @@ class OracleActionsTest {
 
         assertTrue(actions.rollConcepts(List.of()).isEmpty());
         assertEquals(1, roleplay.getOracleLog().size(), "an empty roll is not logged");
+    }
+
+    @Test
+    void diceRollsAreLogged() {
+        Deque<Integer> faces = new ArrayDeque<>(List.of(3, 5));
+        DiceExpression.Roll roll = actions.rollDice("2d6+1", sides -> faces.pop());
+
+        assertEquals(9, roll.total());
+        JournalEntry log = roleplay.getOracleLog().get(0);
+        assertEquals(JournalEntryType.DICE, log.getType());
+        assertEquals("Dice: 2d6 + 1 = 9  ([3, 5] + 1)", log.getText());
+    }
+
+    @Test
+    void unreadableDiceAreRefusedAndNotLogged() {
+        assertThrows(IllegalArgumentException.class, () -> actions.rollDice("2x6"));
+        assertTrue(roleplay.getOracleLog().isEmpty());
+    }
+
+    @Test
+    void generatedNpcsJoinTheCastWithAProfile() {
+        OracleCharacter npc = actions.generateNpc("Kai Allard");
+
+        assertNotNull(npc);
+        assertTrue(roleplay.getActiveCharacters().contains(npc));
+        assertFalse(npc.isLinked());
+        List<String> profile = npc.getNotes().lines().toList();
+        assertEquals(OracleActions.NPC_PROFILE_TABLES.size(), profile.size());
+        assertEquals("Appearance: characters_appearance", profile.get(0));
+        assertEquals("Motive: characters_motive", profile.get(3));
+        JournalEntry log = roleplay.getOracleLog().get(0);
+        assertEquals(JournalEntryType.CONCEPTS, log.getType());
+        assertEquals(Set.of(npc.getId()), log.getCharacters());
+        assertTrue(log.getText().startsWith("New NPC: Kai Allard\n"), log.getText());
+    }
+
+    @Test
+    void aGeneratedNameAlreadyInTheCastIsRefused() {
+        roleplay.addCharacter("Kai Allard");
+        assertNull(actions.generateNpc("Kai Allard"));
+        assertNull(actions.generateNpc(" "));
+        assertTrue(roleplay.getOracleLog().isEmpty());
     }
 }

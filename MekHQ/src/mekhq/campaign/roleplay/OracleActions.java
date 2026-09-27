@@ -40,6 +40,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.IntSupplier;
+import java.util.function.IntUnaryOperator;
 import java.util.function.Supplier;
 
 import megamek.common.annotations.Nullable;
@@ -331,6 +332,69 @@ public class OracleActions {
     }
 
     // endregion Checks
+
+    // region Dice and NPCs
+
+    /**
+     * Rolls a dice expression and logs it.
+     *
+     * @param expression the expression, such as "2d6+1"
+     * @param die        rolls one die of the given number of sides
+     *
+     * @return the roll
+     *
+     * @throws IllegalArgumentException if the expression is not valid
+     */
+    public DiceExpression.Roll rollDice(final String expression, final IntUnaryOperator die) {
+        final DiceExpression.Roll roll = DiceExpression.parse(expression).roll(die);
+        log(JournalEntryType.DICE, getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.dice", roll.expression(),
+              roll.total(), roll.describeWorking()));
+        return roll;
+    }
+
+    /**
+     * Rolls a dice expression with real dice and logs it.
+     *
+     * @param expression the expression, such as "2d6+1"
+     *
+     * @return the roll
+     *
+     * @throws IllegalArgumentException if the expression is not valid
+     */
+    public DiceExpression.Roll rollDice(final String expression) {
+        return rollDice(expression, sides -> randomInt(sides) + 1);
+    }
+
+    /** The Characters tables a generated NPC's profile is drawn from, in the order they are shown. */
+    public static final List<OracleTable> NPC_PROFILE_TABLES = List.of(OracleTable.CHARACTERS_APPEARANCE,
+          OracleTable.CHARACTERS_PERSONALITY, OracleTable.CHARACTERS_DEMEANOR, OracleTable.CHARACTERS_MOTIVE);
+
+    /**
+     * Makes a new cast member with a profile rolled from the Characters tables, and logs it.
+     *
+     * @param name the new character's name
+     *
+     * @return the new character, or {@code null} if the name is blank or already in the cast
+     */
+    public @Nullable OracleCharacter generateNpc(final String name) {
+        final OracleCharacter character = roleplay.addCharacter(name);
+        if (character == null) {
+            return null;
+        }
+        final List<String> lines = new ArrayList<>();
+        for (OracleTable table : NPC_PROFILE_TABLES) {
+            final String meaning = generator.get().generate(table);
+            lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.concept", table.getTableLabel(),
+                  (meaning == null) ? getTextAt(RESOURCE_BUNDLE, "OracleLog.noConcept") : meaning).strip());
+        }
+        final String description = String.join("\n", lines);
+        character.setNotes(description);
+        log(JournalEntryType.CONCEPTS, getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.npc", character.getName())
+                                             + '\n' + description).tagCharacter(character);
+        return character;
+    }
+
+    // endregion Dice and NPCs
 
     /**
      * @param concepts concepts to describe

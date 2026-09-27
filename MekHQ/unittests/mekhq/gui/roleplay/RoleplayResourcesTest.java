@@ -48,6 +48,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
+import mekhq.campaign.roleplay.CampaignChronicle;
 import mekhq.campaign.roleplay.CheckDifficulty;
 import mekhq.campaign.roleplay.JournalEntryType;
 import mekhq.campaign.roleplay.NpcRating;
@@ -60,7 +61,7 @@ class RoleplayResourcesTest {
           Path.of("src/mekhq/campaign/roleplay"));
     /** A complete key in a string literal; keys built by adding text on the end stop at a dot and are skipped. */
     private static final Pattern KEY = Pattern.compile(
-          "\"((?:OracleConsole|OracleLog|OracleGuide|ChecksPage|JournalExporter)\\.[A-Za-z0-9_.]*[A-Za-z0-9_])\"");
+          "\"((?:OracleConsole|OracleLog|OracleGuide|ChecksPage|JournalExporter|Chronicle)\\.[A-Za-z0-9_.]*[A-Za-z0-9_])\"");
 
     private static Properties bundle() throws IOException {
         Properties properties = new Properties();
@@ -114,6 +115,9 @@ class RoleplayResourcesTest {
         }
         for (NpcRating rating : NpcRating.values()) {
             assertTrue(properties.containsKey("NpcRating." + rating.name() + ".label"));
+        }
+        for (CampaignChronicle.PersonChange change : CampaignChronicle.PersonChange.values()) {
+            assertTrue(properties.containsKey("Chronicle.person." + change.name()), change.name());
         }
         for (JournalEntryType type : JournalEntryType.values()) {
             assertTrue(properties.containsKey("JournalEntryType." + type.name() + ".label"));

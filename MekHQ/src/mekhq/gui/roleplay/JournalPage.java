@@ -118,9 +118,11 @@ class JournalPage implements ConsoleSection {
     private enum TypeGroup {
         ALL(EnumSet.noneOf(JournalEntryType.class)),
         NOTES(EnumSet.of(JournalEntryType.NOTE)),
-        ORACLE(EnumSet.of(JournalEntryType.FATE_CHART, JournalEntryType.RANDOM_EVENT, JournalEntryType.CONCEPTS)),
+        ORACLE(EnumSet.of(JournalEntryType.FATE_CHART, JournalEntryType.RANDOM_EVENT, JournalEntryType.CONCEPTS,
+              JournalEntryType.DICE)),
         THREADS(EnumSet.of(JournalEntryType.THREAD)),
-        CHECKS(EnumSet.of(JournalEntryType.CHECK));
+        CHECKS(EnumSet.of(JournalEntryType.CHECK)),
+        CAMPAIGN(EnumSet.of(JournalEntryType.CHRONICLE));
 
         private final Set<JournalEntryType> types;
 
@@ -171,14 +173,13 @@ class JournalPage implements ConsoleSection {
         Hud.styleField(search);
         search.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.search"));
         search.getDocument().addDocumentListener(onChange(this::filtersChanged));
-        JPanel chipRow = Hud.transparentPanel(null);
-        chipRow.setLayout(new BoxLayout(chipRow, BoxLayout.X_AXIS));
+        // Two rows of three, so every type fits the filter column.
+        JPanel chipRow = Hud.transparentPanel(new GridLayout(0, 3, scaleForGUI(4), scaleForGUI(4)));
         for (TypeGroup group : TypeGroup.values()) {
             HudChip chip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.type." + group.name()),
                   () -> setTypeGroup(group));
             typeChips.put(group, chip);
             chipRow.add(chip);
-            chipRow.add(Box.createHorizontalStrut(scaleForGUI(4)));
         }
         styleFilterCombo(threadFilter);
         styleFilterCombo(castFilter);
@@ -225,6 +226,8 @@ class JournalPage implements ConsoleSection {
         });
         JScrollPane listScroll = new JScrollPane(list);
         Hud.styleScroll(listScroll, SURFACE_DEEP, true);
+        // Rows are cut to the list's width, so long titles never need sideways scrolling.
+        listScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
         JPanel board = new JPanel(new BorderLayout());
         board.setOpaque(true);
@@ -493,6 +496,8 @@ class JournalPage implements ConsoleSection {
             case CONCEPTS -> TEXT_MUTED;
             case THREAD -> READY;
             case CHECK -> TEXT;
+            case DICE -> TEXT_FAINT;
+            case CHRONICLE -> ACCENT_BRIGHT;
         };
     }
 

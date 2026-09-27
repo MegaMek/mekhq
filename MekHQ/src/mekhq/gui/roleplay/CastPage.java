@@ -112,6 +112,7 @@ class CastPage implements ConsoleSection {
     private final JPanel renameRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(6), 0));
     private final JTextField renameField = new JTextField();
     private final JPanel appearances = column();
+    private final JPanel profile = column();
     private final HudButton rename;
     private final HudConfirmButton remove;
     private final HudButton restore;
@@ -137,9 +138,18 @@ class CastPage implements ConsoleSection {
         HudButton addButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.add")
                                                   .toUpperCase(Locale.ROOT), true, true);
         addButton.addActionListener(event -> add());
+        HudButton generate = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.generate")
+                                                 .toUpperCase(Locale.ROOT), false, true);
+        generate.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.generate.toolTipText"));
+        generate.addActionListener(event -> console.generateNpc());
+        JPanel addButtons = Hud.transparentPanel(null);
+        addButtons.setLayout(new BoxLayout(addButtons, BoxLayout.X_AXIS));
+        addButtons.add(addButton);
+        addButtons.add(Box.createHorizontalStrut(scaleForGUI(6)));
+        addButtons.add(generate);
         JPanel addRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(6), 0));
         addRow.add(addField, BorderLayout.CENTER);
-        addRow.add(addButton, BorderLayout.EAST);
+        addRow.add(addButtons, BorderLayout.EAST);
 
         inCastChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.filter.active"), () -> setRemoved(false));
         removedChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.filter.removed"), () -> setRemoved(true));
@@ -240,6 +250,7 @@ class CastPage implements ConsoleSection {
         dossier.add(Box.createVerticalStrut(scaleForGUI(8)));
         dossier.add(leftAligned(rightButtonRow(null, rename, remove, restore, check, storyline)));
         dossier.add(Box.createVerticalStrut(scaleForGUI(14)));
+        dossier.add(leftAligned(profile));
         dossier.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.appearances"))));
         dossier.add(Box.createVerticalStrut(scaleForGUI(8)));
         dossier.add(leftAligned(appearances));
@@ -395,6 +406,16 @@ class CastPage implements ConsoleSection {
         remove.setVisible(character.isActive());
         remove.reset();
         restore.setVisible(!character.isActive());
+
+        profile.removeAll();
+        if (!character.getNotes().isBlank()) {
+            profile.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.profile"))));
+            profile.add(Box.createVerticalStrut(scaleForGUI(6)));
+            for (String line : character.getNotes().lines().toList()) {
+                profile.add(leftAligned(AskPage.wrapped(line.strip(), TEXT)));
+            }
+            profile.add(Box.createVerticalStrut(scaleForGUI(14)));
+        }
 
         appearances.removeAll();
         if (seen.isEmpty()) {

@@ -89,6 +89,7 @@ public class AttributesAndTraitsPage {
     private JCheckBox chkRandomizeTraits;
     private JCheckBox chkUseSmallArmsOnly;
     private JSpinner spnMaximumOracleLogEntries;
+    private JCheckBox chkUseOracleChronicle;
 
     private boolean created;
 
@@ -191,6 +192,9 @@ public class AttributesAndTraitsPage {
                 FORM_LABEL_COLUMN_WIDTH,
                 FORM_CONTROL_COLUMN_WIDTH);
         panel.addRow(lblMaximumOracleLogEntries, spnMaximumOracleLogEntries);
+        chkUseOracleChronicle = new CampaignOptionsCheckBox("UseOracleChronicle", getMetadata(new Version(0, 51, 1)));
+        chkUseOracleChronicle.addMouseListener(createTipPanelUpdater("UseOracleChronicle"));
+        panel.addCheckBox(chkUseOracleChronicle);
         return panel;
     }
 
@@ -253,6 +257,7 @@ public class AttributesAndTraitsPage {
         chkRandomizeTraits.setSelected(model.randomizeTraits);
         chkUseSmallArmsOnly.setSelected(model.useSmallArmsOnly);
         spnMaximumOracleLogEntries.setValue(model.maximumOracleLogEntries);
+        chkUseOracleChronicle.setSelected(model.useOracleChronicle);
     }
 
     private void writeToModel() {
@@ -267,5 +272,6 @@ public class AttributesAndTraitsPage {
         model.randomizeTraits = chkRandomizeTraits.isSelected();
         model.useSmallArmsOnly = chkUseSmallArmsOnly.isSelected();
         model.maximumOracleLogEntries = (int) spnMaximumOracleLogEntries.getValue();
+        model.useOracleChronicle = chkUseOracleChronicle.isSelected();
     }
 }

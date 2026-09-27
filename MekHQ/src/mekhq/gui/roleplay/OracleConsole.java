@@ -73,9 +73,12 @@ import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.text.JTextComponent;
 
+import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.common.annotations.Nullable;
+import megamek.common.enums.Gender;
 import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -456,6 +459,40 @@ public class OracleConsole extends JDialog {
     void showCharacter(final UUID characterId) {
         showPage(ConsolePage.CAST);
         castPage.select(characterId);
+    }
+
+    /**
+     * Makes a new cast member with a random name and a profile rolled from the Characters tables, then shows them on
+     * the Cast page.
+     */
+    void generateNpc() {
+        OracleCharacter character = null;
+        // A name already in the cast is refused, so try a few.
+        for (int attempt = 0; attempt < 5 && character == null; attempt++) {
+            character = actions.generateNpc(randomName());
+        }
+        // Names can run out or fail to load; a numbered name always fits.
+        for (int number = roleplay().getCharacters().size() + 1; character == null; number++) {
+            character = actions.generateNpc(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.generatedName") + " "
+                                                  + number);
+        }
+        if (character != null) {
+            changed();
+            showCharacter(character.getId());
+        }
+    }
+
+    private String randomName() {
+        try {
+            Gender gender = RandomGenderGenerator.generate();
+            String name = RandomNameGenerator.getInstance().generate(gender, campaign.getPlayerForce().isClanForce(),
+                  campaign.getPlayerForce().getFaction().getShortName());
+            // Before the name lists have loaded, every name is the same placeholder; use a numbered name instead.
+            return RandomNameGenerator.UNNAMED_FULL_NAME.equals(name) ? "" : name;
+        } catch (Exception e) {
+            LOGGER.error("Failed to generate an NPC name", e);
+            return "";
+        }
     }
 
     /**
