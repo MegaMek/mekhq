@@ -45,6 +45,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -57,10 +58,9 @@ import mekhq.campaign.unit.Unit;
  * reimplement that logic here.</p>
  *
  * <p>Role assignment per seat is delegated to {@link Unit#getDriverRole()} and
- * {@link Unit#getGunnerRole()}. The commander (descriptor
- * from {@code ForceDescriptor.getCo()}) is the first Person; their name is overridden from the
- * descriptor when {@code overrideName} is {@code true}. All other crew are randomly named by MekHQ's standard
- * personnel generator.</p>
+ * {@link Unit#getGunnerRole()}. The commander (descriptor from {@code ForceDescriptor.getCo()}) is the first Person;
+ * their name is overridden from the descriptor when {@code overrideName} is {@code true}. All other crew are randomly
+ * named by MekHQ's standard personnel generator.</p>
  */
 public final class MultiCrewAssembler {
 
@@ -278,6 +278,8 @@ public final class MultiCrewAssembler {
         }
         //The crew descriptor may have applied a new gender (to match the name) so generate a new portrait just in case
         campaign.getPlayerForce().getHumanResources().assignRandomPortraitFor(campaign.getCampaignOptions(), person);
+        //Also regenerate the personality description to match the character
+        PersonalityController.writePersonalityDescription(person);
         return person;
     }
 
@@ -300,8 +302,8 @@ public final class MultiCrewAssembler {
      * Falls back to a MekWarrior where {@link Unit} does not recognise the unit type.
      *
      * <p>{@code getDriverRole()} and {@code getGunnerRole()} answer {@code null} for a type they have no
-     * mapping for. A generated command with an uncrewed unit in it is harder to spot, and harder to fix,
-     * than one with a warrior in the wrong speciality, so the seat is filled and the gap is logged.</p>
+     * mapping for. A generated command with an uncrewed unit in it is harder to spot, and harder to fix, than one with
+     * a warrior in the wrong speciality, so the seat is filled and the gap is logged.</p>
      *
      * @param role     the role the unit reported, or {@code null} if it had none
      * @param unit     the unit being crewed, named in the log where the role was missing
@@ -314,7 +316,7 @@ public final class MultiCrewAssembler {
             return role;
         }
         LOGGER.warn("[CompanyGen]     MultiCrewAssembler: '{}' reported no {} role for unit type {};"
-                    + " filling the seat with a MekWarrior",
+                          + " filling the seat with a MekWarrior",
               unit.getName(), seatName, unit.getEntity().getUnitType());
         return PersonnelRole.MEKWARRIOR;
     }
