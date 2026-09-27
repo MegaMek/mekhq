@@ -64,6 +64,7 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
+import javax.swing.ListCellRenderer;
 import javax.swing.Scrollable;
 
 import megamek.common.annotations.Nullable;
@@ -195,7 +196,7 @@ class AskPage implements ConsoleSection {
         right.add(Box.createVerticalStrut(scaleForGUI(8)));
         right.add(leftAligned(recent));
         verdict.setVerdict(getTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.waiting"),
-              getTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.waiting.reason"), "–", ACCENT);
+              getTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.waiting.reason"), OracleConsole.symbol("none"), ACCENT);
 
         JScrollPane leftScroll = scroll(left, GROUND);
         leftScroll.setPreferredSize(new Dimension(scaleForGUI(440), 0));
@@ -212,7 +213,8 @@ class AskPage implements ConsoleSection {
     public void refresh() {
         int chaos = console.roleplay().getChaosFactor();
         for (FateChartOdds value : FateChartOdds.values()) {
-            odds.setSegmentSub(value, "≤ " + FateChart.getThresholds(value, chaos)[1]);
+            odds.setSegmentSub(value, getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.symbol.atMost",
+                  FateChart.getThresholds(value, chaos)[1]));
         }
         welcome.setVisible(!OracleGuidePreferences.getInstance().isWelcomeDismissed());
         refreshRecent();
@@ -250,10 +252,13 @@ class AskPage implements ConsoleSection {
         if (thresholds[2] <= 100) {
             ranges.add(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.range.exceptionalNo", thresholds[2]));
         }
-        String reason = getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.reason", answer.odds().getLabel(),
-              answer.chaos()) + " · " + String.join(" · ", ranges);
+        List<String> parts = new ArrayList<>();
+        parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.reason", answer.odds().getLabel(),
+              answer.chaos()));
+        parts.addAll(ranges);
+        String reason = OracleConsole.joined(parts);
         if (!answer.question().isBlank()) {
-            reason = "<i>“" + escape(answer.question()) + "”</i><br>" + reason;
+            reason = "<i>" + escape(OracleConsole.quoted(answer.question())) + "</i><br>" + reason;
         }
         verdict.setVerdict(answer.answer().getLabel(), "<html>" + reason + "</html>",
               getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.badge", answer.roll()), colorFor(answer.answer()));
@@ -328,7 +333,17 @@ class AskPage implements ConsoleSection {
             return effect;
         }
         if (focus == RandomEventFocus.NEW_NPC) {
-            return Hud.link(getTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.effect.generateNpc"), console::generateNpc);
+            // One NPC per event: once used, the link is spent, so a double-click can't add two.
+            JLabel[] link = new JLabel[1];
+            link[0] = Hud.link(getTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.effect.generateNpc"), () -> {
+                if (link[0].isEnabled() && console.generateNpc()) {
+                    link[0].setEnabled(false);
+                    link[0].setText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.effect.npcGenerated"));
+                    link[0].setForeground(TEXT_FAINT);
+                    link[0].setCursor(Cursor.getDefaultCursor());
+                }
+            });
+            return link[0];
         }
         if (outcome.isMissingCharacter()) {
             return wrapped(getTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.effect.noCharacter"), TEXT_FAINT);
@@ -450,7 +465,7 @@ class AskPage implements ConsoleSection {
             Hud.styleComboBox(category);
             Hud.styleComboBox(table);
             table.setRenderer(new DefaultListCellRenderer() {
-                private final javax.swing.ListCellRenderer<Object> hud = Hud.comboRenderer();
+                private final ListCellRenderer<Object> hud = Hud.comboRenderer();
 
                 @Override
                 @SuppressWarnings("unchecked")
@@ -465,7 +480,7 @@ class AskPage implements ConsoleSection {
             category.addActionListener(event -> fillTables());
             fillTables();
 
-            HudButton remove = new HudButton("×", false, true);
+            HudButton remove = new HudButton(OracleConsole.symbol("remove"), false, true);
             remove.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.concepts.remove"));
             remove.addActionListener(event -> removeConceptRow(this));
             panel.add(category, BorderLayout.WEST);

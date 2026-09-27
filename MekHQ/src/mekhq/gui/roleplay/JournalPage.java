@@ -83,6 +83,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.ListSelectionModel;
+import javax.swing.Timer;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -120,6 +121,7 @@ import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
  * the rich-text editor. The filtered journal can be exported as Markdown or plain text.
  */
 class JournalPage implements ConsoleSection {
+    private static final int SAVE_DELAY_MILLISECONDS = 400;
     private static final MMLogger LOGGER = MMLogger.create(JournalPage.class);
 
     /** The type chips: each stands for a group of entry types. */
@@ -177,6 +179,8 @@ class JournalPage implements ConsoleSection {
     private final JLabel empty = Hud.notice("");
     /** The entry in the reader, or {@code null} if none. */
     private JournalEntry shown;
+    /** Saves a note shortly after typing pauses, rather than serialising the whole note on every keystroke. */
+    private final Timer saveTimer = new Timer(SAVE_DELAY_MILLISECONDS, event -> saveEditor());
 
     JournalPage(final OracleConsole console) {
         this.console = console;
@@ -288,7 +292,8 @@ class JournalPage implements ConsoleSection {
               () -> showMentionMenu(mention[0]));
         editor.addToolbarButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.quote"),
               getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.quote.toolTipText"), this::quoteLastAnswer);
-        editor.addChangeListener(this::saveEditor);
+        saveTimer.setRepeats(false);
+        editor.addChangeListener(saveTimer::restart);
         editor.setPreferredSize(new Dimension(scaleForGUI(400), scaleForGUI(360)));
 
         delete = new HudConfirmButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.delete").toUpperCase(Locale.ROOT),
@@ -498,6 +503,7 @@ class JournalPage implements ConsoleSection {
 
     @Override
     public void refresh() {
+        flushEditor();
         if (showingTravel) {
             travelLog.refresh();
         }
@@ -513,8 +519,8 @@ class JournalPage implements ConsoleSection {
         listModel.clear();
         String month = null;
         for (JournalEntry entry : entries) {
-            String entryMonth = entry.getDate().getMonth().getDisplayName(TextStyle.FULL, Locale.getDefault()) + " "
-                                      + entry.getDate().getYear();
+            String entryMonth = entry.getDate().getMonth().getDisplayName(TextStyle.FULL,
+                  MekHQ.getMHQOptions().getLocale()) + " " + entry.getDate().getYear();
             if (!entryMonth.equals(month)) {
                 listModel.addElement(entryMonth);
                 month = entryMonth;
@@ -565,7 +571,8 @@ class JournalPage implements ConsoleSection {
     private static String titleOf(final JournalEntry entry) {
         OracleAnswer answer = entry.getAnswer();
         if (answer != null) {
-            return answer.answer().getLabel() + (answer.question().isBlank() ? "" : " · " + answer.question());
+            return answer.question().isBlank() ? answer.answer().getLabel()
+                         : OracleConsole.joined(answer.answer().getLabel(), answer.question());
         }
         if (entry.getCheck() != null) {
             return ChecksPage.summarize(entry.getCheck());
@@ -594,8 +601,7 @@ class JournalPage implements ConsoleSection {
             JournalEntry entry = (JournalEntry) value;
             // The ring's colour shows the type, so the row leaves the width to the title.
             return card.show(colorFor(entry.getType()), !entry.isNote(), titleOf(entry), null, List.of(),
-                  describeTags(entry), String.format("%02d-%02d", entry.getDate().getMonthValue(),
-                        entry.getDate().getDayOfMonth()), null, isSelected);
+                  describeTags(entry), formatDate(entry.getDate()), null, isSelected);
         }
     }
 
@@ -608,6 +614,7 @@ class JournalPage implements ConsoleSection {
             readerTags.setText(tagLine(entry));
             return;
         }
+        flushEditor();
         shown = entry;
         delete.reset();
         reader.setVisible(entry != null);
@@ -623,7 +630,8 @@ class JournalPage implements ConsoleSection {
         readerTitle.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.readerTitle",
               formatDate(entry.getDate()), entry.getType().getLabel()).toUpperCase(Locale.ROOT));
         readerTags.setText(tagLine(entry));
-        editor.setHtml(entry.isNote() ? entry.getText() : JournalText.plainToHtml(entry.getText()));
+        editor.setHtml(entry.isNote() ? JournalText.sanitizeHtml(entry.getText())
+                             : JournalText.plainToHtml(entry.getText()));
         editor.setEditable(entry.isNote());
         editor.setToolbarVisible(entry.isNote());
         delete.setVisible(entry.isNote());
@@ -650,6 +658,14 @@ class JournalPage implements ConsoleSection {
             }
         }
         return String.join(", ", names);
+    }
+
+    /** Saves any typing still waiting on the timer, before the note is left or read elsewhere. */
+    private void flushEditor() {
+        if (saveTimer.isRunning()) {
+            saveTimer.stop();
+            saveEditor();
+        }
     }
 
     private void saveEditor() {
@@ -799,6 +815,7 @@ class JournalPage implements ConsoleSection {
     }
 
     private void deleteShown() {
+        saveTimer.stop();
         if (shown != null && shown.isNote()) {
             console.roleplay().getJournal().remove(shown);
             shown = null;
@@ -812,6 +829,7 @@ class JournalPage implements ConsoleSection {
     // region Export
 
     private void export() {
+        flushEditor();
         JFileChooser chooser = new JFileChooser();
         FileNameExtensionFilter markdown = new FileNameExtensionFilter(
               getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.export.markdown"), "md", "markdown");
@@ -828,7 +846,10 @@ class JournalPage implements ConsoleSection {
 
         File file = chooser.getSelectedFile();
         Format format;
-        if (file.getName().contains(".")) {
+        String lowerName = file.getName().toLowerCase(Locale.ROOT);
+        // Only a known extension overrides the chosen format; a dot elsewhere, as in "Campaign 3067.05", is part of
+        // the name.
+        if (lowerName.endsWith(".md") || lowerName.endsWith(".markdown") || lowerName.endsWith(".txt")) {
             format = Format.forFileName(file.getName());
         } else {
             format = (chooser.getFileFilter() == text) ? Format.TEXT : Format.MARKDOWN;
@@ -850,10 +871,10 @@ class JournalPage implements ConsoleSection {
             Files.writeString(file.toPath(), document, StandardCharsets.UTF_8);
             status.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.export.done", entries.size(),
                   file.getName()));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to export the journal to {}", file, ex);
+        } catch (Exception exception) {
+            LOGGER.error("Failed to export the journal to {}", file, exception);
             status.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.export.failed",
-                  ex.getMessage()));
+                  exception.getMessage()));
         }
     }
 
@@ -869,10 +890,10 @@ class JournalPage implements ConsoleSection {
         try {
             archive = JournalArchive.read(Files.readString(file.toPath(), StandardCharsets.UTF_8),
                   text -> MekHQ.getMHQOptions().parseDisplayFormattedDate(text));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to read the journal in {}", file, ex);
+        } catch (Exception exception) {
+            LOGGER.error("Failed to read the journal in {}", file, exception);
             status.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.import.failed",
-                  ex.getMessage()));
+                  exception.getMessage()));
             return;
         }
         if (archive.entries().isEmpty()) {

@@ -88,8 +88,8 @@ public final class OracleGuidePreferences {
             flags.put(name, flag);
             // Managing the flag loads any value saved in an earlier session and saves it again on exit.
             node.manage(flag);
-        } catch (Exception ex) {
-            LOGGER.error(ex, "Failed to register Oracle tutorial preference {}", name);
+        } catch (Exception exception) {
+            LOGGER.error(exception, "Failed to register Oracle tutorial preference {}", name);
         }
     }
 

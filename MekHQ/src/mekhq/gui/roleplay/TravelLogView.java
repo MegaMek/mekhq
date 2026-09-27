@@ -44,6 +44,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -174,7 +175,7 @@ class TravelLogView {
         // Every row is in the chosen system, so the system column would only repeat it.
         detailTable.removeColumn(detailTable.getColumnModel().getColumn(3));
         detailTitle.setForeground(TEXT);
-        detailTitle.setFont(hudFont(java.awt.Font.BOLD, 1.15f, 0.04f));
+        detailTitle.setFont(hudFont(Font.BOLD, 1.15f, 0.04f));
         JPanel detailHead = column();
         detailHead.add(leftAligned(detailTitle));
         detailHead.add(Box.createVerticalStrut(scaleForGUI(3)));
@@ -309,7 +310,7 @@ class TravelLogView {
                 rows.add(new Row(entry.getDate(), text("TravelLog.campaign"), firstLine(entry.getText()), ""));
             }
         }
-        rows.sort((a, b) -> b.date().compareTo(a.date()));
+        rows.sort((first, second) -> second.date().compareTo(first.date()));
         detailModel.setRows(rows);
     }
 

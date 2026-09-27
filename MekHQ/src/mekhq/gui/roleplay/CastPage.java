@@ -60,6 +60,7 @@ import java.util.UUID;
 import javax.swing.*;
 
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.roleplay.JournalEntry;
 import mekhq.campaign.roleplay.JournalFilter;
@@ -77,6 +78,7 @@ import mekhq.gui.baseComponents.hud.HudConfirmButton;
  * person's portrait and role, and every journal entry the character appears in.
  */
 class CastPage implements ConsoleSection {
+    private static final MMLogger LOGGER = MMLogger.create(CastPage.class);
     private static final int PORTRAIT_SIZE = 64;
 
     private final OracleConsole console;
@@ -384,8 +386,8 @@ class CastPage implements ConsoleSection {
               person.getPrimaryRoleDesc()) : character.isLinked()
                                                    ? getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.about.gone")
                                                    : getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.about.typed");
-        about.setText(linked + "  ·  " + getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.about.count",
-              seen.size()));
+        about.setText(OracleConsole.joined(linked, getFormattedTextAt(RESOURCE_BUNDLE,
+              "OracleConsole.cast.about.count", seen.size())));
 
         rename.setArmed(!character.isLinked());
         rename.setToolTipText(character.isLinked() ? getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.rename.linked")
@@ -426,7 +428,20 @@ class CastPage implements ConsoleSection {
     }
 
     private void add() {
-        OracleCharacter character = console.roleplay().addCharacter(addField.getText());
+        String typed = addField.getText().strip();
+        if (typed.isEmpty()) {
+            return;
+        }
+        OracleCharacter existing = console.roleplay().findByName(typed);
+        if (existing != null && existing.isActive()) {
+            // Keep what was typed so the player can change it.
+            JOptionPane.showMessageDialog(root, getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.alreadyInCast",
+                  existing.getName()), getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.add"),
+                  JOptionPane.INFORMATION_MESSAGE);
+            addField.requestFocusInWindow();
+            return;
+        }
+        OracleCharacter character = console.roleplay().addCharacter(typed);
         addField.setText("");
         if (character != null) {
             selectedId = character.getId();
@@ -487,6 +502,8 @@ class CastPage implements ConsoleSection {
 
     /** Moves a character to where it is dropped in the list. */
     private final class ReorderHandler extends TransferHandler {
+        private boolean dragging;
+
         @Override
         public int getSourceActions(JComponent component) {
             return MOVE;
@@ -495,12 +512,20 @@ class CastPage implements ConsoleSection {
         @Override
         protected Transferable createTransferable(JComponent component) {
             OracleCharacter character = list.getSelectedValue();
+            dragging = character != null;
             return (character == null) ? null : new StringSelection(character.getId().toString());
         }
 
         @Override
         public boolean canImport(TransferSupport support) {
-            return !showingRemoved && support.isDrop() && support.isDataFlavorSupported(DataFlavor.stringFlavor);
+            // Only a drag that started in this list; text dragged in from elsewhere is not a character.
+            return !showingRemoved && support.isDrop() && support.getComponent() == list && dragging
+                         && support.isDataFlavorSupported(DataFlavor.stringFlavor);
+        }
+
+        @Override
+        protected void exportDone(JComponent source, Transferable data, int action) {
+            dragging = false;
         }
 
         @Override
@@ -521,7 +546,8 @@ class CastPage implements ConsoleSection {
                 selectedId = id;
                 console.changed();
                 return true;
-            } catch (Exception ex) {
+            } catch (Exception exception) {
+                LOGGER.debug("[OracleConsole] Ignored a cast drop that could not be read: {}", exception.getMessage());
                 return false;
             }
         }

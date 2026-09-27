@@ -33,6 +33,7 @@
 package mekhq.campaign.roleplay;
 
 import java.util.Locale;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,6 +49,11 @@ public final class JournalText {
     private static final String BOLD = "\uE002";
     private static final String ITALIC = "\uE003";
     private static final Pattern MARKDOWN_SPECIAL = Pattern.compile("[\\\\`*_#<>\\[\\]]");
+    private static final Set<String> ALLOWED_TAGS = Set.of("html", "head", "body", "p", "b", "strong", "i", "em",
+          "u", "h1", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li", "blockquote", "br");
+    private static final Pattern HIDDEN_CONTENT = Pattern.compile(
+          "(?is)<(script|style|title|object|iframe)\\b[^>]*>.*?</\\1\\s*>");
+    private static final Pattern ANY_TAG = Pattern.compile("(?s)<(/?)([a-zA-Z][a-zA-Z0-9]*)\\b[^>]*>");
     private static final Pattern MARKDOWN_ESCAPE = Pattern.compile("\\\\([\\\\`*_#<>\\[\\]+.-])");
     private static final Pattern LIST_START = Pattern.compile("(?m)^(\\s*)([-+]|\\d+\\.)(?=\\s)");
     private static final Pattern HEAD = Pattern.compile("(?is)<head>.*?</head>");
@@ -162,6 +168,28 @@ public final class JournalText {
         String escaped = MARKDOWN_SPECIAL.matcher(text).replaceAll("\\\\$0");
         // A line starting with a list marker would become a list.
         return LIST_START.matcher(escaped).replaceAll("$1\\\\$2");
+    }
+
+    /**
+     * Keeps only the tags the journal's editor writes (paragraphs, bold, italic, underline, headings, lists, quotes and
+     * line breaks), without their attributes. Anything else, such as an image or link from an imported file, would
+     * otherwise be loaded by the editor, fetching remote addresses.
+     *
+     * @param html an HTML document or fragment
+     *
+     * @return the HTML with every other tag removed, keeping its text
+     */
+    public static String sanitizeHtml(final String html) {
+        final String withoutHidden = HIDDEN_CONTENT.matcher(html).replaceAll("");
+        final Matcher tags = ANY_TAG.matcher(withoutHidden);
+        final StringBuilder clean = new StringBuilder();
+        while (tags.find()) {
+            final String name = tags.group(2).toLowerCase(Locale.ROOT);
+            final String replacement = ALLOWED_TAGS.contains(name) ? "<" + tags.group(1) + name + ">" : "";
+            tags.appendReplacement(clean, Matcher.quoteReplacement(replacement));
+        }
+        tags.appendTail(clean);
+        return clean.toString();
     }
 
     /**

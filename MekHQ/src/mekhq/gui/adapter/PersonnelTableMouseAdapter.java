@@ -420,6 +420,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 for (final Person person : people) {
                     getCampaign().getRoleplay().addLinkedCharacter(person.getId(), person.getFullName());
                 }
+                OracleConsole.refreshIfOpen(getCampaign());
                 break;
             }
             case CMD_SKILL_CHECK: {

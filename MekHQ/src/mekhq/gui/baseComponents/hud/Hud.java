@@ -180,26 +180,30 @@ public final class Hud {
         label.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent event) {
-                if (label.contains(event.getPoint())) {
+                if (label.isEnabled() && label.contains(event.getPoint())) {
                     onChoose.run();
                 }
             }
 
             @Override
             public void mouseEntered(MouseEvent event) {
-                label.setForeground(TEXT);
+                if (label.isEnabled()) {
+                    label.setForeground(TEXT);
+                }
             }
 
             @Override
             public void mouseExited(MouseEvent event) {
-                label.setForeground(ACCENT_BRIGHT);
+                if (label.isEnabled()) {
+                    label.setForeground(ACCENT_BRIGHT);
+                }
             }
         });
         label.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent event) {
-                if (event.getKeyCode() == KeyEvent.VK_SPACE
-                          || event.getKeyCode() == KeyEvent.VK_ENTER) {
+                if (label.isEnabled() && (event.getKeyCode() == KeyEvent.VK_SPACE
+                                                || event.getKeyCode() == KeyEvent.VK_ENTER)) {
                     onChoose.run();
                 }
             }

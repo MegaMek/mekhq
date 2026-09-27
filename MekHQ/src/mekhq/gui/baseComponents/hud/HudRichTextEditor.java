@@ -37,15 +37,22 @@ import static mekhq.gui.baseComponents.hud.HudStyle.*;
 
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.datatransfer.Clipboard;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.UnsupportedFlavorException;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.TransferHandler;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -98,6 +105,7 @@ public class HudRichTextEditor extends JPanel {
         setOpaque(false);
 
         editor.setEditorKit(kit);
+        editor.setTransferHandler(new PlainTextPaste(editor.getTransferHandler()));
         editor.setBackground(SURFACE_DEEP);
         editor.setForeground(TEXT);
         editor.setCaretColor(ACCENT);
@@ -282,5 +290,51 @@ public class HudRichTextEditor extends JPanel {
         styles.addRule("blockquote { color: " + hex(TEXT_MUTED) + "; margin-left: 10px; margin-top: 2px; "
                              + "margin-bottom: 8px; padding-left: 8px; border-left: 2px solid " + hex(AMBER) + "; }");
         styles.addRule("a { color: " + hex(ACCENT_BRIGHT) + "; }");
+    }
+
+    /**
+     * Pastes only plain text. Pasted HTML could carry images or links to remote addresses that the editor would fetch
+     * when shown; the toolbar is there for formatting. Copying and dragging out still work as before.
+     */
+    private static final class PlainTextPaste extends TransferHandler {
+        private final TransferHandler original;
+
+        private PlainTextPaste(final TransferHandler original) {
+            this.original = original;
+        }
+
+        @Override
+        public boolean canImport(final TransferSupport support) {
+            return support.isDataFlavorSupported(DataFlavor.stringFlavor);
+        }
+
+        @Override
+        public boolean importData(final TransferSupport support) {
+            if (!canImport(support) || !(support.getComponent() instanceof JEditorPane pane)) {
+                return false;
+            }
+            try {
+                pane.replaceSelection((String) support.getTransferable().getTransferData(DataFlavor.stringFlavor));
+                return true;
+            } catch (UnsupportedFlavorException | IOException exception) {
+                LOGGER.debug("Could not paste into the editor: {}", exception.getMessage());
+                return false;
+            }
+        }
+
+        @Override
+        public int getSourceActions(final JComponent component) {
+            return original.getSourceActions(component);
+        }
+
+        @Override
+        public void exportToClipboard(final JComponent component, final Clipboard clipboard, final int action) {
+            original.exportToClipboard(component, clipboard, action);
+        }
+
+        @Override
+        public void exportAsDrag(final JComponent component, final InputEvent event, final int action) {
+            original.exportAsDrag(component, event, action);
+        }
     }
 }

@@ -454,6 +454,8 @@ public final class JournalArchive {
                 }
             }
             if (entry.isNote()) {
+                // A shared file could hold images or links the editor would fetch; keep only the editor's own tags.
+                entry.setText(JournalText.sanitizeHtml(entry.getText()));
                 roleplay.getJournal().add(entry);
                 notes++;
             } else {

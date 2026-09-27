@@ -147,8 +147,12 @@ class ThreadsPage implements ConsoleSection {
         AskPage.useFixedCardRows(threadList);
         threadList.addListSelectionListener(event -> {
             if (!event.getValueIsAdjusting() && threadList.getSelectedValue() != null) {
-                selectedId = threadList.getSelectedValue().getId();
-                revelation.setVisible(false);
+                UUID picked = threadList.getSelectedValue().getId();
+                // Rebuilding the list re-selects the same thread; only a real change of thread hides the banner.
+                if (!picked.equals(selectedId)) {
+                    revelation.setVisible(false);
+                }
+                selectedId = picked;
                 refreshDetail();
             }
         });
@@ -471,7 +475,7 @@ class ThreadsPage implements ConsoleSection {
                                    : "OracleConsole.threads.step";
         String heading = getFormattedTextAt(RESOURCE_BUNDLE, key, step.number());
         LocalDate date = thread.getRevealDate(step.number());
-        return (date == null) ? heading : heading + "  ·  " + OracleConsole.formatDate(date);
+        return (date == null) ? heading : OracleConsole.joined(heading, OracleConsole.formatDate(date));
     }
 
     private String tooltipFor(final PlotThread thread, final int number) {

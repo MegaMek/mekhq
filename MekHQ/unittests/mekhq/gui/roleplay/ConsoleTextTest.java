@@ -36,6 +36,8 @@ import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT;
 import static mekhq.gui.baseComponents.hud.HudStyle.AMBER;
 import static mekhq.gui.baseComponents.hud.HudStyle.DANGER;
 import static mekhq.gui.baseComponents.hud.HudStyle.READY;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
@@ -50,6 +52,12 @@ import org.junit.jupiter.api.Test;
 
 /** The console pages' text helpers, which decide what players read in lists and result banners. */
 class ConsoleTextTest {
+    private static final String BUNDLE = "mekhq.resources.Roleplay";
+
+    private static String text(final String key) {
+        return getTextAt(BUNDLE, key);
+    }
+
     private static CheckRecord.Side side(final String name, final int roll, final int margin, final boolean won) {
         return new CheckRecord.Side(name, UUID.randomUUID(), "Stealth (Normal)", "7+", roll, List.of(3, 4), margin,
               false, won);
@@ -57,12 +65,12 @@ class ConsoleTextTest {
 
     @Test
     void verdictsFollowTheMargin() {
-        assertEquals("Outstanding", ChecksPage.verdictWord(4));
-        assertEquals("Passed", ChecksPage.verdictWord(3));
-        assertEquals("Passed", ChecksPage.verdictWord(0));
-        assertEquals("Failed", ChecksPage.verdictWord(-1));
-        assertEquals("Failed", ChecksPage.verdictWord(-2));
-        assertEquals("Botched", ChecksPage.verdictWord(-3));
+        assertEquals(text("ChecksPage.verdict.outstanding"), ChecksPage.verdictWord(4));
+        assertEquals(text("ChecksPage.verdict.passed"), ChecksPage.verdictWord(3));
+        assertEquals(text("ChecksPage.verdict.passed"), ChecksPage.verdictWord(0));
+        assertEquals(text("ChecksPage.verdict.failed"), ChecksPage.verdictWord(-1));
+        assertEquals(text("ChecksPage.verdict.failed"), ChecksPage.verdictWord(-2));
+        assertEquals(text("ChecksPage.verdict.botched"), ChecksPage.verdictWord(-3));
         assertEquals(READY, ChecksPage.colorFor(10));
         assertEquals(ACCENT, ChecksPage.colorFor(0));
         assertEquals(AMBER, ChecksPage.colorFor(-2));
@@ -71,13 +79,18 @@ class ConsoleTextTest {
 
     @Test
     void summariesSuitEachKindOfCheck() {
-        assertEquals("Passed · Rook", ChecksPage.summarize(new CheckRecord(false, "", List.of(side("Rook", 9, 2,
-              true)))));
-        assertEquals("1 of 2 passed", ChecksPage.summarize(new CheckRecord(false, "", List.of(
-              side("Rook", 9, 2, true), side("Dace", 4, -3, false)))));
-        assertEquals("Dace wins", ChecksPage.summarize(new CheckRecord(true, "", List.of(
-              side("Rook", 8, 1, false), side("Dace", 8, 1, true)))));
-        assertEquals("Rook (Stealth (Normal)) 9 vs 7+ · Dace (Stealth (Normal)) 4 vs 7+",
+        // Built from the same resource keys, so rewording the text doesn't break the test.
+        assertEquals(OracleConsole.joined(text("ChecksPage.verdict.passed"), "Rook"),
+              ChecksPage.summarize(new CheckRecord(false, "", List.of(side("Rook", 9, 2, true)))));
+        assertEquals(getFormattedTextAt(BUNDLE, "ChecksPage.result.group", 1, 2),
+              ChecksPage.summarize(new CheckRecord(false, "", List.of(side("Rook", 9, 2, true),
+                    side("Dace", 4, -3, false)))));
+        assertEquals(getFormattedTextAt(BUNDLE, "ChecksPage.result.wins", "Dace"),
+              ChecksPage.summarize(new CheckRecord(true, "", List.of(side("Rook", 8, 1, false),
+                    side("Dace", 8, 1, true)))));
+        assertEquals(OracleConsole.joined(
+                    getFormattedTextAt(BUNDLE, "ChecksPage.result.short", "Rook", "Stealth (Normal)", 9, "7+"),
+                    getFormattedTextAt(BUNDLE, "ChecksPage.result.short", "Dace", "Stealth (Normal)", 4, "7+")),
               ChecksPage.describeSides(new CheckRecord(false, "", List.of(side("Rook", 9, 2, true),
                     side("Dace", 4, -3, false)))));
     }
@@ -93,20 +106,22 @@ class ConsoleTextTest {
     void threadProgressCountsToTheNextMark() {
         RandomOracleGenerator generator = mock(RandomOracleGenerator.class);
         PlotThread thread = PlotThread.create("Ghost", PlotThreadLength.SHORT, generator);
-        assertEquals("5 to the next flashpoint", ThreadsPage.describeProgress(thread));
+        assertEquals(getFormattedTextAt(BUNDLE, "OracleConsole.threads.progress.toFlashpoint", 10, 5),
+              ThreadsPage.describeProgress(thread));
         for (int step = 0; step < 4; step++) {
             thread.revealNextStep(null);
         }
-        assertEquals("Flashpoint next", ThreadsPage.describeProgress(thread));
+        assertEquals(text("OracleConsole.threads.progress.flashpointNext"), ThreadsPage.describeProgress(thread));
         thread.revealNextStep(null);
         thread.revealNextStep(null);
         // Step 10 of a Short thread is the conclusion, not a flashpoint.
-        assertEquals("4 to the conclusion", ThreadsPage.describeProgress(thread));
+        assertEquals(getFormattedTextAt(BUNDLE, "OracleConsole.threads.progress.toConclusion", 4, 5),
+              ThreadsPage.describeProgress(thread));
         for (int step = 0; step < 3; step++) {
             thread.revealNextStep(null);
         }
-        assertEquals("Conclusion next", ThreadsPage.describeProgress(thread));
+        assertEquals(text("OracleConsole.threads.progress.conclusionNext"), ThreadsPage.describeProgress(thread));
         thread.revealNextStep(null);
-        assertEquals("Concluded", ThreadsPage.describeProgress(thread));
+        assertEquals(text("OracleConsole.threads.progress.concluded"), ThreadsPage.describeProgress(thread));
     }
 }

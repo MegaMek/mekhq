@@ -84,6 +84,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ActionCheckRoll.RollType;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -116,6 +117,8 @@ import mekhq.gui.baseComponents.hud.HudVerdictBanner;
  * daily report.
  */
 class ChecksPage implements ConsoleSection {
+    private static final MMLogger LOGGER = MMLogger.create(ChecksPage.class);
+
     private static final int RECENT_CHECKS = 5;
     private static final int PREVIEW_PEOPLE = 6;
     private static final int MAXIMUM_OTHER = 6;
@@ -328,7 +331,7 @@ class ChecksPage implements ConsoleSection {
         difficulty.setSegments(levels);
         difficulty.setSelected(CheckDifficulty.NORMAL);
 
-        HudButton otherDown = new HudButton("−", false, true);
+        HudButton otherDown = new HudButton(OracleConsole.symbol("minus"), false, true);
         otherDown.setToolTipText(text("ChecksPage.other.down"));
         otherDown.addActionListener(event -> changeOther(-1));
         HudButton otherUp = new HudButton("+", false, true);
@@ -423,7 +426,7 @@ class ChecksPage implements ConsoleSection {
         right.add(leftAligned(Hud.sectionHeading(text("ChecksPage.recent"))));
         right.add(Box.createVerticalStrut(scaleForGUI(8)));
         right.add(leftAligned(recent));
-        verdict.setVerdict(text("ChecksPage.waiting"), text("ChecksPage.waiting.reason"), "–", ACCENT);
+        verdict.setVerdict(text("ChecksPage.waiting"), text("ChecksPage.waiting.reason"), OracleConsole.symbol("none"), ACCENT);
 
         JScrollPane leftScroll = scroll(left, GROUND);
         leftScroll.setPreferredSize(new Dimension(scaleForGUI(440), 0));
@@ -534,7 +537,12 @@ class ChecksPage implements ConsoleSection {
             peopleModel.clear();
             peopleModel.addAll(shown);
             // People who are ticked but no longer shown stay ticked only if they are still in the list.
+            int before = picked.size();
             picked.retainAll(shown.stream().map(Person::getId).toList());
+            if (picked.size() < before) {
+                LOGGER.debug("[OracleConsole] {} picked people are no longer listed and were unticked",
+                      before - picked.size());
+            }
             if (picked.isEmpty() && !shown.isEmpty()) {
                 picked.add(shown.get(0).getId());
             }
@@ -661,7 +669,7 @@ class ChecksPage implements ConsoleSection {
         for (Person person : people.subList(0, Math.min(3, people.size()))) {
             targets.add(checks.target(person, trait, modifier).describe());
         }
-        return String.join(" / ", targets) + (people.size() > 3 ? " …" : "");
+        return String.join(" / ", targets) + (people.size() > 3 ? " " + OracleConsole.symbol("more") : "");
     }
 
     private @Nullable CheckTrait currentTrait() {
@@ -721,8 +729,12 @@ class ChecksPage implements ConsoleSection {
         List<String> lines = new ArrayList<>();
         boolean ready;
         if (mode == Mode.OPPOSED) {
-            ready = acting.isReady() && defending.isReady();
-            if (ready) {
+            boolean sameSide = acting.isReady() && defending.isReady() && acting.isSameAs(defending);
+            ready = acting.isReady() && defending.isReady() && !sameSide;
+            if (sameSide) {
+                LOGGER.debug("[OracleConsole] Opposed check not armed: both sides are {}", acting.name());
+                lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.preview.sameSide", escape(acting.name())));
+            } else if (ready) {
                 CheckTarget actingTarget = acting.target();
                 CheckTarget defendingTarget = defending.target();
                 double chance = CheckOdds.opposedWinChance(actingTarget, acting.rerolls(), defendingTarget,
@@ -744,9 +756,9 @@ class ChecksPage implements ConsoleSection {
                 for (Person person : people.subList(0, Math.min(PREVIEW_PEOPLE, people.size()))) {
                     CheckTarget target = checks.target(person, trait, modifier);
                     boolean edge = useEdge.isSelected() && checks.canUseEdge(person);
-                    String line = big(target.describe()) + "  " + escape(person.getFullName()) + "  ·  "
-                                        + getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.preview.chance",
-                          percent(CheckOdds.chance(target, edge)), hex(READY));
+                    String line = big(target.describe()) + "  " + OracleConsole.joined(escape(person.getFullName()),
+                          getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.preview.chance",
+                                percent(CheckOdds.chance(target, edge)), hex(READY)));
                     List<String> notes = new ArrayList<>();
                     if (target.rollType() != RollType.NORMAL) {
                         notes.add(text("ChecksPage.preview.aptitude"));
@@ -758,7 +770,7 @@ class ChecksPage implements ConsoleSection {
                         notes.add(getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.preview.edge",
                               person.getCurrentEdge()));
                     }
-                    lines.add(line + (notes.isEmpty() ? "" : "  " + faint(String.join(" · ", notes))));
+                    lines.add(line + (notes.isEmpty() ? "" : "  " + faint(OracleConsole.joined(notes))));
                 }
                 if (people.size() > PREVIEW_PEOPLE) {
                     lines.add(faint(getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.preview.more",
@@ -773,6 +785,9 @@ class ChecksPage implements ConsoleSection {
         }
         preview.setText("<html><div style='width:" + scaleForGUI(380) + "px'>" + String.join("<br>", lines)
                               + "</div></html>");
+        if (!ready) {
+            LOGGER.debug("[OracleConsole] Roll not armed in {} mode: {}", mode, String.join(" / ", lines));
+        }
         rollButton.setArmed(ready);
     }
 
@@ -814,7 +829,8 @@ class ChecksPage implements ConsoleSection {
 
     private void showResult(final CheckRecord record, final boolean fresh) {
         List<CheckRecord.Side> sides = record.sides();
-        String because = record.reason().isBlank() ? "" : "<i>“" + escape(record.reason()) + "”</i><br>";
+        String because = record.reason().isBlank() ? ""
+                               : "<i>" + escape(OracleConsole.quoted(record.reason())) + "</i><br>";
         if (record.opposed() && sides.size() == 2) {
             CheckRecord.Side winner = sides.get(0).won() ? sides.get(0) : sides.get(1);
             int difference = record.winningDifference();
@@ -825,8 +841,8 @@ class ChecksPage implements ConsoleSection {
                         "ChecksPage.result.badge.margin", difference), sides.get(0).won() ? READY : AMBER);
         } else if (sides.size() == 1) {
             CheckRecord.Side side = sides.get(0);
-            verdict.setVerdict(verdictWord(side.margin()), "<html>" + because + escape(side.name() + " · "
-                                                                                             + side.action())
+            verdict.setVerdict(verdictWord(side.margin()), "<html>" + because + escape(OracleConsole.joined(side.name(),
+                                                                                                   side.action()))
                                                                    + "</html>",
                   getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.result.badge.roll", side.roll()),
                   colorFor(side.margin()));
@@ -853,10 +869,10 @@ class ChecksPage implements ConsoleSection {
 
     private static HudCard sideCard(final CheckRecord.Side side, final boolean opposed) {
         List<String> dice = side.dice().stream().map(String::valueOf).toList();
-        String sub = getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.result.side", String.join(" · ", dice),
+        String sub = getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.result.side", OracleConsole.joined(dice),
               side.roll(), side.target());
         if (side.usedEdge()) {
-            sub += "  ·  " + text("ChecksPage.result.edge");
+            sub = OracleConsole.joined(sub, text("ChecksPage.result.edge"));
         }
         String word = opposed ? text(side.won() ? "ChecksPage.result.won" : "ChecksPage.result.lost")
                             : verdictWord(side.margin());
@@ -887,7 +903,7 @@ class ChecksPage implements ConsoleSection {
             return getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.result.wins", winner.name());
         }
         if (sides.size() == 1) {
-            return verdictWord(sides.get(0).margin()) + " · " + sides.get(0).name();
+            return OracleConsole.joined(verdictWord(sides.get(0).margin()), sides.get(0).name());
         }
         return getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.result.group", record.countWon(), sides.size());
     }
@@ -903,7 +919,7 @@ class ChecksPage implements ConsoleSection {
             parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.result.short", side.name(), side.action(),
                   side.roll(), side.target()));
         }
-        return String.join(" · ", parts);
+        return OracleConsole.joined(parts);
     }
 
     private void refreshRecent() {
@@ -1108,12 +1124,12 @@ class ChecksPage implements ConsoleSection {
                 }
                 String kind = text(person != null ? "ChecksPage.opposed.kind.linked"
                                          : "ChecksPage.opposed.kind.rated");
-                model.addElement(new Participant(character.getName() + "  ·  " + kind, person, character));
+                model.addElement(new Participant(OracleConsole.joined(character.getName(), kind), person, character));
             }
             for (Person person : companyPeople()) {
                 if (!inCast.contains(person.getId())) {
-                    model.addElement(new Participant(person.getFullName() + "  ·  "
-                                                           + text("ChecksPage.opposed.kind.company"), person, null));
+                    model.addElement(new Participant(OracleConsole.joined(person.getFullName(),
+                          text("ChecksPage.opposed.kind.company")), person, null));
                 }
             }
             filling = true;
@@ -1192,6 +1208,21 @@ class ChecksPage implements ConsoleSection {
             traitPerson = person;
         }
 
+        /**
+         * @return {@code true} if both sides are the same person or cast member
+         */
+        private boolean isSameAs(final SidePanel other) {
+            Participant mine = (Participant) who.getSelectedItem();
+            Participant theirs = (Participant) other.who.getSelectedItem();
+            if (mine == null || theirs == null) {
+                return false;
+            }
+            boolean samePerson = mine.person() != null && theirs.person() != null
+                                       && mine.person().getId().equals(theirs.person().getId());
+            boolean sameCharacter = mine.character() != null && mine.character() == theirs.character();
+            return samePerson || sameCharacter;
+        }
+
         private boolean isReady() {
             Participant participant = (Participant) who.getSelectedItem();
             return participant != null && (participant.person() == null || trait.getSelectedItem() != null);
@@ -1247,7 +1278,7 @@ class ChecksPage implements ConsoleSection {
                 if (value != null) {
                     label = value.getLabel();
                     if (traitPerson != null) {
-                        label += "  ·  " + checks.target(traitPerson, value, 0).describe();
+                        label = OracleConsole.joined(label, checks.target(traitPerson, value, 0).describe());
                         if (!RoleplayChecks.isTrained(traitPerson, value)) {
                             label += "  " + text("ChecksPage.skill.untrained");
                         }

@@ -185,7 +185,12 @@ public class Roleplay {
         return character;
     }
 
-    private @Nullable OracleCharacter findByName(final String name) {
+    /**
+     * @param name a name, matched exactly
+     *
+     * @return the character with that name, active or removed, or {@code null} if there is none
+     */
+    public @Nullable OracleCharacter findByName(final String name) {
         return characters.stream().filter(character -> character.getName().equals(name)).findFirst().orElse(null);
     }
 

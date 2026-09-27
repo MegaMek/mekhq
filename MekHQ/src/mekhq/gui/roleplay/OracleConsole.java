@@ -87,6 +87,8 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
+import mekhq.campaign.events.persons.PersonNewEvent;
+import mekhq.campaign.events.persons.PersonRemovedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.roleplay.FateChart;
 import mekhq.campaign.roleplay.JournalEntry;
@@ -303,7 +305,7 @@ public class OracleConsole extends JDialog {
         chaosTile = new HudStatTile(getTextAt(RESOURCE_BUNDLE, "OracleConsole.tile.chaos"),
               getTextAt(RESOURCE_BUNDLE, "OracleConsole.tile.chaos.sub"));
         chaosTile.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.tile.chaos.toolTipText"));
-        chaosDown = new HudButton("−", false, true);
+        chaosDown = new HudButton(symbol("minus"), false, true);
         chaosDown.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.tile.chaos.down"));
         chaosDown.addActionListener(event -> changeChaos(-1));
         chaosUp = new HudButton("+", false, true);
@@ -468,10 +470,12 @@ public class OracleConsole extends JDialog {
     /**
      * Makes a new cast member with a random name and a profile rolled from the Characters tables, then shows them on
      * the Cast page.
+     *
+     * @return {@code true} if a character was made; {@code false} if the tables weren't ready
      */
-    void generateNpc() {
+    boolean generateNpc() {
         if (!tablesReady(OracleActions.NPC_PROFILE_TABLES)) {
-            return;
+            return false;
         }
         OracleCharacter character = null;
         // A name already in the cast is refused, so try a few.
@@ -479,12 +483,16 @@ public class OracleConsole extends JDialog {
             character = actions.generateNpc(randomName());
         }
         // Names can run out or fail to load; a numbered name always fits.
+        if (character == null) {
+            LOGGER.debug("[OracleConsole] No free random name for a new NPC; using a numbered name");
+        }
         for (int number = roleplay().getCharacters().size() + 1; character == null; number++) {
             character = actions.generateNpc(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.generatedName") + " "
                                                   + number);
         }
         changed();
         showCharacter(character.getId());
+        return true;
     }
 
     /**
@@ -512,8 +520,8 @@ public class OracleConsole extends JDialog {
                   campaign.getPlayerForce().getFaction().getShortName());
             // Before the name lists have loaded, every name is the same placeholder; use a numbered name instead.
             return RandomNameGenerator.UNNAMED_FULL_NAME.equals(name) ? "" : name;
-        } catch (Exception e) {
-            LOGGER.error("Failed to generate an NPC name", e);
+        } catch (Exception exception) {
+            LOGGER.error("Failed to generate an NPC name", exception);
             return "";
         }
     }
@@ -696,11 +704,42 @@ public class OracleConsole extends JDialog {
             return;
         }
         OracleAnswer answer = latest.getAnswer();
-        String question = answer.question().isBlank() ? answer.odds().getLabel() : "“" + answer.question()
-                                                                                       + "”";
+        String question = answer.question().isBlank() ? answer.odds().getLabel() : quoted(answer.question());
         footerSummary.setText("<html>" + getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.footer.last",
               escape(question), hex(AskPage.colorFor(answer.answer())), escape(answer.answer().getLabel()),
               answer.roll()) + "</html>");
+    }
+
+    /**
+     * @param parts pieces of a line, such as a name and what they are
+     *
+     * @return the pieces joined with the separator the console uses, " · " in English
+     */
+    static String joined(final List<String> parts) {
+        return String.join(getTextAt(RESOURCE_BUNDLE, "OracleConsole.separator"), parts);
+    }
+
+    /** @return the pieces joined with the console's separator */
+    static String joined(final String... parts) {
+        return joined(List.of(parts));
+    }
+
+    /**
+     * @param text a question or reason the player typed
+     *
+     * @return it in quotation marks, as the language writes them
+     */
+    static String quoted(final String text) {
+        return getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.quoted", text);
+    }
+
+    /**
+     * @param name a symbol's name: minus, remove, none or more
+     *
+     * @return the symbol, such as a minus sign
+     */
+    static String symbol(final String name) {
+        return getTextAt(RESOURCE_BUNDLE, "OracleConsole.symbol." + name);
     }
 
     /**
@@ -731,6 +770,28 @@ public class OracleConsole extends JDialog {
     @Subscribe
     public void handle(final PersonChangedEvent event) {
         scheduleRefresh();
+    }
+
+    @Subscribe
+    public void handle(final PersonNewEvent event) {
+        scheduleRefresh();
+    }
+
+    /** Someone removed in the main window must not stay pickable here. */
+    @Subscribe
+    public void handle(final PersonRemovedEvent event) {
+        scheduleRefresh();
+    }
+
+    /**
+     * Refreshes the open console, if it shows this campaign, after a change made elsewhere that posts no event.
+     *
+     * @param campaign the campaign that changed
+     */
+    public static void refreshIfOpen(final Campaign campaign) {
+        if (openConsole != null && openConsole.isDisplayable() && openConsole.campaign == campaign) {
+            openConsole.scheduleRefresh();
+        }
     }
 
     /**
@@ -785,8 +846,8 @@ public class OracleConsole extends JDialog {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(OracleConsole.class);
             setName("OracleConsole");
             preferences.manage(new JWindowPreference(this));
-        } catch (Exception ex) {
-            LOGGER.error("Failed to set user preferences", ex);
+        } catch (Exception exception) {
+            LOGGER.error("Failed to set user preferences", exception);
         }
     }
 }
