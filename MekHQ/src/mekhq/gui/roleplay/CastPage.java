@@ -48,10 +48,13 @@ import java.awt.Font;
 import java.awt.datatransfer.DataFlavor;
 import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.Transferable;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import javax.swing.BorderFactory;
@@ -117,6 +120,12 @@ class CastPage implements ConsoleSection {
     /** The selected id, or {@code null} if nothing is selected. */
     private UUID selectedId;
 
+    /** Each character's journal appearances, counted once per refresh rather than every time a row is drawn. */
+    private final Map<UUID, Appearances> appearanceStats = new HashMap<>();
+
+    /** How often, and most recently when, a character appears in the journal. */
+    private record Appearances(int count, @Nullable LocalDate lastSeen) {}
+
     CastPage(final OracleConsole console) {
         this.console = console;
         root.setOpaque(true);
@@ -143,6 +152,7 @@ class CastPage implements ConsoleSection {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setBackground(SURFACE_DEEP);
         list.setCellRenderer(new CastRenderer());
+        AskPage.useFixedCardRows(list);
         list.addListSelectionListener(event -> {
             if (!event.getValueIsAdjusting() && list.getSelectedValue() != null) {
                 selectedId = list.getSelectedValue().getId();
@@ -239,7 +249,8 @@ class CastPage implements ConsoleSection {
 
         root.add(board, BorderLayout.WEST);
         root.add(right, BorderLayout.CENTER);
-        setRemoved(false);
+        // The console refreshes the page when it is shown, so only the chips are set up here.
+        showRemoved(false);
     }
 
     private static JComponent wrappedHint(final JLabel hint) {
@@ -271,16 +282,21 @@ class CastPage implements ConsoleSection {
     }
 
     private void setRemoved(final boolean removed) {
+        showRemoved(removed);
+        refresh();
+    }
+
+    private void showRemoved(final boolean removed) {
         showingRemoved = removed;
         inCastChip.setActive(!removed);
         removedChip.setActive(removed);
         list.setDragEnabled(!removed);
         listHint.setVisible(!removed);
-        refresh();
     }
 
     @Override
     public void refresh() {
+        countAppearances();
         List<OracleCharacter> shown = console.roleplay().getCharacters().stream()
                                             .filter(character -> character.isActive() != showingRemoved).toList();
         model.clear();
@@ -300,6 +316,20 @@ class CastPage implements ConsoleSection {
         refreshDossier();
     }
 
+    private void countAppearances() {
+        appearanceStats.clear();
+        List<JournalEntry> entries = new ArrayList<>(console.roleplay().getJournal());
+        entries.addAll(console.roleplay().getOracleLog());
+        for (JournalEntry entry : entries) {
+            for (UUID id : entry.getCharacters()) {
+                Appearances previous = appearanceStats.get(id);
+                LocalDate last = (previous == null || entry.getDate().isAfter(previous.lastSeen()))
+                                       ? entry.getDate() : previous.lastSeen();
+                appearanceStats.put(id, new Appearances((previous == null ? 0 : previous.count()) + 1, last));
+            }
+        }
+    }
+
     private List<JournalEntry> appearancesOf(final OracleCharacter character) {
         List<JournalEntry> entries = new ArrayList<>(console.roleplay().getTimeline(
               new JournalFilter(null, null, null, Set.of(), null, character.getId())));
@@ -313,15 +343,15 @@ class CastPage implements ConsoleSection {
         @Override
         public Component getListCellRendererComponent(JList<? extends OracleCharacter> source,
               OracleCharacter character, int index, boolean isSelected, boolean cellHasFocus) {
-            List<JournalEntry> seen = appearancesOf(character);
-            String sub = seen.isEmpty() ? getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.notSeen")
+            Appearances seen = appearanceStats.getOrDefault(character.getId(), new Appearances(0, null));
+            String sub = (seen.lastSeen() == null) ? getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.notSeen")
                                : getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.lastSeen",
-                                     OracleConsole.formatDate(seen.get(0).getDate()));
+                                     OracleConsole.formatDate(seen.lastSeen()));
             List<Tag> tags = character.isLinked()
                                    ? List.of(new Tag(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.linked"),
                                          ACCENT_BRIGHT)) : List.of();
             return card.show(character.isActive() ? ACCENT : TEXT_FAINT, false, character.getName(), null, tags, sub,
-                  Integer.toString(seen.size()), getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.entries"),
+                  Integer.toString(seen.count()), getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.entries"),
                   isSelected);
         }
     }

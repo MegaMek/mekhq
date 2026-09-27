@@ -611,6 +611,20 @@ class AskPage implements ConsoleSection {
         return leftAligned(row);
     }
 
+    /**
+     * Gives a list of {@link HudCard} rows a fixed row size. Without one, Swing draws every row to measure the list,
+     * which is slow for long lists.
+     *
+     * @param list the list
+     */
+    static void useFixedCardRows(final JList<?> list) {
+        HudCard sample = new HudCard().show(ACCENT, false, "Sample", "Role",
+              List.of(new HudCard.Tag("Tag", TEXT_MUTED)), "Sub-line", "00", "unit", false);
+        list.setFixedCellHeight(sample.getPreferredSize().height);
+        // Rows stretch to the list's width; this only keeps the list from measuring every row for its width.
+        list.setFixedCellWidth(scaleForGUI(200));
+    }
+
     static JLabel wrapped(final String text, final Color color) {
         JLabel label = new JLabel("<html><div style='width:" + scaleForGUI(250) + "px'>" + escape(text)
                                         + "</div></html>");

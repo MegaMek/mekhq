@@ -121,10 +121,11 @@ public class OracleConsole extends JDialog {
     private final HudModeSelector<ConsolePage> modeSelector;
     private ConsolePage currentPage = ConsolePage.ASK;
 
-    private final AskPage askPage;
-    private final ThreadsPage threadsPage;
-    private final CastPage castPage;
-    private final JournalPage journalPage;
+    // Pages are built the first time they are shown, so opening the console only builds the Ask page.
+    private AskPage askPage;
+    private ThreadsPage threadsPage;
+    private CastPage castPage;
+    private JournalPage journalPage;
 
     private HudStatTile chaosTile;
     private HudButton chaosDown;
@@ -164,15 +165,6 @@ public class OracleConsole extends JDialog {
         this.campaign = campaign;
         this.actions = OracleActions.forCampaign(campaign);
         refreshLinkedNames();
-
-        askPage = new AskPage(this);
-        threadsPage = new ThreadsPage(this);
-        castPage = new CastPage(this);
-        journalPage = new JournalPage(this);
-        pages.put(ConsolePage.ASK, askPage);
-        pages.put(ConsolePage.THREADS, threadsPage);
-        pages.put(ConsolePage.CAST, castPage);
-        pages.put(ConsolePage.JOURNAL, journalPage);
 
         modeSelector = new HudModeSelector<>(ConsolePage.class, ConsolePage::getLabel, this::showPage);
         modeSelector.setSelected(ConsolePage.ASK);
@@ -235,9 +227,8 @@ public class OracleConsole extends JDialog {
 
         pageHolder.setOpaque(true);
         pageHolder.setBackground(GROUND);
-        for (Map.Entry<ConsolePage, ConsoleSection> page : pages.entrySet()) {
-            pageHolder.add(page.getValue().getComponent(), page.getKey().name());
-        }
+        pageHolder.setPreferredSize(scaleForGUI(1120, 560));
+        page(ConsolePage.ASK);
 
         content.add(buildCommandBar(), BorderLayout.NORTH);
         content.add(pageHolder, BorderLayout.CENTER);
@@ -390,6 +381,28 @@ public class OracleConsole extends JDialog {
     // region Pages and navigation
 
     /**
+     * Returns a page, building it and adding it to the console the first time it is needed.
+     *
+     * @param page the page
+     *
+     * @return the page's section
+     */
+    private ConsoleSection page(final ConsolePage page) {
+        ConsoleSection section = pages.get(page);
+        if (section == null) {
+            section = switch (page) {
+                case ASK -> askPage = new AskPage(this);
+                case THREADS -> threadsPage = new ThreadsPage(this);
+                case CAST -> castPage = new CastPage(this);
+                case JOURNAL -> journalPage = new JournalPage(this);
+            };
+            pages.put(page, section);
+            pageHolder.add(section.getComponent(), page.name());
+        }
+        return section;
+    }
+
+    /**
      * Switches to a page, opening its guide if the player has not seen it yet.
      *
      * @param page the page
@@ -398,9 +411,11 @@ public class OracleConsole extends JDialog {
         closeGuide();
         currentPage = page;
         modeSelector.setSelected(page);
+        ConsoleSection section = page(page);
+        // Only the page on screen is kept up to date, so bring this one up to date as it is shown.
+        section.refresh();
         pageLayout.show(pageHolder, page.name());
         guideButton.setText("?  " + page.getGuideLabel().toUpperCase(Locale.ROOT));
-        pages.get(page).refresh();
         maybeOpenGuide(page);
     }
 
@@ -444,8 +459,8 @@ public class OracleConsole extends JDialog {
         OracleAnswer quote = null;
         JournalEntry lastAnswer = latestAnswer();
         switch (currentPage) {
-            case THREADS -> thread = threadsPage.getSelectedThreadId();
-            case CAST -> character = castPage.getSelectedCharacterId();
+            case THREADS -> thread = (threadsPage == null) ? null : threadsPage.getSelectedThreadId();
+            case CAST -> character = (castPage == null) ? null : castPage.getSelectedCharacterId();
             case ASK, JOURNAL -> {
                 if (lastAnswer != null && currentPage == ConsolePage.ASK) {
                     quote = lastAnswer.getAnswer();
@@ -526,7 +541,7 @@ public class OracleConsole extends JDialog {
     // region Refresh
 
     /**
-     * Refreshes the tiles, footer and every page after a change.
+     * Refreshes the tiles, footer and the page on screen after a change.
      */
     void changed() {
         refresh();
@@ -558,9 +573,8 @@ public class OracleConsole extends JDialog {
 
         refreshFooter();
         guideButton.setText("?  " + currentPage.getGuideLabel().toUpperCase(Locale.ROOT));
-        for (ConsoleSection page : pages.values()) {
-            page.refresh();
-        }
+        // Other pages refresh when they are next shown.
+        page(currentPage).refresh();
     }
 
     private String describeSubtitle() {

@@ -63,6 +63,8 @@ public class JournalEntry {
     private final Set<UUID> threads = new LinkedHashSet<>();
     private final Set<UUID> characters = new LinkedHashSet<>();
     private OracleAnswer answer;
+    /** The note's text without formatting, worked out when first needed; cleared whenever the text changes. */
+    private String plainText;
     /** Character names from saves made before characters had ids; {@link Roleplay} turns them into ids on load. */
     final List<String> legacyCharacterNames = new ArrayList<>();
 
@@ -116,13 +118,21 @@ public class JournalEntry {
 
     public void setText(final String text) {
         this.text = text;
+        plainText = null;
     }
 
     /**
      * @return the entry's text with any formatting removed
      */
     public String getPlainText() {
-        return isNote() ? JournalText.htmlToPlain(text) : text;
+        if (!isNote()) {
+            return text;
+        }
+        // Converting HTML is slow enough to matter when a list of notes is drawn, so keep the result.
+        if (plainText == null) {
+            plainText = JournalText.htmlToPlain(text);
+        }
+        return plainText;
     }
 
     /**

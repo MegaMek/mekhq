@@ -143,6 +143,7 @@ class ThreadsPage implements ConsoleSection {
         threadList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         threadList.setBackground(SURFACE_DEEP);
         threadList.setCellRenderer(new ThreadRenderer());
+        AskPage.useFixedCardRows(threadList);
         threadList.addListSelectionListener(event -> {
             if (!event.getValueIsAdjusting() && threadList.getSelectedValue() != null) {
                 selectedId = threadList.getSelectedValue().getId();
@@ -238,7 +239,8 @@ class ThreadsPage implements ConsoleSection {
 
         root.add(board, BorderLayout.WEST);
         root.add(right, BorderLayout.CENTER);
-        setFilter(Filter.ACTIVE);
+        // The console refreshes the page when it is shown, so only the chips are set up here.
+        showFilter(Filter.ACTIVE);
     }
 
     @Override
@@ -271,11 +273,15 @@ class ThreadsPage implements ConsoleSection {
     // region Board
 
     private void setFilter(final Filter value) {
+        showFilter(value);
+        refresh();
+    }
+
+    private void showFilter(final Filter value) {
         filter = value;
         for (int index = 0; index < chips.size(); index++) {
             chips.get(index).setActive(Filter.values()[index] == value);
         }
-        refresh();
     }
 
     @Override

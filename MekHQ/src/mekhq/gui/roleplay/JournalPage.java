@@ -306,8 +306,11 @@ class JournalPage implements ConsoleSection {
         root.add(board, BorderLayout.WEST);
         root.add(right, BorderLayout.CENTER);
 
+        // The console refreshes the page when it is shown, so only the chips are set up here.
+        updatingFilters = true;
         setTypeGroup(TypeGroup.ALL);
         setOldestFirst(false);
+        updatingFilters = false;
     }
 
     @Override
