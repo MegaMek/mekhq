@@ -78,8 +78,11 @@ public final class JournalArchive {
     static final String START = "<!-- mekhq-journal-data";
     static final String END = "-->";
     private static final int LINE_LENGTH = 76;
-    /** Far more than any journal needs, so a damaged or hostile file can't exhaust memory. */
-    private static final int MAXIMUM_DATA_BYTES = 64 * 1024 * 1024;
+    /**
+     * Far beyond any real journal, even 100,000 records plus notes, so only a damaged or hostile file is refused
+     * before it can exhaust memory.
+     */
+    private static final int MAXIMUM_DATA_BYTES = 1024 * 1024 * 1024;
 
     /**
      * What an import found.
