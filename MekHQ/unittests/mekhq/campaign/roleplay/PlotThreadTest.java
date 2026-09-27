@@ -42,6 +42,7 @@ import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.HashSet;
 import java.util.List;
@@ -58,6 +59,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.w3c.dom.Node;
 
 class PlotThreadTest {
+    private static final LocalDate DATE = LocalDate.of(3025, 6, 1);
+
     private RandomOracleGenerator generator;
 
     @BeforeEach
@@ -123,10 +126,10 @@ class PlotThreadTest {
         PlotThread thread = PlotThread.create("Hunt", PlotThreadLength.SHORT, generator);
         for (int number = 1; number <= 10; number++) {
             assertFalse(thread.isComplete());
-            assertEquals(number, thread.revealNextStep().number());
+            assertEquals(number, thread.revealNextStep(DATE).number());
         }
         assertTrue(thread.isComplete());
-        assertNull(thread.revealNextStep());
+        assertNull(thread.revealNextStep(DATE));
         assertEquals(10, thread.getRevealed().size());
     }
 
@@ -136,8 +139,8 @@ class PlotThreadTest {
         assertFalse(thread.canLoseProgress());
         assertEquals(0, thread.loseProgress(generator));
 
-        thread.revealNextStep();
-        thread.revealNextStep();
+        thread.revealNextStep(DATE);
+        thread.revealNextStep(DATE);
         PlotThreadStep before = thread.getSteps().get(1);
 
         // Swap in pools with different meanings so the re-roll is visible.
@@ -155,14 +158,14 @@ class PlotThreadTest {
         assertEquals(2, after.number());
         assertTrue(after.concepts().stream().allMatch(concept -> "rerolled".equals(concept.meaning())));
         assertFalse(before.equals(after));
-        assertEquals(2, thread.revealNextStep().number());
+        assertEquals(2, thread.revealNextStep(DATE).number());
     }
 
     @Test
     void concludedThreadsCannotLoseProgress() {
         PlotThread thread = PlotThread.create("Hunt", PlotThreadLength.SHORT, generator);
         while (!thread.isComplete()) {
-            thread.revealNextStep();
+            thread.revealNextStep(DATE);
         }
         assertFalse(thread.canLoseProgress());
         assertEquals(0, thread.loseProgress(generator));
@@ -172,12 +175,12 @@ class PlotThreadTest {
     @Test
     void randomEventsOnlyTouchEligibleThreads() {
         Roleplay roleplay = new Roleplay();
-        assertNull(roleplay.progressRandomThread());
+        assertNull(roleplay.progressRandomThread(DATE));
         assertNull(roleplay.loseRandomThreadProgress(generator));
 
         PlotThread concluded = PlotThread.create("Done", PlotThreadLength.SHORT, generator);
         while (!concluded.isComplete()) {
-            concluded.revealNextStep();
+            concluded.revealNextStep(DATE);
         }
         PlotThread fresh = PlotThread.create("Fresh", PlotThreadLength.SHORT, generator);
         roleplay.getPlotThreads().add(concluded);
@@ -185,7 +188,7 @@ class PlotThreadTest {
 
         // Only the fresh thread is unresolved, and nothing has progress that can be lost yet.
         assertNull(roleplay.loseRandomThreadProgress(generator));
-        Roleplay.PlotThreadChange progress = roleplay.progressRandomThread();
+        Roleplay.PlotThreadChange progress = roleplay.progressRandomThread(DATE);
         assertEquals(fresh, progress.thread());
         assertEquals(1, progress.stepNumber());
         assertEquals(1, fresh.getRevealedSteps());
@@ -199,11 +202,56 @@ class PlotThreadTest {
     }
 
     @Test
+    void revealDatesAreKeptAndDroppedWithLostProgress() throws Exception {
+        PlotThread thread = PlotThread.create("Hunt", PlotThreadLength.SHORT, generator);
+        thread.revealNextStep(DATE);
+        thread.revealNextStep(null);
+        thread.revealNextStep(DATE.plusDays(3));
+        assertEquals(DATE, thread.getRevealDate(1));
+        assertNull(thread.getRevealDate(2));
+        assertEquals(DATE.plusDays(3), thread.getRevealDate(3));
+        assertNull(thread.getRevealDate(4), "unrevealed steps have no date");
+
+        thread.loseProgress(generator);
+        assertNull(thread.getRevealDate(3), "a lost step loses its date");
+
+        Roleplay roleplay = new Roleplay();
+        roleplay.getPlotThreads().add(thread);
+        StringWriter stringWriter = new StringWriter();
+        try (PrintWriter writer = new PrintWriter(stringWriter)) {
+            roleplay.writeToXML(writer, 0);
+        }
+        Node node = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                          .parse(new ByteArrayInputStream(stringWriter.toString().getBytes(StandardCharsets.UTF_8)))
+                          .getDocumentElement();
+        PlotThread loaded = Roleplay.generateInstanceFromXML(node).getPlotThreads().get(0);
+        assertEquals(DATE, loaded.getRevealDate(1));
+        assertNull(loaded.getRevealDate(2));
+        assertEquals(2, loaded.getRevealedSteps());
+    }
+
+    @Test
+    void threadsFromOlderSavesHaveNoRevealDates() throws Exception {
+        PlotThread thread = PlotThread.create("Hunt", PlotThreadLength.SHORT, generator);
+        thread.revealNextStep(DATE);
+        StringWriter stringWriter = new StringWriter();
+        try (PrintWriter writer = new PrintWriter(stringWriter)) {
+            thread.writeToXML(writer, 0);
+        }
+        String xml = stringWriter.toString().replaceAll("<revealedOn>[^<]*</revealedOn>\\s*", "");
+        Node node = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+                          .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))).getDocumentElement();
+        PlotThread loaded = PlotThread.generateInstanceFromXML(node);
+        assertEquals(1, loaded.getRevealedSteps());
+        assertNull(loaded.getRevealDate(1));
+    }
+
+    @Test
     void threadsSurviveSaveAndLoad() throws Exception {
         Roleplay original = new Roleplay();
         PlotThread thread = PlotThread.create("The <Long> Hunt & more", PlotThreadLength.MEDIUM, generator);
-        thread.revealNextStep();
-        thread.revealNextStep();
+        thread.revealNextStep(DATE);
+        thread.revealNextStep(DATE);
         original.getPlotThreads().add(thread);
         original.getPlotThreads().add(PlotThread.create("Second", PlotThreadLength.SHORT, generator));
 

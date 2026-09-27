@@ -34,6 +34,7 @@ package mekhq.campaign.roleplay;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.ByteArrayInputStream;
@@ -127,7 +128,8 @@ class JournalTest {
     @Test
     void filterMatchesEachCriterion() {
         PlotThread hunt = thread("Hunt");
-        JournalEntry entry = note(DAY_TWO, "The <b>Ghost</b> strikes").tagThread(hunt).tagCharacter("Ana");
+        OracleCharacter ana = new OracleCharacter("Ana", null);
+        JournalEntry entry = note(DAY_TWO, "The <b>Ghost</b> strikes").tagThread(hunt).tagCharacter(ana);
 
         assertTrue(JournalFilter.ALL.matches(entry));
         assertTrue(new JournalFilter("ghost", null, null, null, null, null).matches(entry));
@@ -135,16 +137,19 @@ class JournalTest {
         assertTrue(new JournalFilter(null, DAY_TWO, DAY_TWO, null, null, null).matches(entry));
         assertFalse(new JournalFilter(null, DAY_THREE, null, null, null, null).matches(entry));
         assertFalse(new JournalFilter(null, null, DAY_ONE, null, null, null).matches(entry));
-        assertTrue(new JournalFilter(null, null, null, JournalEntryType.NOTE, null, null).matches(entry));
-        assertFalse(new JournalFilter(null, null, null, JournalEntryType.THREAD, null, null).matches(entry));
+        assertTrue(new JournalFilter(null, null, null, Set.of(JournalEntryType.NOTE), null, null).matches(entry));
+        assertFalse(new JournalFilter(null, null, null, Set.of(JournalEntryType.THREAD), null, null).matches(entry));
         assertTrue(new JournalFilter(null, null, null, null, hunt.getId(), null).matches(entry));
         assertFalse(new JournalFilter(null, null, null, null, UUID.randomUUID(), null).matches(entry));
-        assertTrue(new JournalFilter(null, null, null, null, null, "Ana").matches(entry));
-        assertFalse(new JournalFilter(null, null, null, null, null, "Bo").matches(entry));
+        assertTrue(new JournalFilter(null, null, null, null, null, ana.getId()).matches(entry));
+        assertFalse(new JournalFilter(null, null, null, null, null, UUID.randomUUID()).matches(entry));
 
         assertFalse(JournalFilter.ALL.isActive());
         assertFalse(new JournalFilter("  ", null, null, null, null, null).isActive());
-        assertTrue(new JournalFilter(null, null, null, JournalEntryType.NOTE, null, null).isActive());
+        assertTrue(new JournalFilter(null, null, null, Set.of(JournalEntryType.NOTE), null, null).isActive());
+        assertTrue(new JournalFilter(null, null, null,
+              Set.of(JournalEntryType.FATE_CHART, JournalEntryType.RANDOM_EVENT), null, null).matches(
+              new JournalEntry(DAY_ONE, JournalEntryType.RANDOM_EVENT, "x")), "a group of types matches any of them");
     }
 
     @Test
@@ -168,22 +173,15 @@ class JournalTest {
     }
 
     @Test
-    void renamingACharacterUpdatesItsTags() {
+    void renamingACharacterKeepsItsTags() {
         Roleplay roleplay = new Roleplay();
-        roleplay.addCharacter("Ana");
-        roleplay.addCharacter("Bo");
-        JournalEntry tagged = note(DAY_ONE, "x").tagCharacter("Ana");
+        OracleCharacter ana = roleplay.addCharacter("Ana");
+        JournalEntry tagged = note(DAY_ONE, "x").tagCharacter(ana);
         roleplay.getJournal().add(tagged);
-        JournalEntry logged = roleplay.logOracle(DAY_ONE, JournalEntryType.RANDOM_EVENT, "y", 500)
-                                    .tagCharacter("Ana");
 
-        assertFalse(roleplay.renameCharacter("Ana", "Bo"), "cannot take another character's name");
-        assertFalse(roleplay.renameCharacter("Ana", " "));
-        assertTrue(roleplay.renameCharacter("Ana", " Anastasia "));
-
-        assertEquals(List.of("Anastasia", "Bo"), roleplay.getCharacters());
-        assertEquals(Set.of("Anastasia"), tagged.getCharacters());
-        assertEquals(Set.of("Anastasia"), logged.getCharacters());
+        assertTrue(roleplay.renameCharacter(ana, "Anastasia"));
+        assertEquals(Set.of(ana.getId()), tagged.getCharacters());
+        assertEquals("Anastasia", roleplay.getCharacterName(tagged.getCharacters().iterator().next()));
     }
 
     // endregion Filters and timeline
@@ -195,10 +193,12 @@ class JournalTest {
         Roleplay original = new Roleplay();
         PlotThread hunt = thread("Hunt");
         original.getPlotThreads().add(hunt);
+        OracleCharacter ana = original.addCharacter("Ana & Co");
         original.getJournal().add(note(DAY_TWO, "<p>Landed on <b>Helm</b>.<br>The &lt;locals&gt; are wary.</p>")
-                                        .tagThread(hunt).tagCharacter("Ana & Co"));
-        original.logOracle(DAY_THREE, JournalEntryType.RANDOM_EVENT, "NPC Action\nCharacter: Ana & Co", 500)
-              .tagCharacter("Ana & Co");
+                                        .tagThread(hunt).tagCharacter(ana));
+        JournalEntry logged = original.logOracle(DAY_THREE, JournalEntryType.RANDOM_EVENT,
+              "NPC Action\nCharacter: Ana & Co", 500).tagCharacter(ana);
+        logged.setAnswer(new OracleAnswer("Is it <safe>?", FateChartOdds.LIKELY, 6, 44, FateChartAnswer.NORMAL_YES));
 
         Roleplay loaded = Roleplay.generateInstanceFromXML(parse(write(original)));
 
@@ -208,12 +208,15 @@ class JournalTest {
         assertEquals(DAY_TWO, note.getDate());
         assertEquals(original.getJournal().get(0).getText(), note.getText());
         assertEquals(Set.of(hunt.getId()), note.getThreads());
-        assertEquals(Set.of("Ana & Co"), note.getCharacters());
+        assertEquals(Set.of(ana.getId()), note.getCharacters());
 
         JournalEntry log = loaded.getOracleLog().get(0);
         assertEquals(JournalEntryType.RANDOM_EVENT, log.getType());
         assertEquals("NPC Action\nCharacter: Ana & Co", log.getText());
-        assertEquals(Set.of("Ana & Co"), log.getCharacters());
+        assertEquals(Set.of(ana.getId()), log.getCharacters());
+        assertEquals(new OracleAnswer("Is it <safe>?", FateChartOdds.LIKELY, 6, 44, FateChartAnswer.NORMAL_YES),
+              log.getAnswer());
+        assertNull(note.getAnswer());
     }
 
     @Test
@@ -247,12 +250,14 @@ class JournalTest {
     @Test
     void exportsMarkdownAndText() {
         PlotThread hunt = thread("Hunt");
+        OracleCharacter ana = new OracleCharacter("Ana", null);
         List<JournalEntry> entries = List.of(
               new JournalEntry(DAY_ONE, JournalEntryType.FATE_CHART, "Asked: Is it safe?\nRolled 12: Yes."),
-              note(DAY_TWO, "<p>We move <b>tonight</b>.</p>").tagThread(hunt).tagCharacter("Ana"));
+              note(DAY_TWO, "<p>We move <b>tonight</b>.</p>").tagThread(hunt).tagCharacter(ana));
 
         String markdown = JournalExporter.export(entries, Format.MARKDOWN, "Journal", "thread Hunt",
-              id -> id.equals(hunt.getId()) ? "Hunt" : null, LocalDate::toString);
+              id -> id.equals(hunt.getId()) ? "Hunt" : null, id -> id.equals(ana.getId()) ? "Ana" : null,
+              LocalDate::toString);
         assertTrue(markdown.startsWith("# Journal\n"), markdown);
         assertTrue(markdown.contains("*Filtered: thread Hunt*"), markdown);
         assertTrue(markdown.contains("## 3025-01-01 - Fate Chart"), markdown);
@@ -260,7 +265,8 @@ class JournalTest {
         assertTrue(markdown.contains("*Threads: Hunt; Characters: Ana*"), markdown);
         assertTrue(markdown.contains("We move **tonight**."), markdown);
 
-        String text = JournalExporter.export(entries, Format.TEXT, "Journal", null, id -> null, LocalDate::toString);
+        String text = JournalExporter.export(entries, Format.TEXT, "Journal", null, id -> null,
+              id -> id.equals(ana.getId()) ? "Ana" : null, LocalDate::toString);
         assertTrue(text.startsWith("Journal\n=======\n"), text);
         assertFalse(text.contains("Filtered"), text);
         assertTrue(text.contains("Threads: (deleted thread); Characters: Ana"), text);

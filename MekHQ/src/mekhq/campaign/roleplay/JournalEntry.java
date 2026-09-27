@@ -35,7 +35,6 @@ package mekhq.campaign.roleplay;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,7 +61,10 @@ public class JournalEntry {
     private final JournalEntryType type;
     private String text;
     private final Set<UUID> threads = new LinkedHashSet<>();
-    private final Set<String> characters = new LinkedHashSet<>();
+    private final Set<UUID> characters = new LinkedHashSet<>();
+    private OracleAnswer answer;
+    /** Character names from saves made before characters had ids; {@link Roleplay} turns them into ids on load. */
+    final List<String> legacyCharacterNames = new ArrayList<>();
 
     /**
      * @param date the in-game date of the entry
@@ -138,10 +140,21 @@ public class JournalEntry {
     }
 
     /**
-     * @return the live set of names of the Oracle characters this entry is tagged with
+     * @return the live set of ids of the Oracle characters this entry is tagged with
      */
-    public Set<String> getCharacters() {
+    public Set<UUID> getCharacters() {
         return characters;
+    }
+
+    /**
+     * @return the Fate Chart question this record logs, or {@code null} if it is not a Fate Chart record
+     */
+    public @Nullable OracleAnswer getAnswer() {
+        return answer;
+    }
+
+    public void setAnswer(final @Nullable OracleAnswer answer) {
+        this.answer = answer;
     }
 
     /**
@@ -161,13 +174,13 @@ public class JournalEntry {
     /**
      * Tags this entry with an Oracle character.
      *
-     * @param character the character's name, or {@code null} to do nothing
+     * @param character the character, or {@code null} to do nothing
      *
      * @return this entry, for chaining
      */
-    public JournalEntry tagCharacter(final @Nullable String character) {
-        if (character != null && !character.isBlank()) {
-            characters.add(character);
+    public JournalEntry tagCharacter(final @Nullable OracleCharacter character) {
+        if (character != null) {
+            characters.add(character.getId());
         }
         return this;
     }
@@ -195,8 +208,11 @@ public class JournalEntry {
             for (UUID thread : entry.threads) {
                 MHQXMLUtility.writeSimpleXMLTag(writer, indent, "thread", thread);
             }
-            for (String character : entry.characters) {
-                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "character", character);
+            for (UUID character : entry.characters) {
+                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "cast", character);
+            }
+            if (entry.answer != null) {
+                entry.answer.writeToXML(writer, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "entry");
         }
@@ -233,7 +249,9 @@ public class JournalEntry {
             JournalEntryType type = defaultType;
             String text = "";
             final List<UUID> threads = new ArrayList<>();
-            final List<String> characters = new ArrayList<>();
+            final List<UUID> characters = new ArrayList<>();
+            final List<String> legacyNames = new ArrayList<>();
+            OracleAnswer answer = null;
 
             final NodeList fields = node.getChildNodes();
             for (int i = 0; i < fields.getLength(); i++) {
@@ -243,7 +261,9 @@ public class JournalEntry {
                     case "type" -> type = JournalEntryType.valueOf(field.getTextContent().trim());
                     case "text" -> text = field.getTextContent();
                     case "thread" -> threads.add(UUID.fromString(field.getTextContent().trim()));
-                    case "character" -> characters.add(field.getTextContent());
+                    case "cast" -> characters.add(UUID.fromString(field.getTextContent().trim()));
+                    case "character" -> legacyNames.add(field.getTextContent());
+                    case "answer" -> answer = OracleAnswer.parse(field);
                     default -> { }
                 }
             }
@@ -258,17 +278,13 @@ public class JournalEntry {
 
             final JournalEntry entry = new JournalEntry(date, type, text);
             entry.threads.addAll(threads);
-            addCharacters(entry, characters);
+            entry.characters.addAll(characters);
+            entry.legacyCharacterNames.addAll(legacyNames);
+            entry.answer = answer;
             return entry;
         } catch (Exception e) {
             LOGGER.error("Failed to load journal entry", e);
             return null;
-        }
-    }
-
-    private static void addCharacters(final JournalEntry entry, final Collection<String> characters) {
-        for (String character : characters) {
-            entry.tagCharacter(character);
         }
     }
 }

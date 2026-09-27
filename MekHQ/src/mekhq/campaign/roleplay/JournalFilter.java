@@ -34,6 +34,7 @@ package mekhq.campaign.roleplay;
 
 import java.time.LocalDate;
 import java.util.Locale;
+import java.util.Set;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
@@ -45,14 +46,18 @@ import megamek.common.annotations.Nullable;
  * @param text      text the entry must contain, ignoring case and formatting
  * @param from      the earliest date to include
  * @param to        the latest date to include
- * @param type      the only type of entry to include
+ * @param types     the types of entry to include; empty includes every type
  * @param thread    the id of a plot thread the entry must be tagged with
- * @param character the name of an Oracle character the entry must be tagged with
+ * @param character the id of an Oracle character the entry must be tagged with
  */
 public record JournalFilter(@Nullable String text, @Nullable LocalDate from, @Nullable LocalDate to,
-      @Nullable JournalEntryType type, @Nullable UUID thread, @Nullable String character) {
+      Set<JournalEntryType> types, @Nullable UUID thread, @Nullable UUID character) {
+    public JournalFilter {
+        types = (types == null) ? Set.of() : Set.copyOf(types);
+    }
+
     /** A filter that matches every entry. */
-    public static final JournalFilter ALL = new JournalFilter(null, null, null, null, null, null);
+    public static final JournalFilter ALL = new JournalFilter(null, null, null, Set.of(), null, null);
 
     /**
      * @param entry a journal entry
@@ -66,7 +71,7 @@ public record JournalFilter(@Nullable String text, @Nullable LocalDate from, @Nu
         if (to != null && entry.getDate().isAfter(to)) {
             return false;
         }
-        if (type != null && entry.getType() != type) {
+        if (!types.isEmpty() && !types.contains(entry.getType())) {
             return false;
         }
         if (thread != null && !entry.getThreads().contains(thread)) {
@@ -86,7 +91,7 @@ public record JournalFilter(@Nullable String text, @Nullable LocalDate from, @Nu
      * @return {@code true} if this filter narrows anything
      */
     public boolean isActive() {
-        return (text != null && !text.isBlank()) || from != null || to != null || type != null || thread != null
+        return (text != null && !text.isBlank()) || from != null || to != null || !types.isEmpty() || thread != null
                      || character != null;
     }
 
@@ -96,6 +101,6 @@ public record JournalFilter(@Nullable String text, @Nullable LocalDate from, @Nu
      * @return a copy of this filter with different search text
      */
     public JournalFilter withText(final @Nullable String newText) {
-        return new JournalFilter(newText, from, to, type, thread, character);
+        return new JournalFilter(newText, from, to, types, thread, character);
     }
 }

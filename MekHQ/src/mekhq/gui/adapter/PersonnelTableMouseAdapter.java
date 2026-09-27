@@ -417,7 +417,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         switch (data[0]) {
             case CMD_ADD_TO_ORACLE_LIST: {
                 for (final Person person : people) {
-                    getCampaign().getRoleplay().addCharacter(person.getFullName());
+                    getCampaign().getRoleplay().addLinkedCharacter(person.getId(), person.getFullName());
                 }
                 break;
             }

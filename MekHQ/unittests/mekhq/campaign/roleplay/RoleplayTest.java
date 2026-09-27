@@ -34,6 +34,7 @@ package mekhq.campaign.roleplay;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -42,6 +43,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.UUID;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.junit.jupiter.api.Test;
@@ -91,33 +93,97 @@ class RoleplayTest {
         assertEquals(Roleplay.DEFAULT_CHAOS_FACTOR, loaded.getChaosFactor());
     }
 
-    @Test
-    void addCharacterIgnoresBlanksAndDuplicates() {
-        Roleplay roleplay = new Roleplay();
-        assertTrue(roleplay.addCharacter("  Natasha Kerensky "));
-        assertFalse(roleplay.addCharacter("Natasha Kerensky"));
-        assertFalse(roleplay.addCharacter("   "));
-        assertFalse(roleplay.addCharacter(null));
-        assertEquals(List.of("Natasha Kerensky"), roleplay.getCharacters());
+    private static List<String> names(final List<OracleCharacter> characters) {
+        return characters.stream().map(OracleCharacter::getName).toList();
     }
 
     @Test
-    void pickRandomCharacterDrawsFromTheList() {
+    void addCharacterIgnoresBlanksAndDuplicates() {
+        Roleplay roleplay = new Roleplay();
+        assertNotNull(roleplay.addCharacter("  Natasha Kerensky "));
+        assertNull(roleplay.addCharacter("Natasha Kerensky"));
+        assertNull(roleplay.addCharacter("   "));
+        assertNull(roleplay.addCharacter(null));
+        assertEquals(List.of("Natasha Kerensky"), names(roleplay.getCharacters()));
+    }
+
+    @Test
+    void pickRandomCharacterDrawsOnlyFromTheActiveCast() {
         Roleplay roleplay = new Roleplay();
         assertNull(roleplay.pickRandomCharacter());
 
-        roleplay.addCharacter("Grayson Carlyle");
-        roleplay.addCharacter("Lori Kalmar");
+        OracleCharacter grayson = roleplay.addCharacter("Grayson Carlyle");
+        OracleCharacter lori = roleplay.addCharacter("Lori Kalmar");
+        roleplay.removeCharacter(lori);
         for (int i = 0; i < 100; i++) {
-            assertTrue(roleplay.getCharacters().contains(roleplay.pickRandomCharacter()));
+            assertEquals(grayson, roleplay.pickRandomCharacter());
         }
+
+        roleplay.removeCharacter(grayson);
+        assertNull(roleplay.pickRandomCharacter());
+    }
+
+    @Test
+    void removedCharactersKeepTheirPlaceInHistoryAndCanBeRestored() {
+        Roleplay roleplay = new Roleplay();
+        OracleCharacter ana = roleplay.addCharacter("Ana");
+        roleplay.addCharacter("Bo");
+        roleplay.removeCharacter(ana);
+
+        assertEquals(List.of("Bo"), names(roleplay.getActiveCharacters()));
+        assertEquals(ana, roleplay.getCharacter(ana.getId()), "a removed character can still be looked up");
+
+        // Adding the same name restores the character rather than creating a new one.
+        assertEquals(ana, roleplay.addCharacter("Ana"));
+        assertTrue(ana.isActive());
+        assertEquals(List.of("Bo", "Ana"), names(roleplay.getActiveCharacters()));
+    }
+
+    @Test
+    void linkedCharactersFollowTheirPerson() {
+        Roleplay roleplay = new Roleplay();
+        UUID personId = UUID.randomUUID();
+        OracleCharacter linked = roleplay.addLinkedCharacter(personId, "Natasha Kerensky");
+        assertTrue(linked.isLinked());
+
+        // Adding the same person again returns the same character, restoring it if removed.
+        roleplay.removeCharacter(linked);
+        assertEquals(linked, roleplay.addLinkedCharacter(personId, "Natasha Kerensky"));
+        assertTrue(linked.isActive());
+
+        roleplay.refreshLinkedNames(id -> id.equals(personId) ? "Natasha 'Black Widow' Kerensky" : null);
+        assertEquals("Natasha 'Black Widow' Kerensky", linked.getName());
+
+        // A person who has left the company keeps their last known name.
+        roleplay.refreshLinkedNames(id -> null);
+        assertEquals("Natasha 'Black Widow' Kerensky", linked.getName());
+    }
+
+    @Test
+    void charactersCanBeRenamedAndReordered() {
+        Roleplay roleplay = new Roleplay();
+        OracleCharacter ana = roleplay.addCharacter("Ana");
+        OracleCharacter bo = roleplay.addCharacter("Bo");
+        OracleCharacter cy = roleplay.addCharacter("Cy");
+
+        assertFalse(roleplay.renameCharacter(ana, "Bo"), "cannot take another cast member's name");
+        assertFalse(roleplay.renameCharacter(ana, " "));
+        assertTrue(roleplay.renameCharacter(ana, " Anastasia "));
+        assertEquals("Anastasia", ana.getName());
+
+        roleplay.moveCharacter(cy, 0);
+        assertEquals(List.of(cy, ana, bo), roleplay.getActiveCharacters());
+        roleplay.moveCharacter(cy, 99);
+        assertEquals(List.of(ana, bo, cy), roleplay.getActiveCharacters());
     }
 
     @Test
     void charactersSurviveSaveAndLoadInOrder() throws Exception {
         Roleplay original = new Roleplay();
-        original.addCharacter("Zeta <Ace> & Co, Ltd");
+        OracleCharacter zeta = original.addCharacter("Zeta <Ace> & Co, Ltd");
         original.addCharacter("Alpha");
+        OracleCharacter linked = original.addLinkedCharacter(UUID.randomUUID(), "Linked");
+        original.removeCharacter(zeta);
 
         StringWriter stringWriter = new StringWriter();
         try (PrintWriter writer = new PrintWriter(stringWriter)) {
@@ -125,7 +191,30 @@ class RoleplayTest {
         }
 
         Roleplay loaded = Roleplay.generateInstanceFromXML(parse(stringWriter.toString()));
-        assertEquals(List.of("Zeta <Ace> & Co, Ltd", "Alpha"), loaded.getCharacters());
+        assertEquals(names(original.getCharacters()), names(loaded.getCharacters()));
+        assertEquals(zeta.getId(), loaded.getCharacters().get(0).getId(), "removed characters keep their place");
+        assertFalse(loaded.getCharacter(zeta.getId()).isActive());
+        assertEquals(linked.getPersonId(), loaded.getCharacter(linked.getId()).getPersonId());
+    }
+
+    @Test
+    void charactersFromOlderSavesLoadByName() throws Exception {
+        Roleplay loaded = Roleplay.generateInstanceFromXML(parse(
+              "<roleplay><characters><character>Ana</character><character>Bo</character></characters>"
+                    + "<journal><entry><date>3025-01-02</date><type>NOTE</type><text>x</text>"
+                    + "<character>Bo</character><character>Gone</character></entry></journal></roleplay>"));
+
+        assertEquals(List.of("Ana", "Bo"), names(loaded.getActiveCharacters()));
+        JournalEntry note = loaded.getJournal().get(0);
+        OracleCharacter bo = loaded.getActiveCharacters().get(1);
+        assertTrue(note.getCharacters().contains(bo.getId()));
+
+        // A tag naming someone no longer in the cast keeps its name through a removed character.
+        assertEquals(2, note.getCharacters().size());
+        OracleCharacter gone = loaded.getCharacters().stream().filter(c -> c.getName().equals("Gone")).findFirst()
+                                     .orElseThrow();
+        assertFalse(gone.isActive());
+        assertTrue(note.getCharacters().contains(gone.getId()));
     }
 
     @Test

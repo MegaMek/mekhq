@@ -130,8 +130,8 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
 import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
-import mekhq.gui.dialog.roleplay.OracleDialog;
 import mekhq.gui.enums.MHQTabType;
+import mekhq.gui.roleplay.OracleConsole;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
@@ -512,8 +512,8 @@ public class CampaignGUI extends JPanel {
 
     /**
      * Creates the Oracle button that sits between the Command Generator button and the Advance Day panel. It opens
-     * the {@link OracleDialog}, used to ask the solo-roleplay Fate Chart yes/no questions. It is squared to the top
-     * panel's height by {@link #initTopPanel()}.
+     * the {@link OracleConsole}, the solo-roleplay console for the Fate Chart, plot threads, cast and journal. It is
+     * squared to the top panel's height by {@link #initTopPanel()}.
      *
      * @return the button
      */
@@ -522,7 +522,7 @@ public class CampaignGUI extends JPanel {
         btnOracle.setToolTipText(resourceMap.getString("btnOracle.toolTipText"));
         btnOracle.setHorizontalAlignment(SwingConstants.CENTER);
         btnOracle.setFont(btnOracle.getFont().deriveFont(Font.BOLD, btnOracle.getFont().getSize2D() * 1.5f));
-        btnOracle.addActionListener(event -> new OracleDialog(getFrame(), getCampaign()).setVisible(true));
+        btnOracle.addActionListener(event -> OracleConsole.showFor(getFrame(), getCampaign()));
         return btnOracle;
     }
 

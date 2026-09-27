@@ -37,10 +37,12 @@ import static megamek.common.compute.Compute.randomInt;
 import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -49,8 +51,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Holds the campaign's solo-roleplay state: the current chaos factor used by the {@link FateChart}, the ordered
- * list of characters the Oracle can pick from when a random event involves an NPC, and the campaign's
+ * Holds the campaign's solo-roleplay state: the current chaos factor used by the {@link FateChart}, the cast of
+ * {@link OracleCharacter}s the Oracle can pick from when a random event involves an NPC, and the campaign's
  * {@link PlotThread}s, and the journal: the player's own notes plus an automatic log of Oracle results.
  */
 public class Roleplay {
@@ -59,7 +61,7 @@ public class Roleplay {
     public static final int DEFAULT_CHAOS_FACTOR = 5;
 
     private int chaosFactor = DEFAULT_CHAOS_FACTOR;
-    private final List<String> characters = new ArrayList<>();
+    private final List<OracleCharacter> characters = new ArrayList<>();
     private final List<PlotThread> plotThreads = new ArrayList<>();
     private final List<JournalEntry> journal = new ArrayList<>();
     private final List<JournalEntry> oracleLog = new ArrayList<>();
@@ -95,41 +97,180 @@ public class Roleplay {
     }
 
     /**
-     * @return the live, ordered list of Oracle characters; changes to it are saved with the campaign
+     * @return every Oracle character in cast order, including removed (inactive) ones
      */
-    public List<String> getCharacters() {
-        return characters;
+    public List<OracleCharacter> getCharacters() {
+        return Collections.unmodifiableList(characters);
     }
 
     /**
-     * Adds a character to the end of the Oracle list. Blank names, and names already on the list, are ignored.
+     * @return the characters currently in the cast, in cast order; the Oracle picks from these
+     */
+    public List<OracleCharacter> getActiveCharacters() {
+        return characters.stream().filter(OracleCharacter::isActive).toList();
+    }
+
+    /**
+     * @param id a character id
+     *
+     * @return the character with that id, active or not, or {@code null} if there is none
+     */
+    public @Nullable OracleCharacter getCharacter(final @Nullable UUID id) {
+        return characters.stream().filter(character -> character.getId().equals(id)).findFirst().orElse(null);
+    }
+
+    /**
+     * @param id a character id
+     *
+     * @return the character's name, or {@code null} if there is no such character
+     */
+    public @Nullable String getCharacterName(final @Nullable UUID id) {
+        final OracleCharacter character = getCharacter(id);
+        return (character == null) ? null : character.getName();
+    }
+
+    /**
+     * Adds a typed-in character to the end of the cast. A blank name, or the name of someone already in the cast, is
+     * ignored; the name of a removed character restores that character instead.
      *
      * @param name the character's name
      *
-     * @return {@code true} if the character was added
+     * @return the added or restored character, or {@code null} if nothing changed
      */
-    public boolean addCharacter(final @Nullable String name) {
+    public @Nullable OracleCharacter addCharacter(final @Nullable String name) {
         if (name == null || name.isBlank()) {
-            return false;
+            return null;
         }
 
         final String trimmed = name.trim();
-        if (characters.contains(trimmed)) {
-            return false;
+        final OracleCharacter existing = findByName(trimmed);
+        if (existing != null) {
+            if (existing.isActive()) {
+                return null;
+            }
+            restoreCharacter(existing);
+            return existing;
         }
-        return characters.add(trimmed);
+
+        final OracleCharacter character = new OracleCharacter(trimmed, null);
+        characters.add(character);
+        return character;
     }
 
     /**
-     * Picks a random character from the Oracle list.
+     * Adds someone from the campaign's personnel to the end of the cast, linked to them. If they are already linked,
+     * their character is restored (if removed) and renamed to match.
      *
-     * @return a random character, or {@code null} if the list is empty
+     * @param personId the person's id
+     * @param name     the person's current name
+     *
+     * @return the linked character
      */
-    public @Nullable String pickRandomCharacter() {
-        if (characters.isEmpty()) {
-            return null;
+    public OracleCharacter addLinkedCharacter(final UUID personId, final String name) {
+        for (OracleCharacter character : characters) {
+            if (personId.equals(character.getPersonId())) {
+                character.setName(name);
+                if (!character.isActive()) {
+                    restoreCharacter(character);
+                }
+                return character;
+            }
         }
-        return characters.get(randomInt(characters.size()));
+
+        final OracleCharacter character = new OracleCharacter(name, personId);
+        characters.add(character);
+        return character;
+    }
+
+    private @Nullable OracleCharacter findByName(final String name) {
+        return characters.stream().filter(character -> character.getName().equals(name)).findFirst().orElse(null);
+    }
+
+    /**
+     * Renames a character. Journal tags follow automatically, since they refer to the character by id.
+     *
+     * @param character the character to rename
+     * @param newName   the new name
+     *
+     * @return {@code true} if renamed; {@code false} if the name is blank or another cast member already has it
+     */
+    public boolean renameCharacter(final OracleCharacter character, final @Nullable String newName) {
+        if (newName == null || newName.isBlank()) {
+            return false;
+        }
+
+        final String trimmed = newName.trim();
+        final OracleCharacter other = findByName(trimmed);
+        if (other != null && other != character && other.isActive()) {
+            return false;
+        }
+        character.setName(trimmed);
+        return true;
+    }
+
+    /**
+     * Removes a character from the cast. Their journal history is kept and they can be restored.
+     *
+     * @param character the character to remove
+     */
+    public void removeCharacter(final OracleCharacter character) {
+        character.setActive(false);
+    }
+
+    /**
+     * Returns a removed character to the end of the cast.
+     *
+     * @param character the character to restore
+     */
+    public void restoreCharacter(final OracleCharacter character) {
+        characters.remove(character);
+        character.setActive(true);
+        final int firstInactive = characters.indexOf(characters.stream().filter(c -> !c.isActive()).findFirst()
+                                                           .orElse(null));
+        characters.add(firstInactive < 0 ? characters.size() : firstInactive, character);
+    }
+
+    /**
+     * Moves an active character to a new place in the cast.
+     *
+     * @param character   the character to move
+     * @param activeIndex its new position among the active characters
+     */
+    public void moveCharacter(final OracleCharacter character, final int activeIndex) {
+        final List<OracleCharacter> active = new ArrayList<>(getActiveCharacters());
+        if (!active.remove(character)) {
+            return;
+        }
+        active.add(Math.clamp(activeIndex, 0, active.size()), character);
+        final List<OracleCharacter> inactive = characters.stream().filter(c -> !c.isActive()).toList();
+        characters.clear();
+        characters.addAll(active);
+        characters.addAll(inactive);
+    }
+
+    /**
+     * Updates linked characters' names to match their person's current name.
+     *
+     * @param personNames looks up a person's current name by id; returns {@code null} if the person is gone
+     */
+    public void refreshLinkedNames(final Function<UUID, String> personNames) {
+        for (OracleCharacter character : characters) {
+            if (character.isLinked()) {
+                final String name = personNames.apply(character.getPersonId());
+                if (name != null && !name.isBlank()) {
+                    character.setName(name);
+                }
+            }
+        }
+    }
+
+    /**
+     * Picks a random character from the cast. Every active character has the same chance.
+     *
+     * @return a random active character, or {@code null} if the cast is empty
+     */
+    public @Nullable OracleCharacter pickRandomCharacter() {
+        return pickRandom(getActiveCharacters());
     }
 
     /**
@@ -205,38 +346,6 @@ public class Roleplay {
         return plotThreads.stream().filter(thread -> thread.getId().equals(id)).findFirst().orElse(null);
     }
 
-    /**
-     * Renames an Oracle character, keeping its place in the list and updating every journal tag that names it.
-     *
-     * @param oldName the current name
-     * @param newName the new name
-     *
-     * @return {@code true} if the character was renamed; {@code false} if it was not on the list, the new name is
-     *       blank, or another character already has the new name
-     */
-    public boolean renameCharacter(final String oldName, final @Nullable String newName) {
-        final int index = characters.indexOf(oldName);
-        if (index < 0 || newName == null || newName.isBlank()) {
-            return false;
-        }
-
-        final String trimmed = newName.trim();
-        if (trimmed.equals(oldName)) {
-            return true;
-        }
-        if (characters.contains(trimmed)) {
-            return false;
-        }
-
-        characters.set(index, trimmed);
-        for (JournalEntry entry : allEntries()) {
-            if (entry.getCharacters().remove(oldName)) {
-                entry.getCharacters().add(trimmed);
-            }
-        }
-        return true;
-    }
-
     private List<JournalEntry> allEntries() {
         final List<JournalEntry> entries = new ArrayList<>(journal);
         entries.addAll(oracleLog);
@@ -256,15 +365,17 @@ public class Roleplay {
     /**
      * Reveals the next step of a random unconcluded plot thread.
      *
+     * @param date the in-game date of the reveal
+     *
      * @return the change made, or {@code null} if every thread is concluded (or there are none)
      */
-    public @Nullable PlotThreadChange progressRandomThread() {
+    public @Nullable PlotThreadChange progressRandomThread(final @Nullable LocalDate date) {
         final PlotThread thread = pickRandom(plotThreads.stream().filter(candidate -> !candidate.isComplete())
                                                    .toList());
         if (thread == null) {
             return null;
         }
-        final PlotThreadStep step = thread.revealNextStep();
+        final PlotThreadStep step = thread.revealNextStep(date);
         return new PlotThreadChange(thread, step.number(), step);
     }
 
@@ -308,8 +419,8 @@ public class Roleplay {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "chaosFactor", chaosFactor);
         if (!characters.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "characters");
-            for (String character : characters) {
-                MHQXMLUtility.writeSimpleXMLTag(writer, indent, "character", character);
+            for (OracleCharacter character : characters) {
+                character.writeToXML(writer, indent);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "characters");
         }
@@ -350,7 +461,10 @@ public class Roleplay {
                     for (int j = 0; j < characterNodes.getLength(); j++) {
                         final Node characterNode = characterNodes.item(j);
                         if (characterNode.getNodeName().equalsIgnoreCase("character")) {
-                            roleplay.addCharacter(characterNode.getTextContent());
+                            final OracleCharacter character = OracleCharacter.parse(characterNode);
+                            if (!character.getName().isBlank()) {
+                                roleplay.characters.add(character);
+                            }
                         }
                     }
                 } else if (child.getNodeName().equalsIgnoreCase("journal")) {
@@ -374,6 +488,26 @@ public class Roleplay {
             }
         }
 
+        roleplay.resolveLegacyCharacterTags();
         return roleplay;
+    }
+
+    /**
+     * Journal entries saved before characters had ids tag characters by name. Point those tags at the character with
+     * that name, adding a removed character for any name no longer in the cast so the tag is kept.
+     */
+    private void resolveLegacyCharacterTags() {
+        for (JournalEntry entry : allEntries()) {
+            for (String name : entry.legacyCharacterNames) {
+                OracleCharacter character = findByName(name);
+                if (character == null) {
+                    character = new OracleCharacter(name, null);
+                    character.setActive(false);
+                    characters.add(character);
+                }
+                entry.getCharacters().add(character.getId());
+            }
+            entry.legacyCharacterNames.clear();
+        }
     }
 }

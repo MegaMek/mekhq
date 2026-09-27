@@ -83,13 +83,14 @@ public final class JournalExporter {
      * @param title          the document's title
      * @param filterSummary  a description of the filter applied, or {@code null} if the export is unfiltered
      * @param threadNames    looks up a thread's name from its id; returns {@code null} for a deleted thread
+     * @param castNames      looks up a character's name from its id; returns {@code null} if unknown
      * @param dateFormatter  formats an entry's date for display
      *
      * @return the document
      */
     public static String export(final List<JournalEntry> entries, final Format format, final String title,
           final @Nullable String filterSummary, final Function<UUID, String> threadNames,
-          final Function<LocalDate, String> dateFormatter) {
+          final Function<UUID, String> castNames, final Function<LocalDate, String> dateFormatter) {
         final boolean markdown = format == Format.MARKDOWN;
         final StringBuilder out = new StringBuilder();
 
@@ -115,7 +116,7 @@ public final class JournalExporter {
                 out.append(heading).append('\n').append("-".repeat(heading.length())).append('\n');
             }
 
-            String tags = describeTags(entry, threadNames);
+            String tags = describeTags(entry, threadNames, castNames);
             if (!tags.isEmpty()) {
                 out.append(markdown ? "*" + tags + "*" : tags).append(markdown ? "\n\n" : "\n");
             }
@@ -132,7 +133,8 @@ public final class JournalExporter {
         return out.toString().strip() + '\n';
     }
 
-    private static String describeTags(final JournalEntry entry, final Function<UUID, String> threadNames) {
+    private static String describeTags(final JournalEntry entry, final Function<UUID, String> threadNames,
+          final Function<UUID, String> castNames) {
         List<String> parts = new ArrayList<>();
         if (!entry.getThreads().isEmpty()) {
             List<String> names = new ArrayList<>();
@@ -143,8 +145,16 @@ public final class JournalExporter {
             parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "JournalExporter.threads", String.join(", ", names)));
         }
         if (!entry.getCharacters().isEmpty()) {
-            parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "JournalExporter.characters",
-                  String.join(", ", entry.getCharacters())));
+            List<String> names = new ArrayList<>();
+            for (UUID id : entry.getCharacters()) {
+                String name = castNames.apply(id);
+                if (name != null) {
+                    names.add(name);
+                }
+            }
+            if (!names.isEmpty()) {
+                parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "JournalExporter.characters", String.join(", ", names)));
+            }
         }
         return String.join("; ", parts);
     }

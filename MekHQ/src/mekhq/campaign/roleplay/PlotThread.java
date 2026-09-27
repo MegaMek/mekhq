@@ -35,6 +35,7 @@ package mekhq.campaign.roleplay;
 import static megamek.common.compute.Compute.randomInt;
 
 import java.io.PrintWriter;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -63,6 +64,9 @@ public class PlotThread {
     /** Every this many steps is a flashpoint. */
     public static final int FLASHPOINT_INTERVAL = 5;
 
+    /** Written in place of a reveal date that is not known, so dates stay in step order. */
+    private static final String UNKNOWN_DATE = "unknown";
+
     /** How many adventure tables a normal step rolls on. */
     public static final int ADVENTURE_ROLLS = 3;
 
@@ -79,6 +83,8 @@ public class PlotThread {
     private PlotThreadLength length;
     private final List<PlotThreadStep> steps = new ArrayList<>();
     private int revealedSteps = 0;
+    /** The in-game date each revealed step was revealed, in step order; {@code null} where it is not known. */
+    private final List<LocalDate> revealDates = new ArrayList<>();
 
     private PlotThread(final String name, final PlotThreadLength length) {
         this.name = name;
@@ -211,13 +217,32 @@ public class PlotThread {
     /**
      * Reveals the next step on the track.
      *
+     * @param date the in-game date of the reveal, or {@code null} if it is not known
+     *
      * @return the newly revealed step, or {@code null} if the thread is already complete
      */
-    public @Nullable PlotThreadStep revealNextStep() {
+    public @Nullable PlotThreadStep revealNextStep(final @Nullable LocalDate date) {
         if (isComplete()) {
             return null;
         }
+        revealDates.add(date);
         return steps.get(revealedSteps++);
+    }
+
+    /**
+     * @param stepNumber a step's number, starting at 1
+     *
+     * @return the in-game date the step was revealed, or {@code null} if it is unrevealed or the date is not known
+     */
+    public @Nullable LocalDate getRevealDate(final int stepNumber) {
+        return (stepNumber >= 1 && stepNumber <= revealDates.size()) ? revealDates.get(stepNumber - 1) : null;
+    }
+
+    /**
+     * @return the next step to be revealed, or {@code null} if the thread is complete
+     */
+    public @Nullable PlotThreadStep getNextStep() {
+        return isComplete() ? null : steps.get(revealedSteps);
     }
 
     /**
@@ -242,6 +267,7 @@ public class PlotThread {
         }
 
         final int index = --revealedSteps;
+        revealDates.remove(index);
         steps.set(index, rollStep(index + 1, length, generator));
         return index + 1;
     }
@@ -263,6 +289,9 @@ public class PlotThread {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "name", name);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "length", length.name());
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "revealedSteps", revealedSteps);
+        for (LocalDate date : revealDates) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "revealedOn", date == null ? UNKNOWN_DATE : date.toString());
+        }
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "steps");
         for (PlotThreadStep step : steps) {
             MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "step");
@@ -294,6 +323,7 @@ public class PlotThread {
             PlotThreadLength length = PlotThreadLength.SHORT;
             int revealedSteps = 0;
             Node stepsNode = null;
+            final List<LocalDate> revealDates = new ArrayList<>();
 
             final NodeList children = node.getChildNodes();
             for (int i = 0; i < children.getLength(); i++) {
@@ -304,6 +334,8 @@ public class PlotThread {
                     case "length" -> length = PlotThreadLength.valueOf(child.getTextContent().trim());
                     case "revealedSteps" -> revealedSteps = Integer.parseInt(child.getTextContent().trim());
                     case "steps" -> stepsNode = child;
+                    case "revealedOn" -> revealDates.add(UNKNOWN_DATE.equals(child.getTextContent().trim()) ? null
+                                                               : MHQXMLUtility.parseDate(child.getTextContent().trim()));
                     default -> { }
                 }
             }
@@ -324,6 +356,10 @@ public class PlotThread {
                 }
             }
             thread.revealedSteps = Math.clamp(revealedSteps, 0, thread.steps.size());
+            // Saves from before reveal dates were kept have none; pad or trim so there is one per revealed step.
+            for (int i = 0; i < thread.revealedSteps; i++) {
+                thread.revealDates.add(i < revealDates.size() ? revealDates.get(i) : null);
+            }
             return thread;
         } catch (Exception e) {
             LOGGER.error("Failed to load plot thread", e);

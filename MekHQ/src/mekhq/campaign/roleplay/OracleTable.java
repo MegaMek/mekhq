@@ -33,6 +33,8 @@
 package mekhq.campaign.roleplay;
 
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 import mekhq.MHQConstants;
 
@@ -121,6 +123,37 @@ public enum OracleTable {
             label.append(' ').append(capitalize(words[i]));
         }
         return label.toString();
+    }
+
+    /**
+     * @return the table's category, the first word of its name, such as "Adventure" or "Themes"
+     */
+    public String getCategory() {
+        return capitalize(name().split("_")[0]);
+    }
+
+    /**
+     * @return the table's label without its category, such as "Natural Weather"
+     */
+    public String getTableLabel() {
+        final String label = getLabel();
+        return label.substring(label.indexOf(':') + 1).strip();
+    }
+
+    /**
+     * @return every category, in the order the tables list them
+     */
+    public static List<String> getCategories() {
+        return Arrays.stream(values()).map(OracleTable::getCategory).distinct().toList();
+    }
+
+    /**
+     * @param category a category from {@link #getCategories()}
+     *
+     * @return the tables in that category, in order
+     */
+    public static List<OracleTable> getTables(final String category) {
+        return Arrays.stream(values()).filter(table -> table.getCategory().equals(category)).toList();
     }
 
     private static String capitalize(final String word) {
