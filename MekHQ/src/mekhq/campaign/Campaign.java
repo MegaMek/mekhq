@@ -227,6 +227,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
+import mekhq.campaign.roleplay.Roleplay;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
@@ -346,6 +347,7 @@ public class Campaign implements ITechManager {
 
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
+    private Roleplay roleplay = new Roleplay();
     private CampaignGUI gui;
 
     private AbstractUnitMarket unitMarket;
@@ -3922,6 +3924,8 @@ public class Campaign implements ITechManager {
 
         getPlayerForce().getHumanResources().writeToXML(writer, indent, this);
 
+        roleplay.writeToXML(writer, indent);
+
         // the formations structure is hierarchical, but that should be handled
         // internally from with writeToXML function for Formation
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "formations");
@@ -5221,6 +5225,14 @@ public class Campaign implements ITechManager {
 
     public void setRandomSkillPreferences(RandomSkillPreferences prefs) {
         randomSkillPreferences = prefs;
+    }
+
+    public Roleplay getRoleplay() {
+        return roleplay;
+    }
+
+    public void setRoleplay(final Roleplay roleplay) {
+        this.roleplay = roleplay;
     }
 
     /**

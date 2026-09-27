@@ -130,6 +130,7 @@ import mekhq.gui.dialog.RetirementDefectionDialog;
 import mekhq.gui.dialog.UnitMarketDialog;
 import mekhq.gui.dialog.glossary.GlossaryDialog;
 import mekhq.gui.dialog.markets.contractMarket.ChaosContractMarketDialog;
+import mekhq.gui.dialog.roleplay.OracleDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
@@ -205,6 +206,7 @@ public class CampaignGUI extends JPanel {
     /* Top Panel */
     private JPanel pnlTop;
     private AccentRoundedJButton btnCommandGenerator;
+    private RoundedJButton btnOracle;
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
@@ -492,6 +494,8 @@ public class CampaignGUI extends JPanel {
               getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
         pnlTop.add(createCommandGeneratorButton());
         pnlTop.add(Box.createHorizontalStrut(SMALL_GAP));
+        pnlTop.add(createOracleButton());
+        pnlTop.add(Box.createHorizontalStrut(SMALL_GAP));
         pnlTop.add(advanceTimePanel);
         pnlTop.add(createCampaignControlPanel(140, 170));
 
@@ -501,6 +505,25 @@ public class CampaignGUI extends JPanel {
         btnCommandGenerator.setMinimumSize(new Dimension(side, side));
         btnCommandGenerator.setPreferredSize(new Dimension(side, side));
         btnCommandGenerator.setMaximumSize(new Dimension(side, side));
+        btnOracle.setMinimumSize(new Dimension(side, side));
+        btnOracle.setPreferredSize(new Dimension(side, side));
+        btnOracle.setMaximumSize(new Dimension(side, side));
+    }
+
+    /**
+     * Creates the Oracle button that sits between the Command Generator button and the Advance Day panel. It opens
+     * the {@link OracleDialog}, used to ask the solo-roleplay Fate Chart yes/no questions. It is squared to the top
+     * panel's height by {@link #initTopPanel()}.
+     *
+     * @return the button
+     */
+    private RoundedJButton createOracleButton() {
+        btnOracle = new RoundedJButton(resourceMap.getString("btnOracle.text"));
+        btnOracle.setToolTipText(resourceMap.getString("btnOracle.toolTipText"));
+        btnOracle.setHorizontalAlignment(SwingConstants.CENTER);
+        btnOracle.setFont(btnOracle.getFont().deriveFont(Font.BOLD, btnOracle.getFont().getSize2D() * 1.5f));
+        btnOracle.addActionListener(event -> new OracleDialog(getFrame(), getCampaign()).setVisible(true));
+        return btnOracle;
     }
 
     /**

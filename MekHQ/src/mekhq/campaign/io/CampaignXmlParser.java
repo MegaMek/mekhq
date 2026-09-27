@@ -154,6 +154,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.LegacyRelinkResult;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.roleplay.Roleplay;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
@@ -2296,6 +2297,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                           campaign,
                           version);
                     campaign.getPlayerForce().setHumanResources(humanResources);
+                } else if (nodeName.equalsIgnoreCase("roleplay")) {
+                    campaign.setRoleplay(Roleplay.generateInstanceFromXML(workingNode));
                 } else if (nodeName.equalsIgnoreCase("parts")) {
                     processPartNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("personnel")) {
