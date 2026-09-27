@@ -476,10 +476,8 @@ public class OracleConsole extends JDialog {
             character = actions.generateNpc(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.generatedName") + " "
                                                   + number);
         }
-        if (character != null) {
-            changed();
-            showCharacter(character.getId());
-        }
+        changed();
+        showCharacter(character.getId());
     }
 
     private String randomName() {
@@ -547,6 +545,7 @@ public class OracleConsole extends JDialog {
                     character = lastAnswer.getCharacters().stream().findFirst().orElse(null);
                 }
             }
+            default -> { }
         }
         showPage(ConsolePage.JOURNAL);
         journalPage.newNote(thread, character, quote);

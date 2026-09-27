@@ -264,7 +264,7 @@ class JournalArchiveTest {
     @Test
     void rescueWritesAnImportableFileNextToACompressedSave(@TempDir final Path folder) throws Exception {
         File save = folder.resolve("Wolf's Dragoons.cpnx.gz").toFile();
-        try (OutputStream out = new GZIPOutputStream(new FileOutputStream(save))) {
+        try (OutputStream file = new FileOutputStream(save); OutputStream out = new GZIPOutputStream(file)) {
             out.write(saveWith(campaignJournal()).getBytes(StandardCharsets.UTF_8));
         }
         File first = JournalRescue.rescue(save, LocalDate::toString);

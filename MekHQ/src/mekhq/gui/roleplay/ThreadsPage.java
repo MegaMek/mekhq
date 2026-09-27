@@ -318,7 +318,7 @@ class ThreadsPage implements ConsoleSection {
         refreshDetail();
     }
 
-    private final class ThreadRenderer implements ListCellRenderer<PlotThread> {
+    private static final class ThreadRenderer implements ListCellRenderer<PlotThread> {
         private final HudCard card = new HudCard();
 
         @Override

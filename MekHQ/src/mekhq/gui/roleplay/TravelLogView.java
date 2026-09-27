@@ -300,7 +300,7 @@ class TravelLogView {
 
         List<Row> rows = new ArrayList<>();
         for (TravelRecord record : log.getTimelineFor(summary.systemId(), contracts)) {
-            rows.add(new Row(record.getDate(), who(record), describe(console.roleplay(), record), ""));
+            rows.add(new Row(record.getDate(), who(record), describe(record), ""));
         }
         // Campaign events the chronicle wrote while the main force was here.
         List<LocalDate[]> stays = log.getStays(summary.systemId(), console.campaign().getLocalDate());
@@ -356,7 +356,7 @@ class TravelLogView {
         List<Row> rows = new ArrayList<>();
         for (TravelRecord record : console.roleplay().getTravelLog().getTimeline(contracts)) {
             if (who == null || who.party() == null || matches(record, who)) {
-                rows.add(new Row(record.getDate(), who(record), describe(console.roleplay(), record),
+                rows.add(new Row(record.getDate(), who(record), describe(record),
                       record.getSystemName()));
             }
         }
@@ -401,7 +401,7 @@ class TravelLogView {
     /**
      * @return a one-line description of a travel record, such as "Departed Galax for Tharkad"
      */
-    static String describe(final Roleplay roleplay, final TravelRecord record) {
+    static String describe(final TravelRecord record) {
         String other = record.getOtherSystemName();
         String key = "TravelLog.kind." + record.getKind().name();
         if ((record.getKind() == Kind.DEPARTED || record.getKind() == Kind.ARRIVED) && other == null) {
@@ -464,7 +464,7 @@ class TravelLogView {
         }
     }
 
-    private final class SystemModel extends AbstractTableModel {
+    private static final class SystemModel extends AbstractTableModel {
         private static final String[] COLUMNS = { "system", "first", "last", "visits", "days", "contracts",
                                                   "present" };
         private List<SystemRow> rows = List.of();
