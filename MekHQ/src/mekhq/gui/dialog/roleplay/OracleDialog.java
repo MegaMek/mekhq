@@ -179,7 +179,8 @@ public class OracleDialog extends JDialog {
         if (result.hasRandomEvent()) {
             lblResult.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result.randomEvent",
                   result.answer().getLabel(), result.roll(), odds.getLabel(), chaosFactor,
-                  result.randomEventFocus().getLabel(), result.randomEventRoll()));
+                  result.randomEventFocus().getLabel(), result.randomEventRoll(),
+                  result.randomEventFocus().getDescription()));
         } else {
             lblResult.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleDialog.result",
                   result.answer().getLabel(), result.roll(), odds.getLabel(), chaosFactor));

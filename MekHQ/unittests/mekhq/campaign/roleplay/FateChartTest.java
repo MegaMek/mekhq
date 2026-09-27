@@ -182,6 +182,7 @@ class FateChartTest {
         }
         for (RandomEventFocus focus : RandomEventFocus.values()) {
             assertFalse(focus.getLabel().startsWith("!"), focus.name());
+            assertFalse(focus.getDescription().startsWith("!"), focus.name());
         }
     }
 }

@@ -76,9 +76,11 @@ public enum RandomEventFocus {
     };
 
     private final String label;
+    private final String description;
 
     RandomEventFocus(String lookupName) {
         this.label = getTextAt(RESOURCE_BUNDLE, "RandomEventFocus." + lookupName + ".label");
+        this.description = getTextAt(RESOURCE_BUNDLE, "RandomEventFocus." + lookupName + ".description");
     }
 
     /**
@@ -102,6 +104,13 @@ public enum RandomEventFocus {
      */
     public String getLabel() {
         return label;
+    }
+
+    /**
+     * @return the localized explanation of what this focus means for the story
+     */
+    public String getDescription() {
+        return description;
     }
 
     @Override
