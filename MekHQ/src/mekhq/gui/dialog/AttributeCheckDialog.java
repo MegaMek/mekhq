@@ -56,6 +56,7 @@ import javax.swing.JSpinner;
 import javax.swing.SpinnerNumberModel;
 
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
@@ -95,34 +96,43 @@ public class AttributeCheckDialog {
      * <p>The labels for these options are dynamically generated using the {@code getLabel} method of
      * {@link SkillAttribute}, retrieving localized strings defined in resource bundles.</p>
      */
-    final static List<String> ATTRIBUTE_CHECK_OPTIONS = List.of(
-          BODY.getLabel(),
-          CHARISMA.getLabel(),
-          DEXTERITY.getLabel(),
-          INTELLIGENCE.getLabel(),
-          REFLEXES.getLabel(),
-          STRENGTH.getLabel(),
-          BODY.getLabel() + "-" + CHARISMA.getLabel(),
-          BODY.getLabel() + "-" + DEXTERITY.getLabel(),
-          BODY.getLabel() + "-" + INTELLIGENCE.getLabel(),
-          BODY.getLabel() + "-" + REFLEXES.getLabel(),
-          BODY.getLabel() + "-" + STRENGTH.getLabel(),
-          BODY.getLabel() + "-" + WILLPOWER.getLabel(),
-          CHARISMA.getLabel() + "-" + DEXTERITY.getLabel(),
-          CHARISMA.getLabel() + "-" + INTELLIGENCE.getLabel(),
-          CHARISMA.getLabel() + "-" + REFLEXES.getLabel(),
-          CHARISMA.getLabel() + "-" + STRENGTH.getLabel(),
-          CHARISMA.getLabel() + "-" + WILLPOWER.getLabel(),
-          DEXTERITY.getLabel() + "-" + INTELLIGENCE.getLabel(),
-          DEXTERITY.getLabel() + "-" + REFLEXES.getLabel(),
-          DEXTERITY.getLabel() + "-" + STRENGTH.getLabel(),
-          DEXTERITY.getLabel() + "-" + WILLPOWER.getLabel(),
-          INTELLIGENCE.getLabel() + "-" + REFLEXES.getLabel(),
-          INTELLIGENCE.getLabel() + "-" + STRENGTH.getLabel(),
-          INTELLIGENCE.getLabel() + "-" + WILLPOWER.getLabel(),
-          REFLEXES.getLabel() + "-" + STRENGTH.getLabel(),
-          REFLEXES.getLabel() + "-" + WILLPOWER.getLabel(),
-          STRENGTH.getLabel() + "-" + WILLPOWER.getLabel());
+    /** The attributes a character can be checked against, in the order the dialog lists them. */
+    private static final List<SkillAttribute> CHECKABLE_ATTRIBUTES = List.of(BODY, CHARISMA, DEXTERITY, INTELLIGENCE,
+          REFLEXES, STRENGTH, WILLPOWER);
+
+    // Declared after CHECKABLE_ATTRIBUTES, which it is built from.
+    final static List<AttributeOption> ATTRIBUTE_CHECK_OPTIONS = buildAttributeCheckOptions();
+
+    /**
+     * One entry in the attribute picker: a single attribute, or a pair checked together.
+     *
+     * @param first  the first attribute
+     * @param second the second attribute, or {@code null} for a single-attribute check
+     */
+    record AttributeOption(SkillAttribute first, @Nullable SkillAttribute second) {
+        /**
+         * @return the option's label, such as "Body" or "Body-Charisma"
+         */
+        String label() {
+            return (second == null) ? first.getLabel() : first.getLabel() + "-" + second.getLabel();
+        }
+    }
+
+    /**
+     * @return every single attribute, followed by every pair of different attributes
+     */
+    static List<AttributeOption> buildAttributeCheckOptions() {
+        List<AttributeOption> options = new ArrayList<>();
+        for (SkillAttribute attribute : CHECKABLE_ATTRIBUTES) {
+            options.add(new AttributeOption(attribute, null));
+        }
+        for (int first = 0; first < CHECKABLE_ATTRIBUTES.size(); first++) {
+            for (int second = first + 1; second < CHECKABLE_ATTRIBUTES.size(); second++) {
+                options.add(new AttributeOption(CHECKABLE_ATTRIBUTES.get(first), CHECKABLE_ATTRIBUTES.get(second)));
+            }
+        }
+        return List.copyOf(options);
+    }
 
     private final Campaign campaign;
     private final Person character;
@@ -199,9 +209,9 @@ public class AttributeCheckDialog {
      * @since 0.50.07
      */
     private String performAttributeCheck(int selectedOption, int selectedModifier, int choiceIndex) {
-        List<SkillAttribute> attributes = deriveAttributesFromOption(ATTRIBUTE_CHECK_OPTIONS.get(selectedOption));
-        SkillAttribute firstAttribute = attributes.getFirst();
-        SkillAttribute secondAttribute = attributes.size() > 1 ? attributes.get(1) : null;
+        AttributeOption option = ATTRIBUTE_CHECK_OPTIONS.get(selectedOption);
+        SkillAttribute firstAttribute = option.first();
+        SkillAttribute secondAttribute = option.second();
         boolean useEdge = choiceIndex == DIALOG_USE_EDGE_INDEX;
         ActionCheckResult attributeCheckResult =
               character.checkAttributes(firstAttribute, secondAttribute).withMiscModifier(selectedModifier)
@@ -357,14 +367,13 @@ public class AttributeCheckDialog {
     private String[] getComboListItems() {
         List<String> options = new ArrayList<>();
 
-        for (String attributeOption : ATTRIBUTE_CHECK_OPTIONS) {
-            List<SkillAttribute> attributes = deriveAttributesFromOption(attributeOption);
-            SkillAttribute firstAttribute = attributes.getFirst();
-            SkillAttribute secondAttribute = attributes.size() > 1 ? attributes.get(1) : null;
+        for (AttributeOption attributeOption : ATTRIBUTE_CHECK_OPTIONS) {
+            SkillAttribute firstAttribute = attributeOption.first();
+            SkillAttribute secondAttribute = attributeOption.second();
             int targetNumber = character.checkAttributes(firstAttribute, secondAttribute).getTargetNumber().getValue();
 
             // Build the label with the target number
-            String formattedAttributeName = "<html><b>" + attributeOption + "</b>";
+            String formattedAttributeName = "<html><b>" + attributeOption.label() + "</b>";
             String label = formattedAttributeName + " (" + targetNumber + "+)</html>";
 
             options.add(label);
@@ -372,30 +381,5 @@ public class AttributeCheckDialog {
 
         // Convert the list to a String array and return it
         return options.toArray(new String[0]);
-    }
-
-    /**
-     * Derives a list of {@link SkillAttribute} instances from the given option string.
-     *
-     * <p>The method checks the provided option to identify and collect all {@code SkillAttribute} values whose
-     * labels are contained within the given string.</p>
-     *
-     * @param option the {@link String} representing the option to parse for attribute labels
-     *
-     * @return a {@link List} of {@link SkillAttribute} instances matching the labels found in the option string
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private List<SkillAttribute> deriveAttributesFromOption(String option) {
-        List<SkillAttribute> attributes = new ArrayList<>();
-
-        for (SkillAttribute attribute : SkillAttribute.values()) {
-            if (option.contains(attribute.getLabel())) {
-                attributes.add(attribute);
-            }
-        }
-
-        return attributes;
     }
 }
