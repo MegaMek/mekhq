@@ -172,6 +172,8 @@ public class PlotThread {
     }
 
     private static List<OracleTable> randomAdventureTables() {
+        // Deliberately every adventure table, including the revelation and conclusion ones, so ordinary steps can
+        // foreshadow them.
         final List<OracleTable> tables = new ArrayList<>(getAdventureTables());
         Collections.shuffle(tables);
         return tables.subList(0, ADVENTURE_ROLLS);
