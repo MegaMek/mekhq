@@ -153,6 +153,9 @@ public class OracleDialog extends JDialog {
         JButton btnClose = new JButton(getTextAt(RESOURCE_BUNDLE, "OracleDialog.close"));
         btnClose.addActionListener(event -> dispose());
         pnlButtons.add(btnRoll);
+        JButton btnPlotThreads = new JButton(getTextAt(RESOURCE_BUNDLE, "OracleDialog.plotThreads"));
+        btnPlotThreads.addActionListener(event -> new PlotThreadsDialog(this, roleplay).setVisible(true));
+        pnlButtons.add(btnPlotThreads);
         pnlButtons.add(btnClose);
         getRootPane().setDefaultButton(btnRoll);
 

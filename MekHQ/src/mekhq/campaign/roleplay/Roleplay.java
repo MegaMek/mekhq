@@ -45,8 +45,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * Holds the campaign's solo-roleplay state: the current chaos factor used by the {@link FateChart}, and the ordered
- * list of characters the Oracle can pick from when a random event involves an NPC.
+ * Holds the campaign's solo-roleplay state: the current chaos factor used by the {@link FateChart}, the ordered
+ * list of characters the Oracle can pick from when a random event involves an NPC, and the campaign's
+ * {@link PlotThread}s.
  */
 public class Roleplay {
     private static final MMLogger LOGGER = MMLogger.create(Roleplay.class);
@@ -55,6 +56,7 @@ public class Roleplay {
 
     private int chaosFactor = DEFAULT_CHAOS_FACTOR;
     private final List<String> characters = new ArrayList<>();
+    private final List<PlotThread> plotThreads = new ArrayList<>();
 
     /**
      * @return the current chaos factor
@@ -125,6 +127,13 @@ public class Roleplay {
     }
 
     /**
+     * @return the live, ordered list of plot threads; changes to it are saved with the campaign
+     */
+    public List<PlotThread> getPlotThreads() {
+        return plotThreads;
+    }
+
+    /**
      * Writes this object to the campaign save as a {@code <roleplay>} element.
      *
      * @param writer the writer to output to
@@ -139,6 +148,13 @@ public class Roleplay {
                 MHQXMLUtility.writeSimpleXMLTag(writer, indent, "character", character);
             }
             MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "characters");
+        }
+        if (!plotThreads.isEmpty()) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "plotThreads");
+            for (PlotThread thread : plotThreads) {
+                thread.writeToXML(writer, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "plotThreads");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "roleplay");
     }
@@ -169,6 +185,17 @@ public class Roleplay {
                         final Node characterNode = characterNodes.item(j);
                         if (characterNode.getNodeName().equalsIgnoreCase("character")) {
                             roleplay.addCharacter(characterNode.getTextContent());
+                        }
+                    }
+                } else if (child.getNodeName().equalsIgnoreCase("plotThreads")) {
+                    final NodeList threadNodes = child.getChildNodes();
+                    for (int j = 0; j < threadNodes.getLength(); j++) {
+                        final Node threadNode = threadNodes.item(j);
+                        if (threadNode.getNodeName().equalsIgnoreCase("plotThread")) {
+                            final PlotThread thread = PlotThread.generateInstanceFromXML(threadNode);
+                            if (thread != null) {
+                                roleplay.plotThreads.add(thread);
+                            }
                         }
                     }
                 }
