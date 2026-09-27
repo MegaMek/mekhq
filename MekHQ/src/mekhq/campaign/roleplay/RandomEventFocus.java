@@ -69,6 +69,8 @@ public enum RandomEventFocus {
           NPC_POSITIVE,
           MOVE_TOWARD_A_THREAD,
           MOVE_AWAY_FROM_A_THREAD,
+          // Mythic GME 2e has "Close a thread" here. That is deliberately replaced: threads close through their own
+          // steps, so this row moves one forward instead.
           MOVE_TOWARD_A_THREAD,
           PC_NEGATIVE,
           PC_POSITIVE,

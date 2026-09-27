@@ -49,7 +49,8 @@ package mekhq.campaign.roleplay;
  * moves one step along that sequence, so a cell's triple is found by adding the odds and chaos indices together.</p>
  *
  * <p>A roll that is a multiple of 11, or a roll of 100, also triggers a random event: a follow-up d100 is rolled on
- * the {@link RandomEventFocus} table.</p>
+ * the {@link RandomEventFocus} table. Unlike Mythic GME 2e, where doubles only count when the digit is at or below
+ * the chaos factor, this is deliberately a flat one-in-ten chance at every chaos factor.</p>
  */
 public final class FateChart {
     public static final int MINIMUM_CHAOS_FACTOR = 1;
