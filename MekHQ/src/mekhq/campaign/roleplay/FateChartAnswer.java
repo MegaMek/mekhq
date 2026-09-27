@@ -48,7 +48,7 @@ public enum FateChartAnswer {
     private final String label;
 
     FateChartAnswer(String lookupName) {
-        this.label =  getTextAt(RESOURCE_BUNDLE, lookupName);
+        this.label =  getTextAt(RESOURCE_BUNDLE, "FateChartAnswer." + lookupName + ".label");
     }
 
     /**
