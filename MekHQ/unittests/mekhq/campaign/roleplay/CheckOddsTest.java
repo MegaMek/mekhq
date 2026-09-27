@@ -108,4 +108,103 @@ class CheckOddsTest {
         assertEquals(-10, new CheckTarget(5, false, true, RollType.NORMAL).margin(12));
         assertEquals(3, new CheckTarget(9, true, false, RollType.NORMAL).margin(6));
     }
+
+    // region Brute force
+
+    /** Every roll of the dice for a target, with its chance: two dice, or three keeping the best or worst two. */
+    private static double[] totals(final RollType rollType) {
+        double[] chances = new double[13];
+        int dice = (rollType == RollType.NORMAL) ? 2 : 3;
+        int outcomes = (int) Math.pow(6, dice);
+        for (int outcome = 0; outcome < outcomes; outcome++) {
+            int[] faces = new int[dice];
+            int rest = outcome;
+            for (int die = 0; die < dice; die++) {
+                faces[die] = rest % 6 + 1;
+                rest /= 6;
+            }
+            java.util.Arrays.sort(faces);
+            int total = (dice == 2) ? faces[0] + faces[1]
+                              : (rollType == RollType.ADVANTAGE) ? faces[1] + faces[2] : faces[0] + faces[1];
+            chances[total] += 1.0 / outcomes;
+        }
+        return chances;
+    }
+
+    /**
+     * Plays out an opposed check exactly as the rules describe, independently of {@link CheckOdds}: both roll, whoever
+     * is losing re-rolls once if they may, and the higher margin wins with ties to the defender.
+     */
+    private static double bruteForceOpposed(final CheckTarget acting, final boolean actingEdge,
+          final CheckTarget defending, final boolean defendingEdge) {
+        double[] a = totals(acting.rollType());
+        double[] d = totals(defending.rollType());
+        double wins = 0;
+        for (int first = 2; first <= 12; first++) {
+            for (int second = 2; second <= 12; second++) {
+                double chance = a[first] * d[second];
+                boolean actingAhead = acting.margin(first) > defending.margin(second);
+                if (actingAhead && defendingEdge && !defending.impossible()) {
+                    for (int reroll = 2; reroll <= 12; reroll++) {
+                        if (acting.margin(first) > defending.margin(reroll)) {
+                            wins += chance * d[reroll];
+                        }
+                    }
+                } else if (!actingAhead && actingEdge && !acting.impossible()) {
+                    for (int reroll = 2; reroll <= 12; reroll++) {
+                        if (acting.margin(reroll) > defending.margin(second)) {
+                            wins += chance * a[reroll];
+                        }
+                    }
+                } else if (actingAhead) {
+                    wins += chance;
+                }
+            }
+        }
+        return wins;
+    }
+
+    @Test
+    void singleChecksMatchEveryRollOfTheDice() {
+        for (RollType rollType : RollType.values()) {
+            double[] totals = totals(rollType);
+            for (int target = 0; target <= 14; target++) {
+                double expected = 0;
+                for (int total = 2; total <= 12; total++) {
+                    expected += (total >= target) ? totals[total] : 0;
+                }
+                CheckTarget check = new CheckTarget(target, false, false, rollType);
+                assertEquals(expected, CheckOdds.chance(check, false), DELTA, rollType + " " + target);
+            }
+        }
+    }
+
+    @Test
+    void opposedChecksMatchPlayingEveryCaseOut() {
+        CheckTarget[] targets = { CheckTarget.of(4), CheckTarget.of(7), CheckTarget.of(11),
+                                  new CheckTarget(8, false, false, RollType.ADVANTAGE),
+                                  new CheckTarget(6, true, false, RollType.NORMAL),
+                                  new CheckTarget(7, false, true, RollType.NORMAL) };
+        boolean[] edges = { false, true };
+        for (CheckTarget acting : targets) {
+            for (CheckTarget defending : targets) {
+                for (boolean actingEdge : edges) {
+                    for (boolean defendingEdge : edges) {
+                        assertEquals(bruteForceOpposed(acting, actingEdge, defending, defendingEdge),
+                              CheckOdds.opposedWinChance(acting, actingEdge, defending, defendingEdge), DELTA,
+                              acting + " vs " + defending + " edge " + actingEdge + "/" + defendingEdge);
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    void theGuideExampleOddsAreRight() {
+        // Rook needs 6+, the Easy Regular dock guard 7+: the Checks guide says Rook wins 56% of the time.
+        assertEquals(56, Math.round(CheckOdds.opposedWinChance(CheckTarget.of(6), false, CheckTarget.of(7), false)
+                                          * 100));
+    }
+
+    // endregion Brute force
 }

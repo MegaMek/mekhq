@@ -75,6 +75,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
@@ -768,6 +769,12 @@ class JournalPage implements ConsoleSection {
             file = new File(file.getParentFile(), file.getName() + '.' + format.getExtension());
         }
 
+        if (file.exists() && JOptionPane.showConfirmDialog(root,
+              getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.export.overwrite", file.getName()),
+              getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.export"), JOptionPane.YES_NO_OPTION)
+                                     != JOptionPane.YES_OPTION) {
+            return;
+        }
         JournalFilter filter = currentFilter();
         List<JournalEntry> entries = console.roleplay().getTimeline(filter);
         String document = JournalExporter.export(entries, format,

@@ -162,10 +162,19 @@ public class OracleCharacter {
                 case "name" -> character.name = text;
                 case "person" -> character.personId = UUID.fromString(text.trim());
                 case "active" -> character.active = Boolean.parseBoolean(text.trim());
-                case "rating" -> character.rating = NpcRating.valueOf(text.trim());
+                case "rating" -> character.rating = parseRating(text.trim());
                 default -> { }
             }
         }
         return character;
+    }
+
+    /** An unknown rating, perhaps from a newer version, is dropped rather than losing the character. */
+    private static @Nullable NpcRating parseRating(final String text) {
+        try {
+            return NpcRating.valueOf(text);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }

@@ -331,7 +331,7 @@ class ThreadsPage implements ConsoleSection {
         return getTextAt(RESOURCE_BUNDLE, "OracleConsole.threads.length.short." + length.name());
     }
 
-    private static String describeProgress(final PlotThread thread) {
+    static String describeProgress(final PlotThread thread) {
         if (thread.isComplete()) {
             return getTextAt(RESOURCE_BUNDLE, "OracleConsole.threads.progress.concluded");
         }

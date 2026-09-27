@@ -241,8 +241,9 @@ public class RoleplayChecks {
         for (Person person : people) {
             ActionCheck<?> check = build(person, trait).withMiscModifier(difficulty.getModifier() + other);
             CheckTarget target = targetOf(person, trait, check);
+            // The daily report is HTML, so what the player typed is escaped there.
             ActionCheckResult result = check.resolve(useEdge && isEdgeAllowed(),
-                  trimmedReason.isEmpty() ? null : trimmedReason);
+                  trimmedReason.isEmpty() ? null : JournalText.escapeHtml(trimmedReason));
             report.accept(result.getReport());
             sides.add(new CheckRecord.Side(person.getFullName(), person.getId(), action, target.describe(),
                   result.getRollResult(), result.getRoll().individualDice(), result.getMarginOfSuccess(),
@@ -310,7 +311,7 @@ public class RoleplayChecks {
         }
         actions.logCheck(record, tagged, thread);
         report.accept(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.check.report",
-              OracleActions.describeCheck(record).replace("\n", "<br>")));
+              JournalText.escapeHtml(OracleActions.describeCheck(record)).replace("\n", "<br>")));
         return record;
     }
 

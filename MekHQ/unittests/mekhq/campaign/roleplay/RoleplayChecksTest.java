@@ -236,4 +236,109 @@ class RoleplayChecksTest {
         assertEquals(NpcRating.GREEN, loaded.getCharacter(guard.getId()).getRating());
         assertNull(loaded.getJournal().isEmpty() ? null : loaded.getJournal().get(0).getCheck());
     }
+
+    @Test
+    void typedTextIsEscapedInTheDailyReport() {
+        rolls.addAll(List.of(9, 5));
+        checks.opposed(rated("<b>Rook</b>", NpcRating.REGULAR, CheckDifficulty.NORMAL),
+              rated("Guard", NpcRating.REGULAR, CheckDifficulty.NORMAL), "Sneak <past> & hide",
+              roleplay.getCharacters(), null);
+
+        String report = reports.get(0);
+        assertFalse(report.contains("<b>Rook</b>"), report);
+        assertTrue(report.contains("&lt;b&gt;Rook&lt;/b&gt;"), report);
+        assertTrue(report.contains("Sneak &lt;past&gt; &amp; hide"), report);
+        assertTrue(roleplay.getOracleLog().get(0).getText().contains("Sneak <past> & hide"),
+              "the journal keeps the text as typed");
+    }
+
+    @Test
+    void theGroupReportEscapesTheReason() {
+        Person natasha = person("Natasha", 0);
+        checks.check(List.of(natasha), WILLPOWER, CheckDifficulty.NORMAL, 0, false, "<i>Hold</i>",
+              roleplay.getCharacters(), null);
+
+        assertTrue(reports.get(0).contains("&lt;i&gt;Hold&lt;/i&gt;"), reports.get(0));
+    }
+
+    @Test
+    void edgeIsNeverSpentOnAHopelessCheck() {
+        Person natasha = person("Natasha", 2);
+        when(natasha.checkAttribute(SkillAttribute.WILLPOWER)).thenAnswer(invocation -> new AttributeCheck(natasha,
+              new TargetRoll(TargetRoll.IMPOSSIBLE, "no chance"), SkillAttribute.WILLPOWER,
+              SkillAttribute.NO_ATTRIBUTE));
+        rolls.addAll(List.of(12, 2));
+        CheckRecord record = checks.opposed(Opponent.person(natasha, null, WILLPOWER, CheckDifficulty.NORMAL, 0,
+              true), rated("Guard", NpcRating.REGULAR, CheckDifficulty.NORMAL), "", roleplay.getCharacters(), null);
+
+        verify(natasha, never()).spendEdge();
+        assertEquals(-10, record.sides().get(0).margin());
+        assertEquals("–", record.sides().get(0).target());
+        assertFalse(record.sides().get(0).won());
+    }
+
+    @Test
+    void aWinnerNeverReRolls() {
+        Person natasha = person("Natasha", 2);
+        rolls.addAll(List.of(12, 2));
+        CheckRecord record = checks.opposed(Opponent.person(natasha, null, WILLPOWER, CheckDifficulty.NORMAL, 0,
+              true), rated("Guard", NpcRating.REGULAR, CheckDifficulty.NORMAL), "", roleplay.getCharacters(), null);
+
+        verify(natasha, never()).spendEdge();
+        assertTrue(record.sides().get(0).won());
+        assertFalse(record.sides().get(0).usedEdge());
+    }
+
+    @Test
+    void someoneWithNoEdgeLeftCannotReRoll() {
+        Person natasha = person("Natasha", 0);
+        rolls.addAll(List.of(2, 12));
+        CheckRecord record = checks.opposed(Opponent.person(natasha, null, WILLPOWER, CheckDifficulty.NORMAL, 0,
+              true), rated("Guard", NpcRating.REGULAR, CheckDifficulty.NORMAL), "", roleplay.getCharacters(), null);
+
+        verify(natasha, never()).spendEdge();
+        assertFalse(record.sides().get(0).usedEdge());
+        assertTrue(rolls.isEmpty());
+    }
+
+    @Test
+    void aRatingWithoutACastMemberIsNotRemembered() {
+        rolls.addAll(List.of(9, 5));
+        CheckRecord record = checks.opposed(Opponent.rated(null, NpcRating.ELITE, CheckDifficulty.NORMAL, 0),
+              rated("Guard", NpcRating.REGULAR, CheckDifficulty.NORMAL), "", roleplay.getCharacters(), null);
+
+        assertEquals("", record.sides().get(0).name());
+        assertEquals("6+", record.sides().get(0).target());
+        assertEquals(Set.of(roleplay.getCharacters().get(0).getId()), roleplay.getOracleLog().get(0).getCharacters());
+    }
+
+    @Test
+    void aPersonInTheCastIsTaggedOnceEvenOnBothSides() {
+        Person natasha = person("Natasha", 0);
+        OracleCharacter linked = roleplay.addLinkedCharacter(natasha.getId(), "Natasha");
+        rolls.addAll(List.of(9, 5));
+        checks.opposed(Opponent.person(natasha, null, WILLPOWER, CheckDifficulty.NORMAL, 0, false),
+              Opponent.person(natasha, linked, WILLPOWER, CheckDifficulty.NORMAL, 0, false), "",
+              roleplay.getCharacters(), null);
+
+        assertEquals(Set.of(linked.getId()), roleplay.getOracleLog().get(0).getCharacters());
+    }
+
+    @Test
+    void edgeTracksTheCampaignAndThePerson() {
+        assertTrue(checks.isEdgeAllowed());
+        assertTrue(checks.canUseEdge(person("Natasha", 1)));
+        assertFalse(checks.canUseEdge(person("Rook", 0)));
+        assertFalse(checks.canUseEdge(null));
+        edgeAllowed = false;
+        assertFalse(checks.canUseEdge(person("Natasha", 1)));
+    }
+
+    @Test
+    void targetsIncludeTheModifier() {
+        Person natasha = person("Natasha", 0);
+        assertEquals("9+", checks.target(natasha, WILLPOWER, 2).describe());
+        assertEquals("6+", checks.target(natasha, WILLPOWER, -1).describe());
+        assertTrue(RoleplayChecks.isTrained(natasha, WILLPOWER), "attributes are always trained");
+    }
 }

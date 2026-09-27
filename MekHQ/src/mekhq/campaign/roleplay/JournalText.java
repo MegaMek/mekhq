@@ -135,12 +135,21 @@ public final class JournalText {
         return BLANK_LINES.matcher(text).replaceAll("\n\n").strip();
     }
 
+    /** @return the character a numeric entity stands for, or the entity unchanged if it is not a valid one */
+    private static String codePoint(final String digits, final String entity) {
+        try {
+            int value = Integer.parseInt(digits);
+            return Character.isValidCodePoint(value) ? new String(Character.toChars(value)) : entity;
+        } catch (NumberFormatException e) {
+            return entity;
+        }
+    }
+
     private static String unescape(final String text) {
         Matcher numeric = NUMERIC_ENTITY.matcher(text);
         StringBuilder result = new StringBuilder();
         while (numeric.find()) {
-            numeric.appendReplacement(result,
-                  Matcher.quoteReplacement(String.valueOf((char) Integer.parseInt(numeric.group(1)))));
+            numeric.appendReplacement(result, Matcher.quoteReplacement(codePoint(numeric.group(1), numeric.group())));
         }
         numeric.appendTail(result);
         return result.toString()

@@ -69,6 +69,7 @@ import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 import javax.swing.text.JTextComponent;
 
@@ -137,6 +138,7 @@ public class OracleConsole extends JDialog {
     private HudButton guideButton;
     private JLabel footerSummary;
     private final JLabel subtitle = new JLabel();
+    private volatile boolean refreshPending;
 
     private final HudGuideDrawer guideDrawer;
     private final JPanel scrim;
@@ -662,13 +664,30 @@ public class OracleConsole extends JDialog {
 
     @Subscribe
     public void handle(final NewDayEvent event) {
-        refresh();
+        scheduleRefresh();
     }
 
     @Subscribe
     public void handle(final PersonChangedEvent event) {
-        refreshLinkedNames();
-        refresh();
+        scheduleRefresh();
+    }
+
+    /**
+     * Refreshes the console once, on the Swing thread, however many campaign events arrive before it runs. Advancing a
+     * day can change hundreds of people, and rebuilding a page for each change would stall the game.
+     */
+    private void scheduleRefresh() {
+        if (refreshPending) {
+            return;
+        }
+        refreshPending = true;
+        SwingUtilities.invokeLater(() -> {
+            refreshPending = false;
+            if (isDisplayable()) {
+                refreshLinkedNames();
+                refresh();
+            }
+        });
     }
 
     // endregion Refresh

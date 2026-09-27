@@ -194,7 +194,11 @@ public class RandomOracleGenerator {
 
                 String[] values = line.split(",");
                 if (values.length == 2) {
-                    meanings.put(values[0].trim(), Integer.parseInt(values[1].trim()));
+                    try {
+                        meanings.put(values[0].trim(), Integer.parseInt(values[1].trim()));
+                    } catch (NumberFormatException e) {
+                        logger.error("Weight is not a number in {} on {}", file, lineNumber);
+                    }
                 } else if (values.length < 2) {
                     logger.error("Not enough fields in {} on {}", file, lineNumber);
                 } else {

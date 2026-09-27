@@ -136,4 +136,26 @@ class RandomOracleGeneratorTest {
         assertEquals(1, meanings.get("defeat"));
         assertFalse(meanings.containsKey("Meaning"));
     }
+
+    @Test
+    void aBadWeightSkipsOnlyThatLine(@TempDir Path directory) throws IOException {
+        Path file = directory.resolve("table.csv");
+        Files.writeString(file, "Meaning,Weight\nvictory,3\ndefeat,lots\nstalemate,2\n", StandardCharsets.UTF_8);
+
+        Map<String, Integer> meanings = new HashMap<>();
+        RandomOracleGenerator.loadMeanings(file.toFile(), meanings);
+
+        assertEquals(Map.of("victory", 3, "stalemate", 2), meanings);
+    }
+
+    @Test
+    void anEmptyFileLoadsNothing(@TempDir Path directory) throws IOException {
+        Path file = directory.resolve("empty.csv");
+        Files.writeString(file, "", StandardCharsets.UTF_8);
+
+        Map<String, Integer> meanings = new HashMap<>();
+        RandomOracleGenerator.loadMeanings(file.toFile(), meanings);
+
+        assertTrue(meanings.isEmpty());
+    }
 }

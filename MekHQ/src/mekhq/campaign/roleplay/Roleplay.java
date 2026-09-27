@@ -461,9 +461,14 @@ public class Roleplay {
                     for (int j = 0; j < characterNodes.getLength(); j++) {
                         final Node characterNode = characterNodes.item(j);
                         if (characterNode.getNodeName().equalsIgnoreCase("character")) {
-                            final OracleCharacter character = OracleCharacter.parse(characterNode);
-                            if (!character.getName().isBlank()) {
-                                roleplay.characters.add(character);
+                            // One unreadable character must not cost the rest of the cast.
+                            try {
+                                final OracleCharacter character = OracleCharacter.parse(characterNode);
+                                if (!character.getName().isBlank()) {
+                                    roleplay.characters.add(character);
+                                }
+                            } catch (Exception e) {
+                                LOGGER.error("Failed to load Oracle character", e);
                             }
                         }
                     }

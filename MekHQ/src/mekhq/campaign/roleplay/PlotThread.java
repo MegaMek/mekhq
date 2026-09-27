@@ -334,8 +334,7 @@ public class PlotThread {
                     case "length" -> length = PlotThreadLength.valueOf(child.getTextContent().trim());
                     case "revealedSteps" -> revealedSteps = Integer.parseInt(child.getTextContent().trim());
                     case "steps" -> stepsNode = child;
-                    case "revealedOn" -> revealDates.add(UNKNOWN_DATE.equals(child.getTextContent().trim()) ? null
-                                                               : MHQXMLUtility.parseDate(child.getTextContent().trim()));
+                    case "revealedOn" -> revealDates.add(parseRevealDate(child.getTextContent().trim()));
                     default -> { }
                 }
             }
@@ -367,6 +366,28 @@ public class PlotThread {
         }
     }
 
+    private static @Nullable LocalDate parseRevealDate(final String text) {
+        if (UNKNOWN_DATE.equals(text)) {
+            return null;
+        }
+        try {
+            return MHQXMLUtility.parseDate(text);
+        } catch (Exception e) {
+            LOGGER.warn("Unreadable plot thread reveal date {}", text);
+            return null;
+        }
+    }
+
+    /** A table that no longer exists is skipped, rather than losing the whole thread. */
+    private static @Nullable OracleTable parseTable(final String text) {
+        try {
+            return OracleTable.valueOf(text);
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Unknown oracle table {} in a plot thread", text);
+            return null;
+        }
+    }
+
     private static List<Concept> parseConcepts(final Node stepNode) {
         final List<Concept> concepts = new ArrayList<>();
         final NodeList conceptNodes = stepNode.getChildNodes();
@@ -382,7 +403,7 @@ public class PlotThread {
             for (int j = 0; j < fields.getLength(); j++) {
                 final Node field = fields.item(j);
                 if (field.getNodeName().equals("table")) {
-                    table = OracleTable.valueOf(field.getTextContent().trim());
+                    table = parseTable(field.getTextContent().trim());
                 } else if (field.getNodeName().equals("meaning")) {
                     meaning = field.getTextContent();
                 }
