@@ -49,10 +49,10 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import mekhq.campaign.roleplay.CampaignChronicle;
-import mekhq.campaign.roleplay.TravelRecord;
 import mekhq.campaign.roleplay.CheckDifficulty;
 import mekhq.campaign.roleplay.JournalEntryType;
 import mekhq.campaign.roleplay.NpcRating;
+import mekhq.campaign.roleplay.TravelRecord;
 import org.junit.jupiter.api.Test;
 
 /** Every piece of text the Oracle console and its engine ask for must exist, or players see a raw key. */
