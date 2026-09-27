@@ -422,7 +422,7 @@ public class OracleActions {
         for (Concept concept : concepts) {
             final String meaning = (concept.meaning() == null) ? getTextAt(RESOURCE_BUNDLE, "OracleLog.noConcept")
                                          : concept.meaning();
-            lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.concept", concept.table().getLabel(), meaning));
+            lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.concept", concept.table().getTableLabel(), meaning));
         }
         return String.join("\n", lines);
     }

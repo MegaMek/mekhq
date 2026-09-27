@@ -472,7 +472,7 @@ class ThreadsPage implements ConsoleSection {
     private String tooltipFor(final PlotThread thread, final int number) {
         PlotThreadStep step = thread.getSteps().get(number - 1);
         String concepts = step.concepts().stream()
-                                .map(concept -> OracleConsole.escape(concept.table().getLabel() + ": "
+                                .map(concept -> OracleConsole.escape(concept.table().getTableLabel() + ": "
                                                                            + (concept.meaning() == null ? ""
                                                                                     : concept.meaning())))
                                 .collect(Collectors.joining("<br>"));

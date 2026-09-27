@@ -564,8 +564,7 @@ class AskPage implements ConsoleSection {
             tile.setBackground(SURFACE_DEEP);
             tile.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(7), scaleForGUI(10), scaleForGUI(8),
                   scaleForGUI(10)));
-            tile.add(leftAligned(Hud.eyebrow(concept.table().getCategory() + " · "
-                                                   + concept.table().getTableLabel())));
+            tile.add(leftAligned(Hud.eyebrow(concept.table().getTableLabel())));
             tile.add(Box.createVerticalStrut(scaleForGUI(2)));
             String meaning = (concept.meaning() == null) ? getTextAt(RESOURCE_BUNDLE, "OracleLog.noConcept")
                                    : concept.meaning();
