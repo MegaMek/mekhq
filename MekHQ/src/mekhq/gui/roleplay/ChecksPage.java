@@ -379,6 +379,8 @@ class ChecksPage implements ConsoleSection {
         left.add(leftAligned(reason));
         left.add(Box.createVerticalStrut(scaleForGUI(6)));
         left.add(leftAligned(thread));
+        left.add(Box.createVerticalStrut(scaleForGUI(20)));
+        left.add(leftAligned(new DiceRoller(console).getPanel()));
 
         // Right column
         preview.setForeground(TEXT_MUTED);
