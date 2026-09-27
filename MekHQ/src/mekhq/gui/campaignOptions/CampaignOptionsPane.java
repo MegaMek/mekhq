@@ -169,6 +169,7 @@ public class CampaignOptionsPane extends JPanel {
     private AwardsAndRandomizationPages awardsAndRandomizationPages;
     private SkillsPages skillsPages;
     private AttributesAndTraitsPage attributesAndTraitsPage;
+    private final RoleplayPage roleplayPage;
     private AbilitiesPages abilitiesPages;
     private RepairAndMaintenancePages repairAndMaintenancePages;
     private EquipmentAndSuppliesPages equipmentAndSuppliesPages;
@@ -192,6 +193,7 @@ public class CampaignOptionsPane extends JPanel {
         this.frame = frame;
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
+        this.roleplayPage = new RoleplayPage(campaignOptions);
         this.mode = mode;
         this.campaignGui = campaign.getGUI();
         initialize();
@@ -389,6 +391,9 @@ public class CampaignOptionsPane extends JPanel {
         registerParentRoute("operations.rulesets", "strategicOperationsCategory", "rulesetsCategory");
         registerDirectRoute("operations.rulesets.stratcon", this::createOperationsStratConPage,
               "strategicOperationsCategory", "rulesetsCategory", "stratConGeneralPage");
+
+        // The solo-roleplay Oracle and its journal, in a section of their own so players find them.
+        registerDirectRoute("roleplay", () -> roleplayPage.createPage(), "roleplayPage");
 
     }
 
@@ -883,6 +888,9 @@ public class CampaignOptionsPane extends JPanel {
             systemsPages.applyCampaignOptionsToCampaign(options);
         }
 
+        // Roleplay
+        roleplayPage.applyCampaignOptionsToCampaign(options);
+
         // Tidy up
         if (preset == null) {
             recalculateCombatTeams(campaign);
@@ -1205,5 +1213,8 @@ public class CampaignOptionsPane extends JPanel {
         marketsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
         rulesetsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
         systemsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
+
+        // Roleplay
+        roleplayPage.loadValuesFromCampaignOptions(presetCampaignOptions);
     }
 }
