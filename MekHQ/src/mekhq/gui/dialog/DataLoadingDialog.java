@@ -39,6 +39,8 @@ import static mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry.build
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP;
 import static mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode.STARTUP_ABRIDGED;
 import static mekhq.utilities.EntityUtilities.isUnsupportedEntity;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
@@ -97,6 +99,7 @@ import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.roleplay.JournalRescue;
 import mekhq.campaign.roleplay.RandomOracleGenerator;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
@@ -629,6 +632,25 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
         }
 
         /**
+         * When a save fails to load, saves its Oracle journal next to it so the player's story isn't lost, and tells
+         * them where it is.
+         */
+        private void rescueJournal() {
+            if (getCampaignFile() == null) {
+                return;
+            }
+            File rescued = JournalRescue.rescue(getCampaignFile(),
+                  date -> MekHQ.getMHQOptions().getDisplayFormattedDate(date));
+            if (rescued != null) {
+                JOptionPane.showMessageDialog(null,
+                      getFormattedTextAt("mekhq.resources.Roleplay", "JournalRescue.saved",
+                            rescued.getAbsolutePath()),
+                      getTextAt("mekhq.resources.Roleplay", "JournalRescue.savedTitle"),
+                      JOptionPane.INFORMATION_MESSAGE);
+            }
+        }
+
+        /**
          * Executed in event dispatching thread
          */
         @Override
@@ -641,6 +663,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 completionHandler.accept(null);
             } catch (ExecutionException ex) {
                 LOGGER.error("", ex);
+                rescueJournal();
                 if (ex.getCause() instanceof NullEntityException) {
                     JOptionPane.showMessageDialog(null,
                           String.format(resources.getString("DataLoadingDialog.NullEntityException.text"),

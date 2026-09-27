@@ -130,6 +130,10 @@ public final class JournalExporter {
             }
             out.append(body).append("\n\n");
         }
+        if (markdown) {
+            // Hidden from readers, this lets the file be imported again without losing anything.
+            out.append(JournalArchive.encode(entries, threadNames, castNames));
+        }
         return out.toString().strip() + '\n';
     }
 

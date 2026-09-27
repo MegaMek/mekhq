@@ -89,6 +89,11 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
+import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.roleplay.JournalArchive;
+import mekhq.campaign.roleplay.JournalArchive.Archive;
+import mekhq.campaign.roleplay.JournalArchive.ImportResult;
 import mekhq.campaign.roleplay.JournalEntry;
 import mekhq.campaign.roleplay.JournalEntryType;
 import mekhq.campaign.roleplay.JournalExporter;
@@ -291,6 +296,10 @@ class JournalPage implements ConsoleSection {
                                                .toUpperCase(Locale.ROOT), false, true);
         export.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.export.toolTipText"));
         export.addActionListener(event -> export());
+        HudButton importButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.import")
+                                                     .toUpperCase(Locale.ROOT), false, true);
+        importButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.import.toolTipText"));
+        importButton.addActionListener(event -> importJournal());
         HudButton newNote = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.new")
                                                 .toUpperCase(Locale.ROOT), true, true);
         newNote.addActionListener(event -> newNote(selectedFilterThread(), selectedFilterCast(), null));
@@ -304,7 +313,7 @@ class JournalPage implements ConsoleSection {
         JPanel actions = Hud.transparentPanel(new BorderLayout());
         actions.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(16), scaleForGUI(12),
               scaleForGUI(16)));
-        actions.add(rightButtonRow(status, delete, export, newNote), BorderLayout.CENTER);
+        actions.add(rightButtonRow(status, delete, importButton, export, newNote), BorderLayout.CENTER);
 
         JPanel right = new JPanel(new BorderLayout());
         right.setOpaque(true);
@@ -839,6 +848,50 @@ class JournalPage implements ConsoleSection {
             status.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.export.failed",
                   ex.getMessage()));
         }
+    }
+
+    private void importJournal() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setFileFilter(new FileNameExtensionFilter(
+              getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.export.markdown"), "md", "markdown"));
+        if (chooser.showOpenDialog(root) != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+        File file = chooser.getSelectedFile();
+        Archive archive;
+        try {
+            archive = JournalArchive.read(Files.readString(file.toPath(), StandardCharsets.UTF_8),
+                  text -> MekHQ.getMHQOptions().parseDisplayFormattedDate(text));
+        } catch (Exception ex) {
+            LOGGER.error("Failed to read the journal in {}", file, ex);
+            status.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.import.failed",
+                  ex.getMessage()));
+            return;
+        }
+        if (archive.entries().isEmpty()) {
+            status.setText(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.import.empty",
+                  file.getName()));
+            return;
+        }
+        long notes = archive.entries().stream().filter(JournalEntry::isNote).count();
+        String question = getFormattedTextAt(RESOURCE_BUNDLE, archive.exact() ? "OracleConsole.journal.import.confirm"
+                                                                     : "OracleConsole.journal.import.confirmText",
+              archive.entries().size(), notes, archive.entries().size() - notes, file.getName());
+        if (JOptionPane.showConfirmDialog(root, question,
+              getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.import"), JOptionPane.OK_CANCEL_OPTION)
+                  != JOptionPane.OK_OPTION) {
+            return;
+        }
+        ImportResult result = JournalArchive.importInto(console.roleplay(), archive,
+              console.campaign().getCampaignOptions().get(CampaignOption.MAXIMUM_ORACLE_LOG_ENTRIES));
+        String done = getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.import.done", result.notes(),
+              result.records(), result.duplicates());
+        if (result.trimmed() > 0) {
+            done += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.import.trimmed",
+                  result.trimmed());
+        }
+        console.changed();
+        status.setText(done);
     }
 
     private @Nullable String describeFilter(final JournalFilter filter) {
