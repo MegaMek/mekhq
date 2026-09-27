@@ -39,23 +39,29 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
  * back the odds combo box in the oracle GUI.
  */
 public enum FateChartOdds {
-    IMPOSSIBLE,
-    NEARLY_IMPOSSIBLE,
-    VERY_UNLIKELY,
-    UNLIKELY,
-    FIFTY_FIFTY,
-    LIKELY,
-    VERY_LIKELY,
-    NEARLY_CERTAIN,
-    CERTAIN;
+    IMPOSSIBLE("IMPOSSIBLE"),
+    NEARLY_IMPOSSIBLE("NEARLY_IMPOSSIBLE"),
+    VERY_UNLIKELY("VERY_UNLIKELY"),
+    UNLIKELY("UNLIKELY"),
+    FIFTY_FIFTY("FIFTY_FIFTY"),
+    LIKELY("LIKELY"),
+    VERY_LIKELY("VERY_LIKELY"),
+    NEARLY_CERTAIN("NEARLY_CERTAIN"),
+    CERTAIN("CERTAIN");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Roleplay";
+
+    private final String label;
+
+    FateChartOdds(String lookupName) {
+        this.label =  getTextAt(RESOURCE_BUNDLE, lookupName);
+    }
 
     /**
      * @return the localized display label for these odds
      */
     public String getLabel() {
-        return getTextAt(RESOURCE_BUNDLE, "FateChartOdds." + name() + ".label");
+        return label;
     }
 
     @Override

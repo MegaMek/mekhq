@@ -38,12 +38,18 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
  * The answer produced by consulting the {@link FateChart}.
  */
 public enum FateChartAnswer {
-    EXCEPTIONAL_YES,
-    NORMAL_YES,
-    NORMAL_NO,
-    EXCEPTIONAL_NO;
+    EXCEPTIONAL_YES("EXCEPTIONAL_YES"),
+    NORMAL_YES("NORMAL_YES"),
+    NORMAL_NO("NORMAL_NO"),
+    EXCEPTIONAL_NO("EXCEPTIONAL_NO");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Roleplay";
+
+    private final String label;
+
+    FateChartAnswer(String lookupName) {
+        this.label =  getTextAt(RESOURCE_BUNDLE, lookupName);
+    }
 
     /**
      * @return {@code true} if this is either kind of yes
@@ -63,7 +69,7 @@ public enum FateChartAnswer {
      * @return the localized display label for this answer
      */
     public String getLabel() {
-        return getTextAt(RESOURCE_BUNDLE, "FateChartAnswer." + name() + ".label");
+        return label;
     }
 
     @Override
