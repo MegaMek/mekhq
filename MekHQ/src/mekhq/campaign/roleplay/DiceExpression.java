@@ -41,6 +41,8 @@ import java.util.function.IntUnaryOperator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import megamek.codeUtilities.MathUtility;
+
 /**
  * A dice expression such as {@code 2d6+1}, {@code d100}, {@code 4d6kh3} or {@code 1d20+1d4-2}, for rules from other
  * games. Each term is a number, or dice written {@code NdS}: N dice (1 if left out) of S sides, where {@code d%} means
@@ -194,7 +196,7 @@ public final class DiceExpression {
         if (digits.length() > 6) {
             throw new IllegalArgumentException("number too large");
         }
-        int value = Integer.parseInt(digits);
+        int value = MathUtility.parseInt(digits, -1);
         if (value < minimum || value > maximum) {
             throw new IllegalArgumentException("number out of range: " + value);
         }

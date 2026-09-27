@@ -34,6 +34,7 @@ package mekhq.campaign.roleplay;
 
 import java.io.PrintWriter;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -74,8 +75,8 @@ public record OracleAnswer(String question, FateChartOdds odds, int chaos, int r
             switch (field.getNodeName()) {
                 case "question" -> question = field.getTextContent();
                 case "odds" -> odds = FateChartOdds.valueOf(text);
-                case "chaos" -> chaos = Integer.parseInt(text);
-                case "roll" -> roll = Integer.parseInt(text);
+                case "chaos" -> chaos = MathUtility.parseInt(text, Roleplay.DEFAULT_CHAOS_FACTOR);
+                case "roll" -> roll = MathUtility.parseInt(text);
                 case "result" -> answer = FateChartAnswer.valueOf(text);
                 default -> { }
             }

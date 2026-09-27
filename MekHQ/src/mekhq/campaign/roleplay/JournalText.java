@@ -36,6 +36,8 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import megamek.codeUtilities.MathUtility;
+
 /**
  * Conversions between the journal's two text forms: plain text (Oracle log records) and the HTML that rich-text notes
  * are stored as.
@@ -137,12 +139,9 @@ public final class JournalText {
 
     /** @return the character a numeric entity stands for, or the entity unchanged if it is not a valid one */
     private static String codePoint(final String digits, final String entity) {
-        try {
-            int value = Integer.parseInt(digits);
-            return Character.isValidCodePoint(value) ? new String(Character.toChars(value)) : entity;
-        } catch (NumberFormatException e) {
-            return entity;
-        }
+        // An unreadable number comes back as -1, which is not a code point either.
+        int value = MathUtility.parseInt(digits, -1);
+        return Character.isValidCodePoint(value) ? new String(Character.toChars(value)) : entity;
     }
 
     private static String unescape(final String text) {

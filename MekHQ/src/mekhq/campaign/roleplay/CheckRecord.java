@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -117,7 +118,7 @@ public record CheckRecord(boolean opposed, String reason, List<Side> sides) {
         for (int i = 0; i < fields.getLength(); i++) {
             final Node field = fields.item(i);
             switch (field.getNodeName()) {
-                case "opposed" -> opposed = Boolean.parseBoolean(field.getTextContent().trim());
+                case "opposed" -> opposed = MathUtility.parseBoolean(field.getTextContent().trim());
                 case "reason" -> reason = field.getTextContent();
                 case "side" -> sides.add(parseSide(field));
                 default -> { }
@@ -145,17 +146,17 @@ public record CheckRecord(boolean opposed, String reason, List<Side> sides) {
                 case "person" -> personId = UUID.fromString(text);
                 case "action" -> action = field.getTextContent();
                 case "target" -> target = text;
-                case "roll" -> roll = Integer.parseInt(text);
+                case "roll" -> roll = MathUtility.parseInt(text);
                 case "dice" -> {
                     for (String die : text.split(",")) {
                         if (!die.isBlank()) {
-                            dice.add(Integer.parseInt(die.trim()));
+                            dice.add(MathUtility.parseInt(die.trim()));
                         }
                     }
                 }
-                case "margin" -> margin = Integer.parseInt(text);
-                case "edge" -> usedEdge = Boolean.parseBoolean(text);
-                case "won" -> won = Boolean.parseBoolean(text);
+                case "margin" -> margin = MathUtility.parseInt(text);
+                case "edge" -> usedEdge = MathUtility.parseBoolean(text);
+                case "won" -> won = MathUtility.parseBoolean(text);
                 default -> { }
             }
         }

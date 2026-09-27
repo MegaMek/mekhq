@@ -42,6 +42,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.roleplay.Concepts.Concept;
@@ -350,7 +351,7 @@ public class PlotThread {
                     case "id" -> id = UUID.fromString(child.getTextContent().trim());
                     case "name" -> name = child.getTextContent();
                     case "length" -> length = PlotThreadLength.valueOf(child.getTextContent().trim());
-                    case "revealedSteps" -> revealedSteps = Integer.parseInt(child.getTextContent().trim());
+                    case "revealedSteps" -> revealedSteps = MathUtility.parseInt(child.getTextContent().trim());
                     case "steps" -> stepsNode = child;
                     case "revealedOn" -> revealDates.add(parseRevealDate(child.getTextContent().trim()));
                     default -> { }

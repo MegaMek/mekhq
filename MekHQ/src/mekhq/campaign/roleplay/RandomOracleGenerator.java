@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.util.weightedMaps.WeightedIntMap;
 import megamek.logging.MMLogger;
@@ -194,10 +195,11 @@ public class RandomOracleGenerator {
 
                 String[] values = line.split(",");
                 if (values.length == 2) {
-                    try {
-                        meanings.put(values[0].trim(), Integer.parseInt(values[1].trim()));
-                    } catch (NumberFormatException e) {
+                    int weight = MathUtility.parseInt(values[1].trim(), Integer.MIN_VALUE);
+                    if (weight == Integer.MIN_VALUE) {
                         logger.error("Weight is not a number in {} on {}", file, lineNumber);
+                    } else {
+                        meanings.put(values[0].trim(), weight);
                     }
                 } else if (values.length < 2) {
                     logger.error("Not enough fields in {} on {}", file, lineNumber);

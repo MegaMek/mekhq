@@ -36,6 +36,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.client.ui.preferences.PreferenceElement;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
@@ -159,7 +160,7 @@ public final class OracleGuidePreferences {
 
         @Override
         protected void initialize(final String saved) {
-            value = Boolean.parseBoolean(saved.strip());
+            value = MathUtility.parseBoolean(saved.strip());
         }
 
         @Override

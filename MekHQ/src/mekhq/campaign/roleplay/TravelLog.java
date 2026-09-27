@@ -48,6 +48,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.roleplay.TravelRecord.Kind;
 import mekhq.campaign.roleplay.TravelRecord.Party;
@@ -542,7 +543,7 @@ public class TravelLog {
         for (int i = 0; i < children.getLength(); i++) {
             final Node child = children.item(i);
             if (child.getNodeName().equalsIgnoreCase("historyFilled")) {
-                log.historyFilled = Boolean.parseBoolean(child.getTextContent().trim());
+                log.historyFilled = MathUtility.parseBoolean(child.getTextContent().trim());
             } else if (child.getNodeName().equalsIgnoreCase("records")) {
                 log.records.addAll(TravelRecord.parseList(child));
             }
