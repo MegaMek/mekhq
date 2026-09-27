@@ -86,6 +86,7 @@ import mekhq.campaign.roleplay.FateChart;
 import mekhq.campaign.roleplay.JournalEntry;
 import mekhq.campaign.roleplay.OracleActions;
 import mekhq.campaign.roleplay.OracleAnswer;
+import mekhq.campaign.roleplay.OracleCharacter;
 import mekhq.campaign.roleplay.PlotThread;
 import mekhq.campaign.roleplay.Roleplay;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -123,6 +124,7 @@ public class OracleConsole extends JDialog {
 
     // Pages are built the first time they are shown, so opening the console only builds the Ask page.
     private AskPage askPage;
+    private ChecksPage checksPage;
     private ThreadsPage threadsPage;
     private CastPage castPage;
     private JournalPage journalPage;
@@ -158,6 +160,20 @@ public class OracleConsole extends JDialog {
         openConsole = new OracleConsole(frame, campaign);
         openConsole.setVisible(true);
         openConsole.onShown();
+    }
+
+    /**
+     * Opens the console on the Checks page, set up to check the given people.
+     *
+     * @param frame     the MekHQ main window
+     * @param campaign  the campaign
+     * @param people    the people to tick
+     * @param attribute {@code true} for an attribute check, {@code false} for a skill check
+     */
+    public static void showChecks(final JFrame frame, final Campaign campaign, final List<Person> people,
+          final boolean attribute) {
+        showFor(frame, campaign);
+        openConsole.showChecksFor(people, attribute);
     }
 
     private OracleConsole(final JFrame frame, final Campaign campaign) {
@@ -392,6 +408,7 @@ public class OracleConsole extends JDialog {
         if (section == null) {
             section = switch (page) {
                 case ASK -> askPage = new AskPage(this);
+                case CHECKS -> checksPage = new ChecksPage(this);
                 case THREADS -> threadsPage = new ThreadsPage(this);
                 case CAST -> castPage = new CastPage(this);
                 case JOURNAL -> journalPage = new JournalPage(this);
@@ -437,6 +454,29 @@ public class OracleConsole extends JDialog {
     void showCharacter(final UUID characterId) {
         showPage(ConsolePage.CAST);
         castPage.select(characterId);
+    }
+
+    /**
+     * Shows the Checks page, set up to check the given people.
+     *
+     * @param people    the people to tick
+     * @param attribute {@code true} for an attribute check, {@code false} for a skill check
+     */
+    void showChecksFor(final List<Person> people, final boolean attribute) {
+        page(ConsolePage.CHECKS);
+        checksPage.preset(people, attribute);
+        showPage(ConsolePage.CHECKS);
+    }
+
+    /**
+     * Shows the Checks page, set up for an opposed check with a cast member defending.
+     *
+     * @param character the cast member
+     */
+    void showOpposedCheck(final OracleCharacter character) {
+        page(ConsolePage.CHECKS);
+        showPage(ConsolePage.CHECKS);
+        checksPage.presetOpposed(character);
     }
 
     /**

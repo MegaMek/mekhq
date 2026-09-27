@@ -63,6 +63,7 @@ public class JournalEntry {
     private final Set<UUID> threads = new LinkedHashSet<>();
     private final Set<UUID> characters = new LinkedHashSet<>();
     private OracleAnswer answer;
+    private CheckRecord check;
     /** The note's text without formatting, worked out when first needed; cleared whenever the text changes. */
     private String plainText;
     /** Character names from saves made before characters had ids; {@link Roleplay} turns them into ids on load. */
@@ -168,6 +169,17 @@ public class JournalEntry {
     }
 
     /**
+     * @return the check this record logs, or {@code null} if it is not a check record
+     */
+    public @Nullable CheckRecord getCheck() {
+        return check;
+    }
+
+    public void setCheck(final @Nullable CheckRecord check) {
+        this.check = check;
+    }
+
+    /**
      * Tags this entry with a plot thread.
      *
      * @param thread the thread, or {@code null} to do nothing
@@ -224,6 +236,9 @@ public class JournalEntry {
             if (entry.answer != null) {
                 entry.answer.writeToXML(writer, indent);
             }
+            if (entry.check != null) {
+                entry.check.writeToXML(writer, indent);
+            }
             MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "entry");
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, tag);
@@ -262,6 +277,7 @@ public class JournalEntry {
             final List<UUID> characters = new ArrayList<>();
             final List<String> legacyNames = new ArrayList<>();
             OracleAnswer answer = null;
+            CheckRecord check = null;
 
             final NodeList fields = node.getChildNodes();
             for (int i = 0; i < fields.getLength(); i++) {
@@ -274,6 +290,7 @@ public class JournalEntry {
                     case "cast" -> characters.add(UUID.fromString(field.getTextContent().trim()));
                     case "character" -> legacyNames.add(field.getTextContent());
                     case "answer" -> answer = OracleAnswer.parse(field);
+                    case "check" -> check = CheckRecord.parse(field);
                     default -> { }
                 }
             }
@@ -291,6 +308,7 @@ public class JournalEntry {
             entry.characters.addAll(characters);
             entry.legacyCharacterNames.addAll(legacyNames);
             entry.answer = answer;
+            entry.check = check;
             return entry;
         } catch (Exception e) {
             LOGGER.error("Failed to load journal entry", e);

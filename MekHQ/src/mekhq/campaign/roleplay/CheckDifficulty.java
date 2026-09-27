@@ -30,48 +30,60 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.roleplay;
+package mekhq.campaign.roleplay;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.util.Locale;
-
 /**
- * The pages of the {@link OracleConsole}.
+ * How hard the situation makes a check, shown as five named levels on the Checks page. The modifier is added to the
+ * target number, so a positive value makes the check harder.
  */
-public enum ConsolePage {
-    ASK("ASK"),
-    CHECKS("CHECKS"),
-    THREADS("THREADS"),
-    CAST("CAST"),
-    JOURNAL("JOURNAL");
+public enum CheckDifficulty {
+    VERY_EASY("VERY_EASY", -3),
+    EASY("EASY", -1),
+    NORMAL("NORMAL", 0),
+    HARD("HARD", 2),
+    VERY_HARD("VERY_HARD", 4);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Roleplay";
 
-    private final String key;
+    private final String label;
+    private final int modifier;
 
-    ConsolePage(String key) {
-        this.key = key;
+    CheckDifficulty(String lookupName, int modifier) {
+        this.label = getTextAt(RESOURCE_BUNDLE, "CheckDifficulty." + lookupName + ".label");
+        this.modifier = modifier;
     }
 
-    /**
-     * @return the page's name in the page selector
-     */
     public String getLabel() {
-        return getTextAt(RESOURCE_BUNDLE, "OracleConsole.page." + key);
+        return label;
     }
 
     /**
-     * @return the label of the page's guide button, such as "How asking works"
+     * @return the change to the target number; positive makes the check harder
      */
-    public String getGuideLabel() {
-        return getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide." + key);
+    public int getModifier() {
+        return modifier;
     }
 
     /**
-     * @return the key this page's guide text is stored under
+     * @return the modifier with its sign, such as "+2", "−1" or "±0"
      */
-    String guideKey() {
-        return key.toLowerCase(Locale.ROOT);
+    public String getSignedModifier() {
+        return signed(modifier);
+    }
+
+    /**
+     * @param value a modifier
+     *
+     * @return the modifier with its sign, such as "+2", "−1" or "±0"
+     */
+    public static String signed(final int value) {
+        return (value > 0) ? "+" + value : (value < 0) ? "−" + Math.abs(value) : "±0";
+    }
+
+    @Override
+    public String toString() {
+        return getLabel();
     }
 }

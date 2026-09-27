@@ -67,6 +67,7 @@ import javax.swing.JTextField;
 import javax.swing.Scrollable;
 
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.roleplay.Concepts;
 import mekhq.campaign.roleplay.Concepts.Concept;
 import mekhq.campaign.roleplay.FateChart;
@@ -75,6 +76,7 @@ import mekhq.campaign.roleplay.FateChartOdds;
 import mekhq.campaign.roleplay.JournalEntry;
 import mekhq.campaign.roleplay.OracleActions.AskOutcome;
 import mekhq.campaign.roleplay.OracleAnswer;
+import mekhq.campaign.roleplay.OracleCharacter;
 import mekhq.campaign.roleplay.OracleTable;
 import mekhq.campaign.roleplay.PlotThreadStep;
 import mekhq.campaign.roleplay.RandomEventFocus;
@@ -293,8 +295,20 @@ class AskPage implements ConsoleSection {
 
     private @Nullable JComponent describeEffect(final AskOutcome outcome, final RandomEventFocus focus) {
         if (outcome.character() != null) {
-            return Hud.link(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.effect.character",
-                  outcome.character().getName()), () -> console.showCharacter(outcome.character().getId()));
+            OracleCharacter character = outcome.character();
+            JLabel show = Hud.link(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.effect.character",
+                  character.getName()), () -> console.showCharacter(character.getId()));
+            Person person = character.isLinked() ? console.campaign().getPlayerForce().getHumanResources()
+                                                         .getPerson(character.getPersonId()) : null;
+            if (person == null) {
+                return show;
+            }
+            JPanel links = column();
+            links.add(leftAligned(show));
+            links.add(Box.createVerticalStrut(scaleForGUI(4)));
+            links.add(leftAligned(Hud.link(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.ask.effect.check",
+                  character.getName()), () -> console.showChecksFor(List.of(person), false))));
+            return links;
         }
         if (outcome.thread() != null) {
             String name = outcome.thread().thread().getName();

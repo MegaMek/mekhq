@@ -30,48 +30,46 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.roleplay;
+package mekhq.campaign.roleplay;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.util.Locale;
-
 /**
- * The pages of the {@link OracleConsole}.
+ * How capable a cast member with no stats is, used when they take part in an opposed check. Each rating stands for a
+ * target number on 2d6.
  */
-public enum ConsolePage {
-    ASK("ASK"),
-    CHECKS("CHECKS"),
-    THREADS("THREADS"),
-    CAST("CAST"),
-    JOURNAL("JOURNAL");
+public enum NpcRating {
+    ULTRA_GREEN("ULTRA_GREEN", 10),
+    GREEN("GREEN", 9),
+    REGULAR("REGULAR", 8),
+    VETERAN("VETERAN", 7),
+    ELITE("ELITE", 6),
+    HEROIC("HEROIC", 5),
+    LEGENDARY("LEGENDARY", 4);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Roleplay";
 
-    private final String key;
+    private final String label;
+    private final int targetNumber;
 
-    ConsolePage(String key) {
-        this.key = key;
+    NpcRating(String lookupName, int targetNumber) {
+        this.label = getTextAt(RESOURCE_BUNDLE, "NpcRating." + lookupName + ".label");
+        this.targetNumber = targetNumber;
     }
 
-    /**
-     * @return the page's name in the page selector
-     */
     public String getLabel() {
-        return getTextAt(RESOURCE_BUNDLE, "OracleConsole.page." + key);
+        return label;
     }
 
     /**
-     * @return the label of the page's guide button, such as "How asking works"
+     * @return the target number a character of this rating rolls against, before modifiers
      */
-    public String getGuideLabel() {
-        return getTextAt(RESOURCE_BUNDLE, "OracleConsole.guide." + key);
+    public int getTargetNumber() {
+        return targetNumber;
     }
 
-    /**
-     * @return the key this page's guide text is stored under
-     */
-    String guideKey() {
-        return key.toLowerCase(Locale.ROOT);
+    @Override
+    public String toString() {
+        return label + " · " + targetNumber + "+";
     }
 }

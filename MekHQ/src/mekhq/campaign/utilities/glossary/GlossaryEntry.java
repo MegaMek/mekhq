@@ -159,6 +159,7 @@ public enum GlossaryEntry {
     NO_SEED_FORCES("NO_SEED_FORCES", new Version("0.51.01")),
     ORACLE("ORACLE", new Version("0.51.01")),
     ORACLE_CAST("ORACLE_CAST", new Version("0.51.01")),
+    ORACLE_CHECKS("ORACLE_CHECKS", new Version("0.51.01")),
     ORACLE_CONCEPTS("ORACLE_CONCEPTS", new Version("0.51.01")),
     ORACLE_RANDOM_EVENTS("ORACLE_RANDOM_EVENTS", new Version("0.51.01")),
     PARTS_AVAILABILITY("PARTS_AVAILABILITY", new Version("0.50.06")),

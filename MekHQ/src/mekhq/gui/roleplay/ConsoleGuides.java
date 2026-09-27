@@ -153,6 +153,7 @@ final class ConsoleGuides {
         return switch (page) {
             case ASK -> List.of(GlossaryEntry.ORACLE, GlossaryEntry.CHAOS_FACTOR, GlossaryEntry.SCENES,
                   GlossaryEntry.ORACLE_RANDOM_EVENTS, GlossaryEntry.ORACLE_CONCEPTS);
+            case CHECKS -> List.of(GlossaryEntry.ORACLE_CHECKS, GlossaryEntry.ORACLE_CAST);
             case THREADS -> List.of(GlossaryEntry.PLOT_THREADS, GlossaryEntry.ORACLE_RANDOM_EVENTS);
             case CAST -> List.of(GlossaryEntry.ORACLE_CAST, GlossaryEntry.ORACLE_RANDOM_EVENTS);
             case JOURNAL -> List.of(GlossaryEntry.ORACLE, GlossaryEntry.PLOT_THREADS, GlossaryEntry.ORACLE_CAST);

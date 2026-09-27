@@ -52,6 +52,7 @@ public class OracleCharacter {
     private String name;
     private UUID personId;
     private boolean active = true;
+    private NpcRating rating;
 
     /**
      * @param name     the character's name
@@ -102,6 +103,17 @@ public class OracleCharacter {
         this.active = active;
     }
 
+    /**
+     * @return the rating last used for this character in an opposed check, or {@code null} if none has been chosen
+     */
+    public @Nullable NpcRating getRating() {
+        return rating;
+    }
+
+    public void setRating(final @Nullable NpcRating rating) {
+        this.rating = rating;
+    }
+
     @Override
     public String toString() {
         return name;
@@ -116,6 +128,9 @@ public class OracleCharacter {
         }
         if (!active) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "active", false);
+        }
+        if (rating != null) {
+            MHQXMLUtility.writeSimpleXMLTag(writer, indent, "rating", rating.name());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "character");
     }
@@ -147,6 +162,7 @@ public class OracleCharacter {
                 case "name" -> character.name = text;
                 case "person" -> character.personId = UUID.fromString(text.trim());
                 case "active" -> character.active = Boolean.parseBoolean(text.trim());
+                case "rating" -> character.rating = NpcRating.valueOf(text.trim());
                 default -> { }
             }
         }

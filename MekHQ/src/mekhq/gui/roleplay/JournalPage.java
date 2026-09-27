@@ -118,7 +118,8 @@ class JournalPage implements ConsoleSection {
         ALL(EnumSet.noneOf(JournalEntryType.class)),
         NOTES(EnumSet.of(JournalEntryType.NOTE)),
         ORACLE(EnumSet.of(JournalEntryType.FATE_CHART, JournalEntryType.RANDOM_EVENT, JournalEntryType.CONCEPTS)),
-        THREADS(EnumSet.of(JournalEntryType.THREAD));
+        THREADS(EnumSet.of(JournalEntryType.THREAD)),
+        CHECKS(EnumSet.of(JournalEntryType.CHECK));
 
         private final Set<JournalEntryType> types;
 
@@ -490,6 +491,7 @@ class JournalPage implements ConsoleSection {
             case RANDOM_EVENT -> AMBER;
             case CONCEPTS -> TEXT_MUTED;
             case THREAD -> READY;
+            case CHECK -> TEXT;
         };
     }
 
@@ -498,11 +500,17 @@ class JournalPage implements ConsoleSection {
         if (answer != null) {
             return answer.answer().getLabel() + (answer.question().isBlank() ? "" : " · " + answer.question());
         }
+        if (entry.getCheck() != null) {
+            return ChecksPage.summarize(entry.getCheck());
+        }
         String first = entry.getPlainText().strip().lines().findFirst().orElse("");
         return first.isEmpty() ? getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.emptyNote") : first;
     }
 
     private static String describeBody(final JournalEntry entry) {
+        if (entry.getCheck() != null) {
+            return ChecksPage.describeSides(entry.getCheck());
+        }
         List<String> lines = entry.getPlainText().strip().lines().skip(1).filter(line -> !line.isBlank()).toList();
         return lines.isEmpty() ? "" : lines.get(0).strip();
     }

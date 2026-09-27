@@ -224,6 +224,10 @@ class CastPage implements ConsoleSection {
         restore = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.restore").toUpperCase(Locale.ROOT),
               false, true);
         restore.addActionListener(event -> setActive(true));
+        HudButton check = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.check").toUpperCase(Locale.ROOT),
+              false, true);
+        check.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.check.toolTipText"));
+        check.addActionListener(event -> makeCheck());
         HudButton storyline = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.readStoryline")
                                                   .toUpperCase(Locale.ROOT), true);
         storyline.addActionListener(event -> console.readStoryline(null, selectedId));
@@ -234,7 +238,7 @@ class CastPage implements ConsoleSection {
         dossier.add(Box.createVerticalStrut(scaleForGUI(8)));
         dossier.add(leftAligned(renameRow));
         dossier.add(Box.createVerticalStrut(scaleForGUI(8)));
-        dossier.add(leftAligned(rightButtonRow(null, rename, remove, restore, storyline)));
+        dossier.add(leftAligned(rightButtonRow(null, rename, remove, restore, check, storyline)));
         dossier.add(Box.createVerticalStrut(scaleForGUI(14)));
         dossier.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.appearances"))));
         dossier.add(Box.createVerticalStrut(scaleForGUI(8)));
@@ -420,6 +424,21 @@ class CastPage implements ConsoleSection {
             selectedId = character.getId();
             setRemoved(false);
             console.changed();
+        }
+    }
+
+    private void makeCheck() {
+        OracleCharacter character = console.roleplay().getCharacter(selectedId);
+        if (character == null) {
+            return;
+        }
+        Person person = character.isLinked()
+                              ? console.campaign().getPlayerForce().getHumanResources()
+                                      .getPerson(character.getPersonId()) : null;
+        if (person != null && character.isActive()) {
+            console.showChecksFor(List.of(person), false);
+        } else {
+            console.showOpposedCheck(character);
         }
     }
 

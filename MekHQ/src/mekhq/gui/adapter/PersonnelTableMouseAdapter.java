@@ -197,6 +197,7 @@ import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.menus.AssignPersonToUnitMenu;
 import mekhq.gui.menus.LocationMenu;
 import mekhq.gui.model.PersonnelTableModel;
+import mekhq.gui.roleplay.OracleConsole;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
@@ -422,15 +423,11 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_SKILL_CHECK: {
-                for (final Person person : people) {
-                    new SkillCheckDialog(getCampaign(), person);
-                }
+                OracleConsole.showChecks(getFrame(), getCampaign(), List.of(people), false);
                 break;
             }
             case CMD_ATTRIBUTE_CHECK: {
-                for (final Person person : people) {
-                    new AttributeCheckDialog(getCampaign(), person);
-                }
+                OracleConsole.showChecks(getFrame(), getCampaign(), List.of(people), true);
                 break;
             }
             case CMD_MEDICAL_RECORDS: {

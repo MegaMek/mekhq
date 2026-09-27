@@ -276,6 +276,62 @@ public class OracleActions {
 
     // endregion Concepts and threads
 
+    // region Checks
+
+    /**
+     * Logs a check made from the Checks page.
+     *
+     * @param check      the check's result
+     * @param characters the cast members who took part, to tag the entry with
+     * @param thread     the thread the check belongs to, or {@code null}
+     *
+     * @return the Oracle log record written
+     */
+    public JournalEntry logCheck(final CheckRecord check, final List<OracleCharacter> characters,
+          final @Nullable PlotThread thread) {
+        final JournalEntry log = log(JournalEntryType.CHECK, describeCheck(check));
+        log.setCheck(check);
+        for (OracleCharacter character : characters) {
+            log.tagCharacter(character);
+        }
+        log.tagThread(thread);
+        return log;
+    }
+
+    /**
+     * @param check a check's result
+     *
+     * @return the check as plain text, one line per side after a summary line
+     */
+    public static String describeCheck(final CheckRecord check) {
+        final List<String> lines = new ArrayList<>();
+        if (!check.reason().isBlank()) {
+            lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.check.reason", check.reason()));
+        }
+        final List<CheckRecord.Side> sides = check.sides();
+        if (check.opposed() && sides.size() == 2) {
+            final CheckRecord.Side winner = sides.get(0).won() ? sides.get(0) : sides.get(1);
+            final int difference = check.winningDifference();
+            lines.add(difference == 0 ? getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.check.opposedTie",
+                  winner.name()) : getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.check.opposed", winner.name(),
+                  difference));
+        } else if (sides.size() > 1) {
+            lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.check.group", check.countWon(), sides.size()));
+        }
+        for (CheckRecord.Side side : sides) {
+            final String key = (side.margin() >= 0) ? "OracleLog.check.passed" : "OracleLog.check.failed";
+            String line = getFormattedTextAt(RESOURCE_BUNDLE, key, side.name(), side.action(), side.roll(),
+                  side.target(), Math.abs(side.margin()));
+            if (side.usedEdge()) {
+                line += ' ' + getTextAt(RESOURCE_BUNDLE, "OracleLog.check.edge");
+            }
+            lines.add(line);
+        }
+        return String.join("\n", lines);
+    }
+
+    // endregion Checks
+
     /**
      * @param concepts concepts to describe
      *
