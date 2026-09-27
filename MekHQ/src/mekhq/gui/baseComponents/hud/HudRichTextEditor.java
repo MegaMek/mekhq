@@ -63,6 +63,7 @@ import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
 import javax.swing.text.html.StyleSheet;
 
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 
 /**
@@ -168,7 +169,7 @@ public class HudRichTextEditor extends JPanel {
      *
      * @return the button
      */
-    public HudButton addToolbarButton(String label, String tooltip, Runnable onChoose) {
+    public HudButton addToolbarButton(String label, @Nullable String tooltip, Runnable onChoose) {
         HudButton button = new HudButton(label, false, true);
         button.setToolTipText(tooltip);
         button.addActionListener(event -> {
@@ -226,8 +227,8 @@ public class HudRichTextEditor extends JPanel {
     public void insertText(String text) {
         try {
             editor.getDocument().insertString(editor.getCaretPosition(), text, null);
-        } catch (BadLocationException ex) {
-            LOGGER.error("Failed to insert text into the editor", ex);
+        } catch (BadLocationException exception) {
+            LOGGER.error("Failed to insert text into the editor", exception);
         }
         editor.requestFocusInWindow();
     }

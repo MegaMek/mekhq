@@ -355,7 +355,7 @@ class CastPage implements ConsoleSection {
                                    ? List.of(new Tag(getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.linked"),
                                          ACCENT_BRIGHT)) : List.of();
             return card.show(character.isActive() ? ACCENT : TEXT_FAINT, false, character.getName(), null, tags, sub,
-                  Integer.toString(seen.count()), getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.entries"),
+                  OracleConsole.formatCount(seen.count()), getTextAt(RESOURCE_BUNDLE, "OracleConsole.cast.entries"),
                   isSelected);
         }
     }

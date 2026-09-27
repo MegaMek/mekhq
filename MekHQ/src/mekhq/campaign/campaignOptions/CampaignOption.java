@@ -124,6 +124,18 @@ public final class CampaignOption<T> {
           of(LithiumFusionBatteryMode.class, LithiumFusionBatteryMode.DISABLED, "lithiumFusionBatteryMode");
     // endregion Interstellar Travel
 
+    // region Oracle
+    /**
+     * The most dice and Oracle results the Oracle log keeps; once reached, the oldest are removed as new ones are
+     * added. Campaign chronicle records don't count and are never removed.
+     */
+    public static final CampaignOption<Integer> MAXIMUM_ORACLE_LOG_ENTRIES =
+          of(Integer.class, 500, "maximumOracleLogEntries");
+    /** Whether contracts, battles, arrivals and personnel changes are written into the Oracle journal. */
+    public static final CampaignOption<Boolean> USE_ORACLE_CHRONICLE =
+          of(Boolean.class, true, "useOracleChronicle");
+    // endregion Oracle
+
     // region Migrated Options (generated storage-only migration)
     public static final CampaignOption<Boolean> REQUIRE_SUPPORT_FORCE_TRANSPORTATION =
           of(Boolean.class, true, "requireSupportForceTransportation");
@@ -141,12 +153,6 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "campaignLevelChaosReputation");
     public static final CampaignOption<Integer> CHAOS_REPUTATION_CAP =
           of(Integer.class, 0, "chaosReputationCap");
-    /** The most Oracle log records kept; once reached, the oldest are removed as new ones are added. */
-    public static final CampaignOption<Integer> MAXIMUM_ORACLE_LOG_ENTRIES =
-          of(Integer.class, 500, "maximumOracleLogEntries");
-    /** Whether contracts, battles, arrivals and personnel changes are written into the Oracle journal. */
-    public static final CampaignOption<Boolean> USE_ORACLE_CHRONICLE =
-          of(Boolean.class, true, "useOracleChronicle");
     public static final CampaignOption<Boolean> CHAOS_DEBT_PENALTIES_STACK =
           of(Boolean.class, false, "chaosDebtPenaltiesStack");
     public static final CampaignOption<Boolean> CHAOS_NO_PARTIAL_SUCCESS_REPUTATION =

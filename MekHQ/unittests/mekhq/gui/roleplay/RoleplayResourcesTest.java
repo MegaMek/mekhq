@@ -46,6 +46,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import mekhq.campaign.roleplay.CampaignChronicle;
@@ -60,9 +61,23 @@ class RoleplayResourcesTest {
     private static final Path BUNDLE = Path.of("resources/mekhq/resources/Roleplay.properties");
     private static final List<Path> SOURCES = List.of(Path.of("src/mekhq/gui/roleplay"),
           Path.of("src/mekhq/campaign/roleplay"));
-    /** A complete key in a string literal; keys built by adding text on the end stop at a dot and are skipped. */
-    private static final Pattern KEY = Pattern.compile(
-          "\"((?:OracleConsole|OracleLog|OracleGuide|ChecksPage|JournalExporter|Chronicle|TravelLog)\\.[A-Za-z0-9_.]*[A-Za-z0-9_])\"");
+    /** A MessageFormat placeholder, such as {0}. */
+    private static final Pattern PLACEHOLDER = Pattern.compile("\\{\\d");
+    /** An apostrophe that is not part of a doubled pair. */
+    private static final Pattern LONE_APOSTROPHE = Pattern.compile("(?<!')'(?!')");
+
+    /**
+     * @return a pattern for a complete key in a string literal, for every prefix the bundle uses; keys built by
+     *       adding text on the end stop at a dot and are skipped
+     */
+    private static Pattern keyPattern(final Properties properties) {
+        String prefixes = properties.stringPropertyNames().stream()
+                                .map(key -> key.substring(0, key.indexOf('.') < 0 ? key.length() : key.indexOf('.')))
+                                .distinct()
+                                .map(Pattern::quote)
+                                .collect(Collectors.joining("|"));
+        return Pattern.compile("\"((?:" + prefixes + ")\\.[A-Za-z0-9_.]*[A-Za-z0-9_])\"");
+    }
 
     private static Properties bundle() throws IOException {
         Properties properties = new Properties();
@@ -75,11 +90,12 @@ class RoleplayResourcesTest {
     @Test
     void everyKeyInTheCodeExists() throws IOException {
         Properties properties = bundle();
+        Pattern keyPattern = keyPattern(properties);
         List<String> missing = new ArrayList<>();
         for (Path directory : SOURCES) {
             try (Stream<Path> files = Files.list(directory)) {
                 for (Path file : files.filter(path -> path.toString().endsWith(".java")).toList()) {
-                    Matcher matcher = KEY.matcher(Files.readString(file, StandardCharsets.UTF_8));
+                    Matcher matcher = keyPattern.matcher(Files.readString(file, StandardCharsets.UTF_8));
                     while (matcher.find()) {
                         if (!properties.containsKey(matcher.group(1))) {
                             missing.add(file.getFileName() + ": " + matcher.group(1));
@@ -140,5 +156,26 @@ class RoleplayResourcesTest {
             assertFalse(text == null || text.isBlank(), "flavour line " + line);
         }
         assertFalse(properties.containsKey("ChecksPage.flavour.50"));
+    }
+
+    /**
+     * Text with placeholders is read through MessageFormat, which drops a lone apostrophe; other text is read as it
+     * is, so a doubled apostrophe would show twice.
+     */
+    @Test
+    void apostrophesAreEscapedOnlyWhereTheTextIsFormatted() throws IOException {
+        Properties properties = bundle();
+        List<String> wrong = new ArrayList<>();
+        for (String key : properties.stringPropertyNames()) {
+            String text = properties.getProperty(key);
+            boolean formatted = PLACEHOLDER.matcher(text).find();
+            if (formatted && LONE_APOSTROPHE.matcher(text).find()) {
+                wrong.add(key + " needs '' for an apostrophe");
+            } else if (!formatted && text.contains("''")) {
+                wrong.add(key + " needs ' rather than ''");
+            }
+        }
+        wrong.sort(String::compareTo);
+        assertEquals(List.of(), wrong);
     }
 }

@@ -93,14 +93,22 @@ public class HudDateField extends JTextField {
      * @return the date typed, or {@code null} if the field is blank or cannot be read
      */
     public @Nullable LocalDate getDate() {
-        String text = getText().strip();
-        return text.isEmpty() ? null : parse(text);
+        return parse(getText());
     }
 
-    private static @Nullable LocalDate parse(String text) {
+    /**
+     * @param text what was typed
+     *
+     * @return the date, if the text is one in yyyy-MM-dd form (spaces around it are ignored), otherwise {@code null}
+     */
+    static @Nullable LocalDate parse(String text) {
+        String trimmed = text.strip();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
         try {
-            return LocalDate.parse(text);
-        } catch (DateTimeParseException ex) {
+            return LocalDate.parse(trimmed);
+        } catch (DateTimeParseException unreadable) {
             return null;
         }
     }
@@ -109,14 +117,14 @@ public class HudDateField extends JTextField {
     protected void paintComponent(Graphics graphics) {
         super.paintComponent(graphics);
         if (getText().isEmpty() && !isFocusOwner()) {
-            Graphics2D g2 = (Graphics2D) graphics.create();
+            Graphics2D canvas = (Graphics2D) graphics.create();
             try {
                 Insets insets = getInsets();
-                g2.setColor(TEXT_FAINT);
-                g2.setFont(getFont());
-                g2.drawString(placeholder, insets.left, insets.top + g2.getFontMetrics().getAscent());
+                canvas.setColor(TEXT_FAINT);
+                canvas.setFont(getFont());
+                canvas.drawString(placeholder, insets.left, insets.top + canvas.getFontMetrics().getAscent());
             } finally {
-                g2.dispose();
+                canvas.dispose();
             }
         }
     }

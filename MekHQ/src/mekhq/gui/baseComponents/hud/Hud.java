@@ -225,19 +225,19 @@ public final class Hud {
         JComponent mark = new JComponent() {
             @Override
             protected void paintComponent(Graphics graphics) {
-                Graphics2D g2 = (Graphics2D) graphics.create();
+                Graphics2D canvas = (Graphics2D) graphics.create();
                 try {
-                    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                    canvas.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                           RenderingHints.VALUE_ANTIALIAS_ON);
                     int size = Math.min(getWidth(), getHeight()) - 1;
-                    g2.setColor(TEXT_FAINT);
-                    g2.drawOval(0, 0, size, size);
-                    g2.setFont(hudFont(Font.BOLD, 0.62f, 0.0f));
-                    FontMetrics metrics = g2.getFontMetrics();
-                    g2.drawString("?", (size + 1 - metrics.stringWidth("?")) / 2,
+                    canvas.setColor(TEXT_FAINT);
+                    canvas.drawOval(0, 0, size, size);
+                    canvas.setFont(hudFont(Font.BOLD, 0.62f, 0.0f));
+                    FontMetrics metrics = canvas.getFontMetrics();
+                    canvas.drawString("?", (size + 1 - metrics.stringWidth("?")) / 2,
                           (size + 1 + metrics.getAscent() - metrics.getDescent()) / 2);
                 } finally {
-                    g2.dispose();
+                    canvas.dispose();
                 }
             }
         };

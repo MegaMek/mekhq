@@ -51,6 +51,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.NumberFormat;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.EnumMap;
@@ -671,7 +672,7 @@ public class OracleConsole extends JDialog {
         List<PlotThread> open = roleplay.getPlotThreads().stream().filter(thread -> !thread.isComplete()).toList();
         long atFlashpoint = open.stream().filter(thread -> thread.getNextStep() != null
                                                                  && thread.getNextStep().majorRevelation()).count();
-        threadsTile.setValue(Integer.toString(open.size()), ACCENT_BRIGHT);
+        threadsTile.setValue(formatCount(open.size()), ACCENT_BRIGHT);
         threadsTile.setSub(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.tile.threads.sub", atFlashpoint));
 
         int entries = roleplay.getJournal().size() + roleplay.getOracleLog().size();
@@ -679,7 +680,7 @@ public class OracleConsole extends JDialog {
         long todayCount = roleplay.getJournal().stream().filter(entry -> entry.getDate().equals(today)).count()
                                 + roleplay.getOracleLog().stream().filter(entry -> entry.getDate().equals(today))
                                         .count();
-        journalTile.setValue(Integer.toString(entries), TEXT);
+        journalTile.setValue(formatCount(entries), TEXT);
         journalTile.setSub(getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.tile.journal.sub", todayCount));
 
         refreshFooter();
@@ -708,6 +709,15 @@ public class OracleConsole extends JDialog {
         footerSummary.setText("<html>" + getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.footer.last",
               escape(question), hex(AskPage.colorFor(answer.answer())), escape(answer.answer().getLabel()),
               answer.roll()) + "</html>");
+    }
+
+    /**
+     * @param count a number of things
+     *
+     * @return the number grouped as MekHQ's locale writes it, such as "1,234", matching counts in formatted text
+     */
+    static String formatCount(final long count) {
+        return NumberFormat.getIntegerInstance(MekHQ.getMHQOptions().getLocale()).format(count);
     }
 
     /**

@@ -47,6 +47,7 @@ import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.util.Locale;
 import java.util.function.IntFunction;
+import java.util.function.IntPredicate;
 import javax.swing.JComponent;
 
 import megamek.common.annotations.Nullable;
@@ -66,7 +67,7 @@ public class HudTrack extends JComponent {
 
     private int steps;
     private int revealed;
-    private transient IntFunction<Boolean> isFlashpoint = number -> false;
+    private transient IntPredicate isFlashpoint = number -> false;
     private transient IntFunction<String> tooltips = number -> null;
     private String flashpointLabel = "";
     private String conclusionLabel = "";
@@ -87,7 +88,7 @@ public class HudTrack extends JComponent {
      * @param flashpointLabel the caption under flashpoint cells
      * @param conclusionLabel the caption under the final cell
      */
-    public void setTrack(int steps, int revealed, IntFunction<Boolean> isFlashpoint, IntFunction<String> tooltips,
+    public void setTrack(int steps, int revealed, IntPredicate isFlashpoint, IntFunction<String> tooltips,
           String flashpointLabel, String conclusionLabel) {
         this.steps = steps;
         this.revealed = revealed;
@@ -127,16 +128,30 @@ public class HudTrack extends JComponent {
     }
 
     @Override
-    public String getToolTipText(MouseEvent event) {
+    public @Nullable String getToolTipText(MouseEvent event) {
         Integer number = stepAt(event.getX(), event.getY());
         return (number == null || number > revealed) ? null : tooltips.apply(number);
     }
 
+    /**
+     * @return the colour of a cell's number: dark on a filled (revealed) cell, bright on the next one, and otherwise
+     *       the cell's own colour
+     */
+    private static Color textColor(boolean done, boolean next, boolean flashpoint, boolean conclusion) {
+        if (done) {
+            return GROUND;
+        }
+        if (next || conclusion) {
+            return ACCENT_BRIGHT;
+        }
+        return flashpoint ? AMBER : TEXT_FAINT;
+    }
+
     @Override
     protected void paintComponent(Graphics graphics) {
-        Graphics2D g2 = (Graphics2D) graphics.create();
+        Graphics2D canvas = (Graphics2D) graphics.create();
         try {
-            g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+            canvas.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
             int width = cellWidth();
             int height = scaleForGUI(CELL_HEIGHT);
             Font numberFont = hudFont(Font.BOLD, 1.0f, 0.0f);
@@ -146,48 +161,47 @@ public class HudTrack extends JComponent {
                 int x = (index % CELLS_PER_ROW) * (width + scaleForGUI(GAP));
                 int y = (index / CELLS_PER_ROW) * (height + scaleForGUI(GAP));
                 boolean conclusion = number == steps;
-                boolean flashpoint = !conclusion && Boolean.TRUE.equals(isFlashpoint.apply(number));
+                boolean flashpoint = !conclusion && isFlashpoint.test(number);
                 boolean done = number <= revealed;
                 boolean next = number == revealed + 1;
 
                 Color frame = conclusion ? ACCENT : flashpoint ? AMBER : BORDER;
                 if (done) {
                     Color fill = flashpoint ? AMBER : ACCENT;
-                    g2.setPaint(new GradientPaint(0, y, translucent(fill, 110), 0, y + height, translucent(fill, 50)));
+                    canvas.setPaint(new GradientPaint(0, y, translucent(fill, 110), 0, y + height, translucent(fill, 50)));
                 } else {
-                    g2.setColor(SURFACE_DEEP);
+                    canvas.setColor(SURFACE_DEEP);
                 }
-                g2.fillRect(x, y, width, height);
-                g2.setColor(done ? (flashpoint ? AMBER : ACCENT) : frame);
-                g2.drawRect(x, y, width - 1, height - 1);
+                canvas.fillRect(x, y, width, height);
+                canvas.setColor(done ? (flashpoint ? AMBER : ACCENT) : frame);
+                canvas.drawRect(x, y, width - 1, height - 1);
                 if (next) {
-                    g2.setColor(ACCENT_BRIGHT);
-                    g2.setStroke(new BasicStroke(scaleForGUI(1), BasicStroke.CAP_BUTT,
+                    canvas.setColor(ACCENT_BRIGHT);
+                    canvas.setStroke(new BasicStroke(scaleForGUI(1), BasicStroke.CAP_BUTT,
                           BasicStroke.JOIN_MITER, 10f, new float[] { 4f, 3f }, 0f));
-                    g2.drawRect(x + scaleForGUI(2), y + scaleForGUI(2), width - scaleForGUI(5), height - scaleForGUI(5));
-                    g2.setStroke(new BasicStroke());
+                    canvas.drawRect(x + scaleForGUI(2), y + scaleForGUI(2), width - scaleForGUI(5),
+                          height - scaleForGUI(5));
+                    canvas.setStroke(new BasicStroke());
                 }
 
                 String caption = conclusion ? conclusionLabel : flashpoint ? flashpointLabel : "";
-                g2.setFont(numberFont);
-                FontMetrics numberMetrics = g2.getFontMetrics();
+                canvas.setFont(numberFont);
+                FontMetrics numberMetrics = canvas.getFontMetrics();
                 String label = Integer.toString(number);
-                Color textColor = done ? GROUND : (next ? ACCENT_BRIGHT : (flashpoint ? AMBER
-                                                                                 : conclusion ? ACCENT_BRIGHT : TEXT_FAINT));
-                g2.setColor(textColor);
+                canvas.setColor(textColor(done, next, flashpoint, conclusion));
                 int numberY = y + (caption.isEmpty() ? (height + numberMetrics.getAscent()) / 2 - scaleForGUI(2)
                                          : height / 2);
-                g2.drawString(label, x + (width - numberMetrics.stringWidth(label)) / 2, numberY);
+                canvas.drawString(label, x + (width - numberMetrics.stringWidth(label)) / 2, numberY);
                 if (!caption.isEmpty()) {
-                    g2.setFont(captionFont);
-                    FontMetrics captionMetrics = g2.getFontMetrics();
+                    canvas.setFont(captionFont);
+                    FontMetrics captionMetrics = canvas.getFontMetrics();
                     String text = caption.toUpperCase(Locale.ROOT);
-                    g2.drawString(text, x + (width - captionMetrics.stringWidth(text)) / 2,
+                    canvas.drawString(text, x + (width - captionMetrics.stringWidth(text)) / 2,
                           y + height - scaleForGUI(6));
                 }
             }
         } finally {
-            g2.dispose();
+            canvas.dispose();
         }
     }
 }
