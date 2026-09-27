@@ -278,14 +278,15 @@ public class RoleplayChecks {
         final CheckTarget defendingTarget = targetOf(defending);
         ActionCheckRoll actingRoll = roller.apply(actingTarget.rollType());
         ActionCheckRoll defendingRoll = roller.apply(defendingTarget.rollType());
-        boolean actingWins = actingTarget.margin(actingRoll.result()) > defendingTarget.margin(defendingRoll.result());
+        boolean actingWins = actingTarget.opposedMargin(actingRoll.result())
+                                   > defendingTarget.opposedMargin(defendingRoll.result());
 
         boolean actingEdge = false;
         boolean defendingEdge = false;
         // Edge is only spent when a re-roll could change the outcome: the acting side must be able to beat the
         // defender's margin, and the defender to at least tie the acting side's.
-        final int actingMargin = actingTarget.margin(actingRoll.result());
-        final int defendingMargin = defendingTarget.margin(defendingRoll.result());
+        final long actingMargin = actingTarget.opposedMargin(actingRoll.result());
+        final long defendingMargin = defendingTarget.opposedMargin(defendingRoll.result());
         if (!actingWins && rerolls(acting, actingTarget) && actingTarget.bestMargin() > defendingMargin) {
             actingRoll = roller.apply(actingTarget.rollType());
             actingEdge = true;
@@ -296,7 +297,8 @@ public class RoleplayChecks {
             defendingEdge = true;
             Objects.requireNonNull(defending.person()).spendEdge();
         }
-        actingWins = actingTarget.margin(actingRoll.result()) > defendingTarget.margin(defendingRoll.result());
+        actingWins = actingTarget.opposedMargin(actingRoll.result())
+                           > defendingTarget.opposedMargin(defendingRoll.result());
 
         final CheckRecord record = new CheckRecord(true, trimmedReason, List.of(
               side(acting, actingTarget, actingRoll, actingEdge, actingWins),
@@ -339,7 +341,15 @@ public class RoleplayChecks {
         UUID personId = (opponent.person() == null) ? null : opponent.person().getId();
         return new CheckRecord.Side(opponent.name(), personId,
               describeAction(label, opponent.difficulty(), opponent.other()), target.describe(), roll.result(),
-              roll.individualDice(), target.margin(roll.result()), usedEdge, won);
+              roll.individualDice(), recordedMargin(target, roll.result()), usedEdge, won);
+    }
+
+    /**
+     * @return the margin an opposed side records: uncapped, as it settled the check, unless the check was impossible
+     */
+    private static int recordedMargin(final CheckTarget target, final int roll) {
+        return target.impossible() ? target.margin(roll)
+                     : (int) Math.clamp(target.opposedMargin(roll), Integer.MIN_VALUE, Integer.MAX_VALUE);
     }
 
     /**

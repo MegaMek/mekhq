@@ -143,16 +143,16 @@ class CheckOddsTest {
         for (int first = 2; first <= 12; first++) {
             for (int second = 2; second <= 12; second++) {
                 double chance = a[first] * d[second];
-                boolean actingAhead = acting.margin(first) > defending.margin(second);
+                boolean actingAhead = acting.opposedMargin(first) > defending.opposedMargin(second);
                 if (actingAhead && defendingEdge && !defending.impossible()) {
                     for (int reroll = 2; reroll <= 12; reroll++) {
-                        if (acting.margin(first) > defending.margin(reroll)) {
+                        if (acting.opposedMargin(first) > defending.opposedMargin(reroll)) {
                             wins += chance * d[reroll];
                         }
                     }
                 } else if (!actingAhead && actingEdge && !acting.impossible()) {
                     for (int reroll = 2; reroll <= 12; reroll++) {
-                        if (acting.margin(reroll) > defending.margin(second)) {
+                        if (acting.opposedMargin(reroll) > defending.opposedMargin(second)) {
                             wins += chance * a[reroll];
                         }
                     }

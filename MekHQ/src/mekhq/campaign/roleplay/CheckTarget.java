@@ -69,6 +69,21 @@ public record CheckTarget(int value, boolean countUp, boolean impossible, RollTy
     }
 
     /**
+     * The margin used to settle an opposed check. Unlike {@link #margin(int)} it is not capped, so beating the target
+     * by 17 beats beating it by 10. An impossible check falls below any possible margin.
+     *
+     * @param roll the total rolled
+     *
+     * @return how far the roll beat the target, or a negative number for a failure
+     */
+    public long opposedMargin(final int roll) {
+        if (impossible) {
+            return Long.MIN_VALUE;
+        }
+        return countUp ? (long) value - roll : (long) roll - value;
+    }
+
+    /**
      * @param roll the total rolled
      *
      * @return {@code true} if the roll succeeds
@@ -85,10 +100,10 @@ public record CheckTarget(int value, boolean countUp, boolean impossible, RollTy
     }
 
     /**
-     * @return the best margin any roll of the dice can reach
+     * @return the best uncapped margin any roll of the dice can reach, for settling an opposed check
      */
-    public int bestMargin() {
-        return margin(countUp ? 2 : 12);
+    public long bestMargin() {
+        return opposedMargin(countUp ? 2 : 12);
     }
 
     /**

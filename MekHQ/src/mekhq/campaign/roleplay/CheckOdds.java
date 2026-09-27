@@ -111,14 +111,14 @@ public final class CheckOdds {
             }
             // The acting side is ahead when the defender's margin falls short; a losing defender may re-roll, and
             // must fall short again.
-            double defenderShort = 1 - chanceToReach(defending, acting.margin(actingRoll), true);
+            double defenderShort = 1 - chanceToReach(defending, acting.opposedMargin(actingRoll), true);
             wins += actingTotals[actingRoll] * defenderShort * (defendingRerolls ? defenderShort : 1);
         }
         if (actingRerolls) {
             double[] defendingTotals = totals(defending.rollType());
             for (int defendingRoll = 2; defendingRoll < SUMS; defendingRoll++) {
                 // The acting side is behind when its margin is no better; its re-roll must then beat the defender's.
-                double actingBeats = chanceToReach(acting, defending.margin(defendingRoll), false);
+                double actingBeats = chanceToReach(acting, defending.opposedMargin(defendingRoll), false);
                 wins += defendingTotals[defendingRoll] * (1 - actingBeats) * actingBeats;
             }
         }
@@ -132,11 +132,11 @@ public final class CheckOdds {
      *
      * @return the chance that one roll against {@code target} beats (or, with {@code orEqual}, ties) {@code margin}
      */
-    private static double chanceToReach(final CheckTarget target, final int margin, final boolean orEqual) {
+    private static double chanceToReach(final CheckTarget target, final long margin, final boolean orEqual) {
         double[] totals = totals(target.rollType());
         double chance = 0;
         for (int total = 2; total < SUMS; total++) {
-            int rolled = target.margin(total);
+            long rolled = target.opposedMargin(total);
             if (rolled > margin || (orEqual && rolled == margin)) {
                 chance += totals[total];
             }

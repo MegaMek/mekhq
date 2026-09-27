@@ -122,6 +122,19 @@ class RoleplayChecksTest {
     }
 
     @Test
+    void opposedMarginsAreNotCapped() {
+        // -5+ rolling 12 beats the target by 17; 2+ rolling 12 beats it by 10. Capped, both would be 10 and tie.
+        rolls.addAll(List.of(12, 12));
+        CheckRecord record = checks.opposed(Opponent.rated(roleplay.addCharacter("Ace"), NpcRating.LEGENDARY,
+              CheckDifficulty.VERY_EASY, -6), Opponent.rated(roleplay.addCharacter("Guard"), NpcRating.HEROIC,
+              CheckDifficulty.VERY_EASY, 0), "", roleplay.getCharacters(), null);
+
+        assertTrue(record.sides().get(0).won());
+        assertEquals(17, record.sides().get(0).margin());
+        assertEquals(7, record.winningDifference());
+    }
+
+    @Test
     void theDefenderWinsATie() {
         rolls.addAll(List.of(9, 9));
         CheckRecord record = checks.opposed(rated("Rook", NpcRating.REGULAR, CheckDifficulty.NORMAL),
