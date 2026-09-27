@@ -521,7 +521,7 @@ public class CampaignGUI extends JPanel {
         btnOracle = new RoundedJButton(resourceMap.getString("btnOracle.text"));
         btnOracle.setToolTipText(resourceMap.getString("btnOracle.toolTipText"));
         btnOracle.setHorizontalAlignment(SwingConstants.CENTER);
-        btnOracle.setFont(btnOracle.getFont().deriveFont(Font.BOLD, btnOracle.getFont().getSize2D() * 1.5f));
+        btnOracle.setFont(btnOracle.getFont().deriveFont(Font.BOLD));
         btnOracle.addActionListener(event -> OracleConsole.showFor(getFrame(), getCampaign()));
         return btnOracle;
     }
