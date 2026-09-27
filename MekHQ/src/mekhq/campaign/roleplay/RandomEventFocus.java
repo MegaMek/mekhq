@@ -36,37 +36,49 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 /**
  * The Random Event Focus table, consulted with a follow-up d100 whenever a {@link FateChart} roll triggers a random
- * event. Entries are ordered by roll range; each holds the highest roll that selects it.
+ * event. A focus may cover more than one roll range; see {@link #fromRoll(int)}.
  */
 public enum RandomEventFocus {
-    REMOTE_EVENT("REMOTE_EVENT", 5),
-    AMBIGUOUS_EVENT("AMBIGUOUS_EVENT", 10),
-    NEW_NPC("NEW_NPC", 20),
-    NPC_ACTION("NPC_ACTION", 40),
-    NPC_NEGATIVE("NPC_NEGATIVE", 45),
-    NPC_POSITIVE("NPC_POSITIVE", 50),
-    MOVE_TOWARD_A_THREAD("MOVE_TOWARD_A_THREAD", 55),
-    MOVE_AWAY_FROM_A_THREAD("MOVE_AWAY_FROM_A_THREAD", 65),
-    CLOSE_A_THREAD("CLOSE_A_THREAD", 70),
-    PC_NEGATIVE("PC_NEGATIVE", 80),
-    PC_POSITIVE("PC_POSITIVE", 85),
-    CURRENT_CONTEXT("CURRENT_CONTEXT", 100);
+    REMOTE_EVENT("REMOTE_EVENT"),
+    AMBIGUOUS_EVENT("AMBIGUOUS_EVENT"),
+    NEW_NPC("NEW_NPC"),
+    NPC_ACTION("NPC_ACTION"),
+    NPC_NEGATIVE("NPC_NEGATIVE"),
+    NPC_POSITIVE("NPC_POSITIVE"),
+    MOVE_TOWARD_A_THREAD("MOVE_TOWARD_A_THREAD"),
+    MOVE_AWAY_FROM_A_THREAD("MOVE_AWAY_FROM_A_THREAD"),
+    PC_NEGATIVE("PC_NEGATIVE"),
+    PC_POSITIVE("PC_POSITIVE"),
+    CURRENT_CONTEXT("CURRENT_CONTEXT");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Roleplay";
 
-    private final String label;
-    private final int maximumRoll;
-
-    RandomEventFocus(String lookupName, int maximumRoll) {
-        this.label = getTextAt(RESOURCE_BUNDLE, "RandomEventFocus." + lookupName + ".label");
-        this.maximumRoll = maximumRoll;
-    }
+    /** The highest roll of each row of the table, in roll order. Pairs with {@link #ROLL_TABLE_RESULTS}. */
+    private static final int[] ROLL_TABLE_MAXIMUMS = { 5, 10, 20, 40, 45, 50, 55, 65, 70, 80, 85, 100 };
 
     /**
-     * @return the highest d100 roll that selects this focus
+     * The focus for each row of the table, in roll order. Each row covers every roll above the previous row's highest
+     * roll, up to and including its own.
      */
-    public int getMaximumRoll() {
-        return maximumRoll;
+    private static final RandomEventFocus[] ROLL_TABLE_RESULTS = {
+          REMOTE_EVENT,
+          AMBIGUOUS_EVENT,
+          NEW_NPC,
+          NPC_ACTION,
+          NPC_NEGATIVE,
+          NPC_POSITIVE,
+          MOVE_TOWARD_A_THREAD,
+          MOVE_AWAY_FROM_A_THREAD,
+          MOVE_TOWARD_A_THREAD,
+          PC_NEGATIVE,
+          PC_POSITIVE,
+          CURRENT_CONTEXT
+    };
+
+    private final String label;
+
+    RandomEventFocus(String lookupName) {
+        this.label = getTextAt(RESOURCE_BUNDLE, "RandomEventFocus." + lookupName + ".label");
     }
 
     /**
@@ -77,9 +89,9 @@ public enum RandomEventFocus {
      * @return the matching focus
      */
     public static RandomEventFocus fromRoll(final int roll) {
-        for (RandomEventFocus focus : values()) {
-            if (roll <= focus.maximumRoll) {
-                return focus;
+        for (int row = 0; row < ROLL_TABLE_MAXIMUMS.length; row++) {
+            if (roll <= ROLL_TABLE_MAXIMUMS[row]) {
+                return ROLL_TABLE_RESULTS[row];
             }
         }
         return CURRENT_CONTEXT;
