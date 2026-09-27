@@ -99,7 +99,6 @@ import mekhq.campaign.roleplay.NpcRating;
 import mekhq.campaign.roleplay.OracleCharacter;
 import mekhq.campaign.roleplay.PlotThread;
 import mekhq.campaign.roleplay.RoleplayChecks;
-import mekhq.campaign.roleplay.RoleplayChecks.Opponent;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCard;
@@ -152,6 +151,9 @@ class ChecksPage implements ConsoleSection {
      */
     private final List<Person> presetOutsiders = new ArrayList<>();
     private boolean updatingPeople;
+    /** Everyone the Who list offers, before the name filter hides any. */
+    private final List<Person> listedPeople = new ArrayList<>();
+    private final JTextField peopleFilter = new JTextField();
 
     // What
     private final CardLayout traitLayout = new CardLayout();
@@ -166,8 +168,8 @@ class ChecksPage implements ConsoleSection {
     private final JComboBox<Object> secondAttribute = new JComboBox<>();
 
     // Opposed
-    private final SidePanel acting;
-    private final SidePanel defending;
+    private final OpposedSidePanel acting;
+    private final OpposedSidePanel defending;
 
     // Situation
     private final JPanel situationSection = column();
@@ -191,19 +193,48 @@ class ChecksPage implements ConsoleSection {
         root.setOpaque(true);
         root.setBackground(GROUND);
 
-        modeControl = new HudSegmentedControl<>(this::setMode);
-        modeControl.setColumns(Mode.values().length);
+        modeControl = buildModeControl();
+        castChip = new HudChip(text("ChecksPage.who.cast"), () -> setWholeCompany(false));
+        companyChip = new HudChip(text("ChecksPage.who.company"), () -> setWholeCompany(true));
+        acting = new OpposedSidePanel(this, checks, false);
+        defending = new OpposedSidePanel(this, checks, true);
+        difficulty = buildDifficulty();
+        useEdge = buildUseEdge();
+        rollButton = new HudButton(text("ChecksPage.roll").toUpperCase(Locale.ROOT), true);
+        rollButton.addActionListener(event -> roll());
+
+        traitCards.add(topAligned(buildSkillCard()), Mode.SKILL.name());
+        traitCards.add(topAligned(buildAttributeCard()), Mode.ATTRIBUTE.name());
+        // The cards share the height of the tallest, so each sits at the top of its own holder.
+        modeCards.add(topAligned(buildGroupCard()), "GROUP");
+        modeCards.add(topAligned(buildOpposedCard()), Mode.OPPOSED.name());
+        buildSituation();
+
+        JScrollPane leftScroll = scroll(buildLeftColumn(), GROUND);
+        leftScroll.setPreferredSize(new Dimension(scaleForGUI(440), 0));
+        root.add(leftScroll, BorderLayout.WEST);
+        root.add(scroll(buildRightColumn(), SURFACE_DEEP), BorderLayout.CENTER);
+
+        setWholeCompanyChips(false);
+    }
+
+    // region Building
+
+    private HudSegmentedControl<Mode> buildModeControl() {
+        HudSegmentedControl<Mode> control = new HudSegmentedControl<>(this::setMode);
+        control.setColumns(Mode.values().length);
         List<Segment<Mode>> modes = new ArrayList<>();
         for (Mode value : Mode.values()) {
             modes.add(new Segment<>(value, text("ChecksPage.mode." + value.name()),
                   text("ChecksPage.mode." + value.name() + ".sub"), true));
         }
-        modeControl.setSegments(modes);
-        modeControl.setSelected(Mode.SKILL);
+        control.setSegments(modes);
+        control.setSelected(Mode.SKILL);
+        return control;
+    }
 
-        // Who
-        castChip = new HudChip(text("ChecksPage.who.cast"), () -> setWholeCompany(false));
-        companyChip = new HudChip(text("ChecksPage.who.company"), () -> setWholeCompany(true));
+    /** The chips choosing cast or whole company, a name filter, and the list of people to tick. */
+    private JComponent buildWhoSection() {
         JPanel chips = Hud.transparentPanel(null);
         chips.setLayout(new BoxLayout(chips, BoxLayout.X_AXIS));
         chips.add(castChip);
@@ -224,25 +255,25 @@ class ChecksPage implements ConsoleSection {
         peopleScroll.setPreferredSize(new Dimension(scaleForGUI(360), scaleForGUI(190)));
         peopleScroll.setMaximumSize(new Dimension(Integer.MAX_VALUE, scaleForGUI(190)));
 
-        // What: skills
+        Hud.styleField(peopleFilter);
+        peopleFilter.setToolTipText(text("ChecksPage.who.filter.toolTipText"));
+        peopleFilter.getDocument().addDocumentListener(onChange(this::showPeople));
+
+        JPanel section = column();
+        section.add(leftAligned(chips));
+        section.add(Box.createVerticalStrut(scaleForGUI(6)));
+        section.add(leftAligned(peopleFilter));
+        section.add(Box.createVerticalStrut(scaleForGUI(6)));
+        section.add(leftAligned(peopleScroll));
+        section.add(Box.createVerticalStrut(scaleForGUI(4)));
+        section.add(leftAligned(peopleHint));
+        return leftAligned(section);
+    }
+
+    private JPanel buildSkillCard() {
         Hud.styleField(skillSearch);
         skillSearch.setToolTipText(text("ChecksPage.skill.search.toolTipText"));
-        skillSearch.getDocument().addDocumentListener(new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent event) {
-                fillSkills();
-            }
-
-            @Override
-            public void removeUpdate(DocumentEvent event) {
-                fillSkills();
-            }
-
-            @Override
-            public void changedUpdate(DocumentEvent event) {
-                fillSkills();
-            }
-        });
+        skillSearch.getDocument().addDocumentListener(onChange(this::fillSkills));
         skillList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         skillList.setBackground(SURFACE_DEEP);
         skillList.setCellRenderer(new SkillRenderer());
@@ -264,8 +295,10 @@ class ChecksPage implements ConsoleSection {
         skillCard.add(leftAligned(skillScroll));
         skillCard.add(Box.createVerticalStrut(scaleForGUI(4)));
         skillCard.add(leftAligned(hint(text("ChecksPage.skill.hint"))));
+        return skillCard;
+    }
 
-        // What: attributes
+    private JPanel buildAttributeCard() {
         firstAttribute.setModel(new DefaultComboBoxModel<>(checkableAttributes().toArray(new SkillAttribute[0])));
         Hud.styleComboBox(firstAttribute);
         Hud.styleComboBox(secondAttribute);
@@ -288,49 +321,57 @@ class ChecksPage implements ConsoleSection {
         attributeCard.add(leftAligned(attributeRow));
         attributeCard.add(Box.createVerticalStrut(scaleForGUI(4)));
         attributeCard.add(leftAligned(hint(text("ChecksPage.attribute.hint"))));
+        return attributeCard;
+    }
 
-        traitCards.add(topAligned(skillCard), Mode.SKILL.name());
-        traitCards.add(topAligned(attributeCard), Mode.ATTRIBUTE.name());
-
+    /** Who rolls and what they roll, for skill and attribute checks. */
+    private JPanel buildGroupCard() {
         JPanel groupCard = column();
         groupCard.add(heading("ChecksPage.who", "ChecksPage.who.help"));
         groupCard.add(Box.createVerticalStrut(scaleForGUI(6)));
-        groupCard.add(leftAligned(chips));
-        groupCard.add(Box.createVerticalStrut(scaleForGUI(6)));
-        groupCard.add(leftAligned(peopleScroll));
-        groupCard.add(Box.createVerticalStrut(scaleForGUI(4)));
-        groupCard.add(leftAligned(peopleHint));
-        groupCard.add(Box.createVerticalStrut(scaleForGUI(14)));
+        groupCard.add(buildWhoSection());
+                groupCard.add(Box.createVerticalStrut(scaleForGUI(14)));
         groupCard.add(heading("ChecksPage.what", "ChecksPage.what.help"));
         groupCard.add(Box.createVerticalStrut(scaleForGUI(6)));
         groupCard.add(leftAligned(traitCards));
+        return groupCard;
+    }
 
-        // Opposed
-        acting = new SidePanel(false);
-        defending = new SidePanel(true);
+    private JPanel buildOpposedCard() {
         JPanel opposedCard = column();
         opposedCard.add(heading("ChecksPage.opposed.acting", "ChecksPage.opposed.acting.help"));
         opposedCard.add(Box.createVerticalStrut(scaleForGUI(6)));
-        opposedCard.add(leftAligned(acting.panel));
+        opposedCard.add(leftAligned(acting.getPanel()));
         opposedCard.add(Box.createVerticalStrut(scaleForGUI(14)));
         opposedCard.add(heading("ChecksPage.opposed.defending", "ChecksPage.opposed.defending.help"));
         opposedCard.add(Box.createVerticalStrut(scaleForGUI(6)));
-        opposedCard.add(leftAligned(defending.panel));
+        opposedCard.add(leftAligned(defending.getPanel()));
+        return opposedCard;
+    }
 
-        // The cards share the height of the tallest, so each sits at the top of its own holder.
-        modeCards.add(topAligned(groupCard), "GROUP");
-        modeCards.add(topAligned(opposedCard), Mode.OPPOSED.name());
-
-        // Situation
-        difficulty = new HudSegmentedControl<>(value -> refreshPreview());
-        difficulty.setColumns(CheckDifficulty.values().length);
+    private HudSegmentedControl<CheckDifficulty> buildDifficulty() {
+        HudSegmentedControl<CheckDifficulty> control = new HudSegmentedControl<>(value -> refreshPreview());
+        control.setColumns(CheckDifficulty.values().length);
         List<Segment<CheckDifficulty>> levels = new ArrayList<>();
         for (CheckDifficulty value : CheckDifficulty.values()) {
             levels.add(new Segment<>(value, value.getLabel(), value.getSignedModifier(), true));
         }
-        difficulty.setSegments(levels);
-        difficulty.setSelected(CheckDifficulty.NORMAL);
+        control.setSegments(levels);
+        control.setSelected(CheckDifficulty.NORMAL);
+        return control;
+    }
 
+    private HudCheckBox buildUseEdge() {
+        HudCheckBox checkBox = new HudCheckBox(text("ChecksPage.edge"));
+        // Off by default: Edge is a limited resource, so spending it is the player's choice.
+        checkBox.setSelected(false);
+        checkBox.setToolTipText(text("ChecksPage.edge.toolTipText"));
+        checkBox.addActionListener(event -> refreshPreview());
+        return checkBox;
+    }
+
+    /** How hard the situation is: the difficulty, any other modifier and whether to spend Edge. */
+    private void buildSituation() {
         HudButton otherDown = new HudButton(OracleConsole.symbol("minus"), false, true);
         otherDown.setToolTipText(text("ChecksPage.other.down"));
         otherDown.addActionListener(event -> changeOther(-1));
@@ -353,12 +394,6 @@ class ChecksPage implements ConsoleSection {
         otherRow.add(Box.createHorizontalGlue());
         refreshOther();
 
-        useEdge = new HudCheckBox(text("ChecksPage.edge"));
-        // Off by default: Edge is a limited resource, so spending it is the player's choice.
-        useEdge.setSelected(false);
-        useEdge.setToolTipText(text("ChecksPage.edge.toolTipText"));
-        useEdge.addActionListener(event -> refreshPreview());
-
         situationSection.add(heading("ChecksPage.situation", "ChecksPage.situation.help"));
         situationSection.add(Box.createVerticalStrut(scaleForGUI(6)));
         situationSection.add(leftAligned(difficulty));
@@ -367,6 +402,10 @@ class ChecksPage implements ConsoleSection {
         situationSection.add(Box.createVerticalStrut(scaleForGUI(6)));
         situationSection.add(leftAligned(useEdge));
 
+    }
+
+    /** The mode, the chosen mode's controls, the situation, the reason and the dice roller. */
+    private JPanel buildLeftColumn() {
         Hud.styleField(reason);
         reason.setToolTipText(text("ChecksPage.reason.toolTipText"));
         reason.addActionListener(event -> roll());
@@ -390,8 +429,11 @@ class ChecksPage implements ConsoleSection {
         left.add(leftAligned(thread));
         left.add(Box.createVerticalStrut(scaleForGUI(20)));
         left.add(leftAligned(new DiceRoller(console).getPanel()));
+        return left;
+    }
 
-        // Right column
+    /** The preview and Roll button, the result and recent checks. */
+    private JPanel buildRightColumn() {
         preview.setForeground(TEXT_MUTED);
         preview.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
         JPanel previewBox = Hud.transparentPanel(new BorderLayout());
@@ -401,9 +443,6 @@ class ChecksPage implements ConsoleSection {
               scaleForGUI(1)), BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(12), scaleForGUI(10),
               scaleForGUI(12))));
         previewBox.add(preview, BorderLayout.CENTER);
-
-        rollButton = new HudButton(text("ChecksPage.roll").toUpperCase(Locale.ROOT), true);
-        rollButton.addActionListener(event -> roll());
 
         JPanel right = column();
         right.setOpaque(true);
@@ -426,15 +465,32 @@ class ChecksPage implements ConsoleSection {
         right.add(leftAligned(Hud.sectionHeading(text("ChecksPage.recent"))));
         right.add(Box.createVerticalStrut(scaleForGUI(8)));
         right.add(leftAligned(recent));
-        verdict.setVerdict(text("ChecksPage.waiting"), text("ChecksPage.waiting.reason"), OracleConsole.symbol("none"), ACCENT);
-
-        JScrollPane leftScroll = scroll(left, GROUND);
-        leftScroll.setPreferredSize(new Dimension(scaleForGUI(440), 0));
-        root.add(leftScroll, BorderLayout.WEST);
-        root.add(scroll(right, SURFACE_DEEP), BorderLayout.CENTER);
-
-        setWholeCompanyChips(false);
+        verdict.setVerdict(text("ChecksPage.waiting"), text("ChecksPage.waiting.reason"),
+              OracleConsole.symbol("none"), ACCENT);
+        return right;
     }
+
+    /** @return a listener that runs {@code action} whenever a text field's contents change */
+    private static DocumentListener onChange(final Runnable action) {
+        return new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent event) {
+                action.run();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent event) {
+                action.run();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent event) {
+                action.run();
+            }
+        };
+    }
+
+    // endregion Building
 
     @Override
     public JComponent getComponent() {
@@ -488,6 +544,8 @@ class ChecksPage implements ConsoleSection {
         setMode(Mode.OPPOSED);
         defending.fill();
         defending.choose(character.getId(), character.getPersonId());
+        // The acting side starts on the first entry, which may be this same character.
+        acting.chooseOtherThan(defending);
         refreshPreview();
     }
 
@@ -520,32 +578,51 @@ class ChecksPage implements ConsoleSection {
     }
 
     private void fillPeople() {
-        List<Person> shown = new ArrayList<>();
+        List<Person> listed = new ArrayList<>();
         if (wholeCompany) {
-            shown.addAll(companyPeople());
-            shown.addAll(presetOutsiders);
+            listed.addAll(companyPeople());
+            listed.addAll(presetOutsiders);
         } else {
             for (OracleCharacter character : console.roleplay().getActiveCharacters()) {
                 Person person = personOf(character);
                 if (person != null) {
-                    shown.add(person);
+                    listed.add(person);
                 }
             }
         }
+        listedPeople.clear();
+        listedPeople.addAll(listed);
+        // People who are ticked but no longer listed stay ticked only if they are still in the list.
+        int before = picked.size();
+        picked.retainAll(listed.stream().map(Person::getId).toList());
+        if (picked.size() < before) {
+            LOGGER.debug("[OracleConsole] {} picked people are no longer listed and were unticked",
+                  before - picked.size());
+        }
+        if (picked.isEmpty() && !listed.isEmpty()) {
+            picked.add(listed.get(0).getId());
+        }
+        showPeople();
+        peopleHint.setText(listed.isEmpty() ? text(wholeCompany ? "ChecksPage.who.noneCompany"
+                                                           : "ChecksPage.who.noneCast")
+                                 : getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.who.count", picked.size()));
+    }
+
+    /**
+     * Shows the listed people whose names match the filter. Filtering only hides rows: anyone ticked stays ticked
+     * and still rolls.
+     */
+    private void showPeople() {
+        String filter = peopleFilter.getText().strip().toLowerCase(Locale.ROOT);
+        List<Person> shown = listedPeople.stream()
+                                   .filter(person -> filter.isEmpty()
+                                                           || person.getFullName().toLowerCase(Locale.ROOT)
+                                                                    .contains(filter))
+                                   .toList();
         updatingPeople = true;
         try {
             peopleModel.clear();
             peopleModel.addAll(shown);
-            // People who are ticked but no longer shown stay ticked only if they are still in the list.
-            int before = picked.size();
-            picked.retainAll(shown.stream().map(Person::getId).toList());
-            if (picked.size() < before) {
-                LOGGER.debug("[OracleConsole] {} picked people are no longer listed and were unticked",
-                      before - picked.size());
-            }
-            if (picked.isEmpty() && !shown.isEmpty()) {
-                picked.add(shown.get(0).getId());
-            }
             peopleList.clearSelection();
             for (int index = 0; index < shown.size(); index++) {
                 if (picked.contains(shown.get(index).getId())) {
@@ -555,15 +632,17 @@ class ChecksPage implements ConsoleSection {
         } finally {
             updatingPeople = false;
         }
-        peopleHint.setText(shown.isEmpty() ? text(wholeCompany ? "ChecksPage.who.noneCompany"
-                                                          : "ChecksPage.who.noneCast")
-                                 : getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.who.count", picked.size()));
     }
 
     private void readPicks() {
-        picked.clear();
-        for (Person person : peopleList.getSelectedValuesList()) {
-            picked.add(person.getId());
+        // Only the rows on show can change; people hidden by the filter keep their ticks.
+        for (int index = 0; index < peopleModel.size(); index++) {
+            UUID id = peopleModel.get(index).getId();
+            if (peopleList.isSelectedIndex(index)) {
+                picked.add(id);
+            } else {
+                picked.remove(id);
+            }
         }
         peopleHint.setText(getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.who.count", picked.size()));
         fillSkills();
@@ -571,23 +650,24 @@ class ChecksPage implements ConsoleSection {
     }
 
     private List<Person> pickedPeople() {
-        List<Person> people = new ArrayList<>();
-        for (int index = 0; index < peopleModel.size(); index++) {
-            if (picked.contains(peopleModel.get(index).getId())) {
-                people.add(peopleModel.get(index));
-            }
-        }
-        return people;
+        return listedPeople.stream().filter(person -> picked.contains(person.getId())).toList();
     }
 
-    private List<Person> companyPeople() {
+    /** @return the console the page belongs to */
+    OracleConsole console() {
+        return console;
+    }
+
+    /** @return the company's active people, by name */
+    List<Person> companyPeople() {
         List<Person> people = new ArrayList<>(console.campaign().getPlayerForce().getHumanResources()
                                                     .getActivePersonnel(false, false));
         people.sort(Comparator.comparing(Person::getFullName, String.CASE_INSENSITIVE_ORDER));
         return people;
     }
 
-    private @Nullable Person personOf(final @Nullable OracleCharacter character) {
+    /** @return the person a cast member is linked to, or {@code null} */
+    @Nullable Person personOf(final @Nullable OracleCharacter character) {
         if (character == null || !character.isLinked()) {
             return null;
         }
@@ -607,7 +687,7 @@ class ChecksPage implements ConsoleSection {
 
     // region What
 
-    private static List<SkillAttribute> checkableAttributes() {
+    static List<SkillAttribute> checkableAttributes() {
         return List.of(SkillAttribute.BODY, SkillAttribute.CHARISMA, SkillAttribute.DEXTERITY,
               SkillAttribute.INTELLIGENCE, SkillAttribute.REFLEXES, SkillAttribute.STRENGTH, SkillAttribute.WILLPOWER);
     }
@@ -725,7 +805,8 @@ class ChecksPage implements ConsoleSection {
 
     // region Preview
 
-    private void refreshPreview() {
+    /** Recomputes the chances shown and whether Roll is ready. */
+    void refreshPreview() {
         List<String> lines = new ArrayList<>();
         boolean ready;
         if (mode == Mode.OPPOSED) {
@@ -958,7 +1039,7 @@ class ChecksPage implements ConsoleSection {
 
     // region Renderers
 
-    private static String text(final String key) {
+    static String text(final String key) {
         return getTextAt(RESOURCE_BUNDLE, key);
     }
 
@@ -969,16 +1050,16 @@ class ChecksPage implements ConsoleSection {
     }
 
     /** A hint that wraps to the width of the left column. */
-    private static JLabel hint(final String text) {
+    static JLabel hint(final String text) {
         return Hud.hint(wrap(text));
     }
 
-    private static String wrap(final String text) {
+    static String wrap(final String text) {
         return text.isEmpty() ? "" : "<html><div style='width:" + scaleForGUI(280) + "px'>" + escape(text)
                                            + "</div></html>";
     }
 
-    private static ListCellRenderer<Object> labelRenderer() {
+    static ListCellRenderer<Object> labelRenderer() {
         ListCellRenderer<Object> hud = Hud.comboRenderer();
         return (list, value, index, isSelected, cellHasFocus) -> {
             Object display = (value instanceof SkillAttribute attribute) ? attribute.getLabel()
@@ -1051,245 +1132,4 @@ class ChecksPage implements ConsoleSection {
     }
 
     // endregion Renderers
-
-    // region Opposed sides
-
-    /** Someone who can take part in an opposed check: a cast member, someone in Personnel, or both. */
-    private record Participant(String label, @Nullable Person person, @Nullable OracleCharacter character) {
-        @Override
-        public String toString() {
-            return label;
-        }
-    }
-
-    /** The controls for one side of an opposed check. */
-    private final class SidePanel {
-        private final boolean isDefender;
-        private final JPanel panel = column();
-        private final JComboBox<Participant> who = new JComboBox<>();
-        private final JComboBox<CheckTrait> trait = new JComboBox<>();
-        private final JComboBox<NpcRating> rating = new JComboBox<>(NpcRating.values());
-        private final JComboBox<CheckDifficulty> sideDifficulty = new JComboBox<>(CheckDifficulty.values());
-        private final HudCheckBox sideEdge = new HudCheckBox(text("ChecksPage.opposed.edge"));
-        private final JLabel note = hint("");
-        private boolean filling;
-        private UUID lastPerson;
-        private Person traitPerson;
-
-        private SidePanel(final boolean isDefender) {
-            this.isDefender = isDefender;
-            Hud.styleComboBox(who);
-            Hud.styleComboBox(trait);
-            Hud.styleComboBox(rating);
-            Hud.styleComboBox(sideDifficulty);
-            rating.setRenderer(labelRenderer());
-            trait.setRenderer(new TraitRenderer());
-            sideDifficulty.setRenderer((list, value, index, isSelected, cellHasFocus) ->
-                                             Hud.comboRenderer().getListCellRendererComponent(list,
-                                                   (value == null) ? "" : value.getLabel() + "  "
-                                                                                + value.getSignedModifier(),
-                                                   index, isSelected, cellHasFocus));
-            sideDifficulty.setSelectedItem(CheckDifficulty.NORMAL);
-            rating.setSelectedItem(NpcRating.REGULAR);
-            sideEdge.setSelected(false);
-            who.addActionListener(event -> {
-                if (!filling) {
-                    changedWho();
-                }
-            });
-            trait.addActionListener(event -> refreshPreview());
-            rating.addActionListener(event -> refreshPreview());
-            sideDifficulty.addActionListener(event -> refreshPreview());
-            sideEdge.addActionListener(event -> refreshPreview());
-
-            panel.add(leftAligned(who));
-            panel.add(Box.createVerticalStrut(scaleForGUI(6)));
-            panel.add(leftAligned(trait));
-            panel.add(leftAligned(rating));
-            panel.add(Box.createVerticalStrut(scaleForGUI(6)));
-            panel.add(leftAligned(sideDifficulty));
-            panel.add(Box.createVerticalStrut(scaleForGUI(6)));
-            panel.add(leftAligned(sideEdge));
-            panel.add(leftAligned(note));
-        }
-
-        private void fill() {
-            Participant previous = (Participant) who.getSelectedItem();
-            DefaultComboBoxModel<Participant> model = new DefaultComboBoxModel<>();
-            Set<UUID> inCast = new LinkedHashSet<>();
-            for (OracleCharacter character : console.roleplay().getActiveCharacters()) {
-                Person person = personOf(character);
-                if (person != null) {
-                    inCast.add(person.getId());
-                }
-                String kind = text(person != null ? "ChecksPage.opposed.kind.linked"
-                                         : "ChecksPage.opposed.kind.rated");
-                model.addElement(new Participant(OracleConsole.joined(character.getName(), kind), person, character));
-            }
-            for (Person person : companyPeople()) {
-                if (!inCast.contains(person.getId())) {
-                    model.addElement(new Participant(OracleConsole.joined(person.getFullName(),
-                          text("ChecksPage.opposed.kind.company")), person, null));
-                }
-            }
-            filling = true;
-            try {
-                who.setModel(model);
-                if (previous != null) {
-                    choose(previous.character() == null ? null : previous.character().getId(),
-                          previous.person() == null ? null : previous.person().getId());
-                } else if (model.getSize() > 0) {
-                    // Start the two sides on different people.
-                    who.setSelectedIndex(Math.min(isDefender ? 1 : 0, model.getSize() - 1));
-                }
-            } finally {
-                filling = false;
-            }
-            changedWho();
-        }
-
-        private void choose(final @Nullable UUID characterId, final @Nullable UUID personId) {
-            for (int index = 0; index < who.getItemCount(); index++) {
-                Participant participant = who.getItemAt(index);
-                boolean sameCharacter = characterId != null && participant.character() != null
-                                              && characterId.equals(participant.character().getId());
-                boolean samePerson = characterId == null && personId != null && participant.person() != null
-                                           && personId.equals(participant.person().getId());
-                if (sameCharacter || samePerson) {
-                    who.setSelectedIndex(index);
-                    return;
-                }
-            }
-        }
-
-        private void changedWho() {
-            Participant participant = (Participant) who.getSelectedItem();
-            Person person = (participant == null) ? null : participant.person();
-            boolean rated = participant != null && person == null;
-            trait.setVisible(person != null);
-            rating.setVisible(rated);
-            sideEdge.setVisible(person != null && checks.isEdgeAllowed());
-            sideEdge.setEnabled(checks.canUseEdge(person));
-            if (person != null && !person.getId().equals(lastPerson)) {
-                fillTraits(person);
-            }
-            lastPerson = (person == null) ? null : person.getId();
-            if (rated && participant.character() != null && participant.character().getRating() != null) {
-                rating.setSelectedItem(participant.character().getRating());
-            }
-            note.setText(wrap(rated ? text("ChecksPage.opposed.ratedNote")
-                                    : (person != null && checks.isEdgeAllowed())
-                                            ? getFormattedTextAt(RESOURCE_BUNDLE, "ChecksPage.preview.edge",
-                                                  person.getCurrentEdge()) : ""));
-            panel.revalidate();
-            refreshPreview();
-        }
-
-        private void fillTraits(final Person person) {
-            CheckTrait previous = (CheckTrait) trait.getSelectedItem();
-            List<CheckTrait> trained = new ArrayList<>();
-            List<CheckTrait> untrained = new ArrayList<>();
-            for (String name : SkillType.getSkillList()) {
-                (person.hasSkill(name) ? trained : untrained).add(CheckTrait.skill(name));
-            }
-            Comparator<CheckTrait> byName = Comparator.comparing(CheckTrait::getLabel, String.CASE_INSENSITIVE_ORDER);
-            trained.sort(byName);
-            untrained.sort(byName);
-            DefaultComboBoxModel<CheckTrait> model = new DefaultComboBoxModel<>();
-            trained.forEach(model::addElement);
-            for (SkillAttribute attribute : checkableAttributes()) {
-                model.addElement(CheckTrait.attributes(attribute, null));
-            }
-            untrained.forEach(model::addElement);
-            trait.setModel(model);
-            if (previous != null && model.getIndexOf(previous) >= 0) {
-                trait.setSelectedItem(previous);
-            }
-            traitPerson = person;
-        }
-
-        /**
-         * @return {@code true} if both sides are the same person or cast member
-         */
-        private boolean isSameAs(final SidePanel other) {
-            Participant mine = (Participant) who.getSelectedItem();
-            Participant theirs = (Participant) other.who.getSelectedItem();
-            if (mine == null || theirs == null) {
-                return false;
-            }
-            boolean samePerson = mine.person() != null && theirs.person() != null
-                                       && mine.person().getId().equals(theirs.person().getId());
-            boolean sameCharacter = mine.character() != null && mine.character() == theirs.character();
-            return samePerson || sameCharacter;
-        }
-
-        private boolean isReady() {
-            Participant participant = (Participant) who.getSelectedItem();
-            return participant != null && (participant.person() == null || trait.getSelectedItem() != null);
-        }
-
-        private String name() {
-            Participant participant = (Participant) who.getSelectedItem();
-            if (participant == null) {
-                return "";
-            }
-            return (participant.person() != null) ? participant.person().getFullName()
-                         : Objects.requireNonNull(participant.character()).getName();
-        }
-
-        private CheckDifficulty difficulty() {
-            return Objects.requireNonNullElse((CheckDifficulty) sideDifficulty.getSelectedItem(),
-                  CheckDifficulty.NORMAL);
-        }
-
-        private boolean rerolls() {
-            Participant participant = (Participant) who.getSelectedItem();
-            return participant != null && sideEdge.isSelected() && checks.canUseEdge(participant.person());
-        }
-
-        private CheckTarget target() {
-            Participant participant = Objects.requireNonNull((Participant) who.getSelectedItem());
-            int modifier = difficulty().getModifier();
-            if (participant.person() != null) {
-                return checks.target(participant.person(), Objects.requireNonNull((CheckTrait) trait.getSelectedItem()),
-                      modifier);
-            }
-            return RoleplayChecks.target((NpcRating) Objects.requireNonNull(rating.getSelectedItem()), modifier);
-        }
-
-        private Opponent opponent() {
-            Participant participant = Objects.requireNonNull((Participant) who.getSelectedItem());
-            if (participant.person() != null) {
-                return Opponent.person(participant.person(), participant.character(),
-                      Objects.requireNonNull((CheckTrait) trait.getSelectedItem()), difficulty(), 0,
-                      sideEdge.isSelected());
-            }
-            return Opponent.rated(participant.character(), (NpcRating) Objects.requireNonNull(
-                  rating.getSelectedItem()), difficulty(), 0);
-        }
-
-        private final class TraitRenderer implements ListCellRenderer<CheckTrait> {
-            private final ListCellRenderer<Object> hud = Hud.comboRenderer();
-
-            @Override
-            public Component getListCellRendererComponent(JList<? extends CheckTrait> list, CheckTrait value,
-                  int index, boolean isSelected, boolean cellHasFocus) {
-                String label = "";
-                if (value != null) {
-                    label = value.getLabel();
-                    if (traitPerson != null) {
-                        label = OracleConsole.joined(label, checks.target(traitPerson, value, 0).describe());
-                        if (!RoleplayChecks.isTrained(traitPerson, value)) {
-                            label += "  " + text("ChecksPage.skill.untrained");
-                        }
-                    }
-                }
-                @SuppressWarnings("unchecked")
-                JList<Object> objects = (JList<Object>) (JList<?>) list;
-                return hud.getListCellRendererComponent(objects, label, index, isSelected, cellHasFocus);
-            }
-        }
-    }
-
-    // endregion Opposed sides
 }

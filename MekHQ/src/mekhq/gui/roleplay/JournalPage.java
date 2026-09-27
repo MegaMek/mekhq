@@ -68,9 +68,7 @@ import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultComboBoxModel;
 import javax.swing.DefaultListModel;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
@@ -154,8 +152,12 @@ class JournalPage implements ConsoleSection {
     private final JTextField search = new JTextField();
     private TypeGroup typeGroup = TypeGroup.ALL;
     private final Map<TypeGroup, HudChip> typeChips = new LinkedHashMap<>();
-    private final JComboBox<Object> threadFilter = new JComboBox<>();
-    private final JComboBox<Object> castFilter = new JComboBox<>();
+    /** The filters' "any" entry. */
+    private static final Object ANY = new Object();
+    private final SearchablePicker<Object> threadFilter = new SearchablePicker<>("journalThreadFilter",
+          JournalPage::filterLabel, this::filtersChanged);
+    private final SearchablePicker<Object> castFilter = new SearchablePicker<>("journalCastFilter",
+          JournalPage::filterLabel, this::filtersChanged);
     private final HudDateField from;
     private final HudDateField to;
     private boolean oldestFirst;
@@ -187,7 +189,37 @@ class JournalPage implements ConsoleSection {
         root.setOpaque(true);
         root.setBackground(GROUND);
 
-        // Filter column
+        from = new HudDateField(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.datePlaceholder"),
+              this::filtersChanged);
+        to = new HudDateField(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.datePlaceholder"),
+              this::filtersChanged);
+        newestChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.newest"),
+              () -> setOldestFirst(false));
+        oldestChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.oldest"),
+              () -> setOldestFirst(true));
+        tagsButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.tags").toUpperCase(Locale.ROOT),
+              false, true);
+        tagsButton.addActionListener(event -> showTagMenu());
+        delete = new HudConfirmButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.delete").toUpperCase(Locale.ROOT),
+              getTextAt(RESOURCE_BUNDLE, "OracleConsole.confirmDelete").toUpperCase(Locale.ROOT), true);
+        delete.addActionListener(event -> deleteShown());
+        travelLog = new TravelLogView(console);
+
+        root.add(buildBoard(buildFilters()), BorderLayout.WEST);
+        root.add(buildReaderColumn(), BorderLayout.CENTER);
+        buildPage();
+
+        // The console refreshes the page when it is shown, so only the chips are set up here.
+        updatingFilters = true;
+        setTypeGroup(TypeGroup.ALL);
+        setOldestFirst(false);
+        updatingFilters = false;
+    }
+
+    // region Building
+
+    /** Search, type chips, thread and cast, dates and sort order. */
+    private JPanel buildFilters() {
         Hud.styleField(search);
         search.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.search"));
         search.getDocument().addDocumentListener(onChange(this::filtersChanged));
@@ -199,18 +231,8 @@ class JournalPage implements ConsoleSection {
             typeChips.put(group, chip);
             chipRow.add(chip);
         }
-        styleFilterCombo(threadFilter);
-        styleFilterCombo(castFilter);
-        from = new HudDateField(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.datePlaceholder"),
-              this::filtersChanged);
-        to = new HudDateField(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.datePlaceholder"),
-              this::filtersChanged);
         from.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.date.toolTipText"));
         to.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.date.toolTipText"));
-        newestChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.newest"),
-              () -> setOldestFirst(false));
-        oldestChip = new HudChip(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.oldest"),
-              () -> setOldestFirst(true));
         JPanel sortRow = Hud.transparentPanel(null);
         sortRow.setLayout(new BoxLayout(sortRow, BoxLayout.X_AXIS));
         sortRow.add(newestChip);
@@ -224,14 +246,18 @@ class JournalPage implements ConsoleSection {
         filters.add(Box.createVerticalStrut(scaleForGUI(8)));
         filters.add(leftAligned(chipRow));
         filters.add(Box.createVerticalStrut(scaleForGUI(8)));
-        filters.add(leftAligned(pair("OracleConsole.journal.thread", threadFilter, "OracleConsole.journal.cast",
-              castFilter)));
+        filters.add(leftAligned(pair("OracleConsole.journal.thread", threadFilter.getComponent(),
+              "OracleConsole.journal.cast", castFilter.getComponent())));
         filters.add(Box.createVerticalStrut(scaleForGUI(6)));
         filters.add(leftAligned(pair("OracleConsole.journal.from", from, "OracleConsole.journal.to", to)));
         filters.add(Box.createVerticalStrut(scaleForGUI(8)));
         filters.add(leftAligned(sortRow));
         filters.add(Box.createVerticalStrut(scaleForGUI(8)));
+        return filters;
+    }
 
+    /** The filters above the list of entries. */
+    private JPanel buildBoard(final JPanel filters) {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setBackground(SURFACE_DEEP);
         list.setCellRenderer(new EntryRenderer());
@@ -261,15 +287,15 @@ class JournalPage implements ConsoleSection {
         boardFoot.add(Box.createVerticalStrut(scaleForGUI(6)));
         boardFoot.add(leftAligned(matches));
         board.add(boardFoot, BorderLayout.SOUTH);
+        return board;
+    }
 
-        // Reader
+    /** The reader and editor, with the page's buttons beneath. */
+    private JPanel buildReaderColumn() {
         readerTitle.setForeground(ACCENT_BRIGHT);
         readerTitle.setFont(hudFont(Font.BOLD, 1.05f, 0.12f));
         readerTags.setForeground(TEXT_MUTED);
         readerTags.setFont(hudFont(Font.PLAIN, 0.88f, 0.0f));
-        tagsButton = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.tags").toUpperCase(Locale.ROOT),
-              false, true);
-        tagsButton.addActionListener(event -> showTagMenu());
         JPanel readerHead = Hud.transparentPanel(new BorderLayout(scaleForGUI(10), 0));
         JPanel headText = column();
         headText.add(leftAligned(readerTitle));
@@ -296,9 +322,6 @@ class JournalPage implements ConsoleSection {
         editor.addChangeListener(saveTimer::restart);
         editor.setPreferredSize(new Dimension(scaleForGUI(400), scaleForGUI(360)));
 
-        delete = new HudConfirmButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.delete").toUpperCase(Locale.ROOT),
-              getTextAt(RESOURCE_BUNDLE, "OracleConsole.confirmDelete").toUpperCase(Locale.ROOT), true);
-        delete.addActionListener(event -> deleteShown());
         HudButton export = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.export")
                                                .toUpperCase(Locale.ROOT), false, true);
         export.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.export.toolTipText"));
@@ -337,12 +360,11 @@ class JournalPage implements ConsoleSection {
         readerHolder.add(reader, BorderLayout.CENTER);
         right.add(readerHolder, BorderLayout.CENTER);
         right.add(actions, BorderLayout.SOUTH);
+        return right;
+    }
 
-        root.add(board, BorderLayout.WEST);
-        root.add(right, BorderLayout.CENTER);
-
-        // The switch between the journal and the travel log, which is kept apart so travel never crowds the story.
-        travelLog = new TravelLogView(console);
+    /** The switch between the journal and the travel log, which is kept apart so travel never crowds the story. */
+    private void buildPage() {
         HudSegmentedControl<Boolean> viewSwitch = new HudSegmentedControl<>(this::showTravel);
         viewSwitch.setColumns(2);
         viewSwitch.setSegments(List.of(
@@ -366,12 +388,9 @@ class JournalPage implements ConsoleSection {
         page.add(switchRow, BorderLayout.NORTH);
         page.add(viewHolder, BorderLayout.CENTER);
 
-        // The console refreshes the page when it is shown, so only the chips are set up here.
-        updatingFilters = true;
-        setTypeGroup(TypeGroup.ALL);
-        setOldestFirst(false);
-        updatingFilters = false;
     }
+
+    // endregion Building
 
     @Override
     public JComponent getComponent() {
@@ -405,13 +424,14 @@ class JournalPage implements ConsoleSection {
         return panel;
     }
 
-    private void styleFilterCombo(final JComboBox<Object> comboBox) {
-        Hud.styleComboBox(comboBox);
-        ListCellRenderer<Object> hud = Hud.comboRenderer();
-        comboBox.setRenderer((source, value, index, isSelected, cellHasFocus) -> hud.getListCellRendererComponent(
-              source, (value == null) ? getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.any") : value, index,
-              isSelected, cellHasFocus));
-        comboBox.addActionListener(event -> filtersChanged());
+    private static String filterLabel(final @Nullable Object value) {
+        if (value == null || value == ANY) {
+            return getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.any");
+        }
+        if (value instanceof PlotThread thread) {
+            return thread.getName();
+        }
+        return (value instanceof OracleCharacter character) ? character.getName() : value.toString();
     }
 
     private void setTypeGroup(final TypeGroup group) {
@@ -432,18 +452,18 @@ class JournalPage implements ConsoleSection {
         search.setText("");
         from.setText("");
         to.setText("");
-        threadFilter.setSelectedItem(null);
-        castFilter.setSelectedItem(null);
+        threadFilter.setSelected(ANY);
+        castFilter.setSelected(ANY);
         updatingFilters = false;
         setTypeGroup(TypeGroup.ALL);
     }
 
     private @Nullable UUID selectedFilterThread() {
-        return (threadFilter.getSelectedItem() instanceof PlotThread thread) ? thread.getId() : null;
+        return (threadFilter.getSelected() instanceof PlotThread thread) ? thread.getId() : null;
     }
 
     private @Nullable UUID selectedFilterCast() {
-        return (castFilter.getSelectedItem() instanceof OracleCharacter character) ? character.getId() : null;
+        return (castFilter.getSelected() instanceof OracleCharacter character) ? character.getId() : null;
     }
 
     private JournalFilter currentFilter() {
@@ -470,8 +490,10 @@ class JournalPage implements ConsoleSection {
         search.setText("");
         from.setText("");
         to.setText("");
-        threadFilter.setSelectedItem(console.roleplay().getPlotThread(threadId));
-        castFilter.setSelectedItem(console.roleplay().getCharacter(characterId));
+        PlotThread thread = console.roleplay().getPlotThread(threadId);
+        OracleCharacter character = console.roleplay().getCharacter(characterId);
+        threadFilter.setSelected((thread == null) ? ANY : thread);
+        castFilter.setSelected((character == null) ? ANY : character);
         updatingFilters = false;
         setOldestFirst(true);
         setTypeGroup(TypeGroup.ALL);
@@ -482,18 +504,14 @@ class JournalPage implements ConsoleSection {
      */
     private void refreshChoices() {
         updatingFilters = true;
-        Object thread = threadFilter.getSelectedItem();
-        Object cast = castFilter.getSelectedItem();
-        DefaultComboBoxModel<Object> threads = new DefaultComboBoxModel<>();
-        threads.addElement(null);
-        console.roleplay().getPlotThreads().forEach(threads::addElement);
-        threadFilter.setModel(threads);
-        threadFilter.setSelectedItem(console.roleplay().getPlotThreads().contains(thread) ? thread : null);
-        DefaultComboBoxModel<Object> characters = new DefaultComboBoxModel<>();
-        characters.addElement(null);
-        console.roleplay().getCharacters().forEach(characters::addElement);
-        castFilter.setModel(characters);
-        castFilter.setSelectedItem(console.roleplay().getCharacters().contains(cast) ? cast : null);
+        List<Object> threads = new ArrayList<>();
+        threads.add(ANY);
+        threads.addAll(console.roleplay().getPlotThreads());
+        threadFilter.setItems(threads, threadFilter.getSelected());
+        List<Object> characters = new ArrayList<>();
+        characters.add(ANY);
+        characters.addAll(console.roleplay().getCharacters());
+        castFilter.setItems(characters, castFilter.getSelected());
         updatingFilters = false;
     }
 

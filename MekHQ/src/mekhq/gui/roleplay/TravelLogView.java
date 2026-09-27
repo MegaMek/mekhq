@@ -56,8 +56,6 @@ import java.util.Objects;
 import java.util.UUID;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -109,7 +107,7 @@ class TravelLogView {
     private final CardLayout cards = new CardLayout();
     private final JPanel cardHolder = new JPanel(cards);
     private final HudSegmentedControl<Mode> modeControl;
-    private final JComboBox<Who> whoFilter = new JComboBox<>();
+    private final SearchablePicker<Who> whoFilter;
     private final JPanel filterRow;
     private final JLabel intro = Hud.hint("");
     private boolean updating;
@@ -139,16 +137,15 @@ class TravelLogView {
         }
         modeControl.setSegments(segments);
 
-        Hud.styleComboBox(whoFilter);
-        whoFilter.setToolTipText(text("TravelLog.who.toolTipText"));
-        whoFilter.addActionListener(event -> {
+        whoFilter = new SearchablePicker<>("travelWhoFilter", Who::label, () -> {
             if (!updating) {
                 refreshTimeline();
             }
         });
+        whoFilter.setToolTipText(text("TravelLog.who.toolTipText"));
         filterRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         filterRow.add(Hud.hint(text("TravelLog.who")), BorderLayout.WEST);
-        filterRow.add(whoFilter, BorderLayout.CENTER);
+        filterRow.add(whoFilter.getComponent(), BorderLayout.CENTER);
 
         JPanel head = column();
         head.setBorder(BorderFactory.createEmptyBorder(0, 0, scaleForGUI(10), 0));
@@ -324,10 +321,10 @@ class TravelLogView {
     }
 
     private void refreshWhoChoices(final TravelLog log) {
-        Who selected = (Who) whoFilter.getSelectedItem();
-        DefaultComboBoxModel<Who> model = new DefaultComboBoxModel<>();
-        model.addElement(new Who(null, null, text("TravelLog.who.all")));
-        model.addElement(new Who(Party.MAIN_FORCE, null, text("TravelLog.mainForce")));
+        Who selected = whoFilter.getSelected();
+        List<Who> choices = new ArrayList<>();
+        choices.add(new Who(null, null, text("TravelLog.who.all")));
+        choices.add(new Who(Party.MAIN_FORCE, null, text("TravelLog.mainForce")));
         Map<UUID, String> bases = new LinkedHashMap<>();
         Map<UUID, String> cast = new LinkedHashMap<>();
         for (TravelRecord record : log.getRecords()) {
@@ -339,21 +336,20 @@ class TravelLogView {
                 cast.put(id, name == null ? record.getPartyName() : name);
             }
         }
-        bases.forEach((id, name) -> model.addElement(new Who(Party.BASE, id,
+        bases.forEach((id, name) -> choices.add(new Who(Party.BASE, id,
               getFormattedTextAt(RESOURCE_BUNDLE, "TravelLog.base", name))));
-        cast.forEach((id, name) -> model.addElement(new Who(Party.CAST, id, name)));
-        whoFilter.setModel(model);
-        for (int i = 0; i < model.getSize(); i++) {
-            Who choice = model.getElementAt(i);
-            if (selected != null && choice.party() == selected.party() && Objects.equals(choice.id(),
-                  selected.id())) {
-                whoFilter.setSelectedIndex(i);
-            }
-        }
+        cast.forEach((id, name) -> choices.add(new Who(Party.CAST, id, name)));
+        // Names can change, so the old choice is found again by who it is, not what it's called.
+        Who keep = choices.stream()
+                         .filter(choice -> selected != null && choice.party() == selected.party()
+                                                 && Objects.equals(choice.id(), selected.id()))
+                         .findFirst()
+                         .orElse(null);
+        whoFilter.setItems(choices, keep);
     }
 
     private void refreshTimeline() {
-        Who who = (Who) whoFilter.getSelectedItem();
+        Who who = whoFilter.getSelected();
         List<Row> rows = new ArrayList<>();
         for (TravelRecord record : console.roleplay().getTravelLog().getTimeline(contracts)) {
             if (who == null || who.party() == null || matches(record, who)) {

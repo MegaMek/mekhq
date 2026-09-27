@@ -129,7 +129,9 @@ class DiceRoller {
         DiceExpression.Roll roll = console.actions().rollDice(expression);
         diceResult.setForeground(TEXT_MUTED);
         diceResult.setText("<html><b><font color='" + hex(ACCENT_BRIGHT) + "' size='+2'>" + roll.total()
-                                 + "</font></b>&nbsp;&nbsp;" + escape(OracleConsole.joined(roll.expression(), roll.describeWorking())) + "</html>");
+                                 + "</font></b>&nbsp;&nbsp;"
+                                 + escape(OracleConsole.joined(roll.expression(), roll.describeWorking()))
+                                 + "</html>");
         console.changed();
     }
 
