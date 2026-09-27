@@ -65,6 +65,7 @@ public class Roleplay {
     private final List<PlotThread> plotThreads = new ArrayList<>();
     private final List<JournalEntry> journal = new ArrayList<>();
     private final List<JournalEntry> oracleLog = new ArrayList<>();
+    private TravelLog travelLog = new TravelLog();
 
     /**
      * @return the current chaos factor
@@ -281,6 +282,13 @@ public class Roleplay {
     }
 
     /**
+     * @return the travel log: where the main force, the bases and the cast have been
+     */
+    public TravelLog getTravelLog() {
+        return travelLog;
+    }
+
+    /**
      * @return the live list of the player's journal notes, oldest first; changes to it are saved with the campaign
      */
     public List<JournalEntry> getJournal() {
@@ -433,6 +441,7 @@ public class Roleplay {
         }
         JournalEntry.writeListToXML(writer, indent, "journal", journal);
         JournalEntry.writeListToXML(writer, indent, "oracleLog", oracleLog);
+        travelLog.writeToXML(writer, indent);
         MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "roleplay");
     }
 
@@ -476,6 +485,8 @@ public class Roleplay {
                     roleplay.journal.addAll(JournalEntry.parseList(child, JournalEntryType.NOTE));
                 } else if (child.getNodeName().equalsIgnoreCase("oracleLog")) {
                     roleplay.oracleLog.addAll(JournalEntry.parseList(child, JournalEntryType.FATE_CHART));
+                } else if (child.getNodeName().equalsIgnoreCase("travelLog")) {
+                    roleplay.travelLog = TravelLog.parse(child);
                 } else if (child.getNodeName().equalsIgnoreCase("plotThreads")) {
                     final NodeList threadNodes = child.getChildNodes();
                     for (int j = 0; j < threadNodes.getLength(); j++) {

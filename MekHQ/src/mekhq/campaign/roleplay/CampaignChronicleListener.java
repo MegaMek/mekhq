@@ -37,6 +37,9 @@ import megamek.common.event.Subscribe;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.events.LocationAddedEvent;
+import mekhq.campaign.events.LocationRemovedEvent;
+import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.events.missions.MissionCompletedEvent;
 import mekhq.campaign.events.missions.MissionNewEvent;
@@ -51,7 +54,7 @@ import mekhq.campaign.roleplay.CampaignChronicle.PersonChange;
 import mekhq.campaign.universe.PlanetarySystem;
 
 /**
- * Passes MekHQ's campaign events to a {@link CampaignChronicle}. Register it on the event bus while a campaign is open
+ * Passes MekHQ's campaign events to a {@link CampaignChronicle} and keeps the {@link TravelLog} up to date. Register it on the event bus while a campaign is open
  * and unregister it when the campaign closes. Events about anything that is not in this campaign are ignored, so a
  * campaign being loaded never writes into another's journal.
  */
@@ -69,6 +72,36 @@ public class CampaignChronicleListener {
         this.chronicle = new CampaignChronicle(campaign.getRoleplay(), campaign::getLocalDate,
               () -> campaign.getCampaignOptions().get(CampaignOption.MAXIMUM_ORACLE_LOG_ENTRIES),
               () -> campaign.getCampaignOptions().get(CampaignOption.USE_ORACLE_CHRONICLE));
+        updateTravelLog();
+    }
+
+    /**
+     * Rebuilds the travel history from past contracts the first time a campaign is opened, then records any travel
+     * since the last look.
+     */
+    public void updateTravelLog() {
+        guard(() -> {
+            TravelLog log = campaign.getRoleplay().getTravelLog();
+            log.fillHistory(TravelSnapshots.contracts(campaign));
+            log.observe(campaign.getLocalDate(), TravelSnapshots.capture(campaign));
+        });
+    }
+
+    @Subscribe
+    public void handle(final NewDayEvent event) {
+        if (event.getCampaign() == campaign) {
+            updateTravelLog();
+        }
+    }
+
+    @Subscribe
+    public void handle(final LocationAddedEvent event) {
+        updateTravelLog();
+    }
+
+    @Subscribe
+    public void handle(final LocationRemovedEvent event) {
+        updateTravelLog();
     }
 
     @Subscribe
@@ -111,6 +144,7 @@ public class CampaignChronicleListener {
                 chronicle.arrived(system.getName(campaign.getLocalDate()));
             }
         });
+        updateTravelLog();
     }
 
     @Subscribe

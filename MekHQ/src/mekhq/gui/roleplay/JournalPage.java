@@ -44,6 +44,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
@@ -105,6 +106,8 @@ import mekhq.gui.baseComponents.hud.HudChip;
 import mekhq.gui.baseComponents.hud.HudConfirmButton;
 import mekhq.gui.baseComponents.hud.HudDateField;
 import mekhq.gui.baseComponents.hud.HudRichTextEditor;
+import mekhq.gui.baseComponents.hud.HudSegmentedControl;
+import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
 
 /**
  * The console's Journal page: every note and Oracle record in one list, grouped by month, narrowed by the filter column
@@ -133,6 +136,12 @@ class JournalPage implements ConsoleSection {
 
     private final OracleConsole console;
     private final JPanel root = new JPanel(new BorderLayout());
+    /** The page itself: the journal or the travel log, chosen by the switch at the top. */
+    private final JPanel page = new JPanel(new BorderLayout());
+    private final CardLayout views = new CardLayout();
+    private final JPanel viewHolder = new JPanel(views);
+    private final TravelLogView travelLog;
+    private boolean showingTravel;
 
     // Filters
     private final JTextField search = new JTextField();
@@ -311,6 +320,31 @@ class JournalPage implements ConsoleSection {
         root.add(board, BorderLayout.WEST);
         root.add(right, BorderLayout.CENTER);
 
+        // The switch between the journal and the travel log, which is kept apart so travel never crowds the story.
+        travelLog = new TravelLogView(console);
+        HudSegmentedControl<Boolean> viewSwitch = new HudSegmentedControl<>(this::showTravel);
+        viewSwitch.setColumns(2);
+        viewSwitch.setSegments(List.of(
+              new Segment<>(false, getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.view.journal"), "", true),
+              new Segment<>(true, getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.view.travel"), "", true)));
+        viewSwitch.setSelected(false);
+        viewSwitch.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.journal.view.toolTipText"));
+        JPanel switchRow = new JPanel(new BorderLayout());
+        switchRow.setOpaque(true);
+        switchRow.setBackground(GROUND);
+        switchRow.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
+              BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(16), scaleForGUI(10), scaleForGUI(16))));
+        switchRow.add(viewSwitch, BorderLayout.WEST);
+        viewHolder.setOpaque(true);
+        viewHolder.setBackground(GROUND);
+        viewHolder.add(root, "journal");
+        viewHolder.add(travelLog.getComponent(), "travel");
+        page.setOpaque(true);
+        page.setBackground(GROUND);
+        page.add(switchRow, BorderLayout.NORTH);
+        page.add(viewHolder, BorderLayout.CENTER);
+
         // The console refreshes the page when it is shown, so only the chips are set up here.
         updatingFilters = true;
         setTypeGroup(TypeGroup.ALL);
@@ -320,7 +354,15 @@ class JournalPage implements ConsoleSection {
 
     @Override
     public JComponent getComponent() {
-        return root;
+        return page;
+    }
+
+    private void showTravel(final boolean travel) {
+        showingTravel = travel;
+        views.show(viewHolder, travel ? "travel" : "journal");
+        if (travel) {
+            travelLog.refresh();
+        }
     }
 
     // region Filters
@@ -440,6 +482,9 @@ class JournalPage implements ConsoleSection {
 
     @Override
     public void refresh() {
+        if (showingTravel) {
+            travelLog.refresh();
+        }
         refreshChoices();
         refreshList(shown);
     }

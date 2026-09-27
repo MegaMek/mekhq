@@ -49,6 +49,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import mekhq.campaign.roleplay.CampaignChronicle;
+import mekhq.campaign.roleplay.TravelRecord;
 import mekhq.campaign.roleplay.CheckDifficulty;
 import mekhq.campaign.roleplay.JournalEntryType;
 import mekhq.campaign.roleplay.NpcRating;
@@ -61,7 +62,7 @@ class RoleplayResourcesTest {
           Path.of("src/mekhq/campaign/roleplay"));
     /** A complete key in a string literal; keys built by adding text on the end stop at a dot and are skipped. */
     private static final Pattern KEY = Pattern.compile(
-          "\"((?:OracleConsole|OracleLog|OracleGuide|ChecksPage|JournalExporter|Chronicle)\\.[A-Za-z0-9_.]*[A-Za-z0-9_])\"");
+          "\"((?:OracleConsole|OracleLog|OracleGuide|ChecksPage|JournalExporter|Chronicle|TravelLog)\\.[A-Za-z0-9_.]*[A-Za-z0-9_])\"");
 
     private static Properties bundle() throws IOException {
         Properties properties = new Properties();
@@ -115,6 +116,13 @@ class RoleplayResourcesTest {
         }
         for (NpcRating rating : NpcRating.values()) {
             assertTrue(properties.containsKey("NpcRating." + rating.name() + ".label"));
+        }
+        for (TravelRecord.Kind kind : TravelRecord.Kind.values()) {
+            assertTrue(properties.containsKey("TravelLog.kind." + kind.name()), kind.name());
+        }
+        for (String column : List.of("system", "first", "last", "visits", "days", "contracts", "present", "date",
+              "who", "what")) {
+            assertTrue(properties.containsKey("TravelLog.column." + column), column);
         }
         for (CampaignChronicle.PersonChange change : CampaignChronicle.PersonChange.values()) {
             assertTrue(properties.containsKey("Chronicle.person." + change.name()), change.name());
