@@ -272,6 +272,24 @@ public class PlotThread {
         return index + 1;
     }
 
+    /**
+     * Re-rolls the concepts of the most recently revealed step, keeping it revealed with its reveal date. The step
+     * keeps its kind, so a Major Revelation stays a Major Revelation and the conclusion stays the conclusion.
+     *
+     * @param generator the generator supplying the oracle tables
+     *
+     * @return the re-rolled step, or {@code null} if no step has been revealed
+     */
+    public @Nullable PlotThreadStep rerollLatestStep(final RandomOracleGenerator generator) {
+        if (revealedSteps == 0) {
+            return null;
+        }
+        final int index = revealedSteps - 1;
+        final PlotThreadStep step = rollStep(index + 1, length, generator);
+        steps.set(index, step);
+        return step;
+    }
+
     @Override
     public String toString() {
         return name;

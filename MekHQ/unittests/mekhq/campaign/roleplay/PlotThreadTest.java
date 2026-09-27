@@ -134,6 +134,35 @@ class PlotThreadTest {
     }
 
     @Test
+    void rerollingReplacesTheLatestRevealedStepOnly() {
+        PlotThread thread = PlotThread.create("Hunt", PlotThreadLength.SHORT, generator);
+        assertNull(thread.rerollLatestStep(generator));
+
+        for (int i = 0; i < PlotThread.FLASHPOINT_INTERVAL; i++) {
+            thread.revealNextStep(DATE);
+        }
+        PlotThreadStep first = thread.getSteps().get(0);
+        PlotThreadStep hidden = thread.getSteps().get(PlotThread.FLASHPOINT_INTERVAL);
+
+        Map<OracleTable, WeightedIntMap<String>> pools = new EnumMap<>(OracleTable.class);
+        for (OracleTable table : OracleTable.values()) {
+            WeightedIntMap<String> pool = new WeightedIntMap<>();
+            pool.add(1, "rerolled");
+            pools.put(table, pool);
+        }
+        PlotThreadStep after = thread.rerollLatestStep(RandomOracleGenerator.createForTesting(pools));
+
+        assertEquals(PlotThread.FLASHPOINT_INTERVAL, after.number());
+        assertTrue(after.majorRevelation());
+        assertTrue(after.concepts().stream().allMatch(concept -> "rerolled".equals(concept.meaning())));
+        assertEquals(after, thread.getSteps().get(PlotThread.FLASHPOINT_INTERVAL - 1));
+        assertEquals(PlotThread.FLASHPOINT_INTERVAL, thread.getRevealedSteps());
+        assertEquals(DATE, thread.getRevealDate(PlotThread.FLASHPOINT_INTERVAL));
+        assertEquals(first, thread.getSteps().get(0));
+        assertEquals(hidden, thread.getSteps().get(PlotThread.FLASHPOINT_INTERVAL));
+    }
+
+    @Test
     void losingProgressHidesAndRerollsTheLatestStep() {
         PlotThread thread = PlotThread.create("Hunt", PlotThreadLength.SHORT, generator);
         assertFalse(thread.canLoseProgress());

@@ -264,6 +264,22 @@ public class OracleActions {
     }
 
     /**
+     * Re-rolls the prompts of a thread's most recently revealed step and logs the new ones.
+     *
+     * @param thread the thread
+     *
+     * @return the re-rolled step, or {@code null} if no step has been revealed
+     */
+    public @Nullable PlotThreadStep rerollLatestStep(final PlotThread thread) {
+        final PlotThreadStep step = thread.rerollLatestStep(generator.get());
+        if (step != null) {
+            log(JournalEntryType.THREAD, getFormattedTextAt(RESOURCE_BUNDLE, "OracleLog.threadRerolled",
+                  thread.getName(), step.number()) + '\n' + describeConcepts(step.concepts())).tagThread(thread);
+        }
+        return step;
+    }
+
+    /**
      * Deletes a thread and logs it. Journal entries tagged with it keep the tag.
      *
      * @param thread the thread

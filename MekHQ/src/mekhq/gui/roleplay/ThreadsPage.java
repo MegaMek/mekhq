@@ -115,6 +115,7 @@ class ThreadsPage implements ConsoleSection {
     private final HudButton rename;
     private final HudConfirmButton delete;
     private final HudButton reveal;
+    private final HudButton reroll;
     private final HudButton storyline;
     private final JLabel empty = Hud.notice("");
 
@@ -208,6 +209,10 @@ class ThreadsPage implements ConsoleSection {
         reveal = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.threads.reveal").toUpperCase(Locale.ROOT),
               true);
         reveal.addActionListener(event -> revealNext());
+        reroll = new HudButton(getTextAt(RESOURCE_BUNDLE, "OracleConsole.threads.reroll").toUpperCase(Locale.ROOT),
+              false, true);
+        reroll.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.threads.reroll.toolTipText"));
+        reroll.addActionListener(event -> rerollLatest());
         revelation.setVisible(false);
 
         JPanel header = Hud.transparentPanel(new BorderLayout());
@@ -224,7 +229,7 @@ class ThreadsPage implements ConsoleSection {
         detail.add(Box.createVerticalStrut(scaleForGUI(12)));
         detail.add(leftAligned(track));
         detail.add(Box.createVerticalStrut(scaleForGUI(12)));
-        detail.add(leftAligned(rightButtonRow(null, rename, delete, storyline, reveal)));
+        detail.add(leftAligned(rightButtonRow(null, rename, delete, storyline, reroll, reveal)));
         detail.add(Box.createVerticalStrut(scaleForGUI(12)));
         detail.add(leftAligned(revelation));
         detail.add(Box.createVerticalStrut(scaleForGUI(8)));
@@ -436,6 +441,7 @@ class ThreadsPage implements ConsoleSection {
               getTextAt(RESOURCE_BUNDLE, "OracleConsole.threads.flashpoint"),
               getTextAt(RESOURCE_BUNDLE, "OracleConsole.threads.conclusion"));
         reveal.setArmed(!thread.isComplete());
+        reroll.setVisible(thread.getRevealedSteps() > 0);
         reveal.setToolTipText(getTextAt(RESOURCE_BUNDLE, "OracleConsole.threads.reveal.toolTipText"));
 
         steps.removeAll();
@@ -492,6 +498,14 @@ class ThreadsPage implements ConsoleSection {
             revelation.setVisible(false);
         }
         console.changed();
+    }
+
+    private void rerollLatest() {
+        PlotThread thread = console.roleplay().getPlotThread(selectedId);
+        if (thread != null && console.actions().rerollLatestStep(thread) != null) {
+            revelation.setVisible(false);
+            console.changed();
+        }
     }
 
     private void startRename() {
