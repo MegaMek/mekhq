@@ -313,7 +313,12 @@ class JournalPage implements ConsoleSection {
         JPanel actions = Hud.transparentPanel(new BorderLayout());
         actions.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(16), scaleForGUI(12),
               scaleForGUI(16)));
-        actions.add(rightButtonRow(status, delete, importButton, export, newNote), BorderLayout.CENTER);
+        // The status sits above the buttons, so a long import or export message never pushes them out of view.
+        JPanel statusRow = Hud.transparentPanel(new BorderLayout());
+        statusRow.setBorder(BorderFactory.createEmptyBorder(0, 0, scaleForGUI(6), 0));
+        statusRow.add(status, BorderLayout.CENTER);
+        actions.add(statusRow, BorderLayout.NORTH);
+        actions.add(rightButtonRow(null, delete, importButton, export, newNote), BorderLayout.CENTER);
 
         JPanel right = new JPanel(new BorderLayout());
         right.setOpaque(true);

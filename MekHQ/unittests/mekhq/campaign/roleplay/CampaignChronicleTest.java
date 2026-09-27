@@ -37,13 +37,23 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.GroundTransitLocation;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.events.TransitCompleteEvent;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.roleplay.CampaignChronicle.PersonChange;
+import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -167,5 +177,29 @@ class CampaignChronicleTest {
         assertEquals(PersonChange.DEPARTED, CampaignChronicleListener.changeFor(PersonnelStatus.DESERTED));
         assertNull(CampaignChronicleListener.changeFor(PersonnelStatus.ACTIVE));
         assertNull(CampaignChronicleListener.changeFor(PersonnelStatus.ON_LEAVE));
+    }
+
+    @Test
+    void onlyTheMainForceArrivingIsChronicled() {
+        Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
+        Roleplay roleplay = new Roleplay();
+        CurrentLocation force = mock(CurrentLocation.class);
+        PlanetarySystem galax = mock(PlanetarySystem.class);
+        when(galax.getName(any())).thenReturn("Galax");
+        when(campaign.getRoleplay()).thenReturn(roleplay);
+        when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
+        when(campaign.getCurrentSystem()).thenReturn(galax);
+        when(campaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(force);
+        when(campaign.getCampaignOptions().get(CampaignOption.USE_ORACLE_CHRONICLE)).thenReturn(true);
+        when(campaign.getCampaignOptions().get(CampaignOption.MAXIMUM_ORACLE_LOG_ENTRIES)).thenReturn(100);
+        CampaignChronicleListener listener = new CampaignChronicleListener(campaign);
+
+        // A convoy between bases finishing its journey is not the company arriving.
+        listener.handle(new TransitCompleteEvent(mock(GroundTransitLocation.class)));
+        assertTrue(roleplay.getOracleLog().stream().noneMatch(entry -> entry.getType() == JournalEntryType.CHRONICLE));
+
+        listener.handle(new TransitCompleteEvent(force));
+        assertEquals(1, roleplay.getOracleLog().stream()
+                              .filter(entry -> entry.getType() == JournalEntryType.CHRONICLE).count());
     }
 }

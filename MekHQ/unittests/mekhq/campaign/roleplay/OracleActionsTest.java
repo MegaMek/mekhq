@@ -211,4 +211,15 @@ class OracleActionsTest {
         assertNull(actions.generateNpc(" "));
         assertTrue(roleplay.getOracleLog().isEmpty());
     }
+
+    @Test
+    void aGeneratedNameMatchingARemovedCharacterDoesNotOverwriteThem() {
+        OracleCharacter old = roleplay.addCharacter("Kai Allard");
+        old.setNotes("The original Kai");
+        roleplay.removeCharacter(old);
+
+        assertNull(actions.generateNpc("Kai Allard"));
+        assertFalse(old.isActive());
+        assertEquals("The original Kai", old.getNotes());
+    }
 }

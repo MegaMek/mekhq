@@ -663,7 +663,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 completionHandler.accept(null);
             } catch (ExecutionException ex) {
                 LOGGER.error("", ex);
-                rescueJournal();
                 if (ex.getCause() instanceof NullEntityException) {
                     JOptionPane.showMessageDialog(null,
                           String.format(resources.getString("DataLoadingDialog.NullEntityException.text"),
@@ -687,6 +686,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                           resources.getString("DataLoadingDialog.ExecutionException.title"),
                           JOptionPane.ERROR_MESSAGE);
                 }
+                // After the error, so the player learns the save failed before being told the journal is safe.
+                rescueJournal();
                 completionHandler.accept(null);
             }
         }

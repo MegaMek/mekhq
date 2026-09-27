@@ -56,7 +56,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
@@ -79,6 +78,8 @@ public final class JournalArchive {
     static final String START = "<!-- mekhq-journal-data";
     static final String END = "-->";
     private static final int LINE_LENGTH = 76;
+    /** Far more than any journal needs, so a damaged or hostile file can't exhaust memory. */
+    private static final int MAXIMUM_DATA_BYTES = 64 * 1024 * 1024;
 
     /**
      * What an import found.
@@ -190,9 +191,12 @@ public final class JournalArchive {
             final byte[] xml;
             try (GZIPInputStream zip = new GZIPInputStream(new ByteArrayInputStream(Base64.getDecoder()
                                                                                           .decode(data)))) {
-                xml = zip.readAllBytes();
+                xml = zip.readNBytes(MAXIMUM_DATA_BYTES + 1);
             }
-            final Node root = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+            if (xml.length > MAXIMUM_DATA_BYTES) {
+                throw new IOException("journal data is too large");
+            }
+            final Node root = MHQXMLUtility.newSafeDocumentBuilder()
                                     .parse(new ByteArrayInputStream(xml)).getDocumentElement();
             final List<JournalEntry> entries = new ArrayList<>();
             final Map<UUID, String> threads = new LinkedHashMap<>();
@@ -235,9 +239,12 @@ public final class JournalArchive {
         List<String> tags = List.of();
         StringBuilder body = null;
         final String text = document.contains(START) ? document.substring(0, document.lastIndexOf(START)) : document;
-        for (String line : (text + "\n## end").split("\\R", -1)) {
-            final Heading heading = line.startsWith("## ") ? heading(line.substring(3), dateParser) : null;
-            final boolean last = line.equals("## end");
+        final String[] lines = text.split("\\R", -1);
+        for (int index = 0; index <= lines.length; index++) {
+            // One pass past the last line flushes the final entry.
+            final boolean last = index == lines.length;
+            final String line = last ? "" : lines[index];
+            final Heading heading = (!last && line.startsWith("## ")) ? heading(line.substring(3), dateParser) : null;
             if (heading == null && !last) {
                 if (body == null) {
                     continue;

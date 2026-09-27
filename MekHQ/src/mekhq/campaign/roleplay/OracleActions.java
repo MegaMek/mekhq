@@ -390,9 +390,15 @@ public class OracleActions {
      *
      * @param name the new character's name
      *
-     * @return the new character, or {@code null} if the name is blank or already in the cast
+     * @return the new character, or {@code null} if the name is blank or already in the cast, even as a removed
+     *       character
      */
     public @Nullable OracleCharacter generateNpc(final String name) {
+        // A removed character with this name would be restored and given someone else's profile, so refuse it.
+        if (name == null || roleplay.getCharacters().stream()
+                                  .anyMatch(existing -> existing.getName().equals(name.strip()))) {
+            return null;
+        }
         final OracleCharacter character = roleplay.addCharacter(name);
         if (character == null) {
             return null;

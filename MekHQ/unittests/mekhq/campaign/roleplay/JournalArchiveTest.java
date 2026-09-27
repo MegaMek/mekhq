@@ -191,6 +191,14 @@ class JournalArchiveTest {
     }
 
     @Test
+    void aLineReadingEndDoesNotCutTheJournalShort() {
+        String document = "## 3025-01-01 - Note\n\nBefore\n## end\nAfter\n\n## 3025-01-02 - Note\n\nNext\n";
+        Archive archive = JournalArchive.read(document, LocalDate::parse);
+        assertEquals(2, archive.entries().size());
+        assertTrue(archive.entries().get(0).getText().contains("After"), archive.entries().get(0).getText());
+    }
+
+    @Test
     void aDamagedDataBlockFallsBackToTheText() {
         String document = export(campaignJournal());
         int start = document.indexOf(JournalArchive.START) + JournalArchive.START.length() + 1;
@@ -236,6 +244,21 @@ class JournalArchiveTest {
         assertNotNull(rescued);
         assertEquals(1, rescued.getJournal().size());
         assertEquals(1, rescued.getOracleLog().size());
+    }
+
+    @Test
+    void aSaveCutShortKeepsTheEntriesItHas() {
+        String save = saveWith(campaignJournal());
+        // Cut the file off after the first Oracle record, inside the Oracle log.
+        String truncated = save.substring(0, save.indexOf("</entry>", save.indexOf("<oracleLog>")) + 8);
+        Roleplay rescued = JournalRescue.read(truncated);
+        assertNotNull(rescued);
+        assertEquals(1, rescued.getOracleLog().size());
+    }
+
+    @Test
+    void aSaveWithNoJournalSectionIsNotReadAsOne() {
+        assertNull(JournalRescue.read("<campaign><units/></campaign>"));
     }
 
     @Test

@@ -50,11 +50,11 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.roleplay.JournalExporter.Format;
+import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 
 /**
@@ -65,8 +65,7 @@ import org.w3c.dom.Node;
 public final class JournalRescue {
     private static final MMLogger LOGGER = MMLogger.create(JournalRescue.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Roleplay";
-    private static final Pattern ROLEPLAY = Pattern.compile("(?s)<roleplay>.*</roleplay>");
-    private static final Pattern LIST = Pattern.compile("(?s)<(journal|oracleLog)>.*?</\\1>");
+    private static final Pattern LIST = Pattern.compile("(?s)<(journal|oracleLog)>.*?(?:</\\1>|\\z)");
     private static final Pattern ENTRY = Pattern.compile("(?s)<entry>.*?</entry>");
 
     private JournalRescue() {
@@ -114,8 +113,14 @@ public final class JournalRescue {
      * @return the roleplay state found, or {@code null} if there was none
      */
     static @Nullable Roleplay read(final String xml) {
-        final Matcher whole = ROLEPLAY.matcher(xml);
-        final String section = whole.find() ? whole.group() : xml;
+        final int open = xml.indexOf("<roleplay>");
+        if (open < 0) {
+            return null;
+        }
+        final int close = xml.lastIndexOf("</roleplay>");
+        // With no closing tag the file was cut short; what follows the opening tag is the best there is.
+        final String section = (close > open) ? xml.substring(open, close + "</roleplay>".length())
+                                     : xml.substring(open);
         final Roleplay parsed = parse(section);
         if (parsed != null) {
             return parsed;
@@ -145,7 +150,7 @@ public final class JournalRescue {
 
     private static @Nullable Roleplay parse(final String xml) {
         try {
-            final Node node = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+            final Node node = MHQXMLUtility.newSafeDocumentBuilder()
                                     .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)))
                                     .getDocumentElement();
             return node.getNodeName().equals("roleplay") ? Roleplay.generateInstanceFromXML(node) : null;

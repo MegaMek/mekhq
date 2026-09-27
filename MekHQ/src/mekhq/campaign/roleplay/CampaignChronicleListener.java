@@ -139,6 +139,10 @@ public class CampaignChronicleListener {
     @Subscribe
     public void handle(final TransitCompleteEvent event) {
         guard(() -> {
+            // Bases and convoys finish journeys too; only the main force's arrival is the company arriving.
+            if (event.getLocation() != campaign.getPlayerForce().getForceDetachment().getCurrentLocation()) {
+                return;
+            }
             PlanetarySystem system = campaign.getCurrentSystem();
             if (system != null) {
                 chronicle.arrived(system.getName(campaign.getLocalDate()));
