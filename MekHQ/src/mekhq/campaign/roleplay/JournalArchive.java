@@ -79,8 +79,9 @@ public final class JournalArchive {
     static final String END = "-->";
     private static final int LINE_LENGTH = 76;
     /**
-     * Far beyond any real journal, even 100,000 records plus notes, so only a damaged or hostile file is refused
-     * before it can exhaust memory.
+     * Far beyond any real journal, even 100,000 records plus notes, so no genuine export is ever refused. It bounds a
+     * damaged or hostile file rather than making it harmless: one that decompresses to this size still needs a few
+     * gigabytes of memory to read, and a player who imports it may run out.
      */
     private static final int MAXIMUM_DATA_BYTES = 1024 * 1024 * 1024;
 
@@ -138,8 +139,8 @@ public final class JournalArchive {
         final ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         try (GZIPOutputStream zip = new GZIPOutputStream(bytes)) {
             zip.write(xml.toString().getBytes(StandardCharsets.UTF_8));
-        } catch (IOException e) {
-            throw new IllegalStateException(e);
+        } catch (IOException exception) {
+            throw new IllegalStateException(exception);
         }
         final String data = Base64.getEncoder().encodeToString(bytes.toByteArray());
         final StringBuilder out = new StringBuilder(START).append('\n');
@@ -216,8 +217,8 @@ public final class JournalArchive {
             }
             entries.sort(Comparator.comparing(JournalEntry::getDate));
             return new Archive(entries, threads, characters, true);
-        } catch (Exception e) {
-            LOGGER.warn("The journal's hidden data could not be read; reading its text instead", e);
+        } catch (Exception exception) {
+            LOGGER.warn("The journal's hidden data could not be read; reading its text instead", exception);
             return null;
         }
     }
@@ -256,8 +257,11 @@ public final class JournalArchive {
                           && line.length() > 2) {
                     final List<String> parts = List.of(line.substring(1, line.length() - 1).split("; "));
                     // Only a line made wholly of tag lists is tags; anything else is an italic first line.
-                    if (parts.stream().allMatch(part -> threadsLine.matcher(part.strip()).matches()
-                                                              || charactersLine.matcher(part.strip()).matches())) {
+                    final boolean allTags = parts.stream()
+                                                  .allMatch(part -> threadsLine.matcher(part.strip()).matches()
+                                                                          || charactersLine.matcher(part.strip())
+                                                                                   .matches());
+                    if (allTags) {
                         tags = parts;
                         continue;
                     }
@@ -294,7 +298,7 @@ public final class JournalArchive {
         final LocalDate date;
         try {
             date = dateParser.apply(text.substring(0, split).strip());
-        } catch (Exception e) {
+        } catch (Exception exception) {
             return null;
         }
         if (date == null) {
@@ -411,6 +415,8 @@ public final class JournalArchive {
      * @return what was added
      */
     public static ImportResult importInto(final Roleplay roleplay, final Archive archive, final int maximumRecords) {
+        // Only what the campaign already has counts as a duplicate: two identical dice rolls on one day in the
+        // imported file are both real.
         final Set<String> known = new HashSet<>();
         roleplay.getJournal().forEach(entry -> known.add(key(entry)));
         roleplay.getOracleLog().forEach(entry -> known.add(key(entry)));
@@ -421,7 +427,7 @@ public final class JournalArchive {
         int records = 0;
         int duplicates = 0;
         for (JournalEntry entry : archive.entries()) {
-            if (!known.add(key(entry))) {
+            if (known.contains(key(entry))) {
                 duplicates++;
                 continue;
             }
@@ -452,12 +458,8 @@ public final class JournalArchive {
             }
         }
         roleplay.getJournal().sort(Comparator.comparing(JournalEntry::getDate));
-        final List<JournalEntry> log = roleplay.getOracleLog();
-        log.sort(Comparator.comparing(JournalEntry::getDate));
-        final int trimmed = Math.max(0, log.size() - Math.max(1, maximumRecords));
-        if (trimmed > 0) {
-            log.subList(0, trimmed).clear();
-        }
+        roleplay.getOracleLog().sort(Comparator.comparing(JournalEntry::getDate));
+        final int trimmed = roleplay.trimOracleLog(maximumRecords);
         return new ImportResult(notes, records, duplicates, trimmed);
     }
 

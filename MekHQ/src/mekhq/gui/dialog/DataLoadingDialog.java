@@ -633,21 +633,30 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
         /**
          * When a save fails to load, saves its Oracle journal next to it so the player's story isn't lost, and tells
-         * them where it is.
+         * them where it is. The save is read again on a background thread so the interface stays responsive.
          */
         private void rescueJournal() {
-            if (getCampaignFile() == null) {
+            final File save = getCampaignFile();
+            if (save == null) {
                 return;
             }
-            File rescued = JournalRescue.rescue(getCampaignFile(),
-                  date -> MekHQ.getMHQOptions().getDisplayFormattedDate(date));
-            if (rescued != null) {
-                JOptionPane.showMessageDialog(null,
-                      getFormattedTextAt("mekhq.resources.Roleplay", "JournalRescue.saved",
-                            rescued.getAbsolutePath()),
-                      getTextAt("mekhq.resources.Roleplay", "JournalRescue.savedTitle"),
-                      JOptionPane.INFORMATION_MESSAGE);
-            }
+            final Thread rescuer = new Thread(() -> {
+                try {
+                    final File rescued = JournalRescue.rescue(save,
+                          date -> MekHQ.getMHQOptions().getDisplayFormattedDate(date));
+                    if (rescued != null) {
+                        SwingUtilities.invokeLater(() -> JOptionPane.showMessageDialog(null,
+                              getFormattedTextAt("mekhq.resources.Roleplay", "JournalRescue.saved",
+                                    rescued.getAbsolutePath()),
+                              getTextAt("mekhq.resources.Roleplay", "JournalRescue.savedTitle"),
+                              JOptionPane.INFORMATION_MESSAGE));
+                    }
+                } catch (Throwable throwable) {
+                    LOGGER.error("Failed to rescue the journal from {}", save, throwable);
+                }
+            }, "Journal rescue");
+            rescuer.setDaemon(true);
+            rescuer.start();
         }
 
         /**
@@ -686,9 +695,15 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                           resources.getString("DataLoadingDialog.ExecutionException.title"),
                           JOptionPane.ERROR_MESSAGE);
                 }
-                // After the error, so the player learns the save failed before being told the journal is safe.
-                rescueJournal();
-                completionHandler.accept(null);
+                try {
+                    // After the error, so the player learns the save failed before being told the journal is safe.
+                    // Out of memory, reading the save again would only fail the same way.
+                    if (!(ex.getCause() instanceof OutOfMemoryError)) {
+                        rescueJournal();
+                    }
+                } finally {
+                    completionHandler.accept(null);
+                }
             }
         }
     }

@@ -379,8 +379,8 @@ public class PlotThread {
                 thread.revealDates.add(i < revealDates.size() ? revealDates.get(i) : null);
             }
             return thread;
-        } catch (Exception e) {
-            LOGGER.error("Failed to load plot thread", e);
+        } catch (Exception exception) {
+            LOGGER.error("Failed to load plot thread", exception);
             return null;
         }
     }
@@ -391,7 +391,7 @@ public class PlotThread {
         }
         try {
             return MHQXMLUtility.parseDate(text);
-        } catch (Exception e) {
+        } catch (Exception exception) {
             LOGGER.warn("Unreadable plot thread reveal date {}", text);
             return null;
         }
@@ -401,14 +401,14 @@ public class PlotThread {
     private static @Nullable OracleTable parseTable(final String text) {
         try {
             return OracleTable.valueOf(text);
-        } catch (IllegalArgumentException e) {
-            LOGGER.warn("Unknown oracle table {} in a plot thread", text);
+        } catch (IllegalArgumentException unknown) {
             return null;
         }
     }
 
     private static List<Concept> parseConcepts(final Node stepNode) {
         final List<Concept> concepts = new ArrayList<>();
+        final List<String> unknownTables = new ArrayList<>();
         final NodeList conceptNodes = stepNode.getChildNodes();
         for (int i = 0; i < conceptNodes.getLength(); i++) {
             final Node conceptNode = conceptNodes.item(i);
@@ -417,19 +417,26 @@ public class PlotThread {
             }
 
             OracleTable table = null;
+            String tableName = null;
             String meaning = null;
             final NodeList fields = conceptNode.getChildNodes();
             for (int j = 0; j < fields.getLength(); j++) {
                 final Node field = fields.item(j);
                 if (field.getNodeName().equals("table")) {
-                    table = parseTable(field.getTextContent().trim());
+                    tableName = field.getTextContent().trim();
+                    table = parseTable(tableName);
                 } else if (field.getNodeName().equals("meaning")) {
                     meaning = field.getTextContent();
                 }
             }
             if (table != null) {
                 concepts.add(new Concept(table, meaning));
+            } else {
+                unknownTables.add(tableName);
             }
+        }
+        if (!unknownTables.isEmpty()) {
+            LOGGER.warn("Skipped plot thread concepts from unknown oracle tables {}", unknownTables);
         }
         return concepts;
     }

@@ -231,15 +231,22 @@ public class TravelRecord {
     static List<TravelRecord> parseList(final Node node) {
         final List<TravelRecord> records = new ArrayList<>();
         final NodeList children = node.getChildNodes();
+        int failures = 0;
+        Exception firstFailure = null;
         for (int i = 0; i < children.getLength(); i++) {
             final Node child = children.item(i);
             if (child.getNodeName().equalsIgnoreCase("record")) {
                 try {
                     records.add(parse(child));
-                } catch (Exception e) {
-                    LOGGER.error("Failed to load a travel log record", e);
+                } catch (Exception exception) {
+                    failures++;
+                    firstFailure = (firstFailure == null) ? exception : firstFailure;
                 }
             }
+        }
+        if (firstFailure != null) {
+            LOGGER.error(firstFailure, "Skipped {} unreadable travel log records; the first failure follows",
+                  failures);
         }
         return records;
     }

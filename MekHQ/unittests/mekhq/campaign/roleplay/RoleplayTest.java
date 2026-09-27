@@ -246,6 +246,18 @@ class RoleplayTest {
         assertEquals(List.of("result 7"), roleplay.getOracleLog().stream().map(JournalEntry::getText).toList());
     }
 
+    @Test
+    void campaignEventsAreNeitherTrimmedNorCounted() {
+        Roleplay roleplay = new Roleplay();
+        java.time.LocalDate date = java.time.LocalDate.of(3025, 1, 1);
+        roleplay.logOracle(date, JournalEntryType.CHRONICLE, "Contract accepted", 2);
+        for (int i = 1; i <= 4; i++) {
+            roleplay.logOracle(date, JournalEntryType.DICE, "roll " + i, 2);
+        }
+        assertEquals(List.of("Contract accepted", "roll 3", "roll 4"),
+              roleplay.getOracleLog().stream().map(JournalEntry::getText).toList());
+    }
+
     private static Node parse(final String xml) throws Exception {
         return DocumentBuilderFactory.newInstance()
                      .newDocumentBuilder()

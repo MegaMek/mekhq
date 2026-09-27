@@ -36,6 +36,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -65,8 +67,10 @@ import org.w3c.dom.Node;
 public final class JournalRescue {
     private static final MMLogger LOGGER = MMLogger.create(JournalRescue.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Roleplay";
-    private static final Pattern LIST = Pattern.compile("(?s)<(journal|oracleLog)>.*?(?:</\\1>|\\z)");
-    private static final Pattern ENTRY = Pattern.compile("(?s)<entry>.*?</entry>");
+    private static final Pattern LIST = Pattern.compile(
+          "(?s)<(journal|oracleLog|characters|plotThreads)>.*?(?:</\\1>|\\z)");
+    private static final Pattern ITEM = Pattern.compile("(?s)<(entry|character|plotThread)\\b.*?</\\1>");
+    private static final int READ_CHUNK = 64 * 1024;
 
     private JournalRescue() {
     }
@@ -94,19 +98,25 @@ public final class JournalRescue {
             final String document = JournalExporter.export(entries, Format.MARKDOWN,
                   getTextAt(RESOURCE_BUNDLE, "JournalRescue.title"), null, roleplay::getPlotThreadName,
                   roleplay::getCharacterName, dateFormatter);
+            final File earlier = findEarlierRescue(save, document);
+            if (earlier != null) {
+                // Trying the same broken save again shouldn't leave another copy each time.
+                return earlier;
+            }
             final File file = freeName(save);
             Files.writeString(file.toPath(), document, StandardCharsets.UTF_8);
             LOGGER.info("Saved {} journal entries from {} to {}", entries.size(), save, file);
             return file;
-        } catch (Exception e) {
-            LOGGER.error("Failed to rescue the journal from {}", save, e);
+        } catch (Exception exception) {
+            LOGGER.error("Failed to rescue the journal from {}", save, exception);
             return null;
         }
     }
 
     /**
      * Reads the roleplay state out of a save's text, as much of it as can be read: the whole {@code <roleplay>}
-     * element if it is sound, otherwise each journal list, otherwise each entry on its own.
+     * element if it is sound, otherwise each list (journal, Oracle log, cast and threads), otherwise each item on its
+     * own.
      *
      * @param xml the save's text
      *
@@ -126,7 +136,8 @@ public final class JournalRescue {
             return parsed;
         }
 
-        // The element is damaged: keep whatever lists, or failing that entries, can still be read.
+        // The element is damaged: keep whatever lists, or failing that items, can still be read. The cast and threads
+        // are kept too, so the journal's tags still name them.
         final StringBuilder repaired = new StringBuilder("<roleplay>");
         final Matcher lists = LIST.matcher(section);
         while (lists.find()) {
@@ -137,10 +148,10 @@ public final class JournalRescue {
                 continue;
             }
             repaired.append('<').append(tag).append('>');
-            final Matcher entries = ENTRY.matcher(list);
-            while (entries.find()) {
-                if (parse("<roleplay><" + tag + ">" + entries.group() + "</" + tag + "></roleplay>") != null) {
-                    repaired.append(entries.group());
+            final Matcher items = ITEM.matcher(list);
+            while (items.find()) {
+                if (parse("<roleplay><" + tag + ">" + items.group() + "</" + tag + "></roleplay>") != null) {
+                    repaired.append(items.group());
                 }
             }
             repaired.append("</").append(tag).append('>');
@@ -154,25 +165,62 @@ public final class JournalRescue {
                                     .parse(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8)))
                                     .getDocumentElement();
             return node.getNodeName().equals("roleplay") ? Roleplay.generateInstanceFromXML(node) : null;
-        } catch (Exception e) {
+        } catch (Exception unreadable) {
             return null;
         }
     }
 
-    private static String readText(final File save) throws IOException {
+    /**
+     * Reads a save's text, decompressing it if needed. A compressed save that was cut short still gives up everything
+     * before the cut.
+     */
+    static String readText(final File save) throws IOException {
         try (InputStream raw = new BufferedInputStream(Files.newInputStream(save.toPath()))) {
             raw.mark(2);
             final boolean zipped = raw.read() == 0x1f && raw.read() == 0x8b;
             raw.reset();
-            final InputStream in = zipped ? new GZIPInputStream(raw) : raw;
-            return new String(in.readAllBytes(), StandardCharsets.UTF_8);
+            final InputStream source = zipped ? new GZIPInputStream(raw) : raw;
+            final ByteArrayOutputStream text = new ByteArrayOutputStream();
+            final byte[] buffer = new byte[READ_CHUNK];
+            try {
+                for (int read = source.read(buffer); read >= 0; read = source.read(buffer)) {
+                    text.write(buffer, 0, read);
+                }
+            } catch (EOFException truncated) {
+                LOGGER.warn("{} ends early; reading the part that is there", save);
+            }
+            return text.toString(StandardCharsets.UTF_8);
         }
+    }
+
+    /**
+     * @return an earlier rescue of this save with exactly this content, or {@code null} if there is none
+     */
+    private static @Nullable File findEarlierRescue(final File save, final String document) throws IOException {
+        for (int number = 1; candidate(save, number).exists(); number++) {
+            final File file = candidate(save, number);
+            if (Files.readString(file.toPath(), StandardCharsets.UTF_8).equals(document)) {
+                return file;
+            }
+        }
+        return null;
     }
 
     /**
      * @return a file next to the save that does not exist yet, such as "My Campaign - journal.md"
      */
     static File freeName(final File save) {
+        int number = 1;
+        while (candidate(save, number).exists()) {
+            number++;
+        }
+        return candidate(save, number);
+    }
+
+    /**
+     * @return the name for a save's {@code number}th rescue: "My Campaign - journal.md", then "... journal 2.md"
+     */
+    private static File candidate(final File save, final int number) {
         String name = save.getName();
         for (String extension : List.of(".gz", ".cpnx", ".xml")) {
             if (name.toLowerCase(Locale.ROOT).endsWith(extension)) {
@@ -180,10 +228,7 @@ public final class JournalRescue {
             }
         }
         final String suffix = getTextAt(RESOURCE_BUNDLE, "JournalRescue.fileSuffix");
-        File file = new File(save.getAbsoluteFile().getParentFile(), name + suffix + ".md");
-        for (int number = 2; file.exists(); number++) {
-            file = new File(save.getAbsoluteFile().getParentFile(), name + suffix + " " + number + ".md");
-        }
-        return file;
+        return new File(save.getAbsoluteFile().getParentFile(),
+              name + suffix + ((number > 1) ? " " + number : "") + ".md");
     }
 }

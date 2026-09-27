@@ -38,6 +38,7 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -70,7 +71,7 @@ public final class JournalExporter {
          * @return {@link #MARKDOWN} for a {@code .md} or {@code .markdown} file, otherwise {@link #TEXT}
          */
         public static Format forFileName(final String fileName) {
-            String lower = fileName.toLowerCase(java.util.Locale.ROOT);
+            String lower = fileName.toLowerCase(Locale.ROOT);
             return (lower.endsWith(".md") || lower.endsWith(".markdown")) ? MARKDOWN : TEXT;
         }
     }

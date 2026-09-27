@@ -157,15 +157,22 @@ class CampaignChronicleTest {
     }
 
     @Test
-    void aGroupTrimmedFromTheLogStartsAgain() {
-        maximum[0] = 1;
+    void aGroupDeletedFromTheLogStartsAgain() {
         JournalEntry first = chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Ana", null);
-        chronicle.arrived("Helm");
+        roleplay.getOracleLog().remove(first);
         JournalEntry again = chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Ben", null);
 
-        assertTrue(first != again, "the trimmed entry is not reused");
+        assertTrue(first != again, "the deleted entry is not reused");
         assertEquals("Killed: Ben.", again.getText());
         assertEquals(1, roleplay.getOracleLog().size());
+    }
+
+    @Test
+    void campaignEventsOutliveTheOracleLogLimit() {
+        maximum[0] = 1;
+        chronicle.personChanged(PersonChange.KILLED, UUID.randomUUID(), "Ana", null);
+        chronicle.arrived("Helm");
+        assertEquals(2, roleplay.getOracleLog().size());
     }
 
     @Test

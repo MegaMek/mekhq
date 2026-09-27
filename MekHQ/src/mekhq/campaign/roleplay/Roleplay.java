@@ -39,6 +39,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -227,7 +228,9 @@ public class Roleplay {
     public void restoreCharacter(final OracleCharacter character) {
         characters.remove(character);
         character.setActive(true);
-        final int firstInactive = characters.indexOf(characters.stream().filter(c -> !c.isActive()).findFirst()
+        final int firstInactive = characters.indexOf(characters.stream()
+                                                           .filter(member -> !member.isActive())
+                                                           .findFirst()
                                                            .orElse(null));
         characters.add(firstInactive < 0 ? characters.size() : firstInactive, character);
     }
@@ -244,7 +247,7 @@ public class Roleplay {
             return;
         }
         active.add(Math.clamp(activeIndex, 0, active.size()), character);
-        final List<OracleCharacter> inactive = characters.stream().filter(c -> !c.isActive()).toList();
+        final List<OracleCharacter> inactive = characters.stream().filter(member -> !member.isActive()).toList();
         characters.clear();
         characters.addAll(active);
         characters.addAll(inactive);
@@ -304,8 +307,8 @@ public class Roleplay {
     }
 
     /**
-     * Records an Oracle result in the Oracle log, then removes the oldest records until at most
-     * {@code maximumEntries} remain.
+     * Records an Oracle result in the Oracle log, then removes the oldest results until at most
+     * {@code maximumEntries} remain. Campaign chronicle records are kept regardless.
      *
      * @param date           the in-game date of the result
      * @param type           what kind of result this is
@@ -322,11 +325,30 @@ public class Roleplay {
         return entry;
     }
 
-    private void trimOracleLog(final int maximumEntries) {
-        final int excess = oracleLog.size() - Math.max(1, maximumEntries);
-        if (excess > 0) {
-            oracleLog.subList(0, excess).clear();
+    /**
+     * Removes the oldest Oracle results until at most {@code maximumEntries} remain. Campaign chronicle records are
+     * history rather than dice, so they are never removed and don't count towards the limit.
+     *
+     * @param maximumEntries the most results to keep; values below 1 are treated as 1
+     *
+     * @return how many results were removed
+     */
+    int trimOracleLog(final int maximumEntries) {
+        int excess = -Math.max(1, maximumEntries);
+        for (JournalEntry entry : oracleLog) {
+            if (entry.getType() != JournalEntryType.CHRONICLE) {
+                excess++;
+            }
         }
+        int removed = 0;
+        final Iterator<JournalEntry> iterator = oracleLog.iterator();
+        while ((removed < excess) && iterator.hasNext()) {
+            if (iterator.next().getType() != JournalEntryType.CHRONICLE) {
+                iterator.remove();
+                removed++;
+            }
+        }
+        return removed;
     }
 
     /**
@@ -469,6 +491,8 @@ public class Roleplay {
                           DEFAULT_CHAOS_FACTOR));
                 } else if (child.getNodeName().equalsIgnoreCase("characters")) {
                     final NodeList characterNodes = child.getChildNodes();
+                    int failures = 0;
+                    Exception firstFailure = null;
                     for (int j = 0; j < characterNodes.getLength(); j++) {
                         final Node characterNode = characterNodes.item(j);
                         if (characterNode.getNodeName().equalsIgnoreCase("character")) {
@@ -478,10 +502,15 @@ public class Roleplay {
                                 if (!character.getName().isBlank()) {
                                     roleplay.characters.add(character);
                                 }
-                            } catch (Exception e) {
-                                LOGGER.error("Failed to load Oracle character", e);
+                            } catch (Exception exception) {
+                                failures++;
+                                firstFailure = (firstFailure == null) ? exception : firstFailure;
                             }
                         }
+                    }
+                    if (firstFailure != null) {
+                        LOGGER.error(firstFailure, "Skipped {} unreadable Oracle characters; the first failure follows",
+                              failures);
                     }
                 } else if (child.getNodeName().equalsIgnoreCase("journal")) {
                     roleplay.journal.addAll(JournalEntry.parseList(child, JournalEntryType.NOTE));
@@ -501,8 +530,8 @@ public class Roleplay {
                         }
                     }
                 }
-            } catch (Exception e) {
-                LOGGER.error("Failed to parse roleplay element {}", child.getNodeName(), e);
+            } catch (Exception exception) {
+                LOGGER.error("Failed to parse roleplay element {}", child.getNodeName(), exception);
             }
         }
 

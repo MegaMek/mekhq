@@ -49,6 +49,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.UUID;
 import java.util.zip.GZIPOutputStream;
 
 import mekhq.campaign.roleplay.JournalArchive.Archive;
@@ -151,6 +152,16 @@ class JournalArchiveTest {
               LocalDate::parse), 3);
         assertEquals(2, result.trimmed());
         assertEquals("roll 2", target.getOracleLog().get(0).getText());
+    }
+
+    @Test
+    void identicalRecordsInOneFileAreAllImported() {
+        Roleplay source = new Roleplay();
+        source.getOracleLog().add(new JournalEntry(DAY_ONE, JournalEntryType.DICE, "Rolled 1d6: 4"));
+        source.getOracleLog().add(new JournalEntry(DAY_ONE, JournalEntryType.DICE, "Rolled 1d6: 4"));
+        Roleplay target = new Roleplay();
+        assertEquals(new ImportResult(0, 2, 0, 0),
+              JournalArchive.importInto(target, JournalArchive.read(export(source), LocalDate::parse), 500));
     }
 
     @Test
@@ -272,10 +283,42 @@ class JournalArchiveTest {
 
         assertNotNull(first);
         assertEquals("Wolf's Dragoons - rescued journal.md", first.getName());
-        assertEquals("Wolf's Dragoons - rescued journal 2.md", second.getName());
+        // Trying the same save again doesn't leave another copy.
+        assertEquals(first, second);
         Archive archive = JournalArchive.read(Files.readString(first.toPath()), LocalDate::parse);
         assertTrue(archive.exact());
         assertEquals(2, archive.entries().size());
+    }
+
+    @Test
+    void aCompressedSaveCutShortStillGivesUpItsJournal(@TempDir final Path folder) throws Exception {
+        File whole = folder.resolve("whole.gz").toFile();
+        try (OutputStream file = new FileOutputStream(whole); OutputStream out = new GZIPOutputStream(file)) {
+            // Plenty of text after the journal, so cutting the file short leaves the journal intact.
+            out.write((saveWith(campaignJournal()) + "<padding>" + "x".repeat(500_000) + "</padding>")
+                            .getBytes(StandardCharsets.UTF_8));
+        }
+        byte[] bytes = Files.readAllBytes(whole.toPath());
+        File save = folder.resolve("cut.cpnx.gz").toFile();
+        Files.write(save.toPath(), java.util.Arrays.copyOf(bytes, bytes.length - 100));
+
+        Roleplay rescued = JournalRescue.read(JournalRescue.readText(save));
+        assertNotNull(rescued);
+        assertEquals(1, rescued.getJournal().size());
+        assertNotNull(JournalRescue.rescue(save, LocalDate::toString));
+    }
+
+    @Test
+    void aDamagedJournalKeepsTheCastAndThreadsForItsTags() {
+        Roleplay roleplay = campaignJournal();
+        roleplay.getJournal().add(new JournalEntry(DAY_TWO, JournalEntryType.NOTE, "MARKER"));
+        Roleplay rescued = JournalRescue.read(saveWith(roleplay).replace("MARKER", "<broken>"));
+        assertNotNull(rescued);
+        assertEquals(1, rescued.getJournal().size());
+        assertEquals("Ana", rescued.getCharacters().get(0).getName());
+        assertEquals(1, rescued.getPlotThreads().size());
+        UUID thread = rescued.getJournal().get(0).getThreads().iterator().next();
+        assertEquals("Hunt", rescued.getPlotThreadName(thread));
     }
 
     @Test

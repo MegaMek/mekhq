@@ -310,8 +310,8 @@ public class JournalEntry {
             entry.answer = answer;
             entry.check = check;
             return entry;
-        } catch (Exception e) {
-            LOGGER.error("Failed to load journal entry", e);
+        } catch (Exception exception) {
+            LOGGER.error("Failed to load journal entry", exception);
             return null;
         }
     }

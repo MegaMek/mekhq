@@ -190,7 +190,7 @@ public class OracleCharacter {
     private static @Nullable NpcRating parseRating(final String text) {
         try {
             return NpcRating.valueOf(text);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException exception) {
             return null;
         }
     }
