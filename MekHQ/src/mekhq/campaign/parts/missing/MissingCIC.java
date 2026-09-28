@@ -39,13 +39,13 @@ import megamek.common.annotations.Nullable;
 import megamek.common.units.Aero;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.CombatInformationCenter;
 import mekhq.campaign.parts.Part;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * @author MKerensky
@@ -96,7 +96,7 @@ public class MissingCIC extends MissingPart {
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof CombatInformationCenter && cost == part.getStickerPrice();
+        return part instanceof CombatInformationCenter && cost.equals(part.getStickerPrice());
     }
 
     @Override
