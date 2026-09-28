@@ -235,7 +235,7 @@ class RefitExecutionCharacterizationTest {
     }
 
     @Test
-    void cancelBeforeTheKitIsFoundLeavesTheKitOnProcurementSeeCore2() throws Exception {
+    void cancelBeforeTheKitIsFoundRemovesTheKitOrder() throws Exception {
         Refit refit = beginKitRefit();
 
         refit.cancel();
@@ -244,13 +244,11 @@ class RefitExecutionCharacterizationTest {
         assertEquals(locustPartsBeforeRefit, PartsCensus.ofUnit(locust));
         assertEquals(Map.of(), warehouseStock());
         assertEquals(STARTING_FUNDS, balance());
-        // Current behaviour, see CORE-2: the cancelled refit's kit stays on the procurement list; changes when CORE-2
-        // is fixed
-        assertEquals(Map.of(refit.getAcquisitionName(), 1), procurementList(), "CORE-2");
+        assertEquals(Map.of(), procurementList(), "The cancelled refit's kit is no longer ordered");
     }
 
     @Test
-    void cancelWhileTheKitIsInTransitLandsTheNewPartsAtOnce() throws Exception {
+    void cancelWhileTheKitIsInTransitLeavesThePartsInTransit() throws Exception {
         Refit refit = beginKitRefit();
         deliverKit(refit, KIT_TRANSIT_DAYS);
 
@@ -258,9 +256,11 @@ class RefitExecutionCharacterizationTest {
 
         assertNull(locust.getRefit());
         assertEquals(locustPartsBeforeRefit, PartsCensus.ofUnit(locust));
-        // Current behaviour: cancel hands each freed part back to the quartermaster with zero transit days, so the
-        // kit's lasers, still three days out, arrive at once as ordinary spares
-        assertEquals(Map.of("Medium Laser", 1, "Small Laser", 2), warehouseStock());
+        // The kit's lasers, still three days out, become ordinary spares that arrive when they were due
+        assertEquals(Map.of("Medium Laser [in transit]", 1, "Small Laser [in transit]", 2), warehouseStock());
+        for (Part sparePart : scenario.getSpareParts()) {
+            assertEquals(KIT_TRANSIT_DAYS, sparePart.getDaysToArrival(), sparePart.getName());
+        }
         assertEquals(STARTING_FUNDS.minus(LOCUST_KIT_PRICE), balance(), "The kit is not refunded");
         assertEquals(Map.of(), procurementList());
     }
@@ -276,15 +276,14 @@ class RefitExecutionCharacterizationTest {
         assertEquals(Map.of("Medium Laser [reserved]", 1), warehouseStock());
         assertEquals(2, refit.getShoppingList().size());
         assertEquals(Map.of("Small Laser", 2), procurementList());
-        // Current behaviour: the refit's first Small Laser entry is the very object placed on the procurement list, so
-        // ordering the second Small Laser raises that entry's quantity to 2 and the refit's list now counts 3
-        assertEquals(Map.of("Small Laser", 3), PartsCensus.ofParts(refit.getShoppingList()));
+        // The procurement list holds its own order, so ordering the second Small Laser leaves the refit's list alone
+        assertEquals(Map.of("Small Laser", 2), PartsCensus.ofParts(refit.getShoppingList()));
         assertFalse(refit.acquireParts());
         assertEquals(STARTING_FUNDS, balance());
     }
 
     @Test
-    void cancelledCustomRefitReturnsTheSpareButLeavesItsOrdersSeeCore2() throws Exception {
+    void cancelledCustomRefitReturnsTheSpareAndRemovesItsOrders() throws Exception {
         Part spareMediumLaser = mediumLaserOf(locust).clone();
         scenario.withSpare(spareMediumLaser, 1);
         Refit refit = new Refit(locust, UnitFixture.LOCUST_LCT_1E.loadEntity(), true, false, false);
@@ -295,9 +294,7 @@ class RefitExecutionCharacterizationTest {
         assertNull(locust.getRefit());
         assertEquals(locustPartsBeforeRefit, PartsCensus.ofUnit(locust));
         assertEquals(Map.of("Medium Laser", 1), warehouseStock(), "The reserved spare is free again");
-        // Current behaviour, see CORE-2: the Small Laser orders placed for the cancelled refit stay on the procurement
-        // list; changes when CORE-2 is fixed
-        assertEquals(Map.of("Small Laser", 2), procurementList(), "CORE-2");
+        assertEquals(Map.of(), procurementList(), "The Small Laser orders placed for the refit are removed");
     }
 
     @Test
