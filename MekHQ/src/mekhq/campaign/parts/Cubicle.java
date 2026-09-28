@@ -190,8 +190,8 @@ public class Cubicle extends Part {
 
     @Override
     public Part clone() {
-        Part part = new Cubicle(getUnitTonnage(), bayType, campaign);
-        copyBaseData(part);
+        Cubicle part = new Cubicle(getUnitTonnage(), bayType, campaign);
+        part.copyBaseData(this);
         return part;
     }
 

@@ -108,15 +108,30 @@ public class MASC extends EquipmentPart {
         return type.hasFlag(MiscTypeFlag.S_SUPERCHARGER);
     }
 
+    /**
+     * A MASC is the same part type as another when the equipment checks every {@link EquipmentPart} makes pass and
+     * both were built for the same engine rating.
+     */
+    @Override
+    public boolean isSamePartType(Part part) {
+        if (!(part instanceof MASC otherMasc)) {
+            return false;
+        }
+        boolean isSameEquipment = super.isSamePartType(part);
+        boolean isSameEngineRating = getEngineRating() == otherMasc.getEngineRating();
+        return isSameEquipment && isSameEngineRating;
+    }
+
+    /**
+     * A damaged MASC never shares a warehouse stack. Otherwise two MASC share a stack under the same rules as every
+     * other part: the same part type, and the same status (quality, damage, delivery and reservation).
+     */
     @Override
     public boolean isSamePartTypeAndStatus(Part part) {
         if (needsFixing() || part.needsFixing()) {
             return false;
         }
-        return part instanceof MASC
-                     && getType().equals(((EquipmentPart) part).getType())
-                     && getTonnage() == part.getTonnage()
-                     && getEngineRating() == ((MASC) part).getEngineRating();
+        return super.isSamePartTypeAndStatus(part);
     }
 
     @Override
