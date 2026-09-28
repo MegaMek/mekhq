@@ -14,6 +14,20 @@ allprojects {
     }
 }
 
+if (hasProperty('suiteReleaseVersion')) {
+    def requested = property('suiteReleaseVersion').toString()
+    if (!(requested ==~ /(?:0|[1-9][0-9]*)\.(?:[0-9]{2}|[1-9][0-9]{2,})\.(?:[0-9]{2}|[1-9][0-9]{2,})/)) {
+        throw new GradleException("suiteReleaseVersion must be canonical padded major.minor.patch (e.g. 0.51.01); got ${requested}")
+    }
+    requested.split(/\./).each { component ->
+        try {
+            Integer.parseInt(component)
+        } catch (NumberFormatException e) {
+            throw new GradleException("suiteReleaseVersion component exceeds Java int range: ${component}", e)
+        }
+    }
+}
+
 subprojects {
     Properties versionProperties = new Properties()
     versionProperties.load(rootProject.file("../megamek/megamek/resources/Version.properties").newDataInputStream())
@@ -22,14 +36,21 @@ subprojects {
     // Optional fourth component, present only for a special point release such as 0.51.0.1. See the comment in
     // MegaMek's megamek/resources/Version.properties, which is the file read above.
     def revisionProperty = versionProperties.getProperty("revision")
-    if (revisionProperty != null && !revisionProperty.trim().isEmpty()) {
+    if (!rootProject.hasProperty('suiteReleaseVersion') && revisionProperty != null && !revisionProperty.trim().isEmpty()) {
         def parsedRevision = Integer.parseInt(revisionProperty.trim())
         if (parsedRevision > 0) {
             processedVersion = String.format("%s.%d", processedVersion, parsedRevision)
         }
     }
 
+    if (rootProject.hasProperty('suiteReleaseVersion')) {
+        processedVersion = rootProject.property('suiteReleaseVersion').toString()
+    }
+
     if (project.hasProperty("extraVersion")) {
+        if (rootProject.hasProperty('suiteReleaseVersion')) {
+            throw new GradleException('extraVersion cannot be combined with suiteReleaseVersion')
+        }
         processedVersion = String.format("%s-%s", processedVersion, project.getProperty('extraVersion'))
     }
 
