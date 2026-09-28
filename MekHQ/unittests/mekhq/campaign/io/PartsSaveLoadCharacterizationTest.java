@@ -130,7 +130,7 @@ class PartsSaveLoadCharacterizationTest {
         scenario.withSpare(wolverineMediumLaser().clone(), 2);
         Part partInTransit = PartsScenario.unitParts(wolverine(), MekActuator.class).getFirst().clone();
         partInTransit.setCampaign(campaign);
-        campaign.getQuartermaster().addPart(partInTransit, TRANSIT_DAYS);
+        campaign.getQuartermaster().addPart(partInTransit, TRANSIT_DAYS, false);
         Part partReservedForRefit = PartsScenario.unitParts(wolverine(), MekLocation.class).getFirst().clone();
         partReservedForRefit.setRefitUnit(wolverine());
         placeInWarehouse(partReservedForRefit);
