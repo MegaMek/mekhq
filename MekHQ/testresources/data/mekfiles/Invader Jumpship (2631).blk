@@ -1,0 +1,217 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-c0e3-71ab-ab61-023aac9a9b33
+</UUID>
+
+<UnitType>
+Jumpship
+</UnitType>
+
+<Name>
+Invader JumpShip
+</Name>
+
+<Model>
+(2631)
+</Model>
+
+<mul id:>
+4373
+</mul id:>
+
+<year>
+2631
+</year>
+
+<type>
+IS Level 2
+</type>
+
+<motion_type>
+Aerodyne
+</motion_type>
+
+<transporters>
+smallcraftbay:2.0:2:1::-1:0
+cargobay:262.0:1:2::-1:0
+cargobay:262.0:1:3::-1:0
+1stclassquarters:40.0:0:-1::-1:0
+crewquarters:140.0:0:-1::-1:0
+dockingcollar
+dockingcollar
+dockingcollar
+</transporters>
+
+<SafeThrust>
+0
+</SafeThrust>
+
+<heatsinks>
+116
+</heatsinks>
+
+<sink_type>
+0
+</sink_type>
+
+<fuel>
+250
+</fuel>
+
+<engine_type>
+1
+</engine_type>
+
+<armor_type>
+41
+</armor_type>
+
+<armor_tech_rating>
+0
+</armor_tech_rating>
+
+<armor_tech_level>
+1
+</armor_tech_level>
+
+<armor>
+7
+7
+7
+5
+6
+6
+</armor>
+
+<Nose Equipment>
+</Nose Equipment>
+
+<Left Front Side Equipment>
+(B) Large Laser
+</Left Front Side Equipment>
+
+<Right Front Side Equipment>
+(B) Large Laser
+</Right Front Side Equipment>
+
+<Aft Equipment>
+</Aft Equipment>
+
+<Aft Left Side Equipment>
+</Aft Left Side Equipment>
+
+<Aft Right Side Equipment>
+</Aft Right Side Equipment>
+
+<Hull Equipment>
+</Hull Equipment>
+
+<structural_integrity>
+1
+</structural_integrity>
+
+<capabilities>
+<p>The Invader-class its most recognizable feature is a pair of large domes on the command section containing hydroponic gardens that provide oxygen and fresh food for the crew. These gardens often produce enough surplus to supply DropShips attached to its three docking collars. Each dome houses a meteor defense system primarily used today for repelling boarding attacks, as aging radar systems often struggle to track small meteors. These meteor defense systems are now mostly replaced by a duo of large lasers or PPC's. To maintain comfort under acceleration, the domes are mounted on traversing arms that swivel out. This aligns the internal decks perpendicular to the line of acceleration before the station-keeping drives engage. However, these mechanical positioning systems are prone to failure. If the domes are extended during a jump, the K-F drive's hyperspace field may fail to enclose them, leading to a 30 percent chance of jump failure or the physical shearing of the domes. Consequently, many crews operate with the domes permanently retracted. Deep within the command section is a high-capacity bridge equipped with extensive communications consoles, planetary map boards, and tracking displays. While it can be run by a skeleton crew, its 20 stations allow it to coordinate up to ten transmitting stations and monitor four simultaneous planetary battles or a full-scale space engagement. Lastly the Invader-class includes a centrifugal grav deck measuring 65 meters in diameter and 6 meters wide to provide artificial gravity for personnel during off-duty hours.</p>
+</capabilities>
+
+<overview>
+<p>The Invader-class JumpShip is the most ubiquitous vessel of its type within the Successor States, serving as a cornerstone for regular armies, large mercenary outfits, and commercial fleets alike. Massing approximately 152,000 tons and stretching 505 meters in length, it features the classic needle-like silhouette common to many JumpShips and is capable of transporting up to three DropShips, with an own cargo capacity of over 500 tons. Its widespread availability and efficient design have made it the primary choice for interstellar transport across the Inner Sphere.</p>
+</overview>
+
+<history>
+<p>While no single Successor State maintains a dominant concentration of Invader-class JumpShips, they are the most prevalent model in space, accounting for approximately 46 percent of all JumpShips in the Inner Sphere. The distribution of these vessels is split primarily between military and commercial interests: Successor State armies command nearly 51 percent of the active Invaders, while merchant entities own 32 percent, and mercenary companies operating in the Inner Sphere account for the remaining 17 percent.</p>
+</history>
+
+<manufacturer>
+Technicron, Stellar Trek, Rashpur-Owens Incorporated, Ioto Galactic Enterprises, Universal Air, Federated-Boeing Interstellar, Butler Ship Yards, Dover Shipyards, Kathil Shipworks, Midway Shipyards, Technicron Manufacturing
+</manufacturer>
+
+<systemManufacturers>
+ENGINE:Rashpur-Owens Incorporated
+</systemManufacturers>
+
+<systemModels>
+ENGINE:KF Mark VIIa
+</systemModels>
+
+<notes>
+This version is the most common in the Inner Sphere, with two Large Lasers, and a cargo space of 524 tons.
+</notes>
+
+<use>
+Mercantile/Military Transport
+</use>
+
+<length>
+505m
+</length>
+
+<source>
+TR:3057r
+</source>
+
+<tonnage>
+152000.0
+</tonnage>
+
+<sail>
+1
+</sail>
+
+<grav_decks>
+65
+</grav_decks>
+
+<designtype>
+0
+</designtype>
+
+<crew>
+34
+</crew>
+
+<officers>
+4
+</officers>
+
+<gunners>
+1
+</gunners>
+
+<passengers>
+0
+</passengers>
+
+<marines>
+0
+</marines>
+
+<battlearmor>
+0
+</battlearmor>
+
+<life_boat>
+0
+</life_boat>
+
+<escape_pod>
+6
+</escape_pod>
+
