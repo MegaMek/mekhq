@@ -232,8 +232,12 @@ public class MedicalController {
         if (actionCheckResult.isSuccess()) {
             boolean inInfirmary = !(null == patient.getDoctorId());
             patient.heal();
-            if (inInfirmary && !patient.needsFixing() && patient.getPrisonerStatus().isFreeOrBondsman()) {
-                MedicalLogger.dismissedFromInfirmary(patient, campaign);
+            if (inInfirmary && !patient.needsFixing()) {
+                if (patient.getPrisonerStatus().isFreeOrBondsman()) {
+                    MedicalLogger.dismissedFromInfirmary(patient, campaign);
+                } else {
+                    MedicalLogger.prisonerDismissedFromInfirmary(patient, campaign);
+                }
             }
             Unit unit = patient.getUnit();
             if (unit != null) {

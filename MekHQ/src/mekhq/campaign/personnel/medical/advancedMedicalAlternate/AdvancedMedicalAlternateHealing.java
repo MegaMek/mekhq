@@ -515,8 +515,12 @@ public class AdvancedMedicalAlternateHealing {
             patient.removeInjury(injury, today);
 
             if (patient.getInjuries().isEmpty()) {
-                if (!(null == patient.getDoctorId()) && patient.getPrisonerStatus().isFreeOrBondsman()) {
-                    MedicalLogger.dismissedFromInfirmary(patient, campaign);
+                if (!(null == patient.getDoctorId())) {
+                    if (patient.getPrisonerStatus().isFreeOrBondsman()) {
+                        MedicalLogger.dismissedFromInfirmary(patient, campaign);
+                    } else {
+                        MedicalLogger.prisonerDismissedFromInfirmary(patient, campaign);
+                    }
                 }
                 // AAM doesn't use 'days to wait for healing' so we just set it to '1.' If the player toggles AAM off,
                 // they will get a free day's worth of healing the next day, but that's not a huge issue.
