@@ -35,6 +35,7 @@ package mekhq.campaign.parts;
 
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
@@ -122,6 +123,7 @@ import org.w3c.dom.NodeList;
  */
 public class Refit extends Part implements IAcquisitionWork {
     private static final MMLogger LOGGER = MMLogger.create(Refit.class);
+    private static final String REFIT_RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
     public static final int NO_CHANGE = 0;
     public static final int CLASS_OMNI = 1;
@@ -1166,8 +1168,12 @@ public class Refit extends Part implements IAcquisitionWork {
     /**
      * Begins the refit after it's been calculated and configured.
      *
+     * @return {@code true} if the refit started, {@code false} if it is a refurbishment the force cannot pay for
      */
-    public void begin() throws EntityLoadingException, IOException {
+    public boolean begin() throws EntityLoadingException, IOException {
+        if (isRefurbishing && !payForRefurbishment()) {
+            return false;
+        }
         if (customJob && isSavingFile) {
             saveCustomization();
         }
@@ -1275,25 +1281,42 @@ public class Refit extends Part implements IAcquisitionWork {
                 MekHQ.triggerEvent(new PartChangedEvent(part));
             }
             orderArmorSupplies();
-            if (shoppingList.isEmpty() && (null == newArmorSupplies || newArmorSupplies.getAmountNeeded() == 0)) {
+            boolean isNothingLeftToBuy = shoppingList.isEmpty()
+                  && ((null == newArmorSupplies) || (newArmorSupplies.getAmountNeeded() == 0));
+            if (isNothingLeftToBuy || isRefurbishing) {
+                // A refurbishment was paid for in full when it started, so it never orders a refit kit on top
+                if (!isNothingLeftToBuy) {
+                    LOGGER.warn("[Refit] Refurbishment of {} listed {} parts to buy; no kit is ordered for them",
+                          getDesc(), shoppingList.size());
+                }
                 kitFound = true;
             } else {
                 getCampaign().getPlayerForce().getShoppingList().addShoppingItem(this, 1, getCampaign());
             }
         }
 
-        if (isRefurbishing) {
-            if (campaign.getQuartermaster().buyRefurbishment(this)) {
-                campaign.addReport(TECHNICAL, messageSurroundedBySpanWithColor(getPositiveColor(),
-                      "<b>Refurbishment ready to begin</b>"));
-            } else {
-                campaign.addReport(TECHNICAL, messageSurroundedBySpanWithColor(getNegativeColor(),
-                      "You cannot afford to refurbish " +
-                            oldUnit.getEntity().getShortName() +
-                            ". Transaction cancelled"));
-            }
-        }
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
+        return true;
+    }
+
+    /**
+     * Pays for a refurbishment before it starts. When the force cannot afford it, the refurbishment does not start and
+     * the daily report says why.
+     *
+     * @return {@code true} if the refurbishment was paid for and can start
+     */
+    private boolean payForRefurbishment() {
+        String unitName = oldUnit.getEntity().getShortName();
+        String cost = campaign.getQuartermaster().getRefurbishmentCost(this).toAmountAndSymbolString();
+        if (!campaign.getQuartermaster().buyRefurbishment(this)) {
+            LOGGER.debug("[Refit] Refurbishment of {} not started: the force cannot pay {}", unitName, cost);
+            campaign.addReport(TECHNICAL, messageSurroundedBySpanWithColor(getNegativeColor(),
+                  getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "Refit.refurbishment.cannotAfford", unitName, cost)));
+            return false;
+        }
+        campaign.addReport(TECHNICAL, messageSurroundedBySpanWithColor(getPositiveColor(),
+              getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "Refit.refurbishment.paid", unitName, cost)));
+        return true;
     }
 
     /**

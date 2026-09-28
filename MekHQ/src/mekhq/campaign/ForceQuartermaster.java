@@ -915,14 +915,27 @@ public record ForceQuartermaster(Campaign campaign) {
      */
     public boolean buyRefurbishment(Part part) {
         if (getCampaignOptions().get(CampaignOption.PAY_FOR_PARTS)) {
-            double contractMultiplier = campaign().getPlayerForce().getPurchaseCostMultiplier(campaign().getActiveContracts());
-            Money cost = part.getActualValue().multipliedBy(contractMultiplier);
             return campaign().getPlayerForce().getFinances().debit(TransactionType.EQUIPMENT_PURCHASE,
-                  campaign().getLocalDate(), cost,
+                  campaign().getLocalDate(), getRefurbishmentCost(part),
                   "Purchase of " + part.getName());
         } else {
             return true;
         }
+    }
+
+    /**
+     * Gets what a refurbishment costs the force, including any contract purchase cost multiplier.
+     *
+     * @param part The refurbishment to price.
+     *
+     * @return The price, or zero when the campaign does not pay for parts.
+     */
+    public Money getRefurbishmentCost(Part part) {
+        if (!getCampaignOptions().get(CampaignOption.PAY_FOR_PARTS)) {
+            return Money.zero();
+        }
+        double contractMultiplier = campaign().getPlayerForce().getPurchaseCostMultiplier(campaign().getActiveContracts());
+        return part.getActualValue().multipliedBy(contractMultiplier);
     }
 
     /**

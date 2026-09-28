@@ -1164,7 +1164,10 @@ public class CampaignGUI extends JPanel {
             return;
         }
         try {
-            r.begin();
+            if (!r.begin()) {
+                // Refused before it started; the daily report says why
+                return;
+            }
         } catch (EntityLoadingException ex) {
             JOptionPane.showMessageDialog(null,
                   "For some reason, the unit you are trying to customize cannot be loaded\n and so the customization was cancelled. Please report the bug with a description\nof the unit being customized.",
