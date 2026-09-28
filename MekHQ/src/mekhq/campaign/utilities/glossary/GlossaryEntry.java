@@ -61,7 +61,6 @@ public enum GlossaryEntry {
     ALT_ADVANCED_MEDICAL("ALT_ADVANCED_MEDICAL", new Version("0.50.10")),
     AREA_OF_OPERATIONS("AREA_OF_OPERATIONS", new Version("0.50.06")),
     ATB("ATB", new Version("0.50.10")),
-    ATOW_TRAITS("ATOW_TRAITS", new Version("0.50.06")),
     ATTRIBUTE_SCORES("ATTRIBUTE_SCORES", new Version("0.50.06")),
     AUTOINFIRMARY("AUTOINFIRMARY", new Version("0.50.06")),
     BLOODHOUSE("BLOODHOUSE", new Version("0.51.01")),
@@ -103,6 +102,7 @@ public enum GlossaryEntry {
     EXPERIENCE_COSTS("EXPERIENCE_COSTS", new Version("0.50.06")),
     EXPERIENCE_RATING("EXPERIENCE_RATING", new Version("0.50.06")),
     EXTRA_INCOME("EXTRA_INCOME", new Version("0.50.10")),
+    FAME("FAME", new Version("0.51.01")),
     FATIGUE("FATIGUE", new Version("0.50.06")),
     FIELD_CONTROL("FIELD_CONTROL", new Version("0.50.06")),
     FIELD_KITCHENS("FIELD_KITCHENS", new Version("0.50.06")),
@@ -199,13 +199,16 @@ public enum GlossaryEntry {
     TEMP_PERSONNEL("TEMP_PERSONNEL", new Version("0.50.06")),
     TOE("TOE", new Version("0.50.06")),
     TRAINING_COMBAT_TEAMS("TRAINING_COMBAT_TEAMS", new Version("0.50.10")),
+    TRAITS("TRAITS", new Version("0.51.01")),
     TRIAL_OF_POSSESSION("TRIAL_OF_POSSESSION", new Version("0.51.01")),
     TURNING_POINTS("TURNING_POINTS", new Version("0.50.06")),
     TURNOVER("TURNOVER", new Version("0.50.06")),
     UNABLE_TO_START_SCENARIO("UNABLE_TO_START_SCENARIO", new Version("0.50.06")),
+    UNLUCKY("UNLUCKY", new Version("0.51.01")),
     VEHICLE_CREWS("VEHICLE_CREWS", new Version("0.51.01")),
     VOCATIONAL_XP("VOCATIONAL_XP", new Version("0.50.06")),
     WARS_OF_REAVING("WARS_OF_REAVING", new Version("0.51.01")),
+    WEALTH("WEALTH", new Version("0.51.01")),
     WINTER_HOLIDAY("WINTER_HOLIDAY", new Version("0.50.06"));
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.GlossaryEntry";
