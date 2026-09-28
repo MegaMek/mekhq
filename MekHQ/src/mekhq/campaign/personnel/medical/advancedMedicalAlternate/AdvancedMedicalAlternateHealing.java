@@ -42,6 +42,7 @@ import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.DayOfWeek;
@@ -309,6 +310,7 @@ public class AdvancedMedicalAlternateHealing {
             boolean useEdge = campaign.getCampaignOptions().get(CampaignOption.USE_EDGE);
             useEdge = useEdge && healingSPAOptions.hasMedicalEdge() && willResolveThisCycle;
             int marginOfSuccess = getMarginOfSuccessForHealing(doctor,
+                  patient,
                   campaign,
                   modifiers,
                   miscPenalty,
@@ -332,6 +334,7 @@ public class AdvancedMedicalAlternateHealing {
      * Performs the healing roll for a doctor and returns its margin of success.
      *
      * @param doctor      the person performing the surgery check
+     * @param patient     the person being healed
      * @param campaign    the {@link Campaign} context
      * @param modifiers   the list of modifiers applied to the surgery roll
      * @param miscPenalty the combined penalty for this healing attempt
@@ -343,10 +346,11 @@ public class AdvancedMedicalAlternateHealing {
      * @author Illiani
      * @since 0.50.10
      */
-    private static int getMarginOfSuccessForHealing(Person doctor, Campaign campaign,
+    private static int getMarginOfSuccessForHealing(Person doctor, Person patient, Campaign campaign,
           List<TargetRollModifier> modifiers, int miscPenalty, boolean useEdge, boolean isUnassistedHealing,
           boolean isUseKinderHealing) {
         ActionCheckResult actionCheckResult = getActionCheckResult(doctor,
+              patient,
               campaign,
               modifiers,
               miscPenalty,
@@ -357,7 +361,7 @@ public class AdvancedMedicalAlternateHealing {
         return actionCheckResult.getMarginOfSuccess();
     }
 
-    private static ActionCheckResult getActionCheckResult(Person doctor, Campaign campaign,
+    private static ActionCheckResult getActionCheckResult(Person doctor, Person patient, Campaign campaign,
           List<TargetRollModifier> modifiers, int miscPenalty, boolean useEdge, boolean isUnassistedHealing,
           boolean isUseKinderHealing) {
         ActionCheckResult actionCheckResult;
@@ -365,6 +369,7 @@ public class AdvancedMedicalAlternateHealing {
             actionCheckResult = performBodyAttributeCheck(doctor, modifiers, miscPenalty, useEdge, isUseKinderHealing);
         } else {
             actionCheckResult = performSurgerySkillCheck(doctor,
+                  patient,
                   campaign,
                   modifiers,
                   miscPenalty,
@@ -425,22 +430,23 @@ public class AdvancedMedicalAlternateHealing {
      * campaign options and {@code useEdge} is {@code true}, a second roll is made and its result replaces the
      * original.</p>
      */
-    private static ActionCheckResult performSurgerySkillCheck(Person doctor, Campaign campaign,
+    private static ActionCheckResult performSurgerySkillCheck(Person doctor, Person patient, Campaign campaign,
           List<TargetRollModifier> modifiers, int miscPenalty, boolean useEdge, boolean isUseKinderHealing) {
         ActionCheckResult actionCheckResult;
         SkillCheck skillCheck = doctor.checkSkill(S_SURGERY, campaign)
                                       .withMiscModifier(miscPenalty)
                                       .withExternalModifiers(modifiers);
-        String resourceBundleKey = "AdvancedMedicalAlternateHealing.assistedHealing.normal";
-        String reportText = getTextAt(RESOURCE_BUNDLE, resourceBundleKey);
+        String patientName = patient.getHyperlinkedFullTitle();
+        String reportText = getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedMedicalAlternateHealing.assistedHealing.normal",
+              patientName);
         actionCheckResult = skillCheck.resolve(false, reportText);
 
         // Edge
         if (isPermanentOutcome(actionCheckResult, isUseKinderHealing) && useEdge && doctor.getCurrentEdge() > 0) {
             // manually update edge because if we pass useEdge == true, the doctor will get one free roll
             doctor.spendEdge();
-            actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
-                  "AdvancedMedicalAlternateHealing.assistedHealing.edge"));
+            actionCheckResult = skillCheck.resolve(false, getFormattedTextAt(RESOURCE_BUNDLE,
+                  "AdvancedMedicalAlternateHealing.assistedHealing.edge", patientName));
         }
         return actionCheckResult;
     }
