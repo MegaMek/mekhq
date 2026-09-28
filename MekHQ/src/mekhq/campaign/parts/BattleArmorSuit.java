@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.battleArmor.BattleArmor;
-import megamek.common.compute.Compute;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.IArmorState;
 import megamek.common.loaders.MekFileParser;
@@ -51,6 +50,7 @@ import megamek.common.units.EntityMovementMode;
 import megamek.common.units.EntityWeightClass;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
@@ -63,7 +63,6 @@ import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Battle Armor suits are crazy - you can't crit the equipment in them, so if we remove the suit we should remove all
@@ -512,7 +511,7 @@ public class BattleArmorSuit extends Part {
                 if (!checkForDestruction) {
                     remove(false);
                 } else {
-                    if (Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
+                    if (campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                         remove(false);
                     } else {
                         // it seems a little weird to change the entity here, but no other
