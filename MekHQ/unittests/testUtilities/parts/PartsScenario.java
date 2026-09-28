@@ -41,6 +41,9 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import testUtilities.MHQTestUtilities;
 
@@ -113,6 +116,40 @@ public final class PartsScenario {
         part.setCampaign(campaign);
         part.setQuantity(quantity);
         campaign.getQuartermaster().addPart(part, 0, false);
+    }
+
+    /**
+     * Adds a Mek technician to the campaign's roster who holds every technician skill at the same experience level,
+     * so the tech is the right type for any part and the skill used is the one the level names. The tech is added
+     * directly, without the hiring process, and starts the day with a full shift of minutes and overtime.
+     *
+     * @param experienceLevel the experience level of every tech skill, such as {@link SkillType#EXP_REGULAR}
+     *
+     * @return the new tech
+     */
+    public Person withTech(int experienceLevel) {
+        if (SkillType.lookupHash == null) {
+            SkillType.initializeTypes();
+        }
+        Person tech = new Person("Test", "Tech", campaign);
+        tech.setPrimaryRoleDirect(PersonnelRole.MEK_TECH);
+        for (String techSkillName : SkillType.getTechSkills()) {
+            int skillLevel = SkillType.getType(techSkillName).getLevelFromExperience(experienceLevel);
+            tech.addSkill(techSkillName, skillLevel, 0);
+        }
+        campaign.getPlayerForce().getHumanResources().importPerson(tech);
+        tech.resetMinutesLeft(false);
+        return tech;
+    }
+
+    /**
+     * Adds temporary AsTechs to the campaign's AsTech pool, together with a full day of their minutes and overtime.
+     * Six AsTechs make one complete team, so no shorthanded modifier applies.
+     *
+     * @param count how many AsTechs to add
+     */
+    public void withAsTechs(int count) {
+        campaign.getPlayerForce().getHumanResources().increaseAsTechPool(campaign, count);
     }
 
     /**
