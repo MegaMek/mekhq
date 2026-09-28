@@ -1,0 +1,283 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-ece7-7dd1-93f6-7032e051221b
+</UUID>
+
+<UnitType>
+Warship
+</UnitType>
+
+<Name>
+Essex II Destroyer
+</Name>
+
+<Model>
+(2711)
+</Model>
+
+<mul id:>
+4136
+</mul id:>
+
+<year>
+2711
+</year>
+
+<type>
+IS Level 3
+</type>
+
+<role>
+None
+</role>
+
+<motion_type>
+Aerodyne
+</motion_type>
+
+<transporters>
+asfbay:6.0:2:1::-1:0
+smallcraftbay:4.0:2:2::-1:0
+cargobay:132618.0:1:3::-1:0
+1stclassquarters:350.0:0:-1::-1:0
+crewquarters:1211.0:0:-1::-1:0
+</transporters>
+
+<SafeThrust>
+3
+</SafeThrust>
+
+<heatsinks>
+746
+</heatsinks>
+
+<sink_type>
+1
+</sink_type>
+
+<fuel>
+3000
+</fuel>
+
+<engine_type>
+1
+</engine_type>
+
+<armor_type>
+13
+</armor_type>
+
+<armor_tech_rating>
+0
+</armor_tech_rating>
+
+<armor_tech_level>
+5
+</armor_tech_level>
+
+<armor>
+37
+37
+37
+35
+37
+37
+</armor>
+
+<Nose Equipment>
+(B) Naval Autocannon (NAC/20)
+Naval Autocannon (NAC/20)
+Ammo NAC/20:40
+</Nose Equipment>
+
+<Left Front Side Equipment>
+(B) Naval Autocannon (NAC/20)
+Naval Autocannon (NAC/20)
+Naval Autocannon (NAC/20)
+Ammo NAC/20:60
+(B) Capital Missile Launcher (Barracuda)
+Ammo Barracuda:10
+</Left Front Side Equipment>
+
+<Right Front Side Equipment>
+(B) Naval Autocannon (NAC/20)
+Naval Autocannon (NAC/20)
+Naval Autocannon (NAC/20)
+Ammo NAC/20:60
+(B) Capital Missile Launcher (Barracuda)
+Ammo Barracuda:10
+</Right Front Side Equipment>
+
+<Aft Equipment>
+(B) Naval Autocannon (NAC/20)
+Naval Autocannon (NAC/20)
+Naval Autocannon (NAC/20)
+Ammo NAC/20:40
+(B) Naval Autocannon (NAC/20)
+Ammo NAC/20:40
+(B) Capital Missile Launcher (Barracuda)
+Ammo Barracuda:10
+</Aft Equipment>
+
+<Aft Left Side Equipment>
+(B) Naval Laser 35
+Naval Laser 35
+(B) Naval PPC (Medium)
+Naval PPC (Medium)
+</Aft Left Side Equipment>
+
+<Aft Right Side Equipment>
+(B) Naval Laser 35
+Naval Laser 35
+(B) Naval PPC (Medium)
+Naval PPC (Medium)
+</Aft Right Side Equipment>
+
+<Hull Equipment>
+</Hull Equipment>
+
+<Left Broadsides Equipment>
+(B) Naval Laser 35
+Naval Laser 35
+(B) Naval PPC (Medium)
+Naval PPC (Medium)
+</Left Broadsides Equipment>
+
+<Right Broadsides Equipment>
+(B) Naval Laser 35
+Naval Laser 35
+(B) Naval PPC (Medium)
+Naval PPC (Medium)
+</Right Broadsides Equipment>
+
+<structural_integrity>
+60
+</structural_integrity>
+
+<capabilities>
+<p>The original Essex I displaced 560,000 tons and mounted twelve naval autocannons complemented by naval laser batteries across all arcs. A crew of 300 operated the vessel, which carried twelve small craft but lacked docking collars for DropShip transport. Safe thrust of three gravities with five-gravity emergency acceleration gave the Essex I respectable speed for a destroyer of its era, though standard armor and modest structural integrity reflected the limitations of early Hegemony shipbuilding.</p><p>The Essex II expanded to 620,000 tons while retaining the same thrust profile, doubling the destructive output of its primary broadside armament and adding capital missile launchers and naval particle projector cannons the original lacked entirely. Naval laser batteries provided sustained energy firepower across broadside and aft quarter arcs. Mitchell Vehicles Interstellar built the hulls with 306 tons of improved ferro-aluminum armor, and Saro Company InterSystem Class VII engines drove the heavier frame. Nirasaki Computers Collective Diamond Green fire control coordinated the weapons suite. A critical flaw in ammunition bay protection left the vessel vulnerable to catastrophic magazine detonations, a deficiency that contributed to multiple combat losses. Six fighter bays and four small craft bays supported screening operations, with a crew complement of 240. The Clan refit added a lithium-fusion battery for rapid successive jumps, upgraded electronics to the Nirasaki Athena-3 system, and expanded aerospace capacity to ten fighters and ten small craft.</p>
+</capabilities>
+
+<overview>
+<p>The Essex destroyer lineage encompasses two distinct classes sharing a common name and a combined service record spanning more than five centuries. The original Essex I was commissioned in 2351 by Delhi WarShips at Carver V for the Terran Hegemony, one of the earliest purpose-built destroyer designs of the spacefaring era. The thoroughly redesigned Essex II, built by Mitchell Vehicles Interstellar at Graham IV, entered service in 2711 under the Star League Defense Force's fleet modernization program. Despite sharing a designation, the two classes differ substantially in displacement, armament, and overall capability. The Essex II earned a formidable reputation for close-range broadside firepower tempered by a recognized protective vulnerability that shaped the class's operational legacy. Essex destroyers in both iterations served the Terran Hegemony, the Star League, the Rim Worlds Republic, multiple Clan navies, and several Inner Sphere powers.</p>
+</overview>
+
+<deployment>
+<p>The SLS Gettysburg earned distinction by destroying the last known Dart-class light cruiser near New Vandenberg before serving through the Periphery Uprising and Hegemony Campaign. The vessel was ultimately lost above Terra in 2777, destroyed by Caspar drone WarShips during Operation CHIEFTAIN. The SLS Cape Bon escorted the transport SLS Ulithi carrying the 295th BattleMech Division to the Buffalo Meadows zenith jump point in July 2785. The Ulithi was stranded and the 295th forced to settle, while the Cape Bon's subsequent fate went unrecorded. The SLS Rondeau was among the WarShips that accompanied General Kerensky during Operation Exodus in 2784, though its specific role within the Exodus fleet remains undocumented.</p>
+</deployment>
+
+<history>
+<p>The Essex destroyer lineage began in 2351 with the original Essex I, built by Delhi WarShips at their Carver V shipyards for the Terran Hegemony. The Essex I was among the earliest purpose-built WarShip designs of the spacefaring era, carrying a heavy naval autocannon armament with extensive laser batteries in a hull capable of three-gravity sustained acceleration. The Rim Worlds Republic operated approximately forty Essex Is, making the class a meaningful component of that Periphery state's naval forces during the Age of War. The Capellan Confederation later revived Essex I production at Capella during the Amaris Crisis, a feat of industrial mobilization that demonstrated the relative simplicity of the original design. All Capellan-built Essex Is were lost by approximately 2830, their aging technology and Succession Wars attrition rendering the original class extinct.</p><p>The Essex II entered production at Mitchell Vehicles Interstellar's Graham IV yards in 2711. The redesign dramatically upgraded the broadside armament and protective scheme while maintaining the original's thrust profile in a heavier hull. Approximately 300 keels were laid down, making the Essex II one of the most numerous destroyer classes of the Star League era. The design's formidable close-range firepower came at a cost: inadequate protection around the ammunition bays left the vessel vulnerable to catastrophic magazine detonations, a flaw that contributed to disproportionate losses in sustained engagements.</p><p>The Essex II saw extensive combat during the Periphery Uprising and the Liberation of Terra. The SLS Gettysburg destroyed the last known Dart-class cruiser before falling to Caspar drones above Terra in 2777, one of many Essex IIs consumed by the desperate campaign to liberate humanity's homeworld. Fewer than thirty vessels survived the Liberation, scattered between the remnants of the Inner Sphere fleet and Kerensky's Exodus force.</p><p>Clan technicians refitted surviving Essex IIs with improved jump capability, upgraded electronics, and expanded aerospace capacity. These modernized vessels served across virtually every Clan navy for centuries. Several traced remarkable paths through multiple owners and conflicts. During the Wars of Reaving and the Jihad, Essex IIs fought on nearly every side of the fractured political order. At least one vessel was salvaged after the liberation of Terra and returned to service under the Republic of the Sphere, while another remained active with the Raven Alliance well into the Dark Age, more than three centuries after the Essex II first entered production.</p>
+</history>
+
+<manufacturer>
+Mitchell Vehicles Interstellar
+</manufacturer>
+
+<primaryFactory>
+Graham IV
+</primaryFactory>
+
+<systemManufacturers>
+CHASSIS:Mitchell Vehicles Interstellar
+ENGINE:Saro Company
+ARMOR:Unknown
+JUMP_JET:Unknown
+COMMUNICATIONS:Nirasaki Computers Collective
+TARGETING:Nirasaki Computers Collective
+</systemManufacturers>
+
+<systemModels>
+CHASSIS:Unknown
+ENGINE:InterSystem Class VII
+ARMOR:Improved Ferro-Aluminum
+JUMP_JET:Unknown
+COMMUNICATIONS:Diamond Green
+TARGETING:Diamond Green
+</systemModels>
+
+<use>
+Destroyer
+</use>
+
+<length>
+615 m
+</length>
+
+<height>
+1120 m Sail
+</height>
+
+<source>
+TR:3057r,JTP:AtreusBC
+</source>
+
+<tonnage>
+620000.0
+</tonnage>
+
+<kf_core>
+1
+</kf_core>
+
+<sail>
+1
+</sail>
+
+<grav_decks>
+55
+</grav_decks>
+
+<designtype>
+1
+</designtype>
+
+<crew>
+240
+</crew>
+
+<officers>
+35
+</officers>
+
+<gunners>
+31
+</gunners>
+
+<passengers>
+0
+</passengers>
+
+<marines>
+0
+</marines>
+
+<battlearmor>
+0
+</battlearmor>
+
+<life_boat>
+6
+</life_boat>
+
+<escape_pod>
+6
+</escape_pod>
+

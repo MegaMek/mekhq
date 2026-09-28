@@ -47,11 +47,14 @@ import megamek.common.units.AeroSpaceFighter;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
+import megamek.common.units.Jumpship;
 import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
+import megamek.common.units.SpaceStation;
 import megamek.common.units.Tank;
 import megamek.common.units.VTOL;
+import megamek.common.units.Warship;
 import testUtilities.MHQTestUtilities;
 
 /**
@@ -104,7 +107,22 @@ public enum UnitFixture {
     /** Shuttle ST-46, a small craft. Source: {@code smallcraft/TRO 3057r/Shuttle ST-46.blk}. */
     SHUTTLE_ST_46("Shuttle ST-46", true, SmallCraft.class),
     /** Leopard (2537), a DropShip. Source: {@code dropships/TRO3057R/IS/Leopard (2537).blk}. */
-    LEOPARD_DROPSHIP("Leopard (2537)", true, Dropship.class);
+    LEOPARD_DROPSHIP("Leopard (2537)", true, Dropship.class),
+    /**
+     * Invader JumpShip (2631), a JumpShip with docking collars and a grav deck. Source:
+     * {@code jumpships/3057R/IS/Invader Jumpship (2631).blk}.
+     */
+    INVADER_JUMPSHIP("Invader Jumpship (2631)", true, Jumpship.class),
+    /**
+     * Essex II Destroyer (2711), a WarShip with fighter and small craft bays. Source:
+     * {@code warship/3057/IS/Essex II Destroyer (2711).blk}.
+     */
+    ESSEX_II_WARSHIP("Essex II Destroyer (2711)", true, Warship.class),
+    /**
+     * Olympus Recharge Station (3072), a space station with docking collars. Source:
+     * {@code spacestation/TRO 3057R/Olympus Recharge Station (3072).blk}.
+     */
+    OLYMPUS_SPACE_STATION("Olympus Recharge Station (3072)", true, SpaceStation.class);
 
     /**
      * A canon refit: the unit a campaign starts with and the variant it is refitted into.
