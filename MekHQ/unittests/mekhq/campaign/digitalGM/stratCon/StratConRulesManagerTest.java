@@ -1750,12 +1750,13 @@ class StratConRulesManagerTest {
             Method scanMethod = StratConRulesManager.class.getDeclaredMethod("scanNeighboringCoords",
                   StratConCoords.class, int.class, Campaign.class, StratConTrackState.class);
             scanMethod.setAccessible(true);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT);
 
             try (MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
                   CALLS_REAL_METHODS);
                   MockedStatic<StratConPointOfInterestRules> ignored = mockStatic(StratConPointOfInterestRules.class)) {
                 rulesManager.when(() -> StratConRulesManager.buildScoutMap(any(), any(), any()))
-                      .thenReturn(new ArrayList<>(List.of(mockScout(HEAVY_SCOUT_WEIGHT))));
+                      .thenReturn(new ArrayList<>(List.of(scout)));
                 scanMethod.invoke(null, new StratConCoords(0, 0), FORCE_ID, campaign, track);
             }
 
