@@ -191,6 +191,7 @@ import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitWorkCheck;
 import mekhq.campaign.parts.SpacecraftCoolingSystem;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -2766,11 +2767,17 @@ public class Campaign implements ITechManager {
             theRefit.cancel();
             return;
         }
-        TargetRoll target = getTargetFor(theRefit, tech);
         // check that all parts have arrived
         if (!theRefit.acquireParts()) {
             return;
         }
+        String reasonTechCannotWork = RefitWorkCheck.reasonTechCannotWork(this, theRefit, tech);
+        if (reasonTechCannotWork != null) {
+            addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "refit.paused",
+                  tech.getHyperlinkedFullTitle(), theRefit.getPartName(), reasonTechCannotWork));
+            return;
+        }
+        TargetRoll target = getTargetFor(theRefit, tech);
         String report = tech.getHyperlinkedFullTitle() + " works on " + theRefit.getPartName();
         int minutes = theRefit.getTimeLeft();
         // FIXME: Overtime?
