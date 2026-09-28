@@ -84,6 +84,7 @@ import megameklab.util.UnitUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.parts.PartChangedEvent;
@@ -1249,15 +1250,11 @@ public class Refit extends Part implements IAcquisitionWork {
 
                     // Check if we need more ammo
                     if (ammoBin.needsFixing()) {
-                        getCampaign().getPlayerForce()
-                              .getShoppingList()
-                              .addShoppingItem(ammoBin.getNewPart(), 1, getCampaign());
+                        orderForThisRefit(ammoBin.getNewPart());
                     }
 
-                } else if (part instanceof IAcquisitionWork) {
-                    getCampaign().getPlayerForce()
-                          .getShoppingList()
-                          .addShoppingItem(((IAcquisitionWork) part), 1, getCampaign());
+                } else if (part instanceof IAcquisitionWork acquisitionWork) {
+                    orderForThisRefit(newOrderFor(acquisitionWork));
                     newShoppingList.add(part);
                 }
             }
@@ -1273,7 +1270,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 while (armorSupplied < armorNeeded) {
                     Armor armorPart = (Armor) (newArmorSupplies.getNewPart());
                     armorSupplied += armorPart.getAmount();
-                    getCampaign().getPlayerForce().getShoppingList().addShoppingItem(armorPart, 1, getCampaign());
+                    orderForThisRefit(armorPart);
                 }
             }
         } else {
@@ -1301,6 +1298,37 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
+    }
+
+    /**
+     * Makes a fresh procurement order for a part on this refit's shopping list. The refit's own entry is never placed on
+     * the procurement list itself: the procurement list adds later orders of the same part to an existing entry, which
+     * would change the quantity the refit's list reports.
+     *
+     * @param shoppingListEntry the refit's shopping list entry to order
+     *
+     * @return a new order for the same part, or the entry itself when no new order can be made from it
+     */
+    private static IAcquisitionWork newOrderFor(IAcquisitionWork shoppingListEntry) {
+        if (shoppingListEntry.getNewEquipment() instanceof Part newPart) {
+            return newPart.getAcquisitionWork();
+        }
+        LOGGER.warn("[Refit] No fresh order can be made for {}; ordering the shopping list entry itself",
+              shoppingListEntry.getAcquisitionName());
+        return shoppingListEntry;
+    }
+
+    /**
+     * Places one order on the procurement list for this refit, tagged with the unit being refitted so that it stays
+     * apart from the player's own orders and is removed if the refit is cancelled.
+     *
+     * @param order the order to place
+     */
+    private void orderForThisRefit(IAcquisitionWork order) {
+        if (order instanceof Part orderPart) {
+            orderPart.setRefitUnit(oldUnit);
+        }
+        getCampaign().getPlayerForce().getShoppingList().addShoppingItem(order, 1, getCampaign());
     }
 
     /**
@@ -1466,20 +1494,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         for (Part part : newUnitParts) {
             part.setRefitUnit(null);
-
-            // If the part was not part of the old unit we need to consolidate it with
-            // others of its
-            // type in the warehouse. Ammo Bins just get unloaded and removed; no reason to
-            // keep
-            // them around.
-            if (part.getUnit() == null) {
-                if (part instanceof AmmoBin) {
-                    ((AmmoBin) part).unload();
-                    getWarehouse().removePart(part);
-                } else {
-                    getCampaign().getQuartermaster().addPart(part, 0, false);
-                }
-            }
+            releaseNewPart(part);
         }
 
         if (null != newArmorSupplies) {
@@ -1489,22 +1504,39 @@ public class Refit extends Part implements IAcquisitionWork {
             newArmorSupplies.changeAmountAvailable(newArmorSupplies.getAmount());
         }
 
-        // Remove refit parts from the procurement list. Those which have already been
-        // purchased and
-        // are in transit are left as is.
-        List<IAcquisitionWork> toRemove = new ArrayList<>();
-        toRemove.add(this);
-        if (getRefitUnit() != null) {
-            for (IAcquisitionWork part : campaign.getPlayerForce().getShoppingList().getPartList()) {
-                if ((part instanceof Part) && Objects.equals(getRefitUnit(), ((Part) part).getRefitUnit())) {
-                    toRemove.add(part);
-                }
-            }
-        }
-        for (IAcquisitionWork work : toRemove) {
-            campaign.getPlayerForce().getShoppingList().removeItem(work);
-        }
+        // Remove the kit and this refit's orders from the procurement list. Those already bought and in transit are
+        // not on the list any more and arrive as usual.
+        campaign.getPlayerForce().getShoppingList().removeOrdersForRefit(this);
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
+    }
+
+    /**
+     * Hands back one part that a cancelled refit had set aside for the new design.
+     *
+     * <p>Parts on the old unit stay where they are. Ammo bins are unloaded and dropped. A part the campaign already
+     * holds goes back to the warehouse as an ordinary spare, keeping its arrival time and brand new status, so parts
+     * still in transit arrive when they were due. A part the refit only listed as needed and never obtained, such as
+     * ammunition still to be bought, is dropped: the campaign never had it.</p>
+     *
+     * @param part a part from this refit's new unit parts, already released from the refit
+     */
+    private void releaseNewPart(Part part) {
+        if (part.getUnit() != null) {
+            return;
+        }
+        if (part instanceof AmmoBin ammoBin) {
+            ammoBin.unload();
+            getWarehouse().removePart(part);
+            return;
+        }
+        LocalWarehouse partWarehouse = part.getWarehouse();
+        boolean isHeldByCampaign = (partWarehouse != null) && (partWarehouse.getPart(part.getId()) == part);
+        if (!isHeldByCampaign) {
+            LOGGER.debug("[Refit] Cancelled refit of {}: dropping {}, which was never obtained", getDesc(),
+                  part.getName());
+            return;
+        }
+        getCampaign().getQuartermaster().addPart(part, part.getDaysToArrival(), part.isBrandNew());
     }
 
     /**
