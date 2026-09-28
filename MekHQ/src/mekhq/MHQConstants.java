@@ -285,6 +285,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN = "nagSomeoneRandomlyDiedCivilian";
     public static final String NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER = "nagSomeoneRandomlyDiedCampFollower";
     public static final String NAG_SOMEONE_RANDOMLY_DIED_RETIREE = "nagSomeoneRandomlyDiedRetired";
+    public static final String NAG_CONTRACT_JOURNAL_PROMPT = "nagContractJournalPrompt";
 
     public static final String CONFIRMATION_ACCEPT_CONTRACT = "confirmationAcceptContract";
     public static final String CONFIRMATION_FACTION_STANDINGS_ULTIMATUM = "confirmationFactionStandingsUltimatum";
