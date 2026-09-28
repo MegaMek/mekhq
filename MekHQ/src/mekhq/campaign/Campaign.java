@@ -2617,7 +2617,7 @@ public class Campaign implements ITechManager {
         }
 
         String report;
-        if (!unit.isConventionalInfantry()) {
+        if (!unit.isSelfMaintainedInfantry()) {
             Person tech = unit.getTech();
             if (null == tech) {
                 // uh-oh
@@ -2704,7 +2704,7 @@ public class Campaign implements ITechManager {
         }
 
         String report;
-        if (!unit.isConventionalInfantry()) {
+        if (!unit.isSelfMaintainedInfantry()) {
             Person tech = unit.getTech();
             if (null == tech) {
                 // uh-oh
@@ -4488,7 +4488,7 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already being worked on by another team");
         } else if (skill == null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
-        } else if (getCampaignOptions().get(CampaignOption.TECHS_NEED_TOOL_KIT) &&
+        } else if (EquipmentKitCatalog.isToolKitRequired(getCampaignOptions(), partWork.getUnit()) &&
                          !EquipmentKitCatalog.hasToolKit(tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no tool kit");
         } else if (!getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN) && (partWork.getSkillMin() > effectiveSkillLevel)) {
@@ -4526,7 +4526,9 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
         }
 
-        // if this is an infantry refit, then automatic success
+        // if this is an infantry refit, then automatic success. Infantry refits take no time (they are a
+        // reorganization), so this holds even when Techs maintain conventional infantry: the Tech must still be the
+        // right profession (checked above via the refit skill), but a zero-time refit must never be failed and retried
         if ((partWork instanceof Refit) &&
                   (partWork.getUnit() != null) &&
                   partWork.getUnit().isConventionalInfantry()) {
