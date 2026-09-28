@@ -46,6 +46,7 @@ import java.util.Map;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.BattleArmorAmmoBin;
+import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.missing.MissingPart;
 import org.junit.jupiter.api.Named;
 import org.junit.jupiter.api.Test;
@@ -80,7 +81,10 @@ class PartIdentityContractTest {
           "Follow-up to #10176: an installed suit prices itself from its unit, its unattached clone from a saved "
                 + "alternate cost that is unset, so the prices differ",
           BattleArmorAmmoBin.class,
-          "Follow-up to #10176: the bin's identity counts the unit's troopers, which an unattached clone does not have");
+          "Follow-up to #10176: the bin's identity counts the unit's troopers, which an unattached clone does not have",
+          LargeCraftAmmoBin.class,
+          "Follow-up to #10176 (item 42): the bin finds its weapon bay through a link that is not saved or copied, "
+                + "so a copy or reloaded bin is not the same part type");
 
     static List<Arguments> stockableParts() {
         List<Arguments> arguments = new ArrayList<>();
