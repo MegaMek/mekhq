@@ -32,15 +32,26 @@
  */
 package mekhq.campaign.mission.scenarios;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import jakarta.xml.bind.annotation.XmlElementWrapper;
-
+/**
+ * One authored weather/condition profile: the odds of each {@link megamek.common.planetaryConditions} value for a single
+ * condition {@link #type} (Light, Wind, Weather, Fog, BlowingSand or EMI), shared by every terrain listed in
+ * {@link #terrain}. Loaded from {@code TerrainConditionsOddsManifest.yaml} by {@link TerrainConditionsOddsManifest}.
+ *
+ * <p>Fields are public and bound by field name so the YAML shape and the Java stay in step; the biome map type names in
+ * {@link #terrain} are the keys of {@link mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest#getBiomeMapTypes()},
+ * and the keys of {@link #odds} are the condition enums' external ids.</p>
+ *
+ * @author Illiani
+ * @since 0.51.01
+ */
 public class TerrainConditionsOdds {
     public String type;
     public String name;
-    @XmlElementWrapper(name = "terrains")
-    public List<String> terrain;
-    public Map<String, Integer> odds;
+    public List<String> terrain = new ArrayList<>();
+    public Map<String, Integer> odds = new HashMap<>();
 }

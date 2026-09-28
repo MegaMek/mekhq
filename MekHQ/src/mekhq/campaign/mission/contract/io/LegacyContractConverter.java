@@ -158,7 +158,7 @@ public final class LegacyContractConverter {
 
         ContractMoraleLevel moraleLevel = ContractMoraleLevel.STALEMATE;
         LocalDate routEndDate = null;
-        Money routedPayout = Money.zero();
+        Money routedPayout = null;
 
         // Matches the legacy default: a contract that never involved a Batchall counts as accepted.
         boolean batchallAccepted = true;
@@ -301,7 +301,7 @@ public final class LegacyContractConverter {
             contract.setClosedOutActiveOnLoad(true);
             campaign.addReport(GENERAL,
                   getFormattedTextAt(RESOURCE_BUNDLE, "legacyContract.report", contract.getName()));
-            if (routedPayout.isPositive()) {
+            if ((routedPayout != null) && routedPayout.isPositive()) {
                 // A routed contract's outstanding payout is an explicit lump sum known here (it needs no force data),
                 // so settle it immediately - mirroring how completeMission pays a routed contract.
                 settle(campaign, contract, routedPayout);

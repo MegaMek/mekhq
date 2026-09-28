@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionFlag.CUSTOM_SYSTEM;
 import static mekhq.gui.campaignOptions.CampaignOptionFlag.RECOMMENDED;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
@@ -49,8 +50,10 @@ import java.awt.Insets;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.DefaultComboBoxModel;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.JSpinner;
@@ -62,6 +65,7 @@ import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.market.enums.ContractMarketMethod;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
@@ -103,8 +107,10 @@ class ContractMarketPage {
     private JSpinner spnContractSearchRadius;
     private JCheckBox chkVariableContractLength;
     private JCheckBox chkUseTwoWayPay;
-    private JCheckBox chkUseCamOpsSalvage;
+    private JLabel lblSalvageSystem;
+    private MMComboBox<SalvageSystem> comboSalvageSystem;
     private JCheckBox chkUseRiskySalvage;
+    private JCheckBox chkKeepEnemyCamouflageOnSalvage;
     private JCheckBox chkEnableSalvageFlagByDefault;
     private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkUseBolsterContractSkill;
@@ -231,17 +237,36 @@ class ContractMarketPage {
               getMetadata(new Version(0, 51, 1)));
         chkUseTwoWayPay.addMouseListener(createTipPanelUpdater("UseTwoWayPay"));
 
-        chkUseCamOpsSalvage = new CampaignOptionsCheckBox("UseCamOpsSalvage",
-              getMetadata(MILESTONE_BEFORE_METADATA));
-        chkUseCamOpsSalvage.addMouseListener(createTipPanelUpdater("UseCamOpsSalvage"));
+        lblSalvageSystem = new CampaignOptionsLabel("SalvageSystem", getMetadata(new Version(0, 51, 1)));
+        lblSalvageSystem.addMouseListener(createTipPanelUpdater("SalvageSystem"));
+        comboSalvageSystem = new MMComboBox<>("comboSalvageSystem", SalvageSystem.values());
+        comboSalvageSystem.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index,
+                  boolean isSelected, boolean cellHasFocus) {
+                JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected,
+                      cellHasFocus);
+                if (value instanceof SalvageSystem salvageSystem) {
+                    label.setToolTipText(wordWrap(salvageSystem.getTooltip()));
+                }
+                return label;
+            }
+        });
+        comboSalvageSystem.addMouseListener(createTipPanelUpdater("SalvageSystem"));
 
         chkUseRiskySalvage = new CampaignOptionsCheckBox("UseRiskySalvage",
               getMetadata(MILESTONE_BEFORE_METADATA, CUSTOM_SYSTEM));
         chkUseRiskySalvage.addMouseListener(createTipPanelUpdater("UseRiskySalvage"));
 
+        chkKeepEnemyCamouflageOnSalvage = new CampaignOptionsCheckBox("KeepEnemyCamouflageOnSalvage",
+              getMetadata(new Version(0, 51, 1)));
+        chkKeepEnemyCamouflageOnSalvage.addMouseListener(createTipPanelUpdater("KeepEnemyCamouflageOnSalvage"));
+
         chkEnableSalvageFlagByDefault = new CampaignOptionsCheckBox("EnableSalvageFlagByDefault",
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkEnableSalvageFlagByDefault.addMouseListener(createTipPanelUpdater("EnableSalvageFlagByDefault"));
+
+        comboSalvageSystem.addActionListener(event -> updateSalvageTeamOptionsEnabledState());
 
         // General options that apply regardless of the contract-pay scheme (Chaos or legacy).
         chkBLCSaleValue = new CampaignOptionsCheckBox("BLCSaleValue");
@@ -317,11 +342,12 @@ class ContractMarketPage {
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblContractMarketMethod, comboContractMarketMethod);
         panel.addRow(lblContractSearchRadius, spnContractSearchRadius);
+        panel.addRow(lblSalvageSystem, comboSalvageSystem);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
               chkVariableContractLength,
               chkUseTwoWayPay,
-              chkUseCamOpsSalvage,
               chkUseRiskySalvage,
+              chkKeepEnemyCamouflageOnSalvage,
               chkEnableSalvageFlagByDefault,
               chkUseDynamicDifficulty,
                 chkUseBolsterContractSkill,
@@ -624,6 +650,17 @@ class ContractMarketPage {
         }
     }
 
+    /**
+     * Greys the options that only matter when salvage teams recover the wrecks. Legacy and Chaos Campaign salvage
+     * have no salvage teams, so they never roll for risky salvage or use the salvage supervisor flag.
+     */
+    private void updateSalvageTeamOptionsEnabledState() {
+        SalvageSystem salvageSystem = comboSalvageSystem.getSelectedItem();
+        boolean isUseSalvageTeams = (salvageSystem != null) && salvageSystem.getSalvage().isUseSalvageOperations();
+        chkUseRiskySalvage.setEnabled(isUseSalvageTeams);
+        chkEnableSalvageFlagByDefault.setEnabled(isUseSalvageTeams);
+    }
+
     private void setContainerEnabled(Container container, boolean enabled) {
         for (Component child : container.getComponents()) {
             child.setEnabled(enabled);
@@ -648,8 +685,9 @@ class ContractMarketPage {
         spnContractSearchRadius.setValue(model.contractSearchRadius);
         chkVariableContractLength.setSelected(model.variableContractLength);
         chkUseTwoWayPay.setSelected(model.useTwoWayPay);
-        chkUseCamOpsSalvage.setSelected(model.useCamOpsSalvage);
+        comboSalvageSystem.setSelectedItem(model.salvageSystem);
         chkUseRiskySalvage.setSelected(model.useRiskySalvage);
+        chkKeepEnemyCamouflageOnSalvage.setSelected(model.keepEnemyCamouflageOnSalvage);
         chkEnableSalvageFlagByDefault.setSelected(model.enableSalvageFlagByDefault);
         chkUseDynamicDifficulty.setSelected(model.useDynamicDifficulty);
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
@@ -687,6 +725,7 @@ class ContractMarketPage {
         chkBLCSaleValue.setSelected(model.blcSaleValue);
         chkOverageRepaymentInFinalPayment.setSelected(model.overageRepaymentInFinalPayment);
         updateContractPayModelEnabledState();
+        updateSalvageTeamOptionsEnabledState();
     }
 
     /**
@@ -704,8 +743,9 @@ class ContractMarketPage {
         model.contractSearchRadius = (int) spnContractSearchRadius.getValue();
         model.variableContractLength = chkVariableContractLength.isSelected();
         model.useTwoWayPay = chkUseTwoWayPay.isSelected();
-        model.useCamOpsSalvage = chkUseCamOpsSalvage.isSelected();
+        model.salvageSystem = comboSalvageSystem.getSelectedItem();
         model.useRiskySalvage = chkUseRiskySalvage.isSelected();
+        model.keepEnemyCamouflageOnSalvage = chkKeepEnemyCamouflageOnSalvage.isSelected();
         model.enableSalvageFlagByDefault = chkEnableSalvageFlagByDefault.isSelected();
         model.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();

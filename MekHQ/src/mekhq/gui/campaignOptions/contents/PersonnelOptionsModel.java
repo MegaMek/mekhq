@@ -139,6 +139,7 @@ class PersonnelOptionsModel {
     boolean addDefaultKitToProcurement;
     boolean npcFactionArmorKits;
     boolean requireMekWarriorKitToDeploy;
+    boolean requireAerospaceKitToDeploy;
     String mekTechDefaultToolKit;
     String mechanicDefaultToolKit;
     String aeroTechDefaultToolKit;
@@ -245,6 +246,7 @@ class PersonnelOptionsModel {
         addDefaultKitToProcurement = options.get(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT);
         npcFactionArmorKits = options.get(CampaignOption.NPC_FACTION_ARMOR_KITS);
         requireMekWarriorKitToDeploy = options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY);
+        requireAerospaceKitToDeploy = options.get(CampaignOption.REQUIRE_AEROSPACE_KIT_TO_DEPLOY);
         mekTechDefaultToolKit = options.get(CampaignOption.MEK_TECH_DEFAULT_TOOL_KIT);
         mechanicDefaultToolKit = options.get(CampaignOption.MECHANIC_DEFAULT_TOOL_KIT);
         aeroTechDefaultToolKit = options.get(CampaignOption.AERO_TECH_DEFAULT_TOOL_KIT);
@@ -355,6 +357,7 @@ class PersonnelOptionsModel {
         options.set(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT, addDefaultKitToProcurement);
         options.set(CampaignOption.NPC_FACTION_ARMOR_KITS, npcFactionArmorKits);
         options.set(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY, requireMekWarriorKitToDeploy);
+        options.set(CampaignOption.REQUIRE_AEROSPACE_KIT_TO_DEPLOY, requireAerospaceKitToDeploy);
         options.set(CampaignOption.MEK_TECH_DEFAULT_TOOL_KIT, mekTechDefaultToolKit);
         options.set(CampaignOption.MECHANIC_DEFAULT_TOOL_KIT, mechanicDefaultToolKit);
         options.set(CampaignOption.AERO_TECH_DEFAULT_TOOL_KIT, aeroTechDefaultToolKit);

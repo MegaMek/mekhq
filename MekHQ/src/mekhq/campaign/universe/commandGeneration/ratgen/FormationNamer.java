@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -87,13 +89,33 @@ public class FormationNamer {
 
     private static final MMLogger LOGGER = MMLogger.create(FormationNamer.class);
 
-    /** Spelled ordinals matching the ruleset engine's {@code {ordinal}} token values. */
-    private static final List<String> SPELLED_ORDINALS = List.of("First", "Second", "Third", "Fourth",
-          "Fifth", "Sixth", "Seventh", "Eighth", "Ninth", "Tenth");
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FormationNamer";
 
-    private static final String[] ROMAN_NUMERALS = { "I", "II", "III", "IV", "V", "VI", "VII", "VIII",
-                                                     "IX", "X", "XI", "XII", "XIII", "XIV", "XV", "XVI",
-                                                     "XVII", "XVIII", "XIX", "XX" };
+    /**
+     * Spelled ordinals matching the ruleset engine's {@code {ordinal}} token values, as shown to the
+     * player: "First Battalion", "Second Battalion".
+     */
+    private static final List<String> SPELLED_ORDINALS = readList("spelledOrdinal", 10);
+
+    /** Roman numerals as shown to the player: "III Battalion". */
+    private static final List<String> ROMAN_NUMERALS = readList("roman", 20);
+
+    /**
+     * The suffix on a numbered ordinal, keyed by the last digit: "1st", "2nd", "3rd", "4th".
+     *
+     * <p>Index 0 is the suffix every other digit takes, so the list reads
+     * {@code [th, st, nd, rd, th, ...]}.</p>
+     */
+    private static final List<String> ORDINAL_SUFFIXES = readList("ordinalSuffix", 10);
+
+    /**
+     * The suffix taken by 11, 12 and 13, which do not follow their last digit.
+     *
+     * <p>English wants "th" for all three where the digit alone would give "st", "nd" and "rd".
+     * A language that does not make that exception can set this to the same value as index 0.</p>
+     */
+    private static final String TEENS_ORDINAL_SUFFIX = getTextAt(RESOURCE_BUNDLE,
+          "FormationNamer.teensOrdinalSuffix.text");
 
     private static final Pattern NUMERIC_ORDINAL = Pattern.compile("(\\d+)(st|nd|rd|th)");
 
@@ -428,7 +450,7 @@ public class FormationNamer {
     private int sequenceLength(DesignatorStyle style) {
         return switch (style) {
             case ALPHABET, GREEK -> Alphabet.values().length;
-            case ROMAN -> ROMAN_NUMERALS.length;
+            case ROMAN -> ROMAN_NUMERALS.size();
             // Ordinals and plain numbers are unbounded in practice; cap the search so a pathological
             // campaign cannot spin here.
             case ORDINAL, NUMERIC_ORDINAL, NUMBER -> 1000;
@@ -445,7 +467,7 @@ public class FormationNamer {
                   ? SPELLED_ORDINALS.get(index)
                   : cardinalOrdinal(index + 1);
             case NUMERIC_ORDINAL -> cardinalOrdinal(index + 1);
-            case ROMAN -> ROMAN_NUMERALS[index];
+            case ROMAN -> ROMAN_NUMERALS.get(index);
             case NUMBER -> Integer.toString(index + 1);
             case ENGINE -> "";
         };
@@ -569,17 +591,28 @@ public class FormationNamer {
     /** Formats {@code number} as a numeric ordinal: 1 to "1st", 2 to "2nd", 11 to "11th". */
     private static String cardinalOrdinal(int number) {
         int modHundred = number % 100;
-        String suffix;
-        if (modHundred >= 11 && modHundred <= 13) {
-            suffix = "th";
-        } else {
-            suffix = switch (number % 10) {
-                case 1 -> "st";
-                case 2 -> "nd";
-                case 3 -> "rd";
-                default -> "th";
-            };
-        }
+        boolean isTeen = (modHundred >= 11) && (modHundred <= 13);
+        String suffix = isTeen ? TEENS_ORDINAL_SUFFIX : ORDINAL_SUFFIXES.get(number % 10);
         return number + suffix;
+    }
+
+    /**
+     * Reads a numbered run of keys out of the bundle into a list.
+     *
+     * <p>Read once, when the class is loaded. These are asked for every time a formation is named,
+     * and a generated command names a few hundred of them.</p>
+     *
+     * @param keyPrefix the key stem, which each entry's index is appended to
+     * @param count     how many entries to read
+     *
+     * @return the entries, in order
+     */
+    private static List<String> readList(String keyPrefix, int count) {
+        List<String> entries = new ArrayList<>(count);
+        for (int index = 0; index < count; index++) {
+            entries.add(getTextAt(RESOURCE_BUNDLE, "FormationNamer." + keyPrefix + "." + index
+                  + ".text"));
+        }
+        return List.copyOf(entries);
     }
 }

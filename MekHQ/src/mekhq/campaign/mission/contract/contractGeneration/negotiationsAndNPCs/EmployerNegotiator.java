@@ -171,12 +171,11 @@ public class EmployerNegotiator {
                     yield SkillLevel.REGULAR;
                 }
             }
-            case NOBLE, MERCENARY_SUBCONTRACT, CORPORATION -> SkillLevel.REGULAR;
+            case NOBLE, MERCENARY_SUBCONTRACT, CORPORATION, UNDERWORLD_CONTACT -> SkillLevel.REGULAR;
             case CIVILIAN_ORGANIZATION_BUSINESS,
                  CIVILIAN_ORGANIZATION_MILITIA,
                  LOCAL_PLANETARY_GOVERNMENT,
-                 ANY_PLANETARY_GOVERNMENT ->
-                  SkillLevel.GREEN;
+                 ANY_PLANETARY_GOVERNMENT -> SkillLevel.GREEN;
             case CIVILIAN_ORGANIZATION_REBELS -> SkillLevel.ULTRA_GREEN;
         };
 

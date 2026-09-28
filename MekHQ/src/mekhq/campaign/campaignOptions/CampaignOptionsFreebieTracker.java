@@ -67,6 +67,8 @@ package mekhq.campaign.campaignOptions;
  *                                      "use global tech skills only" option), so enabling them reads as a
  *                                      {@code false -> true} transition like every other tracked freebie
  * @param techsNeedToolKit              whether technicians require a tool kit to make repairs
+ * @param requireAerospaceKitToDeploy   whether an aerospace fighter requires its crew to wear the aerospace pilot kit
+ *                                      to deploy
  *
  * @author Illiani
  * @since 0.50.11
@@ -76,7 +78,8 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
       boolean useStratCon, boolean useMapless, boolean useAdvancedScouting, boolean useAltAdvancedMedical,
       boolean useDiseases, boolean useNormalizedContractPayModel, boolean useDiminishingContractPay,
       boolean useChaosReputation, boolean useLegacyContractOptions, boolean requireMekWarriorKitToDeploy,
-      boolean useSupportTeams, boolean specialistTechSkillsEnabled, boolean techsNeedToolKit) {
+      boolean useSupportTeams, boolean specialistTechSkillsEnabled, boolean techsNeedToolKit,
+      boolean requireAerospaceKitToDeploy) {
     /**
      * Creates a tracker snapshot from the provided {@link CampaignOptions}.
      *
@@ -100,7 +103,7 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
               !options.get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone(),
               options.get(CampaignOption.USE_MASH_THEATRES),
               options.get(CampaignOption.USE_FATIGUE),
-              options.get(CampaignOption.IS_USE_CAM_OPS_SALVAGE),
+              options.get(CampaignOption.SALVAGE_SYSTEM).getSalvage().isUseSalvageOperations(),
               options.isUseStratCon(),
               options.isUseStratConMaplessMode(),
               options.get(CampaignOption.USE_ADVANCED_SCOUTING) && options.isUseStratCon(),
@@ -113,7 +116,8 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
               options.get(CampaignOption.REQUIRE_MEKWARRIOR_KIT_TO_DEPLOY),
               options.get(CampaignOption.USE_SUPPORT_TEAMS),
               !options.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY),
-              options.get(CampaignOption.TECHS_NEED_TOOL_KIT)
+              options.get(CampaignOption.TECHS_NEED_TOOL_KIT),
+              options.get(CampaignOption.REQUIRE_AEROSPACE_KIT_TO_DEPLOY)
         );
     }
 

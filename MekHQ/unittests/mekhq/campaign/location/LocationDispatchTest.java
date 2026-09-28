@@ -33,9 +33,11 @@
 package mekhq.campaign.location;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -48,6 +50,8 @@ import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.LocalPersonnel;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
@@ -137,6 +141,96 @@ class LocationDispatchTest {
 
             assertNull(registeredGroundTransit());
             assertInstanceOf(CurrentLocation.class, person.getCurrentLocation());
+        }
+    }
+
+    /**
+     * Moving a person straight to the location of something else, as used when newly created personnel are meant to
+     * serve with a unit away from the main force.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nested
+    class MovePersonToLocationOf {
+        private LocalPersonnel mainForcePersonnel;
+        private PlayerBase base;
+
+        @BeforeEach
+        void setUp() {
+            mainForcePersonnel = new LocalPersonnel();
+            mainForcePersonnel.setParent(new FixedLocation(system));
+            when(campaign.getPlayerForce().getPersonnel()).thenReturn(mainForcePersonnel);
+            base = new PlayerBase(new FixedLocation(system));
+        }
+
+        @Test
+        void anchorAtBase_personIsMovedIntoBasePersonnel() {
+            Person anchor = newPerson();
+            anchor.setParent(base.getBasePersonnel());
+            Person person = newPerson();
+            person.setParent(mainForcePersonnel);
+
+            assertTrue(LocationDispatch.movePersonToLocationOf(campaign, person, anchor));
+
+            assertSame(base.getBasePersonnel(), person.getParentLocation());
+            assertTrue(base.getBasePersonnel().containsKey(person.getId()));
+            assertFalse(mainForcePersonnel.containsKey(person.getId()));
+        }
+
+        @Test
+        void anchorInTransit_personIsMovedOntoTheSameTravelNode() {
+            when(system.getTimeToJumpPoint(1.0)).thenReturn(1.0);
+            CurrentLocation travelNode = new CurrentLocation(system, 0.0);
+            JumpPath mockJumpPath = mock(JumpPath.class);
+            when(mockJumpPath.isEmpty()).thenReturn(false);
+            travelNode.setJumpPath(mockJumpPath);
+            Person anchor = newPerson();
+            anchor.setParent(travelNode);
+            Person person = newPerson();
+            person.setParent(mainForcePersonnel);
+
+            assertTrue(LocationDispatch.movePersonToLocationOf(campaign, person, anchor));
+
+            assertSame(travelNode, person.getParentLocation());
+            assertFalse(mainForcePersonnel.containsKey(person.getId()));
+        }
+
+        @Test
+        void anchorWithMainForce_personAtBaseIsMovedToMainForcePersonnel() {
+            Person anchor = newPerson();
+            anchor.setParent(mainForcePersonnel);
+            Person person = newPerson();
+            person.setParent(base.getBasePersonnel());
+
+            assertTrue(LocationDispatch.movePersonToLocationOf(campaign, person, anchor));
+
+            assertSame(mainForcePersonnel, person.getParentLocation());
+            assertTrue(mainForcePersonnel.containsKey(person.getId()));
+            assertFalse(base.getBasePersonnel().containsKey(person.getId()));
+        }
+
+        @Test
+        void alreadyAlongsideAnchor_personIsNotMoved() {
+            Person anchor = newPerson();
+            anchor.setParent(base.getBasePersonnel());
+            Person person = newPerson();
+            person.setParent(base.getBasePersonnel());
+
+            assertTrue(LocationDispatch.movePersonToLocationOf(campaign, person, anchor));
+
+            assertSame(base.getBasePersonnel(), person.getParentLocation());
+        }
+
+        @Test
+        void personThatCannotBeMoved_returnsFalse() {
+            Person anchor = newPerson();
+            anchor.setParent(base.getBasePersonnel());
+            // A mocked person ignores setParent, so they can never reach the anchor
+            Person immovablePerson = mock(Person.class);
+            when(immovablePerson.getLocationNode()).thenReturn(new LocationNode(immovablePerson));
+
+            assertFalse(LocationDispatch.movePersonToLocationOf(campaign, immovablePerson, anchor));
         }
     }
 }

@@ -37,12 +37,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import mekhq.utilities.ReportingUtilities;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
-
-import java.util.List;
 
 class ActionCheckResultTest {
 
@@ -52,9 +52,10 @@ class ActionCheckResultTest {
         assertEquals(3, result.getRollResult());
         assertEquals(1, result.getMarginOfSuccess());
         assertFalse(result.hasUsedEdge());
-        assertEquals("Success.", result.getReport(false));
+        String warningColor = ReportingUtilities.getWarningColor();
+        assertEquals("Success. <span color='" + warningColor + "'><i>It'll do...</i></span>", result.getReport());
         assertEquals("Success. <span color='warning'><i>It'll do...</i></span>",
-              result.getReport(true).replace(ReportingUtilities.getWarningColor(), "warning"));
+              result.getReport().replace(ReportingUtilities.getWarningColor(), "warning"));
     }
 
     @Test
@@ -63,9 +64,11 @@ class ActionCheckResultTest {
         assertEquals(8, result.getRollResult());
         assertEquals(2, result.getMarginOfSuccess());
         assertTrue(result.hasUsedEdge());
-        assertEquals("Success. Used a point of <b>Edge</b>.", result.getReport(false));
+
+        String warningColor = ReportingUtilities.getWarningColor();
+        assertEquals("Success. Used a point of <b>Edge</b>. <span color='" + warningColor + "'><i>It'll do...</i></span>", result.getReport());
         assertEquals("Success. Used a point of <b>Edge</b>. <span color='warning'><i>It'll do...</i></span>",
-              result.getReport(true).replace(ReportingUtilities.getWarningColor(), "warning"));
+              result.getReport().replace(ReportingUtilities.getWarningColor(), "warning"));
     }
 
     @ParameterizedTest

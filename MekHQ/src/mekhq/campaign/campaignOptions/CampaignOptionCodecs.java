@@ -53,12 +53,14 @@ import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
+import mekhq.campaign.enums.LithiumFusionBatteryMode;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.personnel.enums.*;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
@@ -165,6 +167,7 @@ final class CampaignOptionCodecs {
         register(CampaignOption.MINIMUM_CALLSIGN_SKILL_LEVEL, enumCodec(SkillLevel::parseFromString));
         register(CampaignOption.AUTO_RESOLVE_METHOD, enumCodec(AutoResolveMethod::valueOf));
         register(CampaignOption.CHASSIS_FAMILIARITY_MODE, enumCodec(Familiarity::valueOf));
+        register(CampaignOption.LITHIUM_FUSION_BATTERY_MODE, enumCodec(LithiumFusionBatteryMode::valueOf));
 
         // Enums persisted by a lookup name/key rather than Enum.name().
         register(CampaignOption.ACQUISITIONS_TYPE,
@@ -175,6 +178,8 @@ final class CampaignOptionCodecs {
               enumCodec(EdgeRefreshPeriod::fromString, EdgeRefreshPeriod::getLookupKey));
         register(CampaignOption.STRAT_CON_PLAY_TYPE,
               enumCodec(StratConPlayType::fromLookupName, StratConPlayType::getLookupName));
+        register(CampaignOption.SALVAGE_SYSTEM,
+              enumCodec(SalvageSystem::fromLookupName, SalvageSystem::getLookupName));
         register(CampaignOption.STRAT_CON_SECTOR_COUNT_METHOD,
               enumCodec(StratConSectorCountMethod::fromLookupName, StratConSectorCountMethod::getLookupName));
     }

@@ -41,6 +41,8 @@ import megamek.common.preference.PreferenceManager;
 import mekhq.MHQConstants;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.gui.dialog.nagDialogs.ContractSpecialMechanicsNagDialog;
 import mekhq.gui.enums.FormationIconOperationalStatusStyle;
 import mekhq.gui.enums.PersonnelFilterStyle;
 
@@ -210,6 +212,7 @@ class MHQOptionsModel {
     int startGameBotClientDelay;
     int startGameBotClientRetryCount;
     boolean enableAbstractCombatAutoResolve;
+    boolean defaultPlayerForcesOffBoard;
     // endregion Advanced
 
     MHQOptionsModel(MHQOptions options) {
@@ -374,6 +377,10 @@ class MHQOptionsModel {
         for (String key : NAG_IGNORE_KEYS) {
             nagIgnores.put(key, options.getNagDialogIgnore(key));
         }
+        for (ContractObjectiveType objectiveType : ContractSpecialMechanicsNagDialog.getBriefedContractTypes()) {
+            String key = ContractSpecialMechanicsNagDialog.getNagKey(objectiveType);
+            nagIgnores.put(key, options.getNagDialogIgnore(key));
+        }
 
         // Advanced
         userDir = PreferenceManager.getClientPreferences().getUserDir();
@@ -383,6 +390,7 @@ class MHQOptionsModel {
         startGameBotClientDelay = options.getStartGameBotClientDelay();
         startGameBotClientRetryCount = options.getStartGameBotClientRetryCount();
         enableAbstractCombatAutoResolve = options.getEnableAbstractCombatAutoResolve();
+        defaultPlayerForcesOffBoard = options.getDefaultPlayerForcesOffBoard();
     }
 
     /**
@@ -558,6 +566,10 @@ class MHQOptionsModel {
         for (String key : NAG_IGNORE_KEYS) {
             options.setNagDialogIgnore(key, nagIgnores.get(key));
         }
+        for (ContractObjectiveType objectiveType : ContractSpecialMechanicsNagDialog.getBriefedContractTypes()) {
+            String key = ContractSpecialMechanicsNagDialog.getNagKey(objectiveType);
+            options.setNagDialogIgnore(key, nagIgnores.get(key));
+        }
 
         // Advanced
         PreferenceManager.getClientPreferences().setUserDir(userDir);
@@ -568,5 +580,6 @@ class MHQOptionsModel {
         options.setStartGameBotClientDelay(startGameBotClientDelay);
         options.setStartGameBotClientRetryCount(startGameBotClientRetryCount);
         options.setEnableAbstractCombatAutoResolve(enableAbstractCombatAutoResolve);
+        options.setDefaultPlayerForcesOffBoard(defaultPlayerForcesOffBoard);
     }
 }

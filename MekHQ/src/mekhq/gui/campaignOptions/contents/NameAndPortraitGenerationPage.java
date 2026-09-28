@@ -56,10 +56,10 @@ import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.generator.RandomNameGenerator;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -137,6 +137,7 @@ class NameAndPortraitGenerationPage {
 
         chkUseOriginFactionForNames = new CampaignOptionsCheckBox("UseOriginFactionForNames");
         chkUseOriginFactionForNames.addMouseListener(createTipPanelUpdater("UseOriginFactionForNames"));
+        chkUseOriginFactionForNames.addActionListener(event -> updateFactionNamesEnabledState());
 
         lblFactionNames = new CampaignOptionsLabel("FactionNames");
         lblFactionNames.addMouseListener(createTipPanelUpdater("FactionNames"));
@@ -304,6 +305,7 @@ class NameAndPortraitGenerationPage {
 
         chkUseOriginFactionForNames.setSelected(model.useOriginFactionForNames);
         comboFactionNames.setSelectedItem(model.factionNames);
+        updateFactionNamesEnabledState();
         chkAssignPortraitOnRoleChange.setSelected(model.assignPortraitOnRoleChange);
         chkAllowDuplicatePortraits.setSelected(model.allowDuplicatePortraits);
         chkUseGenderedPortraitsOnly.setSelected(model.useGenderedPortraitsOnly);
@@ -332,6 +334,12 @@ class NameAndPortraitGenerationPage {
             }
             chkUsePortrait[civilianIndex].setSelected(civilianSelected);
         }
+    }
+
+    private void updateFactionNamesEnabledState() {
+        boolean enabled = !chkUseOriginFactionForNames.isSelected();
+        lblFactionNames.setEnabled(enabled);
+        comboFactionNames.setEnabled(enabled);
     }
 
     /**

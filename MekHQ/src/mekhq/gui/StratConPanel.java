@@ -37,13 +37,13 @@ import static java.awt.Color.BLUE;
 import static java.awt.Font.BOLD;
 import static java.lang.Math.max;
 import static megamek.utilities.ImageUtilities.addTintToBufferedImage;
-import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
 import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
 import static mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment.Allied;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
 import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
@@ -78,20 +78,27 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpact;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConReconnaissance;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
-import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.ImageType;
+import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
+import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.dialog.StratConTerrainPaintDialog;
-import mekhq.gui.stratCon.StratConScenarioWizard;
-import mekhq.gui.stratCon.TrackForceAssignmentUI;
+import mekhq.gui.stratCon.deployment.StratConDeploymentWizard;
 import mekhq.utilities.ReportingUtilities;
 
 /**
@@ -145,6 +152,22 @@ public class StratConPanel extends JPanel implements ActionListener {
     private static final String RIGHT_CLICK_COMMAND_REMOVE_SCENARIO = "RemoveScenario";
     private static final String RIGHT_CLICK_COMMAND_RESET_DEPLOYMENT = "ResetDeployment";
     private static final String RIGHT_CLICK_COMMAND_ADD_CITY = "AddCity";
+    private static final String RIGHT_CLICK_COMMAND_ADD_POINT_OF_INTEREST = "AddPointOfInterest";
+    private static final String RIGHT_CLICK_COMMAND_REMOVE_POINT_OF_INTEREST = "RemovePointOfInterest";
+    private static final String RIGHT_CLICK_COMMAND_TOGGLE_POINT_OF_INTEREST_REVEALED = "TogglePointOfInterestRevealed";
+    private static final String RIGHT_CLICK_COMMAND_SET_POINT_OF_INTEREST_OWNER = "SetPointOfInterestOwner";
+    private static final String RIGHT_CLICK_COMMAND_RESOLVE_POINT_OF_INTEREST = "ResolvePointOfInterest";
+    private static final String RIGHT_CLICK_PROPERTY_POINT_OF_INTEREST_ID = "PointOfInterestID";
+    // absent (null) on the "Neutral" item, which is what sets a point of interest to have no owner
+    private static final String RIGHT_CLICK_PROPERTY_POINT_OF_INTEREST_OWNER = "PointOfInterestOwner";
+
+    /** Map marker colors for points of interest, by who owns them; facilities use the same allied/hostile pair. */
+    private static final Color ALLIED_POINT_OF_INTEREST_COLOR = Color.CYAN;
+    private static final Color HOSTILE_POINT_OF_INTEREST_COLOR = Color.RED;
+    private static final Color NEUTRAL_POINT_OF_INTEREST_COLOR = Color.YELLOW;
+
+    /** Opacity of a point of interest that has been resolved or has expired, so it reads as spent. */
+    private static final float INACTIVE_POINT_OF_INTEREST_ALPHA = 0.5f;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBStratCon";
 
@@ -203,22 +226,12 @@ public class StratConPanel extends JPanel implements ActionListener {
     // used to control how low the text description goes.
     private final Map<StratConCoords, Integer> numIconsInHex = new HashMap<>();
 
-    private final StratConScenarioWizard scenarioWizard;
-    private final TrackForceAssignmentUI assignmentUI;
-
     private final JLabel infoArea;
 
     private final Map<String, BufferedImage> imageCache = new HashMap<>();
 
-    private boolean commitForces = false;
-
-    public StratConScenarioWizard getStratConScenarioWizard() {
-        return scenarioWizard;
-    }
-
-    public TrackForceAssignmentUI getAssignmentUI() {
-        return assignmentUI;
-    }
+    /** The single reused deployment wizard, created on first use, so only one is ever open. */
+    private StratConDeploymentWizard deploymentWizard;
 
     /**
      * Constructs a StratConPanel instance, given a parent campaign GUI and a pointer to an info area.
@@ -226,15 +239,11 @@ public class StratConPanel extends JPanel implements ActionListener {
     public StratConPanel(CampaignGUI gui, JLabel infoArea) {
         campaign = gui.getCampaign();
 
-        scenarioWizard = new StratConScenarioWizard(campaign, this);
         this.infoArea = infoArea;
         // The selected-hex info is drawn as a HUD over the (dark) map, so its default text reads white; the HTML's own
         // colored spans (recon/objective cues) still show through.
         this.infoArea.setForeground(Color.WHITE);
         this.infoArea.setOpaque(false);
-
-        assignmentUI = new TrackForceAssignmentUI(this);
-        assignmentUI.setVisible(false);
 
         MapInputHandler inputHandler = new MapInputHandler();
         addMouseListener(inputHandler);
@@ -338,7 +347,8 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     /**
      * Scouts (permanently reveals) every hex in the currently selected sector, then repaints. Unlike the GM sector
-     * reveal, this marks the hexes as revealed, so their contents stay visible afterward.
+     * reveal, this marks the hexes as revealed, so their contents stay visible afterward - and, as with real
+     * scouting, every point of interest found is revealed and its type's reveal hook fires.
      */
     public void scoutCurrentSector() {
         if (currentTrack == null) {
@@ -347,10 +357,13 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
-                currentTrack.getRevealedCoords().add(new StratConCoords(x, y));
+                StratConCoords coords = new StratConCoords(x, y);
+                currentTrack.getRevealedCoords().add(coords);
+                StratConPointOfInterestRules.revealPointsOfInterest(currentTrack, coords, campaign);
             }
         }
 
+        StratConReconnaissance.updateObjectives(currentTrack);
         infoArea.setText(buildSelectedHexInfo(campaign));
         repaint();
     }
@@ -444,15 +457,16 @@ public class StratConPanel extends JPanel implements ActionListener {
             return;
         }
 
-        // Shrinking can displace bases, scenarios, objectives, and deployed forces. None of that is silent: say exactly
-        // what will move and let the GM back out.
+        // Shrinking can displace bases, scenarios, points of interest, objectives, and deployed forces. None of that is
+        // silent: say exactly what will move and let the GM back out.
         if (!impact.isEmpty()) {
             String warning = getFormattedTextAt(RESOURCE_BUNDLE,
                   "resizeSector.warning",
                   impact.facilities(),
                   impact.scenarios(),
                   impact.objectives(),
-                  impact.forces());
+                  impact.forces(),
+                  impact.pointsOfInterest());
 
             if (JOptionPane.showConfirmDialog(this,
                   warning,
@@ -572,7 +586,8 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     /**
      * GM tool: un-reveals every hex in the current sector so scouting can be re-tested, then repaints. Open water is
-     * re-revealed, since it never holds fog of war.
+     * re-revealed, since it never holds fog of war. Points of interest are hidden again too, so they can be found
+     * afresh.
      */
     public void resetSectorFog() {
         if (currentTrack == null) {
@@ -580,6 +595,7 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
 
         currentTrack.getRevealedCoords().clear();
+        StratConPointOfInterestRules.hideAllPointsOfInterest(currentTrack);
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratConCoords coords = new StratConCoords(x, y);
@@ -603,6 +619,8 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
 
         currentTrack.setGmRevealed(!currentTrack.isGmRevealed());
+        // A GM reveal counts as scouting for a reconnaissance objective, as it always has.
+        StratConReconnaissance.updateObjectives(currentTrack);
         infoArea.setText(buildSelectedHexInfo(campaign));
         repaint();
     }
@@ -729,6 +747,8 @@ public class StratConPanel extends JPanel implements ActionListener {
                 rightClickMenu.add(menuItemAddCity);
             }
 
+            addPointOfInterestMenuItems(coords);
+
             if (scenario != null) {
                 JMenuItem removeScenarioItem = new JMenuItem();
                 removeScenarioItem.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.removeScenario"));
@@ -742,6 +762,149 @@ public class StratConPanel extends JPanel implements ActionListener {
                 resetDeploymentItem.addActionListener(this);
                 rightClickMenu.add(resetDeploymentItem);
             }
+        }
+    }
+
+    /**
+     * Adds the GM's point of interest tools for the given hex to the right-click menu: an "Add Point of Interest"
+     * submenu listing every known type, and one submenu per point of interest already on the hex.
+     *
+     * <p>A type is offered only where its placement rules allow it (see
+     * {@link StratConPointOfInterestPlacer#canPlace}); others are shown disabled, with a tooltip saying why.</p>
+     *
+     * @param coords the hex the menu was opened on
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void addPointOfInterestMenuItems(StratConCoords coords) {
+        JMenu addPointOfInterestMenu = new JMenu(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.contextMenu.addPointOfInterest"));
+        boolean hexOccupied = currentTrack.isHexOccupied(coords);
+        boolean oceanHex = StratConBiomeManifest.isOceanTerrain(currentTrack.getTerrainTile(coords));
+
+        for (StratConPointOfInterestDefinition definition : StratConPointOfInterestDefinitions.getAllDefinitions()) {
+            JMenuItem definitionItem = new JMenuItem(definition.toString());
+            definitionItem.setActionCommand(RIGHT_CLICK_COMMAND_ADD_POINT_OF_INTEREST);
+            definitionItem.putClientProperty(RIGHT_CLICK_COMMAND_ADD_POINT_OF_INTEREST, definition);
+            definitionItem.addActionListener(this);
+
+            // The same placement rules contracts and outside code are held to; the tooltip says which one failed.
+            if (!StratConPointOfInterestPlacer.canPlace(currentTrack, definition, coords)) {
+                String reasonKey;
+                if (definition.isOccupiesHex() && hexOccupied) {
+                    reasonKey = "stratConTab.contextMenu.addPointOfInterest.occupied";
+                } else if (definition.isLandOnly() && oceanHex) {
+                    reasonKey = "stratConTab.contextMenu.addPointOfInterest.water";
+                } else {
+                    reasonKey = "stratConTab.contextMenu.addPointOfInterest.terrain";
+                }
+
+                definitionItem.setEnabled(false);
+                definitionItem.setToolTipText(getTextAt(RESOURCE_BUNDLE, reasonKey));
+            }
+
+            addPointOfInterestMenu.add(definitionItem);
+        }
+
+        addPointOfInterestMenu.setEnabled(addPointOfInterestMenu.getItemCount() > 0);
+        rightClickMenu.add(addPointOfInterestMenu);
+
+        for (StratConPointOfInterest pointOfInterest : currentTrack.getPointsOfInterest(coords)) {
+            rightClickMenu.add(buildPointOfInterestMenu(pointOfInterest));
+        }
+    }
+
+    /**
+     * Builds the GM submenu for one point of interest: whether it is revealed to the player, who owns it, marking it
+     * resolved (which also meets any strategic objective tied to it), and removing it.
+     *
+     * @param pointOfInterest the point of interest the submenu acts on
+     *
+     * @return the submenu
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JMenu buildPointOfInterestMenu(StratConPointOfInterest pointOfInterest) {
+        JMenu pointOfInterestMenu = new JMenu(getFormattedTextAt(RESOURCE_BUNDLE,
+              "stratConTab.contextMenu.pointOfInterest",
+              pointOfInterest.getDisplayableName()));
+
+        // While the player can see it for another reason (scouted hex, revealed sector, allied, not hidden), the
+        // toggle would change nothing on the map, so it is shown ticked and disabled instead.
+        boolean isAlwaysVisible = pointOfInterest.isVisibleWithoutBeingRevealed(currentTrack);
+        JCheckBoxMenuItem revealedItem = new JCheckBoxMenuItem(getTextAt(RESOURCE_BUNDLE,
+              isAlwaysVisible ?
+                    "stratConTab.contextMenu.pointOfInterest.revealed.alwaysVisible" :
+                    "stratConTab.contextMenu.pointOfInterest.revealed"));
+        revealedItem.setSelected(isAlwaysVisible || pointOfInterest.isRevealed());
+        revealedItem.setEnabled(!isAlwaysVisible);
+        revealedItem.setActionCommand(RIGHT_CLICK_COMMAND_TOGGLE_POINT_OF_INTEREST_REVEALED);
+        revealedItem.putClientProperty(RIGHT_CLICK_PROPERTY_POINT_OF_INTEREST_ID, pointOfInterest.getId());
+        revealedItem.addActionListener(this);
+        pointOfInterestMenu.add(revealedItem);
+
+        pointOfInterestMenu.addSeparator();
+        ButtonGroup ownerGroup = new ButtonGroup();
+        pointOfInterestMenu.add(buildPointOfInterestOwnerItem(pointOfInterest, null, ownerGroup));
+        pointOfInterestMenu.add(buildPointOfInterestOwnerItem(pointOfInterest, Allied, ownerGroup));
+        pointOfInterestMenu.add(buildPointOfInterestOwnerItem(pointOfInterest, ForceAlignment.Opposing, ownerGroup));
+
+        pointOfInterestMenu.addSeparator();
+        JMenuItem resolveItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.contextMenu.pointOfInterest.resolve"));
+        resolveItem.setEnabled(pointOfInterest.isActive());
+        resolveItem.setActionCommand(RIGHT_CLICK_COMMAND_RESOLVE_POINT_OF_INTEREST);
+        resolveItem.putClientProperty(RIGHT_CLICK_PROPERTY_POINT_OF_INTEREST_ID, pointOfInterest.getId());
+        resolveItem.addActionListener(this);
+        pointOfInterestMenu.add(resolveItem);
+
+        JMenuItem removeItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.contextMenu.pointOfInterest.remove"));
+        removeItem.setActionCommand(RIGHT_CLICK_COMMAND_REMOVE_POINT_OF_INTEREST);
+        removeItem.putClientProperty(RIGHT_CLICK_PROPERTY_POINT_OF_INTEREST_ID, pointOfInterest.getId());
+        removeItem.addActionListener(this);
+        pointOfInterestMenu.add(removeItem);
+
+        return pointOfInterestMenu;
+    }
+
+    /**
+     * Builds one owner choice for a point of interest's GM submenu. It is shown selected when it matches the point of
+     * interest's current owner, counting the player as allied and any other side as hostile.
+     *
+     * @param pointOfInterest the point of interest the choice acts on
+     * @param owner           the owner the choice sets, or {@code null} for neutral
+     * @param ownerGroup      the group keeping the owner choices mutually exclusive
+     *
+     * @return the menu item
+     */
+    private JRadioButtonMenuItem buildPointOfInterestOwnerItem(StratConPointOfInterest pointOfInterest,
+          @Nullable ForceAlignment owner, ButtonGroup ownerGroup) {
+        JRadioButtonMenuItem ownerItem = new JRadioButtonMenuItem(getPointOfInterestOwnerLabel(owner));
+        ownerItem.setSelected(getPointOfInterestOwnerLabel(pointOfInterest.getOwner())
+                                    .equals(getPointOfInterestOwnerLabel(owner)));
+        ownerItem.setActionCommand(RIGHT_CLICK_COMMAND_SET_POINT_OF_INTEREST_OWNER);
+        ownerItem.putClientProperty(RIGHT_CLICK_PROPERTY_POINT_OF_INTEREST_ID, pointOfInterest.getId());
+        ownerItem.putClientProperty(RIGHT_CLICK_PROPERTY_POINT_OF_INTEREST_OWNER, owner);
+        ownerItem.addActionListener(this);
+        ownerGroup.add(ownerItem);
+        return ownerItem;
+    }
+
+    /**
+     * @param owner a point of interest's owner, or {@code null} for neutral
+     *
+     * @return "Neutral", "Allied" (the player or an ally), or "Hostile" (any other side)
+     */
+    private static String getPointOfInterestOwnerLabel(@Nullable ForceAlignment owner) {
+        if (owner == null) {
+            return getTextAt(RESOURCE_BUNDLE, "stratConTab.pointOfInterest.owner.neutral");
+        } else if ((owner == Allied) || (owner == ForceAlignment.Player)) {
+            return getTextAt(RESOURCE_BUNDLE, "stratConTab.pointOfInterest.owner.allied");
+        } else {
+            return getTextAt(RESOURCE_BUNDLE, "stratConTab.pointOfInterest.owner.hostile");
         }
     }
 
@@ -771,6 +934,9 @@ public class StratConPanel extends JPanel implements ActionListener {
         g2D.setTransform(originTransform);
         g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
         drawCities(g2D);
+        g2D.setTransform(originTransform);
+        g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
+        drawPointsOfInterest(g2D);
         g2D.setTransform(originTransform);
         g2D.translate(HEX_X_RADIUS, HEX_Y_RADIUS);
         drawFacilities(g2D);
@@ -1115,14 +1281,27 @@ public class StratConPanel extends JPanel implements ActionListener {
      * Retrieves a buffered image from a file given a key into the config file (StratConBiomeManifest.xml)
      */
     private BufferedImage getImage(String imageKey, ImageType imageType) {
-        if (imageCache.containsKey(imageKey)) {
-            return imageCache.get(imageKey);
-        }
-
         String imageName = switch (imageType) {
             case TerrainTile -> StratConBiomeManifest.getInstance().getBiomeImage(imageKey);
             case Facility -> StratConBiomeManifest.getInstance().getFacilityImage(imageKey);
         };
+
+        return loadScaledImage(imageKey, imageName);
+    }
+
+    /**
+     * Loads an image file scaled to fill a hex, caching it under the given key. A file that cannot be read is cached
+     * as missing too, so it is reported once rather than retried (and logged) on every repaint.
+     *
+     * @param cacheKey  the key to cache the image under
+     * @param imageName the image file's path, or {@code null} for none
+     *
+     * @return the scaled image, or {@code null} if there is no file or it could not be read (logged once)
+     */
+    private @Nullable BufferedImage loadScaledImage(String cacheKey, @Nullable String imageName) {
+        if (imageCache.containsKey(cacheKey)) {
+            return imageCache.get(cacheKey);
+        }
 
         if (imageName == null) {
             return null;
@@ -1134,13 +1313,19 @@ public class StratConPanel extends JPanel implements ActionListener {
         try {
             image = ImageIO.read(biomeImageFile);
         } catch (Exception e) {
-            logger.error("Unable to load image: {} with ID '{}'", imageName, imageKey);
+            image = null;
+        }
+
+        // ImageIO.read returns null, rather than throwing, for a file in a format it cannot decode.
+        if (image == null) {
+            logger.error("Unable to load image: {} with ID '{}'", imageName, cacheKey);
+            imageCache.put(cacheKey, null);
             return null;
         }
 
         BufferedImage scaledImage = ImageUtil.getScaledImage(image, HEX_X_RADIUS * 2, HEX_Y_RADIUS * 2);
 
-        imageCache.put(imageKey, scaledImage);
+        imageCache.put(cacheKey, scaledImage);
         return scaledImage;
     }
 
@@ -1415,6 +1600,85 @@ public class StratConPanel extends JPanel implements ActionListener {
      */
     private static boolean isAfter(StratConCoords a, StratConCoords b) {
         return (a.getX() > b.getX()) || ((a.getX() == b.getX()) && (a.getY() > b.getY()));
+    }
+
+    /**
+     * Renders the points of interest the player can see (see {@link StratConPointOfInterest#isVisibleToPlayer}): the
+     * type's sprite if it has one, else a diamond marker, colored by owner - allied, hostile, or neutral - and labelled
+     * with its name. A resolved or expired point of interest is drawn faded, so it reads as spent.
+     *
+     * <p>Drawn after cities and before facilities, so a facility or scenario sharing the hex sits on top.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void drawPointsOfInterest(Graphics2D g2D) {
+        int xRadius = HEX_X_RADIUS / 3;
+        int yRadius = HEX_Y_RADIUS / 3;
+
+        for (StratConPointOfInterest pointOfInterest : currentTrack.getPointsOfInterest()) {
+            StratConCoords coords = pointOfInterest.getCoords();
+            if ((coords == null) ||
+                      currentTrack.isOutOfBounds(coords) ||
+                      !pointOfInterest.isVisibleToPlayer(currentTrack)) {
+                continue;
+            }
+
+            Point center = hexCenter(coords.getX(), coords.getY());
+            Polygon pointOfInterestMarker = new Polygon();
+            pointOfInterestMarker.addPoint(center.x, center.y - yRadius);
+            pointOfInterestMarker.addPoint(center.x + xRadius, center.y);
+            pointOfInterestMarker.addPoint(center.x, center.y + yRadius);
+            pointOfInterestMarker.addPoint(center.x - xRadius, center.y);
+
+            Color pushColor = g2D.getColor();
+            Composite pushComposite = g2D.getComposite();
+            g2D.setColor(getPointOfInterestColor(pointOfInterest));
+            if (!pointOfInterest.isActive()) {
+                g2D.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                      INACTIVE_POINT_OF_INTEREST_ALPHA));
+            }
+
+            BufferedImage pointOfInterestImage = getPointOfInterestImage(pointOfInterest);
+            if (pointOfInterestImage != null) {
+                g2D.drawImage(pointOfInterestImage, null, center.x - HEX_X_RADIUS, center.y - HEX_Y_RADIUS);
+            } else {
+                g2D.fillPolygon(pointOfInterestMarker);
+            }
+
+            drawTextEffect(g2D, pointOfInterestMarker, pointOfInterest.getDisplayableName(), coords);
+
+            g2D.setComposite(pushComposite);
+            g2D.setColor(pushColor);
+        }
+    }
+
+    /**
+     * @return the map color for a point of interest: allied for the player or an ally, neutral for no owner, hostile
+     *       for any other side
+     */
+    private static Color getPointOfInterestColor(StratConPointOfInterest pointOfInterest) {
+        if (pointOfInterest.isNeutral()) {
+            return NEUTRAL_POINT_OF_INTEREST_COLOR;
+        }
+
+        return pointOfInterest.isOwnerAlliedToPlayer() ?
+                     ALLIED_POINT_OF_INTEREST_COLOR :
+                     HOSTILE_POINT_OF_INTEREST_COLOR;
+    }
+
+    /**
+     * @return the sprite for a point of interest's type, or {@code null} if the type has none, is no longer defined, or
+     *       its image could not be read
+     */
+    private @Nullable BufferedImage getPointOfInterestImage(StratConPointOfInterest pointOfInterest) {
+        StratConPointOfInterestDefinition definition = pointOfInterest.getDefinition();
+        if ((definition == null) || (definition.getImagePath() == null)) {
+            return null;
+        }
+
+        // Prefixed so a point of interest's path can never collide with a biome or facility image key in the cache.
+        return loadScaledImage("PointOfInterest:" + definition.getImagePath(), definition.getImagePath());
     }
 
     /**
@@ -1867,6 +2131,8 @@ public class StratConPanel extends JPanel implements ActionListener {
             infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.reconIncomplete",
                   spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG));
         }
+
+        appendPointsOfInterestInfo(infoBuilder, boardState.getSelectedCoords());
         infoBuilder.append("<br/>");
 
         StratConScenario selectedScenario = getSelectedScenario();
@@ -1881,6 +2147,66 @@ public class StratConPanel extends JPanel implements ActionListener {
         infoBuilder.append("</body></html>");
 
         return infoBuilder.toString();
+    }
+
+    /**
+     * Appends the selected-hex info for every point of interest on the hex that the player can see: its name and owner
+     * in the owner's color, its description, whether it has been resolved or has expired (or else when it will
+     * expire), and any extra text its type's behavior supplies.
+     *
+     * @param infoBuilder the selected-hex info being built
+     * @param coords      the selected hex
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void appendPointsOfInterestInfo(StringBuilder infoBuilder, StratConCoords coords) {
+        for (StratConPointOfInterest pointOfInterest : currentTrack.getPointsOfInterest(coords)) {
+            if (!pointOfInterest.isVisibleToPlayer(currentTrack)) {
+                continue;
+            }
+
+            String ownerColor;
+            if (pointOfInterest.isNeutral()) {
+                ownerColor = getWarningColor();
+            } else if (pointOfInterest.isOwnerAlliedToPlayer()) {
+                ownerColor = getPositiveColor();
+            } else {
+                ownerColor = getNegativeColor();
+            }
+
+            infoBuilder.append("<br/>")
+                  .append(getFormattedTextAt(RESOURCE_BUNDLE,
+                        "stratConTab.hexInfo.pointOfInterest",
+                        spanOpeningWithCustomColor(ownerColor),
+                        pointOfInterest.getDisplayableName(),
+                        getPointOfInterestOwnerLabel(pointOfInterest.getOwner()),
+                        CLOSING_SPAN_TAG));
+
+            String description = pointOfInterest.getDescription();
+            if (description != null) {
+                infoBuilder.append("<br/>").append(description);
+            }
+
+            String statusText = switch (pointOfInterest.getStatus()) {
+                case RESOLVED -> getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.pointOfInterest.resolved");
+                case EXPIRED -> getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.pointOfInterest.expired");
+                case ACTIVE -> (pointOfInterest.getExpiryDate() == null) ?
+                                     null :
+                                     getFormattedTextAt(RESOURCE_BUNDLE,
+                                           "stratConTab.hexInfo.pointOfInterest.expires",
+                                           MekHQ.getMHQOptions()
+                                                 .getDisplayFormattedDate(pointOfInterest.getExpiryDate()));
+            };
+            if (statusText != null) {
+                infoBuilder.append("<br/>").append(statusText);
+            }
+
+            String additionalInfo = pointOfInterest.getBehavior().getAdditionalInfo(pointOfInterest, currentTrack);
+            if (additionalInfo != null) {
+                infoBuilder.append("<br/>").append(additionalInfo);
+            }
+        }
     }
 
     /**
@@ -1909,52 +2235,68 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Handles action events triggered by various StratCon-related commands from the right-click context menu. This
-     * method processes user interactions to update the game state, scenarios, facilities, and UI elements based on the
-     * selected command and inputs from the context menu.
+     * Opens the redesigned deployment wizard for the currently selected hex, on the page appropriate to the scenario's
+     * state: the Primary page for a bare hex or an unresolved scenario (deploying primary forces), or the Reinforce
+     * page for a scenario whose primary forces are already committed (managing reinforcements, auxiliaries, and
+     * utility). Official challenges restrict the primary pick to a single force.
      *
-     * <p>The supported commands and their effects are as follows:</p>
+     * <p>A single wizard instance is reused, so repeatedly choosing "Manage Deployment" re-shows and re-populates the
+     * same window instead of stacking new ones.</p>
+     *
+     * @param campaignState the current StratCon campaign state
+     * @param scenario      the scenario on the selected hex, or {@code null} if there is none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void openDeploymentWizard(StratConCampaignState campaignState, @Nullable StratConScenario scenario) {
+        boolean assignToScenario = false;
+        boolean restrictToSingleForce = false;
+        DeploymentMode initialMode = DeploymentMode.PRIMARY;
+
+        if (scenario != null) {
+            if (scenario.getCurrentState() == UNRESOLVED) {
+                AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+                restrictToSingleForce = backingScenario != null &&
+                                              backingScenario.getStratConScenarioType().isOfficialChallenge();
+                assignToScenario = true;
+            } else {
+                initialMode = DeploymentMode.REINFORCE;
+            }
+        }
+
+        if (deploymentWizard == null) {
+            deploymentWizard = new StratConDeploymentWizard(this, campaign);
+        }
+        deploymentWizard.display(campaignState, scenario, assignToScenario, restrictToSingleForce, initialMode);
+        deploymentWizard.toFront();
+    }
+
+    /**
+     * Handles action events triggered by StratCon commands from the right-click context menu, dispatching on the
+     * event's action command. Each command reads the currently selected {@link StratConCoords} and updates the
+     * {@link #currentTrack}'s scenarios, forces, facilities, or cities accordingly, then repaints. If no hex is
+     * selected, or the command matches no case, the method does nothing.
+     *
+     * <p>The supported commands are:</p>
      * <ul>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_MANAGE_FORCES}:</b> Displays the force management UI for the selected coordinates.
-     *       <ul>
-     *           <li>If no scenario exists at the selected coordinates, the force management UI is directly displayed.</li>
-     *           <li>If a scenario exists, it only displays the UI if the scenario is unresolved.</li>
-     *       </ul>
-     *   </li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_MANAGE_SCENARIO}:</b> Displays the scenario wizard with the current scenario at the
-     *       selected coordinates if the scenario's state is {@code PRIMARY_FORCES_COMMITTED}.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_REVEAL_TRACK}:</b> Toggles the "GM revealed" state for the current track and updates
-     *       the menu text to reflect the state ("Hide Track" or "Reveal Track").</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_STICKY_FORCE}:</b> Toggles the sticky force assignment for a given force ID at the
-     *       selected track. When toggled:</li>
-     *           <li>-- If selected, the force is added to the track as sticky.</li>
-     *           <li>-- If deselected, the force is removed from the track's sticky forces.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_REMOVE_FACILITY}:</b> Deletes the facility present at the selected coordinates.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_CAPTURE_FACILITY}:</b> Changes the ownership of the facility at the selected coordinates
-     *       to a different faction or player, as per the rules defined in {@link StratConRulesManager}.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_ADD_FACILITY}:</b> Adds a new facility to the selected coordinates. The facility's
-     *       properties (visibility, type, etc.) are copied from the provided source facility.</li>
-     *   <li><b>{@code RIGHT_CLICK_COMMAND_REMOVE_SCENARIO}:</b> Deletes the currently selected scenario from the campaign.</li>
+     *   <li>{@code MANAGE_FORCES} / {@code MANAGE_SCENARIO} - open the deployment wizard via
+     *       {@link #openDeploymentWizard}, on the Primary page (bare hex or unresolved scenario) or the Reinforce page
+     *       (committed scenario) as appropriate.</li>
+     *   <li>{@code STICKY_FORCE} - toggles whether a force remains deployed on the track.</li>
+     *   <li>{@code REMOVE_FACILITY} / {@code CAPTURE_FACILITY} / {@code ADD_FACILITY} - GM facility edits. Adding or
+     *       removing a facility recomputes roads; capturing deliberately does not.</li>
+     *   <li>{@code ADD_CITY} / {@code REMOVE_CITY} - GM city edits, each recomputing roads.</li>
+     *   <li>{@code ADD_POINT_OF_INTEREST} / {@code REMOVE_POINT_OF_INTEREST} /
+     *       {@code TOGGLE_POINT_OF_INTEREST_REVEALED} / {@code SET_POINT_OF_INTEREST_OWNER} /
+     *       {@code RESOLVE_POINT_OF_INTEREST} - GM point of interest edits. Points of interest do not affect roads,
+     *       so none of these recomputes them.</li>
+     *   <li>{@code REMOVE_SCENARIO} - removes the selected scenario from the campaign.</li>
+     *   <li>{@code RESET_DEPLOYMENT} - resets the selected scenario.</li>
      * </ul>
      *
-     * @param evt the {@link ActionEvent} representing the user's action. Contains information about the triggering
-     *            source and command (e.g., which menu item was selected).
-     *
-     *            <p><b>Behavior:</b></p>
-     *            <ul>
-     *              <li>The method retrieves the {@link StratConCoords} currently selected by the user, and performs actions based on the
-     *                  provided command string in the event.</li>
-     *              <li>The scenarios, forces, and facilities of the {@link #currentTrack} are modified based on the command type, and
-     *                  updates are visually reflected in the UI.</li>
-     *              <li>If a UI-related command is processed (e.g., displaying the scenario wizard or force assignment UI), the appropriate
-     *                  UI components are updated and made visible to the user.</li>
-     *            </ul>
-     *
-     *            <p><b>General Information:</b> If no valid {@link StratConCoords} are selected at the time of the event,
-     *            the method will terminate with no further action. Certain commands (e.g., {@code RIGHT_CLICK_COMMAND_REVEAL_TRACK},
-     *            {@code RIGHT_CLICK_COMMAND_ADD_FACILITY}) require valid coordinates or source properties to execute successfully.</p>
-     *
-     *            <p>If no specific actions from the above list are matched (no corresponding `case`), the method performs no effect.</p>
+     * @param evt the triggering action event; its action command selects the branch and its source carries any
+     *            per-item data (e.g. the sticky force ID or the facility to add)
      */
     @Override
     public void actionPerformed(ActionEvent evt) {
@@ -1963,58 +2305,15 @@ public class StratConPanel extends JPanel implements ActionListener {
             return;
         }
 
-        boolean isPrimaryForce = false;
+        boolean isPointOfInterestEdited = false;
+
         StratConScenario selectedScenario = currentTrack.getScenario(selectedCoords);
         switch (evt.getActionCommand()) {
             case RIGHT_CLICK_COMMAND_MANAGE_FORCES:
-                if (selectedScenario == null) {
-                    assignmentUI.display(campaign, campaignState, selectedCoords, false, false);
-                    assignmentUI.setVisible(true);
-                    isPrimaryForce = true;
-                }
-
-                if (selectedScenario != null) {
-                    ScenarioState currentState = selectedScenario.getCurrentState();
-
-                    if (currentState.equals(UNRESOLVED)) {
-                        AtBDynamicScenario backingScenario = selectedScenario.getBackingScenario();
-                        boolean restrictToSingleForce = backingScenario != null &&
-                                                              backingScenario.getStratConScenarioType()
-                                                                    .isOfficialChallenge();
-                        assignmentUI.display(campaign, campaignState, selectedCoords, restrictToSingleForce, true);
-                        assignmentUI.setVisible(true);
-                        isPrimaryForce = true;
-                    }
-                }
-
-                // Let's reload the scenario in case it updated
-                selectedScenario = currentTrack.getScenario(selectedCoords);
-
-                if (selectedScenario != null && selectedScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
-                    scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
-                          currentTrack,
-                          campaignState,
-                          isPrimaryForce);
-
-                    scenarioWizard.toFront();
-                    scenarioWizard.setVisible(true);
-                }
-
-                setCommitForces(false);
+                openDeploymentWizard(campaignState, selectedScenario);
                 break;
             case RIGHT_CLICK_COMMAND_MANAGE_SCENARIO:
-                // It's possible a scenario may have been placed when deploying the force, so we
-                // need to recheck
-                selectedScenario = currentTrack.getScenario(selectedCoords);
-                if (selectedScenario != null && selectedScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
-                    scenarioWizard.setCurrentScenario(currentTrack.getScenario(selectedCoords),
-                          currentTrack,
-                          campaignState,
-                          false);
-
-                    scenarioWizard.toFront();
-                    scenarioWizard.setVisible(true);
-                }
+                openDeploymentWizard(campaignState, currentTrack.getScenario(selectedCoords));
                 break;
             case RIGHT_CLICK_COMMAND_STICKY_FORCE:
                 JCheckBoxMenuItem source = (JCheckBoxMenuItem) evt.getSource();
@@ -2055,6 +2354,66 @@ public class StratConPanel extends JPanel implements ActionListener {
                 currentTrack.getCities().remove(selectedCoords);
                 recalculateRoads();
                 break;
+            case RIGHT_CLICK_COMMAND_ADD_POINT_OF_INTEREST:
+                JMenuItem definitionSource = (JMenuItem) evt.getSource();
+                StratConPointOfInterestDefinition definition =
+                      (StratConPointOfInterestDefinition) definitionSource.getClientProperty(
+                            RIGHT_CLICK_COMMAND_ADD_POINT_OF_INTEREST);
+                StratConPointOfInterest newPointOfInterest = StratConPointOfInterest.fromDefinition(definition,
+                      selectedCoords,
+                      campaign.getLocalDate());
+
+                if (!currentTrack.addPointOfInterest(newPointOfInterest)) {
+                    logger.warn("Could not add point of interest {} at {} on track {}.",
+                          definition,
+                          selectedCoords,
+                          currentTrack.getDisplayableName());
+                }
+                isPointOfInterestEdited = true;
+                break;
+            case RIGHT_CLICK_COMMAND_REMOVE_POINT_OF_INTEREST:
+                // Withdrawn rather than simply removed, so any objective tied to it goes too, rather than reading as
+                // failed.
+                StratConPointOfInterest pointOfInterestToRemove = currentTrack.getPointOfInterest(getPointOfInterestId(
+                      evt));
+                if (pointOfInterestToRemove != null) {
+                    StratConPointOfInterestRules.withdrawPointOfInterest(currentTrack, pointOfInterestToRemove);
+                    isPointOfInterestEdited = true;
+                }
+                break;
+            case RIGHT_CLICK_COMMAND_RESOLVE_POINT_OF_INTEREST:
+                StratConPointOfInterest pointOfInterestToResolve = currentTrack.getPointOfInterest(
+                      getPointOfInterestId(evt));
+                if (pointOfInterestToResolve != null) {
+                    StratConPointOfInterestRules.resolvePointOfInterest(currentTrack, pointOfInterestToResolve);
+                    isPointOfInterestEdited = true;
+                }
+                break;
+            case RIGHT_CLICK_COMMAND_TOGGLE_POINT_OF_INTEREST_REVEALED:
+                StratConPointOfInterest pointOfInterestToReveal = currentTrack.getPointOfInterest(getPointOfInterestId(
+                      evt));
+                if (pointOfInterestToReveal != null) {
+                    // Revealed through the rules, as scouting does, so the type's reveal hook fires either way.
+                    if (((JCheckBoxMenuItem) evt.getSource()).isSelected()) {
+                        StratConPointOfInterestRules.revealPointOfInterest(currentTrack,
+                              pointOfInterestToReveal,
+                              campaign);
+                    } else {
+                        pointOfInterestToReveal.setRevealed(false);
+                    }
+                    isPointOfInterestEdited = true;
+                }
+                break;
+            case RIGHT_CLICK_COMMAND_SET_POINT_OF_INTEREST_OWNER:
+                StratConPointOfInterest pointOfInterestToChange = currentTrack.getPointOfInterest(getPointOfInterestId(
+                      evt));
+                if (pointOfInterestToChange != null) {
+                    JMenuItem ownerSource = (JMenuItem) evt.getSource();
+                    pointOfInterestToChange.setOwner((ForceAlignment) ownerSource.getClientProperty(
+                          RIGHT_CLICK_PROPERTY_POINT_OF_INTEREST_OWNER));
+                    isPointOfInterestEdited = true;
+                }
+                break;
             case RIGHT_CLICK_COMMAND_REMOVE_SCENARIO:
                 StratConScenario scenario = getSelectedScenario();
 
@@ -2071,7 +2430,20 @@ public class StratConPanel extends JPanel implements ActionListener {
                 break;
         }
 
+        // A point of interest edit can meet, fail or withdraw an objective, so the objective list, sector tabs and
+        // meter bars need refreshing, not just the map.
+        if (isPointOfInterestEdited && (campaignState != null)) {
+            MekHQ.triggerEvent(new MissionChangedEvent(campaignState.getContract()));
+        }
+
         repaint();
+    }
+
+    /**
+     * @return the point of interest ID carried by the menu item that fired the given event
+     */
+    private static String getPointOfInterestId(ActionEvent evt) {
+        return (String) ((JComponent) evt.getSource()).getClientProperty(RIGHT_CLICK_PROPERTY_POINT_OF_INTEREST_ID);
     }
 
     @Override
@@ -2086,12 +2458,4 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public boolean isCommitForces() {
-        return commitForces;
-    }
-
-    public void setCommitForces(boolean commitForces) {
-        this.commitForces = commitForces;
-    }
 }

@@ -269,6 +269,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_INSUFFICIENT_AS_TECH_TIME = "nagInsufficientAstechTime";
     public static final String NAG_INSUFFICIENT_MEDICS = "nagInsufficientMedics";
     public static final String NAG_COMBAT_CHALLENGE = "nagCombatChallenge";
+    /** The prefix of the per-contract-type special mechanics briefing keys; the contract type's name follows it. */
+    public static final String NAG_CONTRACT_SPECIAL_MECHANICS_PREFIX = "nagContractSpecialMechanics.";
     public static final String NAG_UNRESOLVED_STRAT_CON_CONTACTS = "nagUnresolvedStratConContacts";
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
     public static final String NAG_INVALID_FACTION = "nagInvalidFaction";
@@ -305,6 +307,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String START_GAME_BOT_CLIENT_DELAY = "startGameBotClientDelay";
     public static final String START_GAME_BOT_CLIENT_RETRY_COUNT = "startGameBotClientRetryCount";
     public static final String ENABLE_ABSTRACT_COMBAT_AUTO_RESOLVE = "enableAbstractCombatAutoResolve";
+    public static final String DEFAULT_PLAYER_FORCES_OFF_BOARD = "defaultPlayerForcesOffBoard";
 
     // The augmentation rules last chosen in the Command Generator, remembered so a new campaign
     // starts from the player's own answer rather than from the all-off defaults every time.
@@ -406,6 +409,9 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRAT_CON_FACILITY_MANIFEST = "./data/stratconfacilities/facilitymanifest.json";
     public static final String STRAT_CON_USER_FACILITY_MANIFEST = "./data/stratconfacilities/userfacilitymanifest.json";
     public static final String STRAT_CON_FACILITY_PATH = "./data/stratconfacilities/";
+    public static final String STRAT_CON_POINT_OF_INTEREST_MANIFEST = "./data/stratconpointsofinterest/pointofinterestmanifest.json";
+    public static final String STRAT_CON_USER_POINT_OF_INTEREST_MANIFEST = "./data/stratconpointsofinterest/userpointofinterestmanifest.json";
+    public static final String STRAT_CON_POINT_OF_INTEREST_PATH = "./data/stratconpointsofinterest/";
     public static final String STRAT_CON_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/ContractDefinitionManifest.json";
     public static final String STRAT_CON_USER_CONTRACT_MANIFEST = "./data/stratconcontractdefinitions/UserContractDefinitionManifest.json";
     public static final String STRAT_CON_CONTRACT_PATH = "./data/stratconcontractdefinitions/";
@@ -416,7 +422,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String STRAT_CON_URBAN_PROFILES_PATH = "./data/stratconbiomedefinitions/UrbanProfiles.yaml";
     public static final String STRAT_CON_SECTOR_SHAPE_PROFILES_PATH =
           "./data/stratconbiomedefinitions/SectorShapeProfiles.yaml";
-    public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.xml";
+    public static final String TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH = "./data/terrainconditionsodds/TerrainConditionsOddsManifest.yaml";
     public static final String HOSTILE_FACILITY_SCENARIO = "Hostile Facility.json";
     public static final String ALLIED_FACILITY_SCENARIO = "Base Defense.json";
     public static final String SCENARIO_MODIFIER_HOUSE_CO_GROUND = "HouseOfficerGround.json";
@@ -479,6 +485,11 @@ public final class MHQConstants extends SuiteConstants {
           "userdata/data/universe/backgrounds/randomCompanyNameGenerator/preFab.csv").toString();
     // endregion Backgrounds
 
+    // region Oracles
+    public static final String ORACLE_DIRECTORY = Paths.get("data/oracles").toString();
+    public static final String ORACLE_DIRECTORY_USER = Paths.get("userdata/data/oracles").toString();
+    // endregion Oracles
+
     // region Operation Names
     public static final String OPERATION_NAME_DESCRIPTOR = Paths.get(
           "data/universe/contracts/randomOperationNameGenerator/descriptor.csv").toString();
@@ -528,6 +539,10 @@ public final class MHQConstants extends SuiteConstants {
           "data/universe/contracts/randomOperationNameGenerator/nounPirateHunting.csv").toString();
     public static final String OPERATION_NAME_NOUN_PIRATE_HUNTING_USER = Paths.get(
           "userdata/data/universe/contracts/randomOperationNameGenerator/nounPirateHunting.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PIRATE_RAID = Paths.get(
+          "data/universe/contracts/randomOperationNameGenerator/nounPirateRaid.csv").toString();
+    public static final String OPERATION_NAME_NOUN_PIRATE_RAID_USER = Paths.get(
+          "userdata/data/universe/contracts/randomOperationNameGenerator/nounPirateRaid.csv").toString();
     public static final String OPERATION_NAME_NOUN_PLANETARY_ASSAULT = Paths.get(
           "data/universe/contracts/randomOperationNameGenerator/nounPlanetaryAssault.csv").toString();
     public static final String OPERATION_NAME_NOUN_PLANETARY_ASSAULT_USER = Paths.get(

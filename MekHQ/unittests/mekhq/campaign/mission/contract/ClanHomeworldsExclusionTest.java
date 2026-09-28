@@ -131,7 +131,7 @@ class ClanHomeworldsExclusionTest {
         when(campaign.getPlayerForce()).thenReturn(playerForce);
 
         JumpPath jumpPath = mock(JumpPath.class);
-        when(jumpPath.getTotalTime(any(), anyDouble(), anyBoolean())).thenReturn((double) travelDays);
+        when(jumpPath.getTotalTime(any(), anyDouble(), anyBoolean(), any())).thenReturn((double) travelDays);
         when(campaign.calculateJumpPath(any(), any())).thenReturn(jumpPath);
         return campaign;
     }

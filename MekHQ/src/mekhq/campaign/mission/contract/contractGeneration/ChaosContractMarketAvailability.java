@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.contract.contractGeneration;
 
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -243,6 +244,7 @@ public final class ChaosContractMarketAvailability {
         final HiringHallLevel level = campaign.getSystemHiringHallLevel();
         final Faction playerFaction = campaign.getPlayerForce().getFaction();
         final boolean governmentForce = isGovernmentFaction(playerFaction);
+        final boolean pirateForce = playerFaction.getShortName().equals(PIRATE_FACTION_CODE);
         final boolean uninhabited = isUninhabitedSystem(campaign);
 
         // The Networker SPA (senior-most Admin) grants one extra offer slot for the force's primary line of work.
@@ -255,7 +257,10 @@ public final class ChaosContractMarketAvailability {
                 continue; // tournament bouts are never drawn from the hiring-hall market
             }
             if (uninhabited && (type != ContractSearchType.PIRATE)) {
-                continue; // uninhabited or abandoned systems draw only pirate contracts - there is no legitimate market
+                continue; // an uninhabited or abandoned system has no legitimate market - only pirate work is drawn there
+            }
+            if ((type == ContractSearchType.PIRATE) && !pirateForce && !uninhabited) {
+                continue; // acts of piracy are only offered to pirate forces (the uninhabited fallback above is exempt)
             }
             if ((type == ContractSearchType.GOVERNMENT) && !governmentForce) {
                 continue; // government orders are only offered to government (non-mercenary, non-pirate) forces
@@ -277,9 +282,9 @@ public final class ChaosContractMarketAvailability {
         return rolls;
     }
 
-    /** A government campaign is any player force that is neither a mercenary command nor a pirate band. */
+    /** A government campaign is any player force that is neither a mercenary command nor the pirate band. */
     static boolean isGovernmentFaction(final Faction faction) {
-        return !faction.isMercenary() && !faction.isPirate();
+        return !faction.isMercenary() && !faction.getShortName().equals(PIRATE_FACTION_CODE);
     }
 
     /**
@@ -302,7 +307,7 @@ public final class ChaosContractMarketAvailability {
      * mercenary.
      */
     private static ContractSearchType primarySearchType(final Faction faction) {
-        if (faction.isPirate()) {
+        if (faction.getShortName().equals(PIRATE_FACTION_CODE)) {
             return ContractSearchType.PIRATE;
         }
         if (isGovernmentFaction(faction)) {
@@ -524,12 +529,11 @@ public final class ChaosContractMarketAvailability {
         final FactionStandings factionStandings = playerForce.getFactionStandings();
         final boolean isOverridingCommandCircuitRequirements = playerForce.isOverridingCommandCircuitRequirements();
 
-        return AbstractContractGeneration.createContract(campaign,
+        return AbstractContractGeneration.forSearchType(searchType).createContract(campaign,
               campaignOptions,
               currentDate,
               detachment,
               0,
-              searchType,
               factionStandings,
               isOverridingCommandCircuitRequirements,
               isGM,

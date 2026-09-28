@@ -34,6 +34,7 @@ package mekhq.campaign.digitalGM.stratCon;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -44,7 +45,10 @@ import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
+import megamek.common.annotations.Nullable;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInterestBehavior;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.utilities.MHQXMLUtility;
 
 /**
@@ -91,9 +95,14 @@ public class StratConTrackState {
     private Set<StratConCoords> roads;
     private Set<StratConCoords> roadExits;
 
+    // points of interest: map objects that are neither scenarios nor facilities; each records its own coordinates
+    private List<StratConPointOfInterest> pointsOfInterest;
+
     // don't serialize this
     private transient Map<Integer, StratConScenario> backingScenarioMap;
     private transient Map<StratConCoords, StratConStrategicObjective> specificStrategicObjectives;
+    private transient Map<StratConCoords, List<StratConPointOfInterest>> pointsOfInterestByCoords;
+    private transient Map<String, StratConPointOfInterest> pointsOfInterestById;
 
     private int scenarioOdds;
     private int deploymentTime;
@@ -126,6 +135,7 @@ public class StratConTrackState {
         cities = new HashSet<>();
         roads = new HashSet<>();
         roadExits = new HashSet<>();
+        pointsOfInterest = new ArrayList<>();
     }
 
     public String getDisplayableName() {
@@ -475,13 +485,13 @@ public class StratConTrackState {
     }
 
     /**
-     * Determines the number of facilities on this track that actively reveal the track.
+     * Determines how many hexes are added to the scan range of every force scouting this track.
      *
-     * <p>This method iterates through all facilities associated with the track and counts
-     * how many of them have the ability to reveal the track, as determined by the facility's
-     * {@link StratConFacility#getIncreaseScanRange()} method.</p>
+     * <p>Each facility that increases scan range (see {@link StratConFacility#getIncreaseScanRange()}) adds one hex.
+     * Each point of interest adds whatever its type's behavior decides (see
+     * {@link IStratConPointOfInterestBehavior#getScanRangeIncrease}).</p>
      *
-     * @return an integer representing the total number of facilities on this track that are actively revealing it.
+     * @return the total scan range increase on this track
      */
     public int getScanRangeIncrease() {
         int scanRange = 0;
@@ -490,16 +500,26 @@ public class StratConTrackState {
                 scanRange++;
             }
         }
+
+        for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {
+            scanRange += pointOfInterest.getBehavior().getScanRangeIncrease(pointOfInterest, this);
+        }
+
         return scanRange;
     }
 
     /**
-     * Count of all the scenario odds adjustments from facilities (and potentially other sources) on this track.
+     * Count of all the scenario odds adjustments on this track: from facilities, and from points of interest as their
+     * types' behaviors decide (see {@link IStratConPointOfInterestBehavior#getScenarioOddsModifier}).
      */
     public int getScenarioOddsAdjustment() {
         int accumulator = 0;
         for (StratConFacility facility : getFacilities().values()) {
             accumulator += facility.getScenarioOddsModifier();
+        }
+
+        for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {
+            accumulator += pointOfInterest.getBehavior().getScenarioOddsModifier(pointOfInterest, this);
         }
 
         return accumulator;
@@ -553,6 +573,24 @@ public class StratConTrackState {
             StratConCoords coords = strategicObjective.getObjectiveCoords();
             if (coords != null) {
                 specificStrategicObjectives.put(coords, strategicObjective);
+            }
+        }
+    }
+
+    /**
+     * Removes a strategic objective from this track entirely, so it counts as neither met nor failed.
+     *
+     * @param strategicObjective the objective to remove
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void removeStrategicObjective(StratConStrategicObjective strategicObjective) {
+        getStrategicObjectives().remove(strategicObjective);
+        if (specificStrategicObjectives != null) {
+            StratConCoords coords = strategicObjective.getObjectiveCoords();
+            if ((coords != null) && (specificStrategicObjectives.get(coords) == strategicObjective)) {
+                specificStrategicObjectives.remove(coords);
             }
         }
     }
@@ -702,7 +740,7 @@ public class StratConTrackState {
 
     /**
      * Clears all generated terrain, cities, roads, and hex reveals so the sector can be regenerated from scratch.
-     * Scenarios, facilities, and assigned forces are left untouched.
+     * Scenarios, facilities, points of interest, and assigned forces are left untouched.
      */
     public void clearForRegeneration() {
         terrainTypes.clear();
@@ -715,8 +753,10 @@ public class StratConTrackState {
     /**
      * Drops every terrain tile and overlay now lying outside the sector, after its width or height has been reduced.
      *
-     * <p>Occupants - facilities, scenarios, and deployed forces - are deliberately left alone here: they are moved
-     * back inside by the caller rather than quietly destroyed along with the ground they stood on.</p>
+     * <p>Occupants - facilities, scenarios, points of interest, and deployed forces - are deliberately left alone
+     * here: they are moved back inside by the caller rather than quietly destroyed along with the ground they stood
+     * on. That includes points of interest that do not occupy their hex, since any of them may carry a strategic
+     * objective.</p>
      */
     public void trimToBounds() {
         terrainTypes.keySet().removeIf(this::isOutOfBounds);
@@ -724,6 +764,221 @@ public class StratConTrackState {
         roads.removeIf(this::isOutOfBounds);
         roadExits.removeIf(this::isOutOfBounds);
         revealedCoords.removeIf(this::isOutOfBounds);
+    }
+
+    /**
+     * Used for serialization/deserialization. To change the points of interest in this sector, use
+     * {@link #addPointOfInterest}, {@link #movePointOfInterest}, and {@link #removePointOfInterest}, which keep the
+     * lookup by hex correct.
+     *
+     * @return every point of interest in this sector, in the order they were added
+     */
+    @XmlElementWrapper(name = "pointsOfInterest")
+    @XmlElement(name = "pointOfInterest")
+    public List<StratConPointOfInterest> getPointsOfInterest() {
+        return pointsOfInterest;
+    }
+
+    public void setPointsOfInterest(List<StratConPointOfInterest> pointsOfInterest) {
+        this.pointsOfInterest = (pointsOfInterest == null) ? new ArrayList<>() : pointsOfInterest;
+        invalidatePointOfInterestLookups();
+    }
+
+    /**
+     * @param coords the hex to look in
+     *
+     * @return the points of interest on the given hex, in the order they were added; empty if there are none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<StratConPointOfInterest> getPointsOfInterest(StratConCoords coords) {
+        List<StratConPointOfInterest> pointsOfInterestOnHex = getPointsOfInterestByCoords().get(coords);
+        return (pointsOfInterestOnHex == null) ?
+                     Collections.emptyList() :
+                     Collections.unmodifiableList(pointsOfInterestOnHex);
+    }
+
+    /**
+     * @param id the point of interest's unique ID
+     *
+     * @return the point of interest with that ID in this sector, or {@code null} if there is none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConPointOfInterest getPointOfInterest(String id) {
+        if (pointsOfInterestById == null) {
+            pointsOfInterestById = new HashMap<>();
+            for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {
+                pointsOfInterestById.put(pointOfInterest.getId(), pointOfInterest);
+            }
+        }
+
+        return pointsOfInterestById.get(id);
+    }
+
+    /**
+     * @param coords the hex to look in
+     *
+     * @return the point of interest on the given hex that occupies it, or {@code null} if there is none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConPointOfInterest getOccupyingPointOfInterest(StratConCoords coords) {
+        for (StratConPointOfInterest pointOfInterest : getPointsOfInterest(coords)) {
+            if (pointOfInterest.occupiesHex()) {
+                return pointOfInterest;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Adds a point of interest to this sector at its own coordinates.
+     *
+     * <p>It is refused if it has no coordinates, lies outside the sector, shares an ID with a point of interest already
+     * here, or occupies its hex while that hex is already occupied (see {@link #isHexOccupied}).</p>
+     *
+     * @param pointOfInterest the point of interest to add
+     *
+     * @return {@code true} if it was added
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean addPointOfInterest(StratConPointOfInterest pointOfInterest) {
+        StratConCoords coords = pointOfInterest.getCoords();
+        if ((coords == null) || isOutOfBounds(coords) || (getPointOfInterest(pointOfInterest.getId()) != null)) {
+            return false;
+        }
+
+        if (pointOfInterest.occupiesHex() && isHexOccupied(coords)) {
+            return false;
+        }
+
+        pointsOfInterest.add(pointOfInterest);
+        invalidatePointOfInterestLookups();
+        return true;
+    }
+
+    /**
+     * Removes the point of interest with the given ID from this sector.
+     *
+     * @param id the point of interest's unique ID
+     *
+     * @return the removed point of interest, or {@code null} if there was none with that ID
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConPointOfInterest removePointOfInterest(String id) {
+        StratConPointOfInterest pointOfInterest = getPointOfInterest(id);
+        if (pointOfInterest != null) {
+            pointsOfInterest.remove(pointOfInterest);
+            invalidatePointOfInterestLookups();
+        }
+
+        return pointOfInterest;
+    }
+
+    /**
+     * Moves the point of interest with the given ID to another hex. A point of interest that occupies its hex is not
+     * moved onto a hex that is already occupied.
+     *
+     * @param id          the point of interest's unique ID
+     * @param destination the hex to move it to
+     *
+     * @return {@code true} if it was moved (or was already there)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean movePointOfInterest(String id, StratConCoords destination) {
+        StratConPointOfInterest pointOfInterest = getPointOfInterest(id);
+        if ((pointOfInterest == null) || isOutOfBounds(destination)) {
+            return false;
+        }
+
+        if (destination.equals(pointOfInterest.getCoords())) {
+            return true;
+        }
+
+        if (pointOfInterest.occupiesHex() && isHexOccupied(destination)) {
+            return false;
+        }
+
+        pointOfInterest.setCoords(destination);
+        invalidatePointOfInterestLookups();
+        return true;
+    }
+
+    /**
+     * Whether something already takes up the given hex: a scenario, a facility, or a point of interest that occupies
+     * its hex. Deployed forces and points of interest that do not occupy their hex are not counted.
+     *
+     * @param coords the hex to test
+     *
+     * @return {@code true} if the hex is occupied
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isHexOccupied(StratConCoords coords) {
+        return scenarios.containsKey(coords) ||
+                     facilities.containsKey(coords) ||
+                     (getOccupyingPointOfInterest(coords) != null);
+    }
+
+    /**
+     * Counts the distinct hexes that are occupied (see {@link #isHexOccupied}). A facility and the scenario fought over
+     * it share a hex, so they count once.
+     *
+     * @return how many hexes in this sector are occupied
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getOccupiedHexCount() {
+        Set<StratConCoords> occupiedHexes = new HashSet<>(facilities.keySet());
+        occupiedHexes.addAll(scenarios.keySet());
+
+        for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {
+            if ((pointOfInterest.getCoords() != null) && pointOfInterest.occupiesHex()) {
+                occupiedHexes.add(pointOfInterest.getCoords());
+            }
+        }
+
+        return occupiedHexes.size();
+    }
+
+    /**
+     * Drops the lookups by hex and by ID, so they are rebuilt from the list on next use. Call after any change to the
+     * points of interest or where they sit.
+     */
+    private void invalidatePointOfInterestLookups() {
+        pointsOfInterestByCoords = null;
+        pointsOfInterestById = null;
+    }
+
+    /**
+     * Returns (and builds, if necessary) the lookup from hex to the points of interest on it. Rebuilt lazily after any
+     * change to the points of interest.
+     */
+    private Map<StratConCoords, List<StratConPointOfInterest>> getPointsOfInterestByCoords() {
+        if (pointsOfInterestByCoords == null) {
+            pointsOfInterestByCoords = new HashMap<>();
+            for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {
+                StratConCoords coords = pointOfInterest.getCoords();
+                if (coords != null) {
+                    pointsOfInterestByCoords.computeIfAbsent(coords, key -> new ArrayList<>()).add(pointOfInterest);
+                }
+            }
+        }
+
+        return pointsOfInterestByCoords;
     }
 
     /** @return {@code true} if the given hex lies outside this sector's current bounds. */

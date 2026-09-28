@@ -32,9 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.gm;
 
-import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.PRIMARY_FORCES_COMMITTED;
-import static mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState.UNRESOLVED;
-
 import java.util.Map;
 
 import megamek.common.annotations.Nullable;
@@ -45,11 +42,8 @@ import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.gui.StratConPanel;
-import mekhq.gui.stratCon.StratConScenarioWizard;
-import mekhq.gui.stratCon.TrackForceAssignmentUI;
 
 
 /**
@@ -174,48 +168,11 @@ public class MaplessStratCon {
             return;
         }
 
-        // We're going to use these values a lot, so we're going to unpack them from the deploymentContext Record
-        StratConCampaignState campaignState = deploymentContext.campaignState;
-        StratConTrackState trackState = deploymentContext.trackState;
-        StratConScenario stratConScenario = deploymentContext.stratConScenario;
-        StratConCoords scenarioCoords = deploymentContext.scenarioCoords;
-
         stratConPanel.setCurrentTrack(deploymentContext.trackState);
         stratConPanel.setSelectedCoords(deploymentContext.scenarioCoords);
 
-        TrackForceAssignmentUI assignmentUI = stratConPanel.getAssignmentUI();
-        StratConScenarioWizard scenarioWizard = stratConPanel.getStratConScenarioWizard();
+        stratConPanel.openDeploymentWizard(deploymentContext.campaignState, deploymentContext.stratConScenario);
 
-        boolean isPrimaryForce = false;
-        StratConScenario.ScenarioState currentState = stratConScenario.getCurrentState();
-        AtBDynamicScenario backingScenario = stratConScenario.getBackingScenario();
-        boolean restrictToSingleForce = backingScenario != null &&
-                                              backingScenario.getStratConScenarioType().isOfficialChallenge();
-        if (currentState.equals(UNRESOLVED)) {
-            assignmentUI.display(campaign, campaignState, scenarioCoords, restrictToSingleForce, true);
-            assignmentUI.setVisible(true);
-            isPrimaryForce = true;
-        }
-
-        // Let's reload the scenario in case it updated
-        stratConScenario = trackState.getScenario(scenarioCoords);
-        if (stratConScenario == null) {
-            LOGGER.error("StratConScenario is null for scenarioCoords: {}", scenarioCoords);
-            return;
-        }
-
-
-        if (stratConScenario.getCurrentState() == PRIMARY_FORCES_COMMITTED) {
-            scenarioWizard.setCurrentScenario(stratConScenario,
-                  trackState,
-                  campaignState,
-                  isPrimaryForce);
-
-            scenarioWizard.toFront();
-            scenarioWizard.setVisible(true);
-        }
-
-        stratConPanel.setCommitForces(false);
         stratConPanel.repaint();
     }
 }

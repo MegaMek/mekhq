@@ -184,7 +184,6 @@ import mekhq.campaign.personnel.skills.enums.AgingMilestone;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.other.GrayMonday;
-import mekhq.campaign.randomEvents.other.RiotScenario;
 import mekhq.campaign.randomEvents.other.VoiceOfKerensky;
 import mekhq.campaign.randomEvents.prisoners.PrisonerEventManager;
 import mekhq.campaign.randomEvents.prisoners.RecoverMIAPersonnel;
@@ -1168,7 +1167,7 @@ public class CampaignNewDayManager {
     private void embezzleFunds(Person person) {
         ActionCheckResult actionCheckResult =
               person.checkSkill(S_ADMIN, campaign).resolve(false, getTextAt(RESOURCE_BUNDLE, "embezzle.roll"));
-        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport(true));
+        campaign.addReport(SKILL_CHECKS, actionCheckResult.getReport());
 
         if (actionCheckResult.isSuccess()) {
             Money currentCampaignFunds = finances.getBalance();
@@ -1344,13 +1343,6 @@ public class CampaignNewDayManager {
                 }
             }
 
-            if (isMonday && contract.getObjectiveType().isRiotDuty() && contract.getStratConCampaignState() != null) {
-                int riotChance = 4;
-                if (randomInt(riotChance) == 0) {
-                    new RiotScenario(campaign, contract);
-                }
-            }
-
             // Early Contract End (StratCon Only)
             StratConCampaignState campaignState = contract.getStratConCampaignState();
             if (campaignState != null) {
@@ -1375,7 +1367,7 @@ public class CampaignNewDayManager {
                         LocalDate adjustedDate = today.plusDays(1);
                         long remainingMonths = contract.getMonthsLeft(adjustedDate);
                         Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
-                        contract.changeMorale(adjustedDate, finalPayout);
+                        contract.endContractEarly(adjustedDate, finalPayout);
                     }
                 }
             }
@@ -1940,7 +1932,7 @@ public class CampaignNewDayManager {
         ActionCheckResult attributeCheckResult =
               person.checkAttribute(SkillAttribute.WILLPOWER).withMiscModifier(modifier)
                     .resolve(true, getTextAt(RESOURCE_BUNDLE, "mentalBreak.check"));
-        campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport(true));
+        campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport());
 
         return !attributeCheckResult.isSuccess();
     }
@@ -2021,7 +2013,7 @@ public class CampaignNewDayManager {
         ActionCheckResult attributeCheckResult =
               person.checkAttribute(SkillAttribute.WILLPOWER).withMiscModifier(modifier)
                     .resolve(true, getTextAt(RESOURCE_BUNDLE, "discontinuationSyndrome.check"));
-        campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport(true));
+        campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport());
 
         boolean failedWillpowerCheck = attributeCheckResult.isSuccess();
         person.processDiscontinuationSyndrome(campaign,

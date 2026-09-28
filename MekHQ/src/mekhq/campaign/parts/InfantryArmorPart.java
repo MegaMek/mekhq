@@ -317,7 +317,7 @@ public class InfantryArmorPart extends Part {
 
     @Override
     public Part clone() {
-        return new InfantryArmorPart(getUnitTonnage(),
+        InfantryArmorPart clone = new InfantryArmorPart(getUnitTonnage(),
               campaign,
               damageDivisor,
               encumbering,
@@ -326,6 +326,8 @@ public class InfantryArmorPart extends Part {
               sneak_ecm,
               sneak_ir,
               spaceSuit);
+        clone.copyBaseData(this);
+        return clone;
     }
 
     @Override

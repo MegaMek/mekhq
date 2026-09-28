@@ -154,6 +154,7 @@ import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.LegacyRelinkResult;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
+import mekhq.campaign.roleplay.Roleplay;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
@@ -396,6 +397,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // <50.10 compatibility handler (moves old SPA-based Edge to current Attribute-based)
         for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
             performEdgeConversion(campaign, person);
+        }
+
+        // <51.01 compatibility handler: the retired Natural Aptitude SPAs were converted as each person loaded; tell
+        // the player about any that couldn't be
+        for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
+            person.reportUnresolvedLegacyNaturalAptitudes(campaign);
         }
 
         // <51.01 compatibility handler: technicians from before the granular Tech/... skills existed carry only their
@@ -2290,6 +2297,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                           campaign,
                           version);
                     campaign.getPlayerForce().setHumanResources(humanResources);
+                } else if (nodeName.equalsIgnoreCase("roleplay")) {
+                    campaign.setRoleplay(Roleplay.generateInstanceFromXML(workingNode));
                 } else if (nodeName.equalsIgnoreCase("parts")) {
                     processPartNodes(campaign, workingNode, version);
                 } else if (nodeName.equalsIgnoreCase("personnel")) {
@@ -2600,7 +2609,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
             base.getBaseHangar().forEachUnit(unit -> {
-                unit.initializeParts(false);
+                // Must be true so that any parts initializeParts creates are registered with the quartermaster and
+                // assigned real ids. Otherwise, they'll break on the next load.
+                unit.initializeParts(true);
                 unit.runDiagnostic(false);
 
                 List<String> reports = unit.checkForOverCrewing();

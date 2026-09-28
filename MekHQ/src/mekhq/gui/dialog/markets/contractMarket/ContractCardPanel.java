@@ -159,8 +159,9 @@ public class ContractCardPanel extends JPanel {
     }
 
     private void applyTitleText() {
-        // The name reveals the enemy, so a hidden opposition blanks the card title too, matching the dossier.
-        String rawName = contract.isIntelObfuscated(ObfuscatableIntel.OPPOSITION)
+        boolean nameRevealsOpposition = contract.isIntelObfuscated(ObfuscatableIntel.OPPOSITION)
+                                              && !contract.isNameOperationCodename();
+        String rawName = nameRevealsOpposition
                                ? getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.intel.obfuscated")
                                : contract.getName().replace('_', ' ');
         String name = wrapInner(escape(rawName), NAME_MAX_CHARS);

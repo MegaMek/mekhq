@@ -45,6 +45,7 @@ import java.util.Map;
 import java.util.Set;
 
 import megamek.common.util.weightedMaps.WeightedIntMap;
+import mekhq.MHQConstants;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,6 +102,16 @@ class RandomOperationNameGeneratorTest {
             assertTrue(userPaths.add(paths[1]), "duplicate user noun file mapped for " + objectiveType);
         }
         assertEquals(ContractObjectiveType.values().length, basePaths.size());
+    }
+
+    @Test
+    void pirateRaidUsesItsOwnNounFilesNotTerrorisms() {
+        String[] paths = RandomOperationNameGenerator.nounFilePaths(ContractObjectiveType.PIRATE_RAID);
+
+        assertEquals(MHQConstants.OPERATION_NAME_NOUN_PIRATE_RAID, paths[0]);
+        assertEquals(MHQConstants.OPERATION_NAME_NOUN_PIRATE_RAID_USER, paths[1]);
+        assertNotEquals(RandomOperationNameGenerator.nounFilePaths(ContractObjectiveType.TERRORISM)[0], paths[0],
+              "a pirate raid must not reuse the terrorism noun pool");
     }
 
     // --- generation over seeded pools ---

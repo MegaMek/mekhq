@@ -356,7 +356,7 @@ public class TankLocation extends Part {
 
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECHANICAL);
+        return skillType.equals(SkillType.S_TECH_VEHICLE);
     }
 
     @Override

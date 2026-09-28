@@ -484,8 +484,10 @@ public final class InjuryTypes {
             if (hits > 4) {
                 return Collections.singletonList(new GameEffect("certain death", rnd -> {
                     p.changeStatus(c, c.getLocalDate(), PersonnelStatus.WOUNDS);
-                    MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getLocalDate());
-                    LOGGER.info(entry.toString());
+                    if (p.getStatus().isDead()) {
+                        MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getLocalDate());
+                        LOGGER.info(entry.toString());
+                    }
                 }));
             } else {
                 // We have a chance!
@@ -493,8 +495,10 @@ public final class InjuryTypes {
                       new GameEffect(deathChance + "% chance of death", rnd -> {
                           if (rnd.applyAsInt(6) + hits >= 5) {
                               p.changeStatus(c, c.getLocalDate(), PersonnelStatus.WOUNDS);
-                              MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getLocalDate());
-                              LOGGER.info(entry.toString());
+                              if (p.getStatus().isDead()) {
+                                  MedicalLogEntry entry = MedicalLogger.diedDueToBrainTrauma(p, c.getLocalDate());
+                                  LOGGER.info(entry.toString());
+                              }
                           }
                       }));
             }
@@ -742,8 +746,10 @@ public final class InjuryTypes {
                 // Don't even bother doing anything else; we're dead
                 return Collections.singletonList(new GameEffect("certain death", rnd -> {
                     p.changeStatus(c, c.getLocalDate(), PersonnelStatus.WOUNDS);
-                    MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getLocalDate());
-                    LOGGER.info(entry.toString());
+                    if (p.getStatus().isDead()) {
+                        MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getLocalDate());
+                        LOGGER.info(entry.toString());
+                    }
                 }));
             } else {
                 // We have a chance!
@@ -755,8 +761,10 @@ public final class InjuryTypes {
                             LOGGER.info(entry.toString());
                         } else {
                             p.changeStatus(c, c.getLocalDate(), PersonnelStatus.WOUNDS);
-                            MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getLocalDate());
-                            LOGGER.info(entry.toString());
+                            if (p.getStatus().isDead()) {
+                                MedicalLogEntry entry = MedicalLogger.diedOfInternalBleeding(p, c.getLocalDate());
+                                LOGGER.info(entry.toString());
+                            }
                         }
                     }
                 });
@@ -906,8 +914,10 @@ public final class InjuryTypes {
                       int rib = rnd.applyAsInt(100);
                       if (rib < 1) {
                           p.changeStatus(c, c.getLocalDate(), PersonnelStatus.WOUNDS);
-                          MedicalLogEntry entry = MedicalLogger.brokenRibPunctureDead(p, c.getLocalDate());
-                          LOGGER.info(entry.toString());
+                          if (p.getStatus().isDead()) {
+                              MedicalLogEntry entry = MedicalLogger.brokenRibPunctureDead(p, c.getLocalDate());
+                              LOGGER.info(entry.toString());
+                          }
                       } else if (rib < 10) {
                           Injury puncturedLung = PUNCTURED_LUNG.newInjury(c, p, BodyLocation.CHEST, 1);
                           p.addInjury(puncturedLung);

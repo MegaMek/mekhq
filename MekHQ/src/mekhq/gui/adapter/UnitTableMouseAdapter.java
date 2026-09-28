@@ -702,7 +702,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 if (tech != null) {
                     Campaign campaign1 = selectedUnit.getCampaign();
                     if ((!selectedUnit.getActiveCrew().isEmpty()) ||
-                              (campaign1.getPlayerForce().getFormationFor(selectedUnit)) != null) {
+                              (campaign1.getPlayerForce().getFormationFor(selectedUnit)) != null ||
+                              selectedUnit.getTech() != null) {
                         Campaign campaign = gui.getCampaign();
                         ImmersiveDialogSimple clearAssignments = new ImmersiveDialogSimple(selectedUnit.getCampaign(),
                               tech,

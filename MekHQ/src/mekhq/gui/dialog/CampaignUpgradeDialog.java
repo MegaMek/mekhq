@@ -203,6 +203,8 @@ public class CampaignUpgradeDialog {
                         }
                     }
 
+                    storedType.setNaturalAptitudeCost(presetType.getNaturalAptitudeCost());
+
                     // Update Skill Milestones
                     storedType.setGreenLevel(presetType.getGreenLevel());
                     storedType.setRegularLevel(presetType.getRegularLevel());

@@ -176,4 +176,46 @@ public class MissingMekLocationTest {
         // We CAN repair this head
         assertNull(missing.checkFixable());
     }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void destroyedLAMTorsoRepairableEvenWithAvionicsAndLandingGearPresent() {
+        Campaign mockCampaign = mockCampaign();
+        Unit unit = mock(Unit.class);
+        LandAirMek entity = mock(LandAirMek.class);
+        when(unit.getEntity()).thenReturn(entity);
+        when(entity.getWeight()).thenReturn(30.0);
+        doCallRealMethod().when(entity).getLocationName(any());
+
+        int location = Mek.LOC_RIGHT_TORSO;
+        MissingMekLocation missing = new MissingMekLocation(location, 30, 0, false, false, false, mockCampaign);
+        missing.setUnit(unit);
+
+        // 2 criticalSlots
+        doReturn(2).when(entity).getNumberOfCriticalSlots(eq(location));
+        CriticalSlot mockLandingGear = mock(CriticalSlot.class);
+        when(mockLandingGear.isEverHittable()).thenReturn(true);
+        when(mockLandingGear.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
+        when(mockLandingGear.getIndex()).thenReturn(LandAirMek.LAM_LANDING_GEAR);
+        doReturn(mockLandingGear).when(entity).getCritical(eq(location), eq(0));
+        CriticalSlot mockAvionics = mock(CriticalSlot.class);
+        when(mockAvionics.isEverHittable()).thenReturn(true);
+        when(mockAvionics.getType()).thenReturn(CriticalSlot.TYPE_SYSTEM);
+        when(mockAvionics.getIndex()).thenReturn(LandAirMek.LAM_AVIONICS);
+        doReturn(mockAvionics).when(entity).getCritical(eq(location), eq(1));
+
+        // Avionics and Landing Gear still present elsewhere on the unit
+        doAnswer(inv -> null).when(unit).findPart(any());
+
+        // Sanity check: an intact location is blocked by the present Avionics and Landing Gear
+        doReturn(false).when(entity).isLocationTrulyDestroyed(eq(location));
+        assertNotNull(missing.checkFixable());
+
+        // A truly destroyed location ignores its stale critical slots, so we CAN repair this torso
+        doReturn(true).when(entity).isLocationTrulyDestroyed(eq(location));
+        assertNull(missing.checkFixable());
+    }
 }

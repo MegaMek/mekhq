@@ -66,8 +66,8 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -91,6 +91,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 import testUtilities.MHQTestUtilities;
+import testUtilities.parts.RefitKitPricing;
 
 @ExtendWith(value = MockitoExtension.class)
 public class RefitTest {
@@ -128,7 +129,10 @@ public class RefitTest {
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_IMPLANTS)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_INITIATIVE_BONUS)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.USE_TACTICS)).thenReturn(false);
-        lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
+        // Read when a unit's crew gets its Natural Aptitudes and Small Arms skill
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_ARTILLERY)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES)).thenReturn(false);
         lenient().when(mockCampaignOptions.get(CampaignOption.COMMON_PART_PRICE_MULTIPLIER)).thenReturn(1d);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(1d);
@@ -878,9 +882,8 @@ public class RefitTest {
         // Omni reconfig = 120 minutes here
         assertEquals(120.0, refit.getActualTime(), 0.1);
 
-        // Cost?
-        assertEquals(Money.of(316000).multipliedBy(1.1),
-              refit.getCost());
+        // The kit costs its components plus 10 percent (CO p.212)
+        assertEquals(RefitKitPricing.expectedKitPrice(refit), refit.getCost().round());
 
         // We're removing 1 Large Laser and using existing armor in 10 locations
         List<Part> removedParts = refit.getOldUnitParts();

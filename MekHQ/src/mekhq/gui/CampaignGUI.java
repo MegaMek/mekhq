@@ -54,6 +54,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
@@ -102,10 +103,12 @@ import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitWorkCheck;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.roleplay.CampaignChronicleListener;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
@@ -134,6 +137,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.gui.roleplay.OracleConsole;
 import mekhq.gui.view.AdvanceTimePanel;
 import mekhq.gui.view.CommandSummaryPanel;
 import mekhq.gui.view.CurrentLocationPanel;
@@ -205,6 +209,8 @@ public class CampaignGUI extends JPanel {
     /* Top Panel */
     private JPanel pnlTop;
     private AccentRoundedJButton btnCommandGenerator;
+    private RoundedJButton btnOracle;
+    private CampaignChronicleListener chronicleListener;
     private final RoundedJButton btnContractMarket =
           new RoundedJButton(resourceMap.getString("btnContractMarket.market"));
     private final RoundedJButton btnUnitMarket = new RoundedJButton(resourceMap.getString("btnUnitMarket.market"));
@@ -257,11 +263,19 @@ public class CampaignGUI extends JPanel {
     public void addNotify() {
         super.addNotify();
         MekHQ.registerHandler(this);
+        // The chronicle writes campaign events into the Oracle journal while this campaign is open.
+        if (chronicleListener == null) {
+            chronicleListener = new CampaignChronicleListener(getCampaign());
+        }
+        MekHQ.registerHandler(chronicleListener);
     }
 
     @Override
     public void removeNotify() {
         MekHQ.unregisterHandler(this);
+        if (chronicleListener != null) {
+            MekHQ.unregisterHandler(chronicleListener);
+        }
         super.removeNotify();
     }
 
@@ -492,6 +506,8 @@ public class CampaignGUI extends JPanel {
               getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
         pnlTop.add(createCommandGeneratorButton());
         pnlTop.add(Box.createHorizontalStrut(SMALL_GAP));
+        pnlTop.add(createOracleButton());
+        pnlTop.add(Box.createHorizontalStrut(SMALL_GAP));
         pnlTop.add(advanceTimePanel);
         pnlTop.add(createCampaignControlPanel(140, 170));
 
@@ -501,6 +517,25 @@ public class CampaignGUI extends JPanel {
         btnCommandGenerator.setMinimumSize(new Dimension(side, side));
         btnCommandGenerator.setPreferredSize(new Dimension(side, side));
         btnCommandGenerator.setMaximumSize(new Dimension(side, side));
+        btnOracle.setMinimumSize(new Dimension(side, side));
+        btnOracle.setPreferredSize(new Dimension(side, side));
+        btnOracle.setMaximumSize(new Dimension(side, side));
+    }
+
+    /**
+     * Creates the Oracle button that sits between the Command Generator button and the Advance Day panel. It opens
+     * the {@link OracleConsole}, the solo-roleplay console for the Fate Chart, plot threads, cast and journal. It is
+     * squared to the top panel's height by {@link #initTopPanel()}.
+     *
+     * @return the button
+     */
+    private RoundedJButton createOracleButton() {
+        btnOracle = new RoundedJButton(resourceMap.getString("btnOracle.text"));
+        btnOracle.setToolTipText(resourceMap.getString("btnOracle.toolTipText"));
+        btnOracle.setHorizontalAlignment(SwingConstants.CENTER);
+        btnOracle.setFont(btnOracle.getFont().deriveFont(Font.BOLD));
+        btnOracle.addActionListener(event -> OracleConsole.showFor(getFrame(), getCampaign()));
+        return btnOracle;
     }
 
     /**
@@ -810,6 +845,30 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
+     * Brings the StratCon tab forward on the given sector, switching the contract it is showing to the sector's
+     * contract when that contract is one the tab can show. Does nothing if the StratCon tab is not in use, or if it does
+     * not list the contract.
+     *
+     * @param contractId the ID of the contract whose map holds the sector
+     * @param trackIndex the sector's index within that contract's tracks
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void focusOnStratConSector(UUID contractId, int trackIndex) {
+        getStratConTab().ifPresent(stratConTab -> {
+            // Only switch tabs when the sector can be shown; otherwise the link would open whatever contract is showing.
+            if (stratConTab.focusOnSector(contractId, trackIndex)) {
+                tabMain.setSelectedComponent(stratConTab);
+            } else {
+                logger.debug("StratCon tab does not list contract {}; not following the link to sector {}.",
+                      contractId,
+                      trackIndex);
+            }
+        });
+    }
+
+    /**
      * Shows the given system on the interstellar map and brings the navigation tab forward.
      *
      * @param system the system to focus on; ignored when {@code null}, as an unresolvable link should do nothing rather
@@ -993,6 +1052,15 @@ public class CampaignGUI extends JPanel {
                       JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            String reasonEngineerCannotWork = RefitWorkCheck.reasonTechCannotWork(getCampaign(), r, engineer);
+            if (reasonEngineerCannotWork != null) {
+                JOptionPane.showMessageDialog(frame,
+                      MessageFormat.format(resourceMap.getString("refitEngineerCannotWork.text"),
+                            engineer.getFullName(), reasonEngineerCannotWork),
+                      resourceMap.getString("refitEngineerCannotWork.title"),
+                      JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             r.setTech(engineer);
         } else {
             Campaign campaign = getCampaign();
@@ -1021,6 +1089,10 @@ public class CampaignGUI extends JPanel {
                     if (campaign2.getPlayerForce()
                               .getHumanResources()
                               .isWorkingOnRefit(campaign2.getPlayerForce().getHangar(), tech) || tech.isEngineer()) {
+                        continue;
+                    }
+                    // Only offer techs who can actually do the work: at the unit's location, with a possible target
+                    if (RefitWorkCheck.reasonTechCannotWork(campaign2, r, tech) != null) {
                         continue;
                     }
 
@@ -1107,7 +1179,10 @@ public class CampaignGUI extends JPanel {
             return;
         }
         try {
-            r.begin();
+            if (!r.begin()) {
+                // Refused before it started: the unit already has a refit, or the refurbishment cannot be paid for
+                return;
+            }
         } catch (EntityLoadingException ex) {
             JOptionPane.showMessageDialog(null,
                   "For some reason, the unit you are trying to customize cannot be loaded\n and so the customization was cancelled. Please report the bug with a description\nof the unit being customized.",

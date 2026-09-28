@@ -37,10 +37,15 @@ import java.time.LocalDate;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.finances.Money;
 
+/**
+ * @param routedPayout the lump sum paid on a successful completion in place of the remaining escrow, or {@code null}
+ *                     when none has been set and the remaining escrow is paid as normal. A zero payout is deliberate
+ *                     and renders no outstanding pay.
+ */
 public record MoraleData(ContractMoraleLevel moraleLevel,
       @Nullable LocalDate routEndDate,
-      Money routedPayout) {
+      @Nullable Money routedPayout) {
     public MoraleData(ContractMoraleLevel moraleLevel) {
-        this(moraleLevel, null, Money.zero());
+        this(moraleLevel, null, null);
     }
 }

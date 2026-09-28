@@ -35,9 +35,13 @@ package mekhq.campaign.personnel.quartermaster;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -99,8 +103,8 @@ public final class ArmorKitIssuer extends AbstractKitIssuer {
     }
 
     /**
-     * Draws one kit from the character's local stores and issues it to them. Does nothing and reports failure if the
-     * character has no local warehouse or none of the kit is in stock.
+     * Draws one kit from the character's stores (their local warehouse, or the main warehouse if they have none) and
+     * issues it to them. Does nothing and reports failure if there are no stores or none of the kit is in stock.
      *
      * @param person the character to kit
      * @param kit    the kit to issue
@@ -114,7 +118,7 @@ public final class ArmorKitIssuer extends AbstractKitIssuer {
         if (kit.getInternalName().equals(person.getArmorKitName())) {
             return true; // already wearing it — nothing to draw
         }
-        LocalWarehouse warehouse = person.getWarehouse();
+        LocalWarehouse warehouse = warehouseFor(person, campaign);
         if (warehouse == null) {
             return false;
         }
@@ -154,7 +158,7 @@ public final class ArmorKitIssuer extends AbstractKitIssuer {
             return;
         }
         EquipmentType kit = EquipmentType.get(current);
-        LocalWarehouse warehouse = person.getWarehouse();
+        LocalWarehouse warehouse = warehouseFor(person, campaign);
         if ((kit != null) && (warehouse != null)) {
             warehouse.addPart(returnedKit(kit, campaign), true);
         }
@@ -361,42 +365,157 @@ public final class ArmorKitIssuer extends AbstractKitIssuer {
     }
 
     /**
-     * On joining the campaign, a character tries to equip the default kit configured for their group. If it is in their
-     * local stores, it is issued at once; otherwise, when the campaign is set to procure recruits' kits, it is ordered
-     * and remembered so it is issued when it arrives. Does nothing if the group has no default (coveralls), the person
-     * cannot wear a kit, or the kit is unknown.
+     * On joining the campaign, a character tries to equip the default kit configured for their group. If it is in
+     * their stores, it is issued at once. Otherwise a GM-added character is granted it directly, and a regular recruit
+     * has it ordered and remembered (when the campaign is set to procure recruits' kits) so it is issued when it
+     * arrives. Does nothing if the group has no default (coveralls), the person cannot wear a kit, or the kit is
+     * unknown.
      *
      * @param person   the freshly recruited character
      * @param campaign the campaign they joined
-     * @param gmAdd {@code true} if the character is being added by the GM
+     * @param gmAdd    {@code true} if the character is being added by the GM (the kit is granted directly)
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static void equipDefaultKitOnRecruitment(Person person, Campaign campaign, boolean gmAdd) {
-        if (!ArmorKitCatalog.canBeIssuedKit(person)) {
-            return;
-        }
-        String defaultKit = defaultKitFor(ArmorKitCatalog.categoryFor(person), campaign);
-        if ((defaultKit == null) || defaultKit.equals(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME)) {
-            return;
-        }
-        EquipmentType kit = EquipmentType.get(defaultKit);
+        EquipmentType kit = defaultKit(person, campaign);
         if (kit == null) {
             return;
         }
         if (issueFromStock(person, kit, campaign)) {
-            return; // equipped straight from local stores
+            return; // equipped straight from stores
         }
 
-        if (campaign.getCampaignOptions().get(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT)) {
-            if (gmAdd) {
-                add(kit, person);
-            } else {
-                order(kit, 1, campaign);
-                person.setIntendedArmorKitName(kit.getInternalName());
+        if (gmAdd) {
+            returnWornKit(person, campaign);
+            add(kit, person);
+        } else if (campaign.getCampaignOptions().get(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT)) {
+            order(kit, 1, campaign);
+            person.setIntendedArmorKitName(kit.getInternalName());
+        }
+    }
+
+    /**
+     * After a person's role changes, issues their new group's default armor kit — but only if they are still in
+     * coveralls and not already awaiting a kit. Handled like a regular recruit: from stores, else ordered when the
+     * campaign is set to procure recruits' kits.
+     *
+     * @param person   the person whose role changed
+     * @param campaign the campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void equipDefaultKitOnRoleChange(Person person, Campaign campaign) {
+        if (!ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME.equals(person.getArmorKitName())
+                  || (person.getIntendedArmorKitName() != null)) {
+            return;
+        }
+        equipDefaultKitOnRecruitment(person, campaign, false);
+    }
+
+    /**
+     * Swaps each of the given people onto their group's default armor kit, returning what they wore to stores. Kits
+     * come from stores; any shortfall is ordered (and paid for) and issued when it arrives. People whose group has no
+     * default, and soldiers (whose kit is their platoon's), are left unchanged.
+     *
+     * @param people   the people to re-kit
+     * @param campaign the campaign
+     * @param totals   accumulates how many kits were issued and ordered
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void issueDefaultKits(Collection<Person> people, Campaign campaign, KitIssueTotals totals) {
+        Map<EquipmentType, Integer> shortfall = new LinkedHashMap<>();
+        for (Person person : people) {
+            if (!person.getStatus().isActive()) {
+                continue;
+            }
+            EquipmentType kit = defaultKit(person, campaign);
+            if ((kit != null) && issueOrQueue(person, kit, campaign, shortfall, totals)) {
+                MekHQ.triggerEvent(new PersonChangedEvent(person));
+                if (person.getUnit() != null) {
+                    person.getUnit().resetPilotAndEntity();
+                }
             }
         }
+        orderShortfall(shortfall, campaign, totals);
+    }
+
+    /**
+     * Moves everyone in a group wearing its old default armor kit onto the new default, after that campaign option has
+     * changed. The new kit comes from stores, returning the old one; any shortfall is ordered (and paid for) and
+     * swapped in when it arrives.
+     *
+     * @param campaign   the campaign
+     * @param category   the group whose default changed
+     * @param oldKitName the previous default kit internal name
+     * @param newKit     the new default kit
+     * @param totals     accumulates how many kits were issued and ordered
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void switchDefaultKit(Campaign campaign, ArmorKitCatalog.Category category, String oldKitName,
+          EquipmentType newKit, KitIssueTotals totals) {
+        Map<EquipmentType, Integer> shortfall = new LinkedHashMap<>();
+        for (Person person : campaign.getPlayerForce().getPersonnel().values()) {
+            if (!person.getStatus().isActive()
+                      || !ArmorKitCatalog.canBeIssuedKit(person)
+                      || (ArmorKitCatalog.categoryFor(person) != category)
+                      || !oldKitName.equals(person.getArmorKitName())) {
+                continue;
+            }
+            if (issueOrQueue(person, newKit, campaign, shortfall, totals)) {
+                MekHQ.triggerEvent(new PersonChangedEvent(person));
+                if (person.getUnit() != null) {
+                    person.getUnit().resetPilotAndEntity();
+                }
+            }
+        }
+        orderShortfall(shortfall, campaign, totals);
+    }
+
+    /**
+     * Issues a kit from stores or — when out of stock — records it as awaited and tallies it for ordering. Does
+     * nothing when the person already wears it.
+     *
+     * @return {@code true} if a kit was issued
+     */
+    private static boolean issueOrQueue(Person person, EquipmentType kit, Campaign campaign,
+          Map<EquipmentType, Integer> shortfall, KitIssueTotals totals) {
+        if (kit.getInternalName().equals(person.getArmorKitName())) {
+            person.setIntendedArmorKitName(null);
+            return false;
+        }
+        if (issueFromStock(person, kit, campaign)) {
+            person.setIntendedArmorKitName(null);
+            totals.issued++;
+            return true;
+        }
+        if (!kit.getInternalName().equals(person.getIntendedArmorKitName())) {
+            person.setIntendedArmorKitName(kit.getInternalName());
+            shortfall.merge(kit, 1, Integer::sum);
+        }
+        return false;
+    }
+
+    /**
+     * The default armor kit for this person's group, or {@code null} if they cannot wear one, their group has no
+     * default (coveralls), or the kit is unknown.
+     */
+    private static @Nullable EquipmentType defaultKit(Person person, Campaign campaign) {
+        if (!ArmorKitCatalog.canBeIssuedKit(person)) {
+            return null;
+        }
+        CampaignOption<String> option = defaultKitOption(ArmorKitCatalog.categoryFor(person));
+        String kitName = (option == null) ? null : campaign.getCampaignOptions().get(option);
+        if ((kitName == null) || kitName.equals(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME)) {
+            return null;
+        }
+        return EquipmentType.get(kitName);
     }
 
     /**
@@ -412,32 +531,60 @@ public final class ArmorKitIssuer extends AbstractKitIssuer {
      * @since 0.51.01
      */
     public static void equipAllMekWarriorsWithKit(Campaign campaign, String kitInternalName) {
+        equipAllWithKit(campaign, kitInternalName,
+              person -> ArmorKitCatalog.categoryFor(person) == ArmorKitCatalog.Category.MEKWARRIOR);
+    }
+
+    /**
+     * Equips every active player aerospace pilot who is not already wearing the Aerospace Fighter Pilot Kit with it,
+     * directly — a one-off convenience granted when the aerospace deployment requirement is first enabled, so the
+     * fighters are not immediately grounded. No stock is consumed and nothing is charged.
+     *
+     * @param campaign the campaign whose player aerospace pilots are equipped
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void equipAllAerospacePilotsWithKit(Campaign campaign) {
+        equipAllWithKit(campaign, ArmorKitCatalog.KIT_AEROSPACE_PILOT,
+              person -> person.getPrimaryRole().isAerospacePilot() || person.getSecondaryRole().isAerospacePilot());
+    }
+
+    /** Sets the kit directly on every active person matching the filter who is not already wearing it. */
+    private static void equipAllWithKit(Campaign campaign, String kitInternalName, Predicate<Person> eligible) {
         if (EquipmentType.get(kitInternalName) == null) {
             return;
         }
-        int equipped = 0;
         for (Person person : campaign.getPlayerForce().getPersonnel().values()) {
             if (!person.getStatus().isActive()
-                      || (ArmorKitCatalog.categoryFor(person) != ArmorKitCatalog.Category.MEKWARRIOR)
+                      || !eligible.test(person)
                       || kitInternalName.equals(person.getArmorKitName())) {
                 continue;
             }
+            person.setIntendedArmorKitName(null);
             person.setArmorKitName(kitInternalName);
             MekHQ.triggerEvent(new PersonChangedEvent(person));
             if (person.getUnit() != null) {
                 person.getUnit().resetPilotAndEntity();
             }
-            equipped++;
         }
     }
 
-    private static String defaultKitFor(ArmorKitCatalog.Category category, Campaign campaign) {
+    /**
+     * @param category an armor kit group
+     *
+     * @return the campaign option holding that group's default kit, or {@code null} for soldiers, who have no
+     *       per-recruit default (their platoon's kit is issued to the unit instead)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable CampaignOption<String> defaultKitOption(ArmorKitCatalog.Category category) {
         return switch (category) {
-            case MEKWARRIOR -> campaign.getCampaignOptions().get(CampaignOption.MEKWARRIOR_DEFAULT_KIT);
-            case AIRCRAFT -> campaign.getCampaignOptions().get(CampaignOption.AIRCRAFT_DEFAULT_KIT);
-            case INFANTRY -> campaign.getCampaignOptions().get(CampaignOption.VEHICLE_CREW_DEFAULT_KIT);
-            // Soldiers have no per-recruit default kit; their platoon's kit is issued to the unit instead.
-            case SOLDIER -> ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME;
+            case MEKWARRIOR -> CampaignOption.MEKWARRIOR_DEFAULT_KIT;
+            case AIRCRAFT -> CampaignOption.AIRCRAFT_DEFAULT_KIT;
+            case INFANTRY -> CampaignOption.VEHICLE_CREW_DEFAULT_KIT;
+            case SOLDIER -> null;
         };
     }
 }

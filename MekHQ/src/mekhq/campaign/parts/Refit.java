@@ -35,6 +35,7 @@ package mekhq.campaign.parts;
 
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
@@ -84,6 +85,7 @@ import megameklab.util.UnitUtil;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.parts.PartChangedEvent;
@@ -121,6 +123,7 @@ import org.w3c.dom.NodeList;
  */
 public class Refit extends Part implements IAcquisitionWork {
     private static final MMLogger LOGGER = MMLogger.create(Refit.class);
+    private static final String REFIT_RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
     public static final int NO_CHANGE = 0;
     public static final int CLASS_OMNI = 1;
@@ -272,33 +275,31 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * Returns a mutable list of parts for the old unit in the refit. This is intended to be mutated only be
+     * Returns a mutable list of parts for the old unit in the refit. This is intended to be mutated only by
      * {@link mekhq.campaign.Campaign Campaign} when merging parts.
      * <p>
-     * This is only used by RefitTest.java
+     * Refit tests read it to check what a refit plans to keep, remove and add; the refit screens will need the same
+     * view. Treat it as read-only outside {@code Campaign}.
      *
      * @return A mutable {@link List} of old parts in the refit.
      *
      * @since 0.50.04
-     * @deprecated - If only used in a Test file, do we need it?
      */
-    @Deprecated(since = "0.50.04")
     public List<Part> getOldUnitParts() {
         return oldUnitParts;
     }
 
     /**
-     * Returns a mutable list of parts for the new unit in the refit. This is intended to be mutated only be
+     * Returns a mutable list of parts for the new unit in the refit. This is intended to be mutated only by
      * {@link mekhq.campaign.Campaign Campaign} when merging parts.
      * <p>
-     * This is only used by RefitTest.java
+     * Refit tests read it to check what a refit plans to keep, remove and add; the refit screens will need the same
+     * view. Treat it as read-only outside {@code Campaign}.
      *
      * @return A mutable {@link List} of new part IDs in the refit.
      *
      * @since 0.50.04
-     * @deprecated - If only used in a Test file, do we need it?
      */
-    @Deprecated(since = "0.50.04")
     public List<Part> getNewUnitParts() {
         return newUnitParts;
     }
@@ -979,9 +980,9 @@ public class Refit extends Part implements IAcquisitionWork {
         // full ton and half ton MG or OS/regular.
         for (AmmoType type : ammoNeeded.keySet()) {
             int shotsNeeded = Math.max(ammoNeeded.get(type) - campaign.getQuartermaster().getAmmoAvailable(type), 0);
-            int shotsPerTon = type.getShots();
-            if ((shotsNeeded > 0) && (shotsPerTon > 0)) {
-                cost = cost.plus(Money.of(type.getCost(newEntity, false, -1) * ((double) shotsNeeded / shotsPerTon)));
+            if (shotsNeeded > 0) {
+                // Priced like any ammunition bought for the campaign, so the campaign price multipliers apply
+                cost = cost.plus(new AmmoStorage(0, type, shotsNeeded, campaign).getActualValue());
             }
         }
 
@@ -1059,6 +1060,9 @@ public class Refit extends Part implements IAcquisitionWork {
                     plannedReplacementParts.add(replacement);
                 }
             } else {
+                // Heat sinks built into the engine are parts of the kit like any other: a double heat sink costs the
+                // same inside the engine as outside it (TM p.277)
+                cost = cost.plus(((MissingPart) newHeatSinkPart).getNewPart().getActualValue());
                 shoppingList.add(newHeatSinkPart);
             }
         }
@@ -1167,8 +1171,17 @@ public class Refit extends Part implements IAcquisitionWork {
     /**
      * Begins the refit after it's been calculated and configured.
      *
+     * @return {@code true} if the refit started, {@code false} if the unit already has a refit or it is a
+     *       refurbishment the force cannot pay for
      */
-    public void begin() throws EntityLoadingException, IOException {
+    public boolean begin() throws EntityLoadingException, IOException {
+        if (oldUnit.isRefitting()) {
+            LOGGER.warn("[Refit] {} already has a refit in progress; a second one is not started", oldUnit.getName());
+            return false;
+        }
+        if (isRefurbishing && !payForRefurbishment()) {
+            return false;
+        }
         if (customJob && isSavingFile) {
             saveCustomization();
         }
@@ -1183,16 +1196,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
         newEntity.setOwner(oldUnit.getEntity().getOwner());
 
-        // We don't want to require waiting for a refit kit if all that is missing is
-        // ammo or ammo bins.
+        // We don't want to require waiting for a refit kit if all that is missing is ammo or ammo bins. Only the bins
+        // this refit adds need filling; bins the unit keeps hold on to the ammo they already carry.
         Map<AmmoType, Integer> shotsNeeded = new HashMap<>();
-        for (Part part : newUnitParts) {
-            if (part instanceof AmmoBin bin) {
-                bin.setShotsNeeded(bin.getFullShots());
-                shotsNeeded.merge(bin.getType(), bin.getShotsNeeded(), Integer::sum);
-            }
-        }
-
         for (Iterator<Part> iter = shoppingList.iterator(); iter.hasNext(); ) {
             final Part part = iter.next();
             if (part instanceof AmmoBin bin) {
@@ -1230,6 +1236,8 @@ public class Refit extends Part implements IAcquisitionWork {
                 AmmoStorage ammo = new AmmoStorage(0, ammoType, tons * ammoType.getShots(), campaign);
                 newUnitParts.add(ammo);
                 shoppingList.add(ammo);
+                LOGGER.debug("[Refit] {}: {} shots of {} to buy ({} tons)", getDesc(), shotsToBuy, ammoType.getName(),
+                      tons);
             }
         }
 
@@ -1251,15 +1259,12 @@ public class Refit extends Part implements IAcquisitionWork {
 
                     // Check if we need more ammo
                     if (ammoBin.needsFixing()) {
-                        getCampaign().getPlayerForce()
-                              .getShoppingList()
-                              .addShoppingItem(ammoBin.getNewPart(), 1, getCampaign());
+                        orderForThisRefit(ammoBin.getNewPart(), 1);
                     }
 
-                } else if (part instanceof IAcquisitionWork) {
-                    getCampaign().getPlayerForce()
-                          .getShoppingList()
-                          .addShoppingItem(((IAcquisitionWork) part), 1, getCampaign());
+                } else if (part instanceof IAcquisitionWork acquisitionWork) {
+                    int orderQuantity = (part instanceof AmmoStorage ammoToBuy) ? tonsOf(ammoToBuy) : 1;
+                    orderForThisRefit(newOrderFor(acquisitionWork), orderQuantity);
                     newShoppingList.add(part);
                 }
             }
@@ -1275,7 +1280,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 while (armorSupplied < armorNeeded) {
                     Armor armorPart = (Armor) (newArmorSupplies.getNewPart());
                     armorSupplied += armorPart.getAmount();
-                    getCampaign().getPlayerForce().getShoppingList().addShoppingItem(armorPart, 1, getCampaign());
+                    orderForThisRefit(armorPart, 1);
                 }
             }
         } else {
@@ -1284,25 +1289,81 @@ public class Refit extends Part implements IAcquisitionWork {
                 MekHQ.triggerEvent(new PartChangedEvent(part));
             }
             orderArmorSupplies();
-            if (shoppingList.isEmpty() && (null == newArmorSupplies || newArmorSupplies.getAmountNeeded() == 0)) {
+            boolean isNothingLeftToBuy = shoppingList.isEmpty()
+                  && ((null == newArmorSupplies) || (newArmorSupplies.getAmountNeeded() == 0));
+            if (isNothingLeftToBuy || isRefurbishing) {
+                // A refurbishment was paid for in full when it started, so it never orders a refit kit on top
+                if (!isNothingLeftToBuy) {
+                    LOGGER.warn("[Refit] Refurbishment of {} listed {} parts to buy; no kit is ordered for them",
+                          getDesc(), shoppingList.size());
+                }
                 kitFound = true;
             } else {
                 getCampaign().getPlayerForce().getShoppingList().addShoppingItem(this, 1, getCampaign());
             }
         }
 
-        if (isRefurbishing) {
-            if (campaign.getQuartermaster().buyRefurbishment(this)) {
-                campaign.addReport(TECHNICAL, messageSurroundedBySpanWithColor(getPositiveColor(),
-                      "<b>Refurbishment ready to begin</b>"));
-            } else {
-                campaign.addReport(TECHNICAL, messageSurroundedBySpanWithColor(getNegativeColor(),
-                      "You cannot afford to refurbish " +
-                            oldUnit.getEntity().getShortName() +
-                            ". Transaction cancelled"));
-            }
-        }
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
+        return true;
+    }
+
+    /**
+     * Pays for a refurbishment before it starts. When the force cannot afford it, the refurbishment does not start and
+     * the daily report says why.
+     *
+     * @return {@code true} if the refurbishment was paid for and can start
+     */
+    private boolean payForRefurbishment() {
+        String unitName = oldUnit.getEntity().getShortName();
+        String cost = campaign.getQuartermaster().getRefurbishmentCost(this).toAmountAndSymbolString();
+        if (!campaign.getQuartermaster().buyRefurbishment(this)) {
+            LOGGER.debug("[Refit] Refurbishment of {} not started: the force cannot pay {}", unitName, cost);
+            campaign.addReport(TECHNICAL, messageSurroundedBySpanWithColor(getNegativeColor(),
+                  getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "Refit.refurbishment.cannotAfford", unitName, cost)));
+            return false;
+        }
+        campaign.addReport(TECHNICAL, messageSurroundedBySpanWithColor(getPositiveColor(),
+              getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "Refit.refurbishment.paid", unitName, cost)));
+        return true;
+    }
+
+    /**
+     * Makes a fresh procurement order for a part on this refit's shopping list. The refit's own entry is never placed on
+     * the procurement list itself: the procurement list adds later orders of the same part to an existing entry, which
+     * would change the quantity the refit's list reports.
+     *
+     * @param shoppingListEntry the refit's shopping list entry to order
+     *
+     * @return a new order for the same part, or the entry itself when no new order can be made from it
+     */
+    private static IAcquisitionWork newOrderFor(IAcquisitionWork shoppingListEntry) {
+        if (shoppingListEntry.getNewEquipment() instanceof Part newPart) {
+            return newPart.getAcquisitionWork();
+        }
+        LOGGER.warn("[Refit] No fresh order can be made for {}; ordering the shopping list entry itself",
+              shoppingListEntry.getAcquisitionName());
+        return shoppingListEntry;
+    }
+
+    /**
+     * Places an order on the procurement list for this refit, tagged with the unit being refitted so that it stays
+     * apart from the player's own orders and is removed if the refit is cancelled.
+     *
+     * @param order    the order to place
+     * @param quantity how many to order
+     */
+    private void orderForThisRefit(IAcquisitionWork order, int quantity) {
+        if (order instanceof Part orderPart) {
+            orderPart.setRefitUnit(oldUnit);
+        }
+        getCampaign().getPlayerForce().getShoppingList().addShoppingItem(order, quantity, getCampaign());
+    }
+
+    /**
+     * @return how many tons the given ammunition fills; an ammunition order buys one ton at a time
+     */
+    private static int tonsOf(AmmoStorage ammo) {
+        return (int) Math.ceil((double) ammo.getShots() / ammo.getType().getShots());
     }
 
     /**
@@ -1468,20 +1529,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         for (Part part : newUnitParts) {
             part.setRefitUnit(null);
-
-            // If the part was not part of the old unit we need to consolidate it with
-            // others of its
-            // type in the warehouse. Ammo Bins just get unloaded and removed; no reason to
-            // keep
-            // them around.
-            if (part.getUnit() == null) {
-                if (part instanceof AmmoBin) {
-                    ((AmmoBin) part).unload();
-                    getWarehouse().removePart(part);
-                } else {
-                    getCampaign().getQuartermaster().addPart(part, 0, false);
-                }
-            }
+            releaseNewPart(part);
         }
 
         if (null != newArmorSupplies) {
@@ -1491,22 +1539,46 @@ public class Refit extends Part implements IAcquisitionWork {
             newArmorSupplies.changeAmountAvailable(newArmorSupplies.getAmount());
         }
 
-        // Remove refit parts from the procurement list. Those which have already been
-        // purchased and
-        // are in transit are left as is.
-        List<IAcquisitionWork> toRemove = new ArrayList<>();
-        toRemove.add(this);
-        if (getRefitUnit() != null) {
-            for (IAcquisitionWork part : campaign.getPlayerForce().getShoppingList().getPartList()) {
-                if ((part instanceof Part) && Objects.equals(getRefitUnit(), ((Part) part).getRefitUnit())) {
-                    toRemove.add(part);
-                }
-            }
-        }
-        for (IAcquisitionWork work : toRemove) {
-            campaign.getPlayerForce().getShoppingList().removeItem(work);
-        }
+        // Remove the kit and this refit's orders from the procurement list. Those already bought and in transit are
+        // not on the list any more and arrive as usual.
+        campaign.getPlayerForce().getShoppingList().removeOrdersForRefit(this);
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
+    }
+
+    /**
+     * Hands back one part that a cancelled refit had set aside for the new design.
+     *
+     * <p>Parts on the old unit stay where they are. Ammo bins are unloaded and dropped. A part the campaign already
+     * holds goes back to the warehouse as an ordinary spare, keeping its arrival time and brand new status, so parts
+     * still in transit arrive when they were due. A part the refit only listed as needed and never obtained, such as
+     * ammunition still to be bought, is dropped: the campaign never had it.</p>
+     *
+     * @param part a part from this refit's new unit parts, already released from the refit
+     */
+    private void releaseNewPart(Part part) {
+        if (part.getUnit() != null) {
+            return;
+        }
+        if (part instanceof AmmoBin ammoBin) {
+            ammoBin.unload();
+            getWarehouse().removePart(part);
+            return;
+        }
+        if (!isHeldByCampaign(part)) {
+            LOGGER.debug("[Refit] Cancelled refit of {}: dropping {}, which was never obtained", getDesc(),
+                  part.getName());
+            return;
+        }
+        getCampaign().getQuartermaster().addPart(part, part.getDaysToArrival(), part.isBrandNew());
+    }
+
+    /**
+     * @return {@code true} if the part is in a campaign warehouse, {@code false} if the refit only listed it as needed
+     *       and never obtained it, such as ammunition still to be bought
+     */
+    private static boolean isHeldByCampaign(Part part) {
+        LocalWarehouse partWarehouse = part.getWarehouse();
+        return (partWarehouse != null) && (partWarehouse.getPart(part.getId()) == part);
     }
 
     /**
@@ -1620,7 +1692,11 @@ public class Refit extends Part implements IAcquisitionWork {
                                           ((Aero) newEntity).getPodHeatSinks() -
                                           untrackedHeatSinkCount(newEntity);
         }
+        Set<AmmoBin> keptAmmoBins = new HashSet<>();
         for (Part part : newUnitParts) {
+            if ((part instanceof AmmoBin keptAmmoBin) && (part.getUnit() == oldUnit)) {
+                keptAmmoBins.add(keptAmmoBin);
+            }
             if ((!replacingLocations) && (part instanceof MekLocation)) {
                 // Preserve any hip or shoulder damage
                 int loc = ((MekLocation) part).getLoc();
@@ -1649,10 +1725,15 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
 
             } else if (part instanceof AmmoStorage ammoStorage) {
-                // FIXME: why are we merging this back in?!
-                // merge back into the campaign before completing the refit
-                getCampaign().getQuartermaster().addAmmo(ammoStorage.getType(), ammoStorage.getShots());
-                getWarehouse().removePart(part);
+                // Ammo set aside for the new bins goes back into stock, where the new bins load it from below. Ammo
+                // the refit still had to buy was never obtained, so there is nothing to put back.
+                if (isHeldByCampaign(ammoStorage)) {
+                    getCampaign().getQuartermaster().addAmmo(ammoStorage.getType(), ammoStorage.getShots());
+                    getWarehouse().removePart(part);
+                } else {
+                    LOGGER.debug("[Refit] {}: {} shots of {} were never bought and are not loaded", getDesc(),
+                          ammoStorage.getShots(), ammoStorage.getType().getName());
+                }
                 continue;
             }
             part.setUnit(oldUnit);
@@ -1694,7 +1775,8 @@ public class Refit extends Part implements IAcquisitionWork {
             // see https://github.com/MegaMek/mekhq/issues/2703
             part.setCampaign(getCampaign());
 
-            if (part instanceof AmmoBin ammoBin) {
+            if ((part instanceof AmmoBin ammoBin) && !keptAmmoBins.contains(ammoBin)) {
+                // A bin the unit kept holds on to its ammo; only the bins this refit added are loaded, from stock.
                 // All large craft ammo got unloaded into the warehouse earlier, though the part IDs have now changed
                 // . Consider all LC ammo bins empty and load them back up.
                 if (ammoBin instanceof LargeCraftAmmoBin largeCraftAmmoBin) {

@@ -34,6 +34,7 @@ package mekhq.campaign.universe.commandGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -49,6 +50,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
@@ -95,7 +97,8 @@ class AddSupportUnitsToTOETest {
                                     .newPerson(campaign, PersonnelRole.ADMINISTRATOR, PersonnelRole.NONE));
         }
 
-        SupportPersonnelToTOE.organize(campaign, administrators, false);
+        SupportPersonnelToTOE.organize(campaign, administrators, false,
+              campaign.getPlayerForce().getFaction());
 
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         assertNotNull(supportCommand, "organize must record the Support Command formation");
@@ -131,7 +134,8 @@ class AddSupportUnitsToTOETest {
             administrators.add(campaign.getPlayerForce().getHumanResources()
                                      .newPerson(campaign, PersonnelRole.ADMINISTRATOR, PersonnelRole.NONE));
         }
-        SupportPersonnelToTOE.organize(campaign, administrators, false);
+        SupportPersonnelToTOE.organize(campaign, administrators, false,
+              campaign.getPlayerForce().getFaction());
 
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         assertNotNull(supportCommand);
@@ -153,12 +157,87 @@ class AddSupportUnitsToTOETest {
                                   .newPerson(campaign, PersonnelRole.MEK_TECH, PersonnelRole.NONE));
         }
 
-        SupportPersonnelToTOE.organize(campaign, technicians, false);
+        SupportPersonnelToTOE.organize(campaign, technicians, false,
+              campaign.getPlayerForce().getFaction());
 
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         assertNotNull(supportCommand);
         assertEquals(FormationLevel.COMPANY, supportCommand.getFormationLevel(),
               "a platoon plus a squad is five squads, which is a company's worth");
+    }
+
+    @Test
+    void vehiclesStillNeeded_aRolledCapabilityNeverAsksForAVehicleCalledNull() {
+        // With support teams on, salvage and medical are built here rather than standalone, and this path used to
+        // resolve the model by name. Once those capabilities stopped naming one, it asked the cache for a unit
+        // called null and a command silently lost its recovery vehicles and MASH trucks.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Faction faction = campaign.getPlayerForce().getFaction();
+        assertNull(SupportCapability.SALVAGE.unitName(campaign),
+              "this test is only meaningful while salvage rolls its vehicle rather than naming it");
+
+        List<SupportPersonnelToTOE.VehicleSpec> specs = SupportPersonnelToTOE.vehiclesStillNeeded(campaign,
+              SupportCapability.SALVAGE, faction, 4);
+
+        for (SupportPersonnelToTOE.VehicleSpec spec : specs) {
+            assertNotNull(spec.unitName(), "a spec with no unit name cannot be built from");
+            assertTrue(spec.count() > 0, "a spec must ask for at least one vehicle");
+        }
+    }
+
+    @Test
+    void vehiclesStillNeeded_aNamedCapabilityStillResolvesByName() {
+        // The security detail is infantry and still names its unit, so that path must be untouched.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Faction faction = campaign.getPlayerForce().getFaction();
+        String expected = SupportCapability.SECURITY.unitName(campaign);
+        assertNotNull(expected, "the security detail names its unit");
+
+        List<SupportPersonnelToTOE.VehicleSpec> specs = SupportPersonnelToTOE.vehiclesStillNeeded(campaign,
+              SupportCapability.SECURITY, faction, 2);
+
+        assertEquals(1, specs.size());
+        assertEquals(expected, specs.get(0).unitName());
+    }
+
+    @Test
+    void vehiclesStillNeeded_freshCampaignGetsTheFullCount() {
+        // A newly generated command owns no capability vehicles, so generation is unchanged: it builds them all.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+
+        List<SupportPersonnelToTOE.VehicleSpec> specs = SupportPersonnelToTOE.vehiclesStillNeeded(campaign,
+              "Locust LCT-1V", 3);
+
+        assertEquals(1, specs.size());
+        assertEquals("Locust LCT-1V", specs.get(0).unitName());
+        assertEquals(3, specs.get(0).count(), "a campaign that owns none must get the full count");
+    }
+
+    @Test
+    void vehiclesStillNeeded_buildsOnlyWhatTheCampaignLacks() {
+        // Issue 10037: converting a campaign to support teams built a full set of MASH and recovery vehicles on top
+        // of the ones it already owned. Two owned against a target of three means one more, not three.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+
+        List<SupportPersonnelToTOE.VehicleSpec> specs = SupportPersonnelToTOE.vehiclesStillNeeded(campaign,
+              "Locust LCT-1V", 3);
+
+        assertEquals(1, specs.size());
+        assertEquals(1, specs.get(0).count(), "only the vehicle the campaign lacks may be built");
+    }
+
+    @Test
+    void vehiclesStillNeeded_buildsNothingWhenTheTargetIsAlreadyOwned() {
+        // An empty list, not a spec of zero: organizeSection creates the vehicle company for any non-empty list, so a
+        // zero-count spec would leave an empty formation in the TOE.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+        UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getLocustLCT1V());
+
+        assertTrue(SupportPersonnelToTOE.vehiclesStillNeeded(campaign, "Locust LCT-1V", 2).isEmpty(),
+              "a campaign that already fields the target must get no new vehicles");
     }
 
     @Test
@@ -175,7 +254,8 @@ class AddSupportUnitsToTOETest {
                               .newPerson(campaign, PersonnelRole.MECHANIC, PersonnelRole.NONE));
         }
 
-        SupportPersonnelToTOE.organize(campaign, staff, false);
+        SupportPersonnelToTOE.organize(campaign, staff, false,
+              campaign.getPlayerForce().getFaction());
 
         Formation supportCommand = campaign.getPlayerForce().getSupportCommandFormation();
         assertNotNull(supportCommand);

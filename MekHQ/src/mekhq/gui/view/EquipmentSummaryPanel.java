@@ -98,6 +98,11 @@ public class EquipmentSummaryPanel extends JPanel {
             kits.add(kitDisplayName(toolKit));
         }
 
+        String secondaryKit = person.getSecondaryKitName();
+        if (secondaryKit != null) {
+            kits.add(kitDisplayName(secondaryKit));
+        }
+
         kits.sort(Comparator.naturalOrder());
         return kits;
     }

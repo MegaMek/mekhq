@@ -685,7 +685,7 @@ public class EducationController {
         campaign.addReport(PERSONNEL,
               getFormattedTextAt(BUNDLE_NAME, "arrived.text", person.getHyperlinkedFullTitle()));
 
-        AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign, 
+        AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager().getOrCreateCampusLocation(campaign,
               person.getEduAcademySet(), person.getEduAcademyNameInSet(), person.getEduAcademySystem());
         if (campusLocation == null) {
             throw new IllegalStateException("Campus location must exist for system " + person.getEduAcademySystem());
@@ -1106,9 +1106,11 @@ public class EducationController {
                             reportMessage += ' ' + resources.getString("eventTrainingAccidentSuspicious.text");
                         }
 
-                        campaign.addReport(PERSONNEL, reportMessage);
-
                         person.changeStatus(campaign, campaign.getLocalDate(), PersonnelStatus.ACCIDENTAL);
+
+                        if (person.getStatus().isDead()) {
+                            campaign.addReport(PERSONNEL, reportMessage);
+                        }
                     }
                 } else {
                     processTrainingInjury(campaign, academy, person, resources);

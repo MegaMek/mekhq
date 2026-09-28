@@ -38,6 +38,8 @@ import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 import megamek.Version;
 import megamek.common.annotations.Nullable;
@@ -45,6 +47,7 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
@@ -58,7 +61,6 @@ import mekhq.utilities.MHQXMLUtility;
 import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * A list of IAcquisitionWork
@@ -167,6 +169,41 @@ public class ForceShoppingList {
         addShoppingItem(newWork, quantity, campaign, null);
     }
 
+    /**
+     * Identifies the refit an order was placed for, by the id of the unit being refitted. Orders a refit places are
+     * tagged with that unit, so they are never merged with the player's own orders and cancelling the refit can remove
+     * exactly them. The id is compared rather than the unit, because an order read back from a save still holds an
+     * unresolved reference to its unit.
+     *
+     * @return the refitting unit's id, or {@code null} for an order the player placed
+     */
+    private static @Nullable UUID refitOwnerId(IAcquisitionWork shoppingItem) {
+        if ((shoppingItem instanceof Part part) && (part.getRefitUnit() != null)) {
+            return part.getRefitUnit().getId();
+        }
+        return null;
+    }
+
+    /**
+     * Removes the refit kit order for this refit, and every order the refit placed for its unit.
+     *
+     * <p>Orders already bought and in transit are not on this list any more; they arrive as usual. Orders saved
+     * before refits tagged their orders carry no refit, so they are left alone.</p>
+     *
+     * @param refit the refit being cancelled
+     *
+     * @return how many orders were removed
+     */
+    public int removeOrdersForRefit(Refit refit) {
+        UUID refittingUnitId = refit.getOriginalUnit().getId();
+        int ordersBefore = getShoppingList().size();
+        getShoppingList().removeIf(shoppingItem -> (shoppingItem == refit)
+              || refittingUnitId.equals(refitOwnerId(shoppingItem)));
+        int ordersRemoved = ordersBefore - getShoppingList().size();
+        LOGGER.debug("[Refit] Cancelled refit of {}: removed {} procurement orders", refit.getDesc(), ordersRemoved);
+        return ordersRemoved;
+    }
+
     /** The place an existing order resolves to (a base for a base order), or {@code null} for the main force. */
     private static @Nullable IPlace orderPlace(IAcquisitionWork shoppingItem) {
         return (shoppingItem instanceof Part part) ? part.getPlace() : null;
@@ -189,12 +226,12 @@ public class ForceShoppingList {
             newWork.setParent(destination);
         }
 
-        // check to see if this is already on the shopping list for the same destination. If so, then add
-        // quantity to the list
-        // and return
+        // If the same equipment is already ordered for the same destination and the same refit (or neither is for a
+        // refit), add the quantity to that order and return
         for (IAcquisitionWork shoppingItem : getShoppingList()) {
             if (isSameEquipment(shoppingItem.getNewEquipment(), newWork.getNewEquipment())
-                      && orderPlace(shoppingItem) == destination) {
+                      && orderPlace(shoppingItem) == destination
+                      && Objects.equals(refitOwnerId(shoppingItem), refitOwnerId(newWork))) {
                 campaign.addReport(ACQUISITIONS, newWork.getShoppingListReport(quantity));
                 while (quantity > 0) {
                     shoppingItem.incrementQuantity();
@@ -205,9 +242,7 @@ public class ForceShoppingList {
             }
         }
 
-        // if not on the shopping list then try to acquire it with a temporary short
-        // shopping list.
-        // If we fail, then add it to the shopping list
+        // Not on the list yet: add it as a new order
         int origQuantity = quantity;
         while (quantity > 1) {
             newWork.incrementQuantity();

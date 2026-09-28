@@ -304,6 +304,27 @@ public class SpecialAbility {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "ability");
     }
 
+    /**
+     * Whether an ability read from a file no longer exists, such as the retired Natural Aptitude SPAs. Such abilities
+     * are skipped: offering them would let players spend XP on an ability that does nothing.
+     *
+     * @param lookupName the ability's lookup name
+     * @param options    the options the ability must exist in, or {@code null} to skip the check
+     *
+     * @return {@code true} if the ability should be skipped
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isRemovedAbility(@Nullable String lookupName, @Nullable PersonnelOptions options) {
+        if ((options == null) || (lookupName == null) || (options.getOption(lookupName) != null)) {
+            return false;
+        }
+
+        LOGGER.warn("Skipping special ability {}, which no longer exists", lookupName);
+        return true;
+    }
+
     public static void generateInstanceFromXML(Node wn, PersonnelOptions options, Version v) {
         try {
             SpecialAbility retVal = new SpecialAbility();
@@ -354,6 +375,10 @@ public class SpecialAbility {
                 if (null != option) {
                     retVal.desc = option.getDescription();
                 }
+            }
+
+            if (isRemovedAbility(retVal.lookupName, options)) {
+                return;
             }
 
             specialAbilities.put(retVal.lookupName, retVal);
@@ -419,6 +444,10 @@ public class SpecialAbility {
                 if (null != option) {
                     specialAbility.desc = option.getDescription();
                 }
+            }
+
+            if (isRemovedAbility(specialAbility.lookupName, options)) {
+                return;
             }
 
             specialAbilities.put(specialAbility.lookupName, specialAbility);

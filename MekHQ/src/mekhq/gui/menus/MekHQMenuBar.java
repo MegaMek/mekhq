@@ -125,6 +125,7 @@ import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.developerTools.ContractDefinitionEditorDialog;
 import mekhq.gui.developerTools.ScenarioModifierEditorDialog;
 import mekhq.gui.developerTools.StratConFacilityEditorDialog;
+import mekhq.gui.developerTools.StratConPointOfInterestEditorDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
@@ -765,6 +766,10 @@ public class MekHQMenuBar extends JMenuBar {
               event -> new StratConFacilityEditorDialog(getFrame()).setVisible(true));
         menuDeveloperTools.add(miFacilityEditor);
 
+        JMenuItem miPointOfInterestEditor = createMenuItem("miPointOfInterestEditor.text", KeyEvent.VK_P,
+              event -> new StratConPointOfInterestEditorDialog(getFrame()).setVisible(true));
+        menuDeveloperTools.add(miPointOfInterestEditor);
+
         JMenuItem miLifePathBuilder = createMenuItem("miLifePathBuilder.text", KeyEvent.VK_L,
               event -> new LifePathBuilderDialog(getCampaign(), getFrame()));
         menuDeveloperTools.add(miLifePathBuilder);
@@ -964,6 +969,9 @@ public class MekHQMenuBar extends JMenuBar {
                     // changed...
                     person.setUnit(null);
                     person.clearTechUnits();
+
+                    // <51.01 compatibility handler: an older export may hold a Natural Aptitude SPA we couldn't convert
+                    person.reportUnresolvedLegacyNaturalAptitudes(campaign);
                 }
             }
 

@@ -39,7 +39,6 @@ import jakarta.annotation.Nonnull;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
-import megamek.common.compute.Compute;
 import megamek.common.enums.TechRating;
 import megamek.common.units.Aero;
 import megamek.common.units.Dropship;
@@ -85,7 +84,7 @@ public class Avionics extends Part {
             if (checkForDestruction &&
                       hits > priorHits &&
                       (hits < 3 && !campaign.getCampaignOptions().get(CampaignOption.USE_AERO_SYSTEM_HITS)) &&
-                      Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
+                      campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             } else if (hits >= 3) {
                 remove(false);

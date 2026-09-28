@@ -32,6 +32,7 @@
  */
 package testUtilities;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -61,6 +62,7 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.market.PartsStore;
 import mekhq.campaign.market.TestPartsStore;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
+import mekhq.campaign.parts.CampaignDice;
 import mekhq.campaign.personnel.death.RandomDeath;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -151,11 +153,21 @@ public final class MHQTestUtilities {
      * {@link PlayerForce}. This prevents {@link NullPointerException}s in production code that routes through
      * {@code getPlayerForce().getX()}, while still allowing callers to layer additional stubbing on the returned mock.
      *
+     * <p>{@link PlayerForce#getPurchaseCostMultiplier} defaults to {@code 1.0} (no active contract carries
+     * {@code DOUBLE_ALL_COSTS}) since it returns a primitive {@code double}, which deep-stubbing cannot default
+     * sensibly on its own; a test exercising that special rule can override this stub.</p>
+     *
+     * <p>{@link Campaign#getDice()} returns a real {@link CampaignDice}, so part destruction rolls go through
+     * MegaMek's {@code Compute} as they do in play; a test that needs fixed rolls can override this stub.</p>
+     *
      * @return a {@link Campaign} mock with a non-null, deep-stubbed {@link PlayerForce}
      */
     public static Campaign mockCampaign() {
         Campaign campaign = mock(Campaign.class);
-        when(campaign.getPlayerForce()).thenReturn(mock(PlayerForce.class, RETURNS_DEEP_STUBS));
+        PlayerForce playerForce = mock(PlayerForce.class, RETURNS_DEEP_STUBS);
+        when(playerForce.getPurchaseCostMultiplier(any())).thenReturn(1.0);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        when(campaign.getDice()).thenReturn(new CampaignDice());
         return campaign;
     }
 

@@ -37,7 +37,6 @@ import static megamek.common.options.OptionsConstants.MD_BVDNI;
 import static megamek.common.options.OptionsConstants.MD_DERMAL_ARMOR;
 import static megamek.common.options.OptionsConstants.MD_DERMAL_CAMO_ARMOR;
 import static megamek.common.options.OptionsConstants.MD_VDNI;
-import static megamek.common.options.OptionsConstants.UNOFFICIAL_EI_IMPLANT;
 import static megamek.common.options.PilotOptions.LVL3_ADVANTAGES;
 import static mekhq.campaign.enums.DailyReportType.MEDICAL;
 import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
@@ -60,9 +59,10 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 import java.util.List;
 
 import megamek.codeUtilities.ObjectUtility;
+import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
@@ -161,12 +161,13 @@ public class AdvancedMedicalAlternateImplants {
      */
     public static void performEnhancedImagingDegradationCheck(Campaign campaign, Person person) {
         PersonnelOptions options = person.getOptions();
-        boolean hasEnhancedImaging = options.booleanOption(UNOFFICIAL_EI_IMPLANT);
+        boolean hasEnhancedImaging = options.booleanOption(OptionsConstants.MD_EI_IMPLANT);
         boolean hasVDNI = options.booleanOption(MD_VDNI);
         boolean hasBufferedVDNI = options.booleanOption(MD_BVDNI);
         boolean hasTooManyProsthetics = isHasTooManyProsthetics(person);
+        boolean hasAffectedImplant = hasEnhancedImaging || hasVDNI || hasBufferedVDNI;
 
-        if (!hasEnhancedImaging && !hasVDNI && !hasBufferedVDNI && !hasTooManyProsthetics) {
+        if (!hasAffectedImplant && !hasTooManyProsthetics) {
             return;
         }
 
@@ -181,12 +182,12 @@ public class AdvancedMedicalAlternateImplants {
         int frequency = getFrequency(person.getPhenotype().isAerospace(), hasBufferedVDNI, hasVDNI, hasEnhancedImaging);
 
         int gameYear = campaign.getGameYear();
-        if (gameYear % frequency == 0) {
+        if (hasAffectedImplant && (gameYear % frequency == 0)) {
             processDegradationEffects(campaign, person, useFatigue, useAbilities, false);
         }
 
         frequency = 3;
-        if (hasTooManyProsthetics && gameYear % frequency == 0) {
+        if (hasTooManyProsthetics && (gameYear % frequency == 0)) {
             processDegradationEffects(campaign, person, useFatigue, useAbilities, true);
         }
     }
@@ -212,7 +213,7 @@ public class AdvancedMedicalAlternateImplants {
               person.checkAttributes(SkillAttribute.BODY, SkillAttribute.WILLPOWER)
                     .withMiscModifier(resistanceModifier)
                     .resolve(true, getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.skillCheck.degradation"));
-        campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport(false));
+        campaign.addReport(SKILL_CHECKS, attributeCheckResult.getReport());
 
         if (!attributeCheckResult.isSuccess() && useAbilities) {
             String flaw = getAndApplyEIDegradationFlaw(person);

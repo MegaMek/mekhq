@@ -32,21 +32,28 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
+import java.awt.Component;
+import javax.swing.DefaultListCellRenderer;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
+import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
+import mekhq.campaign.enums.LithiumFusionBatteryMode;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -82,6 +89,8 @@ class MaintenancePage {
     private JCheckBox chkUsePlanetaryModifiers;
     private JCheckBox useUnofficialMaintenance;
     private JCheckBox logMaintenance;
+    private JLabel lblLithiumFusionBatteryMode;
+    private MMComboBox<LithiumFusionBatteryMode> comboLithiumFusionBatteryMode;
 
     private boolean created;
 
@@ -151,6 +160,7 @@ class MaintenancePage {
 
         JPanel schedulePanel = createMaintenanceSchedulePanel();
         JPanel qualityPanel = createMaintenanceQualityPanel();
+        JPanel interstellarTravelPanel = createInterstellarTravelPanel();
 
         created = true;
         readFromModel(model);
@@ -165,6 +175,9 @@ class MaintenancePage {
                         "lblMaintenanceQualityPanel.summary",
                         qualityPanel,
                         getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                .section("lblInterstellarTravelPanel.text",
+                        "lblInterstellarTravelPanel.summary",
+                        interstellarTravelPanel)
                 .build();
     }
 
@@ -196,6 +209,39 @@ class MaintenancePage {
     }
 
     /**
+     * Builds the Interstellar Travel section, which controls how Lithium-Fusion batteries affect jumps.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private @Nonnull JPanel createInterstellarTravelPanel() {
+        lblLithiumFusionBatteryMode = new CampaignOptionsLabel("LithiumFusionBatteryMode",
+                getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        lblLithiumFusionBatteryMode.addMouseListener(createTipPanelUpdater("LithiumFusionBatteryMode"));
+        comboLithiumFusionBatteryMode = new MMComboBox<>("comboLithiumFusionBatteryMode",
+                LithiumFusionBatteryMode.values());
+        comboLithiumFusionBatteryMode.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(final JList<?> list, final Object value, final int index,
+                    final boolean isSelected, final boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof LithiumFusionBatteryMode lithiumFusionBatteryMode) {
+                    list.setToolTipText(wordWrap(lithiumFusionBatteryMode.getTooltip()));
+                }
+                return this;
+            }
+        });
+        comboLithiumFusionBatteryMode.addMouseListener(createTipPanelUpdater("LithiumFusionBatteryMode"));
+
+        final SettingsFormPanel panel = new SettingsFormPanel("InterstellarTravelPanel",
+                LABEL_COLUMN_WIDTH,
+                CONTROL_COLUMN_WIDTH);
+        panel.addRow(lblLithiumFusionBatteryMode, comboLithiumFusionBatteryMode);
+
+        return panel;
+    }
+
+    /**
      * Copies maintenance values from the shared model into this page's controls. This is a no-op until the page has been
      * built.
      *
@@ -216,6 +262,7 @@ class MaintenancePage {
         chkUsePlanetaryModifiers.setSelected(model.usePlanetaryModifiers);
         useUnofficialMaintenance.setSelected(model.useUnofficialMaintenance);
         logMaintenance.setSelected(model.logMaintenance);
+        comboLithiumFusionBatteryMode.setSelectedItem(model.lithiumFusionBatteryMode);
     }
 
     /**
@@ -239,5 +286,6 @@ class MaintenancePage {
         model.usePlanetaryModifiers = chkUsePlanetaryModifiers.isSelected();
         model.useUnofficialMaintenance = useUnofficialMaintenance.isSelected();
         model.logMaintenance = logMaintenance.isSelected();
+        model.lithiumFusionBatteryMode = comboLithiumFusionBatteryMode.getSelectedItem();
     }
 }

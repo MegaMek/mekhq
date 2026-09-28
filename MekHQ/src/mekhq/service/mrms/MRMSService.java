@@ -65,6 +65,7 @@ import mekhq.campaign.parts.meks.MekLocation;
 import mekhq.campaign.parts.missing.MissingMekLocation;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -139,7 +140,7 @@ public class MRMSService {
                     Part part = (Part) partWork;
                     part.resetModeToNormal();
 
-                    List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, true, campaign);
+                    List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, campaign);
 
                     if (validTechs.isEmpty()) {
                         continue;
@@ -881,7 +882,7 @@ public class MRMSService {
             ((Part) partWork).resetModeToNormal();
         }
 
-        List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, false, campaign);
+        List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, campaign);
 
         if (validTechs.isEmpty()) {
             unitAction.addPartAction(MRMSPartAction.createNoTechs(partWork));
@@ -1310,6 +1311,10 @@ public class MRMSService {
                 tech = new Person("Temp", String.format("Tech (%s)", skillName), campaign);
                 tech.addSkill(skillName, partSkill.getType().getEliteLevel(), 1);
                 tech.setMinutesLeft(1);
+                // This placeholder represents an idealized, fully equipped tech for the feasibility check. When the
+                // "Techs Need a Tool Kit" campaign option is enabled, getTargetFor treats any kit-less tech as unable to
+                // work, so the placeholder must carry a tool kit, or every part would be wrongly reported as impossible.
+                tech.setRepairKitName(EquipmentKitCatalog.KIT_BASIC_TOOLKIT);
 
                 techCache.put(skillName, tech);
             }
@@ -1329,7 +1334,7 @@ public class MRMSService {
     }
 
     private static List<Person> filterTechs(IPartWork partWork, List<Person> techs,
-          Map<PartRepairType, MRMSOption> mrmsOptionsByType, boolean warehouseMode, Campaign campaign) {
+          Map<PartRepairType, MRMSOption> mrmsOptionsByType, Campaign campaign) {
         List<Person> validTechs = new ArrayList<>();
 
         if (techs.isEmpty()) {
@@ -1349,7 +1354,10 @@ public class MRMSService {
                 continue;
             }
 
-            if (warehouseMode && !tech.isRightTechTypeFor(partWork)) {
+            // Only techs with the skill the task requires may be assigned; with granular tech skills a tech lacking
+            // the specialist skill would otherwise fall back to an unrelated skill and trigger the wrong-tech-type
+            // warning
+            if (!tech.isRightTechTypeFor(partWork)) {
                 continue;
             }
 

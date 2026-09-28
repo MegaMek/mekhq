@@ -799,6 +799,8 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     }
 
     private final ActionScheduler partsScheduler = new ActionScheduler(this::refreshPartsList);
+    /** Debounces re-filtering, so a burst of part changes (e.g. a bulk kit issue) re-filters the table once. */
+    private final ActionScheduler partsFilterScheduler = new ActionScheduler(this::filterParts);
     private final ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
 
     @Subscribe
@@ -838,8 +840,10 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         // EDT. Off-EDT calls are possible whenever a worker thread (e.g. the ratgen pipeline's
         // Stage 8 spare-parts stock-up) triggers a PartChangedEvent through Quartermaster.addPart,
         // which would race the EDT for the underlying Document/table locks the same way the
-        // ReportEvent deadlock did.
-        SwingUtilities.invokeLater(this::filterParts);
+        // ReportEvent deadlock did. The scheduler's timer fires on the EDT, and debouncing it means a
+        // burst of changes (one event per part touched) re-filters and re-sorts the whole table once
+        // rather than once per event.
+        partsFilterScheduler.schedule();
     }
 
     /**

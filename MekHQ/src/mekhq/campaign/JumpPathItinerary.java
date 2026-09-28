@@ -83,7 +83,34 @@ public final class JumpPathItinerary {
          */
         public static Plan calculate(JumpPath path, LocalDate startDate, double accelerationG,
             @Nullable PlanetarySystem fleetSystem, double currentTransit, CircuitPlan circuitPlan) {
+        return calculate(path, startDate, accelerationG, fleetSystem, currentTransit, circuitPlan,
+              JumpDriveProfile.STANDARD);
+    }
+
+    /**
+     * Calculates an immutable itinerary with command-circuit coverage selected per intermediate departure, applying the
+     * fleet's {@link JumpDriveProfile}. Each intermediate recharge is scaled by the profile's multiplier, and the first
+     * {@link JumpDriveProfile#storedJumpCharges()} intermediate systems need no recharge at all.
+     *
+     * @param path             route to calculate
+     * @param startDate        campaign date on which planning begins
+     * @param accelerationG    acceleration used for both endpoint transits
+     * @param fleetSystem      fleet's current system, or {@code null} when unknown
+     * @param currentTransit   fleet transit progress in days
+     * @param circuitPlan      transient command-circuit planning assumption
+     * @param jumpDriveProfile the fleet's jump drive profile; {@code null} is treated as
+     *                         {@link JumpDriveProfile#STANDARD}
+     *
+     * @return immutable plan and system chronology
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Plan calculate(JumpPath path, LocalDate startDate, double accelerationG,
+          @Nullable PlanetarySystem fleetSystem, double currentTransit, CircuitPlan circuitPlan,
+          @Nullable JumpDriveProfile jumpDriveProfile) {
         Objects.requireNonNull(path);
+        JumpDriveProfile profile = Objects.requireNonNullElse(jumpDriveProfile, JumpDriveProfile.STANDARD);
         Objects.requireNonNull(startDate);
           Objects.requireNonNull(circuitPlan);
         requirePositiveFinite(accelerationG, "accelerationG");
@@ -104,10 +131,16 @@ public final class JumpPathItinerary {
 
         int[] rechargeHours = new int[systems.size()];
         int totalRechargeHours = 0;
+        int remainingStoredJumpCharges = profile.storedJumpCharges();
         for (int index = 1; index < systems.size() - 1; index++) {
+            if (remainingStoredJumpCharges > 0) {
+                // A stored charge lets the fleet jump on immediately
+                remainingStoredJumpCharges--;
+                continue;
+            }
             PlanetarySystem system = systems.get(index);
-            rechargeHours[index] = (int) Math.ceil(system.getRechargeTime(startDate,
-                  circuitPlan.usesCircuitAt(index)));
+            double systemRechargeHours = system.getRechargeTime(startDate, circuitPlan.usesCircuitAt(index));
+            rechargeHours[index] = (int) Math.ceil(profile.adjustRechargeTime(systemRechargeHours));
             totalRechargeHours += rechargeHours[index];
         }
 
@@ -158,9 +191,25 @@ public final class JumpPathItinerary {
         public static RequiredAcceleration solveRequiredAcceleration(JumpPath path, LocalDate startDate,
             double desiredTotalDays, @Nullable PlanetarySystem fleetSystem, double currentTransit,
             CircuitPlan circuitPlan) {
+        return solveRequiredAcceleration(path, startDate, desiredTotalDays, fleetSystem, currentTransit, circuitPlan,
+              JumpDriveProfile.STANDARD);
+    }
+
+    /**
+     * Solves the inverse-square transit relationship using per-intermediate command-circuit coverage and the fleet's
+     * {@link JumpDriveProfile}.
+     *
+     * @return a required acceleration, or an empty result when no positive endpoint-transit budget exists
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static RequiredAcceleration solveRequiredAcceleration(JumpPath path, LocalDate startDate,
+          double desiredTotalDays, @Nullable PlanetarySystem fleetSystem, double currentTransit,
+          CircuitPlan circuitPlan, @Nullable JumpDriveProfile jumpDriveProfile) {
         requirePositiveFinite(desiredTotalDays, "desiredTotalDays");
         Plan baseline = calculate(path, startDate, DEFAULT_ACCELERATION_G, fleetSystem, currentTransit,
-              circuitPlan);
+              circuitPlan, jumpDriveProfile);
         double transitAtOneG = baseline.startingTransitDays() + baseline.appliedCurrentTransitDays()
                                    + baseline.endingTransitDays();
         double transitBudget = desiredTotalDays - baseline.rechargeDays() + baseline.appliedCurrentTransitDays();

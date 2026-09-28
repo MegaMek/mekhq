@@ -57,8 +57,8 @@ import megamek.common.util.weightedMaps.WeightedDoubleMap;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
@@ -674,6 +674,13 @@ public class RandomDeath {
         }
 
         if (randomlyDies(person)) {
+            PersonnelStatus causeOfDeath = getCause(person, ageGroup, age);
+
+            // This has to be attempted before any death is announced
+            if (person.attemptToCheatDeath(campaign, causeOfDeath)) {
+                return false;
+            }
+
             // We double-report here, to make sure the user definitely notices that a random death has occurred.
             // Prior to this change, it was exceptionally easy to miss these events.
             String color = ReportingUtilities.getNegativeColor();
@@ -697,15 +704,13 @@ public class RandomDeath {
                       person.getHyperlinkedFullTitle(), formatOpener, CLOSING_SPAN_TAG));
             }
 
-            PersonnelStatus causeOfDeath = getCause(person, ageGroup, age);
-
             // Announce death if applicable, needs to be before we change the status
             String deathAnnouncementNagConstant = RandomDeathAnnouncement.getRandomDeathAnnouncementNagConstant(person);
             if (RandomDeathAnnouncement.checkNag(deathAnnouncementNagConstant)) {
                 new RandomDeathAnnouncement(campaign, person, causeOfDeath, deathAnnouncementNagConstant);
             }
 
-            person.changeStatus(campaign, today, causeOfDeath);
+            person.changeStatus(campaign, today, causeOfDeath, false);
 
             return true;
         } else {

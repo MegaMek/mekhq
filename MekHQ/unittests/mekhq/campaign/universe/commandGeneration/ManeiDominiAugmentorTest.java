@@ -32,16 +32,26 @@
  */
 package mekhq.campaign.universe.commandGeneration;
 
+import static megamek.common.options.OptionsConstants.MD_DERMAL_ARMOR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import megamek.common.enums.ManeiDominiAugmentationRank;
+import megamek.common.options.OptionsConstants;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.ManeiDominiRank;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
+import testUtilities.MHQTestUtilities;
 
 /**
  * Covers what stays on the MekHQ side of Manei Domini augmentation: which commands are Manei Domini at
@@ -74,5 +84,78 @@ class ManeiDominiAugmentorTest {
         assertNotEquals(ManeiDominiRank.NONE, campaignRank,
               augmentationRank + " has no campaign rank of the same name");
         assertEquals(augmentationRank.name(), campaignRank.name());
+    }
+
+    /**
+     * A Shadow Division warrior issued dermal armour keeps it, in a campaign using Advanced Alternate
+     * Medical.
+     *
+     * <p>That rule set works dermal armour out from the prosthetics a person carries and writes the answer
+     * over the implant every new day, so the implant only survives if the prosthetics are on the record.</p>
+     */
+    @Test
+    void dermalImplantsSurviveTheDailyEligibilityPass() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL, true);
+        Person warrior = new Person(campaign);
+        warrior.getOptions().acquireAbility(PersonnelOptions.MD_ADVANTAGES, MD_DERMAL_ARMOR, true);
+
+        int recorded = ManeiDominiAugmentor.recordDermalProsthetics(campaign, warrior,
+              List.of(MD_DERMAL_ARMOR));
+
+        assertEquals(4, recorded, "dermal armour covers both arms and both legs");
+
+        AdvancedMedicalAlternateImplants.checkForDermalEligibility(warrior);
+        assertTrue(warrior.getOptions().booleanOption(MD_DERMAL_ARMOR),
+              "the implant should still be fitted after the daily pass");
+    }
+
+    /**
+     * The other half of the test above: without the prosthetics on the record, the daily pass takes the
+     * implant away. This is the failure the recording exists to prevent, so it is worth pinning down.
+     */
+    @Test
+    void aDermalImplantWithNoProstheticsIsTakenAwayByTheDailyPass() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL, true);
+        Person warrior = new Person(campaign);
+        warrior.getOptions().acquireAbility(PersonnelOptions.MD_ADVANTAGES, MD_DERMAL_ARMOR, true);
+
+        AdvancedMedicalAlternateImplants.checkForDermalEligibility(warrior);
+
+        assertFalse(warrior.getOptions().booleanOption(MD_DERMAL_ARMOR),
+              "an implant with nothing underneath it does not survive the daily pass");
+    }
+
+    /**
+     * A campaign not using Advanced Alternate Medical keeps the implant option as the only record, and
+     * nothing rewrites it. Adding surgery to those warriors' medical history would be inventing history.
+     */
+    @Test
+    void nothingIsRecordedWhenTheCampaignDoesNotUseAlternateMedical() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL, false);
+        Person warrior = new Person(campaign);
+        warrior.getOptions().acquireAbility(PersonnelOptions.MD_ADVANTAGES, MD_DERMAL_ARMOR, true);
+
+        int recorded = ManeiDominiAugmentor.recordDermalProsthetics(campaign, warrior,
+              List.of(MD_DERMAL_ARMOR));
+
+        assertEquals(0, recorded, "no prosthetics should be recorded");
+        assertTrue(warrior.getProstheticInjuries().isEmpty(),
+              "the warrior's medical history should be left alone");
+    }
+
+    /** An implant the alternate rule set does not model is left as an option, with nothing recorded. */
+    @Test
+    void anImplantWithNoProstheticEquivalentRecordsNothing() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL, true);
+        Person warrior = new Person(campaign);
+
+        int recorded = ManeiDominiAugmentor.recordDermalProsthetics(campaign, warrior,
+              List.of(OptionsConstants.MD_PAIN_SHUNT));
+
+        assertEquals(0, recorded, "the pain shunt has no dermal prosthetics to record");
     }
 }

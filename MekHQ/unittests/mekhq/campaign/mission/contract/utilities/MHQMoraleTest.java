@@ -40,6 +40,8 @@ import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.R
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.WEAKENED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -52,10 +54,13 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import megamek.common.enums.SkillLevel;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
+import mekhq.campaign.mission.scenarios.ScenarioType;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -423,5 +428,55 @@ class MHQMoraleTest {
               Arguments.of(DOMINATING, DOMINATING),
               Arguments.of(OVERWHELMING, OVERWHELMING)
         );
+    }
+
+    // Scenarios that shift morale directly
+
+    private static AbstractContract contractOfType(ContractObjectiveType objectiveType) {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getObjectiveType()).thenReturn(objectiveType);
+        when(contract.getMoraleLevel()).thenReturn(STALEMATE);
+        return contract;
+    }
+
+    @Test
+    void aRiotShiftsMoraleOnARiotDutyContract() {
+        assertTrue(MHQMorale.isScenarioOutcomeAffectingMorale(ScenarioType.RIOT,
+              contractOfType(ContractObjectiveType.RIOT_DUTY)));
+    }
+
+    @Test
+    void aRiotElsewhereLeavesMoraleToTheMoraleCheck() {
+        assertFalse(MHQMorale.isScenarioOutcomeAffectingMorale(ScenarioType.RIOT,
+              contractOfType(ContractObjectiveType.RETAINER)), "a disrupted parade on a Retainer contract");
+        assertFalse(MHQMorale.isScenarioOutcomeAffectingMorale(ScenarioType.RIOT, null));
+    }
+
+    @Test
+    void otherScenarioTypesStillFollowTheirOwnFlags() {
+        AbstractContract retainer = contractOfType(ContractObjectiveType.RETAINER);
+
+        assertTrue(MHQMorale.isScenarioOutcomeAffectingMorale(ScenarioType.AFFECTS_MORALE_BOTH_WAYS, retainer));
+        assertFalse(MHQMorale.isScenarioOutcomeAffectingMorale(ScenarioType.NONE, retainer));
+    }
+
+    @Test
+    void winningARiotOnARiotDutyContractLowersMorale() {
+        AbstractContract riotDuty = contractOfType(ContractObjectiveType.RIOT_DUTY);
+
+        MHQMorale.processMoraleChangeFromScenario(mock(Campaign.class), riotDuty, ScenarioStatus.VICTORY,
+              ScenarioType.RIOT);
+
+        verify(riotDuty).changeMorale(WEAKENED);
+    }
+
+    @Test
+    void winningARiotElsewhereLeavesMoraleAlone() {
+        AbstractContract retainer = contractOfType(ContractObjectiveType.RETAINER);
+
+        MHQMorale.processMoraleChangeFromScenario(mock(Campaign.class), retainer, ScenarioStatus.VICTORY,
+              ScenarioType.RIOT);
+
+        verify(retainer, never()).changeMorale(any(ContractMoraleLevel.class));
     }
 }

@@ -94,6 +94,22 @@ public enum EnemySelectionProfile {
         }
     },
     /**
+     * The enemy is the victim of a raid rather than a belligerent: a legitimate regional power the pirate band preys on,
+     * drawn the same way a legitimate employer would be. Falls back to the standard enemy pool when no plausible victim
+     * is in range, so generation never fails. Pairs with a pirate attacker, whose lawless anchor keeps the two distinct.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    PIRATE_VICTIM {
+        @Override
+        public Faction selectEnemy(RandomFactionGenerator generator, ILocation location, LocalDate date,
+              Faction employer) {
+            Faction victim = generator.getRandomEmployerFaction(location, date, false);
+            return (victim != null) ? victim : generator.getRandomEnemy(false, location, date, employer);
+        }
+    },
+    /**
      * The enemy should be a faction the employer is actually at war with: a planetary assault or relief operation
      * presupposes a shooting war, not a neutral neighbor.
      */

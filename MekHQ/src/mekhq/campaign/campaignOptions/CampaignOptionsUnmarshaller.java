@@ -40,6 +40,7 @@ import static mekhq.gui.campaignOptions.enums.ProcurementPersonnelPick.SUPPORT;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
+import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -131,6 +132,9 @@ public class CampaignOptionsUnmarshaller {
                     campaignOptions.set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.MAPLESS);
                 }
             }
+            // < 0.51.01 compatibility: boolean replaced by the SalvageSystem enum.
+            case "isUseCamOpsSalvage" -> campaignOptions.set(CampaignOption.SALVAGE_SYSTEM,
+                  parseBoolean(nodeContents) ? SalvageSystem.CAM_OPS_STRICT : SalvageSystem.LEGACY);
             // Legacy boolean replaced by the alternative advanced medical healing-time multiplier.
             case "useKinderAlternativeAdvancedMedical" -> {
                 if (parseBoolean(nodeContents)) {

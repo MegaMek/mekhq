@@ -266,7 +266,7 @@ public final class FormationIconBuilder {
      * Builds the TYPE / FORMATION / BACKGROUND icon for a single Formation node. Returns {@code null}
      * if the formation's level is unknown (in which case the caller leaves the formation icon-less).
      */
-    private static LayeredFormationIcon buildFormationIcon(Formation formation, Campaign campaign,
+    private static @Nullable LayeredFormationIcon buildFormationIcon(Formation formation, Campaign campaign,
           Faction iconFaction, FormationPieceIcon background) {
         String formationFilename = formationFilenameFor(formation.getFormationLevel(), iconFaction);
         if (formationFilename == null) {
@@ -432,13 +432,21 @@ public final class FormationIconBuilder {
      *
      * @return the StratOps type filename, or {@code null} when the formation has no single clear purpose
      */
-    private static @Nullable String purposeIconFor(Formation formation, Campaign campaign) {
+    static @Nullable String purposeIconFor(Formation formation, Campaign campaign) {
         if (isHeadquarters(formation, campaign)) {
             return HEADQUARTERS_TYPE_FILENAME;
         }
 
         if (formation.isFormationType(FormationType.CONVOY)) {
             return SUPPLY_TYPE_FILENAME;
+        }
+
+        // Asked of the formation rather than of its units, because a recovery vehicle does not have to carry
+        // recovery equipment. A BattleMek Recovery Vehicle is an ordinary Tank with a cargo bay and a winch that
+        // exists only in its fluff text, so the equipment count below finds nothing on the very formation this icon
+        // is for.
+        if (formation.isFormationType(FormationType.SALVAGE)) {
+            return MAINTENANCE_TYPE_FILENAME;
         }
 
         int units = 0;
@@ -617,7 +625,7 @@ public final class FormationIconBuilder {
      * <p>Returns {@code null} only for non-canonical levels (NONE, INVALID, REMOVE_OVERRIDE) so the
      * caller can skip those nodes cleanly.</p>
      */
-    private static String formationFilenameFor(FormationLevel level, Faction faction) {
+    private static @Nullable String formationFilenameFor(FormationLevel level, Faction faction) {
         if (level == null) {
             return null;
         }
@@ -662,7 +670,7 @@ public final class FormationIconBuilder {
      * Builds the BACKGROUND piece from the faction. Returns {@code null} when the faction has no
      * background, or when the background's base image is missing on disk.
      */
-    private static FormationPieceIcon buildBackgroundPiece(Faction iconFaction) {
+    private static @Nullable FormationPieceIcon buildBackgroundPiece(Faction iconFaction) {
         if (iconFaction.getLayeredFormationIconBackgroundFilename() == null) {
             return null;
         }

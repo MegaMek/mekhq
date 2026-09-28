@@ -88,11 +88,13 @@ import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
+import mekhq.campaign.personnel.quartermaster.DefaultKitChanges;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.commandGeneration.SupportCapability;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierReconciler;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
@@ -167,6 +169,7 @@ public class CampaignOptionsPane extends JPanel {
     private AwardsAndRandomizationPages awardsAndRandomizationPages;
     private SkillsPages skillsPages;
     private AttributesAndTraitsPage attributesAndTraitsPage;
+    private final RoleplayPage roleplayPage;
     private AbilitiesPages abilitiesPages;
     private RepairAndMaintenancePages repairAndMaintenancePages;
     private EquipmentAndSuppliesPages equipmentAndSuppliesPages;
@@ -190,6 +193,7 @@ public class CampaignOptionsPane extends JPanel {
         this.frame = frame;
         this.campaign = campaign;
         this.campaignOptions = campaign.getCampaignOptions();
+        this.roleplayPage = new RoleplayPage(campaignOptions);
         this.mode = mode;
         this.campaignGui = campaign.getGUI();
         initialize();
@@ -387,6 +391,9 @@ public class CampaignOptionsPane extends JPanel {
         registerParentRoute("operations.rulesets", "strategicOperationsCategory", "rulesetsCategory");
         registerDirectRoute("operations.rulesets.stratcon", this::createOperationsStratConPage,
               "strategicOperationsCategory", "rulesetsCategory", "stratConGeneralPage");
+
+        // The solo-roleplay Oracle and its journal, in a section of their own so players find them.
+        registerDirectRoute("roleplay", () -> roleplayPage.createPage(), "roleplayPage");
 
     }
 
@@ -845,6 +852,7 @@ public class CampaignOptionsPane extends JPanel {
 
         CampaignOptionsFreebieTracker oldCampaignOptions = new CampaignOptionsFreebieTracker(
               campaign.getCampaignOptions());
+        Map<CampaignOption<String>, String> oldDefaultKits = DefaultKitChanges.snapshot(campaign.getCampaignOptions());
 
         // Options get applied in the order they are defined in the UI
         generalPage.applyCampaignOptionsToCampaign(isStartUp, isSaveAction);
@@ -880,6 +888,9 @@ public class CampaignOptionsPane extends JPanel {
             systemsPages.applyCampaignOptionsToCampaign(options);
         }
 
+        // Roleplay
+        roleplayPage.applyCampaignOptionsToCampaign(options);
+
         // Tidy up
         if (preset == null) {
             recalculateCombatTeams(campaign);
@@ -897,6 +908,14 @@ public class CampaignOptionsPane extends JPanel {
         CampaignOptionsFreebieTracker newCampaignOptions = new CampaignOptionsFreebieTracker(
               campaign.getCampaignOptions());
         triggerUpgradeFreebies(campaign, oldCampaignOptions, newCampaignOptions, isStartUp);
+
+        if (!isStartUp) {
+            List<DefaultKitChanges.Change> defaultKitChanges = DefaultKitChanges.detect(oldDefaultKits,
+                  campaign.getCampaignOptions());
+            if (!defaultKitChanges.isEmpty()) {
+                new DefaultKitCampaignOptionsChangedConfirmationDialog(campaign, defaultKitChanges);
+            }
+        }
     }
 
     /**
@@ -981,27 +1000,27 @@ public class CampaignOptionsPane extends JPanel {
 
         boolean newIsUseMASHTheatres = newOptions.useMASHTheatres();
         if (!isStartUp && newIsUseMASHTheatres && !oldIsUseMASHTheatres) { // Has tracking changed?
-            new MASHTheaterTrackingCampaignOptionsChangedConfirmationDialog(campaign);
+            new SupportCapabilityGrantDialog(campaign, SupportCapability.MEDICAL);
         }
 
         boolean newIsTrackPrisoners = newOptions.trackPrisoners();
         if (!isStartUp && newIsTrackPrisoners && !oldIsTrackPrisoners) { // Has tracking changed?
-            new PrisonerTrackingCampaignOptionsChangedConfirmationDialog(campaign);
+            new SupportCapabilityGrantDialog(campaign, SupportCapability.SECURITY);
         }
 
         boolean newIsUseFatigue = newOptions.useFatigue();
         if (!isStartUp && newIsUseFatigue && !oldIsUseFatigue) { // Has tracking changed?
-            new FatigueTrackingCampaignOptionsChangedConfirmationDialog(campaign);
+            new SupportCapabilityGrantDialog(campaign, SupportCapability.COMMISSARY);
         }
 
         boolean newIsUseAdvancedSalvage = newOptions.useAdvancedSalvage();
         if (!isStartUp && newIsUseAdvancedSalvage && !oldIsUseAdvancedSalvage) { // Has tracking changed?
-            new SalvageCampaignOptionsChangedConfirmationDialog(campaign);
+            new SupportCapabilityGrantDialog(campaign, SupportCapability.SALVAGE);
         }
 
         boolean newIsUseStratCon = newOptions.useStratCon();
         if (!isStartUp && newIsUseStratCon && !oldIsUseStratCon) { // Has tracking changed?
-            new StratConConvoyCampaignOptionsChangedConfirmationDialog(campaign);
+            new SupportCapabilityGrantDialog(campaign, SupportCapability.LOGISTICS);
         }
 
         boolean newIsUseMapless = newOptions.useMapless();
@@ -1051,6 +1070,12 @@ public class CampaignOptionsPane extends JPanel {
                   newRequireMekWarriorKitToDeploy &&
                   !oldRequireMekWarriorKitToDeploy) { // Has tracking changed?
             new MekWarriorKitCampaignOptionsChangedConfirmationDialog(campaign);
+        }
+
+        if (!isStartUp
+                  && newOptions.requireAerospaceKitToDeploy()
+                  && !oldOptions.requireAerospaceKitToDeploy()) { // Has tracking changed?
+            new AerospaceKitCampaignOptionsChangedConfirmationDialog(campaign);
         }
 
         boolean newSpecialistTechSkillsEnabled = newOptions.specialistTechSkillsEnabled();
@@ -1188,5 +1213,8 @@ public class CampaignOptionsPane extends JPanel {
         marketsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
         rulesetsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
         systemsPages.loadValuesFromCampaignOptions(presetCampaignOptions);
+
+        // Roleplay
+        roleplayPage.loadValuesFromCampaignOptions(presetCampaignOptions);
     }
 }

@@ -2049,7 +2049,8 @@ class MekLocationTest {
               false,
               mockCampaign);
 
-        assertTrue(centerTorso.isRightTechType(SkillType.S_TECH_MECHANICAL));
+        assertTrue(centerTorso.isRightTechType(SkillType.S_TECH_MEK));
+        assertFalse(centerTorso.isRightTechType(SkillType.S_TECH_MECHANICAL));
         assertFalse(centerTorso.isRightTechType(SkillType.S_TECH_VEHICLE));
     }
 

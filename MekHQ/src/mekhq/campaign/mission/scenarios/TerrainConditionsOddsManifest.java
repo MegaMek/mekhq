@@ -33,9 +33,6 @@
 package mekhq.campaign.mission.scenarios;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileWriter;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,17 +42,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
-import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.Marshaller;
-import jakarta.xml.bind.Unmarshaller;
-import jakarta.xml.bind.annotation.XmlAccessType;
-import jakarta.xml.bind.annotation.XmlAccessorType;
-import jakarta.xml.bind.annotation.XmlElement;
-import jakarta.xml.bind.annotation.XmlRootElement;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import megamek.common.compute.Compute;
 import megamek.common.planetaryConditions.BlowingSand;
 import megamek.common.planetaryConditions.EMI;
@@ -66,80 +58,75 @@ import megamek.common.planetaryConditions.Wind;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
-import mekhq.utilities.MHQXMLUtility;
 
-@XmlRootElement(name = "TerrainConditionsOddsManifest")
-@XmlAccessorType(XmlAccessType.NONE)
+/**
+ * The authored table of planetary-condition odds, loaded once from {@code TerrainConditionsOddsManifest.yaml} and
+ * reached through {@link #getInstance()}. Each {@link TerrainConditionsOdds} entry pairs a condition {@link
+ * TerrainConditionsOdds#type} (Light, Wind, Weather, Fog, BlowingSand or EMI) with the biome map types it applies to and
+ * a weighted map of that condition's possible values, so a scenario on a given terrain can roll for its own weather.
+ *
+ * <p>The YAML file is the single source of truth: it lives in mm-data and is staged into the {@code data} directory when
+ * the application launches, so it is absent under test. A failed or missing load is logged and quietly replaced by an
+ * empty manifest, in which case every roll returns its calm default (clear skies, daylight, no wind) - the same result a
+ * terrain with no matching entry already produces.</p>
+ *
+ * <p>On first load {@link #validations()} logs a report to help authors keep the table complete: the odds sum per entry,
+ * any unknown terrain, condition type or odds key, duplicate terrain, and - the common gap - biome map types that no
+ * entry covers for a condition. Every key of {@link StratConBiomeManifest#getBiomeMapTypes()} should appear exactly once
+ * per condition type; anything missing rolls the calm default instead of authored odds.</p>
+ *
+ * @author Illiani
+ * @since 0.51.01
+ */
 public class TerrainConditionsOddsManifest {
     private static final MMLogger LOGGER = MMLogger.create(TerrainConditionsOddsManifest.class);
 
-    @XmlElement(name = "TerrainConditionsOdds")
-    private static List<TerrainConditionsOdds> TCO = new ArrayList<>();
+    private List<TerrainConditionsOdds> terrainConditionsOdds = new ArrayList<>();
 
     private static TerrainConditionsOddsManifest instance;
 
+    private static final ObjectMapper MAPPER = buildMapper();
+
+    private static ObjectMapper buildMapper() {
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        // Field-based binding matches the authored data shape and the other StratCon YAML readers.
+        mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.NONE);
+        mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
+        mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+        mapper.enable(DeserializationFeature.ACCEPT_SINGLE_VALUE_AS_ARRAY);
+        return mapper;
+    }
+
+    /**
+     * @return the singleton manifest, loading and validating it on first access. A failed load yields an empty manifest
+     *       rather than {@code null}, so callers never have to guard against a missing table.
+     */
     public static TerrainConditionsOddsManifest getInstance() {
         if (instance == null) {
             instance = load();
-            validations();
+            instance.validations();
         }
 
         return instance;
     }
 
     private static TerrainConditionsOddsManifest load() {
-        TerrainConditionsOddsManifest result = new TerrainConditionsOddsManifest();
-
         File inputFile = new File(MHQConstants.TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH);
         if (!inputFile.exists()) {
-            TCO.addAll(initLight());
-            TCO.addAll(initWind());
-            TCO.addAll(initWeather());
-            TCO.addAll(initFog());
-            TCO.addAll(initBlowingSand());
-            TCO.addAll(initEMI());
-
-            try {
-                JAXBContext context = JAXBContext.newInstance(TerrainConditionsOddsManifest.class);
-                JAXBElement<TerrainConditionsOddsManifest> element = new JAXBElement<>(new QName(
-                      "TerrainConditionsOddsManifest"), TerrainConditionsOddsManifest.class, result);
-                StringWriter writer = new StringWriter();
-
-                Marshaller m = context.createMarshaller();
-                m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-                String comment = "<!--\n";
-                comment += "for a given key the chance is value / sum(odds values)\n";
-                comment += "example 10 / sum(100) = 0.1 or 10%\n";
-                comment += "mekhq.log contains TerrainConditionsOddsManifest validations to help find errors. only runs once on startup\n";
-                comment += "can delete this file to reload defaults\n";
-                comment += "-->\n\n";
-                m.setProperty("org.glassfish.jaxb.xmlHeaders", comment);
-                m.marshal(element, writer);
-                FileWriter fw = new FileWriter(inputFile);
-                fw.append(writer.toString());
-                fw.close();
-            } catch (Exception ex) {
-                LOGGER.error("Error Serializing TerrainConditionsOddsManifest", ex);
-            }
-        } else {
-            try {
-                JAXBContext context = JAXBContext.newInstance(TerrainConditionsOddsManifest.class);
-                Unmarshaller um = context.createUnmarshaller();
-                try (FileInputStream fileStream = new FileInputStream(inputFile)) {
-                    Source inputSource = MHQXMLUtility.createSafeXmlSource(fileStream);
-                    JAXBElement<TerrainConditionsOddsManifest> element = um.unmarshal(inputSource,
-                          TerrainConditionsOddsManifest.class);
-                    result = element.getValue();
-                }
-            } catch (Exception ex) {
-                LOGGER.error("Error Deserializing TerrainConditionsOddsManifest", ex);
-            }
+            LOGGER.warn("Terrain conditions odds file {} does not exist; scenarios will roll default conditions",
+                  MHQConstants.TERRAIN_CONDITIONS_ODDS_MANIFEST_PATH);
+            return new TerrainConditionsOddsManifest();
         }
 
-        return result;
+        try {
+            return MAPPER.readValue(inputFile, TerrainConditionsOddsManifest.class);
+        } catch (Exception ex) {
+            LOGGER.error("Error deserializing TerrainConditionsOddsManifest; scenarios will roll default conditions", ex);
+            return new TerrainConditionsOddsManifest();
+        }
     }
 
-    private static void validations() {
+    private void validations() {
         Set<String> mapTypes = StratConBiomeManifest.getInstance().getBiomeMapTypes().keySet();
         List<String> types = List.of(Light.class.getSimpleName(),
               Wind.class.getSimpleName(),
@@ -162,7 +149,7 @@ public class TerrainConditionsOddsManifest {
         Map<String, Set<String>> conditionTerrain = new HashMap<>();
         Set<String> terrainSet;
 
-        for (TerrainConditionsOdds tco : TCO) {
+        for (TerrainConditionsOdds tco : terrainConditionsOdds) {
             String msg = tco.type + " " + tco.name + " odds sum: " + tco.odds.values().stream().mapToInt(i -> i).sum();
             LOGGER.info(msg);
 
@@ -214,515 +201,10 @@ public class TerrainConditionsOddsManifest {
         }
     }
 
-    private static List<TerrainConditionsOdds> initLight() {
-        List<String> terrain;
-        Map<String, Integer> odds;
-        List<TerrainConditionsOdds> result = new ArrayList<>();
-        TerrainConditionsOdds t;
-
-        odds = Map.of(Light.DAY.getExternalId(),
-              680,
-              Light.DUSK.getExternalId(),
-              180,
-              Light.FULL_MOON.getExternalId(),
-              60,
-              Light.GLARE.getExternalId(),
-              10,
-              Light.MOONLESS.getExternalId(),
-              60,
-              Light.SOLAR_FLARE.getExternalId(),
-              9,
-              Light.PITCH_BLACK.getExternalId(),
-              1);
-        terrain = List.of("ArcticDesert",
-              "Badlands",
-              "ColdFacility",
-              "ColdForest",
-              "ColdHills",
-              "ColdSea",
-              "ColdUrban",
-              "Desert",
-              "Forest",
-              "FrozenFacility",
-              "FrozenSea",
-              "Hills",
-              "HotFacility",
-              "HotForest",
-              "HotHillsDry",
-              "HotHillsWet",
-              "HotSea",
-              "HotUrban",
-              "Jungle",
-              "Plains",
-              "Savannah",
-              "Sea",
-              "SnowField",
-              "Steppe",
-              "Swamp",
-              "TemperateFacility",
-              "Tundra",
-              "Urban");
-        t = new TerrainConditionsOdds();
-        t.type = Light.class.getSimpleName();
-        t.name = "standard";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        odds = Map.of(Light.DAY.getExternalId(),
-              540,
-              Light.DUSK.getExternalId(),
-              200,
-              Light.FULL_MOON.getExternalId(),
-              115,
-              Light.GLARE.getExternalId(),
-              10,
-              Light.MOONLESS.getExternalId(),
-              115,
-              Light.SOLAR_FLARE.getExternalId(),
-              10,
-              Light.PITCH_BLACK.getExternalId(),
-              10);
-        terrain = List.of("ColdMountain", "Glacier", "HotMountainsDry", "HotMountainsWet", "Mountain");
-        t = new TerrainConditionsOdds();
-        t.type = Light.class.getSimpleName();
-        t.name = "dark";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        return result;
-    }
-
-    private static List<TerrainConditionsOdds> initWind() {
-        List<String> terrain;
-        Map<String, Integer> odds;
-        List<TerrainConditionsOdds> result = new ArrayList<>();
-        TerrainConditionsOdds t;
-
-        odds = Map.of(Wind.CALM.getExternalId(),
-              730,
-              Wind.LIGHT_GALE.getExternalId(),
-              140,
-              Wind.MOD_GALE.getExternalId(),
-              90,
-              Wind.STRONG_GALE.getExternalId(),
-              32,
-              Wind.STORM.getExternalId(),
-              5,
-              Wind.TORNADO_F1_TO_F3.getExternalId(),
-              2,
-              Wind.TORNADO_F4.getExternalId(),
-              1);
-        terrain = List.of("ColdFacility",
-              "ColdForest",
-              "ColdHills",
-              "ColdMountain",
-              "ColdUrban",
-              "Forest",
-              "FrozenFacility",
-              "Hills",
-              "HotFacility",
-              "HotForest",
-              "HotHillsWet",
-              "HotMountainsWet",
-              "HotUrban",
-              "Jungle",
-              "Mountain",
-              "Swamp",
-              "TemperateFacility",
-              "Urban");
-        t = new TerrainConditionsOdds();
-        t.type = Wind.class.getSimpleName();
-        t.name = "standard";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        odds = Map.of(Wind.CALM.getExternalId(),
-              500,
-              Wind.LIGHT_GALE.getExternalId(),
-              200,
-              Wind.MOD_GALE.getExternalId(),
-              180,
-              Wind.STRONG_GALE.getExternalId(),
-              100,
-              Wind.STORM.getExternalId(),
-              10,
-              Wind.TORNADO_F1_TO_F3.getExternalId(),
-              7,
-              Wind.TORNADO_F4.getExternalId(),
-              3);
-        terrain = List.of("ArcticDesert",
-              "Badlands",
-              "ColdSea",
-              "Desert",
-              "FrozenSea",
-              "Glacier",
-              "HotHillsDry",
-              "HotMountainsDry",
-              "HotSea",
-              "Plains",
-              "Savannah",
-              "Sea",
-              "SnowField",
-              "Steppe",
-              "Tundra");
-        t = new TerrainConditionsOdds();
-        t.type = Wind.class.getSimpleName();
-        t.name = "high";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        return result;
-    }
-
-    private static List<TerrainConditionsOdds> initWeather() {
-        List<String> terrain;
-        Map<String, Integer> odds = new HashMap<>();
-        List<TerrainConditionsOdds> result = new ArrayList<>();
-        TerrainConditionsOdds t;
-
-        odds.put(Weather.CLEAR.getExternalId(), 670);
-        odds.put(Weather.LIGHT_RAIN.getExternalId(), 70);
-        odds.put(Weather.MOD_RAIN.getExternalId(), 40);
-        odds.put(Weather.HEAVY_RAIN.getExternalId(), 40);
-        odds.put(Weather.GUSTING_RAIN.getExternalId(), 20);
-        odds.put(Weather.DOWNPOUR.getExternalId(), 20);
-        odds.put(Weather.LIGHT_SNOW.getExternalId(), 60);
-        odds.put(Weather.MOD_SNOW.getExternalId(), 20);
-        odds.put(Weather.HEAVY_SNOW.getExternalId(), 20);
-        odds.put(Weather.SLEET.getExternalId(), 30);
-        odds.put(Weather.ICE_STORM.getExternalId(), 5);
-        odds.put(Weather.LIGHT_HAIL.getExternalId(), 0);
-        odds.put(Weather.HEAVY_HAIL.getExternalId(), 0);
-        odds.put(Weather.LIGHTNING_STORM.getExternalId(), 5);
-        terrain = List.of("Forest",
-              "Hills",
-              "HotFacility",
-              "HotForest",
-              "HotUrban",
-              "Mountain",
-              "Plains",
-              "Savannah",
-              "Steppe",
-              "TemperateFacility",
-              "Urban");
-        t = new TerrainConditionsOdds();
-        t.type = Weather.class.getSimpleName();
-        t.name = "standard";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        odds = new HashMap<>();
-        odds.put(Weather.CLEAR.getExternalId(), 460);
-        odds.put(Weather.LIGHT_RAIN.getExternalId(), 160);
-        odds.put(Weather.MOD_RAIN.getExternalId(), 120);
-        odds.put(Weather.HEAVY_RAIN.getExternalId(), 100);
-        odds.put(Weather.GUSTING_RAIN.getExternalId(), 80);
-        odds.put(Weather.DOWNPOUR.getExternalId(), 50);
-        odds.put(Weather.LIGHT_SNOW.getExternalId(), 10);
-        odds.put(Weather.MOD_SNOW.getExternalId(), 0);
-        odds.put(Weather.HEAVY_SNOW.getExternalId(), 0);
-        odds.put(Weather.SLEET.getExternalId(), 10);
-        odds.put(Weather.ICE_STORM.getExternalId(), 0);
-        odds.put(Weather.LIGHT_HAIL.getExternalId(), 0);
-        odds.put(Weather.HEAVY_HAIL.getExternalId(), 0);
-        odds.put(Weather.LIGHTNING_STORM.getExternalId(), 10);
-        terrain = List.of("HotHillsWet", "HotMountainsWet", "HotSea", "Jungle");
-        t = new TerrainConditionsOdds();
-        t.type = Weather.class.getSimpleName();
-        t.name = "hot wet";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        odds = new HashMap<>();
-        odds.put(Weather.CLEAR.getExternalId(), 450);
-        odds.put(Weather.LIGHT_RAIN.getExternalId(), 120);
-        odds.put(Weather.MOD_RAIN.getExternalId(), 100);
-        odds.put(Weather.HEAVY_RAIN.getExternalId(), 80);
-        odds.put(Weather.GUSTING_RAIN.getExternalId(), 60);
-        odds.put(Weather.DOWNPOUR.getExternalId(), 60);
-        odds.put(Weather.LIGHT_SNOW.getExternalId(), 60);
-        odds.put(Weather.MOD_SNOW.getExternalId(), 20);
-        odds.put(Weather.HEAVY_SNOW.getExternalId(), 10);
-        odds.put(Weather.SLEET.getExternalId(), 20);
-        odds.put(Weather.ICE_STORM.getExternalId(), 10);
-        odds.put(Weather.LIGHT_HAIL.getExternalId(), 0);
-        odds.put(Weather.HEAVY_HAIL.getExternalId(), 0);
-        odds.put(Weather.LIGHTNING_STORM.getExternalId(), 10);
-        terrain = List.of("Sea", "Swamp");
-        t = new TerrainConditionsOdds();
-        t.type = Weather.class.getSimpleName();
-        t.name = "wet";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        odds = new HashMap<>();
-        odds.put(Weather.CLEAR.getExternalId(), 460);
-        odds.put(Weather.LIGHT_RAIN.getExternalId(), 60);
-        odds.put(Weather.MOD_RAIN.getExternalId(), 30);
-        odds.put(Weather.HEAVY_RAIN.getExternalId(), 30);
-        odds.put(Weather.GUSTING_RAIN.getExternalId(), 10);
-        odds.put(Weather.DOWNPOUR.getExternalId(), 5);
-        odds.put(Weather.LIGHT_SNOW.getExternalId(), 120);
-        odds.put(Weather.MOD_SNOW.getExternalId(), 100);
-        odds.put(Weather.HEAVY_SNOW.getExternalId(), 60);
-        odds.put(Weather.SLEET.getExternalId(), 80);
-        odds.put(Weather.ICE_STORM.getExternalId(), 40);
-        odds.put(Weather.LIGHT_HAIL.getExternalId(), 0);
-        odds.put(Weather.HEAVY_HAIL.getExternalId(), 0);
-        odds.put(Weather.LIGHTNING_STORM.getExternalId(), 5);
-        terrain = List.of("ColdFacility",
-              "ColdForest",
-              "ColdHills",
-              "ColdMountain",
-              "ColdSea",
-              "ColdUrban",
-              "FrozenFacility",
-              "FrozenSea",
-              "Glacier",
-              "SnowField",
-              "Tundra");
-        t = new TerrainConditionsOdds();
-        t.type = Weather.class.getSimpleName();
-        t.name = "snowy";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        odds = new HashMap<>();
-        odds.put(Weather.CLEAR.getExternalId(), 950);
-        odds.put(Weather.LIGHT_RAIN.getExternalId(), 20);
-        odds.put(Weather.MOD_RAIN.getExternalId(), 10);
-        odds.put(Weather.HEAVY_RAIN.getExternalId(), 0);
-        odds.put(Weather.GUSTING_RAIN.getExternalId(), 0);
-        odds.put(Weather.DOWNPOUR.getExternalId(), 0);
-        odds.put(Weather.LIGHT_SNOW.getExternalId(), 10);
-        odds.put(Weather.MOD_SNOW.getExternalId(), 0);
-        odds.put(Weather.HEAVY_SNOW.getExternalId(), 0);
-        odds.put(Weather.SLEET.getExternalId(), 10);
-        odds.put(Weather.ICE_STORM.getExternalId(), 0);
-        odds.put(Weather.LIGHT_HAIL.getExternalId(), 0);
-        odds.put(Weather.HEAVY_HAIL.getExternalId(), 0);
-        odds.put(Weather.LIGHTNING_STORM.getExternalId(), 0);
-        terrain = List.of("ArcticDesert", "Badlands", "Desert", "HotHillsDry", "HotMountainsDry");
-        t = new TerrainConditionsOdds();
-        t.type = Weather.class.getSimpleName();
-        t.name = "dry";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        return result;
-    }
-
-    private static List<TerrainConditionsOdds> initFog() {
-        List<String> terrain;
-        Map<String, Integer> odds;
-        List<TerrainConditionsOdds> result = new ArrayList<>();
-        TerrainConditionsOdds t;
-
-        odds = Map.of(Fog.FOG_NONE.getExternalId(),
-              900,
-              Fog.FOG_LIGHT.getExternalId(),
-              50,
-              Fog.FOG_HEAVY.getExternalId(),
-              50);
-        terrain = List.of("ArcticDesert",
-              "Forest",
-              "Hills",
-              "Jungle",
-              "Plains",
-              "Savannah",
-              "Steppe",
-              "TemperateFacility",
-              "Urban");
-        t = new TerrainConditionsOdds();
-        t.type = Fog.class.getSimpleName();
-        t.name = "standard";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        odds = Map.of(Fog.FOG_NONE.getExternalId(),
-              800,
-              Fog.FOG_LIGHT.getExternalId(),
-              100,
-              Fog.FOG_HEAVY.getExternalId(),
-              100);
-        terrain = List.of("ColdFacility",
-              "ColdForest",
-              "ColdHills",
-              "ColdMountain",
-              "ColdSea",
-              "ColdUrban",
-              "FrozenFacility",
-              "FrozenSea",
-              "Glacier",
-              "Mountain",
-              "Sea",
-              "SnowField",
-              "Swamp",
-              "Tundra");
-        t = new TerrainConditionsOdds();
-        t.type = Fog.class.getSimpleName();
-        t.name = "heavy";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        odds = Map.of(Fog.FOG_NONE.getExternalId(),
-              980,
-              Fog.FOG_LIGHT.getExternalId(),
-              10,
-              Fog.FOG_HEAVY.getExternalId(),
-              10);
-        terrain = List.of("Badlands",
-              "Desert",
-              "HotFacility",
-              "HotForest",
-              "HotHillsDry",
-              "HotHillsWet",
-              "HotMountainsDry",
-              "HotMountainsWet",
-              "HotSea",
-              "HotUrban");
-        t = new TerrainConditionsOdds();
-        t.type = Fog.class.getSimpleName();
-        t.name = "none";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        return result;
-    }
-
-    private static List<TerrainConditionsOdds> initBlowingSand() {
-        List<String> terrain;
-        Map<String, Integer> odds;
-        List<TerrainConditionsOdds> result = new ArrayList<>();
-        TerrainConditionsOdds t;
-
-        odds = Map.of(BlowingSand.BLOWING_SAND_NONE.getExternalId(),
-              900,
-              BlowingSand.BLOWING_SAND.getExternalId(),
-              100);
-        terrain = List.of("ColdFacility",
-              "ColdForest",
-              "ColdHills",
-              "ColdMountain",
-              "ColdSea",
-              "ColdUrban",
-              "Forest",
-              "FrozenFacility",
-              "FrozenSea",
-              "Hills",
-              "HotFacility",
-              "HotForest",
-              "HotHillsWet",
-              "HotMountainsWet",
-              "HotSea",
-              "HotUrban",
-              "Jungle",
-              "Mountain",
-              "Plains",
-              "Savannah",
-              "Sea",
-              "SnowField",
-              "Steppe",
-              "Swamp",
-              "TemperateFacility",
-              "Urban");
-        t = new TerrainConditionsOdds();
-        t.type = BlowingSand.class.getSimpleName();
-        t.name = "standard";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        odds = Map.of(BlowingSand.BLOWING_SAND_NONE.getExternalId(),
-              700,
-              BlowingSand.BLOWING_SAND.getExternalId(),
-              300);
-        terrain = List.of("ArcticDesert",
-              "Badlands",
-              "Desert",
-              "Glacier",
-              "HotHillsDry",
-              "HotMountainsDry",
-              "Tundra");
-        t = new TerrainConditionsOdds();
-        t.type = BlowingSand.class.getSimpleName();
-        t.name = "heavy";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        return result;
-    }
-
-    private static List<TerrainConditionsOdds> initEMI() {
-        List<String> terrain;
-        Map<String, Integer> odds;
-        List<TerrainConditionsOdds> result = new ArrayList<>();
-        TerrainConditionsOdds t;
-
-        odds = Map.of(EMI.EMI_NONE.getExternalId(), 999, EMI.EMI.getExternalId(), 1);
-        terrain = List.of("ColdFacility",
-              "ColdForest",
-              "ColdHills",
-              "ColdMountain",
-              "ColdSea",
-              "ColdUrban",
-              "Forest",
-              "FrozenFacility",
-              "FrozenSea",
-              "Glacier",
-              "Hills",
-              "HotFacility",
-              "HotForest",
-              "HotHillsWet",
-              "HotMountainsWet",
-              "HotSea",
-              "HotUrban",
-              "Jungle",
-              "Mountain",
-              "Plains",
-              "Savannah",
-              "Sea",
-              "SnowField",
-              "Steppe",
-              "Swamp",
-              "TemperateFacility",
-              "Urban");
-        t = new TerrainConditionsOdds();
-        t.type = EMI.class.getSimpleName();
-        t.name = "standard";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        odds = Map.of(EMI.EMI_NONE.getExternalId(), 950, EMI.EMI.getExternalId(), 50);
-        terrain = List.of("ArcticDesert", "Badlands", "Desert", "HotHillsDry", "HotMountainsDry", "Tundra");
-        t = new TerrainConditionsOdds();
-        t.type = EMI.class.getSimpleName();
-        t.name = "high";
-        t.terrain = terrain;
-        t.odds = odds;
-        result.add(t);
-
-        return result;
-    }
-
     private Map<String, Integer> oddsForTerrain(String type, String terrainType) {
-        terrainType = terrainType == null ? "Hills" : terrainType;
+        terrainType = terrainType == null ? "HILLS" : terrainType;
 
-        for (TerrainConditionsOdds entry : TCO) {
+        for (TerrainConditionsOdds entry : terrainConditionsOdds) {
             if (entry.type.equals(type) && entry.terrain.contains(terrainType)) {
                 return entry.odds;
             }

@@ -59,23 +59,13 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Consumer;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JToggleButton;
-import javax.swing.SpinnerDateModel;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 
 import megamek.client.ui.util.UIUtil;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpDriveProfile;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.JumpPathItinerary;
 import mekhq.campaign.JumpPathItinerary.CircuitMode;
@@ -177,6 +167,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
     private LocalDateTime departureAnchor;
     private LocalDateTime arrivalDeadline;
     private CircuitPlan circuitPlan;
+    private JumpDriveProfile jumpDriveProfile;
     private PathAssessment navigationAssessment;
     private CircuitPlan customCircuitPlan = CircuitPlan.custom(Set.of());
     private JLabel startingTransitValue;
@@ -1197,7 +1188,7 @@ public class JumpPathViewPanel extends JScrollablePanel {
         AbstractLocation currentLocation = getCurrentLocation();
         RequiredAcceleration result = JumpPathItinerary.solveRequiredAcceleration(path, campaign.getLocalDate(),
               desiredTotalDays, getFleetSystem(currentLocation), getCurrentTransit(currentLocation),
-              circuitPlan);
+              circuitPlan, getJumpDriveProfile());
         String resultText;
         if (result.isPossible()) {
             resultText = MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, "planning.requiredAcceleration.format",
@@ -1497,7 +1488,22 @@ public class JumpPathViewPanel extends JScrollablePanel {
     private Plan calculatePlan(double accelerationG) {
         AbstractLocation currentLocation = getCurrentLocation();
         return JumpPathItinerary.calculate(path, campaign.getLocalDate(), accelerationG,
-              getFleetSystem(currentLocation), getCurrentTransit(currentLocation), circuitPlan);
+              getFleetSystem(currentLocation), getCurrentTransit(currentLocation), circuitPlan,
+              getJumpDriveProfile());
+    }
+
+    /**
+     * Returns the main force's jump drive profile. It is looked up once and cached, as determining Lithium-Fusion
+     * battery eligibility walks the whole hangar and the plan is recalculated on every control change.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JumpDriveProfile getJumpDriveProfile() {
+        if (jumpDriveProfile == null) {
+            jumpDriveProfile = campaign.getJumpDriveProfile();
+        }
+        return jumpDriveProfile;
     }
 
     private Result calculateSchedule() {

@@ -205,15 +205,12 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
     }
 
     /**
-     * Suppresses the standard results-line logging performed by {@link #resolve(boolean, String)}.
-     *
-     * <p>Callers that assemble their own running report and merely need the roll, edge handling, and margin from this
-     * utility use this to avoid the utility logging a line that does not slot into their report.</p>
+     * Adds a results-line log performed by {@link #resolve(boolean, String)}.
      *
      * @return updated action check
      */
-    public T withoutLogging() {
-        this.logResult = false;
+    public T withLogging() {
+        this.logResult = true;
         return getThis();
     }
 
@@ -269,12 +266,14 @@ public abstract class ActionCheck<T extends ActionCheck<T>> {
 
         // A check that cannot be beaten (AUTOMATIC_FAIL, IMPOSSIBLE) never re-rolls, so edge is never wasted on it -
         // this guard applies to a caller-supplied condition as well, which may only narrow it further.
-        boolean canSucceed = !targetNumber.cannotSucceed() && targetNumber.getValue() <= 12;
+        // Count-up checks succeed at or under the target number, so the achievable range runs the other way.
+        int target = targetNumber.getValue();
+        boolean canSucceed = !targetNumber.cannotSucceed() && (isCountUp() ? target >= 2 : target <= 12);
         final boolean shouldReroll;
         if (edgeRerollCondition != null) {
             shouldReroll = canSpendEdge && canSucceed && edgeRerollCondition.test(roll);
         } else {
-            boolean failed = roll.result() < targetNumber.getValue();
+            boolean failed = isCountUp() ? roll.result() > target : roll.result() < target;
             shouldReroll = failed && canSucceed && canSpendEdge;
         }
 

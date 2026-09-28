@@ -200,7 +200,9 @@ public class InfantryMotiveType extends Part {
 
     @Override
     public Part clone() {
-        return new InfantryMotiveType(0, campaign, mode);
+        InfantryMotiveType clone = new InfantryMotiveType(0, campaign, mode);
+        clone.copyBaseData(this);
+        return clone;
     }
 
     public EntityMovementMode getMovementMode() {

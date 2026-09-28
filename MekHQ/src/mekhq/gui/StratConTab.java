@@ -50,6 +50,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -68,9 +69,13 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConEscalation;
+import mekhq.campaign.digitalGM.stratCon.StratConReconnaissance;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConStrategicObjective;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.events.GMModeEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.StratConDeploymentEvent;
@@ -119,6 +124,8 @@ public class StratConTab extends CampaignGuiTab {
     private JPanel deploymentTimePanel;
     private JPanel supportPointsPanel;
     private JPanel victoryPointsPanel;
+    private JPanel escalationPanel;
+    private JPanel reconnaissancePanel;
     private JScrollPane expandedObjectivePanel;
     private boolean objectivesCollapsed = false;
 
@@ -243,11 +250,14 @@ public class StratConTab extends CampaignGuiTab {
         // "Edit SP (GM)" / "Edit CVP (GM)" bottom-bar buttons; the sector environment and selected-hex stats are HUDs
         // drawn on the map (see StratConPanel).
 
-        // Bars stack at the top: threat, deployment time, support points, victory points.
+        // Bars stack at the top: threat, deployment time, support points, victory points, and - for contracts that
+        // track them - Escalation and the selected sector's reconnaissance.
         threatLevelPanel = addBarPanel(constraints, gridY++);
         deploymentTimePanel = addBarPanel(constraints, gridY++);
         supportPointsPanel = addBarPanel(constraints, gridY++);
         victoryPointsPanel = addBarPanel(constraints, gridY++);
+        escalationPanel = addBarPanel(constraints, gridY++);
+        reconnaissancePanel = addBarPanel(constraints, gridY++);
 
         // Add the objectives panel below the bars. Its height tracks the objective content (see applyObjectiveText) so
         // it is only as tall as it needs to be; the scroll pane remains as a safety net for unusually long lists.
@@ -440,6 +450,42 @@ public class StratConTab extends CampaignGuiTab {
     }
 
     /**
+     * Shows the given sector, first switching the contract selector to the sector's contract if it is not the one
+     * being viewed. A contract the selector does not list (for example, one in another system) is left alone, as is
+     * the current view.
+     *
+     * @param contractId the ID of the contract whose map holds the sector
+     * @param trackIndex the sector's index within that contract's tracks
+     *
+     * @return {@code true} if the selector lists the contract and it is now shown; {@code false} if it is not listed
+     *       (for example, one that has not started yet), in which case nothing changes
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean focusOnSector(UUID contractId, int trackIndex) {
+        for (int index = 0; index < contractSelector.getItemCount(); index++) {
+            ContractItem contractItem = contractSelector.getItemAt(index);
+            if (!contractItem.contract().getId().equals(contractId)) {
+                continue;
+            }
+
+            if (contractSelector.getSelectedIndex() != index) {
+                // Fires contractSelectionHandler, which rebuilds the sector tabs for this contract.
+                contractSelector.setSelectedIndex(index);
+            }
+
+            if ((trackIndex >= 0) && (trackIndex < sectorTabs.getTabCount())) {
+                // Fires sectorSelectionHandler if this is a different sector.
+                sectorTabs.setSelectedIndex(trackIndex);
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Handles selection of a contract from the dropdown: rebuilds the sector tabs for that contract's tracks.
      */
     private void contractSelectionHandler() {
@@ -558,6 +604,8 @@ public class StratConTab extends CampaignGuiTab {
         updateDeploymentTimeBar(currentSectorTrack);
         updateSupportPointsBar();
         updateVictoryPointsBar(campaignState);
+        updateEscalationBar(campaignState);
+        updateReconnaissanceBar(currentSectorTrack);
 
         if (currentSectorTrack != null) {
             applyObjectiveText(getStrategicObjectiveText(campaignState, currentSectorTrack));
@@ -578,6 +626,65 @@ public class StratConTab extends CampaignGuiTab {
         deploymentTimePanel.setVisible(false);
         supportPointsPanel.setVisible(false);
         victoryPointsPanel.setVisible(false);
+        escalationPanel.setVisible(false);
+        reconnaissancePanel.setVisible(false);
+    }
+
+    /**
+     * Refreshes the reconnaissance bar shown below the Escalation bar: how much of the selected sector's land has been
+     * scouted, for sectors with a reconnaissance objective (see {@link StratConReconnaissance}); hidden for every other
+     * sector.
+     *
+     * @param track the currently selected sector's track, or {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void updateReconnaissanceBar(StratConTrackState track) {
+        reconnaissancePanel.removeAll();
+
+        StratConStrategicObjective objective = (track == null) ? null : StratConReconnaissance.getObjective(track);
+        if (objective == null) {
+            reconnaissancePanel.setVisible(false);
+            return;
+        }
+
+        // Shows the objective's own counts, which only ever rise, so the gauge agrees with the objective even after a
+        // GM resets the sector's fog of war.
+        reconnaissancePanel.setVisible(true);
+        reconnaissancePanel.add(ContractMeterBar.reconnaissance(objective.getCurrentObjectiveCount(),
+              StratConReconnaissance.getLandHexCount(track),
+              objective.getDesiredObjectiveCount()), BorderLayout.CENTER);
+
+        reconnaissancePanel.revalidate();
+        reconnaissancePanel.repaint();
+    }
+
+    /**
+     * Refreshes the Escalation bar shown below the victory-point bar, for contracts that track Escalation (see
+     * {@link StratConEscalation}); hidden for every other contract.
+     *
+     * @param campaignState the StratCon state of the currently selected contract
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void updateEscalationBar(StratConCampaignState campaignState) {
+        escalationPanel.removeAll();
+
+        if (!StratConEscalation.isEscalationUsed(getCampaignGui().getCampaign(), currentContract)) {
+            escalationPanel.setVisible(false);
+            return;
+        }
+
+        escalationPanel.setVisible(true);
+        escalationPanel.add(ContractMeterBar.escalation(campaignState.getEscalation(),
+              StratConEscalation.getMaximumEscalation(currentContract),
+              StratConEscalation.getEscalationTarget(campaignState),
+              StratConEscalation.isDeescalatingContract(currentContract)), BorderLayout.CENTER);
+
+        escalationPanel.revalidate();
+        escalationPanel.repaint();
     }
 
     /**
@@ -766,6 +873,39 @@ public class StratConTab extends CampaignGuiTab {
     }
 
     /**
+     * Describes a point of interest objective for the objectives list. A point of interest the player cannot see yet
+     * is not named; one they can see is described by its type's behavior, falling back to "Investigate [name]".
+     *
+     * @param pointOfInterest the point of interest the objective is tied to, or {@code null} if it is gone
+     * @param track           the sector it sits in
+     * @param visible         whether the player can see it (the phrase then starts the sentence)
+     *
+     * @return the objective phrase
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private String pointOfInterestObjectivePhrase(StratConPointOfInterest pointOfInterest, StratConTrackState track,
+          boolean visible) {
+        if (pointOfInterest == null) {
+            return getTextAt(RESOURCE_BUNDLE, "stratConTab.objectives.pointOfInterest.gone");
+        }
+
+        if (!visible) {
+            return objectivePhrase("stratConTab.objectives.pointOfInterest.unknown", false);
+        }
+
+        String description = pointOfInterest.getBehavior().getObjectiveDescription(pointOfInterest, track);
+        if (description != null) {
+            return description;
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "stratConTab.objectives.pointOfInterest",
+              pointOfInterest.getDisplayableName());
+    }
+
+    /**
      * Builds the detailed strategic objective list for a single sector (track). Only objectives belonging to that
      * sector are shown; the contract-wide Turning Point / Victory Point reminder is intentionally not included here.
      */
@@ -779,8 +919,20 @@ public class StratConTab extends CampaignGuiTab {
         // if allied facility "maintain control of [facility name]"
         // if revealed, " on track [current track] at coordinates [coords]
         for (StratConStrategicObjective objective : track.getStrategicObjectives()) {
-            boolean coordsRevealed = track.getRevealedCoords().contains(objective.getObjectiveCoords());
-            boolean displayCoordinateData = objective.getObjectiveCoords() != null;
+            // A point of interest objective follows its point of interest rather than a fixed hex, and is "revealed"
+            // once the player can see that point of interest.
+            boolean pointOfInterestObjective = objective.getObjectiveType() == StrategicObjectiveType.PointOfInterest;
+            StratConPointOfInterest pointOfInterest = objective.getPointOfInterest(track);
+            StratConCoords objectiveLocation;
+            boolean coordsRevealed;
+            if (pointOfInterestObjective) {
+                objectiveLocation = (pointOfInterest == null) ? null : pointOfInterest.getCoords();
+                coordsRevealed = (pointOfInterest != null) && pointOfInterest.isVisibleToPlayer(track);
+            } else {
+                objectiveLocation = objective.getObjectiveCoords();
+                coordsRevealed = track.getRevealedCoords().contains(objectiveLocation);
+            }
+            boolean displayCoordinateData = objectiveLocation != null;
             boolean objectiveCompleted = objective.isObjectiveCompleted(track);
             boolean objectiveFailed = objective.isObjectiveFailed(track);
 
@@ -821,6 +973,9 @@ public class StratConTab extends CampaignGuiTab {
                 case HostileFacilityControl:
                     sb.append(objectivePhrase("stratConTab.objectives.hostileFacility", coordsRevealed));
                     break;
+                case FacilityDestruction:
+                    sb.append(objectivePhrase("stratConTab.objectives.facilityDestruction", coordsRevealed));
+                    break;
                 case AlliedFacilityControl:
                     sb.append(objectivePhrase("stratConTab.objectives.alliedFacility", coordsRevealed));
 
@@ -835,12 +990,26 @@ public class StratConTab extends CampaignGuiTab {
                           String.valueOf(objective.getDesiredObjectiveCount()),
                           track.getDisplayableName()));
                     break;
+                case PointOfInterest:
+                    sb.append(pointOfInterestObjectivePhrase(pointOfInterest, track, coordsRevealed));
+                    break;
+                case Escalation:
+                    sb.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.objectives.escalation",
+                          String.valueOf(objective.getCurrentObjectiveCount()),
+                          String.valueOf(objective.getDesiredObjectiveCount())));
+                    break;
+                case Reconnaissance:
+                    sb.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.objectives.reconnaissance",
+                          String.valueOf(objective.getCurrentObjectiveCount()),
+                          String.valueOf(objective.getDesiredObjectiveCount()),
+                          track.getDisplayableName()));
+                    break;
                 default:
                     break;
             }
             if (coordsRevealed && displayCoordinateData) {
                 sb.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.objectives.location",
-                      objective.getObjectiveCoords().toBTString(), track.getDisplayableName()));
+                      objectiveLocation.toBTString(), track.getDisplayableName()));
             }
 
             sb.append("</span><br/>");

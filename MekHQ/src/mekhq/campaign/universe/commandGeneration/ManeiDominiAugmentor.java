@@ -34,20 +34,26 @@ package mekhq.campaign.universe.commandGeneration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.AugmentedUnitType;
 import megamek.common.enums.ManeiDominiAugmentationRank;
 import megamek.common.enums.ManeiDominiImplants;
 import megamek.common.enums.NeuralInterfaceMode;
+import megamek.common.options.OptionsConstants;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.personnel.Injury;
+import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.ManeiDominiClass;
 import mekhq.campaign.personnel.enums.ManeiDominiRank;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
 
 /**
  * Fits generated Word of Blake Shadow Division warriors with Manei Domini rank, class and cybernetics.
@@ -65,6 +71,23 @@ public final class ManeiDominiAugmentor {
 
     /** The RAT Generator faction key for the Word of Blake Shadow Divisions. */
     public static final String SHADOW_DIVISION_FACTION_KEY = "WOB.SD";
+
+    /**
+     * The two Manei Domini implants whose option Advanced Alternate Medical re-derives every day,
+     * mapped to the prosthetics that campaign models them as.
+     *
+     * <p>Every other implant is set once and left alone, so it survives on its own. These two do
+     * not: {@code checkForDermalEligibility} counts a warrior's dermal prosthetics each new day and
+     * writes the answer straight over the implant option. A warrior issued dermal armour with
+     * nothing underneath it is counted at zero and stripped the following morning. Recording the
+     * prosthetics keeps the count honest, and puts the implants in the medical record where the
+     * rest of the campaign can see them.</p>
+     */
+    private static final Map<String, List<ProstheticType>> DERMAL_IMPLANT_PROSTHETICS = Map.of(
+          OptionsConstants.MD_DERMAL_ARMOR,
+          List.of(ProstheticType.DERMAL_MYOMER_ARM_ARMOR, ProstheticType.DERMAL_MYOMER_LEG_ARMOR),
+          OptionsConstants.MD_DERMAL_CAMO_ARMOR,
+          List.of(ProstheticType.DERMAL_MYOMER_ARM_CAMO, ProstheticType.DERMAL_MYOMER_LEG_CAMO));
 
     private ManeiDominiAugmentor() {
     }
@@ -132,7 +155,7 @@ public final class ManeiDominiAugmentor {
             ManeiDominiAugmentationRank augmentationRank = rankFor(person);
             person.setManeiDominiRank(toCampaignRank(augmentationRank));
             person.setManeiDominiClass(classFor(person));
-            implantsIssued += issueImplants(person, augmentationRank, generationFaction);
+            implantsIssued += issueImplants(campaign, person, augmentationRank, generationFaction);
             // Read the values back rather than trusting the setters, and show the rank name the
             // roster will actually display. If the rank system is not flagged for Manei Domini the
             // name comes out plain, which is the difference between "not assigned" and "assigned but
@@ -185,8 +208,8 @@ public final class ManeiDominiAugmentor {
      * <p>The explosive charge every Manei Domini implant carries is fitted separately and does not
      * count against the allowance.</p>
      */
-    private static int issueImplants(Person person, ManeiDominiAugmentationRank augmentationRank,
-          String factionCode) {
+    private static int issueImplants(Campaign campaign, Person person,
+          ManeiDominiAugmentationRank augmentationRank, String factionCode) {
         AugmentedUnitType unitType = unitTypeFor(person);
         // Selected and fitted by the shared code, so a warrior raised in MegaMek's generator is
         // augmented exactly as one raised here. A campaign's PersonnelOptions is a PilotOptions, which
@@ -219,6 +242,7 @@ public final class ManeiDominiAugmentor {
                         + " is probably not in the {} group",
                   person.getFullName(), failed, PersonnelOptions.MD_ADVANTAGES);
         }
+        recordDermalProsthetics(campaign, person, confirmed);
         return issued.size();
     }
 
@@ -290,5 +314,90 @@ public final class ManeiDominiAugmentor {
             return ManeiDominiClass.GHOST;
         }
         return ManeiDominiClass.SPECTER;
+    }
+
+    /**
+     * Records the prosthetics behind any dermal implant this warrior was issued, where the campaign uses
+     * Advanced Alternate Medical.
+     *
+     * <p>Without this the implant is gone by the next morning: that rule set works out dermal armour and
+     * dermal camouflage from the prosthetics a person carries, and overwrites the implant option with
+     * what it finds. It wants all four limbs done before it counts the implant as fitted, so each dermal
+     * implant is recorded on both arms and both legs.</p>
+     *
+     * <p>Campaigns not using that rule set are left alone. There the implant option is the only record
+     * anyone keeps, nothing rewrites it, and adding entries to a warrior's medical history would only
+     * put surgery in the roster that never happened.</p>
+     *
+     * @param campaign the campaign the warrior belongs to
+     * @param person   the warrior to record prosthetics for
+     * @param implants the implant options confirmed on the warrior
+     *
+     * @return the number of prosthetics recorded
+     */
+    static int recordDermalProsthetics(Campaign campaign, Person person, List<String> implants) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
+            return 0;
+        }
+        int recorded = 0;
+        List<String> dermalImplants = new ArrayList<>();
+        for (String implant : implants) {
+            List<ProstheticType> prosthetics = DERMAL_IMPLANT_PROSTHETICS.get(implant);
+            if (prosthetics == null) {
+                continue;
+            }
+            dermalImplants.add(implant);
+            for (ProstheticType prosthetic : prosthetics) {
+                recorded += recordProsthetic(campaign, person, prosthetic);
+            }
+        }
+        if (!dermalImplants.isEmpty()) {
+            LOGGER.info("[ManeiDomini]     '{}': Advanced Alternate Medical is on, so {} recorded as {}"
+                        + " prosthetic(s); without these the implant is counted at zero and cleared on"
+                        + " the next day",
+                  person.getFullName(), dermalImplants, recorded);
+        }
+        return recorded;
+    }
+
+    /**
+     * Records one prosthetic at every limb it covers, skipping any limb that already carries it.
+     *
+     * <p>The entry is made at severity zero, which is how this campaign marks a fitted prosthetic rather
+     * than a wound: a permanent note on the record, not something a doctor is asked to heal.</p>
+     *
+     * @param campaign   the campaign the warrior belongs to
+     * @param person     the warrior to record the prosthetic for
+     * @param prosthetic the prosthetic to record
+     *
+     * @return the number of limbs newly recorded
+     */
+    private static int recordProsthetic(Campaign campaign, Person person, ProstheticType prosthetic) {
+        InjuryType injuryType = prosthetic.getInjuryType();
+        int recorded = 0;
+        for (BodyLocation location : prosthetic.getEligibleLocations()) {
+            if (hasProsthetic(person, injuryType, location)) {
+                continue;
+            }
+            person.addInjury(injuryType.newInjury(campaign, person, location, 0));
+            recorded++;
+        }
+        return recorded;
+    }
+
+    /**
+     * @param person     the warrior to check
+     * @param injuryType the prosthetic to look for
+     * @param location   the limb to look at
+     *
+     * @return {@code true} where this warrior already carries that prosthetic on that limb
+     */
+    private static boolean hasProsthetic(Person person, InjuryType injuryType, BodyLocation location) {
+        for (Injury injury : person.getProstheticInjuries()) {
+            if ((injury.getType() == injuryType) && (injury.getLocation() == location)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -206,6 +206,7 @@ public class MRMSServiceTest {
         when(mockTech.canTech(unit.getEntity())).thenReturn(true);
         when(mockTech.getSkillLevel(any(Campaign.class), anyBoolean())).thenReturn(SkillLevel.VETERAN);
         when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(SkillType.S_TECH_MEK, 7, 0));
+        when(mockTech.isRightTechTypeFor(any(IPartWork.class))).thenReturn(true);
         when(mockTech.getMinutesLeft()).thenReturn(480);
         when(mockTech.getATOWAttributes()).thenReturn(new Attributes());
 
@@ -903,6 +904,7 @@ public class MRMSServiceTest {
         when(mockTech.getSkillForWorkingOn(any(IPartWork.class))).thenReturn(new Skill(SkillType.S_TECH_MEK,
               SkillLevel.VETERAN.getExperienceLevel(),
               0));
+        when(mockTech.isRightTechTypeFor(any(IPartWork.class))).thenReturn(true);
         when(mockTech.getMinutesLeft()).thenReturn(480);
         when(mockTech.getSkillModifierData()).thenReturn(TestSkillModifierData.createDefault());
 
@@ -946,6 +948,8 @@ public class MRMSServiceTest {
         private Person createRealTech(String name, SkillLevel skillLevel, int minutesLeft) {
             Person tech = new Person(name, "Tech", mockCampaign);
             tech.addSkill(SkillType.S_TECH_MEK, skillLevel.getExperienceLevel(), 0);
+            // Armor repairs require the granular Tech/Mechanical skill
+            tech.addSkill(SkillType.S_TECH_MECHANICAL, skillLevel.getExperienceLevel(), 0);
             tech.setPrimaryRoleDirect(PersonnelRole.MEK_TECH);
             tech.setMinutesLeft(minutesLeft);
             return tech;

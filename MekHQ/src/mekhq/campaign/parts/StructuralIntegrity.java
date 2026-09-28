@@ -51,6 +51,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.missing.MissingPart;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -108,9 +109,21 @@ public class StructuralIntegrity extends Part {
         this.name = "Structural Integrity";
     }
 
+    /**
+     * Structural Integrity is repaired with the unit's global technician skill: Tech/Vessel for DropShips and
+     * JumpShips (including WarShips and Space Stations), otherwise Tech/Aerospace.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
     @Override
     public boolean isRightTechType(String skillType) {
-        return skillType.equals(SkillType.S_TECH_MECHANICAL);
+        String globalSkillName = Person.getGlobalTechSkillNameFor(getUnit());
+        if (globalSkillName == null) {
+            globalSkillName = SkillType.S_TECH_AERO;
+        }
+
+        return skillType.equals(globalSkillName);
     }
 
     @Override

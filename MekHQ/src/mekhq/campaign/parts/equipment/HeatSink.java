@@ -36,7 +36,6 @@ package mekhq.campaign.parts.equipment;
 import java.util.StringJoiner;
 
 import megamek.common.CriticalSlot;
-import megamek.common.compute.Compute;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
@@ -97,7 +96,7 @@ public class HeatSink extends EquipmentPart {
             }
             if (checkForDestruction
                       && hits > priorHits
-                      && Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
+                      && campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                 remove(false);
             }
         }

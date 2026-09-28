@@ -46,18 +46,22 @@ import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.location.LocationDispatch;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Hires a full complement of personnel for a unit.
  */
 public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
+    private static final MMLogger LOGGER = MMLogger.create(HirePersonnelUnitAction.class);
+
     /**
      * Initializes a new instance of the HirePersonnelUnitAction class.
      *
@@ -124,7 +128,7 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
                 break;
             }
 
-            if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGM, true)) {
+            if (!recruitAtUnitLocation(campaign, unit, person)) {
                 return;
             }
 
@@ -132,6 +136,10 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
                 unit.addPilotOrSoldier(person);
             } else {
                 unit.addDriver(person);
+            }
+            if (person.getUnit() != unit) {
+                // The unit refused the assignment; stop rather than hire endlessly for a slot that never fills
+                break;
             }
         }
 
@@ -173,10 +181,14 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
             if (person == null) {
                 break;
             }
-            if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGM, true)) {
+            if (!recruitAtUnitLocation(campaign, unit, person)) {
                 return;
             }
             unit.addGunner(person);
+            if (person.getUnit() != unit) {
+                // The unit refused the assignment; stop rather than hire endlessly for a slot that never fills
+                break;
+            }
         }
 
         while (unit.canTakeMoreVesselCrew()) {
@@ -201,17 +213,21 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
             if (person == null) {
                 break;
             }
-            if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGM, true)) {
+            if (!recruitAtUnitLocation(campaign, unit, person)) {
                 return;
             }
             unit.addVesselCrew(person);
+            if (person.getUnit() != unit) {
+                // The unit refused the assignment; stop rather than hire endlessly for a slot that never fills
+                break;
+            }
         }
 
         if (unit.canTakeNavigator()) {
             Person person = campaign.getPlayerForce()
                                   .getHumanResources()
                                   .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.VESSEL_NAVIGATOR);
-            if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGM, true)) {
+            if (!recruitAtUnitLocation(campaign, unit, person)) {
                 return;
             }
             unit.setNavigator(person);
@@ -242,7 +258,7 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
                                .getHumanResources()
                                .newPerson(campaign, mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR);
             }
-            if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGM, true)) {
+            if (!recruitAtUnitLocation(campaign, unit, person)) {
                 return;
             }
             unit.setTechOfficer(person);
@@ -265,5 +281,34 @@ public record HirePersonnelUnitAction(boolean isGM) implements IUnitAction {
 
         unit.resetPilotAndEntity();
         unit.runDiagnostic(false);
+    }
+
+    /**
+     * Recruits the given person and moves them to the same effective location as the unit they are being hired for.
+     *
+     * <p>New recruits always join the main force. If the unit is elsewhere (at a player base or in transit), the unit
+     * would refuse the assignment, which previously left the hiring loops spinning forever.</p>
+     *
+     * @param campaign the current campaign
+     * @param unit     the unit the person is being hired to crew
+     * @param person   the person to recruit
+     *
+     * @return {@code true} if the person was recruited and is now co-located with the unit, otherwise {@code false}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean recruitAtUnitLocation(Campaign campaign, Unit unit, Person person) {
+        if (!campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, person, isGM, true)) {
+            return false;
+        }
+
+        if (!LocationDispatch.movePersonToLocationOf(campaign, person, unit)) {
+            LOGGER.warn("Aborting crew hiring for {}: newly hired {} could not be placed with it",
+                  unit.getName(),
+                  person.getFullName());
+            return false;
+        }
+        return true;
     }
 }

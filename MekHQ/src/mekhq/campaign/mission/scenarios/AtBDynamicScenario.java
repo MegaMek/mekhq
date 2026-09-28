@@ -43,11 +43,15 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import megamek.Version;
+import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.Entity;
@@ -110,6 +114,9 @@ public class AtBDynamicScenario extends AtBScenario {
 
     // map of player unit external ID to bot unit external ID where the bot unit was swapped out.
     private Map<UUID, BenchedEntityData> playerUnitSwaps;
+
+    // IDs of player forces the player chose to deploy off-board (artillery only) in the deployment wizard.
+    private Set<Integer> offBoardForceIDs = new LinkedHashSet<>();
 
     private boolean finalized;
 
@@ -194,6 +201,50 @@ public class AtBDynamicScenario extends AtBScenario {
     public void removeFormation(int fid) {
         super.removeFormation(fid);
         playerForceTemplates.remove(fid);
+        offBoardForceIDs.remove(fid);
+    }
+
+    /**
+     * @return the set of player force IDs the player chose to deploy off-board (artillery only)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Set<Integer> getOffBoardForceIDs() {
+        return offBoardForceIDs;
+    }
+
+    public void setOffBoardForceIDs(Set<Integer> offBoardForceIDs) {
+        this.offBoardForceIDs = offBoardForceIDs;
+    }
+
+    /**
+     * @param forceID the player force ID to check
+     *
+     * @return {@code true} if the player marked this force to deploy off-board
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isForceDeployingOffBoard(int forceID) {
+        return offBoardForceIDs.contains(forceID);
+    }
+
+    /**
+     * Marks (or unmarks) a player force to deploy off-board.
+     *
+     * @param forceID  the player force ID
+     * @param offBoard {@code true} to deploy the force off-board, {@code false} to deploy it on-board
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setForceDeployingOffBoard(int forceID, boolean offBoard) {
+        if (offBoard) {
+            offBoardForceIDs.add(forceID);
+        } else {
+            offBoardForceIDs.remove(forceID);
+        }
     }
 
     @Override
@@ -592,6 +643,11 @@ public class AtBDynamicScenario extends AtBScenario {
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, PLAYER_UNIT_SWAPS_ELEMENT);
             }
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "finalized", isFinalized());
+
+            if (!offBoardForceIDs.isEmpty()) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "offBoardForceIDs",
+                      offBoardForceIDs.stream().map(String::valueOf).collect(Collectors.joining(",")));
+            }
         }
 
         super.writeToXMLEnd(pw, indent);
@@ -608,11 +664,11 @@ public class AtBDynamicScenario extends AtBScenario {
             if (wn2.getNodeName().equalsIgnoreCase(ScenarioTemplate.ROOT_XML_ELEMENT_NAME)) {
                 setTemplate(ScenarioTemplate.Deserialize(wn2));
             } else if (wn2.getNodeName().equalsIgnoreCase("effectivePlayerUnitCountMultiplier")) {
-                setEffectivePlayerUnitCountMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                setEffectivePlayerUnitCountMultiplier(MathUtility.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("effectivePlayerBVMultiplier")) {
-                setEffectivePlayerBVMultiplier(Double.parseDouble(wn2.getTextContent().trim()));
+                setEffectivePlayerBVMultiplier(MathUtility.parseDouble(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("friendlyReinforcementDelayReduction")) {
-                setFriendlyReinforcementDelayReduction(Integer.parseInt(wn2.getTextContent().trim()));
+                setFriendlyReinforcementDelayReduction(MathUtility.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("friendlyDelayedReinforcements")) {
                 String[] values = wn2.getTextContent().split(",");
                 for (String value : values) {
@@ -624,11 +680,11 @@ public class AtBDynamicScenario extends AtBScenario {
                     getFriendlyInstantReinforcements().add(UUID.fromString(value));
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("hostileReinforcementDelayReduction")) {
-                setHostileReinforcementDelayReduction(Integer.parseInt(wn2.getTextContent().trim()));
+                setHostileReinforcementDelayReduction(MathUtility.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("effectiveOpForSkill")) {
                 setEffectiveOpForSkill(SkillLevel.valueOf(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase("effectiveOpForQuality")) {
-                setEffectiveOpForQuality(Integer.parseInt(wn2.getTextContent().trim()));
+                setEffectiveOpForQuality(MathUtility.parseInt(wn2.getTextContent().trim()));
             } else if (wn2.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAPS_ELEMENT)) {
                 for (int snsIndex = 0; snsIndex < wn2.getChildNodes().getLength(); snsIndex++) {
                     Node swapNode = wn2.getChildNodes().item(snsIndex);
@@ -655,10 +711,34 @@ public class AtBDynamicScenario extends AtBScenario {
                 }
             } else if (wn2.getNodeName().equalsIgnoreCase("finalized")) {
                 setFinalized(Boolean.parseBoolean(wn2.getTextContent().trim()));
+            } else if (wn2.getNodeName().equalsIgnoreCase("offBoardForceIDs")) {
+                loadOffBoardForceIDs(wn2.getTextContent());
             }
         }
 
         super.loadFieldsFromXmlNode(wn, version, campaign);
+    }
+
+    /**
+     * Restores the off-board force IDs from their saved comma-separated form. A value that is not a number is logged
+     * and skipped, so a hand-edited or corrupted save neither aborts the scenario load nor marks force {@code 0} (the
+     * whole player TOE) as deploying off-board.
+     *
+     * @param content the tag text, for example {@code "3,7"}; blank entries are ignored
+     */
+    private void loadOffBoardForceIDs(String content) {
+        for (String value : content.split(",")) {
+            String trimmedValue = value.trim();
+            if (trimmedValue.isBlank()) {
+                continue;
+            }
+            try {
+                offBoardForceIDs.add(Integer.parseInt(trimmedValue));
+            } catch (NumberFormatException exception) {
+                logger.warn("Skipping unreadable off-board force ID '{}' while loading scenario {}",
+                      trimmedValue, getName());
+            }
+        }
     }
 
     @Override

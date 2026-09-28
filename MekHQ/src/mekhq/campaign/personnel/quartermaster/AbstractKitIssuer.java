@@ -36,12 +36,14 @@ import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_VEHICLE;
 
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
@@ -72,26 +74,30 @@ public abstract class AbstractKitIssuer {
     /**
      * A single reference acquirer at Regular skill, shared by every kit issuer, so a displayed acquisition difficulty
      * is a fixed benchmark rather than a reading off the current staff. Only its acquisition skill matters to
-     * {@code checkAcquisition} (the campaign supplies every other modifier), and MekHQ only ever has one campaign, so
-     * it is built once and reused rather than reconstructed for every card — a {@link Person} is expensive to build and
-     * a kit dialog builds dozens of cards on the EDT. The acquirer holds no reference back to the campaign.
+     * {@code checkAcquisition} (the campaign supplies every other modifier). A {@link Person} is expensive to build and
+     * a kit dialog builds dozens of cards on the EDT, so it is reused — but rebuilt whenever a different campaign is
+     * loaded, since its skill levels are read from that campaign's skill table.
      */
     private static Person regularAcquirer;
 
+    /** The campaign the acquirer was built for, held weakly so a closed campaign can still be collected. */
+    private static WeakReference<Campaign> regularAcquirerCampaign = new WeakReference<>(null);
+
     /**
-     * The shared Regular-skill reference acquirer, built lazily on first use and reused thereafter.
+     * The shared Regular-skill reference acquirer, built lazily and rebuilt when the campaign changes.
      *
-     * @param campaign the campaign the acquirer is (once) constructed against
+     * @param campaign the campaign the acquirer is constructed against
      *
      * @return the shared reference acquirer
      */
-    protected static Person regularAcquirer(Campaign campaign) {
-        if (regularAcquirer == null) {
+    protected static synchronized Person regularAcquirer(Campaign campaign) {
+        if ((regularAcquirer == null) || (regularAcquirerCampaign.get() != campaign)) {
             Person acquirer = new Person(campaign);
             for (String skill : new String[] { S_NEGOTIATION, S_ADMIN, S_TECH_VEHICLE }) {
                 acquirer.addSkill(skill, SkillType.getType(skill).getRegularLevel(), 0);
             }
             regularAcquirer = acquirer;
+            regularAcquirerCampaign = new WeakReference<>(campaign);
         }
         return regularAcquirer;
     }
@@ -119,19 +125,22 @@ public abstract class AbstractKitIssuer {
     }
 
     /**
-     * The number of each present, spare kit these people's distinct local warehouses hold, tallied by kit type in a
-     * single pass. Callers building many cards should use this once instead of
-     * {@link #localStock(Person, EquipmentType)} per kit, which rescans the whole spare-parts list every call.
+     * Kits on hand across the distinct stores the given people draw from (see
+     * {@link #warehouseFor(Person, Campaign)}), keyed by kit type.
      *
-     * @param people the people whose local warehouses to tally
+     * @param people   the people whose stores are counted
+     * @param campaign the campaign whose main warehouse stands in for anyone without local stores
      *
-     * @return kit equipment type -&gt; count in stock across those warehouses
+     * @return kit type to count on hand
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    public static Map<EquipmentType, Integer> localStock(Collection<Person> people) {
+    public static Map<EquipmentType, Integer> localStock(Collection<Person> people, Campaign campaign) {
         Map<EquipmentType, Integer> counts = new HashMap<>();
         Set<LocalWarehouse> counted = new HashSet<>();
         for (Person person : people) {
-            LocalWarehouse warehouse = person.getWarehouse();
+            LocalWarehouse warehouse = warehouseFor(person, campaign);
             if ((warehouse == null) || !counted.add(warehouse)) {
                 continue;
             }
@@ -142,6 +151,70 @@ public abstract class AbstractKitIssuer {
             }
         }
         return counts;
+    }
+
+    /**
+     * The stores a person draws kits from and returns them to: their local warehouse, or the campaign's main warehouse
+     * when they have none.
+     *
+     * @param person   the person
+     * @param campaign the campaign
+     *
+     * @return the warehouse to use, or {@code null} if neither exists
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable LocalWarehouse warehouseFor(Person person, Campaign campaign) {
+        LocalWarehouse warehouse = person.getWarehouse();
+        if ((warehouse != null) || (campaign == null) || (campaign.getPlayerForce() == null)) {
+            return warehouse;
+        }
+        return campaign.getPlayerForce().getWarehouse();
+    }
+
+    /**
+     * How many of a kit the person's stores hold (see {@link #warehouseFor(Person, Campaign)}).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int localStock(Person person, EquipmentType kit, Campaign campaign) {
+        return stockIn(warehouseFor(person, campaign), kit);
+    }
+
+    /** How many present, spare copies of a kit a warehouse holds; 0 for a {@code null} warehouse. */
+    protected static int stockIn(@Nullable LocalWarehouse warehouse, EquipmentType kit) {
+        if (warehouse == null) {
+            return 0;
+        }
+        int count = 0;
+        for (Part part : warehouse.getSpareParts()) {
+            if (isKitPart(part, kit)) {
+                count += Math.max(1, part.getQuantity());
+            }
+        }
+        return count;
+    }
+
+    /**
+     * What a bulk kit operation did, for its report: kits issued from stores and kits ordered for later issue.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static final class KitIssueTotals {
+        public int issued;
+        public int ordered;
+    }
+
+    /** Orders every tallied shortfall, one shopping-list entry per kit type, and adds it to the totals. */
+    protected static void orderShortfall(Map<EquipmentType, Integer> shortfall, Campaign campaign,
+          KitIssueTotals totals) {
+        for (Map.Entry<EquipmentType, Integer> entry : shortfall.entrySet()) {
+            order(entry.getKey(), entry.getValue(), campaign);
+            totals.ordered += entry.getValue();
+        }
     }
 
     /**

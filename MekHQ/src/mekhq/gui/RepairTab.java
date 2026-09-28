@@ -87,6 +87,7 @@ import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -822,18 +823,38 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
                     return false;
                 }
+
+                // Vessel crew assigned to a large craft can only perform repairs as that unit's engineer.
+                Unit assignedUnit = tech.getUnit();
+                if (tech.getPrimaryRole().isVesselCrew() &&
+                          assignedUnit != null &&
+                          assignedUnit.getEntity() != null &&
+                          assignedUnit.getEntity().isLargeCraft() &&
+                          !tech.equals(assignedUnit.getEngineer())) {
+                    return false;
+                }
                 if (btnShowOnlyUnitTechs.isSelected() && (unit != null) && !tech.isRightTechProfessionFor(unit)) {
                     return false;
                 }
+                // Every tech, including a self-crewed unit's engineer, must hold the skill the task requires and,
+                // where the campaign demands one, a tool kit - regardless of the filter toggles
+                if (!tech.isRightTechTypeFor(part)) {
+                    return false;
+                }
+                if (getCampaignOptions().get(CampaignOption.TECHS_NEED_TOOL_KIT) &&
+                          !EquipmentKitCatalog.hasToolKit(tech)) {
+                    return false;
+                }
                 if ((unit != null) && unit.isSelfCrewed()) {
-                    if (!tech.getPrimaryRole().isVesselCrew()) {
+                    // Only the vessel crew assigned to this unit may work on it; they then face the same skill-level
+                    // and time checks as any other tech below
+                    if (!tech.getPrimaryRole().isVesselCrew() || !unit.equals(tech.getUnit())) {
                         return false;
                     }
-                    // check whether the engineer is assigned to the correct unit
-                    return unit.equals(tech.getUnit());
                 } else if (tech.getPrimaryRole().isVesselCrew() && (unit != null) && !unit.isSelfCrewed()) {
                     return false;
-                } else if (!tech.isRightTechTypeFor(part) && !btnShowAllTechs.isSelected()) {
+                } else if (!btnShowAllTechs.isSelected() && !tech.isTechExpanded()) {
+                    // Otherwise only personnel in a technician role are offered
                     return false;
                 }
                 Skill skill = tech.getSkillForWorkingOn(part);

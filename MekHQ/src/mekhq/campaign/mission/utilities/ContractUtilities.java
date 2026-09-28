@@ -184,7 +184,8 @@ public class ContractUtilities {
         if (jumpPath != null) {
             LocalDate currentDate = campaign.getLocalDate();
             double transitTime = currentLocation.getTransitTime();
-            return (int) ceil(jumpPath.getTotalTime(currentDate, transitTime, isUseCommandCircuit));
+            return (int) ceil(jumpPath.getTotalTime(currentDate, transitTime, isUseCommandCircuit,
+                  campaign.getJumpDriveProfile(currentLocation)));
         }
 
         return 0;

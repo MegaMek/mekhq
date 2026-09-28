@@ -147,7 +147,7 @@ class EquipmentKitCatalogTest {
     }
 
     @Test
-    void deluxeToolkitModifiesEveryTechSkillIncludingTheGlobalOnes() {
+    void deluxeToolkitModifiesTheAstechSkill() {
         Map<String, Integer> bonuses = EquipmentKitCatalog.kitSkillBonuses(personWithKit(KIT_DELUXE_TOOLKIT));
         assertEquals(DELUXE_TOOLKIT_ROLL_BONUS, bonuses.get(S_ASTECH));
     }
@@ -167,7 +167,7 @@ class EquipmentKitCatalogTest {
 
     @Test
     void deluxeToolkitIsNotABespokeMaintenanceBonusItReachesMaintenanceThroughTheSkillValue() {
-        // The Deluxe Toolkit's maintenance +1 is a skill modifier (kitSkillBonuses on the global skill), not a bespoke
+        // The Deluxe Toolkit's bonus is a skill modifier (kitSkillBonuses on the Astech skill), not a bespoke
         // maintenance-roll modifier, so maintenanceBonus itself returns 0 for it.
         assertEquals(0, EquipmentKitCatalog.maintenanceBonus(personWithKit(KIT_DELUXE_TOOLKIT)));
     }

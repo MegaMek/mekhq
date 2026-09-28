@@ -246,7 +246,9 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         String systemName = currentSystem.getPrintableName(date);
         if (location.isAtJumpPoint()) {
             boolean isUseCommandCircuit = campaign.isUseCommandCircuit();
-            double neededRechargeTime = currentSystem.getRechargeTime(date, isUseCommandCircuit);
+            double neededRechargeTime = campaign.getJumpDriveProfile(location)
+                                              .adjustRechargeTime(currentSystem.getRechargeTime(date,
+                                                    isUseCommandCircuit));
             if (Double.isInfinite(neededRechargeTime)) {
                 return getFormattedTextAt("title.chargingImpossible",
                       systemName, currentSystem.getRechargeTimeText(date, isUseCommandCircuit));
@@ -365,7 +367,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         TransportCostCalculations calculation = campaign.getTransportCostCalculation(EXP_REGULAR);
         if (jumpPath.getJumps() > 0) {
             int duration = (int) Math.ceil(jumpPath.getTotalTime(campaign.getLocalDate(), location.getTransitTime(),
-                  campaign.isUseCommandCircuit()));
+                  campaign.isUseCommandCircuit(), campaign.getJumpDriveProfile(location)));
             Money jumpCost = calculation.calculateJumpCostForEntireJourney(duration, jumpPath.getJumps());
             return getFormattedTextAt("info.jumpCost.remaining", jumpCost.toAmountString());
         } else {

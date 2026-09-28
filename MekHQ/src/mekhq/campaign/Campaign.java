@@ -45,12 +45,14 @@ import static mekhq.campaign.enums.DailyReportType.BATTLE;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.enums.DailyReportType.SKILL_CHECKS;
 import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_INTERSTELLAR_NEGOTIATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_LOGISTICIAN;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_ADMIN_APPRAISAL_FAIL;
 import static mekhq.campaign.personnel.ranks.Rank.RO_MIN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_NEGOTIATION;
@@ -135,6 +137,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.enums.DailyReportType;
+import mekhq.campaign.enums.LithiumFusionBatteryMode;
 import mekhq.campaign.events.*;
 import mekhq.campaign.events.loans.LoanNewEvent;
 import mekhq.campaign.events.loans.LoanPaidEvent;
@@ -172,6 +175,7 @@ import mekhq.campaign.market.unitMarket.AbstractUnitMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractHistoryData;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.mission.contract.utilities.ContractSettlement;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -181,10 +185,13 @@ import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.utilities.TransportCostCalculations;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.BAArmor;
+import mekhq.campaign.parts.CampaignDice;
+import mekhq.campaign.parts.Dice;
 import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitWorkCheck;
 import mekhq.campaign.parts.SpacecraftCoolingSystem;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -223,6 +230,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker;
 import mekhq.campaign.randomEvents.randomEventsSystem.RandomEventLibraries;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
+import mekhq.campaign.roleplay.Roleplay;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.CrewType;
@@ -243,6 +251,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumsLibrary;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 import mekhq.campaign.universe.warriorsAlmanac.WarriorsAlmanacEntry;
+import mekhq.campaign.utilities.LithiumFusionBatteries;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
@@ -285,6 +294,8 @@ public class Campaign implements ITechManager {
     // TODO (campaign split): Quartermaster holds a Campaign back-reference. Remove that coupling so it can
     //   move onto the force (AbstractForce/PlayerForce) alongside the other owned state.
     private final ForceQuartermaster quartermaster;
+    /** The source of part destruction rolls; not saved, and replaceable in tests. */
+    private Dice dice = new CampaignDice();
     CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this,
           CampaignTransportType.TACTICAL_TRANSPORT);
     CampaignTransporterMap towTransporters = new CampaignTransporterMap(this, CampaignTransportType.TOW_TRANSPORT);
@@ -341,6 +352,7 @@ public class Campaign implements ITechManager {
 
     private CampaignOptions campaignOptions;
     private RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
+    private Roleplay roleplay = new Roleplay();
     private CampaignGUI gui;
 
     private AbstractUnitMarket unitMarket;
@@ -1165,15 +1177,110 @@ public class Campaign implements ITechManager {
     }
 
     public TransportCostCalculations getTransportCostCalculation(int crewExperienceLevel) {
-        // Units queued for travel elsewhere (e.g. left behind at a base via the jump-blocker prompt) still sit in
-        // the hangar until the queue is dispatched next day, but must not be billed as traveling with the campaign.
-        List<Unit> travelingUnits = getPlayerForce().getHangar().getUnits().stream()
-                                          .filter(unit -> !getCampaignLocationManager().isQueuedForTravel(unit))
-                                          .toList();
+        return getTransportCostCalculation(getTravelingUnits(), crewExperienceLevel);
+    }
+
+    private TransportCostCalculations getTransportCostCalculation(List<Unit> travelingUnits,
+          int crewExperienceLevel) {
         return new TransportCostCalculations(travelingUnits,
               LocalWarehouse.getSpareParts(getParts()),
               getPlayerForce().getHumanResources().getPersonnelFilteringOutDepartedAndAbsent(),
               crewExperienceLevel);
+    }
+
+    /**
+     * Returns the main force's units that travel with it when it jumps.
+     *
+     * <p>Units queued for travel elsewhere (e.g. left behind at a base via the jump-blocker prompt) still sit in the
+     * hangar until the queue is dispatched next day, but don't travel with the campaign.</p>
+     *
+     * @return the traveling units
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<Unit> getTravelingUnits() {
+        CampaignLocationManager campaignLocationManager = getCampaignLocationManager();
+        List<Unit> travelingUnits = new ArrayList<>();
+        for (Unit unit : getPlayerForce().getHangar().getUnits()) {
+            if (!campaignLocationManager.isQueuedForTravel(unit)) {
+                travelingUnits.add(unit);
+            }
+        }
+        return travelingUnits;
+    }
+
+    /**
+     * Returns the Lithium-Fusion battery mode that currently applies to the main force's travel.
+     *
+     * <p>This is the campaign option's mode when the traveling fleet qualifies for it (see
+     * {@link LithiumFusionBatteries#isFleetEligible}), otherwise {@link LithiumFusionBatteryMode#DISABLED}.</p>
+     *
+     * @return the effective Lithium-Fusion battery mode
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public LithiumFusionBatteryMode getEffectiveLithiumFusionBatteryMode() {
+        LithiumFusionBatteryMode mode = getCampaignOptions().get(CampaignOption.LITHIUM_FUSION_BATTERY_MODE);
+        if (!mode.isEnabled()) {
+            return LithiumFusionBatteryMode.DISABLED;
+        }
+
+        List<Unit> travelingUnits = getTravelingUnits();
+        TransportCostCalculations transportCalculations = getTransportCostCalculation(travelingUnits, EXP_REGULAR);
+        return LithiumFusionBatteries.isFleetEligible(travelingUnits, transportCalculations)
+                     ? mode
+                     : LithiumFusionBatteryMode.DISABLED;
+    }
+
+    /**
+     * Returns the Lithium-Fusion battery mode that applies to the given traveling location. Only the main force's own
+     * location can benefit from Lithium-Fusion batteries; every other location gets
+     * {@link LithiumFusionBatteryMode#DISABLED}.
+     *
+     * @param location the traveling location
+     *
+     * @return the effective Lithium-Fusion battery mode for that location
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public LithiumFusionBatteryMode getEffectiveLithiumFusionBatteryMode(@Nullable AbstractLocation location) {
+        if ((location == null) || (location != getPlayerForce().getForceDetachment().getCurrentLocation())) {
+            return LithiumFusionBatteryMode.DISABLED;
+        }
+        return getEffectiveLithiumFusionBatteryMode();
+    }
+
+    /**
+     * Returns the jump drive profile for the main force's current location.
+     *
+     * @return the main force's jump drive profile
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public JumpDriveProfile getJumpDriveProfile() {
+        return getJumpDriveProfile(getPlayerForce().getForceDetachment().getCurrentLocation());
+    }
+
+    /**
+     * Returns the jump drive profile that applies to the given location. Only the main force's own location can benefit
+     * from Lithium-Fusion batteries; every other traveling node uses {@link JumpDriveProfile#STANDARD}.
+     *
+     * @param location the traveling location
+     *
+     * @return the jump drive profile for that location
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public JumpDriveProfile getJumpDriveProfile(@Nullable AbstractLocation location) {
+        LithiumFusionBatteryMode mode = getEffectiveLithiumFusionBatteryMode(location);
+        boolean isBatteryCharged = (location instanceof CurrentLocation currentLocation)
+                                         && currentLocation.isLithiumFusionBatteryCharged();
+        return JumpDriveProfile.fromMode(mode, isBatteryCharged);
     }
 
     /**
@@ -1283,8 +1390,10 @@ public class Campaign implements ITechManager {
      *
      * @param testUnit     TestUnit to add.
      * @param deliveryTime How many days until the unit arrives
+     *
+     * @return the new unit wrapped around the test unit's entity, which is the unit the campaign keeps
      */
-    public void addTestUnit(TestUnit testUnit, int deliveryTime) {
+    public Unit addTestUnit(TestUnit testUnit, int deliveryTime) {
         // we really just want the entity and the parts so let's just wrap that around a new unit.
         Unit unit = new Unit(testUnit.getEntity(), this);
         getPlayerForce().getHangar().addUnit(unit);
@@ -1317,6 +1426,9 @@ public class Campaign implements ITechManager {
             unit.setSalvage(true);
         }
 
+        // The unit isn't available until it has been delivered, just like its parts
+        unit.setDaysToArrival(Math.max(0, deliveryTime));
+
         // Assign an entity ID to our new unit
         if (Entity.NONE == unit.getEntity().getId()) {
             unit.getEntity().setId(game.getNextEntityId());
@@ -1325,6 +1437,7 @@ public class Campaign implements ITechManager {
 
         checkDuplicateNamesDuringAdd(unit.getEntity());
         addReport(ACQUISITIONS, unit.getHyperlinkedName() + " has been added to the unit roster.");
+        return unit;
     }
 
     /**
@@ -1920,6 +2033,25 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Returns the dice used for part destruction rolls. By default this is a {@link CampaignDice}, which rolls through
+     * MegaMek's {@code Compute} exactly as the parts always have.
+     *
+     * @return the dice for this campaign; never {@code null}
+     */
+    public Dice getDice() {
+        return dice;
+    }
+
+    /**
+     * Replaces the dice used for part destruction rolls, so a test can supply fixed rolls.
+     *
+     * @param dice the dice to use from now on; must not be {@code null}
+     */
+    public void setDice(Dice dice) {
+        this.dice = Objects.requireNonNull(dice, "dice");
+    }
+
+    /**
      * @return A collection of parts in the Warehouse.
      */
     public Collection<Part> getParts() {
@@ -2220,8 +2352,10 @@ public class Campaign implements ITechManager {
         // SHOULD we check to see if this acquisition needs to be paid for
         if ((acquisition instanceof UnitOrder && getCampaignOptions().get(CampaignOption.PAY_FOR_UNITS)) ||
                   (acquisition instanceof Part && getCampaignOptions().get(CampaignOption.PAY_FOR_PARTS))) {
-            // CAN the acquisition actually be paid for
-            return getPlayerForce().getFunds().isGreaterOrEqualThan(acquisition.getBuyCost());
+            // CAN the acquisition actually be paid for, at the (possibly contract-doubled) purchase price
+            double contractMultiplier = getPlayerForce().getPurchaseCostMultiplier(getActiveContracts());
+            Money buyCost = acquisition.getBuyCost().multipliedBy(contractMultiplier);
+            return getPlayerForce().getFunds().isGreaterOrEqualThan(buyCost);
         }
         return true;
     }
@@ -2375,6 +2509,8 @@ public class Campaign implements ITechManager {
                 boolean isUseEdge = campaignOptions.get(CampaignOption.USE_EDGE) &&
                                           person.getOptions().booleanOption(EDGE_ADMIN_APPRAISAL_FAIL);
                 ActionCheckResult appraisalResult = Appraisal.performAppraisalCheck(person, currentDay, isUseEdge);
+                addReport(SKILL_CHECKS, appraisalResult.getReport());
+
                 valueChange = Appraisal.getAppraisalCostMultiplier(appraisalResult.getMarginOfSuccess());
                 appraisalReport = Appraisal.getAppraisalReport(valueChange, appraisalResult.getReportMargin());
             }
@@ -2631,11 +2767,17 @@ public class Campaign implements ITechManager {
             theRefit.cancel();
             return;
         }
-        TargetRoll target = getTargetFor(theRefit, tech);
         // check that all parts have arrived
         if (!theRefit.acquireParts()) {
             return;
         }
+        String reasonTechCannotWork = RefitWorkCheck.reasonTechCannotWork(this, theRefit, tech);
+        if (reasonTechCannotWork != null) {
+            addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "refit.paused",
+                  tech.getHyperlinkedFullTitle(), theRefit.getPartName(), reasonTechCannotWork));
+            return;
+        }
+        TargetRoll target = getTargetFor(theRefit, tech);
         String report = tech.getHyperlinkedFullTitle() + " works on " + theRefit.getPartName();
         int minutes = theRefit.getTimeLeft();
         // FIXME: Overtime?
@@ -2674,7 +2816,6 @@ public class Campaign implements ITechManager {
                                                            .booleanOption(PersonnelOptions.EDGE_REPAIR_FAILED_REFIT) &&
                                                      (tech.getCurrentEdge() > 0);
                     SkillCheck refitCheck = new SkillCheck(tech, refitSkill.getType(), target)
-                                                  .withoutLogging()
                                                   .withoutSubject()
                                                   .withEdgeRerollCondition(firstRoll -> firstRoll.result() <
                                                                                               target.getValue());
@@ -2685,7 +2826,7 @@ public class Campaign implements ITechManager {
                     ActionCheckResult refitResult = refitCheck.resolve(canUseEdge, null);
                     roll = refitResult.getRollResult();
                     report = report + getFormattedTextAt(RESOURCE_BUNDLE, "refit.check.report",
-                          target.getValueAsString(), refitResult.getReport(true)) + " ";
+                          target.getValueAsString(), refitResult.getReport()) + " ";
                 }
 
                 if (roll >= target.getValue()) {
@@ -2909,7 +3050,6 @@ public class Campaign implements ITechManager {
                                              (tech.getCurrentEdge() > 0) &&
                                              (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS);
             SkillCheck repairCheck = new SkillCheck(tech, repairSkill.getType(), target)
-                                           .withoutLogging()
                                            .withoutSubject()
                                            .withEdgeRerollCondition(firstRoll -> {
                                                int rolled = firstRoll.result();
@@ -2937,7 +3077,7 @@ public class Campaign implements ITechManager {
             ActionCheckResult repairResult = repairCheck.resolve(canUseEdge, null);
             roll = repairResult.getRollResult();
             report = report + getFormattedTextAt(RESOURCE_BUNDLE, "repair.check.report",
-                  target.getValueAsString(), repairResult.getReport(true));
+                  target.getValueAsString(), repairResult.getReport());
         }
 
         final boolean taskSucceeded = roll >= target.getValue();
@@ -2961,6 +3101,8 @@ public class Campaign implements ITechManager {
                       getLocalDate(),
                       cost,
                       "Repair of " + partWork.getPartName());
+                // An employer covering straight support reimburses its share of the repair cost.
+                ContractSupportPayments.reimburseStraightSupport(this, cost, partWork.getPartName());
             }
             if ((roll == 12) && (target.getValue() != TargetRoll.AUTOMATIC_SUCCESS)) {
                 xpGained += getCampaignOptions().get(CampaignOption.SUCCESS_XP);
@@ -3811,6 +3953,8 @@ public class Campaign implements ITechManager {
         getPlayerForce().getHangar().writeToXML(writer, indent, "units"); // Units
 
         getPlayerForce().getHumanResources().writeToXML(writer, indent, this);
+
+        roleplay.writeToXML(writer, indent);
 
         // the formations structure is hierarchical, but that should be handled
         // internally from with writeToXML function for Formation
@@ -5113,6 +5257,14 @@ public class Campaign implements ITechManager {
         randomSkillPreferences = prefs;
     }
 
+    public Roleplay getRoleplay() {
+        return roleplay;
+    }
+
+    public void setRoleplay(final Roleplay roleplay) {
+        this.roleplay = roleplay;
+    }
+
     /**
      * @param planet the starting planet, or null to use the faction default
      */
@@ -5284,8 +5436,8 @@ public class Campaign implements ITechManager {
 
             Money routedPayout = mission.getRoutPayout();
 
-                    remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
-   }
+            remainingMoney = routedPayout == null ? remainingMoney : routedPayout;
+        }
 
         // Shareholders take their cut of the contract's gross final payout, mirroring the monthly share payout.
         final Money grossPayout = remainingMoney;

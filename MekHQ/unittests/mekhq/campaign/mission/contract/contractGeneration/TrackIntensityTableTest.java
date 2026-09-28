@@ -161,4 +161,28 @@ class TrackIntensityTableTest {
                   TrackIntensityTable.rollSchedule(SIX_MONTH_LENGTH, 6));
         }
     }
+
+    @Test
+    void scheduleForCountPlacesExactlyThatManyItemsWhateverTheCount() {
+        // Counts well past either table's widest column must still all be placed, by rolling in batches.
+        for (int lengthInMonths : new int[] { 3, 6 }) {
+            int nativeMonths = (lengthInMonths <= TrackIntensityTable.SHORT_TABLE_MAX_MONTHS) ? 3 : 6;
+            for (int count = 0; count <= 20; count++) {
+                List<Integer> schedule = TrackIntensityTable.rollScheduleForCount(lengthInMonths, count);
+
+                assertEquals(nativeMonths, schedule.size(), "length " + lengthInMonths + ", count " + count);
+                int placed = 0;
+                for (int items : schedule) {
+                    placed += items;
+                }
+                assertEquals(count, placed, "length " + lengthInMonths + ", count " + count);
+            }
+        }
+    }
+
+    @Test
+    void scheduleForANonPositiveCountIsEmpty() {
+        assertEquals(List.of(0, 0, 0), TrackIntensityTable.rollScheduleForCount(3, 0));
+        assertEquals(List.of(0, 0, 0, 0, 0, 0), TrackIntensityTable.rollScheduleForCount(6, -2));
+    }
 }

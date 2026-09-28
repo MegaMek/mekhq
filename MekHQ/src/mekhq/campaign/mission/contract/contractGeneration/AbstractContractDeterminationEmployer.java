@@ -37,6 +37,7 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.utilities.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.REBEL_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
 
@@ -90,13 +91,16 @@ public abstract class AbstractContractDeterminationEmployer {
     private static final int WORD_OF_BLAKE_EMPLOYER_CHANCE = 40;
 
     /**
-     * Returns the employer determination appropriate to the search: a mercenary search draws a themed employer, while
-     * anything else is a government contract issued by the player's own faction.
+     * Returns the employer determination appropriate to the search: a mercenary search draws a themed employer, a
+     * pirate search fields a self-directed pirate band, and a government (or tournament) search is issued by the
+     * player's own faction.
      */
     public static AbstractContractDeterminationEmployer forSearchType(ContractSearchType searchType) {
-        return searchType == ContractSearchType.MERCENARY
-                     ? new ChaosContractDeterminationEmployerMercenary()
-                     : new ChaosContractDeterminationEmployerGovernment();
+        return switch (searchType) {
+            case MERCENARY -> new ChaosContractDeterminationEmployerMercenary();
+            case PIRATE -> new ChaosContractDeterminationEmployerPirate();
+            case GOVERNMENT, TOURNAMENT -> new ChaosContractDeterminationEmployerGovernment();
+        };
     }
 
     public @Nullable EmployerData getEmployerGenerationData(LocalDate currentDate, ILocation currentLocation,
@@ -287,6 +291,9 @@ public abstract class AbstractContractDeterminationEmployer {
                         () -> pickRegionalOwner(currentDate, currentLocation, null));
             case CIVILIAN_ORGANIZATION_REBELS -> factions.getFaction(REBEL_FACTION_CODE);
             case MERCENARY_SUBCONTRACT -> factions.getFaction(MERCENARY_FACTION_CODE);
+            // An underworld contact operates out of pirate circles. Reached only if a non-pirate determination ever
+            // rolls this type; the pirate determination overrides this hook (see ChaosContractDeterminationEmployerPirate).
+            case UNDERWORLD_CONTACT -> factions.getFaction(PIRATE_FACTION_CODE);
         };
     }
 
@@ -313,6 +320,10 @@ public abstract class AbstractContractDeterminationEmployer {
                   flavor.isGovernment()
                         ? flavor
                         : pickRegionalOwner(currentDate, currentLocation, flavor);
+            // A pirate raid anchors on pirate space (the raiders' staging ground), not the contact. Reached only if a
+            // non-pirate determination ever rolls this type; the pirate determination overrides this hook (see
+            // ChaosContractDeterminationEmployerPirate).
+            case UNDERWORLD_CONTACT -> flavor;
         };
     }
 

@@ -38,6 +38,7 @@ import static org.mockito.Mockito.mockStatic;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveData;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
@@ -122,5 +123,19 @@ class ChaosContractDeterminationObjectiveTest {
             assertFalse(ChaosObjectiveType.RAID.getCamOpsObjectiveType().isUndefined(),
                   "RAID.getCamOpsObjectiveType() must never return the UNDEFINED sentinel");
         }
+    }
+
+    /**
+     * An acts-of-piracy search always yields a pirate raid (the player raids) against a garrisoning victim (the victim
+     * defends), rather than a roll on the general objective table.
+     */
+    @Test
+    void determinePirateContractObjectiveTypeIsAlwaysARaidAgainstAGarrison() {
+        ContractObjectiveData data = ChaosContractDeterminationObjective.determinePirateContractObjectiveType();
+
+        assertEquals(ContractObjectiveType.PIRATE_RAID, data.playerObjectiveType(),
+              "the player's objective is always a pirate raid");
+        assertEquals(ChaosObjectiveType.GARRISON, data.opposingObjectiveType().getChaosObjectiveType(),
+              "the victim's objective is to garrison against the raid");
     }
 }

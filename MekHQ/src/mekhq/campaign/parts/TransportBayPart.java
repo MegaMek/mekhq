@@ -38,7 +38,6 @@ import java.util.List;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.bays.Bay;
-import megamek.common.compute.Compute;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -127,7 +126,7 @@ public class TransportBayPart extends Part {
                                          .toList();
                 for (Part door : doors) {
                     if (checkForDestruction
-                              && Compute.d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
+                              && campaign.getDice().d6(2) < campaign.getCampaignOptions().get(CampaignOption.DESTROY_PART_TARGET)) {
                         door.remove(false);
                     } else {
                         door.hits = 1;
@@ -145,7 +144,7 @@ public class TransportBayPart extends Part {
                                             .filter(p -> p instanceof Cubicle)
                                             .toList();
                 while ((hits > prevHits) && !cubicles.isEmpty()) {
-                    Part cubicle = cubicles.get(Compute.randomInt(cubicles.size()));
+                    Part cubicle = cubicles.get(campaign.getDice().randomInt(cubicles.size()));
                     cubicle.remove(false);
                     prevHits++;
                 }
