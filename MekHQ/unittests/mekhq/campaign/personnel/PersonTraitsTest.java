@@ -286,6 +286,12 @@ class PersonTraitsTest {
 
     @Nested
     class AdjustedReputation {
+        @BeforeEach
+        void zeroBaseReputation() {
+            // New characters start with STARTING_REPUTATION_SCORE; zero it so only Fame and Connections are measured
+            person.setReputationDirect(0);
+        }
+
         @Test
         void fameAndConnectionsAreAdded() {
             person.setFame(2);
