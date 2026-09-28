@@ -147,7 +147,8 @@ public class SystemsPages {
 
         updateModelFromCreatedControls();
 
-        if (model.resetCriminalRecord) {
+        // Saving a preset must leave the running campaign's criminal record alone; the reset waits for Apply
+        if (model.resetCriminalRecord && (presetCampaignOptions == null)) {
             campaign.getPlayerForce().setCampOpsDateOfLastCrime(null);
             campaign.getPlayerForce().setCamOpsCrimeRating(0);
             campaign.getPlayerForce().setCampOpsCrimePirateModifier(0);

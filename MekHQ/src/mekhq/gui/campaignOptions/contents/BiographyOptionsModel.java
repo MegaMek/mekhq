@@ -32,15 +32,11 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static megamek.client.generator.RandomGenderGenerator.getPercentFemale;
-
 import java.util.EnumMap;
 import java.util.Map;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
-import megamek.client.generator.RandomGenderGenerator;
-import megamek.client.generator.RandomNameGenerator;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -111,7 +107,7 @@ class BiographyOptionsModel {
 
     BiographyOptionsModel(@Nonnull CampaignOptions options, @Nonnull RandomOriginOptions originOptions) {
         useDylansRandomXP = options.get(CampaignOption.USE_DYLANS_RANDOM_XP);
-        percentFemale = getPercentFemale();
+        percentFemale = options.get(CampaignOption.PERCENT_FEMALE);
         nonBinaryDiceSize = options.get(CampaignOption.NON_BINARY_DICE_SIZE);
         familyDisplayLevel = options.get(CampaignOption.FAMILY_DISPLAY_LEVEL);
         announceOfficersOnly = options.get(CampaignOption.ANNOUNCE_OFFICERS_ONLY);
@@ -161,7 +157,7 @@ class BiographyOptionsModel {
         allAges = options.get(CampaignOption.ALL_AGES);
         militaryAcademyAccidents = options.get(CampaignOption.MILITARY_ACADEMY_ACCIDENTS);
         useOriginFactionForNames = options.get(CampaignOption.USE_ORIGIN_FACTION_FOR_NAMES);
-        factionNames = RandomNameGenerator.getInstance().getChosenFaction();
+        factionNames = options.get(CampaignOption.NAME_GENERATOR_FACTION);
         assignPortraitOnRoleChange = options.get(CampaignOption.ASSIGN_PORTRAIT_ON_ROLE_CHANGE);
         allowDuplicatePortraits = options.get(CampaignOption.ALLOW_DUPLICATE_PORTRAITS);
         useGenderedPortraitsOnly = options.get(CampaignOption.USE_GENDERED_PORTRAITS_ONLY);
@@ -172,7 +168,7 @@ class BiographyOptionsModel {
 
     void applyTo(@Nonnull CampaignOptions options, @Nonnull RandomOriginOptions originOptions) {
         options.set(CampaignOption.USE_DYLANS_RANDOM_XP, useDylansRandomXP);
-        RandomGenderGenerator.setPercentFemale(percentFemale);
+        options.set(CampaignOption.PERCENT_FEMALE, percentFemale);
         options.set(CampaignOption.NON_BINARY_DICE_SIZE, nonBinaryDiceSize);
         options.set(CampaignOption.FAMILY_DISPLAY_LEVEL, familyDisplayLevel);
         options.set(CampaignOption.ANNOUNCE_OFFICERS_ONLY, announceOfficersOnly);
@@ -233,7 +229,7 @@ class BiographyOptionsModel {
         options.set(CampaignOption.USE_GENDERED_PORTRAITS_ONLY, useGenderedPortraitsOnly);
         options.set(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN, noRandomPortraitsForChildren);
         options.set(CampaignOption.CHILD_PORTRAITS_WHEN_COMING_OF_AGE, childPortraitsWhenComingOfAge);
-        RandomNameGenerator.getInstance().setChosenFaction(factionNames);
+        options.set(CampaignOption.NAME_GENERATOR_FACTION, factionNames);
         for (int i = 0; i < usePortraitForRole.length; i++) {
             options.setUsePortraitForRole(i, usePortraitForRole[i]);
         }

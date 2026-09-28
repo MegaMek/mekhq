@@ -36,6 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.Map;
+
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 import org.junit.jupiter.api.BeforeEach;
@@ -120,5 +122,26 @@ class SkillsOptionsModelTest {
         assertEquals(7, roundTripped.heroicLevel);
         assertEquals(8, roundTripped.legendaryLevel);
         assertArrayEquals(configuration.costs, roundTripped.costs);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void presetMissingASkillLoadsThatSkillAtItsDefault() {
+        String presetSkillName = SkillType.getSkillList()[0];
+        String missingSkillName = SkillType.getSkillList()[1];
+        int defaultTarget = SkillType.getType(missingSkillName).getTarget();
+
+        // The running campaign has customized the skill the preset lacks
+        SkillType.getType(missingSkillName).setTarget(defaultTarget + 1);
+
+        SkillsOptionsModel model = new SkillsOptionsModel(new CampaignOptions(),
+              Map.of(presetSkillName, SkillType.getType(presetSkillName)));
+        SkillConfiguration configuration = model.getSkillConfiguration(missingSkillName);
+        assertNotNull(configuration);
+
+        assertEquals(defaultTarget, configuration.targetNumber);
     }
 }
