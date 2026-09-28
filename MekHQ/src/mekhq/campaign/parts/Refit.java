@@ -980,9 +980,9 @@ public class Refit extends Part implements IAcquisitionWork {
         // full ton and half ton MG or OS/regular.
         for (AmmoType type : ammoNeeded.keySet()) {
             int shotsNeeded = Math.max(ammoNeeded.get(type) - campaign.getQuartermaster().getAmmoAvailable(type), 0);
-            int shotsPerTon = type.getShots();
-            if ((shotsNeeded > 0) && (shotsPerTon > 0)) {
-                cost = cost.plus(Money.of(type.getCost(newEntity, false, -1) * ((double) shotsNeeded / shotsPerTon)));
+            if (shotsNeeded > 0) {
+                // Priced like any ammunition bought for the campaign, so the campaign price multipliers apply
+                cost = cost.plus(new AmmoStorage(0, type, shotsNeeded, campaign).getActualValue());
             }
         }
 
@@ -1060,6 +1060,9 @@ public class Refit extends Part implements IAcquisitionWork {
                     plannedReplacementParts.add(replacement);
                 }
             } else {
+                // Heat sinks built into the engine are parts of the kit like any other: a double heat sink costs the
+                // same inside the engine as outside it (TM p.277)
+                cost = cost.plus(((MissingPart) newHeatSinkPart).getNewPart().getActualValue());
                 shoppingList.add(newHeatSinkPart);
             }
         }

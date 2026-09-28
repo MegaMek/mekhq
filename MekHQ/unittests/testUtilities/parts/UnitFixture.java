@@ -73,6 +73,11 @@ public enum UnitFixture {
      * copy).
      */
     LOCUST_LCT_1E("Locust LCT-1E", false, Mek.class),
+    /**
+     * Locust LCT-5V, an LCT-1V with the same 160 engine but double heat sinks, so a refit into it changes the heat
+     * sinks built into the engine. Source: {@code meks/3085u/Phoenix/Locust LCT-5V.mtf}.
+     */
+    LOCUST_LCT_5V("Locust LCT-5V", false, Mek.class),
     /** Wolverine WVR-6R, a medium Mek. Source: {@code meks/3039u/Wolverine WVR-6R.mtf}. */
     WOLVERINE_WVR_6R("Wolverine WVR-6R", false, Mek.class),
     /** Wolverine WVR-6M, the refit target of the WVR-6R. Source: {@code meks/3039u/Wolverine WVR-6M.mtf}. */
