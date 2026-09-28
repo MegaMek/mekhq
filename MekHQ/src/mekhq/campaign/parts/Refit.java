@@ -272,33 +272,31 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * Returns a mutable list of parts for the old unit in the refit. This is intended to be mutated only be
+     * Returns a mutable list of parts for the old unit in the refit. This is intended to be mutated only by
      * {@link mekhq.campaign.Campaign Campaign} when merging parts.
      * <p>
-     * This is only used by RefitTest.java
+     * Refit tests read it to check what a refit plans to keep, remove and add; the refit screens will need the same
+     * view. Treat it as read-only outside {@code Campaign}.
      *
      * @return A mutable {@link List} of old parts in the refit.
      *
      * @since 0.50.04
-     * @deprecated - If only used in a Test file, do we need it?
      */
-    @Deprecated(since = "0.50.04")
     public List<Part> getOldUnitParts() {
         return oldUnitParts;
     }
 
     /**
-     * Returns a mutable list of parts for the new unit in the refit. This is intended to be mutated only be
+     * Returns a mutable list of parts for the new unit in the refit. This is intended to be mutated only by
      * {@link mekhq.campaign.Campaign Campaign} when merging parts.
      * <p>
-     * This is only used by RefitTest.java
+     * Refit tests read it to check what a refit plans to keep, remove and add; the refit screens will need the same
+     * view. Treat it as read-only outside {@code Campaign}.
      *
      * @return A mutable {@link List} of new part IDs in the refit.
      *
      * @since 0.50.04
-     * @deprecated - If only used in a Test file, do we need it?
      */
-    @Deprecated(since = "0.50.04")
     public List<Part> getNewUnitParts() {
         return newUnitParts;
     }
