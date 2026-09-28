@@ -1171,9 +1171,14 @@ public class Refit extends Part implements IAcquisitionWork {
     /**
      * Begins the refit after it's been calculated and configured.
      *
-     * @return {@code true} if the refit started, {@code false} if it is a refurbishment the force cannot pay for
+     * @return {@code true} if the refit started, {@code false} if the unit already has a refit or it is a
+     *       refurbishment the force cannot pay for
      */
     public boolean begin() throws EntityLoadingException, IOException {
+        if (oldUnit.isRefitting()) {
+            LOGGER.warn("[Refit] {} already has a refit in progress; a second one is not started", oldUnit.getName());
+            return false;
+        }
         if (isRefurbishing && !payForRefurbishment()) {
             return false;
         }
