@@ -184,8 +184,8 @@ public class BayDoor extends Part {
 
     @Override
     public Part clone() {
-        Part newPart = new BayDoor(getUnitTonnage(), campaign);
-        copyBaseData(newPart);
+        BayDoor newPart = new BayDoor(getUnitTonnage(), campaign);
+        newPart.copyBaseData(this);
         return newPart;
     }
 
