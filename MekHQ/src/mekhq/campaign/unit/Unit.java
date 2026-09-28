@@ -6272,6 +6272,11 @@ public class Unit implements ITechnology, ILocatable {
                     part.setTech(engineer);
                 }
             }
+            // a refit in progress is worked by the engineer too; otherwise the old engineer's name stays on it and
+            // the new engineer is refused as "another team"
+            if (refit != null) {
+                refit.setTech(engineer);
+            }
         } else {
             // cancel any mothballing if this happens
             if (isMothballing()) {

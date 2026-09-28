@@ -54,6 +54,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
@@ -102,6 +103,7 @@ import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitWorkCheck;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -1050,6 +1052,15 @@ public class CampaignGUI extends JPanel {
                       JOptionPane.WARNING_MESSAGE);
                 return;
             }
+            String reasonEngineerCannotWork = RefitWorkCheck.reasonTechCannotWork(getCampaign(), r, engineer);
+            if (reasonEngineerCannotWork != null) {
+                JOptionPane.showMessageDialog(frame,
+                      MessageFormat.format(resourceMap.getString("refitEngineerCannotWork.text"),
+                            engineer.getFullName(), reasonEngineerCannotWork),
+                      resourceMap.getString("refitEngineerCannotWork.title"),
+                      JOptionPane.WARNING_MESSAGE);
+                return;
+            }
             r.setTech(engineer);
         } else {
             Campaign campaign = getCampaign();
@@ -1078,6 +1089,10 @@ public class CampaignGUI extends JPanel {
                     if (campaign2.getPlayerForce()
                               .getHumanResources()
                               .isWorkingOnRefit(campaign2.getPlayerForce().getHangar(), tech) || tech.isEngineer()) {
+                        continue;
+                    }
+                    // Only offer techs who can actually do the work: at the unit's location, with a possible target
+                    if (RefitWorkCheck.reasonTechCannotWork(campaign2, r, tech) != null) {
                         continue;
                     }
 
