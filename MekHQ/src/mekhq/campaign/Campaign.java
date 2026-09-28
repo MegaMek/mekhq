@@ -185,6 +185,8 @@ import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.utilities.TransportCostCalculations;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.BAArmor;
+import mekhq.campaign.parts.CampaignDice;
+import mekhq.campaign.parts.Dice;
 import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
@@ -291,6 +293,8 @@ public class Campaign implements ITechManager {
     // TODO (campaign split): Quartermaster holds a Campaign back-reference. Remove that coupling so it can
     //   move onto the force (AbstractForce/PlayerForce) alongside the other owned state.
     private final ForceQuartermaster quartermaster;
+    /** The source of part destruction rolls; not saved, and replaceable in tests. */
+    private Dice dice = new CampaignDice();
     CampaignTransporterMap tacticalTransporters = new CampaignTransporterMap(this,
           CampaignTransportType.TACTICAL_TRANSPORT);
     CampaignTransporterMap towTransporters = new CampaignTransporterMap(this, CampaignTransportType.TOW_TRANSPORT);
@@ -2025,6 +2029,25 @@ public class Campaign implements ITechManager {
 
     public ForceQuartermaster getQuartermaster() {
         return quartermaster;
+    }
+
+    /**
+     * Returns the dice used for part destruction rolls. By default this is a {@link CampaignDice}, which rolls through
+     * MegaMek's {@code Compute} exactly as the parts always have.
+     *
+     * @return the dice for this campaign; never {@code null}
+     */
+    public Dice getDice() {
+        return dice;
+    }
+
+    /**
+     * Replaces the dice used for part destruction rolls, so a test can supply fixed rolls.
+     *
+     * @param dice the dice to use from now on; must not be {@code null}
+     */
+    public void setDice(Dice dice) {
+        this.dice = Objects.requireNonNull(dice, "dice");
     }
 
     /**
