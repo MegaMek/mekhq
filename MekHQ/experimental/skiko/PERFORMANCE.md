@@ -149,6 +149,56 @@ previous 16 ms requested cadence. Invalid pacing values fail before execution.
 Elapsed time now ends at the final acknowledged callback rather than the later
 summary timer tick. Neither mode measures actual displayed FPS.
 
+### Screen-sampled map updates (experimental)
+
+Set `JAVA_TOOL_OPTIONS=-Dmekhq.skiko.visibleFrames=true` when running the paired
+performance task to sample a centered 256x128 physical-pixel map region from an
+independent screen-capture thread. The optional `visible-frames.csv` records
+observed distinct-map updates per second, sample rate, and p95 update gaps for
+each scene/motion/renderer; companion PNGs identify the sampled region. No admin
+access is required. The same workload runs on Java2D and both native backends;
+set `SKIKO_RENDER_API=OPENGL` for the OpenGL process and leave it unset for
+Direct3D. Gradle's smoke task does not forward `-Dskiko.renderApi` to its forked JVM.
+
+This is a **lower bound on visible region changes**, not swapchain-present FPS or
+an instrumented count of every displayed frame. Motion may leave the small
+region unchanged, while a sample may skip multiple frames or capture compositor
+artifacts. Confirm sample rate approaches display refresh and inspect its map
+crop before comparing runs. Screen readback adds workload and may itself affect
+frame pacing. Do not compare these rates with unsampled callback-only runs as
+though they measured the same workload.
+
+On the 240 Hz Intel display (1018x549 logical viewport at 175% scale), two
+repeats each of 240 detail-pan requests in `throughput` mode gave these sampled
+map-update rates; ranges are observed Hz across the two repeats:
+
+| Scene | Java2D | Intel Direct3D | Intel OpenGL |
+| --- | ---: | ---: | ---: |
+| Cartography | 100.8-117.1 / 107.4-109.7 | 181.2-202.5 | 98.6-100.3 |
+| HPG | 92.4-94.7 / 89.5-95.0 | 128.7-133.5 | 71.1-71.3 |
+
+Java2D's first range is paired with the Direct3D run, its second with OpenGL.
+The sampled rate was generally 235-240 Hz (one Java2D cartography pass 228 Hz).
+These short, small-viewport results show Direct3D delivering more visible map
+updates for this scripted detail-pan workload. They do not establish live
+full-window smoothness, a steady input-paced FPS, or the root cause of stalls.
+
+The same sampler also measured 240 zoom requests per pass (two repeats per
+renderer), with these observed update rates and p95 gaps between detected changes:
+
+| Scene | Java2D Hz / p95 gap | Intel Direct3D Hz / p95 gap | Intel OpenGL Hz / p95 gap |
+| --- | ---: | ---: | ---: |
+| Cartography zoom | 48-52 Hz / 29-33 ms | 53-60 Hz / 121-129 ms | 61-63 Hz / 54-55 ms |
+| HPG zoom | 24-25 Hz / 104-117 ms | 43-48 Hz / 137-150 ms | 50 Hz / 70-74 ms |
+
+The zoom rate alone hides important jitter: Direct3D showed much longer p95
+visible-update gaps even while acknowledging all camera requests. OpenGL had
+steadier sampled zoom updates, but was worse than Direct3D for HPG/detail-pan.
+The region may miss changes in other parts of the window, and a 240 Hz sampled
+desktop image cannot prove scanout or latency to the user's eyes. In particular,
+these results are not a justification to change the renderer default or claim
+that the native map is now smooth at a full-sized window.
+
 The four-pass core/detail check acknowledged all 240 requests per pass:
 
 | Renderer | Elapsed seconds | Acknowledged callbacks/sec | Request-to-callback p95 |

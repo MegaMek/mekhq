@@ -2,7 +2,11 @@ package mekhq.gui;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.Robot;
 import java.awt.event.MouseWheelEvent;
+import java.awt.image.BufferedImage;
 import java.lang.management.ManagementFactory;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -14,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import javax.imageio.ImageIO;
 import javax.swing.AbstractButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
@@ -63,6 +68,100 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
     private int mapHeight;
     private jdk.jfr.Recording recording;
     private PassWindow passWindow;
+    private VisibleFrames visibleFrames;
+
+    private record VisibleSample(long time, long fingerprint) {
+    }
+
+    private static final class VisibleFrames {
+        private final Rectangle region;
+        private final Robot robot;
+        private final List<VisibleSample> samples = new ArrayList<>();
+        private final Thread thread;
+        private volatile boolean running = true;
+        private volatile RuntimeException failure;
+        private BufferedImage firstImage;
+
+        VisibleFrames(Component map) throws Exception {
+            Point position = map.getLocationOnScreen();
+            int width = Math.min(256, map.getWidth());
+            int height = Math.min(128, map.getHeight());
+            region = new Rectangle(position.x + (map.getWidth() - width) / 2,
+                  position.y + (map.getHeight() - height) / 2, width, height);
+            robot = new Robot(map.getGraphicsConfiguration().getDevice());
+            thread = new Thread(() -> {
+                try {
+                    while (running) {
+                        BufferedImage image = robot.createScreenCapture(region);
+                        long time = System.nanoTime();
+                        if (firstImage == null) {
+                            firstImage = image;
+                        }
+                        long fingerprint = 0xcbf29ce484222325L;
+                        for (int y = 0; y < image.getHeight(); y += 4) {
+                            for (int x = 0; x < image.getWidth(); x += 4) {
+                                fingerprint = (fingerprint ^ image.getRGB(x, y)) * 0x100000001b3L;
+                            }
+                        }
+                        samples.add(new VisibleSample(time, fingerprint));
+                    }
+                } catch (RuntimeException exception) {
+                    failure = exception;
+                }
+            }, "map-visible-frame-sampler");
+            thread.setDaemon(true);
+            thread.start();
+        }
+
+        String stop(Path output, Pass pass, long start, long end) throws Exception {
+            running = false;
+            thread.join(2000);
+            if (thread.isAlive() || failure != null) {
+                throw new IllegalStateException("Visible map capture did not complete", failure);
+            }
+            if (firstImage != null) {
+                ImageIO.write(firstImage, "png", output.resolve(String.format(Locale.ROOT,
+                        "visible-region-%d-%s-%s-%s.png", pass.repeat(), pass.scene(), pass.motion(),
+                        pass.renderer())).toFile());
+            }
+            long lower = start + 100_000_000L;
+            long upper = end - 100_000_000L;
+            List<VisibleSample> measured = new ArrayList<>();
+            for (VisibleSample sample : samples) {
+                if (sample.time() >= lower && sample.time() <= upper) {
+                    measured.add(sample);
+                }
+            }
+            if (measured.size() < 2) {
+                throw new IllegalStateException("Insufficient visible map samples: " + measured.size());
+            }
+            List<Long> samplingGaps = new ArrayList<>();
+            List<Long> updateGaps = new ArrayList<>();
+            int updates = 0;
+            long lastUpdate = 0;
+            for (int index = 1; index < measured.size(); index++) {
+                VisibleSample previous = measured.get(index - 1);
+                VisibleSample current = measured.get(index);
+                samplingGaps.add(current.time() - previous.time());
+                if (current.fingerprint() != previous.fingerprint()) {
+                    updates++;
+                    if (lastUpdate != 0) {
+                        updateGaps.add(current.time() - lastUpdate);
+                    }
+                    lastUpdate = current.time();
+                }
+            }
+            samplingGaps.sort(Long::compareTo);
+            updateGaps.sort(Long::compareTo);
+            double seconds = (measured.getLast().time() - measured.getFirst().time()) / 1e9;
+            return String.format(Locale.ROOT, "%d,%s,%s,%s,%d,%d,%d,%d,%d,%.2f,%.2f,%.3f,%.3f",
+                pass.repeat(), pass.scene(), pass.motion(), pass.renderer(), region.x, region.y, measured.size(), updates,
+                  measured.size() - updates - 1, (measured.size() - 1) / seconds, updates / seconds,
+                  samplingGaps.get((int) Math.ceil(samplingGaps.size() * .95) - 1) / 1e6,
+                  updateGaps.isEmpty() ? Double.NaN
+                        : updateGaps.get((int) Math.ceil(updateGaps.size() * .95) - 1) / 1e6);
+        }
+    }
 
     @jdk.jfr.Name("mekhq.MapMeasuredPass")
     @jdk.jfr.StackTrace(false)
@@ -100,6 +199,10 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
         threads.setThreadCpuTimeEnabled(true);
         output = Path.of("build", "skiko-perf", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmss")));
         Files.createDirectories(output);
+        if (Boolean.getBoolean("mekhq.skiko.visibleFrames")) {
+            Files.writeString(output.resolve("visible-frames.csv"),
+                "repeat,scene,motion,renderer,region_x,region_y,samples,updates,duplicates,sample_hz,observed_update_hz,sample_gap_p95_ms,update_gap_p95_ms\n");
+        }
           Files.writeString(output.resolve("pass-windows.csv"),
               "pid,repeat,scene,motion,renderer,start_utc,last_callback_utc,clock_bracket_ns\n");
         String pacing = System.getenv("SKIKO_PERF_PACING");
@@ -289,6 +392,9 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
                 samples.clear();
                 coalesced = 0;
                 lastTick = 0;
+                if (Boolean.getBoolean("mekhq.skiko.visibleFrames")) {
+                    visibleFrames = new VisibleFrames(map);
+                }
             }
             tickGap = lastTick == 0 ? 0 : now - lastTick;
             lastTick = now;
@@ -371,6 +477,13 @@ public final class SkikoMapPerformance implements ExperimentalMapView.RenderObse
             throw new IllegalStateException("Insufficient rendered samples: " + samples.size());
         }
         Pass pass = passes.get(passIndex);
+        if (visibleFrames != null) {
+            String visible = visibleFrames.stop(output, pass, passStart, lastCompleted);
+            visibleFrames = null;
+            Files.writeString(output.resolve("visible-frames.csv"), visible + "\n",
+                  java.nio.file.StandardOpenOption.APPEND);
+            System.out.println("MAP_VISIBLE_FRAMES " + visible);
+        }
         long[] paints = new long[samples.size()];
         passWindow.commit();
         long[] cpus = new long[samples.size()];
