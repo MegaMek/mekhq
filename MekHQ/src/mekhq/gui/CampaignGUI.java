@@ -1180,7 +1180,7 @@ public class CampaignGUI extends JPanel {
         }
         try {
             if (!r.begin()) {
-                // Refused before it started; the daily report says why
+                // Refused before it started: the unit already has a refit, or the refurbishment cannot be paid for
                 return;
             }
         } catch (EntityLoadingException ex) {
