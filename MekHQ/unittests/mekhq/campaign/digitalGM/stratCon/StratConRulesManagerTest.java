@@ -62,6 +62,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
@@ -77,6 +78,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
+import mekhq.campaign.personnel.skills.ActionCheckResult;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
@@ -1290,6 +1292,99 @@ class StratConRulesManagerTest {
         }
 
         @Test
+        void testBuildScoutMap_TN_ReconCamera() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 45, 5, false, false, true,
+                  false, false);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_ReconCamera_AP_DoNotStack() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 45, 5, false, true, true,
+                  false, false);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_ReconCamera_IS_AP_DoNotStack() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, false)), 45, 5, true, true, true,
+                  false, false);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_EagleEyes_ReconCamera_DoNotStack() {
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 45, 5, false, false, true,
+                  false, false);
+            assertEquals(3, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_TN_AllModifiersCombined() {
+            // skill 4, 60t (+2), speed 8 (-1), sensors (-1), Eagle Eyes blocked by sensors (0)
+            ScoutRecord bestScout = getBestScoutForUnit(List.of(mockPerson(4, true)), 60, 8, false, true);
+            assertEquals(4, bestScout.skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_NullEntityUsesWorstCaseDefaults() {
+            Formation formation = mock(Formation.class);
+            mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
+            Unit unit = mock(Unit.class);
+            Person person = mockPerson(4, false);
+
+            when(formation.getAllUnitsAsUnits(hangar, false)).thenReturn(Collections.singletonList(unit));
+            when(unit.getCrew()).thenReturn(List.of(person));
+            when(unit.getEntity()).thenReturn(null);
+
+            List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(formation, hangar,
+                  mockCampaign(false, false));
+
+            // skill 4, 200t default (+6), speed 0 default (+1), no sensors
+            assertEquals(1, scouts.size());
+            assertEquals(200.0, scouts.getFirst().unitWeight());
+            assertEquals(11, scouts.getFirst().skillCheck().getTargetNumber().getValue());
+        }
+
+        @Test
+        void testBuildScoutMap_OnlyCommandersMatter_UsesCommander() {
+            Person betterCrewMember = mockPerson(1, false);
+            Person commander = mockPerson(4, false);
+            List<ScoutRecord> scouts = getScoutsForCommanderOnlyUnit(List.of(betterCrewMember, commander),
+                  commander);
+
+            assertEquals(1, scouts.size());
+            assertEquals(commander, scouts.getFirst().scout());
+        }
+
+        @Test
+        void testBuildScoutMap_OnlyCommandersMatter_NoCommanderSkipsUnit() {
+            List<ScoutRecord> scouts = getScoutsForCommanderOnlyUnit(List.of(mockPerson(1, false)), null);
+            assertTrue(scouts.isEmpty());
+        }
+
+        private List<ScoutRecord> getScoutsForCommanderOnlyUnit(List<Person> crew, Person commander) {
+            Formation formation = mock(Formation.class);
+            mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
+            Unit unit = mock(Unit.class);
+            Entity entity = mock(Entity.class);
+            Campaign campaign = mockCampaign(false, false);
+
+            when(formation.getAllUnitsAsUnits(hangar, false)).thenReturn(Collections.singletonList(unit));
+            when(unit.getCrew()).thenReturn(crew);
+            when(unit.getEntity()).thenReturn(entity);
+            when(unit.isOnlyCommandersMatter(campaign.getCampaignOptions())).thenReturn(true);
+            when(unit.getCommander()).thenReturn(commander);
+            when(entity.getWeight()).thenReturn(45.0);
+
+            try (MockedStatic<AtBDynamicScenarioFactory> scenarioFactory = mockStatic(AtBDynamicScenarioFactory.class);
+                  MockedStatic<EntityUtilities> ignored = mockStatic(EntityUtilities.class)) {
+                scenarioFactory.when(() -> AtBDynamicScenarioFactory.calculateAtBSpeed(entity)).thenReturn(5);
+                return StratConRulesManager.buildScoutMap(formation, hangar, campaign);
+            }
+        }
+
+        @Test
         void testBuildScoutMap_NullFormation() {
             List<ScoutRecord> scouts =
                   StratConRulesManager.buildScoutMap(null,
@@ -1332,11 +1427,18 @@ class StratConRulesManagerTest {
             return getBestScoutForUnit(crew, unitWeight, unitSpeed, hasImprovedSensors, hasActiveProbe, false, false);
         }
 
+        private ScoutRecord getBestScoutForUnit(List<Person> crew, double unitWeight, int unitSpeed,
+              boolean hasImprovedSensors, boolean hasActiveProbe, boolean useAgingEffects, boolean isClanCampaign) {
+            return getBestScoutForUnit(crew, unitWeight, unitSpeed, hasImprovedSensors, hasActiveProbe, false,
+                  useAgingEffects, isClanCampaign);
+        }
+
         /**
          * Mocks a single unit with multiple crew members and gets the best scout
          */
         private ScoutRecord getBestScoutForUnit(List<Person> crew, double unitWeight, int unitSpeed,
-              boolean hasImprovedSensors, boolean hasActiveProbe, boolean useAgingEffects, boolean isClanCampaign) {
+              boolean hasImprovedSensors, boolean hasActiveProbe, boolean hasReconCamera, boolean useAgingEffects,
+              boolean isClanCampaign) {
             Formation formation = mock(Formation.class);
             mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
             Unit unit = mock(Unit.class);
@@ -1353,6 +1455,7 @@ class StratConRulesManagerTest {
                 scenarioFactory.when(() -> AtBDynamicScenarioFactory.calculateAtBSpeed(entity)).thenReturn(unitSpeed);
                 entityUtils.when(() -> EntityUtilities.hasImprovedSensors(entity)).thenReturn(hasImprovedSensors);
                 entityUtils.when(() -> EntityUtilities.hasActiveProbe(entity)).thenReturn(hasActiveProbe);
+                entityUtils.when(() -> EntityUtilities.hasReconCamera(entity)).thenReturn(hasReconCamera);
 
                 Campaign campaign = mockCampaign(useAgingEffects, isClanCampaign);
                 List<ScoutRecord> scouts = StratConRulesManager.buildScoutMap(formation, hangar, campaign);
@@ -1393,6 +1496,281 @@ class StratConRulesManagerTest {
 
                 return StratConRulesManager.buildScoutMap(formation, hangar, campaign);
             }
+        }
+    }
+
+    /**
+     * Covers how a deployed force scans the hexes around it: scan range, the advanced scouting single roll per scout,
+     * light scouts' extra range, failed rolls, already-revealed hexes, and the early exit when the deployment hex holds
+     * a scenario.
+     */
+    @Nested
+    class ScanNeighboringCoords {
+        private static final int FORCE_ID = 1;
+        private static final StratConCoords CENTER = new StratConCoords(5, 5);
+
+        private static final int HEAVY_SCOUT_WEIGHT = 50;
+        private static final int LIGHT_SCOUT_WEIGHT = 35;
+
+        private Campaign campaign;
+        private CampaignOptions campaignOptions;
+        private StratConTrackState track;
+        private final Hashtable<Integer, CombatTeam> combatTeams = new Hashtable<>();
+
+        @BeforeAll
+        static void beforeAll() {
+            SkillType.initializeTypes();
+        }
+
+        private void setUp(boolean useAdvancedScouting, int trackScanRangeIncrease) {
+            campaign = MHQTestUtilities.mockCampaign();
+            campaignOptions = mock(CampaignOptions.class);
+            when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+            when(campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING)).thenReturn(useAdvancedScouting);
+            lenient().when(campaignOptions.get(CampaignOption.USE_EDGE)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
+            lenient().when(campaignOptions.get(CampaignOption.FATIGUE_RATE)).thenReturn(1);
+
+            Formation formation = mock(Formation.class);
+            lenient().when(formation.getAllUnits(false)).thenReturn(new Vector<>());
+            when(campaign.getPlayerForce().getFormation(FORCE_ID)).thenReturn(formation);
+            when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeams);
+
+            track = spy(new StratConTrackState());
+            track.setWidth(11);
+            track.setHeight(11);
+            doReturn(trackScanRangeIncrease).when(track).getScanRangeIncrease();
+        }
+
+        private void setPatrol() {
+            CombatTeam combatTeam = mock(CombatTeam.class);
+            CombatRole combatRole = mock(CombatRole.class);
+            when(combatRole.isPatrol()).thenReturn(true);
+            when(combatTeam.getRole()).thenReturn(combatRole);
+            combatTeams.put(FORCE_ID, combatTeam);
+        }
+
+        private ScoutRecord mockScout(double unitWeight, Boolean... rollResults) {
+            Person person = mock(Person.class);
+            PersonnelOptions options = mock(PersonnelOptions.class);
+            lenient().when(person.getOptions()).thenReturn(options);
+
+            SkillCheck skillCheck = mock(SkillCheck.class);
+            if (rollResults.length > 0) {
+                ActionCheckResult first = mockResult(rollResults[0]);
+                ActionCheckResult[] rest = new ActionCheckResult[rollResults.length - 1];
+                for (int index = 1; index < rollResults.length; index++) {
+                    rest[index - 1] = mockResult(rollResults[index]);
+                }
+                lenient().when(skillCheck.resolve(anyBoolean(), any())).thenReturn(first, rest);
+            }
+            return new ScoutRecord(person, skillCheck, unitWeight);
+        }
+
+        private static ActionCheckResult mockResult(boolean isSuccess) {
+            ActionCheckResult result = mock(ActionCheckResult.class);
+            when(result.isSuccess()).thenReturn(isSuccess);
+            return result;
+        }
+
+        /**
+         * Runs the private scan with the given scouts standing in for the ones {@code buildScoutMap} would find.
+         */
+        private void scan(ScoutRecord... scouts) throws Exception {
+            Method scanMethod = StratConRulesManager.class.getDeclaredMethod("scanNeighboringCoords",
+                  StratConCoords.class, int.class, Campaign.class, StratConTrackState.class);
+            scanMethod.setAccessible(true);
+
+            try (MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                  CALLS_REAL_METHODS);
+                  MockedStatic<StratConPointOfInterestRules> ignored = mockStatic(StratConPointOfInterestRules.class)) {
+                rulesManager.when(() -> StratConRulesManager.buildScoutMap(any(), any(), any()))
+                      .thenReturn(new ArrayList<>(List.of(scouts)));
+                scanMethod.invoke(null, CENTER, FORCE_ID, campaign, track);
+            }
+        }
+
+        private int revealedCount() {
+            return track.getRevealedCoords().size();
+        }
+
+        @Test
+        void standardScouting_rangeOne_revealsWholeFirstRingWithoutRolling() throws Exception {
+            setUp(false, 1);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT);
+            scan(scout);
+
+            assertEquals(7, revealedCount());
+            verify(scout.skillCheck(), never()).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void standardScouting_rangeTwo_revealsTwoRings() throws Exception {
+            setUp(false, 2);
+            scan(mockScout(HEAVY_SCOUT_WEIGHT));
+            assertEquals(19, revealedCount());
+        }
+
+        @Test
+        void standardScouting_rangeZero_revealsOnlyDeploymentHex() throws Exception {
+            setUp(false, 0);
+            scan(mockScout(LIGHT_SCOUT_WEIGHT));
+
+            // light scouts only get extra range under advanced scouting
+            assertEquals(1, revealedCount());
+            assertTrue(track.getRevealedCoords().contains(CENTER));
+        }
+
+        @Test
+        void standardScouting_patrolRoleAddsOneRange() throws Exception {
+            setUp(false, 0);
+            setPatrol();
+            scan(mockScout(HEAVY_SCOUT_WEIGHT));
+            assertEquals(7, revealedCount());
+        }
+
+        @Test
+        void advancedScouting_successfulRoll_revealsOneHex() throws Exception {
+            setUp(true, 2);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            scan(scout);
+
+            assertEquals(2, revealedCount());
+            verify(scout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void advancedScouting_failedRoll_revealsNothingBeyondDeploymentHex() throws Exception {
+            setUp(true, 1);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT, false);
+            scan(scout);
+
+            assertEquals(1, revealedCount());
+            verify(scout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void advancedScouting_eachScoutRollsOnce() throws Exception {
+            setUp(true, 1);
+            ScoutRecord firstScout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            ScoutRecord secondScout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            ScoutRecord thirdScout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            scan(firstScout, secondScout, thirdScout);
+
+            assertEquals(4, revealedCount());
+            verify(firstScout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+            verify(secondScout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+            verify(thirdScout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void advancedScouting_laterScoutCanTryHexAnEarlierScoutFailed() throws Exception {
+            setUp(true, 1);
+            ScoutRecord failingScout = mockScout(HEAVY_SCOUT_WEIGHT, false);
+            ScoutRecord succeedingScout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            scan(failingScout, succeedingScout);
+
+            assertEquals(2, revealedCount());
+        }
+
+        @Test
+        void advancedScouting_heavyScoutWithNoRange_doesNotRoll() throws Exception {
+            setUp(true, 0);
+            ScoutRecord scout = mockScout(LIGHT_SCOUT_WEIGHT + 1, true);
+            scan(scout);
+
+            assertEquals(1, revealedCount());
+            verify(scout.skillCheck(), never()).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void advancedScouting_lightScoutGetsOneExtraRange() throws Exception {
+            setUp(true, 0);
+            ScoutRecord scout = mockScout(LIGHT_SCOUT_WEIGHT, true);
+            scan(scout);
+
+            assertEquals(2, revealedCount());
+            verify(scout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void advancedScouting_patrolAndLightScoutRangeStack() throws Exception {
+            setUp(true, 0);
+            setPatrol();
+            // Pre-reveal the first ring so the only unexplored hexes are two away
+            for (int direction = 0; direction < 6; direction++) {
+                track.getRevealedCoords().add(CENTER.translate(direction));
+            }
+            scan(mockScout(LIGHT_SCOUT_WEIGHT, true));
+
+            assertEquals(8, revealedCount());
+        }
+
+        @Test
+        void advancedScouting_alreadyRevealedHexesCostNoRoll() throws Exception {
+            setUp(true, 2);
+            for (int direction = 0; direction < 6; direction++) {
+                track.getRevealedCoords().add(CENTER.translate(direction));
+            }
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            scan(scout);
+
+            // the whole first ring plus one hex from the second ring
+            assertEquals(8, revealedCount());
+            verify(scout.skillCheck(), times(1)).resolve(anyBoolean(), any());
+        }
+
+        @Test
+        void advancedScouting_edgeIsOfferedOnlyWhenEnabledAndScoutHasTrigger() throws Exception {
+            setUp(true, 1);
+            when(campaignOptions.get(CampaignOption.USE_EDGE)).thenReturn(true);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            when(scout.scout().getOptions().booleanOption(PersonnelOptions.EDGE_RECON_FAIL)).thenReturn(true);
+            scan(scout);
+
+            verify(scout.skillCheck()).resolve(eq(true), any());
+        }
+
+        @Test
+        void advancedScouting_edgeNotOfferedWhenCampaignOptionDisabled() throws Exception {
+            setUp(true, 1);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT, true);
+            lenient().when(scout.scout().getOptions().booleanOption(PersonnelOptions.EDGE_RECON_FAIL))
+                  .thenReturn(true);
+            scan(scout);
+
+            verify(scout.skillCheck()).resolve(eq(false), any());
+        }
+
+        @Test
+        void scouting_neverRevealsOffTrackHexes() throws Exception {
+            setUp(false, 2);
+            track.setWidth(1);
+            track.setHeight(1);
+            Method scanMethod = StratConRulesManager.class.getDeclaredMethod("scanNeighboringCoords",
+                  StratConCoords.class, int.class, Campaign.class, StratConTrackState.class);
+            scanMethod.setAccessible(true);
+            ScoutRecord scout = mockScout(HEAVY_SCOUT_WEIGHT);
+
+            try (MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class,
+                  CALLS_REAL_METHODS);
+                  MockedStatic<StratConPointOfInterestRules> ignored = mockStatic(StratConPointOfInterestRules.class)) {
+                rulesManager.when(() -> StratConRulesManager.buildScoutMap(any(), any(), any()))
+                      .thenReturn(new ArrayList<>(List.of(scout)));
+                scanMethod.invoke(null, new StratConCoords(0, 0), FORCE_ID, campaign, track);
+            }
+
+            assertEquals(1, revealedCount());
+        }
+
+        @Test
+        void scenarioOnDeploymentHex_stopsScanningNeighbors() throws Exception {
+            setUp(false, 2);
+            StratConScenario scenario = mock(StratConScenario.class);
+            doReturn(scenario).when(track).getScenario(CENTER);
+            scan(mockScout(HEAVY_SCOUT_WEIGHT));
+
+            assertEquals(1, revealedCount());
         }
     }
 
