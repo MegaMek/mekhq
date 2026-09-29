@@ -3,7 +3,7 @@
 MekHQ's normal `:MekHQ:buildAllPackages` remains unchanged without suite properties.
 To build a coordinated suite, check out the four sibling repositories (`megamek`,
 `megameklab`, `mekhq`, `mm-data`) at the selected commits with no tracked
-modifications. Supply the same five properties to each product build:
+modifications or unknown package inputs. Supply the same five properties to each product build:
 
 ```text
 -PsuiteReleaseVersion=0.51.01
@@ -38,7 +38,13 @@ user-specific settings.
 For local verification, run `:MekHQ:verifySuiteMekHQArchive` with the same
 properties. This builds the archive if absent; add
 `-PsuiteArchiveFile=<path-to-MekHQ-version.tar.gz>` to inspect an existing
-archive without rebuilding it. Run companion product archive verifiers as
-well. Suite builds fail on dirty tracked inputs or mismatched pins, so a
-working tree with uncommitted source edits is not suitable for producing a
-publishable archive.
+archive without rebuilding it. This is offline structural inspection against
+the declared versions, pins and any supplied reused companion archives: it
+compares root and lib JARs within the archive, not locally built JARs (whose
+Build-Date may differ), and does not attest to the state of local checkouts.
+Run companion product archive verifiers as well. Producing a publishable
+archive instead requires `distTar` without `suiteArchiveFile`: before any
+producer runs it checks pins, tracked changes, and untracked or ignored source
+inputs in all four repositories. Ignored local data mirrors are allowed only
+when identical to tracked mm-data files; build and Gradle cache outputs are
+outside the source check. Use clean checkouts for final packaging.
