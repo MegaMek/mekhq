@@ -58,6 +58,7 @@ class SystemsOptionsModel {
     boolean useFactionStandingResupply;
     boolean useFactionStandingCommandCircuit;
     boolean useFactionStandingOutlawed;
+    boolean useFactionStandingUltimatums;
     boolean useFactionStandingBatchallRestrictions;
     boolean useFactionStandingRecruitment;
     boolean useFactionStandingBarracksCosts;
@@ -82,6 +83,7 @@ class SystemsOptionsModel {
         reputationPerformanceModifierCutOff = options.get(CampaignOption.REPUTATION_PERFORMANCE_MODIFIER_CUT_OFF);
         trackFactionStanding = options.get(CampaignOption.TRACK_FACTION_STANDING);
         trackClimateRegardChanges = options.get(CampaignOption.TRACK_CLIMATE_REGARD_CHANGES);
+        useFactionStandingUltimatums = options.get(CampaignOption.USE_FACTION_STANDING_ULTIMATUMS);
         regardMultiplier = options.get(CampaignOption.REGARD_MULTIPLIER);
         useFactionStandingNegotiation = options.get(CampaignOption.USE_FACTION_STANDING_NEGOTIATION);
         useFactionStandingResupply = options.get(CampaignOption.USE_FACTION_STANDING_RESUPPLY);
@@ -111,6 +113,7 @@ class SystemsOptionsModel {
         options.set(CampaignOption.REPUTATION_PERFORMANCE_MODIFIER_CUT_OFF, reputationPerformanceModifierCutOff);
         options.set(CampaignOption.TRACK_FACTION_STANDING, trackFactionStanding);
         options.set(CampaignOption.TRACK_CLIMATE_REGARD_CHANGES, trackClimateRegardChanges);
+        options.set(CampaignOption.USE_FACTION_STANDING_ULTIMATUMS, useFactionStandingUltimatums);
         options.set(CampaignOption.REGARD_MULTIPLIER, regardMultiplier);
         options.set(CampaignOption.USE_FACTION_STANDING_NEGOTIATION, useFactionStandingNegotiation);
         options.set(CampaignOption.USE_FACTION_STANDING_RESUPPLY, useFactionStandingResupply);

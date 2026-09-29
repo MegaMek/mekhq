@@ -1,0 +1,42 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+  "name": "COMSTAR_SCHISM",
+  "date": "3052-09-21",
+  "notes": "Represents the date commemorating the schism within ComStar. Primus Myndo Waterly was killed June 6th 3025, a week later (June 13th) Sharilar Mori was elected as Primus. This caused Precentor Demona Aziz to head to Atreus (FWL) and kick off the ComStar Schism. It's a 100-day journey from Terra to Atreus, which is how we got this date. There is an argument to be made that Precentor Aziz probably could have traveled via command circuit or similar. I think that's very valid, however, I still went with the below date as it factors time needed to get a meeting with Thomas Marik and then to arrange the HPG message that officially starts the schism.",
+  "affectedFactionCodes": [
+    "CS"
+  ],
+  "sides": [
+    {
+      "id": "WOB",
+      "name": "Precentor Demona Aziz",
+      "role": "RELIGIOUS_LEADER",
+      "factionCode": "WOB"
+    },
+    {
+      "id": "CS",
+      "name": "Precentor Martial Anastasius Focht",
+      "role": "NOBLE",
+      "factionCode": "CS"
+    }
+  ],
+  "dissenterPreference": "CS",
+  "isViolentTransition": true,
+  "divisiveness": 0
+}

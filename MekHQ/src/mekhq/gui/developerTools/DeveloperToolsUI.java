@@ -32,6 +32,7 @@
  */
 package mekhq.gui.developerTools;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
@@ -64,10 +65,11 @@ final class DeveloperToolsUI {
      * @param control    the row control
      */
     static void applyRowTooltip(String bundleName, String labelKey, JLabel label, Component control) {
-        String tooltip = getTextAt(bundleName, labelKey + ".tooltip");
-        if (!isResourceKeyValid(tooltip)) {
+        String rawTooltip = getTextAt(bundleName, labelKey + ".tooltip");
+        if (!isResourceKeyValid(rawTooltip)) {
             return;
         }
+        String tooltip = wordWrap(rawTooltip);
 
         label.setToolTipText(tooltip);
         if ((control instanceof JScrollPane scrollPane)

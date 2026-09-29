@@ -35,6 +35,8 @@ package mekhq.campaign.universe.factionStanding;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_1;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_2;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_3;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -224,5 +226,31 @@ class GoingRogueTest {
 
         verifyNoInteractions(factionStandings);
         verify(campaign, never()).addReport(eq(DailyReportType.POLITICS), anyString());
+    }
+
+    @Test
+    @DisplayName("failsLoyaltyCheck: a roll below the target number of 6 fails")
+    void testFailsLoyaltyCheckBaseTargetNumber() {
+        assertTrue(GoingRogue.failsLoyaltyCheck(5, 0, 0));
+        assertFalse(GoingRogue.failsLoyaltyCheck(6, 0, 0));
+    }
+
+    @Test
+    @DisplayName("failsLoyaltyCheck: divisiveness raises or lowers the target number")
+    void testFailsLoyaltyCheckAppliesDivisiveness() {
+        // A divisive ultimatum (+2) makes a roll of 7 fail
+        assertTrue(GoingRogue.failsLoyaltyCheck(7, 0, 2));
+        assertFalse(GoingRogue.failsLoyaltyCheck(8, 0, 2));
+        // A unifying ultimatum (-2) lets a roll of 4 pass
+        assertFalse(GoingRogue.failsLoyaltyCheck(4, 0, -2));
+        assertTrue(GoingRogue.failsLoyaltyCheck(3, 0, -2));
+    }
+
+    @Test
+    @DisplayName("failsLoyaltyCheck: divisiveness stacks with the person's loyalty modifier")
+    void testFailsLoyaltyCheckStacksWithLoyaltyModifier() {
+        assertTrue(GoingRogue.failsLoyaltyCheck(8, 1, 2));
+        assertFalse(GoingRogue.failsLoyaltyCheck(9, 1, 2));
+        assertFalse(GoingRogue.failsLoyaltyCheck(6, -1, 1));
     }
 }
