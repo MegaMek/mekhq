@@ -426,6 +426,7 @@ public class Refit extends Part implements IAcquisitionWork {
         //      happen later.
 
         List<Part> partsRemaining = new ArrayList<>();
+        Money spacecraftSystemUpgrades = Money.zero();
         for (Part newPart : newUnit.getParts()) {
             if (isOmniRefit && !newPart.isOmniPodded()) {
                 continue;
@@ -452,12 +453,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
                 boolean acceptableReplacement = (oldPart instanceof MissingPart oldMissingPart) &&
                                                       oldMissingPart.isAcceptableReplacement(newPart, true);
-                // We're not going to require replacing the life support system just because
-                // the number of bay personnel changes.
-                boolean aeroLifeSupportIssue = (oldPart instanceof AeroLifeSupport) &&
-                                                     (newPart instanceof AeroLifeSupport) &&
-                                                     !crewSizeChanged();
-                if (acceptableReplacement || oldPart.isSamePartType(newPart) || aeroLifeSupportIssue) {
+                // The ship keeps its drive, fire control and life support when only their size or value changes
+                boolean isKeptSpacecraftSystem = RefitSpacecraftSystems.isSameSystem(oldPart, newPart);
+                if (acceptableReplacement || oldPart.isSamePartType(newPart) || isKeptSpacecraftSystem) {
 
                     // need a special check for location and armor amount for armor
                     if ((oldPart instanceof Armor oldArmorPart) &&
@@ -489,6 +487,10 @@ public class Refit extends Part implements IAcquisitionWork {
                             continue;
                         }
                     }
+                    if (isKeptSpacecraftSystem) {
+                        spacecraftSystemUpgrades = spacecraftSystemUpgrades.plus(
+                              RefitSpacecraftSystems.upgradeCost(oldPart, newPart));
+                    }
                     newUnitParts.add(oldPart);
                     partFound = true;
                     break;
@@ -501,6 +503,12 @@ public class Refit extends Part implements IAcquisitionWork {
                 // Address new and moved parts next
                 partsRemaining.add(newPart);
             }
+        }
+
+        if (spacecraftSystemUpgrades.isPositive()) {
+            cost = cost.plus(spacecraftSystemUpgrades);
+            LOGGER.debug("[Refit] {}: keeps its drive, fire control and life support and pays {} to bring them up to"
+                  + " the new design", oldUnit.getName(), spacecraftSystemUpgrades.toAmountAndSymbolString());
         }
 
         // Step 2b: Find parts that moved or add them as new parts
@@ -517,12 +525,8 @@ public class Refit extends Part implements IAcquisitionWork {
 
                 boolean acceptableReplacement = (oldPart instanceof MissingPart oldMissingPart) &&
                                                       oldMissingPart.isAcceptableReplacement(newPart, true);
-                // We're not going to require replacing the life support system just because the number of bay
-                // personnel changes.
-                boolean aeroLifeSupportIssue = (oldPart instanceof AeroLifeSupport) &&
-                                                     (newPart instanceof AeroLifeSupport) &&
-                                                     !crewSizeChanged();
-                if (acceptableReplacement || oldPart.isSamePartType(newPart) || aeroLifeSupportIssue) {
+                boolean isKeptSpacecraftSystem = RefitSpacecraftSystems.isSameSystem(oldPart, newPart);
+                if (acceptableReplacement || oldPart.isSamePartType(newPart) || isKeptSpacecraftSystem) {
 
                     // need a special check for location and armor amount for armor
                     if ((oldPart instanceof Armor oldArmorPart) &&
@@ -722,6 +726,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
             } else if (newPart instanceof MissingInfantryMotiveType || newPart instanceof MissingInfantryArmorPart) {
                 updateRefitClass(CLASS_A);
+
+            } else if (RefitSpacecraftSystems.isNewShipComponent(newPart)) {
+                updateRefitClass(CLASS_C);
 
             } else {
                 // determine whether this is A, B, or C
@@ -1962,6 +1969,7 @@ public class Refit extends Part implements IAcquisitionWork {
             keptCoolingSystem.setSinkType(spacecraftHeatSinkType(newEntity));
             keptCoolingSystem.updateConditionFromEntity(false);
         }
+        RefitSpacecraftSystems.refreshKeptSystems(oldUnit);
 
         for (Part part : oldUnit.getParts()) {
             part.updateConditionFromPart();
@@ -2409,27 +2417,6 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public void setShorthandedMod(int i) {
 
-    }
-
-    /**
-     * Requiring the life support system to be changed just because the number of bay personnel changes is a bit much.
-     * Instead, we'll limit it to changes in crew size, measured by quarters.
-     *
-     * @return true if the crew quarters capacity changed.
-     */
-    private boolean crewSizeChanged() {
-        int oldCrew = oldUnit.getEntity()
-                            .getTransportBays()
-                            .stream()
-                            .filter(Bay::isQuarters)
-                            .mapToInt(b -> (int) b.getCapacity())
-                            .sum();
-        int newCrew = newEntity.getTransportBays()
-                            .stream()
-                            .filter(Bay::isQuarters)
-                            .mapToInt(b -> (int) b.getCapacity())
-                            .sum();
-        return oldCrew != newCrew;
     }
 
     /**
