@@ -14,16 +14,22 @@ allprojects {
     }
 }
 
-if (hasProperty('suiteReleaseVersion')) {
-    def requested = property('suiteReleaseVersion').toString()
+['suiteReleaseVersion', 'suiteMegaMekVersion', 'suiteMegaMekLabVersion', 'suiteMekHQVersion'].each { name ->
+    if (!hasProperty(name)) {
+        return
+    }
+    if (name != 'suiteReleaseVersion' && !hasProperty('suiteReleaseVersion')) {
+        throw new GradleException("${name} requires suiteReleaseVersion")
+    }
+    def requested = property(name).toString()
     if (!(requested ==~ /(?:0|[1-9][0-9]*)\.(?:[0-9]{2}|[1-9][0-9]{2,})\.(?:[0-9]{2}|[1-9][0-9]{2,})/)) {
-        throw new GradleException("suiteReleaseVersion must be canonical padded major.minor.patch (e.g. 0.51.01); got ${requested}")
+        throw new GradleException("${name} must be canonical padded major.minor.patch (e.g. 0.51.01); got ${requested}")
     }
     requested.split(/\./).each { component ->
         try {
             Integer.parseInt(component)
         } catch (NumberFormatException e) {
-            throw new GradleException("suiteReleaseVersion component exceeds Java int range: ${component}", e)
+            throw new GradleException("${name} component exceeds Java int range: ${component}", e)
         }
     }
 }
@@ -44,7 +50,8 @@ subprojects {
     }
 
     if (rootProject.hasProperty('suiteReleaseVersion')) {
-        processedVersion = rootProject.property('suiteReleaseVersion').toString()
+        processedVersion = (rootProject.findProperty('suiteMekHQVersion')
+                ?: rootProject.property('suiteReleaseVersion')).toString()
     }
 
     if (project.hasProperty("extraVersion")) {

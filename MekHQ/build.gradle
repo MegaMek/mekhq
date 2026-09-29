@@ -86,6 +86,9 @@ tasks.register('runSkikoStress', JavaExec) {
 }
 
 def suiteVersion = rootProject.findProperty('suiteReleaseVersion')?.toString()
+def hqVersion = rootProject.findProperty('suiteMekHQVersion')?.toString() ?: suiteVersion
+def gameVersionExpected = rootProject.findProperty('suiteMegaMekVersion')?.toString() ?: suiteVersion
+def labVersion = rootProject.findProperty('suiteMegaMekLabVersion')?.toString() ?: suiteVersion
 def suitePins = [
         megamek   : ['suiteMegaMekCommit', new File(rootDir, '../megamek')],
         megameklab: ['suiteMegaMekLabCommit', new File(rootDir, '../megameklab')],
@@ -93,7 +96,8 @@ def suitePins = [
         mmData    : ['suiteMmDataCommit', new File(rootDir, '../mm-data')]
 ]
 def suiteRecord = {
-    def result = [schemaVersion: '1', product: 'MekHQ', version: suiteVersion]
+    def result = [schemaVersion: '1', product: 'MekHQ', version: hqVersion,
+                  megamekVersion: gameVersionExpected, megameklabVersion: labVersion]
     suitePins.each { key, spec -> result[key.toString() + 'Commit'] = rootProject.findProperty(spec[0])?.toString() }
     result.minimumJavaVersion = '21'
     result
@@ -134,8 +138,23 @@ def checkSuitePins = {
     }
 }
 def assertSuiteRecord = { Properties actual, String label, String product ->
-    def expected = suiteRecord() + [product: product]
-    if (actual.stringPropertyNames() != expected.keySet()) {
+    def expected = product == 'MekHQ' ? suiteRecord() : [
+            schemaVersion: '1', product: product,
+            version: product == 'MegaMek' ? gameVersionExpected : labVersion,
+            megamekCommit: rootProject.property('suiteMegaMekCommit').toString(),
+            mmDataCommit: rootProject.property('suiteMmDataCommit').toString(),
+            minimumJavaVersion: '21']
+    if (product == 'MegaMekLab') {
+        expected.megameklabCommit = rootProject.property('suiteMegaMekLabCommit').toString()
+        expected.megamekVersion = gameVersionExpected
+    }
+    def fields = product == 'MekHQ' ? expected.keySet()
+            : expected.keySet() + ['megameklabCommit', 'mekhqCommit']
+    // Lab already requires its own commit; its only unrelated pin is MekHQ.
+    if (product == 'MegaMekLab') {
+        fields = expected.keySet() + ['mekhqCommit']
+    }
+    if (actual.stringPropertyNames() != (fields as Set)) {
         throw new GradleException("${label}: suite identity has missing or unexpected fields")
     }
     expected.each { key, value ->
@@ -144,13 +163,25 @@ def assertSuiteRecord = { Properties actual, String label, String product ->
         }
     }
 }
+def reusedCompanionJar = { String product ->
+    new File(layout.buildDirectory.get().asFile, "suite/companions/${product}.jar")
+}
+def companionJar = { String product ->
+    def reused = rootProject.findProperty(product == 'MegaMek'
+            ? 'suiteMegaMekArchiveFile' : 'suiteMegaMekLabArchiveFile')
+    reused != null ? reusedCompanionJar(product) : new File(product == 'MegaMek' ? mmDir : mmlDir,
+            "${product == 'MegaMek' ? 'megamek' : 'megameklab'}/build/libs/${product}.jar")
+}
 def readSuiteArchive = { File archive, String product ->
     if (!archive.isFile()) {
         throw new GradleException("Missing ${product} suite archive: ${archive}")
     }
-    String root = "${product}-${suiteVersion}"
+    String root = "${product}-${product == 'MegaMek' ? gameVersionExpected : labVersion}"
+    if (archive.name != "${root}.tar.gz") {
+        throw new GradleException("${archive}: archive name does not match ${product}'s own version")
+    }
     def recordFiles = []
-    def jars = [] as Set
+    def jars = [:]
     tarTree(resources.gzip(archive)).visit { entry ->
         String path = entry.path.replace('\\', '/')
         if (path != root && !path.startsWith("${root}/")) {
@@ -163,15 +194,37 @@ def readSuiteArchive = { File archive, String product ->
                 recordFiles.add(props)
             }
             if (path == "${root}/${product}.jar" || path == "${root}/lib/${product}.jar") {
-                def module = product == 'MegaMek' ? 'megamek' : 'megameklab'
-                def source = new File(product == 'MegaMek' ? mmDir : mmlDir,
-                        "${module}/build/libs/${product}.jar")
-                if (!source.isFile() || !java.util.Arrays.equals(
-                        java.security.MessageDigest.getInstance('SHA-256').digest(entry.file.bytes),
-                        java.security.MessageDigest.getInstance('SHA-256').digest(source.bytes))) {
-                    throw new GradleException("${archive}: bundled ${product}.jar does not match built jar")
+                if (jars.containsKey(path)) {
+                    throw new GradleException("${archive}: duplicate ${path}")
                 }
-                jars.add(path)
+                new JarFile(entry.file).withCloseable { bundled ->
+                    if (product == 'MegaMek') {
+                        def versionEntry = bundled.getJarEntry('Version.properties')
+                        if (versionEntry == null) {
+                            throw new GradleException("${archive}: MegaMek.jar lacks Version.properties")
+                        }
+                        def version = new Properties()
+                        bundled.getInputStream(versionEntry).withCloseable { version.load(it) }
+                        if ([version.getProperty('major'), version.getProperty('minor'),
+                             version.getProperty('patch')].join('.') != gameVersionExpected
+                                || version.getProperty('revision')?.trim()) {
+                            throw new GradleException("${archive}: wrong MegaMek.jar runtime version")
+                        }
+                    } else if (bundled.manifest?.mainAttributes?.getValue('Implementation-Version') != labVersion) {
+                        throw new GradleException("${archive}: wrong MegaMekLab.jar product version")
+                    }
+                }
+                // Build-Date makes a newly built jar byte-unstable; compare the two archived copies
+                // and package the archived jar itself when reusing a product release.
+                jars[path] = java.security.MessageDigest.getInstance('SHA-256').digest(entry.file.bytes)
+                if (path == "${root}/${product}.jar" &&
+                        rootProject.hasProperty(product == 'MegaMek'
+                                ? 'suiteMegaMekArchiveFile' : 'suiteMegaMekLabArchiveFile')) {
+                    def destination = reusedCompanionJar(product)
+                    destination.parentFile.mkdirs()
+                    java.nio.file.Files.copy(entry.file.toPath(), destination.toPath(),
+                            java.nio.file.StandardCopyOption.REPLACE_EXISTING)
+                }
             }
         }
     }
@@ -179,7 +232,10 @@ def readSuiteArchive = { File archive, String product ->
         throw new GradleException("${archive}: missing ${root}/suite-build.properties")
     }
     assertSuiteRecord(recordFiles[0], archive.name, product)
-    if (!jars.contains(root + '/' + product + '.jar') || !jars.contains(root + '/lib/' + product + '.jar')) {
+    if (!jars.containsKey(root + '/' + product + '.jar') ||
+            !jars.containsKey(root + '/lib/' + product + '.jar') ||
+            !java.util.Arrays.equals(jars[root + '/' + product + '.jar'],
+                    jars[root + '/lib/' + product + '.jar'])) {
         throw new GradleException("${archive}: missing ${product} launcher jar")
     }
 }
@@ -204,15 +260,22 @@ if (suiteVersion != null) {
     tasks.register('verifySuiteInputs') {
         description = 'Checks suite commit pins, clean tracked inputs, and included product identities.'
         group = 'verification'
-        dependsOn gradle.includedBuild('megamek').task(':megamek:assembleDist')
-        dependsOn gradle.includedBuild('megameklab').task(':megameklab:assembleDist')
+        if (!project.hasProperty('suiteMegaMekArchiveFile')) {
+            dependsOn gradle.includedBuild('megamek').task(':megamek:assembleDist')
+        }
+        if (!project.hasProperty('suiteMegaMekLabArchiveFile')) {
+            dependsOn gradle.includedBuild('megameklab').task(':megameklab:assembleDist')
+        }
         doLast {
             checkSuitePins()
             [['MegaMek', mmDir, 'megamek'], ['MegaMekLab', mmlDir, 'megameklab']].each { product, dir, module ->
-                def archive = new File(dir, "${module}/build/distributions/${product}-${suiteVersion}.tar.gz")
+                def reused = project.findProperty(product == 'MegaMek'
+                        ? 'suiteMegaMekArchiveFile' : 'suiteMegaMekLabArchiveFile')
+                def archive = reused != null ? project.file(reused) : new File(dir,
+                        "${module}/build/distributions/${product}-${product == 'MegaMek' ? gameVersionExpected : labVersion}.tar.gz")
                 readSuiteArchive(archive, product)
             }
-            def mmJar = new File(mmDir, 'megamek/build/libs/MegaMek.jar')
+            def mmJar = companionJar('MegaMek')
             if (!mmJar.isFile()) {
                 throw new GradleException("Missing included MegaMek jar: ${mmJar}")
             }
@@ -224,8 +287,8 @@ if (suiteVersion != null) {
                 def props = new Properties()
                 zip.getInputStream(entry).withCloseable { props.load(it) }
                 def actual = [props.getProperty('major'), props.getProperty('minor'), props.getProperty('patch')].join('.')
-                if (props.getProperty('revision')?.trim() || actual != suiteVersion) {
-                    throw new GradleException("Included MegaMek jar version ${actual} does not match ${suiteVersion}")
+                if (props.getProperty('revision')?.trim() || actual != gameVersionExpected) {
+                    throw new GradleException("Included MegaMek jar version ${actual} does not match ${gameVersionExpected}")
                 }
             }
         }
@@ -240,10 +303,17 @@ if (suiteVersion != null) {
             def archive = project.hasProperty('suiteArchiveFile')
                     ? project.file(project.property('suiteArchiveFile'))
                     : tasks.named('distTar').get().archiveFile.get().asFile
-            if (!archive.isFile() || archive.name != "MekHQ-${suiteVersion}.tar.gz") {
+            if (!archive.isFile() || archive.name != "MekHQ-${hqVersion}.tar.gz") {
                 throw new GradleException("Missing or incorrectly named MekHQ suite archive: ${archive}")
             }
-            String root = "MekHQ-${suiteVersion}/"
+            ['MegaMek', 'MegaMekLab'].each { product ->
+                def reused = project.findProperty(product == 'MegaMek'
+                        ? 'suiteMegaMekArchiveFile' : 'suiteMegaMekLabArchiveFile')
+                if (reused != null) {
+                    readSuiteArchive(project.file(reused), product)
+                }
+            }
+            String root = "MekHQ-${hqVersion}/"
             def paths = [] as Set
             def records = []
             def forbidden = ['clientsettings.xml', 'gameoptions.xml', 'recent-advanced-searches.json',
@@ -266,10 +336,8 @@ if (suiteVersion != null) {
                         records.add(props)
                     }
                     if (['MegaMek.jar', 'MegaMekLab.jar', 'MekHQ.jar'].contains(path.substring(path.lastIndexOf('/') + 1))) {
-                        def source = path.endsWith('MegaMek.jar')
-                                ? new File(mmDir, 'megamek/build/libs/MegaMek.jar')
-                                : path.endsWith('MegaMekLab.jar')
-                                ? new File(mmlDir, 'megameklab/build/libs/MegaMekLab.jar')
+                        def source = path.endsWith('MegaMek.jar') ? companionJar('MegaMek')
+                                : path.endsWith('MegaMekLab.jar') ? companionJar('MegaMekLab')
                                 : tasks.named('jar').get().archiveFile.get().asFile
                         if (!source.isFile() || !java.util.Arrays.equals(
                                 java.security.MessageDigest.getInstance('SHA-256').digest(entry.file.bytes),
@@ -285,11 +353,12 @@ if (suiteVersion != null) {
                                 def version = new Properties()
                                 bundled.getInputStream(versionEntry).withCloseable { version.load(it) }
                                 if ([version.getProperty('major'), version.getProperty('minor'),
-                                     version.getProperty('patch')].join('.') != suiteVersion
+                                     version.getProperty('patch')].join('.') != gameVersionExpected
                                         || version.getProperty('revision')?.trim()) {
                                     throw new GradleException("Wrong runtime version in ${path}")
                                 }
-                            } else if (bundled.manifest?.mainAttributes?.getValue('Implementation-Version') != suiteVersion) {
+                            } else if (bundled.manifest?.mainAttributes?.getValue('Implementation-Version') !=
+                                    (path.endsWith('MegaMekLab.jar') ? labVersion : hqVersion)) {
                                 throw new GradleException("Wrong product version in ${path}")
                             }
                         }
@@ -311,7 +380,7 @@ if (suiteVersion != null) {
         }
     }
     tasks.named('jar') {
-        manifest.attributes('Implementation-Version': suiteVersion)
+        manifest.attributes('Implementation-Version': hqVersion)
     }
 }
 
@@ -770,11 +839,11 @@ distributions {
                 include '*.exe'
             }
 
-            from("${mmDir}/megamek/build/libs/MegaMek.jar") {
+            from(suiteVersion != null ? companionJar('MegaMek') : "${mmDir}/megamek/build/libs/MegaMek.jar") {
                 into "lib"
             }
 
-            from("${mmDir}/megamek/build/libs/MegaMek.jar")
+            from(suiteVersion != null ? companionJar('MegaMek') : "${mmDir}/megamek/build/libs/MegaMek.jar")
             from("${mmDir}/megamek/") {
                 include '*.ini'
             }
@@ -806,11 +875,11 @@ distributions {
                 include '*.exe'
             }
 
-            from("${mmlDir}/megameklab/build/libs/MegaMekLab.jar") {
+            from(suiteVersion != null ? companionJar('MegaMekLab') : "${mmlDir}/megameklab/build/libs/MegaMekLab.jar") {
                 into "lib"
             }
 
-            from("${mmlDir}/megameklab/build/libs/MegaMekLab.jar")
+            from(suiteVersion != null ? companionJar('MegaMekLab') : "${mmlDir}/megameklab/build/libs/MegaMekLab.jar")
 
             from("${mmlDir}/megameklab/") {
                 include '*.ini'

@@ -14,7 +14,19 @@ modifications. Supply the same five properties to each product build:
 ```
 
 The version must be canonical padded `major.minor.patch`, with components in
-Java's signed integer range. In suite mode, MekHQ uses it for its Gradle
+Java's signed integer range. Optional `suiteMegaMekVersion`,
+`suiteMegaMekLabVersion`, and `suiteMekHQVersion` inputs each default to
+`suiteReleaseVersion` and must have the same canonical format. For a Lab-only
+change, reuse the old MegaMek release without publishing a newly numbered
+MegaMek artifact; build Lab and MekHQ at the new suite version. MekHQ's
+identity records the two bundled component versions and their source commits;
+verification checks the included archives' own versions and dependency
+source/data pins rather than requiring their unrelated Lab/HQ pins to match
+the newer suite. Pass `-PsuiteMegaMekArchiveFile=<existing-archive>` or
+`-PsuiteMegaMekLabArchiveFile=<existing-archive>` to verify and reuse an
+unchanged product's archive without running its `assembleDist` task; its
+bundled jar must still match the pinned companion jar used in MekHQ.
+In suite mode, MekHQ uses its own product version for its Gradle
 dependency coordinates and archive name; MegaMek supplies the packaged
 `Version.properties` used by the three applications at runtime. The task
 checks sibling archive records and product jars before packaging. Each archive
