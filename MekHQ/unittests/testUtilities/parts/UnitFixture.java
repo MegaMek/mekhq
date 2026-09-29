@@ -162,6 +162,11 @@ public enum UnitFixture {
      */
     LEOPARD_CV_DROPSHIP("Leopard CV (2581)", true, Dropship.class),
     /**
+     * Leopard PA, a pirate Leopard with guns in all six arcs where the standard Leopard has four. Source:
+     * {@code dropships/XTRs/Pirates/Leopard PA.blk}.
+     */
+    LEOPARD_PA_DROPSHIP("Leopard PA", true, Dropship.class),
+    /**
      * Invader JumpShip (2631), a JumpShip with docking collars and a grav deck. Source:
      * {@code jumpships/3057R/IS/Invader Jumpship (2631).blk}.
      */
