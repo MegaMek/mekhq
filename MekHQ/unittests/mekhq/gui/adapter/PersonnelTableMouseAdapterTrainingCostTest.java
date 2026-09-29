@@ -96,7 +96,7 @@ class PersonnelTableMouseAdapterTrainingCostTest {
         when(campaign.getPlayerForce().getFinances()).thenReturn(finances);
 
         person = mock(Person.class);
-        when(person.getFullTitle()).thenReturn("MechWarrior Test");
+        when(person.getFullTitle()).thenReturn("MekWarrior Test");
         when(person.getHyperlinkedName()).thenReturn("Test");
 
         CampaignGUI gui = mock(CampaignGUI.class);
