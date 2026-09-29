@@ -923,6 +923,23 @@ distributions {
 
             from(jar)
 
+            if (suiteVersion != null) {
+                // The application plugin also contributes runtimeClasspath to lib via
+                // its own main-distribution CopySpec. It can contain a freshly built
+                // companion jar before our explicit copies; duplicatesStrategy alone
+                // would then retain the wrong jar. Filter by source, not just name,
+                // so the validated companion copies survive and all other runtime
+                // dependencies remain available.
+                eachFile { details ->
+                    if (details.path ==~ /(?:[^\/]+\/)?lib\/(?:MegaMek|MegaMekLab)\.jar/) {
+                        def product = details.name.substring(0, details.name.length() - '.jar'.length())
+                        if (details.file.canonicalFile != companionJar(product).canonicalFile) {
+                            details.exclude()
+                        }
+                    }
+                }
+            }
+
             duplicatesStrategy = 'exclude'
         }
     }
