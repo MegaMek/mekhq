@@ -47,16 +47,7 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
+import javax.swing.*;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -142,6 +133,7 @@ class ContractMarketPage {
 
     private JPanel pnlContractPay;
     private JCheckBox chkUseChaosSupportPointConversion;
+    private JCheckBox chkBasePayOnlyConsidersScale;
     private JCheckBox chkUseLegacyOptions;
     private JPanel pnlLegacyContractPayOptions;
     private JRadioButton btnContractEquipment;
@@ -439,6 +431,9 @@ class ContractMarketPage {
         chkUseChaosSupportPointConversion = new CampaignOptionsCheckBox("UseChaosSupportPointConversion",
               getMetadata(new Version(0, 51, 1)));
         chkUseChaosSupportPointConversion.addMouseListener(createTipPanelUpdater("UseChaosSupportPointConversion"));
+        chkBasePayOnlyConsidersScale = new CampaignOptionsCheckBox("BasePayOnlyConsidersScale",
+              getMetadata(new Version(0, 51, 1)));
+        chkBasePayOnlyConsidersScale.addMouseListener(createTipPanelUpdater("BasePayOnlyConsidersScale"));
 
         // Top-level pay scheme: the default Chaos Campaign scheme, or the legacy force-value / payroll schemes whose
         // basis and options are configured in the nested card below. Leaving the box unticked keeps Chaos pay.
@@ -570,6 +565,9 @@ class ContractMarketPage {
         layout.gridx = 0;
         layout.gridy = 0;
         panel.add(chkUseChaosSupportPointConversion, layout);
+
+        layout.gridy++;
+        panel.add(chkBasePayOnlyConsidersScale, layout);
 
         layout.gridy++;
         panel.add(chkUseLegacyOptions, layout);
@@ -708,6 +706,7 @@ class ContractMarketPage {
         spnContractTransportMultiplier.setValue(model.contractTransportMultiplier);
         spnContractSalvageMultiplier.setValue(model.contractSalvageMultiplier);
         chkUseChaosSupportPointConversion.setSelected(model.useChaosSupportPointConversion);
+        chkBasePayOnlyConsidersScale.setSelected(model.basePayOnlyConsidersScale);
         chkUseLegacyOptions.setSelected(model.useLegacyContractPay);
         if (model.equipmentContractBase) {
             btnContractEquipment.setSelected(true);
@@ -766,6 +765,7 @@ class ContractMarketPage {
         model.contractTransportMultiplier = (double) spnContractTransportMultiplier.getValue();
         model.contractSalvageMultiplier = (double) spnContractSalvageMultiplier.getValue();
         model.useChaosSupportPointConversion = chkUseChaosSupportPointConversion.isSelected();
+        model.basePayOnlyConsidersScale = chkBasePayOnlyConsidersScale.isSelected();
         model.useLegacyContractPay = chkUseLegacyOptions.isSelected();
         model.equipmentContractBase = btnContractEquipment.isSelected();
         model.equipmentContractPercent = (double) spnEquipPercent.getValue();

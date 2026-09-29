@@ -86,6 +86,7 @@ class MarketsOptionsModel {
     double contractTransportMultiplier;
     double contractSalvageMultiplier;
     boolean useChaosSupportPointConversion;
+    boolean basePayOnlyConsidersScale;
     boolean useLegacyContractPay;
     boolean equipmentContractBase;
     double equipmentContractPercent;
@@ -139,6 +140,7 @@ class MarketsOptionsModel {
         contractTransportMultiplier = options.get(CampaignOption.CONTRACT_TRANSPORT_MULTIPLIER);
         contractSalvageMultiplier = options.get(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER);
         useChaosSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION);
+        basePayOnlyConsidersScale = options.get(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE);
         useLegacyContractPay = options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY);
         equipmentContractBase = options.get(CampaignOption.EQUIPMENT_CONTRACT_BASE);
         equipmentContractPercent = options.get(CampaignOption.EQUIPMENT_CONTRACT_PERCENT);
@@ -207,6 +209,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.CONTRACT_TRANSPORT_MULTIPLIER, contractTransportMultiplier);
         options.set(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER, contractSalvageMultiplier);
         options.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, useChaosSupportPointConversion);
+        options.set(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE, basePayOnlyConsidersScale);
         options.set(CampaignOption.USE_LEGACY_CONTRACT_PAY, useLegacyContractPay);
         options.set(CampaignOption.EQUIPMENT_CONTRACT_BASE, equipmentContractBase);
         options.setEquipmentContractPercent(equipmentContractPercent);

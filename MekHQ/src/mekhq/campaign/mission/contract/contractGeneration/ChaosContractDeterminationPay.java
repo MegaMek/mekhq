@@ -32,11 +32,14 @@
  */
 package mekhq.campaign.mission.contract.contractGeneration;
 
+import static java.lang.Math.ceil;
 import static java.lang.Math.round;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
+import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import org.jspecify.annotations.NonNull;
@@ -66,11 +69,67 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
               shouldConvertSupportPoints(campaign));
     }
 
+    /**
+     * The monthly retainer. Hot Spots: Draconis Reach (first printing pg 26) intends Base Pay to cover maintenance and
+     * salaries, so by default it is the force's covered monthly running costs (see {@link #getCoveredMonthlyCosts}).
+     * With {@link CampaignOption#BASE_PAY_ONLY_CONSIDERS_SCALE} it is instead a flat amount per Scale. Either way it is
+     * scaled by the contract's base pay multiplier.
+     */
     @Override
     public @NonNull Money getMonthlyPay(Campaign campaign, AbstractContract contract) {
-        int monthlyPayInSupportPoints = DEFAULT_MONTHLY_PAY_MULTIPLIER * contract.getScale();
-        monthlyPayInSupportPoints = (int) round(monthlyPayInSupportPoints * contract.getBasePayMultiplier());
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(monthlyPayInSupportPoints,
-              shouldConvertSupportPoints(campaign));
+        boolean isConvertSupportPoints = shouldConvertSupportPoints(campaign);
+
+        if (campaign.getCampaignOptions().get(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE)) {
+            int monthlyPayInSupportPoints = DEFAULT_MONTHLY_PAY_MULTIPLIER * contract.getScale();
+            monthlyPayInSupportPoints = (int) round(monthlyPayInSupportPoints * contract.getBasePayMultiplier());
+            return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(monthlyPayInSupportPoints,
+                  isConvertSupportPoints);
+        }
+
+        Money monthlyPay = getCoveredMonthlyCosts(campaign).multipliedBy(contract.getBasePayMultiplier());
+        if (isConvertSupportPoints) {
+            return monthlyPay;
+        }
+
+        // Pay is expressed in raw support points, so convert the C-bill costs, rounding up
+        double monthlyPayInSupportPoints = monthlyPay.getAmount().doubleValue()
+                                                 / ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION;
+        return Money.of(ceil(monthlyPayInSupportPoints));
+    }
+
+    /**
+     * The monthly running costs Base Pay covers: salaries, unit maintenance, Hot Spots upkeep, overhead, and food and
+     * housing. Each is only included while the campaign actually charges it. The player force is a single detachment,
+     * so its costs are the detachment's costs.
+     *
+     * @param campaign the campaign
+     *
+     * @return the covered monthly costs, in C-bills
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static Money getCoveredMonthlyCosts(Campaign campaign) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Accountant accountant = campaign.getAccountant();
+
+        Money coveredCosts = Money.zero();
+        if (campaignOptions.get(CampaignOption.PAY_FOR_SALARIES)) {
+            coveredCosts = coveredCosts.plus(accountant.getPayRoll());
+        }
+
+        if (campaignOptions.get(CampaignOption.PAY_FOR_MAINTAIN)) {
+            // Maintenance is charged weekly; the planetary maintenance reduction never applies on contract
+            Money weeklyMaintenance =
+                  Accountant.getWeeklyMaintenanceTotal(campaign.getPlayerForce().getHangar().getUnits());
+            coveredCosts = coveredCosts.plus(weeklyMaintenance.multipliedBy(4));
+        }
+
+        // These are zero unless their options are enabled
+        coveredCosts = coveredCosts.plus(accountant.getHotSpotsUpkeepCosts());
+        coveredCosts = coveredCosts.plus(accountant.getOverheadExpenses());
+        coveredCosts = coveredCosts.plus(accountant.getMonthlyFoodAndHousingExpenses());
+
+        return coveredCosts;
     }
 }

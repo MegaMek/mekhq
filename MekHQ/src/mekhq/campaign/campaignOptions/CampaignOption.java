@@ -844,6 +844,8 @@ public final class CampaignOption<T> {
           of(Integer.class, 0, "rentedFacilitiesCostHoldingCells");
     public static final CampaignOption<Integer> RENTED_FACILITIES_COST_REPAIR_BAYS =
           of(Integer.class, 0, "rentedFacilitiesCostRepairBays");
+    public static final CampaignOption<Boolean> BASE_PAY_ONLY_CONSIDERS_SCALE =
+          of(Boolean.class, false, "basePayOnlyConsidersScale");
     public static final CampaignOption<Boolean> USE_CHAOS_SUPPORT_POINT_CONVERSION =
           of(Boolean.class, true, "useChaosSupportPointConversion");
     public static final CampaignOption<Boolean> USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION =
