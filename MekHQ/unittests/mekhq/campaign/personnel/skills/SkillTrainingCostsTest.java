@@ -46,6 +46,8 @@ import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -259,6 +261,124 @@ class SkillTrainingCostsTest {
             // Total 3 -> 4 is Regular to Veteran
             assertEquals(supportPoints(300), cost(person, false));
             verify(skill).getTotalSkillLevel(skillModifierData);
+        }
+    }
+
+    /** The whole-career price of a recruit's skills, used for training-based recruitment costs. */
+    @Nested
+    class AccumulatedCost {
+        private Person person;
+        private Skills skills;
+
+        @BeforeEach
+        void setUpPerson() {
+            person = mock(Person.class);
+            skills = mock(Skills.class);
+            when(person.getSkills()).thenReturn(skills);
+            when(person.getPrimaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
+            when(person.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
+            when(skills.getSkillNames()).thenReturn(List.of());
+        }
+
+        private void holdsSkills(String... skillNamesAndLevels) {
+            List<String> skillNames = new ArrayList<>();
+            for (int index = 0; index < skillNamesAndLevels.length; index += 2) {
+                String skillName = skillNamesAndLevels[index];
+                Skill skill = mock(Skill.class);
+                when(skill.getTotalSkillLevel(any())).thenReturn(Integer.parseInt(skillNamesAndLevels[index + 1]));
+                when(person.getSkill(skillName)).thenReturn(skill);
+                skillNames.add(skillName);
+            }
+            when(skills.getSkillNames()).thenReturn(skillNames);
+        }
+
+        private Money accumulated() {
+            return SkillTrainingCosts.getAccumulatedSkillTrainingCost(campaign, person);
+        }
+
+        @Test
+        void noSkillsCostNothing() {
+            assertEquals(Money.zero(), accumulated());
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "0, 0", "2, 0", "3, 100", "4, 400", "5, 1100", "6, 2300", "7, 4500", "12, 4500" })
+        void nonProfessionSkillsAddUpEveryLevelReached(int level, int expectedSupportPoints) {
+            holdsSkills(SkillType.S_TACTICS, String.valueOf(level));
+
+            assertEquals(supportPoints(expectedSupportPoints), accumulated());
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "2, 0", "3, 100", "4, 300", "5, 1000", "6, 2200", "7, 3400" })
+        void roleSkillsUseTheProfessionTable(int level, int expectedSupportPoints) {
+            holdsSkills(SkillType.S_GUN_MEK, String.valueOf(level));
+
+            assertEquals(supportPoints(expectedSupportPoints), accumulated());
+        }
+
+        @Test
+        void secondaryRoleSkillsUseTheProfessionTable() {
+            when(person.getPrimaryRole()).thenReturn(PersonnelRole.NONE);
+            when(person.getSecondaryRole()).thenReturn(PersonnelRole.MEKWARRIOR);
+            holdsSkills(SkillType.S_PILOT_MEK, "7");
+
+            assertEquals(supportPoints(3400), accumulated());
+        }
+
+        @Test
+        void utilitySkillsUseTheProfessionTable() {
+            when(skillType.isUtilitySkill()).thenReturn(true);
+            holdsSkills(SkillType.S_TACTICS, "7");
+
+            assertEquals(supportPoints(3400), accumulated());
+        }
+
+        @Test
+        void roleplaySkillsAreLeftOut() {
+            when(skillType.isRoleplaySkill()).thenReturn(true);
+            holdsSkills(SkillType.S_TACTICS, "7");
+
+            assertEquals(Money.zero(), accumulated());
+        }
+
+        @Test
+        void everySkillIsSummed() {
+            // Veteran role skill (300) + Elite other skill (1100) + Green skill (0)
+            holdsSkills(SkillType.S_GUN_MEK, "4", SkillType.S_TACTICS, "5", SkillType.S_LEADER, "2");
+
+            assertEquals(supportPoints(1400), accumulated());
+        }
+
+        @Test
+        void unknownSkillsAreSkipped() {
+            holdsSkills("Removed Skill", "7", SkillType.S_TACTICS, "3");
+            skillTypes.when(() -> SkillType.getType("Removed Skill")).thenReturn(null);
+
+            assertEquals(supportPoints(100), accumulated());
+        }
+
+        /** Priced whatever the skill improvement option says; recruitment decides whether it applies. */
+        @Test
+        void pricedEvenWithTheImprovementOptionOff() {
+            campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, false);
+            holdsSkills(SkillType.S_TACTICS, "3");
+
+            assertEquals(supportPoints(100), accumulated());
+        }
+
+        /** A recruit with every skill Legendary must not overflow. */
+        @Test
+        void largeTotalsDoNotOverflow() {
+            String[] manySkills = new String[2_000];
+            for (int index = 0; index < manySkills.length; index += 2) {
+                manySkills[index] = "Skill " + index;
+                manySkills[index + 1] = "7";
+            }
+            holdsSkills(manySkills);
+
+            // 1,000 skills x 4,500 SP x 10,000 C-bills
+            assertEquals(Money.of(45_000_000_000.0), accumulated());
         }
     }
 

@@ -63,6 +63,7 @@ class FinancesOptionsModel {
     boolean planetaryCostReductionsForMaintenance;
     boolean payForTransport;
     boolean payForRecruitment;
+    double recruitmentTrainingCostMultiplier;
     boolean payForFood;
     boolean payForHousing;
     boolean sellUnits;
@@ -113,6 +114,7 @@ class FinancesOptionsModel {
         planetaryCostReductionsForMaintenance = options.get(CampaignOption.PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE);
         payForTransport = options.get(CampaignOption.PAY_FOR_TRANSPORT);
         payForRecruitment = options.get(CampaignOption.PAY_FOR_RECRUITMENT);
+        recruitmentTrainingCostMultiplier = options.get(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER);
         payForFood = options.get(CampaignOption.PAY_FOR_FOOD);
         payForHousing = options.get(CampaignOption.PAY_FOR_HOUSING);
         sellUnits = options.get(CampaignOption.SELL_UNITS);
@@ -165,6 +167,7 @@ class FinancesOptionsModel {
         options.set(CampaignOption.PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE, planetaryCostReductionsForMaintenance);
         options.set(CampaignOption.PAY_FOR_TRANSPORT, payForTransport);
         options.set(CampaignOption.PAY_FOR_RECRUITMENT, payForRecruitment);
+        options.set(CampaignOption.RECRUITMENT_TRAINING_COST_MULTIPLIER, recruitmentTrainingCostMultiplier);
         options.set(CampaignOption.PAY_FOR_FOOD, payForFood);
         options.set(CampaignOption.PAY_FOR_HOUSING, payForHousing);
         options.set(CampaignOption.SELL_UNITS, sellUnits);

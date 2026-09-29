@@ -230,6 +230,26 @@ public class SpaUtilities {
     }
 
     /**
+     * Gets the combined C-bill cost of training every non-flaw SPA a person holds, as though each had been bought in
+     * turn. Used to price recruits.
+     *
+     * @param person the person whose SPAs are priced
+     *
+     * @return the combined cost of the person's SPAs
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getAccumulatedSpaTrainingCost(final Person person) {
+        Money total = Money.zero();
+        int nonFlawSpaCount = countNonFlawSpas(person);
+        for (int heldSpas = 0; heldSpas < nonFlawSpaCount; heldSpas++) {
+            total = total.plus(getSpaTrainingCost(heldSpas));
+        }
+        return total;
+    }
+
+    /**
      * As {@link #getSpaTrainingCost(Person)}, for callers that have already counted the person's non-flaw SPAs.
      *
      * @param nonFlawSpaCount the number of non-flaw SPAs the person already holds

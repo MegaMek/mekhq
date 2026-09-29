@@ -36,6 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -193,6 +194,18 @@ class SpaTrainingCostTest {
 
             // Two non-flaw SPAs held, so the next is the third: 360 SP
             assertEquals(Money.of(360 * SUPPORT_POINTS_TO_C_BILLS), SpaUtilities.getSpaTrainingCost(person));
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({ "0, 0", "1, 60", "2, 240", "3, 600", "5, 2100", "7, 3900" })
+    void accumulatedCostAddsUpEverySpaHeld(int heldSpas, int expectedSupportPoints) {
+        try (MockedStatic<SpaUtilities> spaUtilities = mockStatic(SpaUtilities.class, CALLS_REAL_METHODS)) {
+            Person person = personWithOptions(List.of());
+            spaUtilities.when(() -> SpaUtilities.countNonFlawSpas(person)).thenReturn(heldSpas);
+
+            assertEquals(Money.of(expectedSupportPoints * SUPPORT_POINTS_TO_C_BILLS),
+                  SpaUtilities.getAccumulatedSpaTrainingCost(person));
         }
     }
 

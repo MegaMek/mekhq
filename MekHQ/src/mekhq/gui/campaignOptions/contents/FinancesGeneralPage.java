@@ -101,6 +101,8 @@ class FinancesGeneralPage {
     private JCheckBox payForRecruitmentBox;
     private JCheckBox payForFoodBox;
     private JCheckBox payForHousingBox;
+    private JLabel lblRecruitmentTrainingCostMultiplier;
+    private JSpinner spnRecruitmentTrainingCostMultiplier;
 
     private JPanel pnlSales;
     private JCheckBox sellUnitsBox;
@@ -237,6 +239,13 @@ class FinancesGeneralPage {
         payForHousingBox = new CampaignOptionsCheckBox("PayForHousingBox",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         payForHousingBox.addMouseListener(createTipPanelUpdater("PayForHousingBox"));
+        lblRecruitmentTrainingCostMultiplier = new CampaignOptionsLabel("RecruitmentTrainingCostMultiplier");
+        lblRecruitmentTrainingCostMultiplier
+              .addMouseListener(createTipPanelUpdater("RecruitmentTrainingCostMultiplier"));
+        spnRecruitmentTrainingCostMultiplier = new CampaignOptionsSpinner("RecruitmentTrainingCostMultiplier",
+              1.5, 0.0, 10.0, 0.1);
+        spnRecruitmentTrainingCostMultiplier
+              .addMouseListener(createTipPanelUpdater("RecruitmentTrainingCostMultiplier"));
 
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("PaymentsPanel",
@@ -255,6 +264,7 @@ class FinancesGeneralPage {
                 payForRecruitmentBox,
                 payForFoodBox,
                 payForHousingBox);
+        panel.addRow(lblRecruitmentTrainingCostMultiplier, spnRecruitmentTrainingCostMultiplier);
 
         return panel;
     }
@@ -517,6 +527,7 @@ class FinancesGeneralPage {
         escalatingHotSpotsUpkeepBox.setSelected(model.escalatingHotSpotsUpkeep);
         payForTransportBox.setSelected(model.payForTransport);
         payForRecruitmentBox.setSelected(model.payForRecruitment);
+        spnRecruitmentTrainingCostMultiplier.setValue(model.recruitmentTrainingCostMultiplier);
         payForFoodBox.setSelected(model.payForFood);
         payForHousingBox.setSelected(model.payForHousing);
         sellUnitsBox.setSelected(model.sellUnits);
@@ -606,6 +617,7 @@ class FinancesGeneralPage {
         model.escalatingHotSpotsUpkeep = escalatingHotSpotsUpkeepBox.isSelected();
         model.payForTransport = payForTransportBox.isSelected();
         model.payForRecruitment = payForRecruitmentBox.isSelected();
+        model.recruitmentTrainingCostMultiplier = (double) spnRecruitmentTrainingCostMultiplier.getValue();
         model.payForFood = payForFoodBox.isSelected();
         model.payForHousing = payForHousingBox.isSelected();
         model.sellUnits = sellUnitsBox.isSelected();

@@ -133,6 +133,48 @@ public final class SkillTrainingCosts {
     }
 
     /**
+     * Gets the combined C-bill cost of every priced experience level a person's skills have reached, as though each
+     * skill had been trained up from scratch. Used to price recruits. Roleplay skills are left out; profession and
+     * utility skills use the profession table. Unlike {@link #getSkillImprovementCost(Campaign, Person, String)},
+     * this doesn't check {@link CampaignOption#SKILL_IMPROVEMENTS_COST_C_BILLS}; the caller decides whether it applies.
+     *
+     * @param campaign the campaign, for the profession skill and skill modifier options
+     * @param person   the person whose skills are priced
+     *
+     * @return the combined cost of the person's skill levels
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getAccumulatedSkillTrainingCost(Campaign campaign, Person person) {
+        SkillModifierData skillModifierData = getSkillModifierData(campaign, person);
+        List<String> roleSkills = getRoleSkills(campaign, person.getPrimaryRole());
+        roleSkills.addAll(getRoleSkills(campaign, person.getSecondaryRole()));
+
+        long totalSupportPoints = 0;
+        for (String skillName : person.getSkills().getSkillNames()) {
+            SkillType skillType = SkillType.getType(skillName);
+            Skill skill = person.getSkill(skillName);
+            if (skillType == null || skill == null || skillType.isRoleplaySkill()) {
+                continue;
+            }
+
+            boolean isProfessionSkill = roleSkills.contains(skillName) || skillType.isUtilitySkill();
+            int[] costTable = isProfessionSkill
+                                    ? PROFESSION_COSTS_IN_SUPPORT_POINTS
+                                    : NON_PROFESSION_COSTS_IN_SUPPORT_POINTS;
+            int experienceLevel = Math.min(
+                  skillType.getExperienceLevel(skill.getTotalSkillLevel(skillModifierData)), EXP_LEGENDARY);
+            for (int level = EXP_REGULAR; level <= experienceLevel; level++) {
+                totalSupportPoints += costTable[level];
+            }
+        }
+
+        // Converted here, as a long, rather than through ChaosCampaignUtilities, whose int maths could overflow
+        return Money.of((double) totalSupportPoints * ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION);
+    }
+
+    /**
      * @author Illiani
      * @since 0.51.01
      */
@@ -147,13 +189,22 @@ public final class SkillTrainingCosts {
      * @since 0.51.01
      */
     private static boolean isRoleSkill(Campaign campaign, PersonnelRole role, String skillName) {
+        return getRoleSkills(campaign, role).contains(skillName);
+    }
+
+    /**
+     * @return a modifiable list of the skills belonging to the role
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static List<String> getRoleSkills(Campaign campaign, PersonnelRole role) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        List<String> roleSkills = role.getSkillsForProfession(
+        return role.getSkillsForProfession(
               campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION),
               campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION),
               campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION),
               campaignOptions.get(CampaignOption.USE_ARTILLERY),
               true);
-        return roleSkills.contains(skillName);
     }
 }

@@ -87,6 +87,7 @@ import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.RecruitmentCosts;
 import mekhq.campaign.personnel.divorce.AbstractDivorce;
 import mekhq.campaign.personnel.enums.GeneticLegacyRole;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -2450,7 +2451,7 @@ public class ForceHumanResources {
             if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_RECRUITMENT) && !gmAdd) {
                 if (!finances.debit(TransactionType.RECRUITMENT,
                       currentDay,
-                      person.getSalary(campaign).multipliedBy(2),
+                      RecruitmentCosts.getRecruitmentCost(campaign, person),
                       String.format(resources.getString("personnelRecruitmentFinancesReason.text"),
                             person.getFullName()))) {
                     campaign.addReport(DailyReportType.FINANCES,

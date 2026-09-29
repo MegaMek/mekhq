@@ -786,6 +786,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "sellParts");
     public static final CampaignOption<Boolean> PAY_FOR_RECRUITMENT =
           of(Boolean.class, false, "payForRecruitment");
+    public static final CampaignOption<Double> RECRUITMENT_TRAINING_COST_MULTIPLIER =
+          of(Double.class, 1.5, "recruitmentTrainingCostMultiplier");
     public static final CampaignOption<Boolean> PAY_FOR_FOOD =
           of(Boolean.class, false, "payForFood");
     public static final CampaignOption<Boolean> PAY_FOR_HOUSING =
