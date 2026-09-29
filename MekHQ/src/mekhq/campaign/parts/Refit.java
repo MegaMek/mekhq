@@ -725,6 +725,10 @@ public class Refit extends Part implements IAcquisitionWork {
                 updateRefitClass(CLASS_E);
                 locationHasNewStuff[Mek.LOC_HEAD] = true;
 
+            } else if ((newPart instanceof MissingAeroHeatSink) && newPart.isOmniPodded()) {
+                // A pod heat sink goes in the fighter's body, so an OmniPod reconfiguration has work there
+                locationHasNewStuff[Aero.LOC_FUSELAGE] = true;
+
             } else if (newPart instanceof MissingInfantryMotiveType || newPart instanceof MissingInfantryArmorPart) {
                 updateRefitClass(CLASS_A);
 
@@ -1832,8 +1836,8 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         int expectedHeatSinkParts = 0;
-        if (newEntity.getClass() == Aero.class) { // Aero but not subclasses
-            // Only Aerospace Fighters are expected to have heat sink parts (Meks handled separately) SmallCraft,
+        if (isAerospaceFighter(newEntity)) {
+            // Only aerospace fighters are expected to have heat sink parts (Meks handled separately). SmallCraft,
             // DropShip, JumpShip, WarShip, and SpaceStation use SpacecraftCoolingSystem instead
             expectedHeatSinkParts = ((Aero) newEntity).getHeatSinks() -
                                           ((Aero) newEntity).getPodHeatSinks() -
@@ -3219,6 +3223,16 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * Aerospace fighters carry their heat sinks as parts. A conventional fighter is also an {@link AeroSpaceFighter} in
+     * MegaMek but follows its own heat sink rule, and larger craft use a {@link SpacecraftCoolingSystem} instead.
+     *
+     * @return {@code true} if the entity is an aerospace fighter, not a conventional fighter
+     */
+    private static boolean isAerospaceFighter(Entity entity) {
+        return (entity instanceof AeroSpaceFighter) && !(entity instanceof ConvFighter);
+    }
+
+    /**
      * Refits may require adding or removing heat sinks that are not tracked as parts. For Meks and ASFs this would be
      * engine-integrated heat sinks if the heat sink type is changed. For vehicles and conventional fighters this would
      * be heat sinks required by energy weapons.
@@ -3232,7 +3246,7 @@ public class Refit extends Part implements IAcquisitionWork {
             return Math.min(((Mek) entity).heatSinks(),
                   entity.getEngine().integralHeatSinkCapacity(((Mek) entity).hasCompactHeatSinks()));
 
-        } else if (entity.getClass() == Aero.class) { // Aero but not subclasses
+        } else if (isAerospaceFighter(entity)) {
             return entity.getEngine().getWeightFreeEngineHeatSinks();
 
         } else {
