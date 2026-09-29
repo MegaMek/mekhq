@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.compute.damage.PreExistingDamageLevel;
@@ -142,5 +143,40 @@ class UltimatumUnitDamageTest {
         when(mek.isDestroyed()).thenReturn(true);
 
         assertFalse(UltimatumUnitDamage.isEligible(buildUnit(mek, true, false, false)));
+    }
+
+    @Test
+    @DisplayName("Invalid shares never cause damage: negative or NaN mean none, above 1 damages every unit")
+    void testInvalidSharesAreSafe() {
+        assertEquals(PreExistingDamageLevel.NONE, UltimatumUnitDamage.getDamageLevel(Double.NaN));
+        assertEquals(PreExistingDamageLevel.NONE, UltimatumUnitDamage.getDamageLevel(-0.5));
+        assertEquals(0, UltimatumUnitDamage.getUnitsToDamage(10, Double.NaN));
+        assertEquals(0, UltimatumUnitDamage.getUnitsToDamage(10, -0.5));
+        assertEquals(0, UltimatumUnitDamage.getUnitsToDamage(-3, 0.5));
+    }
+
+    @Test
+    @DisplayName("Everyone leaving damages every unit heavily")
+    void testEveryoneLeaving() {
+        List<Person> personnel = List.of(buildPerson(PersonnelStatus.DESERTED), buildPerson(PersonnelStatus.HOMICIDE));
+        double share = UltimatumUnitDamage.getDepartedShare(personnel);
+
+        assertEquals(1.0, share, 0.0001);
+        assertEquals(PreExistingDamageLevel.HEAVY, UltimatumUnitDamage.getDamageLevel(share));
+        assertEquals(7, UltimatumUnitDamage.getUnitsToDamage(7, share));
+    }
+
+    @Test
+    @DisplayName("A single departure out of many still damages one unit, lightly")
+    void testSingleDepartureAmongMany() {
+        List<Person> personnel = new ArrayList<>();
+        personnel.add(buildPerson(PersonnelStatus.DESERTED));
+        for (int index = 0; index < 99; index++) {
+            personnel.add(buildPerson(PersonnelStatus.ACTIVE));
+        }
+        double share = UltimatumUnitDamage.getDepartedShare(personnel);
+
+        assertEquals(PreExistingDamageLevel.LIGHT, UltimatumUnitDamage.getDamageLevel(share));
+        assertEquals(1, UltimatumUnitDamage.getUnitsToDamage(40, share));
     }
 }

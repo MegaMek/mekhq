@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -45,12 +46,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.gui.dialog.factionStanding.FactionStandingUltimatumDialog;
@@ -285,5 +289,200 @@ class FactionStandingUltimatumsLibraryTest {
         FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(List.of(ultimatum));
 
         assertTrue(library.getUltimatums().isEmpty());
+    }
+
+    // ----- text formatting -----
+
+    /** Matches an apostrophe that isn't doubled, which MessageFormat treats as the start of a quoted section. */
+    private static final Pattern LONE_APOSTROPHE = Pattern.compile("(?<!')'(?!')");
+
+    /** Matches a placeholder MessageFormat left unsubstituted. */
+    private static final Pattern UNSUBSTITUTED_PLACEHOLDER = Pattern.compile("\\{\\d");
+
+    @Test
+    @DisplayName("No ultimatum text has a lone apostrophe, which would swallow the rest of the text in MessageFormat")
+    void testNoLoneApostrophesInUltimatumText() {
+        for (FactionStandingUltimatumData ultimatum : getDistinctFixtureUltimatums()) {
+            for (String key : getRequiredKeys(ultimatum)) {
+                String text = getTextAt(RESOURCE_BUNDLE, key);
+                assertFalse(LONE_APOSTROPHE.matcher(text).find(), "Lone apostrophe in " + key);
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("Every ultimatum text formats with every placeholder substituted")
+    void testUltimatumTextFormatsCompletely() {
+        Object[] arguments = new Object[24];
+        Arrays.fill(arguments, "ARG");
+        for (FactionStandingUltimatumData ultimatum : getDistinctFixtureUltimatums()) {
+            for (String key : getRequiredKeys(ultimatum)) {
+                String formatted = MessageFormat.format(getTextAt(RESOURCE_BUNDLE, key), arguments);
+                assertFalse(UNSUBSTITUTED_PLACEHOLDER.matcher(formatted).find(), "Unsubstituted placeholder in " + key);
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("The unit damage report reads correctly for one unit and for several")
+    void testUnitDamageReportPluralization() {
+        String single = getFormattedTextAt(RESOURCE_BUNDLE, "FactionStandingUltimatumDialog.unitDamage.report", 1,
+              "light");
+        String several = getFormattedTextAt(RESOURCE_BUNDLE, "FactionStandingUltimatumDialog.unitDamage.report", 3,
+              "heavy");
+
+        assertTrue(single.contains("One unit was damaged"), single);
+        assertTrue(several.contains("3 units were damaged"), several);
+        assertTrue(several.contains("(heavy damage)"), several);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static List<String> getRequiredKeys(FactionStandingUltimatumData ultimatum) {
+        List<String> sideIds = new ArrayList<>();
+        for (FactionStandingUltimatumSide side : ultimatum.sides()) {
+            sideIds.add(side.id());
+        }
+        return FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), sideIds);
+    }
+
+    // ----- malformed data -----
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static FactionStandingUltimatumData buildUltimatumWithSides(String name,
+          List<FactionStandingUltimatumSide> sides, String dissenterPreference) {
+        return new FactionStandingUltimatumData(name, TEST_DATE.toString(), null, List.of("FC"), sides,
+              dissenterPreference, false, 0);
+    }
+
+    @Test
+    @DisplayName("An ultimatum whose side is missing its role, faction, name, or ID is skipped instead of crashing")
+    void testIncompleteSideIsSkipped() {
+        List<FactionStandingUltimatumSide> brokenSides = List.of(
+              new FactionStandingUltimatumSide("LA", "Leader", null, "LA"),
+              new FactionStandingUltimatumSide("LA", "Leader", PersonnelRole.NOBLE, " "),
+              new FactionStandingUltimatumSide("LA", "", PersonnelRole.NOBLE, "LA"),
+              new FactionStandingUltimatumSide(null, "Leader", PersonnelRole.NOBLE, "LA"));
+
+        for (FactionStandingUltimatumSide brokenSide : brokenSides) {
+            FactionStandingUltimatumData ultimatum = buildUltimatumWithSides("BROKEN", List.of(brokenSide), "ROGUE");
+
+            assertNotNull(FactionStandingUltimatumsLibrary.findLoadProblem(ultimatum), brokenSide.toString());
+            assertTrue(new FactionStandingUltimatumsLibrary(List.of(ultimatum)).getUltimatums().isEmpty(),
+                  brokenSide.toString());
+        }
+    }
+
+    @Test
+    @DisplayName("An ultimatum without a name is skipped, as its text keys are built from the name")
+    void testNamelessUltimatumIsSkipped() {
+        FactionStandingUltimatumSide side = new FactionStandingUltimatumSide("LA", "Leader", PersonnelRole.NOBLE,
+              "LA");
+
+        for (String name : new String[] { null, "", "  " }) {
+            FactionStandingUltimatumData ultimatum = buildUltimatumWithSides(name, List.of(side), "LA");
+            assertTrue(new FactionStandingUltimatumsLibrary(List.of(ultimatum)).getUltimatums().isEmpty());
+        }
+    }
+
+    @Test
+    @DisplayName("Two sides with the same ID are rejected, as they would share text keys")
+    void testDuplicateSideIdsAreSkipped() {
+        FactionStandingUltimatumData ultimatum = buildUltimatumWithSides("DUPLICATES", List.of(
+              new FactionStandingUltimatumSide("LA", "First", PersonnelRole.NOBLE, "LA"),
+              new FactionStandingUltimatumSide("LA", "Second", PersonnelRole.NOBLE, "FS")), "LA");
+
+        assertTrue(new FactionStandingUltimatumsLibrary(List.of(ultimatum)).getUltimatums().isEmpty());
+    }
+
+    @Test
+    @DisplayName("An unknown dissenter preference is flagged but the ultimatum still loads")
+    void testUnknownDissenterPreferenceStillLoads() {
+        FactionStandingUltimatumSide side = new FactionStandingUltimatumSide("LA", "Leader", PersonnelRole.NOBLE,
+              "LA");
+        FactionStandingUltimatumData unknown = buildUltimatumWithSides("UNKNOWN_PREFERENCE", List.of(side), "DC");
+        FactionStandingUltimatumData missing = buildUltimatumWithSides("MISSING_PREFERENCE", List.of(side), null);
+
+        assertFalse(FactionStandingUltimatumsLibrary.isValidDissenterPreference(unknown));
+        assertFalse(FactionStandingUltimatumsLibrary.isValidDissenterPreference(missing));
+        assertTrue(FactionStandingUltimatumsLibrary.isValidDissenterPreference(
+              buildUltimatumWithSides("ROGUE_PREFERENCE", List.of(side), "ROGUE")));
+        assertNotNull(new FactionStandingUltimatumsLibrary(List.of(unknown)).getUltimatum(TEST_DATE, "FC"));
+    }
+
+    @Test
+    @DisplayName("A file with an unknown role is skipped without stopping the other files loading")
+    void testUnknownRoleFileIsSkipped(@TempDir Path temporaryDirectory) throws IOException {
+        Files.copy(new File(FIXTURE_DIRECTORY, "EXODUS.json").toPath(), temporaryDirectory.resolve("EXODUS.json"));
+        String broken = Files.readString(new File(FIXTURE_DIRECTORY, "FED_COM_CIVIL_WAR.json").toPath())
+                              .replace("\"NOBLE\"", "\"WIZARD\"");
+        Files.writeString(temporaryDirectory.resolve("FED_COM_CIVIL_WAR.json"), broken);
+        File manifestFile = writeManifest(temporaryDirectory, "EXODUS.json", "FED_COM_CIVIL_WAR.json");
+
+        FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(manifestFile);
+
+        assertNotNull(library.getUltimatum(EXODUS_DATE, "TH"));
+        assertNull(library.getUltimatum(LocalDate.of(3057, 9, 18), "FC"));
+    }
+
+    @Test
+    @DisplayName("A file with a null entry in its sides is skipped rather than crashing the load")
+    void testNullSideFileIsSkipped(@TempDir Path temporaryDirectory) throws IOException {
+        Path ultimatumFile = temporaryDirectory.resolve("NULL_SIDE.json");
+        Files.writeString(ultimatumFile, """
+              {
+                "name": "NULL_SIDE",
+                "date": "3057-09-18",
+                "affectedFactionCodes": [ "FC" ],
+                "sides": [ null ],
+                "dissenterPreference": "ROGUE"
+              }
+              """);
+
+        assertNull(FactionStandingUltimatumData.deserialize(ultimatumFile.toFile()));
+        FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(
+              writeManifest(temporaryDirectory, "NULL_SIDE.json"));
+        assertTrue(library.getUltimatums().isEmpty());
+    }
+
+    @Test
+    @DisplayName("A file listed twice in the manifest is only indexed once")
+    void testDuplicateManifestEntryIsHarmless(@TempDir Path temporaryDirectory) throws IOException {
+        Files.copy(new File(FIXTURE_DIRECTORY, "EXODUS.json").toPath(), temporaryDirectory.resolve("EXODUS.json"));
+
+        FactionStandingUltimatumsLibrary library = new FactionStandingUltimatumsLibrary(
+              writeManifest(temporaryDirectory, "EXODUS.json", "EXODUS.json"));
+
+        assertEquals(1, library.getUltimatums().size());
+        assertEquals(3, library.getUltimatums().get(EXODUS_DATE).size());
+    }
+
+    @Test
+    @DisplayName("A manifest with no file list loads an empty library, but an unreadable one fails loudly")
+    void testEmptyAndMalformedManifests(@TempDir Path temporaryDirectory) throws IOException {
+        Path emptyManifest = temporaryDirectory.resolve("empty.json");
+        Files.writeString(emptyManifest, "# header comment\n{}\n");
+        Path malformedManifest = temporaryDirectory.resolve("malformed.json");
+        Files.writeString(malformedManifest, "{ \"ultimatumFileNames\": [ ");
+
+        assertTrue(new FactionStandingUltimatumsLibrary(emptyManifest.toFile()).getUltimatums().isEmpty());
+        assertThrows(RuntimeException.class, () -> new FactionStandingUltimatumsLibrary(malformedManifest.toFile()));
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static File writeManifest(Path directory, String... fileNames) {
+        FactionStandingUltimatumManifest manifest = new FactionStandingUltimatumManifest();
+        manifest.ultimatumFileNames.addAll(List.of(fileNames));
+        File manifestFile = directory.resolve("ultimatummanifest.json").toFile();
+        assertTrue(manifest.serialize(manifestFile));
+        return manifestFile;
     }
 }

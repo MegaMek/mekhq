@@ -129,7 +129,8 @@ public final class UltimatumUnitDamage {
      * @since 0.51.01
      */
     static PreExistingDamageLevel getDamageLevel(double departedShare) {
-        if (departedShare <= 0.0) {
+        // Written as "not above zero" so a NaN share also means no damage, rather than falling through to Heavy
+        if (!(departedShare > 0.0)) {
             return PreExistingDamageLevel.NONE;
         } else if (departedShare < MODERATE_DAMAGE_THRESHOLD) {
             return PreExistingDamageLevel.LIGHT;
@@ -152,7 +153,7 @@ public final class UltimatumUnitDamage {
      * @since 0.51.01
      */
     static int getUnitsToDamage(int eligibleUnitCount, double departedShare) {
-        if ((eligibleUnitCount <= 0) || (departedShare <= 0.0)) {
+        if ((eligibleUnitCount <= 0) || !(departedShare > 0.0)) {
             return 0;
         }
 

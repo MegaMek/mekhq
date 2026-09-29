@@ -37,8 +37,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
@@ -174,6 +176,55 @@ public class FactionStandingUltimatumsLibrary {
     }
 
     /**
+     * Finds a problem that would break an ultimatum when it is presented: a missing name, which its text keys are
+     * built from, or a side missing its ID, leader name, role, or faction, or repeating another side's ID.
+     *
+     * @param ultimatum the ultimatum to check
+     *
+     * @return a description of the first problem found, or {@code null} if the ultimatum can be presented
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable String findLoadProblem(FactionStandingUltimatumData ultimatum) {
+        if (isBlank(ultimatum.name())) {
+            return "it has no name";
+        }
+
+        Set<String> sideIds = new HashSet<>();
+        for (FactionStandingUltimatumSide side : ultimatum.sides()) {
+            if (isBlank(side.id()) || isBlank(side.name()) || side.role() == null || isBlank(side.factionCode())) {
+                return "a side is missing its id, name, role, or faction code";
+            }
+            if (!sideIds.add(side.id())) {
+                return "more than one side uses the id " + side.id();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return {@code true} if the dissenter preference is {@link FactionStandingUltimatumData#ROGUE_PREFERENCE} or
+     *       names one of the ultimatum's sides
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isValidDissenterPreference(FactionStandingUltimatumData ultimatum) {
+        String preference = ultimatum.dissenterPreference();
+        return FactionStandingUltimatumData.ROGUE_PREFERENCE.equals(preference)
+                     || ultimatum.getSide(preference) != null;
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isBlank(@Nullable String value) {
+        return value == null || value.isBlank();
+    }
+
+    /**
      * Adds each ultimatum to {@link #ultimatumMap} under its date and every one of its affected faction codes.
      *
      * <p>A faction can only receive one ultimatum per date. If two ultimatums claim the same date and faction, the
@@ -196,6 +247,17 @@ public class FactionStandingUltimatumsLibrary {
             if (ultimatum.sides().isEmpty()) {
                 LOGGER.warn("Ultimatum {} has no sides to choose between and will never trigger", ultimatum.name());
                 continue;
+            }
+
+            String problem = findLoadProblem(ultimatum);
+            if (problem != null) {
+                LOGGER.error("Ultimatum {} will never trigger: {}", ultimatum.name(), problem);
+                continue;
+            }
+
+            if (!isValidDissenterPreference(ultimatum)) {
+                LOGGER.warn("Ultimatum {} has dissenter preference '{}', which names no side; the dissenter will "
+                                  + "always leave", ultimatum.name(), ultimatum.dissenterPreference());
             }
 
             LocalDate date;

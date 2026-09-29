@@ -249,4 +249,36 @@ class FactionStandingUltimatumEditorDialogTest {
               FactionStandingUltimatumEditorDialog.getBundleFilePath(
                     "mekhq.resources.FactionStandingUltimatumDialog"));
     }
+
+    @Test
+    @DisplayName("A side loaded without an ID is reported instead of crashing validation")
+    void testSideWithoutIdIsReported() {
+        FactionStandingUltimatumSide idlessSide = new FactionStandingUltimatumSide(null, "Leader", PersonnelRole.NOBLE,
+              "LA");
+        FactionStandingUltimatumData ultimatum = buildValidUltimatum(List.of(idlessSide, DAVION_SIDE), "FS");
+
+        assertEquals(List.of("ultimatumEditor.problem.side"),
+              FactionStandingUltimatumEditorDialog.findProblems(ultimatum));
+    }
+
+    @Test
+    @DisplayName("The dissenter preference must match a side ID exactly, including case")
+    void testDissenterPreferenceIsCaseSensitive() {
+        assertEquals(List.of("ultimatumEditor.problem.dissenterPreference"),
+              FactionStandingUltimatumEditorDialog.findProblems(
+                    buildValidUltimatum(List.of(LYRAN_SIDE, DAVION_SIDE), "fs")));
+    }
+
+    @Test
+    @DisplayName("An ultimatum with no sides still lists its scene and rogue keys")
+    void testTextKeyRowsWithoutSides() {
+        List<FactionStandingUltimatumEditorDialog.TextKeyRow> rows = FactionStandingUltimatumEditorDialog
+                                                                           .buildTextKeyRows(buildUltimatum(
+                                                                                 "NO_SIDES_TEST", "3057-09-18",
+                                                                                 List.of("FC"), List.of(), "ROGUE",
+                                                                                 0));
+
+        assertEquals(5, rows.size());
+        assertEquals("FactionStandingUltimatumDialog.NO_SIDES_TEST.rogue.pirate.pitch", rows.get(4).key());
+    }
 }

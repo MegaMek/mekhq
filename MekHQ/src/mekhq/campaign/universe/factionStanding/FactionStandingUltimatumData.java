@@ -54,9 +54,9 @@ import megamek.logging.MMLogger;
  * @param affectedFactionCodes the codes of every faction whose campaigns receive this ultimatum. Never {@code null}
  * @param sides                the sides the player can choose between, in the order the picker shows them. The first
  *                             side delivers the opening offer. Never {@code null}
- * @param dissenterPreference   the {@link FactionStandingUltimatumSide#id() ID} of the side the dissenting officer wants
- *                             the campaign to choose, or {@link #ROGUE_PREFERENCE} if they want it to go rogue. They
- *                             leave the campaign if the player chooses anything else
+ * @param dissenterPreference  the {@link FactionStandingUltimatumSide#id() ID} of the side the dissenting officer
+ *                             wants the campaign to choose, or {@link #ROGUE_PREFERENCE} if they want it to go rogue.
+ *                             They leave the campaign if the player chooses anything else
  * @param isViolentTransition  {@code true} if the transition is violent
  * @param divisiveness         how divisive the ultimatum is. Added to the target number of the loyalty check each
  *                             character makes to follow the player's decision, so positive values make more characters
@@ -116,9 +116,13 @@ public record FactionStandingUltimatumData(
      * @author Illiani
      * @since 0.51.01
      */
-    public @Nullable FactionStandingUltimatumSide getSide(String sideId) {
+    public @Nullable FactionStandingUltimatumSide getSide(@Nullable String sideId) {
+        if (sideId == null) {
+            return null;
+        }
         for (FactionStandingUltimatumSide side : sides) {
-            if (side.id().equals(sideId)) {
+            // Sides from a hand-edited file may be missing their ID
+            if (sideId.equals(side.id())) {
                 return side;
             }
         }
@@ -137,6 +141,21 @@ public record FactionStandingUltimatumData(
     @JsonIgnore
     public LocalDate getDate() {
         return LocalDate.parse(date);
+    }
+
+    /**
+     * Returns the divisiveness to use in play, limited to {@link #MINIMUM_DIVISIVENESS} through
+     * {@link #MAXIMUM_DIVISIVENESS}. A hand-edited file can hold any value, and an extreme one would make every loyalty
+     * check pass or fail regardless of the character.
+     *
+     * @return the clamped divisiveness
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @JsonIgnore
+    public int getEffectiveDivisiveness() {
+        return Math.clamp(divisiveness, MINIMUM_DIVISIVENESS, MAXIMUM_DIVISIVENESS);
     }
 
     /**

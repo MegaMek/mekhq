@@ -97,7 +97,7 @@ public final class FactionStandingUltimatum {
               sides,
               ultimatum.dissenterPreference(),
               ultimatum.isViolentTransition(),
-              ultimatum.divisiveness(),
+              ultimatum.getEffectiveDivisiveness(),
               ultimatum.name(),
               date);
         return true;

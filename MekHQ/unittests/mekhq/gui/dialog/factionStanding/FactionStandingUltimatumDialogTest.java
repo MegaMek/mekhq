@@ -342,4 +342,53 @@ class FactionStandingUltimatumDialogTest {
 
         assertNull(FactionStandingUltimatumDialog.getThirdInCommand(campaign, commander, secondInCommand));
     }
+
+    @Test
+    @DisplayName("Sides sharing a faction only lower standing with it once")
+    void testStandingLossCodesDeduplicateFactions() {
+        Faction federatedCommonwealth = buildFaction("FC", false);
+        Faction lyranAlliance = buildFaction("LA", false);
+        Faction federatedSuns = buildFaction("FS", false);
+        List<UltimatumSide> sides = List.of(buildSide("LA", lyranAlliance), buildSide("FS_NORTH", federatedSuns),
+              buildSide("FS_SOUTH", federatedSuns));
+
+        assertEquals(List.of("FC", "FS"),
+              FactionStandingUltimatumDialog.getStandingLossCodes(sides, lyranAlliance, federatedCommonwealth));
+    }
+
+    @Test
+    @DisplayName("Going rogue from an aggregate faction doesn't list that faction as a standing loss")
+    void testStandingLossCodesFromAggregateFaction() {
+        Faction mercenaries = buildFaction("MERC", true);
+        Faction lyranAlliance = buildFaction("LA", false);
+        List<UltimatumSide> sides = List.of(buildSide("LA", lyranAlliance));
+
+        assertEquals(List.of("LA"), FactionStandingUltimatumDialog.getStandingLossCodes(sides, null, mercenaries));
+    }
+
+    @Test
+    @DisplayName("The dissenter preference is matched exactly, so a differently cased ID means they leave")
+    void testDissenterPreferenceIsCaseSensitive() {
+        assertFalse(FactionStandingUltimatumDialog.dissenterStays("fs", ChoiceKind.SIDE, "FS"));
+        assertFalse(FactionStandingUltimatumDialog.dissenterStays("rogue", ChoiceKind.MERCENARY, null));
+    }
+
+    @Test
+    @DisplayName("A one-sided ultimatum shows exactly three cards and the dissenter stays only on their choice")
+    void testSingleSidedUltimatumCards() {
+        Faction draconisCombine = buildFaction("DC", false);
+        List<UltimatumSide> sides = List.of(buildSide("FRR", buildFaction("FRR", false)));
+
+        List<PickerChoice> choices = FactionStandingUltimatumDialog.buildChoices(sides, "RASALHAGUE_INDEPENDENCE",
+              draconisCombine, true, true, "FRR", GAME_YEAR, key -> key);
+
+        assertEquals(3, choices.size());
+        assertTrue(choices.get(0).dissenterStays());
+        assertFalse(choices.get(1).dissenterStays());
+        assertFalse(choices.get(2).dissenterStays());
+        // Violent and leaving DC: the side card is a defection, and its standing row lowers DC
+        assertEquals(2, choices.get(0).tagRows().get(0).size());
+        assertEquals(List.of("DC"),
+              FactionStandingUltimatumDialog.getStandingLossCodes(sides, sides.get(0).faction(), draconisCombine));
+    }
 }

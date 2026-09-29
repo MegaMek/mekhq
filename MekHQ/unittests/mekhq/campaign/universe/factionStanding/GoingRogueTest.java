@@ -253,4 +253,14 @@ class GoingRogueTest {
         assertFalse(GoingRogue.failsLoyaltyCheck(9, 1, 2));
         assertFalse(GoingRogue.failsLoyaltyCheck(6, -1, 1));
     }
+
+    @Test
+    @DisplayName("failsLoyaltyCheck: at the divisiveness limits, the best and worst rolls still behave sensibly")
+    void testFailsLoyaltyCheckAtDivisivenessLimits() {
+        // +6: target 12, so only a natural 12 passes for a neutral character
+        assertTrue(GoingRogue.failsLoyaltyCheck(11, 0, FactionStandingUltimatumData.MAXIMUM_DIVISIVENESS));
+        assertFalse(GoingRogue.failsLoyaltyCheck(12, 0, FactionStandingUltimatumData.MAXIMUM_DIVISIVENESS));
+        // -6: target 0, so even a natural 2 passes for a neutral character
+        assertFalse(GoingRogue.failsLoyaltyCheck(2, 0, FactionStandingUltimatumData.MINIMUM_DIVISIVENESS));
+    }
 }
