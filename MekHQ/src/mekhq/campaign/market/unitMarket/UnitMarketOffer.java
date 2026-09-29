@@ -44,6 +44,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
 import mekhq.utilities.MHQXMLUtility;
@@ -138,7 +139,7 @@ public class UnitMarketOffer {
      * @return the final price of this Offer
      */
     public Money getPrice() {
-        Money cost = Money.of((double) getUnit().getCost()).multipliedBy(getPercent()).dividedBy(100);
+        Money cost = getBaseCost().multipliedBy(getPercent()).dividedBy(100);
 
         final Entity entity = getEntity();
         if (entity == null) {
@@ -156,6 +157,26 @@ public class UnitMarketOffer {
         }
 
         return cost;
+    }
+
+    /**
+     * @return the offered unit's list price before the market percentage and tech base multipliers: its construction
+     *       cost, or under {@link CampaignOption#USE_ALTERNATE_UNIT_COST} one support point per point of Battle Value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private Money getBaseCost() {
+        if (!campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
+            return Money.of((double) getUnit().getCost());
+        }
+
+        // The summary's Battle Value is the unit's own, with no pilot, C3, or TAG adjustments
+        double valueInSupportPoints = getUnit().getBV();
+        if (!campaignOptions.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)) {
+            return Money.of(valueInSupportPoints);
+        }
+        return Money.of(valueInSupportPoints * ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION);
     }
 
     // region File I/O

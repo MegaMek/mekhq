@@ -86,6 +86,7 @@ class FinancesGeneralPage {
     private JCheckBox chkPlanetaryCostReductionsOnContract;
     private JCheckBox chkPlanetaryCostReductionsForMaintenance;
     private JCheckBox chkIncreaseClanRepairCosts;
+    private JCheckBox chkUseAlternateUnitCost;
 
     private JPanel pnlPayments;
     private JCheckBox payForPartsBox;
@@ -307,6 +308,8 @@ class FinancesGeneralPage {
               createTipPanelUpdater("PlanetaryCostReductionsForMaintenance"));
         chkIncreaseClanRepairCosts = new CampaignOptionsCheckBox("IncreaseClanRepairCosts");
         chkIncreaseClanRepairCosts.addMouseListener(createTipPanelUpdater("IncreaseClanRepairCosts"));
+        chkUseAlternateUnitCost = new CampaignOptionsCheckBox("UseAlternateUnitCost");
+        chkUseAlternateUnitCost.addMouseListener(createTipPanelUpdater("UseAlternateUnitCost"));
 
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("GeneralOptionsPanel",
@@ -323,7 +326,8 @@ class FinancesGeneralPage {
                 chkUsePlanetaryCostReductions,
                 chkPlanetaryCostReductionsOnContract,
                 chkPlanetaryCostReductionsForMaintenance,
-                chkIncreaseClanRepairCosts);
+                chkIncreaseClanRepairCosts,
+                chkUseAlternateUnitCost);
         panel.addRow(lblFinancialYearDuration, comboFinancialYearDuration);
 
         return panel;
@@ -502,6 +506,7 @@ class FinancesGeneralPage {
         chkPlanetaryCostReductionsOnContract.setSelected(model.planetaryCostReductionsOnContract);
         chkPlanetaryCostReductionsForMaintenance.setSelected(model.planetaryCostReductionsForMaintenance);
         chkIncreaseClanRepairCosts.setSelected(model.increaseClanRepairCosts);
+        chkUseAlternateUnitCost.setSelected(model.useAlternateUnitCost);
         payForPartsBox.setSelected(model.payForParts);
         payForRepairsBox.setSelected(model.payForRepairs);
         payForUnitsBox.setSelected(model.payForUnits);
@@ -590,6 +595,7 @@ class FinancesGeneralPage {
         model.planetaryCostReductionsOnContract = chkPlanetaryCostReductionsOnContract.isSelected();
         model.planetaryCostReductionsForMaintenance = chkPlanetaryCostReductionsForMaintenance.isSelected();
         model.increaseClanRepairCosts = chkIncreaseClanRepairCosts.isSelected();
+        model.useAlternateUnitCost = chkUseAlternateUnitCost.isSelected();
         model.payForParts = payForPartsBox.isSelected();
         model.payForRepairs = payForRepairsBox.isSelected();
         model.payForUnits = payForUnitsBox.isSelected();

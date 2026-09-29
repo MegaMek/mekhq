@@ -116,6 +116,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.persons.PersonCrewAssignmentEvent;
 import mekhq.campaign.events.persons.PersonTechAssignmentEvent;
@@ -183,6 +184,9 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class Unit implements ITechnology, ILocatable {
+    /** Under Alternate Unit Cost, units always sell for this fraction of their value */
+    static final double ALTERNATE_UNIT_COST_SELL_FRACTION = 0.5;
+
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Unit";
     private static final MMLogger LOGGER = MMLogger.create(Unit.class);
 
@@ -1663,6 +1667,10 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public Money getSellValue() {
+        if (isUseAlternateUnitCost()) {
+            return getAlternateUnitCost().multipliedBy(ALTERNATE_UNIT_COST_SELL_FRACTION);
+        }
+
         Money partsValue = Money.zero();
 
         partsValue = partsValue.plus(parts.stream()
@@ -1796,6 +1804,19 @@ public class Unit implements ITechnology, ILocatable {
     public String getSellValueBreakdown() {
         StringBuilder breakdown = new StringBuilder();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        if (isUseAlternateUnitCost()) {
+            Money alternateUnitCost = getAlternateUnitCost();
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.alternate.battleValue",
+                  getUnitBattleValue())).append("<br>");
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.buyNew",
+                  alternateUnitCost.toAmountAndSymbolString())).append("<br>");
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.alternate.half",
+                  String.format("%.2f", ALTERNATE_UNIT_COST_SELL_FRACTION))).append("<hr>");
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.sellFor",
+                  alternateUnitCost.multipliedBy(ALTERNATE_UNIT_COST_SELL_FRACTION).toAmountString()));
+            return breakdown.toString();
+        }
 
         // Get the "buy new" price
         Money buyNewPrice = getBuyCost();
@@ -2911,19 +2932,109 @@ public class Unit implements ITechnology, ILocatable {
     // End Transport Assignments
 
     public Money getBuyCost() {
+        if (isUseAlternateUnitCost()) {
+            return getAlternateUnitCost();
+        }
+
         Money cost = Money.of((getEntity() instanceof Infantry) ?
                                     getEntity().getAlternateCost() :
                                     getEntity().getCost(false));
 
-        if (getEntity().isMixedTech()) {
-            cost = cost.multipliedBy(getCampaign().getCampaignOptions().get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER));
-        } else if (getEntity().isClan()) {
-            cost = cost.multipliedBy(getCampaign().getCampaignOptions().get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER));
-        } else { // Inner Sphere Entity
-            cost = cost.multipliedBy(getCampaign().getCampaignOptions().get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER));
+        return cost.multipliedBy(getUnitPriceMultiplier());
+    }
+
+    /**
+     * @return the campaign's Inner Sphere, Clan, or mixed-tech unit price multiplier, matching this unit's tech base
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private double getUnitPriceMultiplier() {
+        CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+        Entity unitEntity = getEntity();
+        if (unitEntity.isMixedTech()) {
+            return campaignOptions.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);
+        } else if (unitEntity.isClan()) {
+            return campaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER);
+        }
+        return campaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER);
+    }
+
+    /**
+     * @return {@code true} if units are valued by Battle Value ({@link CampaignOption#USE_ALTERNATE_UNIT_COST})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isUseAlternateUnitCost() {
+        return getCampaign().getCampaignOptions().get(CampaignOption.USE_ALTERNATE_UNIT_COST) && (getEntity() != null);
+    }
+
+    /**
+     * The unit's condition when its Battle Value was last calculated. Battle Value is expensive to work out and unit
+     * value is read constantly (unit tables, finances), so it is only recalculated when the condition changes.
+     */
+    private record BattleValueCondition(int totalArmor, int totalInternal, int damagedEquipment, int equipmentCount,
+          int battleValue) {}
+
+    private transient BattleValueCondition cachedBattleValueCondition;
+
+    /**
+     * @return the unit's Battle Value in its current condition, excluding pilot skill, C3, and TAG
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int getUnitBattleValue() {
+        Entity unitEntity = getEntity();
+        int totalArmor = unitEntity.getTotalArmor();
+        int totalInternal = unitEntity.getTotalInternal();
+        int damagedEquipment = 0;
+        int equipmentCount = 0;
+        for (Mounted<?> mounted : unitEntity.getEquipment()) {
+            equipmentCount++;
+            if (mounted.isDestroyed() || mounted.isHit() || mounted.isMissing()) {
+                damagedEquipment++;
+            }
         }
 
-        return cost;
+        BattleValueCondition cached = cachedBattleValueCondition;
+        if (cached != null
+                  && cached.totalArmor() == totalArmor
+                  && cached.totalInternal() == totalInternal
+                  && cached.damagedEquipment() == damagedEquipment
+                  && cached.equipmentCount() == equipmentCount) {
+            return cached.battleValue();
+        }
+
+        int battleValue = unitEntity.calculateBattleValue(true, true, true);
+        cachedBattleValueCondition = new BattleValueCondition(totalArmor, totalInternal, damagedEquipment,
+              equipmentCount, battleValue);
+        return battleValue;
+    }
+
+    /**
+     * Gets the unit's value under {@link CampaignOption#USE_ALTERNATE_UNIT_COST}: one support point per point of
+     * Battle Value, converted to C-bills when support point conversion is enabled, then adjusted by the unit price
+     * multiplier for the unit's tech base.
+     *
+     * <p>Battle Value is calculated from the unit's current state, so damage, lost armor, and destroyed equipment
+     * lower it. Pilot skill, C3 networks, and TAG are excluded, since they depend on the crew and force rather than the
+     * unit itself.</p>
+     *
+     * @return the unit's Battle Value-based value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getAlternateUnitCost() {
+        int battleValue = getUnitBattleValue();
+        double valueInSupportPoints = battleValue * getUnitPriceMultiplier();
+        if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)) {
+            return Money.of(valueInSupportPoints);
+        }
+        // Converted here rather than through ChaosCampaignUtilities, whose integer maths overflows for large vessels
+        return Money.of(valueInSupportPoints * ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION);
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {
