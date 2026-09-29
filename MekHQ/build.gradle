@@ -832,6 +832,11 @@ distributions {
             }
 
             from("${mmDir}/megamek/build/launch4j/lib") {
+                // In suite mode the verified companion jar (possibly reused from an archive)
+                // is the authoritative copy; launch4j/lib may contain a newer build.
+                if (suiteVersion != null) {
+                    exclude 'MegaMek.jar'
+                }
                 into "lib"
             }
 
@@ -850,6 +855,9 @@ distributions {
 
             // MegaMekLab Includes
             from("${mmlDir}/megameklab/build/launch4j/lib") {
+                if (suiteVersion != null) {
+                    exclude 'MegaMekLab.jar'
+                }
                 into "lib"
             }
 
