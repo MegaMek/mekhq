@@ -818,10 +818,8 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
-        // if oldUnitParts is not empty we are removing some stuff and so this should be at least a Class A refit.
-        // Bay parts are always listed there because completion rebuilds them, so they alone remove nothing.
-        boolean isRemovingParts = oldUnitParts.stream().anyMatch(part -> !(part instanceof TransportBayPart));
-        if (isRemovingParts) {
+        // Removing anything makes this at least a Class A refit
+        if (isRemovingPartsOtherThanBays()) {
             if (isOmniRefit) {
                 updateRefitClass(CLASS_OMNI);
             } else {
@@ -3169,6 +3167,34 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * Bay parts are always listed among the old unit's parts because completion rebuilds them, so they alone remove
+     * nothing from the unit.
+     *
+     * @return {@code true} if the refit takes out any part other than a bay part
+     */
+    private boolean isRemovingPartsOtherThanBays() {
+        for (Part oldPart : oldUnitParts) {
+            if (!(oldPart instanceof TransportBayPart)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return the unit's cargo and transport bays, leaving out crew quarters
+     */
+    private static List<Bay> baysOtherThanQuarters(Entity entity) {
+        List<Bay> bays = new ArrayList<>();
+        for (Bay bay : entity.getTransportBays()) {
+            if (!bay.isQuarters()) {
+                bays.add(bay);
+            }
+        }
+        return bays;
+    }
+
+    /**
      * Adds the refit time for changes to cargo and transport bays that the bay's own parts do not cover (CO p. 206),
      * and grades the bay work by refit class (CO p. 211). Cubicles and doors that are added or removed carry their own
      * time as parts: 7 days per cubicle, 10 hours per door. What remains is:
@@ -3186,28 +3212,32 @@ public class Refit extends Part implements IAcquisitionWork {
         BayComponents oldComponents = BayComponents.of(oldUnit.getEntity());
         BayComponents newComponents = BayComponents.of(newEntity);
 
-        List<Bay> oldBays = new ArrayList<>(oldUnit.getEntity()
-                                                  .getTransportBays()
-                                                  .stream()
-                                                  .filter(bay -> !bay.isQuarters())
-                                                  .toList());
-        List<Bay> newBays = new ArrayList<>(newEntity.getTransportBays()
-                                                  .stream()
-                                                  .filter(bay -> !bay.isQuarters())
-                                                  .toList());
+        List<Bay> oldBays = baysOtherThanQuarters(oldUnit.getEntity());
+        List<Bay> newBays = baysOtherThanQuarters(newEntity);
 
         // A bay of the same type, size and doors is unchanged
         removeMatchingBays(oldBays, newBays, true);
 
         // A bay of the same type and size only gains or loses doors
         DoorChanges doorChanges = removeMatchingBays(oldBays, newBays, false);
-        int doorsTakenOut = doorChanges.takenOut() + oldBays.stream().mapToInt(Bay::getDoors).sum();
-        int doorsFitted = doorChanges.fitted() + newBays.stream().mapToInt(Bay::getDoors).sum();
+        int doorsTakenOut = doorChanges.takenOut();
+        int oldBaysWithoutCubicles = 0;
+        for (Bay oldBay : oldBays) {
+            doorsTakenOut += oldBay.getDoors();
+            if (hasNoCubicles(oldBay)) {
+                oldBaysWithoutCubicles++;
+            }
+        }
+        int doorsFitted = doorChanges.fitted();
+        int newBaysWithoutCubicles = 0;
+        for (Bay newBay : newBays) {
+            doorsFitted += newBay.getDoors();
+            if (hasNoCubicles(newBay)) {
+                newBaysWithoutCubicles++;
+            }
+        }
         int doorsMoved = Math.min(doorsTakenOut, doorsFitted);
-
-        long oldBaysWithoutCubicles = oldBays.stream().filter(Refit::hasNoCubicles).count();
-        long newBaysWithoutCubicles = newBays.stream().filter(Refit::hasNoCubicles).count();
-        int baysWithoutCubiclesChanged = (int) Math.max(oldBaysWithoutCubicles, newBaysWithoutCubicles);
+        int baysWithoutCubiclesChanged = Math.max(oldBaysWithoutCubicles, newBaysWithoutCubicles);
 
         boolean isLargeCraft = newEntity.isLargeCraft();
         int bayDuration = isLargeCraft ? WORK_MONTH : WORK_HOUR * 2;
@@ -3256,11 +3286,12 @@ public class Refit extends Part implements IAcquisitionWork {
          * @return {@code true} if this has more doors, or more cubicles of any bay type, than the other
          */
         boolean hasMoreThan(BayComponents other) {
-            boolean hasMoreCubicles = cubicles.entrySet()
-                                            .stream()
-                                            .anyMatch(entry -> entry.getValue()
-                                                                     > other.cubicles.getOrDefault(entry.getKey(), 0));
-            return hasMoreCubicles || (doors > other.doors);
+            for (Map.Entry<BayType, Integer> cubiclesOfType : cubicles.entrySet()) {
+                if (cubiclesOfType.getValue() > other.cubicles.getOrDefault(cubiclesOfType.getKey(), 0)) {
+                    return true;
+                }
+            }
+            return doors > other.doors;
         }
     }
 
