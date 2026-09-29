@@ -1073,7 +1073,7 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Boolean> TRACK_FACTION_STANDING =
           of(Boolean.class, false, "trackFactionStanding");
     public static final CampaignOption<Boolean> USE_FACTION_STANDING_ULTIMATUMS =
-          of(Boolean.class, true, "useFactionStandingUltimatums");
+          of(Boolean.class, false, "useFactionStandingUltimatums");
     public static final CampaignOption<Boolean> TRACK_CLIMATE_REGARD_CHANGES =
           of(Boolean.class, false, "trackClimateRegardChanges");
     public static final CampaignOption<Boolean> USE_FACTION_STANDING_NEGOTIATION =
