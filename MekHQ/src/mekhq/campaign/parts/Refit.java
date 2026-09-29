@@ -1586,12 +1586,92 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * An Omni reconfiguration only swaps pod-mounted equipment: the refit neither removes nor adds the unit's fixed
+     * parts (engine, gyro, structure, actuators, fixed weapons). Those parts must stay on the unit when its part list is
+     * rebuilt from the refit.
+     *
+     * @param oldEntity the unit's entity before the refit
+     *
+     * @return the unit's parts the refit does not touch, or an empty list when this is not an Omni reconfiguration
+     */
+    private List<Part> getFixedPartsKeptByOmniRefit(Entity oldEntity) {
+        boolean isOmniRefit = oldEntity.isOmni() && newEntity.isOmni();
+        if (!isOmniRefit) {
+            return List.of();
+        }
+        Set<Part> partsTheRefitHandles = Collections.newSetFromMap(new IdentityHashMap<>());
+        partsTheRefitHandles.addAll(oldUnitParts);
+        partsTheRefitHandles.addAll(newUnitParts);
+        List<Part> fixedParts = new ArrayList<>();
+        for (Part part : oldUnit.getParts()) {
+            if (!partsTheRefitHandles.contains(part)) {
+                fixedParts.add(part);
+            }
+        }
+        LOGGER.debug("[Refit] Omni reconfiguration of {} keeps {} fixed parts", oldUnit.getName(), fixedParts.size());
+        return fixedParts;
+    }
+
+    /**
+     * Designs may differ in their lower arm and hand actuators, as Omni configurations often do. The refit matches an
+     * actuator by type, not by arm, so an actuator the unit keeps may sit in an arm that no longer has one. Such an
+     * actuator is released (given no location), so that {@link #assignArmActuators()} can move it to an arm that now
+     * needs one.
+     *
+     * @param partsTheUnitKeeps the parts the unit carries into the new design
+     *
+     * @return the actuators released from their arms
+     */
+    private List<MekActuator> releaseArmActuatorsTheNewDesignLacks(List<Part> partsTheUnitKeeps) {
+        List<MekActuator> releasedArmActuators = new ArrayList<>();
+        if (!(newEntity instanceof Mek newMek)) {
+            return releasedArmActuators;
+        }
+        for (Part part : partsTheUnitKeeps) {
+            if (!(part instanceof MekActuator actuator)) {
+                continue;
+            }
+            boolean isArmActuator = (actuator.getType() == Mek.ACTUATOR_LOWER_ARM)
+                  || (actuator.getType() == Mek.ACTUATOR_HAND);
+            if (isArmActuator && !newMek.hasSystem(actuator.getType(), actuator.getLocation())) {
+                LOGGER.debug("[Refit] {}: releasing {} from location {}", oldUnit.getName(), actuator.getName(),
+                      actuator.getLocation());
+                actuator.setLocation(Entity.LOC_NONE);
+                releasedArmActuators.add(actuator);
+            }
+        }
+        return releasedArmActuators;
+    }
+
+    /**
+     * Returns released arm actuators that no arm of the new configuration needed to the warehouse as spares.
+     *
+     * @param releasedArmActuators the actuators released by {@link #releaseArmActuatorsTheNewDesignLacks}
+     */
+    private void returnUnplacedArmActuators(List<MekActuator> releasedArmActuators) {
+        for (MekActuator actuator : releasedArmActuators) {
+            if (actuator.getLocation() != Entity.LOC_NONE) {
+                continue;
+            }
+            LOGGER.debug("[Refit] {}: {} is not needed by the new configuration and becomes a spare",
+                  oldUnit.getName(), actuator.getName());
+            oldUnit.removePart(actuator);
+            actuator.setUnit(null);
+            getCampaign().getQuartermaster().addPart(actuator, 0, false);
+        }
+    }
+
+    /**
      * Actually transform the old unit into the new one, and do all the cleanup that that entails
      */
     private void complete() {
         boolean aClan = false;
         oldUnit.setRefit(null);
         Entity oldEntity = oldUnit.getEntity();
+        List<Part> fixedPartsToKeep = getFixedPartsKeptByOmniRefit(oldEntity);
+        List<Part> partsTheUnitKeeps = new ArrayList<>(fixedPartsToKeep);
+        partsTheUnitKeeps.addAll(newUnitParts);
+        List<MekActuator> releasedArmActuators = releaseArmActuatorsTheNewDesignLacks(partsTheUnitKeeps);
         // add old parts to the warehouse
         for (Part part : oldUnitParts) {
             part.setUnit(null);
@@ -1678,8 +1758,8 @@ public class Refit extends Part implements IAcquisitionWork {
 
         UnitLogger.refit(oldUnit, getCampaign().getLocalDate(), oldModelName, newModelName);
 
-        // set up new parts
-        ArrayList<Part> newParts = new ArrayList<>();
+        // set up new parts, starting with any fixed parts an Omni reconfiguration leaves in place
+        ArrayList<Part> newParts = new ArrayList<>(fixedPartsToKeep);
         // We've already made the old suits go *poof*; now we materialize new ones.
         if (newEntity instanceof BattleArmor) {
             for (int t = BattleArmor.LOC_TROOPER_1; t < newEntity.locations(); t++) {
@@ -1761,6 +1841,7 @@ public class Refit extends Part implements IAcquisitionWork {
         changeAmmoBinMunitions(oldUnit);
 
         assignArmActuators();
+        returnUnplacedArmActuators(releasedArmActuators);
         assignBayParts();
 
         if (newEntity instanceof Mek) {
