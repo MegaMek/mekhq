@@ -176,6 +176,7 @@ import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillDeprecationTool;
 import mekhq.campaign.personnel.skills.SkillModifierData;
+import mekhq.campaign.personnel.skills.SkillTrainingCosts;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.TechnicianSkills;
@@ -723,6 +724,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_IMPROVE: {
                 String skillName = data[1];
                 Skill skill = selectedPerson.getSkill(skillName);
+
+                if (!payForSkillTraining(selectedPerson, skillName)) {
+                    break;
+                }
 
                 int baseCost = selectedPerson.getCostToImprove(skillName,
                       getCampaignOptions().get(CampaignOption.USE_REASONING_XP_MULTIPLIER));
@@ -3279,10 +3284,28 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                           person.getSkillModifierData(getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
                                 getCampaign().getPlayerForce().isClanForce(), getCampaign().getLocalDate());
 
+                    boolean isAffordable = true;
+                    Money trainingCost = SkillTrainingCosts.getSkillImprovementCost(getCampaign(), person, typeName);
+                    if (!trainingCost.isZero()) {
+                        String htmlClosingTag = "</html>";
+                        boolean isHtml = description.endsWith(htmlClosingTag);
+                        String innerDescription = isHtml
+                                                        ? description.substring(0,
+                              description.length() - htmlClosingTag.length())
+                                                        : description;
+                        description = getFormattedTextAt(GUI_RESOURCE_BUNDLE, "skillDesc.withTraining",
+                              innerDescription, trainingCost.toAmountAndSymbolString())
+                                            + (isHtml ? htmlClosingTag : "");
+                        isAffordable = getCampaign().getPlayerForce()
+                                             .getFinances()
+                                             .getBalance()
+                                             .isGreaterOrEqualThan(trainingCost);
+                    }
+
                     menuItem = new JMenuItem(description);
                     menuItem.setActionCommand(makeCommand(CMD_IMPROVE, typeName, String.valueOf(cost)));
                     menuItem.addActionListener(this);
-                    menuItem.setEnabled(person.getXP() >= cost);
+                    menuItem.setEnabled(person.getXP() >= cost && isAffordable);
                     if (skill != null) {
                         if (skill.isImprovementLegal()) {
                             SkillType skillType = getType(typeName);
@@ -5161,6 +5184,38 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         return naturalAptitudesMenu;
+    }
+
+    /**
+     * Charges the C-bill cost of improving a skill, if skill improvement costs are enabled.
+     *
+     * @param person    the person being trained
+     * @param skillName the skill being improved
+     *
+     * @return {@code true} if the skill may be improved, or {@code false} if the force couldn't afford the training
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean payForSkillTraining(Person person, String skillName) {
+        Campaign campaign = getCampaign();
+        Money trainingCost = SkillTrainingCosts.getSkillImprovementCost(campaign, person, skillName);
+        if (trainingCost.isZero()) {
+            return true;
+        }
+
+        if (campaign.getPlayerForce().getFinances().debit(TransactionType.EDUCATION,
+              campaign.getLocalDate(),
+              trainingCost,
+              getFormattedTextAt(GUI_RESOURCE_BUNDLE, "skillTraining.transaction", person.getFullTitle(),
+                    skillName))) {
+            return true;
+        }
+
+        campaign.addReport(PERSONNEL, getFormattedTextAt(GUI_RESOURCE_BUNDLE, "skillTraining.insufficientFunds",
+              spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, person.getHyperlinkedName(),
+              skillName, trainingCost.toAmountAndSymbolString()));
+        return false;
     }
 
     /**

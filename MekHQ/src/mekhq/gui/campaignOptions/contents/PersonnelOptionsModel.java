@@ -54,6 +54,7 @@ class PersonnelOptionsModel {
     boolean useAbilities;
     boolean useSpaTrainingCosts;
     boolean capTotalSpas;
+    boolean skillImprovementsCostCBills;
     boolean onlyCommandersMatterVehicles;
     boolean onlyCommandersMatterInfantry;
     boolean onlyCommandersMatterBattleArmor;
@@ -163,6 +164,7 @@ class PersonnelOptionsModel {
         useAbilities = options.get(CampaignOption.USE_ABILITIES);
         useSpaTrainingCosts = options.get(CampaignOption.USE_SPA_TRAINING_COSTS);
         capTotalSpas = options.get(CampaignOption.CAP_TOTAL_SPAS);
+        skillImprovementsCostCBills = options.get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS);
         onlyCommandersMatterVehicles = options.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES);
         onlyCommandersMatterInfantry = options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY);
         onlyCommandersMatterBattleArmor = options.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR);
@@ -273,6 +275,7 @@ class PersonnelOptionsModel {
         options.set(CampaignOption.USE_ABILITIES, useAbilities);
         options.set(CampaignOption.USE_SPA_TRAINING_COSTS, useSpaTrainingCosts);
         options.set(CampaignOption.CAP_TOTAL_SPAS, capTotalSpas);
+        options.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, skillImprovementsCostCBills);
         options.set(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES, onlyCommandersMatterVehicles);
         options.set(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY, onlyCommandersMatterInfantry);
         options.set(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR, onlyCommandersMatterBattleArmor);

@@ -307,6 +307,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "useSpaTrainingCosts");
     public static final CampaignOption<Boolean> CAP_TOTAL_SPAS =
           of(Boolean.class, false, "capTotalSpas");
+    public static final CampaignOption<Boolean> SKILL_IMPROVEMENTS_COST_C_BILLS =
+          of(Boolean.class, false, "skillImprovementsCostCBills");
     public static final CampaignOption<Boolean> ONLY_COMMANDERS_MATTER_VEHICLES =
           of(Boolean.class, false, "onlyCommandersMatterVehicles");
     public static final CampaignOption<Boolean> ONLY_COMMANDERS_MATTER_INFANTRY =
