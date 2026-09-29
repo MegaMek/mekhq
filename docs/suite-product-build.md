@@ -33,7 +33,7 @@ checks sibling archive records and product jars before packaging. Each archive
 contains `suite-build.properties` at its normal root (schema 1, product,
 version, four commits and minimum Java 21). MekHQ's archive continues to
 include all three launcher jars, scripts and bundled data, while excluding
-user-specific settings.
+user-specific settings and user data.
 
 For local verification, run `:MekHQ:verifySuiteMekHQArchive` with the same
 properties. This builds the archive if absent; add

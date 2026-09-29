@@ -171,7 +171,8 @@ def checkSuitePins = {
                 return
             }
             def relative = path.replaceFirst(/^(?:megamek|megameklab|MekHQ)\//, '')
-            if (relative ==~ /mmconf\/(?:clientsettings\.xml|gameoptions\.xml|(?:mm|mml|mhq)\.preferences|megameklab\.properties(?:\.bak)?|recent-advanced-searches\.json|recent_boards\.yml|searches\/[^\/]+\.json)/
+            if (relative.startsWith('userdata/')
+                    || relative ==~ /mmconf\/(?:clientsettings\.xml|gameoptions\.xml|(?:mm|mml|mhq)\.preferences|megameklab\.properties(?:\.bak)?|recent-advanced-searches\.json|recent_boards\.yml|searches\/[^\/]+\.json)/
                     || relative in ['docs/OfficialUnitList.txt', 'docs/mm-revision.txt',
                                     'docs/mml-revision.txt', 'docs/mhq-revision.txt',
                                     'MegaMek.l4j.ini', 'MegaMekLab.l4j.ini', 'MekHQ.l4j.ini',
@@ -386,6 +387,7 @@ if (suiteVersion != null) {
                 }
                 if (!entry.directory) {
                     if (!paths.add(path) || forbidden.contains(path.substring(path.lastIndexOf('/') + 1))
+                            || path.startsWith(root + 'userdata/')
                             || path.endsWith('.cache') || path.startsWith(root + 'mmconf/searches/')) {
                         throw new GradleException("Duplicate or protected user data in archive: ${path}")
                     }
@@ -863,6 +865,9 @@ tasks.register('stageFiles', Copy) {
     exclude "mmconf/recent-advanced-searches.json"
     exclude "mmconf/recent_boards.yml"
     exclude "mmconf/searches/*.json"
+    if (suiteVersion != null) {
+        exclude "userdata/**"
+    }
 
     exclude("data/**/*.cache")
 
