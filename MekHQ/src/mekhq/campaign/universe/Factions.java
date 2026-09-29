@@ -365,7 +365,7 @@ public class Factions {
      * @author Illiani
      * @since 0.51.0
      */
-    private static String getFactionLogoAddress(int gameYear, String factionCode) {
+    public static String getFactionLogoAddress(int gameYear, String factionCode) {
         final String IMAGE_DIRECTORY = "data/images/universe/factions/";
         final String FILE_TYPE = ".png";
 

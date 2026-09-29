@@ -39,6 +39,48 @@ sourceSets {
             srcDirs = ['testresources']
         }
     }
+    skikoStress {
+        java.srcDirs = ['experimental/skiko/src']
+        resources.srcDirs = ['experimental/skiko/resources']
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    skikoStressImplementation.extendsFrom implementation
+    skikoStressRuntimeOnly.extendsFrom runtimeOnly
+}
+
+def skikoVersion = '0.150.1'
+def skikoOs = System.getProperty('os.name').toLowerCase(Locale.ROOT)
+def skikoPlatform = skikoOs.startsWith('windows') ? 'windows' : skikoOs.startsWith('mac') ? 'macos' : 'linux'
+def skikoArch = System.getProperty('os.arch') in ['aarch64', 'arm64'] ? 'arm64' : 'x64'
+
+dependencies {
+    skikoStressImplementation "org.jetbrains.skiko:skiko-awt:${skikoVersion}"
+    skikoStressImplementation 'org.jetbrains.kotlin:kotlin-stdlib:2.3.20'
+    skikoStressImplementation 'net.bytebuddy:byte-buddy:1.17.7'
+    skikoStressRuntimeOnly "org.jetbrains.skiko:skiko-awt-runtime-${skikoPlatform}-${skikoArch}:${skikoVersion}"
+}
+
+def skikoStageAgent = tasks.register('skikoStageAgent', Jar) {
+    dependsOn tasks.named('compileSkikoStressJava')
+    archiveClassifier = 'skiko-stage-agent'
+    from(sourceSets.skikoStress.output) {
+        include 'mekhq/gui/SkikoStageAgent*.class'
+    }
+    manifest.attributes('Premain-Class': 'mekhq.gui.SkikoStageAgent')
+}
+
+tasks.register('runSkikoStress', JavaExec) {
+    group = 'application'
+    description = 'Runs the isolated Swing/Skiko integration stress harness (not included in distributions)'
+    classpath = sourceSets.skikoStress.runtimeClasspath
+    mainClass = 'mekhq.gui.experimental.SkikoIntegrationStress'
+    workingDir = projectDir
+    System.getProperties().findAll { key, value -> key.toString().startsWith('skiko.') && value != null }
+            .each { key, value -> systemProperty key.toString(), value.toString() }
 }
 
 ext {
@@ -117,6 +159,35 @@ application {
             'java.base/java.util.concurrent=ALL-UNNAMED',
             '-Dsun.awt.disablegrab=true'
     ]
+}
+
+tasks.register('runSkikoMap', JavaExec) {
+    group = 'application'
+    description = 'Runs MekHQ with a menu toggle between Java2D and the experimental native Skia star map'
+    classpath = sourceSets.skikoStress.runtimeClasspath
+    mainClass = application.mainClass
+    workingDir = projectDir
+    jvmArgs application.applicationDefaultJvmArgs
+    System.getProperties().findAll { key, value ->
+        (key.toString().startsWith('mekhq.') || key.toString().startsWith('skiko.')) && value != null
+    }.each { key, value -> systemProperty key.toString(), value.toString() }
+    systemProperty 'mekhq.experimental.skikoMap', 'true'
+}
+
+tasks.register('runSkikoMapSmoke', JavaExec) {
+    group = 'application'
+    description = 'Exercises the real campaign MapTab with a temporary in-memory campaign'
+    classpath = sourceSets.skikoStress.runtimeClasspath
+    mainClass = 'mekhq.SkikoMapSmoke'
+    workingDir = projectDir
+    jvmArgs application.applicationDefaultJvmArgs
+    if (providers.gradleProperty('skikoStageTiming').isPresent()) {
+        dependsOn skikoStageAgent
+        jvmArgs '--add-opens=java.desktop/sun.java2d=ALL-UNNAMED'
+        doFirst {
+            jvmArgs "-javaagent:${skikoStageAgent.get().archiveFile.get().asFile.absolutePath}"
+        }
+    }
 }
 
 // Forward mekhq.* system properties set on the Gradle daemon (e.g. via IDEA Run Config "VM options",

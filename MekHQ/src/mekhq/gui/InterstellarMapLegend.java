@@ -167,10 +167,27 @@ final class InterstellarMapLegend {
     }
 
     static JTabbedPane createTabbedPane(SymbolPainter symbolPainter) {
+        return createTabbedPane(symbolPainter, symbol -> true);
+    }
+
+    static JTabbedPane createTabbedPane(SymbolPainter symbolPainter,
+          java.util.function.Predicate<Symbol> supported) {
+        List<Section> sections = new ArrayList<>();
+        for (Section section : SECTIONS) {
+            List<Entry> entries = new ArrayList<>();
+            for (Entry entry : section.entries()) {
+                if (supported.test(entry.symbol())) {
+                    entries.add(entry);
+                }
+            }
+            if (!entries.isEmpty()) {
+                sections.add(new Section(section.heading(), entries));
+            }
+        }
         int contentWidth = UIUtil.scaleForGUI(CONTENT_WIDTH);
         List<JPanel> sectionPanels = new ArrayList<>(SECTIONS.size());
         int maximumSectionHeight = 1;
-        for (Section section : SECTIONS) {
+        for (Section section : sections) {
             JPanel sectionPanel = createSection(section, contentWidth, symbolPainter);
             sectionPanels.add(sectionPanel);
             maximumSectionHeight = Math.max(maximumSectionHeight, sectionPanel.getPreferredSize().height);
@@ -186,7 +203,7 @@ final class InterstellarMapLegend {
         tabbedPane.getAccessibleContext().setAccessibleName(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.legend.accessibleName"));
         tabbedPane.getAccessibleContext().setAccessibleDescription(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "map.legend.accessibleDescription"));
         for (int sectionIndex = 0; sectionIndex < sectionPanels.size(); sectionIndex++) {
-            Section section = SECTIONS.get(sectionIndex);
+            Section section = sections.get(sectionIndex);
             JScrollPane scrollPane = createSectionScrollPane(sectionPanels.get(sectionIndex), contentWidth,
                   viewportHeight);
             tabbedPane.addTab(section.heading(), scrollPane);
