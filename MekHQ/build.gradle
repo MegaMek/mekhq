@@ -148,11 +148,11 @@ def readSuiteArchive = { File archive, String product ->
     if (!archive.isFile()) {
         throw new GradleException("Missing ${product} suite archive: ${archive}")
     }
-    def root = "${product}-${suiteVersion}"
+    String root = "${product}-${suiteVersion}"
     def recordFiles = []
     def jars = [] as Set
     tarTree(resources.gzip(archive)).visit { entry ->
-        def path = entry.path.replace('\\', '/')
+        String path = entry.path.replace('\\', '/')
         if (path != root && !path.startsWith("${root}/")) {
             throw new GradleException("${archive}: unexpected archive root ${path}")
         }
@@ -179,7 +179,7 @@ def readSuiteArchive = { File archive, String product ->
         throw new GradleException("${archive}: missing ${root}/suite-build.properties")
     }
     assertSuiteRecord(recordFiles[0], archive.name, product)
-    if (!jars.contains("${root}/${product}.jar") || !jars.contains("${root}/lib/${product}.jar")) {
+    if (!jars.contains(root + '/' + product + '.jar') || !jars.contains(root + '/lib/' + product + '.jar')) {
         throw new GradleException("${archive}: missing ${product} launcher jar")
     }
 }
@@ -243,7 +243,7 @@ if (suiteVersion != null) {
             if (!archive.isFile() || archive.name != "MekHQ-${suiteVersion}.tar.gz") {
                 throw new GradleException("Missing or incorrectly named MekHQ suite archive: ${archive}")
             }
-            def root = "MekHQ-${suiteVersion}/"
+            String root = "MekHQ-${suiteVersion}/"
             def paths = [] as Set
             def records = []
             def forbidden = ['clientsettings.xml', 'gameoptions.xml', 'recent-advanced-searches.json',
@@ -251,7 +251,7 @@ if (suiteVersion != null) {
                              'megameklab.properties.bak', 'mhq.preferences', 'mm.preferences',
                              'mml.preferences']
             tarTree(resources.gzip(archive)).visit { entry ->
-                def path = entry.path.replace('\\', '/')
+                String path = entry.path.replace('\\', '/')
                 if (path != root[0..-2] && !path.startsWith(root)) {
                     throw new GradleException("Wrong suite archive root: ${path}")
                 }
