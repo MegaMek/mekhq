@@ -1904,7 +1904,8 @@ public class Refit extends Part implements IAcquisitionWork {
             part.setUnit(oldUnit);
             part.setRefitUnit(null);
             newParts.add(part);
-            if (part instanceof Armor) {
+            if (part instanceof Armor armor) {
+                keepDamageOnUnchangedArmor(armor);
                 // get amounts correct for armor
                 part.updateConditionFromEntity(false);
             }
@@ -1991,6 +1992,7 @@ public class Refit extends Part implements IAcquisitionWork {
             campaign.addReport(PERSONNEL, report);
         }
         oldUnit.resetPilotAndEntity();
+        addPartsForNewLocations();
 
         if (isRefurbishing) {
             for (Part part : oldUnit.getParts()) {
@@ -2020,6 +2022,61 @@ public class Refit extends Part implements IAcquisitionWork {
         }
         armor.setUnit(oldUnit);
         return armor;
+    }
+
+    /**
+     * A refit kit carries the armor the refit needs. It goes straight into this refit's own armor supplies, which are
+     * reserved for the refit, so no repair can use it first, and {@link #partsInTransit()} waits for it to arrive.
+     *
+     * @param transitDays how long the kit takes to arrive
+     */
+    private void addKitArmor(int transitDays) {
+        int kitArmorPoints = armorNeeded - newArmorSupplies.getAmount();
+        if (kitArmorPoints <= 0) {
+            return;
+        }
+        newArmorSupplies.setAmount(armorNeeded);
+        newArmorSupplies.setAmountNeeded(0);
+        if (newArmorSupplies.getId() <= 0) {
+            getCampaign().getQuartermaster().addPart(newArmorSupplies, transitDays, false);
+        } else {
+            newArmorSupplies.setDaysToArrival(transitDays);
+        }
+        LOGGER.debug("[Refit] {}: the kit brings {} points of {}, reserved for the refit, arriving in {} days",
+              oldUnit.getName(), kitArmorPoints, newArmorSupplies.getName(), transitDays);
+    }
+
+    /**
+     * Armor on a location whose total the refit does not change is carried over as it is, damage included; only
+     * locations the refit changes get new armor. The unit's new design is loaded at full armor, so its value for such
+     * a location is set back to what the armor part holds before the part reads it.
+     *
+     * @param armor an armor part the refitted unit keeps
+     */
+    private void keepDamageOnUnchangedArmor(Armor armor) {
+        Entity entity = oldUnit.getEntity();
+        int location = armor.getLocation();
+        boolean isRear = armor.isRearMounted();
+        boolean isUnchangedLocation = armor.getTotalAmount() == entity.getOArmor(location, isRear);
+        if (isUnchangedLocation && (armor.getAmount() < armor.getTotalAmount())) {
+            entity.setArmor(armor.getAmount(), location, isRear);
+            LOGGER.debug("[Refit] {}: {} keeps its damage, {} of {} armor points", oldUnit.getName(),
+                  entity.getLocationAbbr(location), armor.getAmount(), armor.getTotalAmount());
+        }
+    }
+
+    /**
+     * A location the new design adds, such as a vehicle's new turret, has no armor or structure parts yet. The unit
+     * creates them the same way it does when a campaign is loaded.
+     */
+    private void addPartsForNewLocations() {
+        int partsBefore = oldUnit.getParts().size();
+        oldUnit.initializeParts(true);
+        int partsAdded = oldUnit.getParts().size() - partsBefore;
+        if (partsAdded > 0) {
+            LOGGER.debug("[Refit] {}: added {} parts for locations the new design adds", oldUnit.getName(),
+                  partsAdded);
+        }
     }
 
     /**
@@ -2910,13 +2967,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
         if (null != newArmorSupplies) {
-            int amount = armorNeeded - newArmorSupplies.getAmount();
-            if (amount > 0) {
-                Armor armor = (Armor) newArmorSupplies.getNewPart();
-                armor.setAmount(amount);
-                getCampaign().getQuartermaster().addPart(armor, transitDays, false);
-            }
-            orderArmorSupplies();
+            addKitArmor(transitDays);
         }
         shoppingList = new ArrayList<>();
         kitFound = true;

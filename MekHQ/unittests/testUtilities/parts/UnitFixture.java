@@ -88,6 +88,10 @@ public enum UnitFixture {
     HUNCHBACK_HBK_4P("Hunchback HBK-4P", false, Mek.class),
     /** Vedette Medium Tank, a tracked combat vehicle. Source: {@code vehicles/3039u/Vedette Medium Tank.blk}. */
     VEDETTE_MEDIUM_TANK("Vedette Medium Tank", true, Tank.class),
+    /** Armored Personnel Carrier (Hover LRM), a hover APC without a turret. Source: {@code vehicles/3039u/APC (Hover LRM).blk}. */
+    APC_HOVER_LRM("APC (Hover LRM)", true, Tank.class),
+    /** Armored Personnel Carrier (Hover MG), the same APC with a turret. Source: {@code vehicles/3039u/APC (Hover MG).blk}. */
+    APC_HOVER_MG("APC (Hover MG)", true, Tank.class),
     /**
      * Epona Pursuit Tank Prime, a Clan hover OmniVehicle with its weapons in the turret. Source:
      * {@code vehicles/3060u/Epona Pursuit Tank Prime.blk}.
