@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.parts;
 
+import java.util.List;
+
 import megamek.common.units.Entity;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.kfs.KFChargingSystem;
@@ -60,6 +62,20 @@ import mekhq.campaign.unit.Unit;
  * difference in price. A change of K-F drive core type is a new drive.
  */
 final class RefitSpacecraftSystems {
+    /** The missing parts that stand for a ship component a refit fits new. */
+    private static final List<Class<? extends Part>> NEW_SHIP_COMPONENT_TYPES = List.of(
+          MissingDropshipDockingCollar.class,
+          MissingJumpshipDockingCollar.class,
+          MissingKFBoom.class,
+          MissingLFBattery.class,
+          MissingKFDriveCoil.class,
+          MissingKFDriveController.class,
+          MissingKFFieldInitiator.class,
+          MissingKFChargingSystem.class,
+          MissingKFHeliumTank.class,
+          MissingFireControlSystem.class,
+          MissingAeroLifeSupport.class);
+
     private RefitSpacecraftSystems() {}
 
     /**
@@ -69,9 +85,13 @@ final class RefitSpacecraftSystems {
      * @return {@code true} if both are the same ship-wide system, which the ship keeps through the refit
      */
     static boolean isSameSystem(Part oldPart, Part newPart) {
+        if (oldPart instanceof FireControlSystem) {
+            return newPart instanceof FireControlSystem;
+        }
+        if (oldPart instanceof CombatInformationCenter) {
+            return newPart instanceof CombatInformationCenter;
+        }
         return switch (oldPart) {
-            case FireControlSystem ignored -> newPart instanceof FireControlSystem;
-            case CombatInformationCenter ignored -> newPart instanceof CombatInformationCenter;
             case AeroLifeSupport oldLifeSupport -> (newPart instanceof AeroLifeSupport newLifeSupport)
                   && (oldLifeSupport.isForFighter() == newLifeSupport.isForFighter());
             case KFDriveCoil oldCoil -> (newPart instanceof KFDriveCoil newCoil)
@@ -99,20 +119,12 @@ final class RefitSpacecraftSystems {
      * @return {@code true} if it is a new ship component
      */
     static boolean isNewShipComponent(Part newPart) {
-        return switch (newPart) {
-            case MissingDropshipDockingCollar ignored -> true;
-            case MissingJumpshipDockingCollar ignored -> true;
-            case MissingKFBoom ignored -> true;
-            case MissingLFBattery ignored -> true;
-            case MissingKFDriveCoil ignored -> true;
-            case MissingKFDriveController ignored -> true;
-            case MissingKFFieldInitiator ignored -> true;
-            case MissingKFChargingSystem ignored -> true;
-            case MissingKFHeliumTank ignored -> true;
-            case MissingFireControlSystem ignored -> true;
-            case MissingAeroLifeSupport ignored -> true;
-            default -> false;
-        };
+        for (Class<? extends Part> shipComponentType : NEW_SHIP_COMPONENT_TYPES) {
+            if (shipComponentType.isInstance(newPart)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
