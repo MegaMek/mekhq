@@ -1353,6 +1353,47 @@ public final class MHQOptions extends SuiteOptions {
               .putBoolean(MHQConstants.SELF_CORRECT_MAINTENANCE, value);
     }
 
+    /**
+     * @return {@code true} if units loaded into a transport's bays should be skipped by the automated travel
+     *       mothballing
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean getDoNotMothballUnitsInBays() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.DO_NOT_MOTHBALL_UNITS_IN_BAYS, false);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setDoNotMothballUnitsInBays(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.DO_NOT_MOTHBALL_UNITS_IN_BAYS, value);
+    }
+
+    /**
+     * @return {@code true} if salvage units should be skipped by the automated travel mothballing
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean getDoNotMothballSalvage() {
+        return userPreferences.node(MHQConstants.NEW_DAY_NODE)
+                     .getBoolean(MHQConstants.DO_NOT_MOTHBALL_SALVAGE, false);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setDoNotMothballSalvage(final boolean value) {
+        userPreferences.node(MHQConstants.NEW_DAY_NODE)
+              .putBoolean(MHQConstants.DO_NOT_MOTHBALL_SALVAGE, value);
+    }
+
     public boolean getNewDayFormationIconOperationalStatus() {
         return userPreferences.node(MHQConstants.NEW_DAY_NODE)
                      .getBoolean(MHQConstants.NEW_DAY_FORCE_ICON_OPERATIONAL_STATUS, true);

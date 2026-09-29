@@ -52,6 +52,7 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
@@ -174,6 +175,11 @@ public class ContractAutomation {
         List<UUID> mothballTargets = new ArrayList<>();
         MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
 
+        final MHQOptions mhqOptions = MekHQ.getMHQOptions();
+        // Null during unit tests
+        final boolean skipUnitsInBays = (mhqOptions != null) && mhqOptions.getDoNotMothballUnitsInBays();
+        final boolean skipSalvage = (mhqOptions != null) && mhqOptions.getDoNotMothballSalvage();
+
         Set<UUID> detachmentUnitIds = detachment.getHangar().getUnits().stream()
                                             .map(Unit::getId)
                                             .collect(Collectors.toSet());
@@ -190,6 +196,14 @@ public class ContractAutomation {
 
                 if (unit == null) {
                     logger.error("Failed to get unit for unit ID {}", unitId);
+                    continue;
+                }
+
+                if (skipUnitsInBays && isAssignedToTransport(unit)) {
+                    continue;
+                }
+
+                if (skipSalvage && unit.isSalvage()) {
                     continue;
                 }
 
@@ -218,6 +232,26 @@ public class ContractAutomation {
         }
 
         detachment.setAutomatedMothballUnits(mothballTargets);
+    }
+
+    /**
+     * Checks whether the unit is assigned to another unit in the TO&amp;E for any kind of transport (ship, tactical or
+     * tow).
+     *
+     * @param unit the unit to check
+     *
+     * @return {@code true} if the unit has a transport assignment of any type
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isAssignedToTransport(Unit unit) {
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            if (unit.hasTransportAssignment(campaignTransportType)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
