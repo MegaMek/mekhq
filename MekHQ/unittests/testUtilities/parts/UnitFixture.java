@@ -88,6 +88,16 @@ public enum UnitFixture {
     HUNCHBACK_HBK_4P("Hunchback HBK-4P", false, Mek.class),
     /** Vedette Medium Tank, a tracked combat vehicle. Source: {@code vehicles/3039u/Vedette Medium Tank.blk}. */
     VEDETTE_MEDIUM_TANK("Vedette Medium Tank", true, Tank.class),
+    /**
+     * Epona Pursuit Tank Prime, a Clan hover OmniVehicle with its weapons in the turret. Source:
+     * {@code vehicles/3060u/Epona Pursuit Tank Prime.blk}.
+     */
+    EPONA_PURSUIT_TANK_PRIME("Epona Pursuit Tank Prime", true, Tank.class),
+    /**
+     * Epona Pursuit Tank A, another configuration of the same OmniVehicle, with weapons in the front and turret.
+     * Source: {@code vehicles/3060u/Epona Pursuit Tank A.blk}.
+     */
+    EPONA_PURSUIT_TANK_A("Epona Pursuit Tank A", true, Tank.class),
     /** Warrior H-7 Attack Helicopter, a VTOL. Source: {@code vehicles/3039u/Warrior H-7 Attack Helicopter.blk}. */
     WARRIOR_H_7_ATTACK_HELICOPTER("Warrior H-7 Attack Helicopter", true, VTOL.class),
     /**
@@ -100,6 +110,16 @@ public enum UnitFixture {
      * {@code battlearmor/3058Uu/Elemental BA [Laser] (Sqd5).blk}.
      */
     ELEMENTAL_BATTLE_ARMOR_LASER("Elemental BA [Laser] (Sqd5)", true, BattleArmor.class),
+    /**
+     * Elemental battle armor with flamers instead of lasers, the same point of five. Source:
+     * {@code battlearmor/3058Uu/Elemental BA [Flamer] (Sqd5).blk}.
+     */
+    ELEMENTAL_BATTLE_ARMOR_FLAMER("Elemental BA [Flamer] (Sqd5)", true, BattleArmor.class),
+    /**
+     * Elemental battle armor with lasers in a squad of six, one trooper more than the point of five. Source:
+     * {@code battlearmor/3058Uu/Elemental BA [Laser] (Sqd6).blk}.
+     */
+    ELEMENTAL_BATTLE_ARMOR_LASER_SQUAD_OF_SIX("Elemental BA [Laser] (Sqd6)", true, BattleArmor.class),
     /**
      * A conventional foot platoon. Source: {@code infantry/DCMS/Foot Platoon (DCMS) (Laser 2620+).blk} (older pinned
      * copy).

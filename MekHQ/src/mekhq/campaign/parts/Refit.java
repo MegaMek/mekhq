@@ -62,10 +62,12 @@ import megamek.common.enums.TechRating;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Engine;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
+import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -363,7 +365,10 @@ public class Refit extends Part implements IAcquisitionWork {
      * happening in this refit.
      */
     public void calculate() {
+        // A new Unit resets its entity's camouflage; for a refurbishment that entity is the unit's own, so keep it
+        Camouflage camouflageBeforeRefit = newEntity.getCamouflage();
         Unit newUnit = new Unit(newEntity, getCampaign());
+        newEntity.setCamouflage(camouflageBeforeRefit);
         newUnit.initializeParts(false);
         refitClass = NO_CHANGE;
         boolean isOmniRefit = oldUnit.getEntity().isOmni() && newEntity.isOmni();
@@ -958,6 +963,9 @@ public class Refit extends Part implements IAcquisitionWork {
                       0,
                       Entity.LOC_NONE,
                       getCampaign());
+            } else if (newEntity instanceof BattleArmor) {
+                // Battle armor is bought by the point, not by the ton like Mek armor
+                newArmorSupplies = new BAArmor(0, 0, armorType, Entity.LOC_NONE, armorIsClan, getCampaign());
             } else {
                 newArmorSupplies = new Armor(0, armorType, 0, 0, false, armorIsClan, getCampaign());
             }
@@ -1122,9 +1130,16 @@ public class Refit extends Part implements IAcquisitionWork {
             time = 0;
         }
 
+        if (isBattleArmorSquadGrowing()) {
+            // Adding troopers needs new suits bought for them; until that is supported, refuse rather than hand them
+            // out for free
+            errorStrings.add(getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "Refit.battleArmor.squadGrowth"));
+        }
+
         // figure out if we are putting new stuff on a missing location
         if (!replacingLocations) {
-            for (int loc = 0; loc < newEntity.locations(); loc++) {
+            int oldLocations = oldUnit.getEntity().locations();
+            for (int loc = 0; loc < Math.min(newEntity.locations(), oldLocations); loc++) {
                 if (locationHasNewStuff[loc] && oldUnit.isLocationDestroyed(loc)) {
                     // FIXME: WeaverThree - Why would this be a thing? Surely we'd replace the
                     // location during the refit...
@@ -1583,12 +1598,147 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * An Omni reconfiguration only swaps pod-mounted equipment: the refit neither removes nor adds the unit's fixed
+     * parts (engine, gyro, structure, actuators, fixed weapons). Those parts must stay on the unit when its part list is
+     * rebuilt from the refit.
+     *
+     * @param oldEntity the unit's entity before the refit
+     *
+     * @return the unit's parts the refit does not touch, or an empty list when this is not an Omni reconfiguration
+     */
+    private List<Part> getFixedPartsKeptByOmniRefit(Entity oldEntity) {
+        boolean isOmniRefit = oldEntity.isOmni() && newEntity.isOmni();
+        if (!isOmniRefit) {
+            return List.of();
+        }
+        Set<Part> partsTheRefitHandles = Collections.newSetFromMap(new IdentityHashMap<>());
+        partsTheRefitHandles.addAll(oldUnitParts);
+        partsTheRefitHandles.addAll(newUnitParts);
+        List<Part> fixedParts = new ArrayList<>();
+        for (Part part : oldUnit.getParts()) {
+            if (!partsTheRefitHandles.contains(part)) {
+                fixedParts.add(part);
+            }
+        }
+        LOGGER.debug("[Refit] Omni reconfiguration of {} keeps {} fixed parts", oldUnit.getName(), fixedParts.size());
+        return fixedParts;
+    }
+
+    /**
+     * Designs may differ in their lower arm and hand actuators, as Omni configurations often do. The refit matches an
+     * actuator by type, not by arm, so an actuator the unit keeps may sit in an arm that no longer has one. Such an
+     * actuator is released (given no location), so that {@link #assignArmActuators()} can move it to an arm that now
+     * needs one.
+     *
+     * @param partsTheUnitKeeps the parts the unit carries into the new design
+     *
+     * @return the actuators released from their arms
+     */
+    private List<MekActuator> releaseArmActuatorsTheNewDesignLacks(List<Part> partsTheUnitKeeps) {
+        List<MekActuator> releasedArmActuators = new ArrayList<>();
+        if (!(newEntity instanceof Mek newMek)) {
+            return releasedArmActuators;
+        }
+        for (Part part : partsTheUnitKeeps) {
+            if (!(part instanceof MekActuator actuator)) {
+                continue;
+            }
+            boolean isArmActuator = (actuator.getType() == Mek.ACTUATOR_LOWER_ARM)
+                  || (actuator.getType() == Mek.ACTUATOR_HAND);
+            if (isArmActuator && !newMek.hasSystem(actuator.getType(), actuator.getLocation())) {
+                LOGGER.debug("[Refit] {}: releasing {} from location {}", oldUnit.getName(), actuator.getName(),
+                      actuator.getLocation());
+                actuator.setLocation(Entity.LOC_NONE);
+                releasedArmActuators.add(actuator);
+            }
+        }
+        return releasedArmActuators;
+    }
+
+    /**
+     * Returns released arm actuators that no arm of the new configuration needed to the warehouse as spares.
+     *
+     * @param releasedArmActuators the actuators released by {@link #releaseArmActuatorsTheNewDesignLacks}
+     */
+    private void returnUnplacedArmActuators(List<MekActuator> releasedArmActuators) {
+        for (MekActuator actuator : releasedArmActuators) {
+            if (actuator.getLocation() != Entity.LOC_NONE) {
+                continue;
+            }
+            LOGGER.debug("[Refit] {}: {} is not needed by the new configuration and becomes a spare",
+                  oldUnit.getName(), actuator.getName());
+            oldUnit.removePart(actuator);
+            actuator.setUnit(null);
+            getCampaign().getQuartermaster().addPart(actuator, 0, false);
+        }
+    }
+
+    /**
+     * @return {@code true} if this refits a battle armor squad into a design with more troopers
+     */
+    private boolean isBattleArmorSquadGrowing() {
+        return (oldUnit.getEntity() instanceof BattleArmor) && (newEntity instanceof BattleArmor)
+              && (newEntity.locations() > oldUnit.getEntity().locations());
+    }
+
+    /**
+     * @return each trooper's suit on the unit, intact or destroyed, by trooper location
+     */
+    private static Map<Integer, Part> getBattleArmorSuitsByTrooper(Unit unit) {
+        Map<Integer, Part> suitsByTrooper = new HashMap<>();
+        for (Part part : unit.getParts()) {
+            if ((part instanceof BattleArmorSuit) || (part instanceof MissingBattleArmorSuit)) {
+                suitsByTrooper.put(part.getLocation(), part);
+            }
+        }
+        return suitsByTrooper;
+    }
+
+    /**
+     * A battle armor refit alters each trooper's existing suit rather than replacing it: a suit keeps its quality, and
+     * a destroyed suit stays destroyed. Only the suit's design changes.
+     *
+     * @param newBattleArmor    the new design, already on the unit
+     * @param oldSuitsByTrooper each trooper's suit before the refit
+     *
+     * @return one suit, or destroyed-suit placeholder, per trooper of the new design
+     */
+    private List<Part> createSuitsForNewDesign(BattleArmor newBattleArmor, Map<Integer, Part> oldSuitsByTrooper) {
+        List<Part> suits = new ArrayList<>();
+        for (int trooper = BattleArmor.LOC_TROOPER_1; trooper < newBattleArmor.locations(); trooper++) {
+            BattleArmorSuit suit = new BattleArmorSuit(newBattleArmor, trooper, getCampaign());
+            Part oldSuit = oldSuitsByTrooper.get(trooper);
+            if (oldSuit instanceof MissingBattleArmorSuit) {
+                newBattleArmor.setInternal(IArmorState.ARMOR_DESTROYED, trooper);
+                MissingPart destroyedSuit = suit.getMissingPart();
+                destroyedSuit.setUnit(oldUnit);
+                getCampaign().getQuartermaster().addPart(destroyedSuit, 0, false);
+                suits.add(destroyedSuit);
+                continue;
+            }
+            if (oldSuit != null) {
+                suit.setQuality(oldSuit.getQuality());
+                suit.setBrandNew(oldSuit.isBrandNew());
+            }
+            suit.setUnit(oldUnit);
+            suits.add(suit);
+        }
+        LOGGER.debug("[Refit] {}: {} troopers carried into the new suit design", oldUnit.getName(), suits.size());
+        return suits;
+    }
+
+    /**
      * Actually transform the old unit into the new one, and do all the cleanup that that entails
      */
     private void complete() {
         boolean aClan = false;
         oldUnit.setRefit(null);
         Entity oldEntity = oldUnit.getEntity();
+        List<Part> fixedPartsToKeep = getFixedPartsKeptByOmniRefit(oldEntity);
+        List<Part> partsTheUnitKeeps = new ArrayList<>(fixedPartsToKeep);
+        partsTheUnitKeeps.addAll(newUnitParts);
+        List<MekActuator> releasedArmActuators = releaseArmActuatorsTheNewDesignLacks(partsTheUnitKeeps);
+        Map<Integer, Part> oldSuitsByTrooper = getBattleArmorSuitsByTrooper(oldUnit);
         // add old parts to the warehouse
         for (Part part : oldUnitParts) {
             part.setUnit(null);
@@ -1670,19 +1820,16 @@ public class Refit extends Part implements IAcquisitionWork {
 
         // don't forget to switch entities!
         // ----------------- from here on oldUnit refers to the new entity -------------------------
+        newEntity.setCamouflage(oldEntity.getCamouflage());
         oldUnit.setEntity(newEntity);
 
         UnitLogger.refit(oldUnit, getCampaign().getLocalDate(), oldModelName, newModelName);
 
-        // set up new parts
-        ArrayList<Part> newParts = new ArrayList<>();
-        // We've already made the old suits go *poof*; now we materialize new ones.
-        if (newEntity instanceof BattleArmor) {
-            for (int t = BattleArmor.LOC_TROOPER_1; t < newEntity.locations(); t++) {
-                Part suit = new BattleArmorSuit((BattleArmor) newEntity, t, getCampaign());
-                newParts.add(suit);
-                suit.setUnit(oldUnit);
-            }
+        // set up new parts, starting with any fixed parts an Omni reconfiguration leaves in place
+        ArrayList<Part> newParts = new ArrayList<>(fixedPartsToKeep);
+        // Each trooper's suit becomes a suit of the new design, keeping its quality or staying destroyed
+        if (newEntity instanceof BattleArmor newBattleArmor) {
+            newParts.addAll(createSuitsForNewDesign(newBattleArmor, oldSuitsByTrooper));
         }
 
         int expectedHeatSinkParts = 0;
@@ -1695,6 +1842,11 @@ public class Refit extends Part implements IAcquisitionWork {
         }
         Set<AmmoBin> keptAmmoBins = new HashSet<>();
         for (Part part : newUnitParts) {
+            if ((part instanceof BattleArmorSuit) || (part instanceof MissingBattleArmorSuit)) {
+                // Replaced by the suits built for the new design above
+                getWarehouse().removePart(part);
+                continue;
+            }
             if ((part instanceof AmmoBin keptAmmoBin) && (part.getUnit() == oldUnit)) {
                 keptAmmoBins.add(keptAmmoBin);
             }
@@ -1757,6 +1909,7 @@ public class Refit extends Part implements IAcquisitionWork {
         changeAmmoBinMunitions(oldUnit);
 
         assignArmActuators();
+        returnUnplacedArmActuators(releasedArmActuators);
         assignBayParts();
 
         if (newEntity instanceof Mek) {
@@ -2422,6 +2575,15 @@ public class Refit extends Part implements IAcquisitionWork {
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "newUnitParts");
         }
 
+        if (!oldIntegratedHeatSinks.isEmpty()) {
+            // The heat sinks freed from the engine exist only on this refit until it completes, so write them in full
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "oldIntegratedHeatSinks");
+            for (final Part part : oldIntegratedHeatSinks) {
+                part.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "oldIntegratedHeatSinks");
+        }
+
         if (!largeCraftBinsToChange.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lcBinsToChange");
             for (Part part : largeCraftBinsToChange) {
@@ -2539,6 +2701,8 @@ public class Refit extends Part implements IAcquisitionWork {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("shoppingList")) {
                     processShoppingListFromXML(retVal, wn2, retVal.oldUnit, version);
+                } else if (wn2.getNodeName().equalsIgnoreCase("oldIntegratedHeatSinks")) {
+                    processOldIntegratedHeatSinksFromXML(retVal, wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("newArmorSupplies")) {
                     processArmorSuppliesFromXML(retVal, wn2, version);
                 }
@@ -2549,6 +2713,32 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         return retVal;
+    }
+
+    /**
+     * Reads back the heat sinks the refit frees from the engine, which go to the warehouse when the refit completes.
+     */
+    private static void processOldIntegratedHeatSinksFromXML(Refit refit, Node heatSinksNode, Version version) {
+        NodeList childNodes = heatSinksNode.getChildNodes();
+        for (int index = 0; index < childNodes.getLength(); index++) {
+            Node childNode = childNodes.item(index);
+            if ((childNode.getNodeType() != Node.ELEMENT_NODE) || !childNode.getNodeName().equalsIgnoreCase("part")) {
+                continue;
+            }
+            Part heatSink = Part.generateInstanceFromXML(childNode, version);
+            if (heatSink == null) {
+                LOGGER.error("[Refit] Refit on unit {} has an unreadable freed heat sink", refit.oldUnit.getId());
+                continue;
+            }
+            refit.oldIntegratedHeatSinks.add(heatSink);
+        }
+    }
+
+    /**
+     * @return the heat sinks this refit frees from the engine; they go to the warehouse when the refit completes
+     */
+    public List<Part> getOldIntegratedHeatSinks() {
+        return Collections.unmodifiableList(oldIntegratedHeatSinks);
     }
 
     private static void processShoppingListFromXML(Refit retVal, Node wn, Unit u, Version version) {
@@ -2608,6 +2798,9 @@ public class Refit extends Part implements IAcquisitionWork {
         setCampaign(oldUnit.getCampaign());
         for (Part p : shoppingList) {
             p.setCampaign(oldUnit.getCampaign());
+        }
+        for (Part heatSink : oldIntegratedHeatSinks) {
+            heatSink.setCampaign(oldUnit.getCampaign());
         }
 
         if (null != newArmorSupplies) {
