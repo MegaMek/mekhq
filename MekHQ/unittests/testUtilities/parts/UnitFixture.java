@@ -111,6 +111,16 @@ public enum UnitFixture {
      */
     ELEMENTAL_BATTLE_ARMOR_LASER("Elemental BA [Laser] (Sqd5)", true, BattleArmor.class),
     /**
+     * Elemental battle armor with flamers instead of lasers, the same point of five. Source:
+     * {@code battlearmor/3058Uu/Elemental BA [Flamer] (Sqd5).blk}.
+     */
+    ELEMENTAL_BATTLE_ARMOR_FLAMER("Elemental BA [Flamer] (Sqd5)", true, BattleArmor.class),
+    /**
+     * Elemental battle armor with lasers in a squad of six, one trooper more than the point of five. Source:
+     * {@code battlearmor/3058Uu/Elemental BA [Laser] (Sqd6).blk}.
+     */
+    ELEMENTAL_BATTLE_ARMOR_LASER_SQUAD_OF_SIX("Elemental BA [Laser] (Sqd6)", true, BattleArmor.class),
+    /**
      * A conventional foot platoon. Source: {@code infantry/DCMS/Foot Platoon (DCMS) (Laser 2620+).blk} (older pinned
      * copy).
      */
