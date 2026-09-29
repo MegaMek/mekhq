@@ -62,6 +62,7 @@ import megamek.common.enums.TechRating;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Engine;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
@@ -961,6 +962,9 @@ public class Refit extends Part implements IAcquisitionWork {
                       0,
                       Entity.LOC_NONE,
                       getCampaign());
+            } else if (newEntity instanceof BattleArmor) {
+                // Battle armor is bought by the point, not by the ton like Mek armor
+                newArmorSupplies = new BAArmor(0, 0, armorType, Entity.LOC_NONE, armorIsClan, getCampaign());
             } else {
                 newArmorSupplies = new Armor(0, armorType, 0, 0, false, armorIsClan, getCampaign());
             }
@@ -1125,9 +1129,16 @@ public class Refit extends Part implements IAcquisitionWork {
             time = 0;
         }
 
+        if (isBattleArmorSquadGrowing()) {
+            // Adding troopers needs new suits bought for them; until that is supported, refuse rather than hand them
+            // out for free
+            errorStrings.add(getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "Refit.battleArmor.squadGrowth"));
+        }
+
         // figure out if we are putting new stuff on a missing location
         if (!replacingLocations) {
-            for (int loc = 0; loc < newEntity.locations(); loc++) {
+            int oldLocations = oldUnit.getEntity().locations();
+            for (int loc = 0; loc < Math.min(newEntity.locations(), oldLocations); loc++) {
                 if (locationHasNewStuff[loc] && oldUnit.isLocationDestroyed(loc)) {
                     // FIXME: WeaverThree - Why would this be a thing? Surely we'd replace the
                     // location during the refit...
@@ -1662,6 +1673,60 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * @return {@code true} if this refits a battle armor squad into a design with more troopers
+     */
+    private boolean isBattleArmorSquadGrowing() {
+        return (oldUnit.getEntity() instanceof BattleArmor) && (newEntity instanceof BattleArmor)
+              && (newEntity.locations() > oldUnit.getEntity().locations());
+    }
+
+    /**
+     * @return each trooper's suit on the unit, intact or destroyed, by trooper location
+     */
+    private static Map<Integer, Part> getBattleArmorSuitsByTrooper(Unit unit) {
+        Map<Integer, Part> suitsByTrooper = new HashMap<>();
+        for (Part part : unit.getParts()) {
+            if ((part instanceof BattleArmorSuit) || (part instanceof MissingBattleArmorSuit)) {
+                suitsByTrooper.put(part.getLocation(), part);
+            }
+        }
+        return suitsByTrooper;
+    }
+
+    /**
+     * A battle armor refit alters each trooper's existing suit rather than replacing it: a suit keeps its quality, and
+     * a destroyed suit stays destroyed. Only the suit's design changes.
+     *
+     * @param newBattleArmor    the new design, already on the unit
+     * @param oldSuitsByTrooper each trooper's suit before the refit
+     *
+     * @return one suit, or destroyed-suit placeholder, per trooper of the new design
+     */
+    private List<Part> createSuitsForNewDesign(BattleArmor newBattleArmor, Map<Integer, Part> oldSuitsByTrooper) {
+        List<Part> suits = new ArrayList<>();
+        for (int trooper = BattleArmor.LOC_TROOPER_1; trooper < newBattleArmor.locations(); trooper++) {
+            BattleArmorSuit suit = new BattleArmorSuit(newBattleArmor, trooper, getCampaign());
+            Part oldSuit = oldSuitsByTrooper.get(trooper);
+            if (oldSuit instanceof MissingBattleArmorSuit) {
+                newBattleArmor.setInternal(IArmorState.ARMOR_DESTROYED, trooper);
+                MissingPart destroyedSuit = suit.getMissingPart();
+                destroyedSuit.setUnit(oldUnit);
+                getCampaign().getQuartermaster().addPart(destroyedSuit, 0, false);
+                suits.add(destroyedSuit);
+                continue;
+            }
+            if (oldSuit != null) {
+                suit.setQuality(oldSuit.getQuality());
+                suit.setBrandNew(oldSuit.isBrandNew());
+            }
+            suit.setUnit(oldUnit);
+            suits.add(suit);
+        }
+        LOGGER.debug("[Refit] {}: {} troopers carried into the new suit design", oldUnit.getName(), suits.size());
+        return suits;
+    }
+
+    /**
      * Actually transform the old unit into the new one, and do all the cleanup that that entails
      */
     private void complete() {
@@ -1672,6 +1737,7 @@ public class Refit extends Part implements IAcquisitionWork {
         List<Part> partsTheUnitKeeps = new ArrayList<>(fixedPartsToKeep);
         partsTheUnitKeeps.addAll(newUnitParts);
         List<MekActuator> releasedArmActuators = releaseArmActuatorsTheNewDesignLacks(partsTheUnitKeeps);
+        Map<Integer, Part> oldSuitsByTrooper = getBattleArmorSuitsByTrooper(oldUnit);
         // add old parts to the warehouse
         for (Part part : oldUnitParts) {
             part.setUnit(null);
@@ -1760,13 +1826,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
         // set up new parts, starting with any fixed parts an Omni reconfiguration leaves in place
         ArrayList<Part> newParts = new ArrayList<>(fixedPartsToKeep);
-        // We've already made the old suits go *poof*; now we materialize new ones.
-        if (newEntity instanceof BattleArmor) {
-            for (int t = BattleArmor.LOC_TROOPER_1; t < newEntity.locations(); t++) {
-                Part suit = new BattleArmorSuit((BattleArmor) newEntity, t, getCampaign());
-                newParts.add(suit);
-                suit.setUnit(oldUnit);
-            }
+        // Each trooper's suit becomes a suit of the new design, keeping its quality or staying destroyed
+        if (newEntity instanceof BattleArmor newBattleArmor) {
+            newParts.addAll(createSuitsForNewDesign(newBattleArmor, oldSuitsByTrooper));
         }
 
         int expectedHeatSinkParts = 0;
@@ -1779,6 +1841,11 @@ public class Refit extends Part implements IAcquisitionWork {
         }
         Set<AmmoBin> keptAmmoBins = new HashSet<>();
         for (Part part : newUnitParts) {
+            if ((part instanceof BattleArmorSuit) || (part instanceof MissingBattleArmorSuit)) {
+                // Replaced by the suits built for the new design above
+                getWarehouse().removePart(part);
+                continue;
+            }
             if ((part instanceof AmmoBin keptAmmoBin) && (part.getUnit() == oldUnit)) {
                 keptAmmoBins.add(keptAmmoBin);
             }
