@@ -47,6 +47,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.enums.UnitMarketType;
+import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -154,6 +155,11 @@ public class UnitMarketOffer {
             cost = cost.multipliedBy(campaignOptions.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER));
         } else { // Inner Sphere Entity
             cost = cost.multipliedBy(campaignOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER));
+        }
+
+        // Battle Value ignores price quirks, which the construction cost already includes
+        if (campaignOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)) {
+            cost = cost.multipliedBy(Unit.getQuirkPriceMultiplier(entity));
         }
 
         return cost;

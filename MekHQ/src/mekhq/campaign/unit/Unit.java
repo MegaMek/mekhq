@@ -186,6 +186,8 @@ import org.w3c.dom.NodeList;
 public class Unit implements ITechnology, ILocatable {
     /** Under Alternate Unit Cost, units always sell for this fraction of their value */
     static final double ALTERNATE_UNIT_COST_SELL_FRACTION = 0.5;
+    private static final double GOOD_REPUTATION_1_PRICE_MULTIPLIER = 1.1;
+    private static final double GOOD_REPUTATION_2_PRICE_MULTIPLIER = 1.25;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Unit";
     private static final MMLogger LOGGER = MMLogger.create(Unit.class);
@@ -1668,7 +1670,7 @@ public class Unit implements ITechnology, ILocatable {
 
     public Money getSellValue() {
         if (isUseAlternateUnitCost()) {
-            return getAlternateUnitCost().multipliedBy(ALTERNATE_UNIT_COST_SELL_FRACTION);
+            return getAlternateSellValue();
         }
 
         Money partsValue = Money.zero();
@@ -1812,9 +1814,18 @@ public class Unit implements ITechnology, ILocatable {
             breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.buyNew",
                   alternateUnitCost.toAmountAndSymbolString())).append("<br>");
             breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.alternate.half",
-                  String.format("%.2f", ALTERNATE_UNIT_COST_SELL_FRACTION))).append("<hr>");
+                  String.format("%.2f", ALTERNATE_UNIT_COST_SELL_FRACTION))).append("<br>");
+            breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.quality",
+                  getQualityName(), String.format("%.2f", getAlternateQualityMultiplier()))).append("<br>");
+            double obsoleteMultiplier = entity.getObsoleteResaleModifier(campaign.getGameYear());
+            if (obsoleteMultiplier < 1.0) {
+                int yearsObsolete = campaign.getGameYear() - entity.getObsoleteYearForModifiers(campaign.getGameYear());
+                breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.obsolete",
+                      yearsObsolete, String.format("%.2f", obsoleteMultiplier))).append("<br>");
+            }
+            breakdown.append("<hr>");
             breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.sellFor",
-                  alternateUnitCost.multipliedBy(ALTERNATE_UNIT_COST_SELL_FRACTION).toAmountString()));
+                  getAlternateSellValue().toAmountString()));
             return breakdown.toString();
         }
 
@@ -3022,6 +3033,9 @@ public class Unit implements ITechnology, ILocatable {
      * lower it. Pilot skill, C3 networks, and TAG are excluded, since they depend on the crew and force rather than the
      * unit itself.</p>
      *
+     * <p>Quirks that affect a unit's traditional price, such as Good Reputation, affect this value too (see
+     * {@link #getQuirkPriceMultiplier(Entity)}).</p>
+     *
      * @return the unit's Battle Value-based value
      *
      * @author Illiani
@@ -3029,12 +3043,78 @@ public class Unit implements ITechnology, ILocatable {
      */
     public Money getAlternateUnitCost() {
         int battleValue = getUnitBattleValue();
-        double valueInSupportPoints = battleValue * getUnitPriceMultiplier();
+        double valueInSupportPoints = battleValue * getUnitPriceMultiplier() * getQuirkPriceMultiplier(getEntity());
         if (!getCampaign().getCampaignOptions().get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION)) {
             return Money.of(valueInSupportPoints);
         }
         // Converted here rather than through ChaosCampaignUtilities, whose integer maths overflows for large vessels
         return Money.of(valueInSupportPoints * ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION);
+    }
+
+    /**
+     * Gets the price multiplier from quirks that affect a unit's traditional price, for use with
+     * {@link CampaignOption#USE_ALTERNATE_UNIT_COST}. Matches MegaMek's construction cost: Good Reputation 1 (×1.1) and
+     * Good Reputation 2 (×1.25), which only affect 'Meks.
+     *
+     * @param unitEntity the unit's entity; may be {@code null}
+     *
+     * @return the quirk price multiplier, or 1.0 if no price quirks apply
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getQuirkPriceMultiplier(@Nullable Entity unitEntity) {
+        if (!(unitEntity instanceof Mek)) {
+            return 1.0;
+        }
+
+        if (unitEntity.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_1)) {
+            return GOOD_REPUTATION_1_PRICE_MULTIPLIER;
+        } else if (unitEntity.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_2)) {
+            return GOOD_REPUTATION_2_PRICE_MULTIPLIER;
+        }
+        return 1.0;
+    }
+
+    /**
+     * Gets the unit's sell value under {@link CampaignOption#USE_ALTERNATE_UNIT_COST}: half its
+     * {@link #getAlternateUnitCost()}, adjusted for the unit's quality (see {@link #getAlternateQualityMultiplier()}),
+     * then reduced further by the obsolete quirk resale modifier as a traditionally priced unit would be.
+     *
+     * @return the unit's Battle Value-based sell value
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    Money getAlternateSellValue() {
+        Money sellValue = getAlternateUnitCost().multipliedBy(ALTERNATE_UNIT_COST_SELL_FRACTION)
+                                .multipliedBy(getAlternateQualityMultiplier());
+        double obsoleteMultiplier = getEntity().getObsoleteResaleModifier(getCampaign().getGameYear());
+        if (obsoleteMultiplier < 1.0) {
+            sellValue = sellValue.multipliedBy(obsoleteMultiplier);
+        }
+        return sellValue;
+    }
+
+    /**
+     * Gets how much the unit's quality adjusts its sell value under {@link CampaignOption#USE_ALTERNATE_UNIT_COST}.
+     * Battle Value takes no account of quality, so the Used Part Price Multipliers are applied relative to average
+     * (quality D): a quality D unit sells for exactly half its value, while better and worse units sell for more and
+     * less. With the default multipliers, quality A sells at x0.2 of that half and quality F at x1.8.
+     *
+     * @return the quality multiplier, or 1.0 if the quality D multiplier is not positive
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    double getAlternateQualityMultiplier() {
+        double[] usedPartPriceMultipliers = getCampaign().getCampaignOptions()
+                                                  .get(CampaignOption.USED_PART_PRICE_MULTIPLIERS);
+        double averageMultiplier = usedPartPriceMultipliers[QUALITY_D.toNumeric()];
+        if (averageMultiplier <= 0) {
+            return 1.0;
+        }
+        return usedPartPriceMultipliers[getQuality().toNumeric()] / averageMultiplier;
     }
 
     public void writeToXML(final PrintWriter pw, int indent) {

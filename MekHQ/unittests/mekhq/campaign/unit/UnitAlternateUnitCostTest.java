@@ -37,8 +37,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,8 +52,10 @@ import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
+import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
+import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -67,7 +72,7 @@ import testUtilities.MHQTestUtilities;
 /**
  * Tests "Alternate Unit Cost": a unit is worth its current Battle Value (without pilot, C3, or TAG) in support points,
  * scaled by the tech-base unit price multiplier and converted to C-bills when support point conversion is on. Units
- * always sell for half that.
+ * sell for half that, adjusted for quality relative to quality D and reduced if obsolete.
  */
 class UnitAlternateUnitCostTest {
     private static final int SUPPORT_POINTS_TO_C_BILLS = 10_000;
@@ -104,6 +109,8 @@ class UnitAlternateUnitCostTest {
             when(entity.getTotalInternal()).thenReturn(50);
             when(entity.calculateBattleValue(true, true, true)).thenReturn(500);
             when(entity.getCost(false)).thenReturn(3_000_000.0);
+            // Not obsolete unless a test says otherwise
+            when(entity.getObsoleteResaleModifier(anyInt())).thenReturn(1.0);
 
             unit = new Unit(entity, campaign);
         }
@@ -327,11 +334,155 @@ class UnitAlternateUnitCostTest {
             }
 
             @Test
-            void breakdownHasNoQualityOrObsoleteStepsUnderTheAlternateValue() {
+            void breakdownShowsTheObsoleteStepWhenTheUnitIsObsolete() {
+                when(entity.getObsoleteResaleModifier(anyInt())).thenReturn(0.8);
+
                 String breakdown = unit.getSellValueBreakdown();
 
-                assertFalse(breakdown.contains("Quality ("), breakdown);
+                assertTrue(breakdown.contains("Obsolete ("), breakdown);
+                assertTrue(breakdown.contains(Money.of(2_000_000).toAmountString()), breakdown);
+            }
+
+            @Test
+            void breakdownShowsTheQualityStepButNoObsoleteStepForACurrentUnit() {
+                String breakdown = unit.getSellValueBreakdown();
+
+                assertTrue(breakdown.contains("Quality ("), breakdown);
+                assertTrue(breakdown.contains("x" + String.format("%.2f", 1.0)), breakdown);
                 assertFalse(breakdown.contains("Obsolete ("), breakdown);
+            }
+        }
+
+        /** Quirks that change a unit's traditional price change its alternate value in the same way. */
+        @Nested
+        class PriceQuirks {
+            @Test
+            void goodReputationOneAddsTenPercent() {
+                when(entity.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_1)).thenReturn(true);
+
+                assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+                assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS).multipliedBy(0.5), unit.getSellValue());
+            }
+
+            @Test
+            void goodReputationTwoAddsAQuarter() {
+                when(entity.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_2)).thenReturn(true);
+
+                assertEquals(Money.of(500 * 1.25 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+            }
+
+            /** Matches MegaMek, where Good Reputation 1 is checked first. */
+            @Test
+            void bothGoodReputationsUseTheFirst() {
+                when(entity.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_1)).thenReturn(true);
+                when(entity.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_2)).thenReturn(true);
+
+                assertEquals(Money.of(500 * 1.1 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+            }
+
+            @Test
+            void goodReputationStacksWithTheTechBaseMultiplier() {
+                campaignOptions.set(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER, 2.0);
+                when(entity.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_2)).thenReturn(true);
+
+                assertEquals(Money.of(500 * 2.0 * 1.25 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+            }
+
+            /** Only 'Meks' construction cost includes Good Reputation, so other units ignore it. */
+            @Test
+            void goodReputationDoesNotAffectNonMeks() {
+                Tank tank = mock(Tank.class);
+                when(tank.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_1)).thenReturn(true);
+                when(tank.hasQuirk(OptionsConstants.QUIRK_POS_GOOD_REP_2)).thenReturn(true);
+
+                assertEquals(1.0, Unit.getQuirkPriceMultiplier(tank));
+            }
+
+            @Test
+            void noEntityHasNoQuirkMultiplier() {
+                assertEquals(1.0, Unit.getQuirkPriceMultiplier(null));
+            }
+
+            @Test
+            void obsoleteUnitsSellForLess() {
+                when(entity.getObsoleteResaleModifier(anyInt())).thenReturn(0.8);
+
+                // Half of 5,000,000, then x0.8
+                assertEquals(Money.of(2_000_000), unit.getSellValue());
+            }
+
+            /** Obsolescence only affects resale, as it does for traditionally priced units. */
+            @Test
+            void obsoleteUnitsCostTheSameToBuy() {
+                when(entity.getObsoleteResaleModifier(anyInt())).thenReturn(0.8);
+
+                assertEquals(Money.of(500 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+            }
+
+            @Test
+            void unaffectedByTheQuirksWithoutThem() {
+                assertEquals(Money.of(500 * SUPPORT_POINTS_TO_C_BILLS), unit.getBuyCost());
+                assertEquals(Money.of(2_500_000), unit.getSellValue());
+            }
+        }
+
+        /**
+         * Battle Value ignores quality, so sale prices apply the Used Part Price Multipliers relative to quality D:
+         * a quality D unit sells for exactly half.
+         */
+        @Nested
+        class Quality {
+            private Unit unitOfQuality(PartQuality quality) {
+                Unit qualityUnit = spy(unit);
+                doReturn(quality).when(qualityUnit).getQuality();
+                return qualityUnit;
+            }
+
+            /** Default multipliers are 0.1 / 0.2 / 0.3 / 0.5 / 0.7 / 0.9 for A to F. */
+            @ParameterizedTest
+            @CsvSource({ "QUALITY_A, 500000", "QUALITY_B, 1000000", "QUALITY_C, 1500000", "QUALITY_D, 2500000",
+                         "QUALITY_E, 3500000", "QUALITY_F, 4500000" })
+            void qualityScalesTheSaleFromHalfAtQualityD(PartQuality quality, int expected) {
+                assertEquals(Money.of(expected), unitOfQuality(quality).getSellValue());
+            }
+
+            @Test
+            void qualityDoesNotChangeTheBuyCost() {
+                assertEquals(Money.of(500 * SUPPORT_POINTS_TO_C_BILLS), unitOfQuality(PartQuality.QUALITY_A).getBuyCost());
+            }
+
+            @Test
+            void customMultipliersAreUsed() {
+                campaignOptions.set(CampaignOption.USED_PART_PRICE_MULTIPLIERS,
+                      new double[] { 0.25, 0.5, 0.75, 1.0, 1.5, 2.0 });
+
+                // Half of 5,000,000, then 2.0 / 1.0
+                assertEquals(Money.of(5_000_000), unitOfQuality(PartQuality.QUALITY_F).getSellValue());
+            }
+
+            /** A zero quality D multiplier can't be divided by, so quality is ignored rather than crashing. */
+            @Test
+            void zeroQualityDMultiplierIgnoresQuality() {
+                campaignOptions.set(CampaignOption.USED_PART_PRICE_MULTIPLIERS,
+                      new double[] { 0.1, 0.2, 0.3, 0.0, 0.7, 0.9 });
+
+                assertEquals(Money.of(2_500_000), unitOfQuality(PartQuality.QUALITY_A).getSellValue());
+            }
+
+            @Test
+            void qualityAndObsolescenceStack() {
+                when(entity.getObsoleteResaleModifier(anyInt())).thenReturn(0.5);
+
+                // Half of 5,000,000, x(0.9 / 0.5) for quality F, then x0.5 for obsolescence
+                assertEquals(Money.of(2_250_000), unitOfQuality(PartQuality.QUALITY_F).getSellValue());
+            }
+
+            @Test
+            void breakdownShowsTheQualityMultiplier() {
+                String breakdown = unitOfQuality(PartQuality.QUALITY_B).getSellValueBreakdown();
+
+                assertTrue(breakdown.contains("x" + String.format("%.2f", 0.4)), breakdown);
+                assertTrue(breakdown.contains(Money.of(1_000_000).toAmountString()), breakdown);
             }
         }
 
