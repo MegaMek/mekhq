@@ -106,8 +106,15 @@ def checkSuitePins = {
         }
         def repo = spec[1].canonicalFile
         def git = { List<String> args ->
-            def process = new ProcessBuilder(['git', '-C', repo.absolutePath] + args)
-                    .redirectErrorStream(true).start()
+            def builder = new ProcessBuilder(['git', '-C', repo.absolutePath] + args)
+                    .redirectErrorStream(true)
+            // Gradle's composite process can inherit incomplete command-line Git
+            // config (GIT_CONFIG_COUNT/KEY_n/VALUE_n). Do not pass it to child Git:
+            // a missing value makes even rev-parse fail before pin checks run.
+            builder.environment().keySet().removeIf { name ->
+                name ==~ /(?i)GIT_CONFIG_(?:COUNT|KEY_[0-9]+|VALUE_[0-9]+)/
+            }
+            def process = builder.start()
             def output = process.inputStream.getText('UTF-8').trim()
             if (process.waitFor() != 0) {
                 throw new GradleException("Cannot inspect ${repo}: ${output}")
