@@ -81,7 +81,6 @@ class RefitOmniReconfigurationTest {
     @Test
     void aReconfiguredOmniVehicleKeepsItsFixedPartsAndMatchesTheNewConfiguration() throws Exception {
         PartsScenario scenario = PartsScenario.create();
-        Campaign campaign = scenario.getCampaign();
         Unit epona = scenario.withUnit(UnitFixture.EPONA_PURSUIT_TANK_PRIME);
         Refit refit = new Refit(epona, UnitFixture.EPONA_PURSUIT_TANK_A.loadEntity(), false, false, false);
         assertEquals(Refit.CLASS_OMNI, refit.getRefitClass(), "Prime to A is an Omni reconfiguration");
