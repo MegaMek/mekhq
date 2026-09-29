@@ -49,6 +49,8 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.List;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.finances.Money;
@@ -284,6 +286,64 @@ class AbstractContractTest {
 
         assertFalse(contract.canSalvage(), "STEP_ONE leaves the employer with all salvage");
         assertFalse(contract.isSalvageExchange());
+    }
+
+    @Test
+    void salvageTaperDefaultsToNoTaper() {
+        assertEquals(1.0, new ChaosContract().getSalvageTaperMultiplier());
+    }
+
+    @Test
+    void salvageTaperScalesTheNegotiatedSalvageRights() {
+        AbstractContract contract = contract();
+        contract.setContractTerms(termsWithSalvage(ChaosContractStepsTable.STEP_THREE));
+        double untapered = contract.getSalvageRightsMultiplier();
+
+        contract.setSalvageTaperMultiplier(0.65);
+
+        assertEquals(untapered * 0.65, contract.getSalvageRightsMultiplier(), 1e-9);
+    }
+
+    @Test
+    void salvageTaperStacksWithTheCampaignSalvageMultiplier() {
+        AbstractContract contract = contract();
+        contract.setContractTerms(termsWithSalvage(ChaosContractStepsTable.STEP_THREE));
+        double untapered = contract.getSalvageRightsMultiplier();
+        CampaignOptions campaignOptions = new CampaignOptions();
+        campaignOptions.set(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER, 2.0);
+        contract.setCampaignOptions(campaignOptions);
+
+        contract.setSalvageTaperMultiplier(0.5);
+
+        assertEquals(untapered * 2.0 * 0.5, contract.getSalvageRightsMultiplier(), 1e-9);
+    }
+
+    /** The taper is part of the agreed terms, so changing campaign options afterwards must not alter it. */
+    @Test
+    void salvageTaperIsNotReadFromCampaignOptions() {
+        AbstractContract contract = contract();
+        contract.setContractTerms(termsWithSalvage(ChaosContractStepsTable.STEP_THREE));
+        CampaignOptions campaignOptions = new CampaignOptions();
+        campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, true);
+        contract.setCampaignOptions(campaignOptions);
+        contract.setScale(10);
+        double beforeToggle = contract.getSalvageRightsMultiplier();
+
+        campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, false);
+
+        assertEquals(1.0, contract.getSalvageTaperMultiplier());
+        assertEquals(beforeToggle, contract.getSalvageRightsMultiplier(), 1e-9);
+    }
+
+    /** A tapered share is smaller, never gone: the taper cannot take salvage away altogether. */
+    @Test
+    void taperedSalvageIsStillSalvage() {
+        AbstractContract contract = contract();
+        contract.setContractTerms(termsWithSalvage(ChaosContractStepsTable.STEP_THREE));
+
+        contract.setSalvageTaperMultiplier(0.51);
+
+        assertTrue(contract.canSalvage());
     }
 
     @Test

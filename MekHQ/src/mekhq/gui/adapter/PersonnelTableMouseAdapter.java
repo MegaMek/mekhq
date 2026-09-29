@@ -5203,7 +5203,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @author Illiani
      * @since 0.51.01
      */
-    private boolean payForSkillTraining(Person person, String skillName) {
+    boolean payForSkillTraining(Person person, String skillName) {
         Campaign campaign = getCampaign();
         Money trainingCost = SkillTrainingCosts.getSkillImprovementCost(campaign, person, skillName);
         if (trainingCost.isZero()) {
@@ -5238,7 +5238,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
      * @author Illiani
      * @since 0.51.01
      */
-    private boolean payForSpaTraining(Person person, String abilityName) {
+    boolean payForSpaTraining(Person person, String abilityName) {
         Campaign campaign = getCampaign();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         SpecialAbility ability = SpecialAbility.getAbility(abilityName);
