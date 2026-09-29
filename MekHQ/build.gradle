@@ -109,8 +109,8 @@ def checkSuitePins = {
             throw new GradleException("${spec[0]} must be a lowercase 40-hex commit in suite mode")
         }
         def repo = spec[1].canonicalFile
-        def git = { List<String> args ->
-            def builder = new ProcessBuilder(['git', '-C', repo.absolutePath] + args)
+        def git = { File checkout, List<String> args ->
+            def builder = new ProcessBuilder(['git', '-C', checkout.absolutePath] + args)
                     .redirectErrorStream(true)
             // Gradle's composite process can inherit incomplete command-line Git
             // config (GIT_CONFIG_COUNT/KEY_n/VALUE_n). Do not pass it to child Git:
@@ -121,18 +121,18 @@ def checkSuitePins = {
             def process = builder.start()
             def output = process.inputStream.getText('UTF-8').trim()
             if (process.waitFor() != 0) {
-                throw new GradleException("Cannot inspect ${repo}: ${output}")
+                throw new GradleException("Cannot inspect ${checkout}: ${output}")
             }
             output
         }
-        if (new File(git(['rev-parse', '--show-toplevel'])).canonicalFile != repo) {
+        if (new File(git(repo, ['rev-parse', '--show-toplevel'])).canonicalFile != repo) {
             throw new GradleException("${spec[0]} must point to its own sibling checkout: ${repo}")
         }
-        if (git(['rev-parse', 'HEAD']) != expected) {
+        if (git(repo, ['rev-parse', 'HEAD']) != expected) {
             throw new GradleException("${key} HEAD does not match ${spec[0]}=${expected}")
         }
         // Ignore untracked and ignored build artifacts; never ignore modifications to tracked inputs.
-        if (git(['status', '--porcelain=v1', '--untracked-files=no'])) {
+        if (git(repo, ['status', '--porcelain=v1', '--untracked-files=no'])) {
             throw new GradleException("${key} has modified tracked files; suite archives require clean pinned inputs")
         }
         // Git status ignores both ignored data mirrors and untracked source files.
@@ -150,20 +150,11 @@ def checkSuitePins = {
                    'MekHQ/mmconf', 'MekHQ/scripts', 'MekHQ/campaigns', 'MekHQ/userdata',
                    ':(top,glob)MekHQ/*.ini', 'MekHQ/SubmitBug.html', 'MekHQ/sentry.properties']
         def dataRepo = new File(rootDir, '../mm-data')
-        def dataGit = { List<String> args ->
-            def command = new ProcessBuilder(['git', '-C', dataRepo.canonicalPath] + args)
-                    .redirectErrorStream(true).start()
-            def text = command.inputStream.getText('UTF-8')
-            if (command.waitFor() != 0) {
-                throw new GradleException("Cannot inspect mm-data: ${text}")
-            }
-            text
-        }
-        def trackedData = dataGit(['ls-files', '-z', '--cached', '--', 'data'])
+        def trackedData = git(dataRepo.canonicalFile, ['ls-files', '-z', '--cached', '--', 'data'])
                 .split('\u0000').toList().toSet()
-        def untracked = git(['ls-files', '-z', '--others', '--exclude-standard', '--'] + scopes)
+        def untracked = git(repo, ['ls-files', '-z', '--others', '--exclude-standard', '--'] + scopes)
                 .split('\u0000')
-        def ignored = git(['ls-files', '-z', '--others', '--ignored', '--exclude-standard', '--'] + scopes)
+        def ignored = git(repo, ['ls-files', '-z', '--others', '--ignored', '--exclude-standard', '--'] + scopes)
                 .split('\u0000')
         def unknown = (untracked.toList() + ignored.toList()).unique()
         unknown.each { path ->
