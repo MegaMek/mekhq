@@ -35,6 +35,8 @@ package mekhq.campaign.parts;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static testUtilities.parts.RefitKitPricing.expectedKitPrice;
 
@@ -97,6 +99,23 @@ class RefitBattleArmorTest {
         }
         assertTrue(isTrooperTwoStillDestroyed, "The destroyed suit does not come back");
         assertEquals(oneSuitPerTrooper(5), suitsPerTrooper(), "No trooper ends up with two suits");
+    }
+
+    @Test
+    void aDestroyedSuitStaysDestroyedInThePointThatPlaysTheGame() {
+        suitOf(2).remove(false);
+        // A design loaded fresh from its file has all five troopers alive; the refit must carry the loss over to it. A
+        // refit that adds anything to the destroyed trooper is refused, so the design here is the same one.
+        BattleArmor freshDesign = (BattleArmor) UnitFixture.ELEMENTAL_BATTLE_ARMOR_LASER.loadEntity();
+        assertEquals(5, freshDesign.getNumberActiveTroopers());
+        Refit refit = new Refit(elementals, freshDesign, true, false, false);
+        assertNull(refit.checkFixable(), "A refit that leaves the destroyed trooper alone may go ahead");
+
+        refit.succeed();
+
+        assertSame(freshDesign, elementals.getEntity());
+        assertEquals(4, freshDesign.getNumberActiveTroopers(), "The point plays the game one trooper short");
+        assertEquals(oneSuitPerTrooper(5), suitsPerTrooper(), "Each trooper slot still has exactly one suit");
     }
 
     @Test
