@@ -818,8 +818,10 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
-        // if oldUnitParts is not empty we are removing some stuff and so this should be at least a Class A refit
-        if (!oldUnitParts.isEmpty()) {
+        // if oldUnitParts is not empty we are removing some stuff and so this should be at least a Class A refit.
+        // Bay parts are always listed there because completion rebuilds them, so they alone remove nothing.
+        boolean isRemovingParts = oldUnitParts.stream().anyMatch(part -> !(part instanceof TransportBayPart));
+        if (isRemovingParts) {
             if (isOmniRefit) {
                 updateRefitClass(CLASS_OMNI);
             } else {
@@ -827,72 +829,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
-        /*
-         * Cargo and transport bays are essentially just open space and while it may take time and  materials to
-         * change the cubicles or the number of doors, the bay itself does not require  any refit work unless the
-         * size changes. First we create a list of all bays on each unit, then we attempt to match them by size and
-         * number of doors. Any remaining are matched on size, and difference in number of doors is noted as moving
-         * doors has to be accounted for in the time calculation.
-         */
-        List<Bay> oldUnitBays = new ArrayList<>(oldUnit.getEntity()
-                                                      .getTransportBays()
-                                                      .stream()
-                                                      .filter(b -> !b.isQuarters())
-                                                      .toList());
-        List<Bay> newUnitBays = new ArrayList<>(newEntity.getTransportBays()
-                                                      .stream()
-                                                      .filter(b -> !b.isQuarters())
-                                                      .toList());
-
-        // If any bays keep the same size but have any doors added or removed, we need to note that separately since
-        // removing a door from one bay and adding it to another requires time even if the number of parts hasn't
-        // changed. We track them separately so that we don't charge time for changing the overall number of doors
-        // twice.
-        int doorsRemoved = 0;
-        int doorsAdded = 0;
-        if (oldUnitBays.size() + newUnitBays.size() > 0) {
-            for (Iterator<Bay> oldBays = oldUnitBays.iterator(); oldBays.hasNext(); ) {
-                final Bay oldbay = oldBays.next();
-                for (Iterator<Bay> newBays = newUnitBays.iterator(); newBays.hasNext(); ) {
-                    final Bay newbay = newBays.next();
-                    if ((oldbay.getCapacity() == newbay.getCapacity()) && (oldbay.getDoors() == newbay.getDoors())) {
-                        oldBays.remove();
-                        newBays.remove();
-                        break;
-                    }
-                }
-            }
-            for (Iterator<Bay> oldBays = oldUnitBays.iterator(); oldBays.hasNext(); ) {
-                final Bay oldbay = oldBays.next();
-                for (Iterator<Bay> newBays = newUnitBays.iterator(); newBays.hasNext(); ) {
-                    final Bay newbay = newBays.next();
-                    if (oldbay.getCapacity() == newbay.getCapacity()) {
-                        if (oldbay.getDoors() > newbay.getDoors()) {
-                            doorsRemoved += oldbay.getDoors() - newbay.getDoors();
-                        } else {
-                            doorsAdded += newbay.getDoors() - oldbay.getDoors();
-                        }
-                        oldBays.remove();
-                        newBays.remove();
-                        break;
-                    }
-                }
-            }
-            // Use bay replacement time of 1 month (30 days) for each bay to be resized, plus another month for any
-            // bays to be added or removed. Note this only applies to large craft, CVs use 120 minutes. CO 205
-            int bayDuration = getNewEntity().isLargeCraft() ? WORK_MONTH : WORK_HOUR * 2;
-            time += Math.max(oldUnitBays.size(), newUnitBays.size()) * bayDuration;
-            int deltaDoors = oldUnitBays.stream().mapToInt(Bay::getDoors).sum() -
-                                   newUnitBays.stream().mapToInt(Bay::getDoors).sum();
-            if (deltaDoors < 0) {
-                doorsAdded = Math.max(0, doorsAdded - deltaDoors);
-            } else {
-                doorsRemoved = Math.max(0, doorsRemoved + deltaDoors);
-            }
-            // Doors for large craft take 10 hours. Doors for others take 120 minutes. CO 205
-            int doorDuration = getNewEntity().isLargeCraft() ? WORK_HOUR * 10 : WORK_HOUR * 2;
-            time += (doorsAdded + doorsRemoved) * doorDuration;
-        }
+        planBayWork();
 
         // Step 4: loop through remaining equipment on old unit parts and add time for removing.
         for (Part oldPart : oldUnitParts) {
@@ -3232,6 +3169,148 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * Adds the refit time for changes to cargo and transport bays that the bay's own parts do not cover (CO p. 206),
+     * and grades the bay work by refit class (CO p. 211). Cubicles and doors that are added or removed carry their own
+     * time as parts: 7 days per cubicle, 10 hours per door. What remains is:
+     * <ul>
+     *     <li>a month for each cargo or infantry bay that is added, removed or resized on a large craft (2 hours on
+     *     other units), since these bays have no cubicles to carry the work; and</li>
+     *     <li>door time for each door taken out of one bay and fitted to another, since the door part itself does not
+     *     change.</li>
+     * </ul>
+     * Crew quarters are left out; a change in crew size is handled with life support. Bay work that only removes is
+     * Class A; bay work that adds is Class B if the refit also takes bay parts out, as when a BattleMek bay becomes
+     * fighter bays, and Class C if it takes nothing out.
+     */
+    private void planBayWork() {
+        BayComponents oldComponents = BayComponents.of(oldUnit.getEntity());
+        BayComponents newComponents = BayComponents.of(newEntity);
+
+        List<Bay> oldBays = new ArrayList<>(oldUnit.getEntity()
+                                                  .getTransportBays()
+                                                  .stream()
+                                                  .filter(bay -> !bay.isQuarters())
+                                                  .toList());
+        List<Bay> newBays = new ArrayList<>(newEntity.getTransportBays()
+                                                  .stream()
+                                                  .filter(bay -> !bay.isQuarters())
+                                                  .toList());
+
+        // A bay of the same type, size and doors is unchanged
+        removeMatchingBays(oldBays, newBays, true);
+
+        // A bay of the same type and size only gains or loses doors
+        DoorChanges doorChanges = removeMatchingBays(oldBays, newBays, false);
+        int doorsTakenOut = doorChanges.takenOut() + oldBays.stream().mapToInt(Bay::getDoors).sum();
+        int doorsFitted = doorChanges.fitted() + newBays.stream().mapToInt(Bay::getDoors).sum();
+        int doorsMoved = Math.min(doorsTakenOut, doorsFitted);
+
+        long oldBaysWithoutCubicles = oldBays.stream().filter(Refit::hasNoCubicles).count();
+        long newBaysWithoutCubicles = newBays.stream().filter(Refit::hasNoCubicles).count();
+        int baysWithoutCubiclesChanged = (int) Math.max(oldBaysWithoutCubicles, newBaysWithoutCubicles);
+
+        boolean isLargeCraft = newEntity.isLargeCraft();
+        int bayDuration = isLargeCraft ? WORK_MONTH : WORK_HOUR * 2;
+        int doorDuration = isLargeCraft ? WORK_HOUR * 10 : WORK_HOUR * 2;
+        time += (baysWithoutCubiclesChanged * bayDuration) + (doorsMoved * doorDuration);
+
+        boolean isAddingBayParts = newComponents.hasMoreThan(oldComponents)
+              || (newBaysWithoutCubicles > 0)
+              || (doorsMoved > 0);
+        boolean isRemovingBayParts = oldComponents.hasMoreThan(newComponents)
+              || (oldBaysWithoutCubicles > 0)
+              || (doorsMoved > 0);
+        if (isAddingBayParts) {
+            updateRefitClass(isRemovingBayParts ? CLASS_B : CLASS_C);
+        } else if (isRemovingBayParts) {
+            updateRefitClass(CLASS_A);
+        }
+        LOGGER.debug("[Refit] {}: {} cargo or infantry bays change, {} bay doors move, adding bay parts {}, removing"
+              + " bay parts {}", oldUnit.getName(), baysWithoutCubiclesChanged, doorsMoved, isAddingBayParts,
+              isRemovingBayParts);
+    }
+
+    /**
+     * The cubicles, by bay type, and the doors in a unit's cargo and transport bays, not counting crew quarters.
+     *
+     * @param cubicles the cubicles of each bay type
+     * @param doors    the bay doors
+     */
+    private record BayComponents(Map<BayType, Integer> cubicles, int doors) {
+        static BayComponents of(Entity entity) {
+            Map<BayType, Integer> cubicles = new HashMap<>();
+            int doors = 0;
+            for (Bay bay : entity.getTransportBays()) {
+                if (bay.isQuarters()) {
+                    continue;
+                }
+                doors += bay.getDoors();
+                if (!hasNoCubicles(bay)) {
+                    cubicles.merge(BayType.getTypeForBay(bay), (int) bay.getCapacity(), Integer::sum);
+                }
+            }
+            return new BayComponents(cubicles, doors);
+        }
+
+        /**
+         * @return {@code true} if this has more doors, or more cubicles of any bay type, than the other
+         */
+        boolean hasMoreThan(BayComponents other) {
+            boolean hasMoreCubicles = cubicles.entrySet()
+                                            .stream()
+                                            .anyMatch(entry -> entry.getValue()
+                                                                     > other.cubicles.getOrDefault(entry.getKey(), 0));
+            return hasMoreCubicles || (doors > other.doors);
+        }
+    }
+
+    /**
+     * Removes each old bay that has a new bay of the same type and size from both lists, pairing each bay at most once.
+     *
+     * @param oldBays        the old unit's bays still to be matched
+     * @param newBays        the new design's bays still to be matched
+     * @param mustMatchDoors {@code true} to pair only bays that also have the same number of doors
+     *
+     * @return the doors taken out of, and fitted to, the paired bays
+     */
+    private static DoorChanges removeMatchingBays(List<Bay> oldBays, List<Bay> newBays, boolean mustMatchDoors) {
+        int doorsTakenOut = 0;
+        int doorsFitted = 0;
+        for (Iterator<Bay> oldBayIterator = oldBays.iterator(); oldBayIterator.hasNext(); ) {
+            Bay oldBay = oldBayIterator.next();
+            for (Iterator<Bay> newBayIterator = newBays.iterator(); newBayIterator.hasNext(); ) {
+                Bay newBay = newBayIterator.next();
+                boolean isSameBay = (BayType.getTypeForBay(oldBay) == BayType.getTypeForBay(newBay))
+                      && (oldBay.getCapacity() == newBay.getCapacity());
+                boolean isSameDoors = oldBay.getDoors() == newBay.getDoors();
+                if (isSameBay && (isSameDoors || !mustMatchDoors)) {
+                    doorsTakenOut += Math.max(0, oldBay.getDoors() - newBay.getDoors());
+                    doorsFitted += Math.max(0, newBay.getDoors() - oldBay.getDoors());
+                    oldBayIterator.remove();
+                    newBayIterator.remove();
+                    break;
+                }
+            }
+        }
+        return new DoorChanges(doorsTakenOut, doorsFitted);
+    }
+
+    /**
+     * Doors taken out of, and fitted to, bays that a refit keeps.
+     *
+     * @param takenOut the doors taken out
+     * @param fitted   the doors fitted
+     */
+    private record DoorChanges(int takenOut, int fitted) {}
+
+    /**
+     * @return {@code true} if the bay holds no cubicles, so its refit work is not carried by cubicle parts
+     */
+    private static boolean hasNoCubicles(Bay bay) {
+        return BayType.getTypeForBay(bay).getCategory() != BayType.CATEGORY_NON_INFANTRY;
+    }
+
+    /**
      * Assigns bay doors and cubicles as child parts of the bay part. We also need to make sure the bay number of the
      * parts match up to the Entity. The easiest way to do that is to remove all the bay parts and create new ones from
      * scratch. Then we assign doors and cubicles.
@@ -3256,9 +3335,6 @@ public class Refit extends Part implements IAcquisitionWork {
         }
         oldBays.forEach(part -> part.remove(false));
         for (Bay bay : entity.getTransportBays()) {
-            if (bay.isQuarters()) {
-                continue;
-            }
             BayType bayType = BayType.getTypeForBay(bay);
             Part bayPart = new TransportBayPart((int) oldUnit.getEntity().getWeight(),
                   bay.getBayNumber(),
