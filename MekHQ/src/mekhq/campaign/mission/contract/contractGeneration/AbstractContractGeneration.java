@@ -411,10 +411,7 @@ public abstract class AbstractContractGeneration {
      */
     public static int determineScale(Campaign campaign, PlayerForce playerForce, LocalHangar detachmentHangar,
           AbstractContract contract) {
-        boolean convertSupportPointsToBattleValue = campaign.getCampaignOptions()
-                                                          .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
-        int scale = ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, detachmentHangar,
-              contract.getObjectiveType().isCadreDuty(), convertSupportPointsToBattleValue);
+        int scale = determineUncappedScale(campaign, playerForce, detachmentHangar, contract);
 
         // Hiring halls only broker jobs of the size they can support; a larger force is paid for the job, not itself
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
@@ -425,6 +422,27 @@ public abstract class AbstractContractGeneration {
         }
 
         return scale;
+    }
+
+    /**
+     * Determines the Scale of the units the player force commits to a contract, ignoring any Hiring Hall cap.
+     *
+     * @param campaign         the campaign, for the support-point-to-Battle-Value scale conversion option
+     * @param playerForce      the player force whose committed units set the scale
+     * @param detachmentHangar the hangar whose units are weighed
+     * @param contract         the contract being sized (its objective decides whether cadre units count)
+     *
+     * @return the Scale of the committed force
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int determineUncappedScale(Campaign campaign, PlayerForce playerForce,
+          LocalHangar detachmentHangar, AbstractContract contract) {
+        boolean convertSupportPointsToBattleValue = campaign.getCampaignOptions()
+                                                          .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
+        return ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, detachmentHangar,
+              contract.getObjectiveType().isCadreDuty(), convertSupportPointsToBattleValue);
     }
 
     /**

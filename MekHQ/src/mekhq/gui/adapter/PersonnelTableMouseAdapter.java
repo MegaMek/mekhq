@@ -3149,6 +3149,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 List<SpecialAbility> specialAbilities = new ArrayList<>(SpecialAbility.getSpecialAbilities().values());
                 specialAbilities.sort(Comparator.comparing(SpecialAbility::getName));
 
+                int nonFlawSpaCount = SpaUtilities.countNonFlawSpas(person);
                 List<SpecialAbility> eligibleAbilities = new ArrayList<>();
                 List<SpecialAbility> notEligibleAbilities = new ArrayList<>();
                 List<SpecialAbility> alreadyPurchasedFlaws = new ArrayList<>();
@@ -3177,6 +3178,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                           utilityAbilityMenu,
                           characterFlawMenu,
                           characterOriginMenu,
+                          nonFlawSpaCount,
                           true);
                 }
 
@@ -3198,6 +3200,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                           utilityAbilityMenu,
                           characterFlawMenu,
                           characterOriginMenu,
+                          nonFlawSpaCount,
                           false);
                 }
 
@@ -3285,7 +3288,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                 getCampaign().getPlayerForce().isClanForce(), getCampaign().getLocalDate());
 
                     boolean isAffordable = true;
-                    Money trainingCost = SkillTrainingCosts.getSkillImprovementCost(getCampaign(), person, typeName);
+                    boolean isRoleSkill = primaryProfessionSkills.contains(typeName)
+                                                || secondaryProfessionSkills.contains(typeName);
+                    Money trainingCost = SkillTrainingCosts.getSkillImprovementCost(getCampaign(), person, typeName,
+                          isRoleSkill, skillModifierData);
                     if (!trainingCost.isZero()) {
                         String htmlClosingTag = "</html>";
                         boolean isHtml = description.endsWith(htmlClosingTag);
@@ -5219,29 +5225,41 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
-     * Charges the C-bill cost of training a new SPA, if SPA training costs are enabled. Flaws are free.
+     * Checks a new SPA against the SPA cap and charges its C-bill training cost, if those options are enabled. Flaws
+     * are never capped or charged. The menu already disables capped or unaffordable SPAs; this guards against a menu
+     * that was built before the person or the force's funds changed.
      *
      * @param person      the person being trained
      * @param abilityName the name of the ability being acquired
      *
-     * @return {@code true} if the SPA may be acquired, or {@code false} if the force couldn't afford the training
+     * @return {@code true} if the SPA may be acquired, or {@code false} if the person is at the SPA cap or the force
+     *       couldn't afford the training
      *
      * @author Illiani
      * @since 0.51.01
      */
     private boolean payForSpaTraining(Person person, String abilityName) {
         Campaign campaign = getCampaign();
-        if (!campaign.getCampaignOptions().get(CampaignOption.USE_SPA_TRAINING_COSTS)) {
-            return true;
-        }
-
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
         SpecialAbility ability = SpecialAbility.getAbility(abilityName);
         if (ability == null || SpaUtilities.isFlaw(ability)) {
             return true;
         }
 
-        Money trainingCost = SpaUtilities.getSpaTrainingCost(person);
+        int nonFlawSpaCount = SpaUtilities.countNonFlawSpas(person);
         String displayName = SpecialAbility.getDisplayName(abilityName);
+        if (campaignOptions.get(CampaignOption.CAP_TOTAL_SPAS) && nonFlawSpaCount >= SpaUtilities.SPA_CAP) {
+            campaign.addReport(PERSONNEL, getFormattedTextAt(GUI_RESOURCE_BUNDLE, "spaTraining.capReached",
+                  spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, person.getHyperlinkedName(),
+                  displayName, SpaUtilities.SPA_CAP));
+            return false;
+        }
+
+        if (!campaignOptions.get(CampaignOption.USE_SPA_TRAINING_COSTS)) {
+            return true;
+        }
+
+        Money trainingCost = SpaUtilities.getSpaTrainingCost(nonFlawSpaCount);
         if (campaign.getPlayerForce().getFinances().debit(TransactionType.EDUCATION,
               campaign.getLocalDate(),
               trainingCost,
@@ -5259,7 +5277,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private void addSPAToMenu(SpecialAbility spa, double reasoningXpCostMultiplier, double xpCostMultiplier,
           Person person,
           JMenu combatAbilityMenu, JMenu maneuveringAbilityMenu, JMenu utilityAbilityMenu, JMenu characterFlawMenu,
-          JMenu characterOriginMenu, boolean isEligible) {
+          JMenu characterOriginMenu, int nonFlawSpaCount, boolean isEligible) {
         JMenuItem menuItem;
         int cost;
         // Reasoning cost changes should always take place before global changes
@@ -5272,13 +5290,12 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         if (!SpaUtilities.isFlaw(spa)) {
             CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
-            if (campaignOptions.get(CampaignOption.CAP_TOTAL_SPAS)
-                      && SpaUtilities.countNonFlawSpas(person) >= SpaUtilities.SPA_CAP) {
+            if (campaignOptions.get(CampaignOption.CAP_TOTAL_SPAS) && nonFlawSpaCount >= SpaUtilities.SPA_CAP) {
                 available = false;
             }
 
             if (campaignOptions.get(CampaignOption.USE_SPA_TRAINING_COSTS)) {
-                Money trainingCost = SpaUtilities.getSpaTrainingCost(person);
+                Money trainingCost = SpaUtilities.getSpaTrainingCost(nonFlawSpaCount);
                 costDesc = getFormattedTextAt(GUI_RESOURCE_BUNDLE, "costValueWithTraining.format",
                       String.valueOf(cost), trainingCost.toAmountAndSymbolString());
                 Money balance = getCampaign().getPlayerForce().getFinances().getBalance();

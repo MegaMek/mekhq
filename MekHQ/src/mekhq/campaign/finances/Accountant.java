@@ -57,7 +57,6 @@ import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.chaosCampaign.ChaosScaleLimits;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
-import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.campaign.parts.Part;
@@ -289,7 +288,7 @@ public record Accountant(Campaign campaign) {
     }
 
     public Money getMaintenanceCosts() {
-        return getMaintenanceTotal(getAllUnits(), getCampaignOptions().get(CampaignOption.PAY_FOR_MAINTAIN))
+        return getMaintenanceTotal(getAllUnits(), getCampaignOptions().isChargingMaintenance())
                      .multipliedBy(PlanetaryCostReductions.getMaintenanceMultiplier(campaign()));
     }
 
@@ -396,10 +395,7 @@ public record Accountant(Campaign campaign) {
             return Money.zero();
         }
 
-        PlayerForce playerForce = campaign().getPlayerForce();
-        int scale = ChaosContractDeterminationScale.generateScaleForTableOfOrganization(playerForce,
-              playerForce.getHangar(),
-              campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION));
+        int scale = ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign());
         int upkeepInSupportPoints = HOT_SPOTS_UPKEEP_PER_SCALE * scale;
         if (campaignOptions.get(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP)) {
             upkeepInSupportPoints = (int) Math.round(upkeepInSupportPoints
@@ -418,7 +414,7 @@ public record Accountant(Campaign campaign) {
               getTemporaryAsTechPool(),
               getTemporaryMedicPool(),
               getTempCrewMap(),
-              getCampaignOptions().get(CampaignOption.PAY_FOR_OVERHEAD));
+              getCampaignOptions().isChargingOverhead());
     }
 
     /**

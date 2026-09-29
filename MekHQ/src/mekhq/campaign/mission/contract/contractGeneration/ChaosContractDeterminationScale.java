@@ -35,8 +35,13 @@ package mekhq.campaign.mission.contract.contractGeneration;
 import static java.lang.Math.ceil;
 import static mekhq.campaign.force.FormationType.STANDARD;
 
+import java.lang.ref.WeakReference;
+import java.time.LocalDate;
+
 import megamek.common.units.Entity;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.utilities.CombatRole;
@@ -46,6 +51,50 @@ public class ChaosContractDeterminationScale {
     private final static double BATTLE_VALUE_PER_SCALE = 4_500.0; // Draconis Reach first printing pg 36
     private final static double BATTLEFIELD_SUPPORT_POINTS_PER_SCALE = 32.0; // Draconis Reach first printing pg 36
     private final static double BATTLE_VALUE_PER_BSP = 500.0; // Battle for Tukayyid, pg24
+
+    /**
+     * The last whole-TO&amp;E Scale worked out, reused until the day, the hangar's size, or the conversion option
+     * changes. Working it out means calculating the Battle Value of every unit, which the finances report and every
+     * contract offer would otherwise repeat.
+     */
+    private record TableOfOrganizationScale(WeakReference<Campaign> campaign, LocalDate date, int unitCount,
+          boolean convertSupportPointsToBattleValue, int scale) {}
+
+    private static volatile TableOfOrganizationScale cachedTableOfOrganizationScale;
+
+    /**
+     * As {@link #generateScaleForTableOfOrganization(PlayerForce, LocalHangar, boolean)} for the campaign's player
+     * force, reusing the result for the rest of the day while the hangar's size is unchanged.
+     *
+     * @param campaign the campaign
+     *
+     * @return the Scale of the whole TO&amp;E
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getScaleForTableOfOrganization(Campaign campaign) {
+        PlayerForce playerForce = campaign.getPlayerForce();
+        LocalHangar hangar = playerForce.getHangar();
+        LocalDate today = campaign.getLocalDate();
+        int unitCount = hangar.getUnits().size();
+        boolean convertSupportPointsToBattleValue = campaign.getCampaignOptions()
+                                                          .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
+
+        TableOfOrganizationScale cached = cachedTableOfOrganizationScale;
+        if (cached != null
+                  && cached.campaign().get() == campaign
+                  && cached.date().equals(today)
+                  && cached.unitCount() == unitCount
+                  && cached.convertSupportPointsToBattleValue() == convertSupportPointsToBattleValue) {
+            return cached.scale();
+        }
+
+        int scale = generateScaleForTableOfOrganization(playerForce, hangar, convertSupportPointsToBattleValue);
+        cachedTableOfOrganizationScale = new TableOfOrganizationScale(new WeakReference<>(campaign), today, unitCount,
+              convertSupportPointsToBattleValue, scale);
+        return scale;
+    }
 
     static int generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar, boolean isCadreDuty,
           boolean convertSupportPointsToBattleValue) {

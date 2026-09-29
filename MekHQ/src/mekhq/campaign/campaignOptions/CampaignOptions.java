@@ -567,6 +567,44 @@ public class CampaignOptions {
      * @return {@code true} if both faction standing tracking and faction standing command circuit usage are enabled;
      *       {@code false} otherwise.
      */
+    /**
+     * Hot Spots upkeep replaces unit maintenance, so maintenance is never charged alongside it, whatever its own option
+     * says. The options dialog already prevents combining them; this also covers presets and hand-edited saves.
+     *
+     * @return {@code true} if unit maintenance is charged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isChargingMaintenance() {
+        return get(CampaignOption.PAY_FOR_MAINTAIN) && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+    }
+
+    /**
+     * Hot Spots upkeep replaces overhead, so overhead is never charged alongside it, whatever its own option says.
+     *
+     * @return {@code true} if overhead is charged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isChargingOverhead() {
+        return get(CampaignOption.PAY_FOR_OVERHEAD) && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+    }
+
+    /**
+     * Hot Spots upkeep replaces peacetime operating costs, so they are never charged alongside it, whatever their own
+     * option says.
+     *
+     * @return {@code true} if peacetime operating costs are charged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isChargingPeacetimeCost() {
+        return get(CampaignOption.USE_PEACETIME_COST) && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+    }
+
     public boolean isUseFactionStandingCommandCircuitSafe() {
         return get(CampaignOption.TRACK_FACTION_STANDING) && get(CampaignOption.USE_FACTION_STANDING_COMMAND_CIRCUIT);
     }

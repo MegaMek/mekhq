@@ -57,7 +57,6 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.GMModeEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
@@ -677,7 +676,7 @@ public final class FinancesTab extends CampaignGuiTab {
                   String.format(formatted, rentals.toAmountAndSymbolString())));
         }
 
-        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_PEACETIME_COST)) {
+        if (getCampaign().getCampaignOptions().isChargingPeacetimeCost()) {
             financialLine.append(formattingFinancialReport(resourceMap.getString("spareParts.text"), 2,
                   String.format(formatted, report.getMonthlySparePartCosts().toAmountAndSymbolString())));
             financialLine.append(formattingFinancialReport(resourceMap.getString("trainingMunitions.text"), 2,

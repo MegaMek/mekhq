@@ -56,7 +56,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.chaosCampaign.ChaosScaleLimits;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.SupportPointNegotiation;
 import mekhq.campaign.finances.Money;
@@ -166,6 +165,8 @@ public abstract class AbstractContract {
     private transient UUID pendingPlayerNegotiatorId;
     private transient Double pendingLegacySettlementMultiplier;
     private transient CampaignOptions campaignOptions;
+    /** Salvage rights multiplier from the Scale taper; 1.0 for contracts signed without it */
+    private double salvageTaperMultiplier = 1.0;
 
     public @Nonnull List<Scenario> getScenarios() {
         return scenarios;
@@ -1064,12 +1065,29 @@ public abstract class AbstractContract {
     }
 
     public double getSalvageRightsMultiplier() {
-        double salvageRightsMultiplier = getSalvageRightsStep().getSalvageMultiplier() * contractTermMultiplier(
+        final double salvageRightsMultiplier = getSalvageRightsStep().getSalvageMultiplier() * contractTermMultiplier(
               CampaignOption.CONTRACT_SALVAGE_MULTIPLIER);
-        if (campaignOptions != null && campaignOptions.get(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE)) {
-            salvageRightsMultiplier *= ChaosScaleLimits.getTaperMultiplier(getScale());
-        }
-        return salvageRightsMultiplier;
+        return salvageRightsMultiplier * salvageTaperMultiplier;
+    }
+
+    /**
+     * @return the multiplier applied to salvage rights by the Scale taper, locked in when the contract's pay was set
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public double getSalvageTaperMultiplier() {
+        return salvageTaperMultiplier;
+    }
+
+    /**
+     * @param salvageTaperMultiplier the multiplier applied to salvage rights by the Scale taper
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setSalvageTaperMultiplier(double salvageTaperMultiplier) {
+        this.salvageTaperMultiplier = salvageTaperMultiplier;
     }
 
     public boolean isSalvageExchange() {

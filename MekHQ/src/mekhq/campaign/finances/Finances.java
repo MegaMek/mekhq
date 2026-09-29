@@ -394,7 +394,7 @@ public class Finances {
 
         // Handle peacetime operating expenses, payroll, and loan payments
         if (isNewMonth) {
-            if (campaignOptions.get(CampaignOption.USE_PEACETIME_COST)) {
+            if (campaignOptions.isChargingPeacetimeCost()) {
                 if (!campaignOptions.get(CampaignOption.SHOW_PEACETIME_COST)) {
                     // Do not include salaries as that will be tracked below
                     Money peacetimeCost = accountant.getPeacetimeCost(false);
@@ -495,7 +495,7 @@ public class Finances {
             }
 
             // Handle overhead expenses
-            if (campaignOptions.get(CampaignOption.PAY_FOR_OVERHEAD)) {
+            if (campaignOptions.isChargingOverhead()) {
                 Money overheadCost = accountant.getOverheadExpenses();
 
                 if (debit(TransactionType.OVERHEAD, today, overheadCost, resourceMap.getString("Overhead.title"))) {

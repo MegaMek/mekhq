@@ -68,6 +68,7 @@ import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.*;
+import mekhq.campaign.mission.contract.contractGeneration.AbstractContractDeterminationPay;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerType;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
@@ -1254,6 +1255,9 @@ public class ContractEditorDialog extends JDialog {
               AbstractContractGeneration.determineCombatPay(campaign, contract), contract)
                                      : moneyValue(combatPaySpinner);
         contract.setContractFinanceData(new ContractFinanceData(transportPay, monthlyPayValue, combatPayValue));
+        // The salvage taper follows the contract's (possibly edited) Scale
+        contract.setSalvageTaperMultiplier(AbstractContractDeterminationPay.forCampaign(campaign)
+                                                 .getSalvageTaperMultiplier(campaign, contract));
 
         // Intel obfuscation - which fields are hidden from the player in the market.
         contract.setIntelObfuscated(ObfuscatableIntel.ALLIED_COMMAND, obfuscateAlliedCommandCheckbox.isSelected());

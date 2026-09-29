@@ -151,7 +151,7 @@ public class Maintenance {
             }
 
             // maybe use the money
-            if (campaignOptions.get(CampaignOption.PAY_FOR_MAINTAIN)) {
+            if (campaignOptions.isChargingMaintenance()) {
                 Money maintenanceCost = unit.getMaintenanceCost()
                                               .multipliedBy(PlanetaryCostReductions.getMaintenanceMultiplier(campaign));
                 if (!(campaign.getPlayerForce().getFinances().debit(TransactionType.MAINTENANCE,

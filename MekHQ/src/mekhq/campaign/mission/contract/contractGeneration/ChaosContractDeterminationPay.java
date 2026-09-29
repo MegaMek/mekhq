@@ -42,6 +42,7 @@ import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.chaosCampaign.ChaosScaleLimits;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
 import org.jspecify.annotations.NonNull;
 
@@ -80,6 +81,18 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
      * With {@link CampaignOption#BASE_PAY_ONLY_CONSIDERS_SCALE} it is instead a flat amount per Scale. Either way it is
      * scaled by the contract's base pay multiplier.
      */
+    /**
+     * Salvage rights taper off above Scale 3 when {@link CampaignOption#TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE} is set,
+     * matching the combat pay taper.
+     */
+    @Override
+    public double getSalvageTaperMultiplier(Campaign campaign, AbstractContract contract) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE)) {
+            return 1.0;
+        }
+        return ChaosScaleLimits.getTaperMultiplier(contract.getScale());
+    }
+
     @Override
     public @NonNull Money getMonthlyPay(Campaign campaign, AbstractContract contract) {
         boolean isConvertSupportPoints = shouldConvertSupportPoints(campaign);
@@ -91,7 +104,9 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
                   isConvertSupportPoints);
         }
 
-        Money monthlyPay = getCoveredMonthlyCosts(campaign).multipliedBy(contract.getBasePayMultiplier());
+        Money monthlyPay = getCoveredMonthlyCosts(campaign)
+                                 .multipliedBy(getJobShare(campaign, contract))
+                                 .multipliedBy(contract.getBasePayMultiplier());
         if (isConvertSupportPoints) {
             return monthlyPay;
         }
@@ -100,6 +115,34 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
         double monthlyPayInSupportPoints = monthlyPay.getAmount().doubleValue()
                                                  / ChaosCampaignUtilities.SUPPORT_POINTS_TO_MONEY_CONVERSION;
         return Money.of(ceil(monthlyPayInSupportPoints));
+    }
+
+    /**
+     * When contract Scale is capped by the Hiring Hall, the employer only covers the costs of the part of the force the
+     * job needs: the capped Scale as a share of the committed force's Scale.
+     *
+     * @param campaign the campaign
+     * @param contract the contract being paid
+     *
+     * @return the share of the force's costs the employer covers, {@code [0, 1]}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static double getJobShare(Campaign campaign, AbstractContract contract) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL)) {
+            return 1.0;
+        }
+
+        PlayerForce playerForce = campaign.getPlayerForce();
+        int uncappedScale = AbstractContractGeneration.determineUncappedScale(campaign, playerForce,
+              playerForce.getHangar(), contract);
+        int contractScale = contract.getScale();
+        if (uncappedScale <= 0 || contractScale >= uncappedScale) {
+            return 1.0;
+        }
+
+        return Math.max(0, contractScale) / (double) uncappedScale;
     }
 
     /**
@@ -123,7 +166,7 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
             coveredCosts = coveredCosts.plus(accountant.getPayRoll());
         }
 
-        if (campaignOptions.get(CampaignOption.PAY_FOR_MAINTAIN)) {
+        if (campaignOptions.isChargingMaintenance()) {
             // Maintenance is charged weekly; the planetary maintenance reduction never applies on contract
             Money weeklyMaintenance =
                   Accountant.getWeeklyMaintenanceTotal(campaign.getPlayerForce().getHangar().getUnits());

@@ -64,7 +64,7 @@ public final class SkillTrainingCosts {
     /**
      * Gets the C-bill cost of improving a person's skill by one level.
      *
-     * @param campaign  the campaign, for the profession skill options
+     * @param campaign  the campaign, for the profession skill and skill modifier options
      * @param person    the person improving the skill
      * @param skillName the name of the skill being improved (or gained)
      *
@@ -75,6 +75,35 @@ public final class SkillTrainingCosts {
      * @since 0.51.01
      */
     public static Money getSkillImprovementCost(Campaign campaign, Person person, String skillName) {
+        SkillType skillType = SkillType.getType(skillName);
+        if (skillType == null || !campaign.getCampaignOptions().get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS)) {
+            return Money.zero();
+        }
+
+        boolean isRoleSkill = isRoleSkill(campaign, person.getPrimaryRole(), skillName)
+                                    || isRoleSkill(campaign, person.getSecondaryRole(), skillName);
+        return getSkillImprovementCost(campaign, person, skillName, isRoleSkill,
+              getSkillModifierData(campaign, person));
+    }
+
+    /**
+     * As {@link #getSkillImprovementCost(Campaign, Person, String)}, for callers that have already worked out the
+     * person's role skills and skill modifiers, such as a menu listing every skill.
+     *
+     * @param campaign          the campaign
+     * @param person            the person improving the skill
+     * @param skillName         the name of the skill being improved (or gained)
+     * @param isRoleSkill       whether the skill belongs to the person's primary or secondary role
+     * @param skillModifierData the person's skill modifiers, which decide the skill's experience level
+     *
+     * @return the cost, or zero if the option is disabled or the improvement doesn't reach a new priced experience
+     *       level
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getSkillImprovementCost(Campaign campaign, Person person, String skillName,
+          boolean isRoleSkill, SkillModifierData skillModifierData) {
         if (!campaign.getCampaignOptions().get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS)) {
             return Money.zero();
         }
@@ -84,16 +113,18 @@ public final class SkillTrainingCosts {
             return Money.zero();
         }
 
+        // Use the level including modifiers, as shown to the player; improving the skill raises it by one
         Skill skill = person.getSkill(skillName);
-        int currentExperienceLevel = skill == null ? -1 : skillType.getExperienceLevel(skill.getLevel());
-        int nextLevel = skill == null ? 0 : skill.getLevel() + 1;
-        int nextExperienceLevel = skillType.getExperienceLevel(nextLevel);
+        int currentLevel = skill == null ? -1 : skill.getTotalSkillLevel(skillModifierData);
+        int currentExperienceLevel = skill == null ? -1 : skillType.getExperienceLevel(currentLevel);
+        int nextExperienceLevel = skillType.getExperienceLevel(currentLevel + 1);
 
         if (nextExperienceLevel <= currentExperienceLevel || nextExperienceLevel < EXP_REGULAR) {
             return Money.zero();
         }
 
-        int[] costTable = isProfessionSkill(campaign, person, skillType)
+        boolean isProfessionSkill = isRoleSkill || skillType.isUtilitySkill() || skillType.isRoleplaySkill();
+        int[] costTable = isProfessionSkill
                                 ? PROFESSION_COSTS_IN_SUPPORT_POINTS
                                 : NON_PROFESSION_COSTS_IN_SUPPORT_POINTS;
         int cappedExperienceLevel = Math.min(nextExperienceLevel, EXP_LEGENDARY);
@@ -102,20 +133,13 @@ public final class SkillTrainingCosts {
     }
 
     /**
-     * A skill is a profession skill if it belongs to the person's primary or secondary role, or is a utility or
-     * roleplay skill.
-     *
      * @author Illiani
      * @since 0.51.01
      */
-    private static boolean isProfessionSkill(Campaign campaign, Person person, SkillType skillType) {
-        if (skillType.isUtilitySkill() || skillType.isRoleplaySkill()) {
-            return true;
-        }
-
-        String skillName = skillType.getName();
-        return isRoleSkill(campaign, person.getPrimaryRole(), skillName)
-                     || isRoleSkill(campaign, person.getSecondaryRole(), skillName);
+    private static SkillModifierData getSkillModifierData(Campaign campaign, Person person) {
+        return person.getSkillModifierData(campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate());
     }
 
     /**
@@ -124,7 +148,8 @@ public final class SkillTrainingCosts {
      */
     private static boolean isRoleSkill(Campaign campaign, PersonnelRole role, String skillName) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        List<String> roleSkills = role.getSkillsForProfession(campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION),
+        List<String> roleSkills = role.getSkillsForProfession(
+              campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION),
               campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION),
               campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION),
               campaignOptions.get(CampaignOption.USE_ARTILLERY),

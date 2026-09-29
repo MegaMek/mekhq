@@ -226,7 +226,22 @@ public class SpaUtilities {
      * @since 0.51.01
      */
     public static Money getSpaTrainingCost(final Person person) {
-        int nextSpaIndex = Math.min(countNonFlawSpas(person), SPA_TRAINING_COSTS_IN_SUPPORT_POINTS.length - 1);
-        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(SPA_TRAINING_COSTS_IN_SUPPORT_POINTS[nextSpaIndex]);
+        return getSpaTrainingCost(countNonFlawSpas(person));
+    }
+
+    /**
+     * As {@link #getSpaTrainingCost(Person)}, for callers that have already counted the person's non-flaw SPAs.
+     *
+     * @param nonFlawSpaCount the number of non-flaw SPAs the person already holds
+     *
+     * @return the cost of the person's next SPA
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getSpaTrainingCost(final int nonFlawSpaCount) {
+        int nextSpaIndex = Math.min(nonFlawSpaCount, SPA_TRAINING_COSTS_IN_SUPPORT_POINTS.length - 1);
+        int trainingCostInSupportPoints = SPA_TRAINING_COSTS_IN_SUPPORT_POINTS[nextSpaIndex];
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(trainingCostInSupportPoints);
     }
 }

@@ -31,8 +31,8 @@ import mekhq.campaign.universe.PlanetarySystem;
 
 /**
  * Hot Spots: Draconis Reach off-contract planetary repair and refit cost reductions (Draconis Reach first printing pg
- * 69). While on a planet, repair and refit costs are scaled by the system's Hiring Hall Rating: A-B ×0.5, C ×0.75, D-F
- * ×1.0.
+ * 69). While on a planet, repair and refit costs are scaled by the system's Hiring Hall Rating: A-B ×0.5, C ×0.75,
+ * D-F ×1.0.
  *
  * <p>By default the reduction only applies while the force has no active contract. Campaign options can extend it to
  * cover time on contract (repairs and refits only) and maintenance while off contract. Maintenance is never reduced
@@ -61,7 +61,7 @@ public final class PlanetaryCostReductions {
             return NO_REDUCTION;
         }
 
-        if (campaign.hasActiveContract()
+        if (isOnContract(campaign)
                   && !campaignOptions.get(CampaignOption.PLANETARY_COST_REDUCTIONS_ON_CONTRACT)) {
             return NO_REDUCTION;
         }
@@ -85,11 +85,22 @@ public final class PlanetaryCostReductions {
         }
 
         // Maintenance is never reduced while on contract, even when reductions otherwise apply on contract
-        if (campaign.hasActiveContract()) {
+        if (isOnContract(campaign)) {
             return NO_REDUCTION;
         }
 
         return getPlanetaryMultiplier(campaign);
+    }
+
+    /**
+     * Checks the contracts directly rather than {@link Campaign#hasActiveContract()}, which is a cached flag that is
+     * only refreshed daily while StratCon is enabled.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isOnContract(Campaign campaign) {
+        return !campaign.getActiveContracts().isEmpty();
     }
 
     /**
