@@ -88,6 +88,16 @@ public enum UnitFixture {
     HUNCHBACK_HBK_4P("Hunchback HBK-4P", false, Mek.class),
     /** Vedette Medium Tank, a tracked combat vehicle. Source: {@code vehicles/3039u/Vedette Medium Tank.blk}. */
     VEDETTE_MEDIUM_TANK("Vedette Medium Tank", true, Tank.class),
+    /**
+     * Epona Pursuit Tank Prime, a Clan hover OmniVehicle with its weapons in the turret. Source:
+     * {@code vehicles/3060u/Epona Pursuit Tank Prime.blk}.
+     */
+    EPONA_PURSUIT_TANK_PRIME("Epona Pursuit Tank Prime", true, Tank.class),
+    /**
+     * Epona Pursuit Tank A, another configuration of the same OmniVehicle, with weapons in the front and turret.
+     * Source: {@code vehicles/3060u/Epona Pursuit Tank A.blk}.
+     */
+    EPONA_PURSUIT_TANK_A("Epona Pursuit Tank A", true, Tank.class),
     /** Warrior H-7 Attack Helicopter, a VTOL. Source: {@code vehicles/3039u/Warrior H-7 Attack Helicopter.blk}. */
     WARRIOR_H_7_ATTACK_HELICOPTER("Warrior H-7 Attack Helicopter", true, VTOL.class),
     /**
