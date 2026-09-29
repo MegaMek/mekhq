@@ -172,7 +172,7 @@ class AbstractStratConGMTest {
     }
 
     @Test
-    void mondayGeneratesWeeklyDatesForEveryTrackWhenNotSingleDrop() {
+    void mondayDoesNotRollWeeklyDatesWhenNotSingleDrop() {
         StratConTrackState track1 = trackWith();
         StratConTrackState track2 = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track1, track2), new ArrayList<>());
@@ -181,16 +181,43 @@ class AbstractStratConGMTest {
 
         gm.handleNewDay(newDay(MONDAY, contract));
 
-        verify(gm.generation).generateWeeklyScenarioDates(any(),
-              eq(campaignState),
-              eq(contract),
-              eq(track1),
-              eq(false));
-        verify(gm.generation).generateWeeklyScenarioDates(any(),
-              eq(campaignState),
-              eq(contract),
-              eq(track2),
-              eq(false));
+        // Outside Single Drop play, ordinary scenarios are scheduled up front rather than rolled each Monday
+        verify(gm.generation, never()).generateWeeklyScenarioDates(any(), any(), any(), any(), anyBoolean());
+    }
+
+    @Test
+    void aContractWithoutUpFrontScenariosIsScheduledFromToday() {
+        StratConTrackState track = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        when(contract.getStartDate()).thenReturn(TUESDAY.minusMonths(1));
+        when(contract.getEndingDate()).thenReturn(TUESDAY.plusMonths(2));
+        when(contract.getLengthInMonths()).thenReturn(3);
+        when(contract.getTrackCount()).thenReturn(1);
+        when(contract.getScale()).thenReturn(1);
+        TestGM gm = new TestGM(false);
+
+        NewDayEvent event = newDay(TUESDAY, contract);
+        CampaignOptions options = event.getCampaign().getCampaignOptions();
+        when(options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)).thenReturn(true);
+        when(options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
+        when(options.get(CampaignOption.FEWER_WEEKLY_SCENARIOS)).thenReturn(false);
+
+        gm.handleNewDay(event);
+
+        verify(campaignState).setNormalTempoScheduled(true);
+    }
+
+    @Test
+    void singleDropDoesNotScheduleScenariosUpFront() {
+        StratConTrackState track = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        TestGM gm = new TestGM(true);
+
+        gm.handleNewDay(newDay(TUESDAY, contract));
+
+        verify(campaignState, never()).setNormalTempoScheduled(anyBoolean());
     }
 
     @Test

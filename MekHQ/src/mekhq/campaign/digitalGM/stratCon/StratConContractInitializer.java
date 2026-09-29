@@ -341,6 +341,15 @@ public class StratConContractInitializer {
             }
         }
 
+        // A new contract has placed nothing yet, so its point of interest ledger starts empty rather than from the map.
+        campaignState.setPointOfInterestLedgerSeeded(true);
+
+        // Pre-roll the days on which the contract's ordinary scenarios appear. Mapless play has them too; Single Drop
+        // play keeps its own weekly pace instead.
+        if (!campaignOptions.isUseStratConSinglesMode()) {
+            StratConScenarioTempo.scheduleNormalScenarios(campaign, contract, campaignState, contract.getStartDate());
+        }
+
         // Pre-roll the days on which each strategic-objective scenario, and each point of interest, appears over the
         // contract's run.
         if (!isUseMaplessMode) {
@@ -353,7 +362,7 @@ public class StratConContractInitializer {
             // Most contracts with special points of interest get no Essential scenarios: those points of interest, and
             // the combat bonus paid for each one dealt with, take their place.
             if (!isReplacingEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
-                scheduleStrategicScenarioSpawnDates(contract, campaignState);
+                scheduleStrategicScenarioSpawnDates(contract, campaignState, contract.getStartDate());
             }
 
             schedulePointsOfInterest(contract,
@@ -393,7 +402,8 @@ public class StratConContractInitializer {
      * gives, per contract month, how many strategic scenarios appear that month. Each such scenario is assigned an
      * independent random day within that month's window, so they trickle in over the month rather than all landing on
      * the first day. The dates are stored on the campaign state and drained by the daily StratCon lifecycle, which
-     * spawns whatever is due via {@link #spawnScheduledStrategicScenarios}.</p>
+     * spawns whatever is due via {@link #spawnScheduledStrategicScenarios}. Only days on or after {@code fromDate} are
+     * kept, so a schedule rolled again partway through the contract leaves the days already past alone.</p>
      *
      * <p>Schedule entries at or beyond the contract's final month are folded into that final month's window, so a
      * schedule longer than the contract still delivers every scenario (its tail lands in the last month); a schedule
@@ -402,9 +412,10 @@ public class StratConContractInitializer {
      *
      * @param contract      the contract whose schedule is being laid out
      * @param campaignState the campaign state to store the rolled spawn dates on
+     * @param fromDate      the first day to keep; the contract's start date when it is accepted
      */
-    private static void scheduleStrategicScenarioSpawnDates(AbstractContract contract,
-          StratConCampaignState campaignState) {
+    static void scheduleStrategicScenarioSpawnDates(AbstractContract contract, StratConCampaignState campaignState,
+          @Nullable LocalDate fromDate) {
         LocalDate startDate = contract.getStartDate();
         List<Integer> schedule = contract.getScenarioSchedule();
         if ((startDate == null) || schedule.isEmpty()) {
@@ -412,7 +423,9 @@ public class StratConContractInitializer {
         }
 
         for (LocalDate spawnDate : rollSpawnDates(startDate, schedule, contract.getLengthInMonths())) {
-            campaignState.addStrategicScenarioSpawnDate(spawnDate);
+            if ((fromDate == null) || !spawnDate.isBefore(fromDate)) {
+                campaignState.addStrategicScenarioSpawnDate(spawnDate);
+            }
         }
     }
 
@@ -491,6 +504,37 @@ public class StratConContractInitializer {
     static void schedulePointsOfInterest(AbstractContract contract, StratConContractDefinition contractDefinition,
           StratConCampaignState campaignState, boolean isMultiplyTrackIntensityByScale,
           boolean isContractsUseSpecialMechanics) {
+        schedulePointsOfInterest(contract, contractDefinition, campaignState, isMultiplyTrackIntensityByScale,
+              isContractsUseSpecialMechanics, contract.getStartDate(), 0, Map.of());
+    }
+
+    /**
+     * As {@link #schedulePointsOfInterest(AbstractContract, StratConContractDefinition, StratConCampaignState, boolean,
+     * boolean)}, but for a schedule rolled from a given day on, after some points of interest have already been placed
+     * or fallen due (see {@link StratConScenarioTempo#regenerateSchedules}).
+     *
+     * <p>Special points of interest are rolled for the whole contract as usual, and only the days from
+     * {@code fromDate} on are kept; the marks already made count against what is marked now. A definition's points of
+     * interest are a fixed number, so those already placed or due are taken off it, and the rest are spread across the
+     * contract's remaining months instead.</p>
+     *
+     * @param contract                        the contract
+     * @param contractDefinition              its StratCon contract definition
+     * @param campaignState                   the campaign state to store the scheduled points of interest on
+     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
+     * @param isContractsUseSpecialMechanics  whether the contract uses its type's special mechanics
+     * @param fromDate                        the first day to schedule on; the contract's start date when it is
+     *                                        accepted
+     * @param committedCount                  how many points of interest have already been placed or fallen due
+     * @param alreadyMarkedCounts             how many of those were marked under each initial state key
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void schedulePointsOfInterest(AbstractContract contract, StratConContractDefinition contractDefinition,
+          StratConCampaignState campaignState, boolean isMultiplyTrackIntensityByScale,
+          boolean isContractsUseSpecialMechanics, @Nullable LocalDate fromDate, int committedCount,
+          Map<String, Integer> alreadyMarkedCounts) {
         // A Recon Raid using special mechanics has no points of interest at all: its sectors are scouted instead.
         if (StratConReconnaissance.usesReconnaissance(contract, isContractsUseSpecialMechanics)) {
             return;
@@ -498,12 +542,18 @@ public class StratConContractInitializer {
 
         String specialTypeId = getSpecialPointOfInterestTypeId(contract, isContractsUseSpecialMechanics);
         if (specialTypeId != null) {
-            scheduleSpecialPointsOfInterest(contract, campaignState, isMultiplyTrackIntensityByScale, specialTypeId);
+            scheduleSpecialPointsOfInterest(contract, campaignState, isMultiplyTrackIntensityByScale, specialTypeId,
+                  fromDate, alreadyMarkedCounts);
             return;
         }
 
         List<StratConScheduledPointOfInterest> requestedPointsOfInterest =
               getRequestedPointsOfInterest(contractDefinition, contract.getScale());
+        // Those already placed or due are taken off at random, since which type each was drawn as is not remembered.
+        int removedCount = min(committedCount, requestedPointsOfInterest.size());
+        for (int index = 0; index < removedCount; index++) {
+            requestedPointsOfInterest.remove(Compute.randomInt(requestedPointsOfInterest.size()));
+        }
         if (requestedPointsOfInterest.isEmpty()) {
             return;
         }
@@ -516,10 +566,18 @@ public class StratConContractInitializer {
             return;
         }
 
-        List<Integer> schedule = TrackIntensityTable.rollScheduleForCount(contract.getLengthInMonths(),
+        // Spread across the months still to come: from the start date on acceptance, from fromDate when rolled again.
+        LocalDate windowStart = ((fromDate == null) || fromDate.isBefore(startDate)) ? startDate : fromDate;
+        int elapsedMonths = (int) ChronoUnit.MONTHS.between(startDate, windowStart);
+        int remainingMonths = max(1, contract.getLengthInMonths() - elapsedMonths);
+        List<Integer> schedule = TrackIntensityTable.rollScheduleForCount(remainingMonths,
               requestedPointsOfInterest.size());
 
-        List<LocalDate> spawnDates = rollSpawnDates(startDate, schedule, contract.getLengthInMonths());
+        List<LocalDate> spawnDates = rollSpawnDates(windowStart, schedule, remainingMonths);
+        LocalDate endDate = contract.getEndingDate();
+        if ((endDate != null) && endDate.isAfter(windowStart)) {
+            spawnDates.replaceAll(spawnDate -> spawnDate.isBefore(endDate) ? spawnDate : endDate.minusDays(1));
+        }
 
         int scheduledCount = min(requestedPointsOfInterest.size(), spawnDates.size());
         for (int index = 0; index < scheduledCount; index++) {
@@ -619,6 +677,30 @@ public class StratConContractInitializer {
     // Package-private rather than private so scheduling can be tested without standing up a whole contract.
     static void scheduleSpecialPointsOfInterest(AbstractContract contract, StratConCampaignState campaignState,
           boolean isMultiplyTrackIntensityByScale, String typeId) {
+        scheduleSpecialPointsOfInterest(contract, campaignState, isMultiplyTrackIntensityByScale, typeId,
+              contract.getStartDate(), Map.of());
+    }
+
+    /**
+     * As {@link #scheduleSpecialPointsOfInterest(AbstractContract, StratConCampaignState, boolean, String)}, but
+     * keeping only the days from {@code fromDate} on, with the marks already made earlier in the contract counting
+     * against what is marked now (see {@link IStratConPointOfInterestBehavior#onScheduled(List, AbstractContract,
+     * Map)}).
+     *
+     * @param contract                        the contract
+     * @param campaignState                   the campaign state to store the scheduled points of interest on
+     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
+     * @param typeId                          the type ID of the special point of interest to schedule
+     * @param fromDate                        the first day to keep; the contract's start date when it is accepted
+     * @param alreadyMarkedCounts             how many points of interest earlier in the contract were marked under
+     *                                        each initial state key
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void scheduleSpecialPointsOfInterest(AbstractContract contract, StratConCampaignState campaignState,
+          boolean isMultiplyTrackIntensityByScale, String typeId, @Nullable LocalDate fromDate,
+          Map<String, Integer> alreadyMarkedCounts) {
         LocalDate startDate = contract.getStartDate();
         if (startDate == null) {
             LOGGER.warn("Contract {} has no start date, so its {} points of interest cannot be scheduled.",
@@ -636,8 +718,10 @@ public class StratConContractInitializer {
         boolean isStrategicObjective = isSpecialPointOfInterestObjective(typeId);
         List<StratConScheduledPointOfInterest> scheduledPointsOfInterest = new ArrayList<>();
         for (LocalDate spawnDate : rollSpawnDates(startDate, schedule, contract.getLengthInMonths())) {
-            scheduledPointsOfInterest.add(new StratConScheduledPointOfInterest(spawnDate, typeId,
-                  isStrategicObjective));
+            if ((fromDate == null) || !spawnDate.isBefore(fromDate)) {
+                scheduledPointsOfInterest.add(new StratConScheduledPointOfInterest(spawnDate, typeId,
+                      isStrategicObjective));
+            }
         }
 
         // Anything a type settles up front - such as which leads pan out - is settled now, so it cannot be gamed later.
@@ -648,7 +732,7 @@ public class StratConContractInitializer {
                               + "accepted.", typeId, contract.getName());
         } else {
             StratConPointOfInterestBehaviors.getBehavior(definition.getBehaviorId())
-                  .onScheduled(scheduledPointsOfInterest, contract);
+                  .onScheduled(scheduledPointsOfInterest, contract, alreadyMarkedCounts);
         }
 
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {

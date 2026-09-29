@@ -47,16 +47,7 @@ import java.awt.Container;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
-import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JCheckBox;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JSpinner;
+import javax.swing.*;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -116,6 +107,7 @@ class ContractMarketPage {
     private JCheckBox chkUseBolsterContractSkill;
     private JCheckBox chkUseChaosScaleSupportPointConversion;
     private JCheckBox chkMultiplyTrackIntensityByScale;
+    private JCheckBox chkFewerWeeklyScenarios;
     private JCheckBox chkUseContractFactionModifiers;
     private JCheckBox chkUseIntelObfuscation;
     private JCheckBox chkUseNonNegotiableTerms;
@@ -293,6 +285,10 @@ class ContractMarketPage {
         chkMultiplyTrackIntensityByScale.addMouseListener(
               createTipPanelUpdater("MultiplyTrackIntensityByScale"));
 
+        chkFewerWeeklyScenarios = new CampaignOptionsCheckBox("FewerWeeklyScenarios",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkFewerWeeklyScenarios.addMouseListener(createTipPanelUpdater("FewerWeeklyScenarios"));
+
         chkUseContractFactionModifiers = new CampaignOptionsCheckBox("UseContractFactionModifiers",
               getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
         chkUseContractFactionModifiers.addMouseListener(createTipPanelUpdater("UseContractFactionModifiers"));
@@ -353,6 +349,7 @@ class ContractMarketPage {
                 chkUseBolsterContractSkill,
               chkUseChaosScaleSupportPointConversion,
               chkMultiplyTrackIntensityByScale,
+              chkFewerWeeklyScenarios,
               chkUseContractFactionModifiers,
               chkUseIntelObfuscation,
               chkUseNonNegotiableTerms,
@@ -693,6 +690,7 @@ class ContractMarketPage {
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
         chkUseChaosScaleSupportPointConversion.setSelected(model.useChaosScaleSupportPointConversion);
         chkMultiplyTrackIntensityByScale.setSelected(model.multiplyTrackIntensityByScale);
+        chkFewerWeeklyScenarios.setSelected(model.fewerWeeklyScenarios);
         chkUseContractFactionModifiers.setSelected(model.useContractFactionModifiers);
         chkUseIntelObfuscation.setSelected(model.useIntelObfuscation);
         chkUseNonNegotiableTerms.setSelected(model.useNonNegotiableTerms);
@@ -751,6 +749,7 @@ class ContractMarketPage {
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
         model.useChaosScaleSupportPointConversion = chkUseChaosScaleSupportPointConversion.isSelected();
         model.multiplyTrackIntensityByScale = chkMultiplyTrackIntensityByScale.isSelected();
+        model.fewerWeeklyScenarios = chkFewerWeeklyScenarios.isSelected();
         model.useContractFactionModifiers = chkUseContractFactionModifiers.isSelected();
         model.useIntelObfuscation = chkUseIntelObfuscation.isSelected();
         model.useNonNegotiableTerms = chkUseNonNegotiableTerms.isSelected();

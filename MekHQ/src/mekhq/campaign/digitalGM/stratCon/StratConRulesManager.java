@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
-import static java.lang.Math.ceil;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
@@ -218,47 +217,29 @@ public class StratConRulesManager {
     }
 
     /**
-     * This method generates scenario dates for each week of the StratCon campaign.
-     * <p>
-     * The method first determines the number of turning point scenario rolls based on the required lance count from the
-     * track, then multiplies that count depending on the contract's morale level.
-     * <p>
-     * If auto-assign for lances is enabled, and either there are no available forces or the number of weekly scenarios
-     * equals or exceeds the number of available forces, it breaks from the scenario generation loop.
-     * <p>
-     * For each scenario, a scenario odds target number is calculated, and a roll is made against this target. If the
-     * roll is less than the target number, a new weekly scenario is created with a random date within the week.
+     * Schedules the coming week's scenario in Single Drop play: one scenario, on a random day within the week.
+     *
+     * <p>Other play schedules its ordinary scenarios up front, across the whole contract, so this does nothing for it
+     * (see {@link StratConScenarioTempo}).</p>
      *
      * @param campaign             The campaign.
      * @param campaignState        The state of the StratCon campaign.
      * @param contract             The AbstractContract for the campaign.
      * @param track                The StratCon campaign track.
-     * @param isUseStratConSingles If {@code true} only a single scenario will be generated
+     * @param isUseStratConSingles If {@code true} a single scenario is scheduled; otherwise nothing is
      */
     public static void generateScenariosDatesForWeek(Campaign campaign, StratConCampaignState campaignState,
           AbstractContract contract, StratConTrackState track, boolean isUseStratConSingles) {
         // Important note: we don't check to see whether the OpFor has been routed when scheduling scenario dates.
         // This is because it's possible the OpFor will rally between the start of the week and when the scenario is
         // scheduled.
-
-        int scenarioRolls = isUseStratConSingles ? 1 :
-                                  // We divide the number of scenario rolls by the number of tracks so that we're not
-                                  // unintentionally multiplying Intensity by tracks
-                                  (int) ceil(track.getRequiredLanceCount() / (double) campaignState.getTrackCount());
-        for (int scenarioIndex = 0; scenarioIndex < scenarioRolls; scenarioIndex++) {
-            int targetNum = calculateScenarioOdds(track, contract, false);
-            int roll = randomInt(100);
-
-            if (isUseStratConSingles || roll < targetNum) {
-                LocalDate scenarioDate = campaign.getLocalDate().plusDays(randomInt(7));
-                campaignState.addWeeklyScenario(scenarioDate);
-                LOGGER.info("StratCon Weekly Scenario Roll: {} vs. {} ({})",
-                      roll,
-                      targetNum, scenarioDate);
-            } else {
-                LOGGER.info("StratCon Weekly Scenario Roll: {} vs. {}", roll, targetNum);
-            }
+        if (!isUseStratConSingles) {
+            return;
         }
+
+        LocalDate scenarioDate = campaign.getLocalDate().plusDays(randomInt(7));
+        campaignState.addWeeklyScenario(scenarioDate);
+        LOGGER.info("StratCon Single Drop scenario scheduled for {}", scenarioDate);
     }
 
     /**
