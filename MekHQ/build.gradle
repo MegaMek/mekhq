@@ -434,8 +434,9 @@ if (suiteVersion != null) {
             } || !['MekHQ.sh', 'MegaMek.sh', 'MegaMekLab.sh', 'bin/MekHQ'].every {
                 paths.contains(root + it)
             } || !paths.any { it.startsWith(root + 'data/boards/') }
-                    || !paths.any { it.startsWith(root + 'data/mekfiles/') }) {
-                throw new GradleException('Suite archive is missing launcher, product jars, or bundled data')
+                    || !paths.any { it.startsWith(root + 'data/mekfiles/') }
+                    || !paths.contains(root + 'data/images/imgFileAtlasMap.yml')) {
+                throw new GradleException('Suite archive is missing launcher, product jars, or bundled data/atlases')
             }
         }
     }
@@ -819,12 +820,14 @@ tasks.register('officialUnitList', JavaExec) {
     args = ['-oul', "${projectDir}/docs/OfficialUnitList.txt"]
 }
 
-tasks.register('stageFiles', Copy) {
+tasks.register(suiteVersion != null ? 'copySuiteFiles' : 'stageFiles', Copy) {
     description = 'Stages files that are to be copied into the distribution.'
 
     mustRunAfter(stageDataFiles)
     dependsOn officialUnitList
-    dependsOn deleteAtlasedImages
+    if (suiteVersion == null) {
+        dependsOn deleteAtlasedImages
+    }
 
     dependsOn gradle.includedBuild('megamek').task(':megamek:generateDynamicFiles')
     dependsOn gradle.includedBuild('megameklab').task(':megameklab:generateDynamicFiles')
@@ -867,6 +870,16 @@ tasks.register('stageFiles', Copy) {
     doLast {
         mkdir "${fileStagingDir}/logs"
         mkdir "${fileStagingDir}/userdata/data/campaignPresets/"
+    }
+}
+
+if (suiteVersion != null) {
+    tasks.named('createImageAtlases') {
+        dependsOn tasks.named('copySuiteFiles')
+    }
+    tasks.register('stageFiles') {
+        dependsOn tasks.named('copySuiteFiles')
+        dependsOn deleteAtlasedImages
     }
 }
 
