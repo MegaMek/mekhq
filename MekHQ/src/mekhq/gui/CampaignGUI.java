@@ -54,7 +54,6 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
-import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.List;
@@ -86,6 +85,8 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignController;
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.campaignOptions.AcquisitionsType;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -148,6 +149,7 @@ import mekhq.gui.view.CurrentLocationPanel;
  */
 public class CampaignGUI extends JPanel {
     private static final MMLogger logger = MMLogger.create(CampaignGUI.class);
+    private static final String REFIT_RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
     @Serial
     private static final long serialVersionUID = 3126634639249129512L;
@@ -1044,157 +1046,148 @@ public class CampaignGUI extends JPanel {
     /**
      * Asks the player which tech should work on a refit, offering only techs who can do the work.
      *
-     * @param r the refit
+     * @param refit the refit
      *
      * @return the chosen tech, or {@code null} if the player cancelled or no tech can do the work
      */
-    private @Nullable Person selectRefitTech(Refit r) {
+    private @Nullable Person selectRefitTech(Refit refit) {
         Campaign campaign = getCampaign();
-        if (campaign.getPlayerForce()
-                  .getHumanResources()
-                  .getActivePersonnel(false, false)
-                  .stream()
-                  .anyMatch(Person::isTech)) {
-            String name;
-            Map<String, Person> techHash = new HashMap<>();
-            List<String> techList = new ArrayList<>();
-
-            Campaign campaign1 = getCampaign();
-            List<Person> techs = campaign1.getPlayerForce()
-                                       .getHumanResources()
-                                       .getTechs(campaign1.getPlayerForce().getHangar().getUnits(),
-                                             campaign1.getCampaignOptions(),
-                                             campaign1.getPlayerForce().isClanForce(),
-                                             campaign1.getLocalDate(),
-                                             false,
-                                             true);
-            int lastRightTech = 0;
-
-            for (Person tech : techs) {
-                Campaign campaign2 = getCampaign();
-                if (campaign2.getPlayerForce()
-                          .getHumanResources()
-                          .isWorkingOnRefit(campaign2.getPlayerForce().getHangar(), tech) || tech.isEngineer()) {
-                    continue;
-                }
-                // Only offer techs who can actually do the work: at the unit's location, with a possible target
-                if (RefitWorkCheck.reasonTechCannotWork(campaign2, r, tech) != null) {
-                    continue;
-                }
-
-                name = "<html>" +
-                             tech.getFullName() +
-                             ", <b>" +
-                             SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(),
-                                   false,
-                                   true)) +
-                             "</b> " +
-                             tech.getPrimaryRoleDesc() +
-                             " (" +
-                             getCampaign().getTargetFor(r, tech).getValueAsString() +
-                             "+), " +
-                             tech.getMinutesLeft() +
-                             '/' +
-                             tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
-                                                                  .get(CampaignOption.TECHS_USE_ADMINISTRATION)) +
-                             " minutes</html>";
-                techHash.put(name, tech);
-                if (tech.isRightTechTypeFor(r)) {
-                    techList.add(lastRightTech++, name);
-                } else {
-                    techList.add(name);
-                }
-            }
-
-            String s = (techList.isEmpty()) ?
-                             null :
-                             (String) JOptionPane.showInputDialog(frame,
-                                   "Which tech should work on the refit?",
-                                   "Select Tech",
-                                   JOptionPane.PLAIN_MESSAGE,
-                                   null,
-                                   techList.toArray(),
-                                   techList.getFirst());
-
-            if (null == s) {
-                return null;
-            }
-
-            Person selectedTech = techHash.get(s);
-
-            if (!selectedTech.isRightTechTypeFor(r)) {
-                if (JOptionPane.NO_OPTION ==
-                          JOptionPane.showConfirmDialog(null,
-                                "This tech is not appropriate for this unit. Would you like to continue?",
-                                "Incorrect Tech Type",
-                                JOptionPane.YES_NO_OPTION)) {
-                    return null;
-                }
-            }
-
-            return selectedTech;
-        } else {
+        boolean hasAnyTech = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .getActivePersonnel(false, false)
+                                   .stream()
+                                   .anyMatch(Person::isTech);
+        if (!hasAnyTech) {
             JOptionPane.showMessageDialog(frame,
-                  "You have no techs available to work on this refit.",
-                  "No Techs",
+                  getTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.noTechs.text"),
+                  getTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.noTechs.title"),
                   JOptionPane.WARNING_MESSAGE);
             return null;
         }
+
+        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+        LocalHangar hangar = campaign.getPlayerForce().getHangar();
+        boolean isUsingAdministration = campaign.getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION);
+        List<Person> techs = humanResources.getTechs(hangar.getUnits(),
+              campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              false,
+              true);
+
+        Map<String, Person> techsByLabel = new HashMap<>();
+        List<String> techLabels = new ArrayList<>();
+        int lastRightTechIndex = 0;
+        for (Person tech : techs) {
+            if (humanResources.isWorkingOnRefit(hangar, tech) || tech.isEngineer()) {
+                continue;
+            }
+            // Only offer techs who can actually do the work: at the unit's location, with a possible target
+            if (RefitWorkCheck.reasonTechCannotWork(campaign, refit, tech) != null) {
+                continue;
+            }
+
+            String techLabel = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.techLabel",
+                  tech.getFullName(),
+                  SkillType.getColoredExperienceLevelName(tech.getSkillLevel(campaign, false, true)),
+                  tech.getPrimaryRoleDesc(),
+                  campaign.getTargetFor(refit, tech).getValueAsString(),
+                  String.valueOf(tech.getMinutesLeft()),
+                  String.valueOf(tech.getDailyAvailableTechTime(isUsingAdministration)));
+            techsByLabel.put(techLabel, tech);
+            if (tech.isRightTechTypeFor(refit)) {
+                techLabels.add(lastRightTechIndex++, techLabel);
+            } else {
+                techLabels.add(techLabel);
+            }
+        }
+
+        if (techLabels.isEmpty()) {
+            JOptionPane.showMessageDialog(frame,
+                  getTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.noTechs.text"),
+                  getTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.noTechs.title"),
+                  JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+
+        String chosenLabel = (String) JOptionPane.showInputDialog(frame,
+              getTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.prompt"),
+              getTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.title"),
+              JOptionPane.PLAIN_MESSAGE,
+              null,
+              techLabels.toArray(),
+              techLabels.getFirst());
+        if (chosenLabel == null) {
+            return null;
+        }
+
+        Person selectedTech = techsByLabel.get(chosenLabel);
+        if (!selectedTech.isRightTechTypeFor(refit)) {
+            int response = JOptionPane.showConfirmDialog(null,
+                  getTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.wrongType.text"),
+                  getTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.wrongType.title"),
+                  JOptionPane.YES_NO_OPTION);
+            if (response == JOptionPane.NO_OPTION) {
+                return null;
+            }
+        }
+        return selectedTech;
     }
 
     /**
      * Gives a refit a new tech after its tech has left. The refit keeps its progress and carries on with the new
      * tech from the next day.
      *
-     * @param r the refit without a tech
+     * @param refit the refit without a tech
      */
-    public void assignRefitTech(Refit r) {
-        Person selectedTech = selectRefitTech(r);
+    public void assignRefitTech(Refit refit) {
+        Person selectedTech = selectRefitTech(refit);
         if (selectedTech == null) {
             return;
         }
-        r.setTech(selectedTech);
-        logger.info("[Refit] {} now works on the refit of {}", selectedTech.getFullName(), r.getUnit().getName());
-        MekHQ.triggerEvent(new UnitRefitEvent(r.getUnit()));
+        refit.setTech(selectedTech);
+        logger.info("[Refit] {} now works on the refit of {}", selectedTech.getFullName(), refit.getUnit().getName());
+        MekHQ.triggerEvent(new UnitRefitEvent(refit.getUnit()));
     }
 
-    public void refitUnit(Refit r, boolean selectModelName) {
-        if (r.getOriginalEntity() instanceof Infantry && !(r.getOriginalEntity() instanceof BattleArmor)) {
-            r.setTech(null);
-        } else if (r.getOriginalEntity() instanceof Dropship || r.getOriginalEntity() instanceof Jumpship) {
-            Person engineer = r.getOriginalUnit().getEngineer();
+    public void refitUnit(Refit refit, boolean selectModelName) {
+        Campaign campaign = getCampaign();
+        if (refit.getOriginalEntity() instanceof Infantry && !(refit.getOriginalEntity() instanceof BattleArmor)) {
+            refit.setTech(null);
+        } else if (refit.getOriginalEntity() instanceof Dropship || refit.getOriginalEntity() instanceof Jumpship) {
+            Person engineer = refit.getOriginalUnit().getEngineer();
             if (engineer == null) {
                 JOptionPane.showMessageDialog(frame,
-                      "You cannot refit a ship that does not have an engineer. Assign a qualified vessel crew to this unit.",
-                      "No Engineer",
+                      getTextAt(REFIT_RESOURCE_BUNDLE, "refitNoEngineer.text"),
+                      getTextAt(REFIT_RESOURCE_BUNDLE, "refitNoEngineer.title"),
                       JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            String reasonEngineerCannotWork = RefitWorkCheck.reasonTechCannotWork(getCampaign(), r, engineer);
+            String reasonEngineerCannotWork = RefitWorkCheck.reasonTechCannotWork(campaign, refit, engineer);
             if (reasonEngineerCannotWork != null) {
                 JOptionPane.showMessageDialog(frame,
-                      MessageFormat.format(resourceMap.getString("refitEngineerCannotWork.text"),
+                      getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitEngineerCannotWork.text",
                             engineer.getFullName(), reasonEngineerCannotWork),
-                      resourceMap.getString("refitEngineerCannotWork.title"),
+                      getTextAt(REFIT_RESOURCE_BUNDLE, "refitEngineerCannotWork.title"),
                       JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            r.setTech(engineer);
+            refit.setTech(engineer);
         } else {
-            Person selectedTech = selectRefitTech(r);
+            Person selectedTech = selectRefitTech(refit);
             if (selectedTech == null) {
                 return;
             }
-            r.setTech(selectedTech);
+            refit.setTech(selectedTech);
         }
         if (selectModelName) {
             // select a model name
-            RefitNameDialog rnd = new RefitNameDialog(frame, true, r);
-            rnd.setVisible(true);
-            if (rnd.wasCancelled()) {
+            RefitNameDialog refitNameDialog = new RefitNameDialog(frame, true, refit);
+            refitNameDialog.setVisible(true);
+            if (refitNameDialog.wasCancelled()) {
                 // Set the tech team to null since we may want to change it when we re-do the
                 // refit
-                r.setTech(null);
+                refit.setTech(null);
                 return;
             }
         }
@@ -1202,44 +1195,39 @@ public class CampaignGUI extends JPanel {
         // check to see if user really wants to do it - give some info on what
         // will be done
         // TODO: better information
-        String RefitRefurbish = getRefitRefurbish(r);
-        if (0 !=
-                  JOptionPane.showConfirmDialog(null,
-                        RefitRefurbish + r.getUnit().getName() + '?',
-                        "Proceed?",
-                        JOptionPane.YES_NO_OPTION)) {
+        int response = JOptionPane.showConfirmDialog(null,
+              getRefitConfirmation(refit),
+              getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.title"),
+              JOptionPane.YES_NO_OPTION);
+        if (response != JOptionPane.YES_OPTION) {
             return;
         }
         try {
-            if (!r.begin()) {
+            if (!refit.begin()) {
                 // Refused before it started: the unit already has a refit, or the refurbishment cannot be paid for
                 return;
             }
-        } catch (EntityLoadingException ex) {
+        } catch (EntityLoadingException exception) {
             JOptionPane.showMessageDialog(null,
-                  "For some reason, the unit you are trying to customize cannot be loaded\n and so the customization was cancelled. Please report the bug with a description\nof the unit being customized.",
-                  "Could not customize unit",
+                  getTextAt(REFIT_RESOURCE_BUNDLE, "refitLoadFailed.text"),
+                  getTextAt(REFIT_RESOURCE_BUNDLE, "refitLoadFailed.title"),
                   JOptionPane.ERROR_MESSAGE);
             return;
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage(), "IO Exception", JOptionPane.ERROR_MESSAGE);
+        } catch (IOException exception) {
+            JOptionPane.showMessageDialog(null, exception.getMessage(),
+                  getTextAt(REFIT_RESOURCE_BUNDLE, "refitIOException.title"), JOptionPane.ERROR_MESSAGE);
             return;
         }
-        getCampaign().refit(r);
+        campaign.refit(refit);
         getMekLabTab().clearUnit();
     }
 
-    private static String getRefitRefurbish(Refit r) {
-        String RefitRefurbish;
-        if (r.isBeingRefurbished()) {
-            RefitRefurbish = "Refurbishment is a " +
-                                   r.getRefitClassName() +
-                                   " refit and must be done at a factory and costs 10% of the purchase price" +
-                                   ".\n Are you sure you want to refurbish ";
-        } else {
-            RefitRefurbish = "This is a " + r.getRefitClassName() + " refit. Are you sure you want to refit ";
-        }
-        return RefitRefurbish;
+    /**
+     * @return the question asked before a refit or refurbishment starts, naming its refit class and the unit
+     */
+    private static String getRefitConfirmation(Refit refit) {
+        String key = refit.isBeingRefurbished() ? "refitConfirm.refurbish.text" : "refitConfirm.refit.text";
+        return getFormattedTextAt(REFIT_RESOURCE_BUNDLE, key, refit.getRefitClassName(), refit.getUnit().getName());
     }
 
     /**
