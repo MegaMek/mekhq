@@ -129,6 +129,24 @@ public enum UnitFixture {
     MINOTAUR_PROTOMEK("Minotaur", true, ProtoMek.class),
     /** Shilone SL-17, an aerospace fighter. Source: {@code fighters/TRO3039u/Shilone SL-17.blk}. */
     SHILONE_SL_17("Shilone SL-17", true, AeroSpaceFighter.class),
+    /**
+     * Shilone SL-17AC, the SL-17 with one heat sink fewer. Source: {@code fighters/TRO3039u/Shilone SL-17AC.blk}.
+     */
+    SHILONE_SL_17AC("Shilone SL-17AC", true, AeroSpaceFighter.class),
+    /**
+     * Shilone SL-17R, the SL-17 with double heat sinks instead of single ones, including those in the engine.
+     * Source: {@code fighters/TRO3039u/Shilone SL-17R.blk}.
+     */
+    SHILONE_SL_17R("Shilone SL-17R", true, AeroSpaceFighter.class),
+    /**
+     * Batu Prime, a Clan OmniFighter with two pod-mounted heat sinks. Source: {@code fighters/TRO3055U/Batu Prime.blk}.
+     */
+    BATU_PRIME("Batu Prime", true, AeroSpaceFighter.class),
+    /**
+     * Batu D, another configuration of the Batu with four pod-mounted heat sinks. Source:
+     * {@code fighters/TRO3055U/Batu D.blk}.
+     */
+    BATU_D("Batu D", true, AeroSpaceFighter.class),
     /** Shuttle ST-46, a small craft. Source: {@code smallcraft/TRO 3057r/Shuttle ST-46.blk}. */
     SHUTTLE_ST_46("Shuttle ST-46", true, SmallCraft.class),
     /** Leopard (2537), a DropShip. Source: {@code dropships/TRO3057R/IS/Leopard (2537).blk}. */
