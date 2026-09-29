@@ -844,6 +844,12 @@ public final class CampaignOption<T> {
           of(Integer.class, 0, "rentedFacilitiesCostHoldingCells");
     public static final CampaignOption<Integer> RENTED_FACILITIES_COST_REPAIR_BAYS =
           of(Integer.class, 0, "rentedFacilitiesCostRepairBays");
+    public static final CampaignOption<Boolean> CAP_CONTRACT_SCALE_BY_HIRING_HALL =
+          of(Boolean.class, false, "capContractScaleByHiringHall");
+    public static final CampaignOption<Boolean> TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE =
+          of(Boolean.class, false, "taperCombatPayAndSalvageByScale");
+    public static final CampaignOption<Boolean> ESCALATING_HOT_SPOTS_UPKEEP =
+          of(Boolean.class, false, "escalatingHotSpotsUpkeep");
     public static final CampaignOption<Boolean> BASE_PAY_ONLY_CONSIDERS_SCALE =
           of(Boolean.class, false, "basePayOnlyConsidersScale");
     public static final CampaignOption<Boolean> USE_CHAOS_SUPPORT_POINT_CONVERSION =

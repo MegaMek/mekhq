@@ -39,6 +39,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
+import mekhq.campaign.chaosCampaign.ChaosScaleLimits;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -60,6 +61,10 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
     public @NonNull Money getCombatPay(Campaign campaign, AbstractContract contract) {
         int scale = contract.getScale();
         int combatPayInSupportPoints = DEFAULT_COMBAT_PAY_MULTIPLIER * scale;
+        if (campaign.getCampaignOptions().get(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE)) {
+            combatPayInSupportPoints = (int) round(DEFAULT_COMBAT_PAY_MULTIPLIER
+                                                         * ChaosScaleLimits.getTaperedScale(scale));
+        }
         // When "Multiply Track Intensity by Scale" is set, a contract fields scale times as many scenarios. Divide
         // combat pay by scale so it stays flat across those extra scenarios rather than growing with their number.
         if ((scale > 0) && campaign.getCampaignOptions().get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)) {

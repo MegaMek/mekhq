@@ -54,6 +54,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
+import mekhq.campaign.chaosCampaign.ChaosScaleLimits;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
@@ -400,6 +401,10 @@ public record Accountant(Campaign campaign) {
               playerForce.getHangar(),
               campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION));
         int upkeepInSupportPoints = HOT_SPOTS_UPKEEP_PER_SCALE * scale;
+        if (campaignOptions.get(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP)) {
+            upkeepInSupportPoints = (int) Math.round(upkeepInSupportPoints
+                                                           * ChaosScaleLimits.getUpkeepEscalationMultiplier(scale));
+        }
 
         return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(upkeepInSupportPoints,
               campaignOptions.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION));

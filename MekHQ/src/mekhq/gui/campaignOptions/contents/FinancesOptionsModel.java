@@ -55,6 +55,7 @@ class FinancesOptionsModel {
     boolean payForOverhead;
     boolean payForMaintain;
     boolean payForHotSpotsUpkeep;
+    boolean escalatingHotSpotsUpkeep;
     boolean usePlanetaryCostReductions;
     boolean planetaryCostReductionsOnContract;
     boolean planetaryCostReductionsForMaintenance;
@@ -102,6 +103,7 @@ class FinancesOptionsModel {
         payForOverhead = options.get(CampaignOption.PAY_FOR_OVERHEAD);
         payForMaintain = options.get(CampaignOption.PAY_FOR_MAINTAIN);
         payForHotSpotsUpkeep = options.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+        escalatingHotSpotsUpkeep = options.get(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP);
         usePlanetaryCostReductions = options.get(CampaignOption.USE_PLANETARY_COST_REDUCTIONS);
         planetaryCostReductionsOnContract = options.get(CampaignOption.PLANETARY_COST_REDUCTIONS_ON_CONTRACT);
         planetaryCostReductionsForMaintenance = options.get(CampaignOption.PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE);
@@ -151,6 +153,7 @@ class FinancesOptionsModel {
         options.set(CampaignOption.PAY_FOR_OVERHEAD, payForOverhead);
         options.set(CampaignOption.PAY_FOR_MAINTAIN, payForMaintain);
         options.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, payForHotSpotsUpkeep);
+        options.set(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP, escalatingHotSpotsUpkeep);
         options.set(CampaignOption.USE_PLANETARY_COST_REDUCTIONS, usePlanetaryCostReductions);
         options.set(CampaignOption.PLANETARY_COST_REDUCTIONS_ON_CONTRACT, planetaryCostReductionsOnContract);
         options.set(CampaignOption.PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE, planetaryCostReductionsForMaintenance);

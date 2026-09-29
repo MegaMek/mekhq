@@ -56,6 +56,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.chaosCampaign.ChaosScaleLimits;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.SupportPointNegotiation;
 import mekhq.campaign.finances.Money;
@@ -1063,8 +1064,12 @@ public abstract class AbstractContract {
     }
 
     public double getSalvageRightsMultiplier() {
-        return getSalvageRightsStep().getSalvageMultiplier() * contractTermMultiplier(
+        double salvageRightsMultiplier = getSalvageRightsStep().getSalvageMultiplier() * contractTermMultiplier(
               CampaignOption.CONTRACT_SALVAGE_MULTIPLIER);
+        if (campaignOptions != null && campaignOptions.get(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE)) {
+            salvageRightsMultiplier *= ChaosScaleLimits.getTaperMultiplier(getScale());
+        }
+        return salvageRightsMultiplier;
     }
 
     public boolean isSalvageExchange() {

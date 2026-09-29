@@ -52,6 +52,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.chaosCampaign.ChaosScaleLimits;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
@@ -69,6 +70,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
@@ -411,8 +413,18 @@ public abstract class AbstractContractGeneration {
           AbstractContract contract) {
         boolean convertSupportPointsToBattleValue = campaign.getCampaignOptions()
                                                           .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
-        return ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, detachmentHangar,
+        int scale = ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, detachmentHangar,
               contract.getObjectiveType().isCadreDuty(), convertSupportPointsToBattleValue);
+
+        // Hiring halls only broker jobs of the size they can support; a larger force is paid for the job, not itself
+        PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        if (campaign.getCampaignOptions().get(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL)
+                  && currentSystem != null) {
+            HiringHallLevel hiringHallLevel = currentSystem.getHiringHallLevel(campaign.getLocalDate());
+            scale = Math.min(scale, ChaosScaleLimits.getMaximumContractScale(hiringHallLevel));
+        }
+
+        return scale;
     }
 
     /**

@@ -94,6 +94,7 @@ class FinancesGeneralPage {
     private JCheckBox payForOverheadBox;
     private JCheckBox payForMaintainBox;
     private JCheckBox payForHotSpotsUpkeepBox;
+    private JCheckBox escalatingHotSpotsUpkeepBox;
     private JCheckBox payForTransportBox;
     private JCheckBox payForRecruitmentBox;
     private JCheckBox payForFoodBox;
@@ -221,6 +222,8 @@ class FinancesGeneralPage {
         payForHotSpotsUpkeepBox = new CampaignOptionsCheckBox("PayForHotSpotsUpkeepBox");
         payForHotSpotsUpkeepBox.addMouseListener(createTipPanelUpdater("PayForHotSpotsUpkeepBox"));
         payForHotSpotsUpkeepBox.addItemListener(event -> updateHotSpotsUpkeepExclusions());
+        escalatingHotSpotsUpkeepBox = new CampaignOptionsCheckBox("EscalatingHotSpotsUpkeepBox");
+        escalatingHotSpotsUpkeepBox.addMouseListener(createTipPanelUpdater("EscalatingHotSpotsUpkeepBox"));
         payForTransportBox = new CampaignOptionsCheckBox("PayForTransportBox");
         payForTransportBox.addMouseListener(createTipPanelUpdater("PayForTransportBox"));
         payForRecruitmentBox = new CampaignOptionsCheckBox("PayForRecruitmentBox");
@@ -245,6 +248,7 @@ class FinancesGeneralPage {
                 payForOverheadBox,
                 payForMaintainBox,
                 payForHotSpotsUpkeepBox,
+                escalatingHotSpotsUpkeepBox,
                 payForTransportBox,
                 payForRecruitmentBox,
                 payForFoodBox,
@@ -500,6 +504,7 @@ class FinancesGeneralPage {
         payForOverheadBox.setSelected(model.payForOverhead);
         payForMaintainBox.setSelected(model.payForMaintain);
         payForHotSpotsUpkeepBox.setSelected(model.payForHotSpotsUpkeep);
+        escalatingHotSpotsUpkeepBox.setSelected(model.escalatingHotSpotsUpkeep);
         payForTransportBox.setSelected(model.payForTransport);
         payForRecruitmentBox.setSelected(model.payForRecruitment);
         payForFoodBox.setSelected(model.payForFood);
@@ -553,6 +558,8 @@ class FinancesGeneralPage {
             }
             excludedBox.setEnabled(!isPayForHotSpotsUpkeep);
         }
+
+        escalatingHotSpotsUpkeepBox.setEnabled(isPayForHotSpotsUpkeep);
     }
 
     /**
@@ -584,6 +591,7 @@ class FinancesGeneralPage {
         model.payForOverhead = payForOverheadBox.isSelected();
         model.payForMaintain = payForMaintainBox.isSelected();
         model.payForHotSpotsUpkeep = payForHotSpotsUpkeepBox.isSelected();
+        model.escalatingHotSpotsUpkeep = escalatingHotSpotsUpkeepBox.isSelected();
         model.payForTransport = payForTransportBox.isSelected();
         model.payForRecruitment = payForRecruitmentBox.isSelected();
         model.payForFood = payForFoodBox.isSelected();
