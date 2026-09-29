@@ -66,6 +66,7 @@ import megamek.common.equipment.MiscMounted;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.equipment.WeaponType;
+import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.ITechnology;
 import megamek.common.loaders.BLKFile;
 import megamek.common.loaders.EntityLoadingException;
@@ -362,7 +363,10 @@ public class Refit extends Part implements IAcquisitionWork {
      * happening in this refit.
      */
     public void calculate() {
+        // A new Unit resets its entity's camouflage; for a refurbishment that entity is the unit's own, so keep it
+        Camouflage camouflageBeforeRefit = newEntity.getCamouflage();
         Unit newUnit = new Unit(newEntity, getCampaign());
+        newEntity.setCamouflage(camouflageBeforeRefit);
         newUnit.initializeParts(false);
         refitClass = NO_CHANGE;
         boolean isOmniRefit = oldUnit.getEntity().isOmni() && newEntity.isOmni();
@@ -1669,6 +1673,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         // don't forget to switch entities!
         // ----------------- from here on oldUnit refers to the new entity -------------------------
+        newEntity.setCamouflage(oldEntity.getCamouflage());
         oldUnit.setEntity(newEntity);
 
         UnitLogger.refit(oldUnit, getCampaign().getLocalDate(), oldModelName, newModelName);
@@ -2421,6 +2426,15 @@ public class Refit extends Part implements IAcquisitionWork {
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "newUnitParts");
         }
 
+        if (!oldIntegratedHeatSinks.isEmpty()) {
+            // The heat sinks freed from the engine exist only on this refit until it completes, so write them in full
+            MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "oldIntegratedHeatSinks");
+            for (final Part part : oldIntegratedHeatSinks) {
+                part.writeToXML(pw, indent);
+            }
+            MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "oldIntegratedHeatSinks");
+        }
+
         if (!largeCraftBinsToChange.isEmpty()) {
             MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "lcBinsToChange");
             for (Part part : largeCraftBinsToChange) {
@@ -2538,6 +2552,8 @@ public class Refit extends Part implements IAcquisitionWork {
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("shoppingList")) {
                     processShoppingListFromXML(retVal, wn2, retVal.oldUnit, version);
+                } else if (wn2.getNodeName().equalsIgnoreCase("oldIntegratedHeatSinks")) {
+                    processOldIntegratedHeatSinksFromXML(retVal, wn2, version);
                 } else if (wn2.getNodeName().equalsIgnoreCase("newArmorSupplies")) {
                     processArmorSuppliesFromXML(retVal, wn2, version);
                 }
@@ -2548,6 +2564,32 @@ public class Refit extends Part implements IAcquisitionWork {
         }
 
         return retVal;
+    }
+
+    /**
+     * Reads back the heat sinks the refit frees from the engine, which go to the warehouse when the refit completes.
+     */
+    private static void processOldIntegratedHeatSinksFromXML(Refit refit, Node heatSinksNode, Version version) {
+        NodeList childNodes = heatSinksNode.getChildNodes();
+        for (int index = 0; index < childNodes.getLength(); index++) {
+            Node childNode = childNodes.item(index);
+            if ((childNode.getNodeType() != Node.ELEMENT_NODE) || !childNode.getNodeName().equalsIgnoreCase("part")) {
+                continue;
+            }
+            Part heatSink = Part.generateInstanceFromXML(childNode, version);
+            if (heatSink == null) {
+                LOGGER.error("[Refit] Refit on unit {} has an unreadable freed heat sink", refit.oldUnit.getId());
+                continue;
+            }
+            refit.oldIntegratedHeatSinks.add(heatSink);
+        }
+    }
+
+    /**
+     * @return the heat sinks this refit frees from the engine; they go to the warehouse when the refit completes
+     */
+    public List<Part> getOldIntegratedHeatSinks() {
+        return Collections.unmodifiableList(oldIntegratedHeatSinks);
     }
 
     private static void processShoppingListFromXML(Refit retVal, Node wn, Unit u, Version version) {
@@ -2607,6 +2649,9 @@ public class Refit extends Part implements IAcquisitionWork {
         setCampaign(oldUnit.getCampaign());
         for (Part p : shoppingList) {
             p.setCampaign(oldUnit.getCampaign());
+        }
+        for (Part heatSink : oldIntegratedHeatSinks) {
+            heatSink.setCampaign(oldUnit.getCampaign());
         }
 
         if (null != newArmorSupplies) {
