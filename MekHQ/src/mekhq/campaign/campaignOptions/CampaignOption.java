@@ -303,6 +303,10 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "useArtillery");
     public static final CampaignOption<Boolean> USE_ABILITIES =
           of(Boolean.class, false, "useAbilities");
+    public static final CampaignOption<Boolean> USE_SPA_TRAINING_COSTS =
+          of(Boolean.class, false, "useSpaTrainingCosts");
+    public static final CampaignOption<Boolean> CAP_TOTAL_SPAS =
+          of(Boolean.class, false, "capTotalSpas");
     public static final CampaignOption<Boolean> ONLY_COMMANDERS_MATTER_VEHICLES =
           of(Boolean.class, false, "onlyCommandersMatterVehicles");
     public static final CampaignOption<Boolean> ONLY_COMMANDERS_MATTER_INFANTRY =

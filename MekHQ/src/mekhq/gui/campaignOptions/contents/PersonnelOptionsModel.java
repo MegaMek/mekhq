@@ -52,6 +52,8 @@ class PersonnelOptionsModel {
     boolean useRandomToughness;
     boolean useArtillery;
     boolean useAbilities;
+    boolean useSpaTrainingCosts;
+    boolean capTotalSpas;
     boolean onlyCommandersMatterVehicles;
     boolean onlyCommandersMatterInfantry;
     boolean onlyCommandersMatterBattleArmor;
@@ -159,6 +161,8 @@ class PersonnelOptionsModel {
         useRandomToughness = options.get(CampaignOption.USE_RANDOM_TOUGHNESS);
         useArtillery = options.get(CampaignOption.USE_ARTILLERY);
         useAbilities = options.get(CampaignOption.USE_ABILITIES);
+        useSpaTrainingCosts = options.get(CampaignOption.USE_SPA_TRAINING_COSTS);
+        capTotalSpas = options.get(CampaignOption.CAP_TOTAL_SPAS);
         onlyCommandersMatterVehicles = options.get(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES);
         onlyCommandersMatterInfantry = options.get(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY);
         onlyCommandersMatterBattleArmor = options.get(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR);
@@ -267,6 +271,8 @@ class PersonnelOptionsModel {
         options.set(CampaignOption.USE_RANDOM_TOUGHNESS, useRandomToughness);
         options.set(CampaignOption.USE_ARTILLERY, useArtillery);
         options.set(CampaignOption.USE_ABILITIES, useAbilities);
+        options.set(CampaignOption.USE_SPA_TRAINING_COSTS, useSpaTrainingCosts);
+        options.set(CampaignOption.CAP_TOTAL_SPAS, capTotalSpas);
         options.set(CampaignOption.ONLY_COMMANDERS_MATTER_VEHICLES, onlyCommandersMatterVehicles);
         options.set(CampaignOption.ONLY_COMMANDERS_MATTER_INFANTRY, onlyCommandersMatterInfantry);
         options.set(CampaignOption.ONLY_COMMANDERS_MATTER_BATTLE_ARMOR, onlyCommandersMatterBattleArmor);

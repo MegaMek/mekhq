@@ -43,10 +43,16 @@ import static mekhq.utilities.spaUtilities.enums.AbilityCategory.COMBAT_ABILITY;
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.MANEUVERING_ABILITY;
 import static mekhq.utilities.spaUtilities.enums.AbilityCategory.UTILITY_ABILITY;
 
+import java.util.Enumeration;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
+import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
+import mekhq.campaign.finances.Money;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SkillPrerequisite;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -64,6 +70,17 @@ import mekhq.utilities.spaUtilities.enums.AbilityCategory;
  */
 public class SpaUtilities {
     private static final MMLogger LOGGER = MMLogger.create(SpaUtilities.class);
+
+    /**
+     * The most non-flaw SPAs a character may buy when SPA totals are capped.
+     */
+    public static final int SPA_CAP = 5;
+
+    /**
+     * Support point cost of training a character's first, second, third, fourth, and fifth-or-later non-flaw SPA.
+     * Unofficial, following the table in Hot Spots: Draconis Reach first printing pg 34.
+     */
+    private static final int[] SPA_TRAINING_COSTS_IN_SUPPORT_POINTS = { 60, 180, 360, 600, 900 };
 
     /**
      * Checks if a given {@link SpecialAbility} belongs to the specified {@link AbilityCategory}.
@@ -156,5 +173,60 @@ public class SpaUtilities {
 
         // If it isn't a Combat or Maneuvering ability, it's a utility ability
         return isManeuvering ? MANEUVERING_ABILITY : UTILITY_ABILITY;
+    }
+
+    /**
+     * @param ability the ability to check
+     *
+     * @return {@code true} if the ability is a flaw (negative cost, and not a character-creation-only ability)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isFlaw(final SpecialAbility ability) {
+        return !ability.getOriginOnly() && ability.getCost() < 0;
+    }
+
+    /**
+     * Counts the SPAs a person holds, excluding flaws. Abilities that aren't enabled in the campaign's SPA list are
+     * skipped.
+     *
+     * @param person the person to check
+     *
+     * @return the number of non-flaw SPAs the person holds
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int countNonFlawSpas(final Person person) {
+        int nonFlawSpaCount = 0;
+        for (Enumeration<IOption> options = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES);
+              options.hasMoreElements(); ) {
+            IOption option = options.nextElement();
+            if (!option.booleanValue()) {
+                continue;
+            }
+
+            SpecialAbility ability = SpecialAbility.getAbility(option.getName());
+            if (ability != null && !isFlaw(ability)) {
+                nonFlawSpaCount++;
+            }
+        }
+        return nonFlawSpaCount;
+    }
+
+    /**
+     * Gets the C-bill cost of training a person's next non-flaw SPA, covering training materials and sim pod time.
+     *
+     * @param person the person being trained
+     *
+     * @return the cost of the person's next SPA
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Money getSpaTrainingCost(final Person person) {
+        int nextSpaIndex = Math.min(countNonFlawSpas(person), SPA_TRAINING_COSTS_IN_SUPPORT_POINTS.length - 1);
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(SPA_TRAINING_COSTS_IN_SUPPORT_POINTS[nextSpaIndex]);
     }
 }

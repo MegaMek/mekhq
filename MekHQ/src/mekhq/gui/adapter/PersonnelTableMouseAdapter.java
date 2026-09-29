@@ -202,6 +202,7 @@ import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.MultiLineTooltip;
 import mekhq.gui.utilities.StaticChecks;
 import mekhq.utilities.ReportingUtilities;
+import mekhq.utilities.spaUtilities.SpaUtilities;
 import mekhq.utilities.spaUtilities.enums.AbilityCategory;
 
 public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
@@ -927,6 +928,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_ABILITY: {
                 String selected = data[1];
                 int cost = MathUtility.parseInt(data[2]);
+                if (!payForSpaTraining(selectedPerson, selected)) {
+                    break;
+                }
                 selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, selected, true);
                 selectedPerson.spendXP(cost);
                 final String displayName = SpecialAbility.getDisplayName(selected);
@@ -941,6 +945,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_WEAPON_SPECIALIST: {
                 String selected = data[1];
                 int cost = MathUtility.parseInt(data[2]);
+                if (!payForSpaTraining(selectedPerson, OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
+                    break;
+                }
                 selectedPerson.getOptions()
                       .acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                             OptionsConstants.GUNNERY_WEAPON_SPECIALIST,
@@ -960,6 +967,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_SANDBLASTER: {
                 String selected = data[1];
                 int cost = MathUtility.parseInt(data[2]);
+                if (!payForSpaTraining(selectedPerson, OptionsConstants.GUNNERY_SANDBLASTER)) {
+                    break;
+                }
                 selectedPerson.getOptions()
                       .acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, OptionsConstants.GUNNERY_SANDBLASTER, selected);
                 selectedPerson.spendXP(cost);
@@ -977,6 +987,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_SPECIALIST: {
                 String selected = data[1];
                 int cost = MathUtility.parseInt(data[2]);
+                if (!payForSpaTraining(selectedPerson, OptionsConstants.GUNNERY_SPECIALIST)) {
+                    break;
+                }
                 selectedPerson.getOptions()
                       .acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, OptionsConstants.GUNNERY_SPECIALIST, selected);
                 selectedPerson.spendXP(cost);
@@ -994,6 +1007,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_RANGEMASTER: {
                 String selected = data[1];
                 int cost = MathUtility.parseInt(data[2]);
+                if (!payForSpaTraining(selectedPerson, OptionsConstants.GUNNERY_RANGE_MASTER)) {
+                    break;
+                }
                 selectedPerson.getOptions()
                       .acquireAbility(PersonnelOptions.LVL3_ADVANTAGES,
                             OptionsConstants.GUNNERY_RANGE_MASTER,
@@ -1013,6 +1029,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_ENVIRONMENT_SPECIALIST: {
                 String selected = data[1];
                 int cost = MathUtility.parseInt(data[2]);
+                if (!payForSpaTraining(selectedPerson, OptionsConstants.MISC_ENV_SPECIALIST)) {
+                    break;
+                }
                 selectedPerson.getOptions()
                       .acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, OptionsConstants.MISC_ENV_SPECIALIST, selected);
                 selectedPerson.spendXP(cost);
@@ -1030,6 +1049,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             case CMD_ACQUIRE_HUMAN_TRO: {
                 String selected = data[1];
                 int cost = MathUtility.parseInt(data[2]);
+                if (!payForSpaTraining(selectedPerson, OptionsConstants.MISC_HUMAN_TRO)) {
+                    break;
+                }
                 selectedPerson.getOptions()
                       .acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, OptionsConstants.MISC_HUMAN_TRO, selected);
                 selectedPerson.spendXP(cost);
@@ -1048,6 +1070,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 String selected = data[1];
                 int cost = MathUtility.parseInt(data[2]);
                 String ability = data[3];
+                if (!payForSpaTraining(selectedPerson, ability)) {
+                    break;
+                }
                 selectedPerson.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, ability, selected);
                 selectedPerson.spendXP(cost);
                 final String displayName = String.format("%s %s", SpecialAbility.getDisplayName(ability), selected);
@@ -5138,6 +5163,44 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         return naturalAptitudesMenu;
     }
 
+    /**
+     * Charges the C-bill cost of training a new SPA, if SPA training costs are enabled. Flaws are free.
+     *
+     * @param person      the person being trained
+     * @param abilityName the name of the ability being acquired
+     *
+     * @return {@code true} if the SPA may be acquired, or {@code false} if the force couldn't afford the training
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean payForSpaTraining(Person person, String abilityName) {
+        Campaign campaign = getCampaign();
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_SPA_TRAINING_COSTS)) {
+            return true;
+        }
+
+        SpecialAbility ability = SpecialAbility.getAbility(abilityName);
+        if (ability == null || SpaUtilities.isFlaw(ability)) {
+            return true;
+        }
+
+        Money trainingCost = SpaUtilities.getSpaTrainingCost(person);
+        String displayName = SpecialAbility.getDisplayName(abilityName);
+        if (campaign.getPlayerForce().getFinances().debit(TransactionType.EDUCATION,
+              campaign.getLocalDate(),
+              trainingCost,
+              getFormattedTextAt(GUI_RESOURCE_BUNDLE, "spaTraining.transaction", person.getFullTitle(),
+                    displayName))) {
+            return true;
+        }
+
+        campaign.addReport(PERSONNEL, getFormattedTextAt(GUI_RESOURCE_BUNDLE, "spaTraining.insufficientFunds",
+              spanOpeningWithCustomColor(getNegativeColor()), CLOSING_SPAN_TAG, person.getHyperlinkedName(),
+              displayName, trainingCost.toAmountAndSymbolString()));
+        return false;
+    }
+
     private void addSPAToMenu(SpecialAbility spa, double reasoningXpCostMultiplier, double xpCostMultiplier,
           Person person,
           JMenu combatAbilityMenu, JMenu maneuveringAbilityMenu, JMenu utilityAbilityMenu, JMenu characterFlawMenu,
@@ -5151,6 +5214,22 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
         String costDesc = String.format(resources.getString("costValue.format"), cost);
         boolean available = person.getXP() >= cost;
+
+        if (!SpaUtilities.isFlaw(spa)) {
+            CampaignOptions campaignOptions = getCampaign().getCampaignOptions();
+            if (campaignOptions.get(CampaignOption.CAP_TOTAL_SPAS)
+                      && SpaUtilities.countNonFlawSpas(person) >= SpaUtilities.SPA_CAP) {
+                available = false;
+            }
+
+            if (campaignOptions.get(CampaignOption.USE_SPA_TRAINING_COSTS)) {
+                Money trainingCost = SpaUtilities.getSpaTrainingCost(person);
+                costDesc = getFormattedTextAt(GUI_RESOURCE_BUNDLE, "costValueWithTraining.format",
+                      String.valueOf(cost), trainingCost.toAmountAndSymbolString());
+                Money balance = getCampaign().getPlayerForce().getFinances().getBalance();
+                available = available && balance.isGreaterOrEqualThan(trainingCost);
+            }
+        }
         String spaName = spa.getName();
         if (spaName.equals(OptionsConstants.GUNNERY_WEAPON_SPECIALIST)) {
             Unit unit = person.getUnit();
