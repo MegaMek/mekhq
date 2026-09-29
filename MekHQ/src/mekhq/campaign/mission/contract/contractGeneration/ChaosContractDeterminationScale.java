@@ -64,12 +64,63 @@ public class ChaosContractDeterminationScale {
             }
         }
 
+        return convertBattleValueToScale(validBattleValue, convertSupportPointsToBattleValue);
+    }
+
+    /**
+     * Determines the Scale of the player's entire TO&amp;E, for Hot Spots upkeep. Unlike
+     * {@link #generateScaleForDetachment(PlayerForce, LocalHangar, boolean, boolean)}, every unit assigned to a
+     * formation counts, regardless of formation type or combat role. Units outside the TO&amp;E and mothballed units
+     * are ignored.
+     *
+     * @param playerForce                       the player force whose TO&amp;E is weighed
+     * @param hangar                            the hangar holding the player force's units
+     * @param convertSupportPointsToBattleValue whether the per-Scale battlefield support point allotment is folded into
+     *                                          the per-Scale Battle Value
+     *
+     * @return the Scale of the whole TO&amp;E
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int generateScaleForTableOfOrganization(PlayerForce playerForce, LocalHangar hangar,
+          boolean convertSupportPointsToBattleValue) {
+        int totalBattleValue = 0;
+
+        for (Unit unit : hangar.getUnits()) {
+            if (unit.isMothballed()) {
+                continue;
+            }
+
+            Formation formation = playerForce.getFormation(unit.getFormationId());
+            if (formation != null) {
+                Entity entity = unit.getEntity();
+                totalBattleValue += entity != null ? entity.calculateBattleValue(true, true) : 0;
+            }
+        }
+
+        return convertBattleValueToScale(totalBattleValue, convertSupportPointsToBattleValue);
+    }
+
+    /**
+     * Converts a Battle Value total into Scale, rounding up.
+     *
+     * @param battleValue                       the Battle Value to convert
+     * @param convertSupportPointsToBattleValue whether the per-Scale battlefield support point allotment is folded into
+     *                                          the per-Scale Battle Value
+     *
+     * @return the resulting Scale
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static int convertBattleValueToScale(int battleValue, boolean convertSupportPointsToBattleValue) {
         double battleValuePerScale = BATTLE_VALUE_PER_SCALE;
         if (convertSupportPointsToBattleValue) {
             // Fold the battlefield-support-point allotment into the per-scale Battle Value by converting it to BV.
             battleValuePerScale += BATTLEFIELD_SUPPORT_POINTS_PER_SCALE * BATTLE_VALUE_PER_BSP;
         }
 
-        return (int) ceil(validBattleValue / battleValuePerScale);
+        return (int) ceil(battleValue / battleValuePerScale);
     }
 }

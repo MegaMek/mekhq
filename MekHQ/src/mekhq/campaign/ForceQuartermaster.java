@@ -48,6 +48,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.parts.PartArrivedEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.PlanetaryCostReductions;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Armor;
@@ -935,7 +936,11 @@ public record ForceQuartermaster(Campaign campaign) {
             return Money.zero();
         }
         double contractMultiplier = campaign().getPlayerForce().getPurchaseCostMultiplier(campaign().getActiveContracts());
-        return part.getActualValue().multipliedBy(contractMultiplier);
+        Money cost = part.getActualValue().multipliedBy(contractMultiplier);
+        if (part instanceof Refit) {
+            cost = cost.multipliedBy(PlanetaryCostReductions.getRepairAndRefitMultiplier(campaign()));
+        }
+        return cost;
     }
 
     /**

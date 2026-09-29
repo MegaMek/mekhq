@@ -36,6 +36,8 @@ package mekhq.campaign.finances;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.campaign.finances.WeeklyNetWorth.parseWeeklyNetWorthFromXML;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
 
@@ -82,6 +84,7 @@ import org.w3c.dom.NodeList;
 public class Finances {
     private static final MMLogger LOGGER = MMLogger.create(Finances.class);
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Finances";
     private final transient ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.Finances",
           MekHQ.getMHQOptions().getLocale());
 
@@ -500,6 +503,21 @@ public class Finances {
                           overheadCost.toAmountAndSymbolString()));
                 } else {
                     addReportInsufficientFunds(campaign, resourceMap.getString("OverheadCosts.text"));
+                }
+            }
+
+            // Handle Hot Spots upkeep
+            if (campaignOptions.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)) {
+                Money hotSpotsUpkeepCost = accountant.getHotSpotsUpkeepCosts();
+
+                if (debit(TransactionType.MAINTENANCE,
+                      today,
+                      hotSpotsUpkeepCost,
+                      getTextAt(RESOURCE_BUNDLE, "HotSpotsUpkeep.title"))) {
+                    campaign.addReport(FINANCES, getFormattedTextAt(RESOURCE_BUNDLE, "HotSpotsUpkeep.text",
+                          hotSpotsUpkeepCost.toAmountAndSymbolString()));
+                } else {
+                    addReportInsufficientFunds(campaign, getTextAt(RESOURCE_BUNDLE, "HotSpotsUpkeepCosts.text"));
                 }
             }
 

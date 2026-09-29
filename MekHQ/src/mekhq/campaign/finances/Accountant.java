@@ -53,9 +53,12 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.EducationController;
@@ -72,6 +75,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
 public record Accountant(Campaign campaign) {
     private static final MMLogger LOGGER = MMLogger.create(Accountant.class);
 
+    /** Mirrors Hot Spots contract pay (Draconis Reach first printing pg 26) */
+    final static int HOT_SPOTS_UPKEEP_PER_SCALE = 500;
     final static int HOUSING_PRISONER_OR_DEPENDENT = 228;
     final static int HOUSING_ENLISTED = 312;
     final static int HOUSING_OFFICER = 780;
@@ -283,7 +288,8 @@ public record Accountant(Campaign campaign) {
     }
 
     public Money getMaintenanceCosts() {
-        return getMaintenanceTotal(getAllUnits(), getCampaignOptions().get(CampaignOption.PAY_FOR_MAINTAIN));
+        return getMaintenanceTotal(getAllUnits(), getCampaignOptions().get(CampaignOption.PAY_FOR_MAINTAIN))
+                     .multipliedBy(PlanetaryCostReductions.getMaintenanceMultiplier(campaign()));
     }
 
     /**
@@ -310,7 +316,8 @@ public record Accountant(Campaign campaign) {
     }
 
     public Money getWeeklyMaintenanceCosts() {
-        return getWeeklyMaintenanceTotal(getAllUnits());
+        return getWeeklyMaintenanceTotal(getAllUnits())
+                     .multipliedBy(PlanetaryCostReductions.getMaintenanceMultiplier(campaign()));
     }
 
     /**
@@ -370,6 +377,32 @@ public record Accountant(Campaign campaign) {
               temporaryMedicPool,
               tempCrewMap,
               false).multipliedBy(0.05);
+    }
+
+    /**
+     * Calculates the monthly Hot Spots upkeep cost. Upkeep is {@link #HOT_SPOTS_UPKEEP_PER_SCALE} support points per
+     * Scale of the player's entire TO&amp;E (not just the units committed to a contract), converted to C-bills when
+     * support point conversion is enabled.
+     *
+     * @return the monthly upkeep cost, or zero if Hot Spots upkeep is disabled
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getHotSpotsUpkeepCosts() {
+        CampaignOptions campaignOptions = getCampaignOptions();
+        if (!campaignOptions.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)) {
+            return Money.zero();
+        }
+
+        PlayerForce playerForce = campaign().getPlayerForce();
+        int scale = ChaosContractDeterminationScale.generateScaleForTableOfOrganization(playerForce,
+              playerForce.getHangar(),
+              campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION));
+        int upkeepInSupportPoints = HOT_SPOTS_UPKEEP_PER_SCALE * scale;
+
+        return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(upkeepInSupportPoints,
+              campaignOptions.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION));
     }
 
     public Money getOverheadExpenses() {

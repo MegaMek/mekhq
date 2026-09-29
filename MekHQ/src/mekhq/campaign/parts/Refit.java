@@ -91,6 +91,7 @@ import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.PlanetaryCostReductions;
 import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -2739,7 +2740,8 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     @Override
     public String find(int transitDays, double valueMultiplier) {
-        if (campaign.getQuartermaster().buyPart(this, valueMultiplier, transitDays)) {
+        double planetaryMultiplier = PlanetaryCostReductions.getRepairAndRefitMultiplier(campaign);
+        if (campaign.getQuartermaster().buyPart(this, valueMultiplier * planetaryMultiplier, transitDays)) {
             return messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
                                                           .getFontColorPositiveHexColor(),
                   "<b> refit kit found.</b> Kit will arrive in " + transitDays + " days.");

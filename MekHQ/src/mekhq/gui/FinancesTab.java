@@ -33,6 +33,7 @@
 package mekhq.gui;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -120,6 +121,7 @@ public final class FinancesTab extends CampaignGuiTab {
 
     private boolean chartsInitialized = false;
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FinancesTab";
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
           MekHQ.getMHQOptions().getLocale());
 
@@ -662,6 +664,11 @@ public final class FinancesTab extends CampaignGuiTab {
         if (!report.getOverheadCosts().isZero()) {
             financialLine.append(formattingFinancialReport(resourceMap.getString("overhead.text"), 2,
                   String.format(formatted, report.getOverheadCosts().toAmountAndSymbolString())));
+        }
+
+        if (!report.getHotSpotsUpkeepCosts().isZero()) {
+            financialLine.append(formattingFinancialReport(getTextAt(RESOURCE_BUNDLE, "hotSpotsUpkeep.text"), 2,
+                  String.format(formatted, report.getHotSpotsUpkeepCosts().toAmountAndSymbolString())));
         }
 
         Money rentals = report.getRentals();

@@ -760,6 +760,14 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "payForOverhead");
     public static final CampaignOption<Boolean> PAY_FOR_MAINTAIN =
           of(Boolean.class, false, "payForMaintain");
+    public static final CampaignOption<Boolean> PAY_FOR_HOT_SPOTS_UPKEEP =
+          of(Boolean.class, false, "payForHotSpotsUpkeep");
+    public static final CampaignOption<Boolean> USE_PLANETARY_COST_REDUCTIONS =
+          of(Boolean.class, false, "usePlanetaryCostReductions");
+    public static final CampaignOption<Boolean> PLANETARY_COST_REDUCTIONS_ON_CONTRACT =
+          of(Boolean.class, false, "planetaryCostReductionsOnContract");
+    public static final CampaignOption<Boolean> PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE =
+          of(Boolean.class, false, "planetaryCostReductionsForMaintenance");
     public static final CampaignOption<Boolean> PAY_FOR_TRANSPORT =
           of(Boolean.class, false, "payForTransport");
     public static final CampaignOption<Boolean> SELL_UNITS =

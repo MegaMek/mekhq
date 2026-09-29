@@ -66,6 +66,7 @@ public class FinancialReport {
     private Money maintenance = Money.zero();
     private Money salaries = Money.zero();
     private Money overhead = Money.zero();
+    private Money hotSpotsUpkeep = Money.zero();
     private Money contracts = Money.zero();
     private Money rentals = Money.zero();
 
@@ -87,7 +88,7 @@ public class FinancialReport {
     }
 
     public Money getMonthlyExpenses() {
-        return maintenance.plus(salaries).plus(overhead).plus(coSpareParts).plus(coAmmo).plus(coFuel).plus(rentals);
+        return maintenance.plus(salaries).plus(overhead).plus(hotSpotsUpkeep).plus(coSpareParts).plus(coAmmo).plus(coFuel).plus(rentals);
     }
 
     public Money getCash() {
@@ -104,6 +105,16 @@ public class FinancialReport {
 
     public Money getOverheadCosts() {
         return overhead;
+    }
+
+    /**
+     * @return the monthly Hot Spots upkeep cost
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getHotSpotsUpkeepCosts() {
+        return hotSpotsUpkeep;
     }
 
     public Money getSalaries() {
@@ -207,6 +218,9 @@ public class FinancialReport {
         }
         if (campaignOptions.get(CampaignOption.PAY_FOR_OVERHEAD)) {
             financialReport.overhead = accountant.getOverheadExpenses();
+        }
+        if (campaignOptions.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)) {
+            financialReport.hotSpotsUpkeep = accountant.getHotSpotsUpkeepCosts();
         }
         if (campaignOptions.get(CampaignOption.USE_PEACETIME_COST)) {
             financialReport.coSpareParts = accountant.getMonthlySpareParts();

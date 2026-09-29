@@ -68,7 +68,9 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.PlanetaryCostReductions;
 import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
@@ -97,7 +99,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Parts do the lions share of the work of repairing, salvaging, reloading, refueling, etc. for units. Each unit has an
@@ -1370,7 +1371,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         if (includeRepairDetails && hits > 0) {
             details.add(hits + (hits == 1 ? " hit" : " hits"));
             if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
-                details.add(getActualValue().multipliedBy(0.2).toAmountAndSymbolString() + " to repair");
+                details.add(getActualValue().multipliedBy(0.2)
+                                  .multipliedBy(PlanetaryCostReductions.getRepairAndRefitMultiplier(campaign))
+                                  .toAmountAndSymbolString() + " to repair");
             }
         }
         return details.toString();

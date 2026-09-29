@@ -35,8 +35,8 @@ package mekhq.gui.campaignOptions.contents;
 import java.util.Arrays;
 
 import jakarta.annotation.Nonnull;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 
 class FinancesOptionsModel {
@@ -54,6 +54,10 @@ class FinancesOptionsModel {
     boolean payForSalaries;
     boolean payForOverhead;
     boolean payForMaintain;
+    boolean payForHotSpotsUpkeep;
+    boolean usePlanetaryCostReductions;
+    boolean planetaryCostReductionsOnContract;
+    boolean planetaryCostReductionsForMaintenance;
     boolean payForTransport;
     boolean payForRecruitment;
     boolean payForFood;
@@ -97,6 +101,10 @@ class FinancesOptionsModel {
         payForSalaries = options.get(CampaignOption.PAY_FOR_SALARIES);
         payForOverhead = options.get(CampaignOption.PAY_FOR_OVERHEAD);
         payForMaintain = options.get(CampaignOption.PAY_FOR_MAINTAIN);
+        payForHotSpotsUpkeep = options.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+        usePlanetaryCostReductions = options.get(CampaignOption.USE_PLANETARY_COST_REDUCTIONS);
+        planetaryCostReductionsOnContract = options.get(CampaignOption.PLANETARY_COST_REDUCTIONS_ON_CONTRACT);
+        planetaryCostReductionsForMaintenance = options.get(CampaignOption.PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE);
         payForTransport = options.get(CampaignOption.PAY_FOR_TRANSPORT);
         payForRecruitment = options.get(CampaignOption.PAY_FOR_RECRUITMENT);
         payForFood = options.get(CampaignOption.PAY_FOR_FOOD);
@@ -142,6 +150,10 @@ class FinancesOptionsModel {
         options.set(CampaignOption.PAY_FOR_SALARIES, payForSalaries);
         options.set(CampaignOption.PAY_FOR_OVERHEAD, payForOverhead);
         options.set(CampaignOption.PAY_FOR_MAINTAIN, payForMaintain);
+        options.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, payForHotSpotsUpkeep);
+        options.set(CampaignOption.USE_PLANETARY_COST_REDUCTIONS, usePlanetaryCostReductions);
+        options.set(CampaignOption.PLANETARY_COST_REDUCTIONS_ON_CONTRACT, planetaryCostReductionsOnContract);
+        options.set(CampaignOption.PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE, planetaryCostReductionsForMaintenance);
         options.set(CampaignOption.PAY_FOR_TRANSPORT, payForTransport);
         options.set(CampaignOption.PAY_FOR_RECRUITMENT, payForRecruitment);
         options.set(CampaignOption.PAY_FOR_FOOD, payForFood);
