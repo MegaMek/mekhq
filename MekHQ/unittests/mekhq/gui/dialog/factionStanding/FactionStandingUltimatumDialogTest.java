@@ -328,7 +328,8 @@ class FactionStandingUltimatumDialogTest {
         Person senior = mock(Person.class);
         Campaign campaign = buildCampaign(List.of(commander, junior, secondInCommand, senior));
 
-        when(senior.outRanksUsingSkillTiebreaker(campaign, junior)).thenReturn(true);
+        when(senior.outRanksUsingSkillTiebreaker(campaign.getCampaignOptions(), false,
+              campaign.getLocalDate(), junior)).thenReturn(true);
 
         assertSame(senior, FactionStandingUltimatumDialog.getThirdInCommand(campaign, commander, secondInCommand));
     }
