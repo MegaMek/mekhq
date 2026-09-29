@@ -768,6 +768,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "payForMaintain");
     public static final CampaignOption<Boolean> PAY_FOR_HOT_SPOTS_UPKEEP =
           of(Boolean.class, false, "payForHotSpotsUpkeep");
+    public static final CampaignOption<Boolean> INCREASE_CLAN_REPAIR_COSTS =
+          of(Boolean.class, false, "increaseClanRepairCosts");
     public static final CampaignOption<Boolean> USE_PLANETARY_COST_REDUCTIONS =
           of(Boolean.class, false, "usePlanetaryCostReductions");
     public static final CampaignOption<Boolean> PLANETARY_COST_REDUCTIONS_ON_CONTRACT =

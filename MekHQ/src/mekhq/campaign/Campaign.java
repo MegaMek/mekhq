@@ -155,7 +155,7 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.PlanetaryCostReductions;
+import mekhq.campaign.finances.RepairCosts;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Detachment;
@@ -3087,7 +3087,7 @@ public class Campaign implements ITechManager {
             }
             if (getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS) && action.equals(" fix ") && !(partWork instanceof Armor)) {
                 Money cost = partWork.getUndamagedValue().multipliedBy(0.2)
-                                   .multipliedBy(PlanetaryCostReductions.getRepairAndRefitMultiplier(this));
+                                   .multipliedBy(RepairCosts.getRepairCostMultiplier(this, repairedUnit));
                 report += "<br>Repairs cost " + cost.toAmountAndSymbolString() + " worth of parts.";
                 getPlayerForce().getFinances().debit(TransactionType.REPAIRS,
                       getLocalDate(),

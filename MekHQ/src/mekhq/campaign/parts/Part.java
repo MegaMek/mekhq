@@ -70,7 +70,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.PlanetaryCostReductions;
+import mekhq.campaign.finances.RepairCosts;
 import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
@@ -1372,7 +1372,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             details.add(hits + (hits == 1 ? " hit" : " hits"));
             if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
                 details.add(getActualValue().multipliedBy(0.2)
-                                  .multipliedBy(PlanetaryCostReductions.getRepairAndRefitMultiplier(campaign))
+                                  .multipliedBy(RepairCosts.getRepairCostMultiplier(campaign, unit))
                                   .toAmountAndSymbolString() + " to repair");
             }
         }

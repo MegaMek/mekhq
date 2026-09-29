@@ -59,7 +59,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
-import mekhq.campaign.finances.PlanetaryCostReductions;
+import mekhq.campaign.finances.RepairCosts;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -672,7 +672,7 @@ public class MekLocation extends Part {
                 if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
                     toReturn.append(", ")
                           .append(getUndamagedValue().multipliedBy(0.2)
-                                        .multipliedBy(PlanetaryCostReductions.getRepairAndRefitMultiplier(campaign))
+                                        .multipliedBy(RepairCosts.getRepairCostMultiplier(campaign, unit))
                                         .toAmountAndSymbolString())
                           .append(" to repair");
                 }

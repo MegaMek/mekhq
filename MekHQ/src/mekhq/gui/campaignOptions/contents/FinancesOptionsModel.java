@@ -57,6 +57,7 @@ class FinancesOptionsModel {
     boolean payForHotSpotsUpkeep;
     boolean escalatingHotSpotsUpkeep;
     boolean usePlanetaryCostReductions;
+    boolean increaseClanRepairCosts;
     boolean planetaryCostReductionsOnContract;
     boolean planetaryCostReductionsForMaintenance;
     boolean payForTransport;
@@ -105,6 +106,7 @@ class FinancesOptionsModel {
         payForHotSpotsUpkeep = options.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
         escalatingHotSpotsUpkeep = options.get(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP);
         usePlanetaryCostReductions = options.get(CampaignOption.USE_PLANETARY_COST_REDUCTIONS);
+        increaseClanRepairCosts = options.get(CampaignOption.INCREASE_CLAN_REPAIR_COSTS);
         planetaryCostReductionsOnContract = options.get(CampaignOption.PLANETARY_COST_REDUCTIONS_ON_CONTRACT);
         planetaryCostReductionsForMaintenance = options.get(CampaignOption.PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE);
         payForTransport = options.get(CampaignOption.PAY_FOR_TRANSPORT);
@@ -155,6 +157,7 @@ class FinancesOptionsModel {
         options.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, payForHotSpotsUpkeep);
         options.set(CampaignOption.ESCALATING_HOT_SPOTS_UPKEEP, escalatingHotSpotsUpkeep);
         options.set(CampaignOption.USE_PLANETARY_COST_REDUCTIONS, usePlanetaryCostReductions);
+        options.set(CampaignOption.INCREASE_CLAN_REPAIR_COSTS, increaseClanRepairCosts);
         options.set(CampaignOption.PLANETARY_COST_REDUCTIONS_ON_CONTRACT, planetaryCostReductionsOnContract);
         options.set(CampaignOption.PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE, planetaryCostReductionsForMaintenance);
         options.set(CampaignOption.PAY_FOR_TRANSPORT, payForTransport);
