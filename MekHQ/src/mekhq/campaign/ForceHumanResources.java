@@ -2813,9 +2813,21 @@ public class ForceHumanResources {
     }
 
     public boolean isWorkingOnRefit(LocalHangar hangar, Person person) {
+        return findUnitRefitBy(hangar, person) != null;
+    }
+
+    /**
+     * Finds the unit whose refit this person is working on. A refit ties its tech up from the day it starts until it
+     * is completed or cancelled, including days spent waiting for parts.
+     *
+     * @param hangar the hangar to search
+     * @param person the person to look for
+     *
+     * @return the unit being refitted by this person, or {@code null} if they are not working on a refit
+     */
+    public @Nullable Unit findUnitRefitBy(LocalHangar hangar, Person person) {
         Objects.requireNonNull(person);
-        Unit unit = hangar.findUnit(u -> u.isRefitting() && person.equals(u.getRefit().getTech()));
-        return unit != null;
+        return hangar.findUnit(unit -> unit.isRefitting() && person.equals(unit.getRefit().getTech()));
     }
 
     /**
