@@ -157,6 +157,11 @@ public enum UnitFixture {
      */
     LEOPARD_DROPSHIP_3056("Leopard (3056)", true, Dropship.class),
     /**
+     * Leopard CV (2581), the carrier Leopard: three fighter bays in place of the BattleMek bay. Source:
+     * {@code dropships/TRO3057R/IS/Leopard CV (2581).blk}.
+     */
+    LEOPARD_CV_DROPSHIP("Leopard CV (2581)", true, Dropship.class),
+    /**
      * Invader JumpShip (2631), a JumpShip with docking collars and a grav deck. Source:
      * {@code jumpships/3057R/IS/Invader Jumpship (2631).blk}.
      */
