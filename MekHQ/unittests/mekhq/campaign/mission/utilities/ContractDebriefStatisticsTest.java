@@ -187,6 +187,30 @@ class ContractDebriefStatisticsTest {
     }
 
     @Test
+    void recommendsMandatedStatusOverBreach() {
+        // A contract ended early by its employer losing the planet must not be recommended as a breach
+        StratConCampaignState state = stratConWith(-3, new ArrayList<>());
+        AbstractContract contract = baseContract(new ArrayList<>());
+        when(contract.getRequiredVictoryPoints()).thenReturn(3);
+        when(contract.getStratConCampaignState()).thenReturn(state);
+        when(contract.getEndingDate()).thenReturn(FUTURE_END);
+        when(contract.getMandatedCompletionStatus()).thenReturn(MissionStatus.PARTIAL);
+
+        assertEquals(MissionStatus.PARTIAL, from(contract).getRecommendedStatus());
+    }
+
+    @Test
+    void recommendsMandatedStatusOverSuccess() {
+        StratConCampaignState state = stratConWith(5, new ArrayList<>());
+        AbstractContract contract = baseContract(new ArrayList<>());
+        when(contract.getRequiredVictoryPoints()).thenReturn(3);
+        when(contract.getStratConCampaignState()).thenReturn(state);
+        when(contract.getMandatedCompletionStatus()).thenReturn(MissionStatus.PARTIAL);
+
+        assertEquals(MissionStatus.PARTIAL, from(contract).getRecommendedStatus());
+    }
+
+    @Test
     void recommendsFailureWhenRunningToTermWithNoProgress() {
         StratConCampaignState state = stratConWith(-3, new ArrayList<>());
         AbstractContract contract = baseContract(new ArrayList<>());

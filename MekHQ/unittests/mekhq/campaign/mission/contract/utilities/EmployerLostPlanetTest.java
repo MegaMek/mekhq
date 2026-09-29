@@ -32,7 +32,9 @@
  */
 package mekhq.campaign.mission.contract.utilities;
 
+import static mekhq.campaign.mission.contract.utilities.EmployerLostPlanet.getContractsLosingControl;
 import static mekhq.campaign.mission.contract.utilities.EmployerLostPlanet.isEmployerLosingControl;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -41,16 +43,20 @@ import static org.mockito.Mockito.when;
 import java.time.LocalDate;
 import java.util.List;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link EmployerLostPlanet#isEmployerLosingControl}.
+ * Tests {@link EmployerLostPlanet}'s detection of an employer losing control of a contract's planet.
  *
  * @author Illiani
  * @since 0.51.01
@@ -134,5 +140,73 @@ class EmployerLostPlanetTest {
         when(planet.getFactions(AFTER)).thenReturn(List.of(ENEMY));
 
         assertFalse(isEmployerLosingControl(contract, BEFORE, AFTER));
+    }
+
+    @Test
+    void systemOwnershipUsedWhenPlanetUnknown() {
+        PlanetarySystem system = mock(PlanetarySystem.class);
+        when(contract.getTargetPlanet()).thenReturn(null);
+        when(contract.getTargetSystem()).thenReturn(system);
+        when(system.getFactions(BEFORE)).thenReturn(List.of(EMPLOYER));
+        when(system.getFactions(AFTER)).thenReturn(List.of(ENEMY));
+
+        assertTrue(isEmployerLosingControl(contract, BEFORE, AFTER));
+    }
+
+    @Test
+    void noPlanetOrSystemIgnored() {
+        when(contract.getTargetPlanet()).thenReturn(null);
+        when(contract.getTargetSystem()).thenReturn(null);
+
+        assertFalse(isEmployerLosingControl(contract, BEFORE, AFTER));
+    }
+
+    @Test
+    void contractWithoutEmployerIgnored() {
+        when(contract.getStandingEmployerFaction()).thenReturn(null);
+        when(planet.getFactions(BEFORE)).thenReturn(List.of(EMPLOYER));
+        when(planet.getFactions(AFTER)).thenReturn(List.of(ENEMY));
+
+        assertFalse(isEmployerLosingControl(contract, BEFORE, AFTER));
+    }
+
+    @Test
+    void contractsLosingControlFound() {
+        when(planet.getFactions(BEFORE)).thenReturn(List.of(EMPLOYER));
+        when(planet.getFactions(AFTER)).thenReturn(List.of(ENEMY));
+        AbstractContract unaffectedContract = mock(AbstractContract.class);
+        Campaign campaign = campaignWith(true, true, List.of(contract, unaffectedContract));
+
+        assertEquals(List.of(contract), getContractsLosingControl(campaign, BEFORE, AFTER));
+    }
+
+    @Test
+    void noContractsLosingControlWhenOptionDisabled() {
+        when(planet.getFactions(BEFORE)).thenReturn(List.of(EMPLOYER));
+        when(planet.getFactions(AFTER)).thenReturn(List.of(ENEMY));
+        Campaign campaign = campaignWith(true, false, List.of(contract));
+
+        assertTrue(getContractsLosingControl(campaign, BEFORE, AFTER).isEmpty());
+    }
+
+    @Test
+    void noContractsLosingControlWithoutStratCon() {
+        when(planet.getFactions(BEFORE)).thenReturn(List.of(EMPLOYER));
+        when(planet.getFactions(AFTER)).thenReturn(List.of(ENEMY));
+        Campaign campaign = campaignWith(false, true, List.of(contract));
+
+        assertTrue(getContractsLosingControl(campaign, BEFORE, AFTER).isEmpty());
+    }
+
+    private static Campaign campaignWith(boolean isUseStratCon, boolean isUseReactions,
+          List<AbstractContract> activeContracts) {
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        when(campaignOptions.isUseStratCon()).thenReturn(isUseStratCon);
+        when(campaignOptions.get(CampaignOption.USE_EMPLOYER_LOST_PLANET_REACTIONS)).thenReturn(isUseReactions);
+
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        when(campaign.getActiveContracts(true)).thenReturn(activeContracts);
+        return campaign;
     }
 }
