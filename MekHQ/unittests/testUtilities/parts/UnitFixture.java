@@ -152,6 +152,11 @@ public enum UnitFixture {
     /** Leopard (2537), a DropShip. Source: {@code dropships/TRO3057R/IS/Leopard (2537).blk}. */
     LEOPARD_DROPSHIP("Leopard (2537)", true, Dropship.class),
     /**
+     * Leopard (3056), the Leopard refitted with double heat sinks and newer weapons and ammunition. Source:
+     * {@code dropships/TRO3057R/IS/Leopard (3056).blk}.
+     */
+    LEOPARD_DROPSHIP_3056("Leopard (3056)", true, Dropship.class),
+    /**
      * Invader JumpShip (2631), a JumpShip with docking collars and a grav deck. Source:
      * {@code jumpships/3057R/IS/Invader Jumpship (2631).blk}.
      */
