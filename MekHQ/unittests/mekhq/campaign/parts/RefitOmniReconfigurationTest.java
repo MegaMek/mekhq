@@ -46,10 +46,12 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import testUtilities.parts.PartsCensus;
 import testUtilities.parts.PartsScenario;
+import testUtilities.parts.UnitFixture;
 
 /**
- * Reconfiguring an OmniMek swaps only its pod-mounted equipment; its fixed parts (engine, gyro, structure, actuators)
- * stay on the unit (issue #10201, reported in #5748 as the engine being wiped by a simple pod change).
+ * Reconfiguring an OmniMek or OmniVehicle swaps only its pod-mounted equipment; its fixed parts (engine, gyro or
+ * motive system, structure, actuators, turret) stay on the unit (issue #10201, reported in #5748 as the engine being
+ * wiped by a simple pod change).
  */
 class RefitOmniReconfigurationTest {
     @BeforeAll
@@ -74,6 +76,25 @@ class RefitOmniReconfigurationTest {
         assertEquals("B", masakari.getEntity().getModel());
         assertEquals(PartsCensus.ofUnit(freshMasakariB), PartsCensus.ofUnit(masakari),
               "The reconfigured unit has the same parts as a factory-fresh Masakari B, fixed parts included");
+    }
+
+    @Test
+    void aReconfiguredOmniVehicleKeepsItsFixedPartsAndMatchesTheNewConfiguration() throws Exception {
+        PartsScenario scenario = PartsScenario.create();
+        Campaign campaign = scenario.getCampaign();
+        Unit epona = scenario.withUnit(UnitFixture.EPONA_PURSUIT_TANK_PRIME);
+        Refit refit = new Refit(epona, UnitFixture.EPONA_PURSUIT_TANK_A.loadEntity(), false, false, false);
+        assertEquals(Refit.CLASS_OMNI, refit.getRefitClass(), "Prime to A is an Omni reconfiguration");
+        refit.begin();
+        refit.find(0, 1.0);
+        assertTrue(refit.acquireParts());
+
+        refit.succeed();
+
+        Unit freshEponaA = scenario.withUnit(UnitFixture.EPONA_PURSUIT_TANK_A);
+        assertEquals("A", epona.getEntity().getModel());
+        assertEquals(PartsCensus.ofUnit(freshEponaA), PartsCensus.ofUnit(epona),
+              "The reconfigured vehicle has the same parts as a factory-fresh Epona A, fixed parts included");
     }
 
     private static Unit addUnit(Campaign campaign, Entity entity) {
