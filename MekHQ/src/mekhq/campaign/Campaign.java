@@ -2761,10 +2761,9 @@ public class Campaign implements ITechManager {
                             theRefit.getTech() :
                             theRefit.getUnit().getEngineer();
         if (tech == null) {
-            addReport(TECHNICAL, "No tech is assigned to refit " +
-                                       theRefit.getOriginalEntity().getShortName() +
-                                       ". Refit cancelled.");
-            theRefit.cancel();
+            // The tech left (transfer, death, removal); keep the progress and wait for a new tech
+            addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "refit.noTech",
+                  theRefit.getOriginalEntity().getShortName()));
             return;
         }
         // check that all parts have arrived
@@ -3370,6 +3369,12 @@ public class Campaign implements ITechManager {
         Unit unit = getPlayerForce().getHangar().getUnit(id);
         if (unit == null) {
             return;
+        }
+
+        // A refit in progress gives back its reserved parts and removes its orders before the unit goes
+        if (unit.isRefitting()) {
+            LOGGER.debug("[Refit] {} leaves the campaign mid-refit; cancelling the refit", unit.getName());
+            unit.getRefit().cancel();
         }
 
         // remove all parts for this unit as well
@@ -4464,6 +4469,17 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * A tech working on a refit is tied up until it is completed or cancelled, including days spent waiting for parts,
+     * so they take no other work. Maintenance of units they already look after is separate and carries on.
+     *
+     * @return {@code true} if the tech is working on a refit and the task is anything other than that refit
+     */
+    private boolean isBusyWithAnotherRefit(IPartWork partWork, Person tech) {
+        Unit refittingUnit = getPlayerForce().getHumanResources().findUnitRefitBy(getPlayerForce().getHangar(), tech);
+        return (refittingUnit != null) && (partWork != refittingUnit.getRefit());
+    }
+
+    /**
      * Calculates the {@link TargetRoll} required for a technician to work on a specific part task.
      *
      * <p>This method determines task difficulty and eligibility by evaluating the technician's skills, penalties due
@@ -4493,6 +4509,9 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is not currently available!");
         } else if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already being worked on by another team");
+        } else if (isBusyWithAnotherRefit(partWork, tech)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, getFormattedTextAt(RESOURCE_BUNDLE, "refit.techBusy",
+                  getPlayerForce().getHumanResources().findUnitRefitBy(getPlayerForce().getHangar(), tech).getName()));
         } else if (skill == null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
         } else if (getCampaignOptions().get(CampaignOption.TECHS_NEED_TOOL_KIT) &&
