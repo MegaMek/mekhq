@@ -96,6 +96,7 @@ import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.missions.MissionEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.transactions.TransactionEvent;
+import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardFormationIcon;
@@ -1040,6 +1041,123 @@ public class CampaignGUI extends JPanel {
         return true;
     }
 
+    /**
+     * Asks the player which tech should work on a refit, offering only techs who can do the work.
+     *
+     * @param r the refit
+     *
+     * @return the chosen tech, or {@code null} if the player cancelled or no tech can do the work
+     */
+    private @Nullable Person selectRefitTech(Refit r) {
+        Campaign campaign = getCampaign();
+        if (campaign.getPlayerForce()
+                  .getHumanResources()
+                  .getActivePersonnel(false, false)
+                  .stream()
+                  .anyMatch(Person::isTech)) {
+            String name;
+            Map<String, Person> techHash = new HashMap<>();
+            List<String> techList = new ArrayList<>();
+
+            Campaign campaign1 = getCampaign();
+            List<Person> techs = campaign1.getPlayerForce()
+                                       .getHumanResources()
+                                       .getTechs(campaign1.getPlayerForce().getHangar().getUnits(),
+                                             campaign1.getCampaignOptions(),
+                                             campaign1.getPlayerForce().isClanForce(),
+                                             campaign1.getLocalDate(),
+                                             false,
+                                             true);
+            int lastRightTech = 0;
+
+            for (Person tech : techs) {
+                Campaign campaign2 = getCampaign();
+                if (campaign2.getPlayerForce()
+                          .getHumanResources()
+                          .isWorkingOnRefit(campaign2.getPlayerForce().getHangar(), tech) || tech.isEngineer()) {
+                    continue;
+                }
+                // Only offer techs who can actually do the work: at the unit's location, with a possible target
+                if (RefitWorkCheck.reasonTechCannotWork(campaign2, r, tech) != null) {
+                    continue;
+                }
+
+                name = "<html>" +
+                             tech.getFullName() +
+                             ", <b>" +
+                             SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(),
+                                   false,
+                                   true)) +
+                             "</b> " +
+                             tech.getPrimaryRoleDesc() +
+                             " (" +
+                             getCampaign().getTargetFor(r, tech).getValueAsString() +
+                             "+), " +
+                             tech.getMinutesLeft() +
+                             '/' +
+                             tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
+                                                                  .get(CampaignOption.TECHS_USE_ADMINISTRATION)) +
+                             " minutes</html>";
+                techHash.put(name, tech);
+                if (tech.isRightTechTypeFor(r)) {
+                    techList.add(lastRightTech++, name);
+                } else {
+                    techList.add(name);
+                }
+            }
+
+            String s = (techList.isEmpty()) ?
+                             null :
+                             (String) JOptionPane.showInputDialog(frame,
+                                   "Which tech should work on the refit?",
+                                   "Select Tech",
+                                   JOptionPane.PLAIN_MESSAGE,
+                                   null,
+                                   techList.toArray(),
+                                   techList.getFirst());
+
+            if (null == s) {
+                return null;
+            }
+
+            Person selectedTech = techHash.get(s);
+
+            if (!selectedTech.isRightTechTypeFor(r)) {
+                if (JOptionPane.NO_OPTION ==
+                          JOptionPane.showConfirmDialog(null,
+                                "This tech is not appropriate for this unit. Would you like to continue?",
+                                "Incorrect Tech Type",
+                                JOptionPane.YES_NO_OPTION)) {
+                    return null;
+                }
+            }
+
+            return selectedTech;
+        } else {
+            JOptionPane.showMessageDialog(frame,
+                  "You have no techs available to work on this refit.",
+                  "No Techs",
+                  JOptionPane.WARNING_MESSAGE);
+            return null;
+        }
+    }
+
+    /**
+     * Gives a refit a new tech after its tech has left. The refit keeps its progress and carries on with the new
+     * tech from the next day.
+     *
+     * @param r the refit without a tech
+     */
+    public void assignRefitTech(Refit r) {
+        Person selectedTech = selectRefitTech(r);
+        if (selectedTech == null) {
+            return;
+        }
+        r.setTech(selectedTech);
+        logger.info("[Refit] {} now works on the refit of {}", selectedTech.getFullName(), r.getUnit().getName());
+        MekHQ.triggerEvent(new UnitRefitEvent(r.getUnit()));
+    }
+
     public void refitUnit(Refit r, boolean selectModelName) {
         if (r.getOriginalEntity() instanceof Infantry && !(r.getOriginalEntity() instanceof BattleArmor)) {
             r.setTech(null);
@@ -1063,97 +1181,11 @@ public class CampaignGUI extends JPanel {
             }
             r.setTech(engineer);
         } else {
-            Campaign campaign = getCampaign();
-            if (campaign.getPlayerForce()
-                      .getHumanResources()
-                      .getActivePersonnel(false, false)
-                      .stream()
-                      .anyMatch(Person::isTech)) {
-                String name;
-                Map<String, Person> techHash = new HashMap<>();
-                List<String> techList = new ArrayList<>();
-
-                Campaign campaign1 = getCampaign();
-                List<Person> techs = campaign1.getPlayerForce()
-                                           .getHumanResources()
-                                           .getTechs(campaign1.getPlayerForce().getHangar().getUnits(),
-                                                 campaign1.getCampaignOptions(),
-                                                 campaign1.getPlayerForce().isClanForce(),
-                                                 campaign1.getLocalDate(),
-                                                 false,
-                                                 true);
-                int lastRightTech = 0;
-
-                for (Person tech : techs) {
-                    Campaign campaign2 = getCampaign();
-                    if (campaign2.getPlayerForce()
-                              .getHumanResources()
-                              .isWorkingOnRefit(campaign2.getPlayerForce().getHangar(), tech) || tech.isEngineer()) {
-                        continue;
-                    }
-                    // Only offer techs who can actually do the work: at the unit's location, with a possible target
-                    if (RefitWorkCheck.reasonTechCannotWork(campaign2, r, tech) != null) {
-                        continue;
-                    }
-
-                    name = "<html>" +
-                                 tech.getFullName() +
-                                 ", <b>" +
-                                 SkillType.getColoredExperienceLevelName(tech.getSkillLevel(getCampaign(),
-                                       false,
-                                       true)) +
-                                 "</b> " +
-                                 tech.getPrimaryRoleDesc() +
-                                 " (" +
-                                 getCampaign().getTargetFor(r, tech).getValueAsString() +
-                                 "+), " +
-                                 tech.getMinutesLeft() +
-                                 '/' +
-                                 tech.getDailyAvailableTechTime(getCampaign().getCampaignOptions()
-                                                                      .get(CampaignOption.TECHS_USE_ADMINISTRATION)) +
-                                 " minutes</html>";
-                    techHash.put(name, tech);
-                    if (tech.isRightTechTypeFor(r)) {
-                        techList.add(lastRightTech++, name);
-                    } else {
-                        techList.add(name);
-                    }
-                }
-
-                String s = (techList.isEmpty()) ?
-                                 null :
-                                 (String) JOptionPane.showInputDialog(frame,
-                                       "Which tech should work on the refit?",
-                                       "Select Tech",
-                                       JOptionPane.PLAIN_MESSAGE,
-                                       null,
-                                       techList.toArray(),
-                                       techList.getFirst());
-
-                if (null == s) {
-                    return;
-                }
-
-                Person selectedTech = techHash.get(s);
-
-                if (!selectedTech.isRightTechTypeFor(r)) {
-                    if (JOptionPane.NO_OPTION ==
-                              JOptionPane.showConfirmDialog(null,
-                                    "This tech is not appropriate for this unit. Would you like to continue?",
-                                    "Incorrect Tech Type",
-                                    JOptionPane.YES_NO_OPTION)) {
-                        return;
-                    }
-                }
-
-                r.setTech(selectedTech);
-            } else {
-                JOptionPane.showMessageDialog(frame,
-                      "You have no techs available to work on this refit.",
-                      "No Techs",
-                      JOptionPane.WARNING_MESSAGE);
+            Person selectedTech = selectRefitTech(r);
+            if (selectedTech == null) {
                 return;
             }
+            r.setTech(selectedTech);
         }
         if (selectModelName) {
             // select a model name
