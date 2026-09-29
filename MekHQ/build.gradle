@@ -159,12 +159,13 @@ def checkSuitePins = {
             }
             text
         }
-        def trackedData = dataGit(['ls-files', '-z', '--cached', '--', 'data']).split('\u0000').toSet()
+        def trackedData = dataGit(['ls-files', '-z', '--cached', '--', 'data'])
+                .split('\u0000').toList().toSet()
         def untracked = git(['ls-files', '-z', '--others', '--exclude-standard', '--'] + scopes)
                 .split('\u0000')
         def ignored = git(['ls-files', '-z', '--others', '--ignored', '--exclude-standard', '--'] + scopes)
                 .split('\u0000')
-        def unknown = (untracked + ignored).unique()
+        def unknown = (untracked.toList() + ignored.toList()).unique()
         unknown.each { path ->
             if (!path) {
                 return
