@@ -1949,6 +1949,23 @@ public class ForceHumanResources {
     }
 
     /**
+     * Recruits a person whose recruitment cost has already been paid, such as a hire from the personnel market, which
+     * charges its own hiring cost. Pay for Recruitment is not charged a second time.
+     *
+     * @param campaign the campaign
+     * @param person   the person to recruit
+     * @param gmAdd    if {@code true}, the person is added by the GM
+     *
+     * @return {@code true} if recruitment was successful; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean recruitPrepaidPerson(Campaign campaign, Person person, boolean gmAdd) {
+        return recruitPerson(campaign, person, person.getPrisonerStatus(), gmAdd, true, true, false, true);
+    }
+
+    /**
      * If the person does not already have a bloodname, assigns a chance of having one based on skill and rank.
      *
      * @param campaign   the campaign
@@ -2438,6 +2455,29 @@ public class ForceHumanResources {
      */
     public boolean recruitPerson(Campaign campaign, Person person, PrisonerStatus prisonerStatus, boolean gmAdd,
           boolean log, boolean employ, boolean bypassSimulateRelationships) {
+        return recruitPerson(campaign, person, prisonerStatus, gmAdd, log, employ, bypassSimulateRelationships, false);
+    }
+
+    /**
+     * Recruits a person into the campaign roster.
+     *
+     * @param campaign                    the campaign
+     * @param person                      the person to recruit; must not be {@code null}
+     * @param prisonerStatus              the prison status to assign to the person
+     * @param gmAdd                       if {@code true}, bypasses funds check
+     * @param log                         if {@code true}, recruitment is logged
+     * @param employ                      if {@code true}, the person is marked as employed
+     * @param bypassSimulateRelationships if {@code true}, relationship simulation does not occur
+     * @param isRecruitmentPrepaid        if {@code true}, the recruitment cost has already been paid elsewhere and is not
+     *                                    charged again
+     *
+     * @return {@code true} if recruitment was successful; {@code false} otherwise
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean recruitPerson(Campaign campaign, Person person, PrisonerStatus prisonerStatus, boolean gmAdd,
+          boolean log, boolean employ, boolean bypassSimulateRelationships, boolean isRecruitmentPrepaid) {
         if (person == null) {
             LOGGER.warn("A null person was passed into recruitPerson.");
             return false;
@@ -2448,7 +2488,8 @@ public class ForceHumanResources {
         Finances finances = campaign.getPlayerForce().getFinances();
 
         if (employ && !person.isEmployed()) {
-            if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_RECRUITMENT) && !gmAdd) {
+            if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_RECRUITMENT) && !gmAdd
+                      && !isRecruitmentPrepaid) {
                 if (!finances.debit(TransactionType.RECRUITMENT,
                       currentDay,
                       RecruitmentCosts.getRecruitmentCost(campaign, person),

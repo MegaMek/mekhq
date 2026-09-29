@@ -35,11 +35,13 @@ package mekhq.campaign.finances;
 import static mekhq.campaign.enums.DailyReportType.FINANCES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -56,9 +58,11 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.parts.Part;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * Tests the monthly Hot Spots upkeep debit in {@link Finances#newDay}: charged on the first of the month as
@@ -169,5 +173,30 @@ class FinancesHotSpotsUpkeepTest {
 
         assertEquals(STARTING_FUNDS.minus(OVERHEAD), finances.getBalance());
         verify(accountant, never()).getHotSpotsUpkeepCosts();
+    }
+
+    /** A force with no Scale owes nothing, so no upkeep is charged and no zero-value transaction is recorded. */
+    @Test
+    void zeroUpkeepIsNotChargedOrRecorded() {
+        when(accountant.getHotSpotsUpkeepCosts()).thenReturn(Money.zero());
+
+        newDay(FIRST_OF_MONTH);
+
+        assertEquals(STARTING_FUNDS, finances.getBalance());
+        assertTrue(transactionsOfType(TransactionType.MAINTENANCE).isEmpty());
+    }
+
+    /** Straight support covers repairs and maintenance, not peacetime costs. */
+    @Test
+    void peacetimeCostsAreNotReimbursedByStraightSupport() {
+        campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, false);
+        campaignOptions.set(CampaignOption.PAY_FOR_OVERHEAD, false);
+        try (MockedStatic<ContractSupportPayments> supportPayments = mockStatic(ContractSupportPayments.class)) {
+            newDay(FIRST_OF_MONTH);
+
+            supportPayments.verify(() -> ContractSupportPayments.reimburseStraightSupport(any(), any(), any()),
+                  never());
+        }
+        assertEquals(STARTING_FUNDS.minus(PEACETIME), finances.getBalance());
     }
 }
