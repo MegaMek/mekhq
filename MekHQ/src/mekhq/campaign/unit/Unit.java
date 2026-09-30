@@ -1329,6 +1329,47 @@ public class Unit implements ITechnology, ILocatable {
         }
     }
 
+    /**
+     * @return one trooper's armor part for the platoon: its armor kit, taking the kit's damage divisor and price, or
+     *       armor described by the platoon's armor properties when it has no kit
+     */
+    private InfantryArmorPart createInfantryArmorPart(ConvInfantry infantry) {
+        EquipmentType armorKit = infantry.getArmorKit();
+        double damageDivisor = (armorKit instanceof MiscType kit) ? kit.getDamageDivisor()
+              : infantry.getCustomArmorDamageDivisor();
+        return new InfantryArmorPart(0,
+              getCampaign(),
+              armorKit,
+              damageDivisor,
+              infantry.isArmorEncumbering(),
+              infantry.hasDEST(),
+              infantry.hasSneakCamo(),
+              infantry.hasSneakIR(),
+              infantry.hasSneakECM(),
+              infantry.hasSpaceSuit());
+    }
+
+    /**
+     * Armor parts saved before parts recorded their armor kit know only the kit's properties, so two different kits
+     * looked the same. They take the platoon's kit when the campaign loads.
+     */
+    private void giveArmorPartsTheirKit(ConvInfantry infantry) {
+        EquipmentType armorKit = infantry.getArmorKit();
+        if (armorKit == null) {
+            return;
+        }
+        int updated = 0;
+        for (Part part : parts) {
+            if ((part instanceof InfantryArmorPart armorPart) && (armorPart.getArmorKit() == null)) {
+                armorPart.setArmorKit(armorKit);
+                updated++;
+            }
+        }
+        if (updated > 0) {
+            LOGGER.info("{}: {} armor parts now record their {}", getName(), updated, armorKit.getName());
+        }
+    }
+
     public void removePart(Part part) {
         parts.remove(part);
     }
@@ -4911,37 +4952,18 @@ public class Unit implements ITechnology, ILocatable {
                 }
             }
             if (null == infantryArmor) {
-                EquipmentType eq = infantry.getArmorKit();
-                if (null != eq) {
-                    infantryArmor = new EquipmentPart(0, eq, 0, 1.0, false, getCampaign());
-                } else {
-                    infantryArmor = new InfantryArmorPart(0,
-                          getCampaign(),
-                          infantry.getCustomArmorDamageDivisor(),
-                          infantry.isArmorEncumbering(),
-                          infantry.hasDEST(),
-                          infantry.hasSneakCamo(),
-                          infantry.hasSneakECM(),
-                          infantry.hasSneakIR(),
-                          infantry.hasSpaceSuit());
-                }
+                infantryArmor = createInfantryArmorPart(infantry);
                 if (infantryArmor.getStickerPrice().isPositive()) {
                     int number = entity.getOInternal(ConvInfantry.LOC_INFANTRY);
                     while (number > 0) {
-                        infantryArmor = new InfantryArmorPart(0,
-                              getCampaign(),
-                              infantry.getCustomArmorDamageDivisor(),
-                              infantry.isArmorEncumbering(),
-                              infantry.hasDEST(),
-                              infantry.hasSneakCamo(),
-                              infantry.hasSneakECM(),
-                              infantry.hasSneakIR(),
-                              infantry.hasSpaceSuit());
+                        infantryArmor = createInfantryArmorPart(infantry);
                         addPart(infantryArmor);
                         partsToAdd.add(infantryArmor);
                         number--;
                     }
                 }
+            } else {
+                giveArmorPartsTheirKit(infantry);
             }
             InfantryWeapon primaryType = infantry.getPrimaryWeapon();
             InfantryWeapon secondaryType = infantry.getSecondaryWeapon();
