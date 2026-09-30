@@ -575,6 +575,33 @@ public class MRMSService {
     private static MRMSUnitAction performUnitMassTechAction(Campaign campaign, Unit unit, List<Person> techs,
           Map<PartRepairType, MRMSOption> mrmsOptionsByType, boolean salvaging,
           MRMSConfiguredOptions configuredOptions) {
+        boolean wasSalvaging = unit.isSalvage();
+        boolean allowedCarryover = configuredOptions.isAllowCarryover();
+        try {
+            return performUnitMassTechActionOnce(campaign, unit, techs, mrmsOptionsByType, salvaging,
+                  configuredOptions);
+        } finally {
+            restoreAfterLimbStripping(unit, wasSalvaging, configuredOptions, allowedCarryover);
+        }
+    }
+
+    /**
+     * Stripping a limb with a broken hip or shoulder switches the unit to salvage mode and turns carryover off for a
+     * while. Both go back to how they were whatever happens, so an early return or an error cannot leave the unit in
+     * salvage mode or carryover off for every later unit in the batch.
+     */
+    private static void restoreAfterLimbStripping(Unit unit, boolean wasSalvaging,
+          MRMSConfiguredOptions configuredOptions, boolean allowedCarryover) {
+        if (unit.isSalvage() != wasSalvaging) {
+            LOGGER.debug("[MRMS] {}: salvage mode put back to {}", unit.getName(), wasSalvaging);
+            unit.setSalvage(wasSalvaging);
+        }
+        configuredOptions.setAllowCarryover(allowedCarryover);
+    }
+
+    private static MRMSUnitAction performUnitMassTechActionOnce(Campaign campaign, Unit unit, List<Person> techs,
+          Map<PartRepairType, MRMSOption> mrmsOptionsByType, boolean salvaging,
+          MRMSConfiguredOptions configuredOptions) {
         List<IPartWork> parts = unit.getPartsNeedingService(true);
 
         if (parts.isEmpty()) {
@@ -753,6 +780,19 @@ public class MRMSService {
     private static MRMSUnitAction scrapLocationAndRemoveEquipment(Campaign campaign, Unit unit,
           List<Person> techs, Map<PartRepairType, MRMSOption> mrmsOptionsByType,
           MRMSConfiguredOptions configuredOptions, List<IPartWork> parts) {
+        boolean wasSalvaging = unit.isSalvage();
+        boolean allowedCarryover = configuredOptions.isAllowCarryover();
+        try {
+            return scrapLocationAndRemoveEquipmentOnce(campaign, unit, techs, mrmsOptionsByType, configuredOptions,
+                  parts);
+        } finally {
+            restoreAfterLimbStripping(unit, wasSalvaging, configuredOptions, allowedCarryover);
+        }
+    }
+
+    private static MRMSUnitAction scrapLocationAndRemoveEquipmentOnce(Campaign campaign, Unit unit,
+          List<Person> techs, Map<PartRepairType, MRMSOption> mrmsOptionsByType,
+          MRMSConfiguredOptions configuredOptions, List<IPartWork> parts) {
 
         if (parts.isEmpty()) {
             return new MRMSUnitAction(unit, false, MRMSUnitAction.STATUS.ALL_PARTS_IN_PROCESS);
@@ -811,11 +851,10 @@ public class MRMSService {
                 }
 
                 if (partsToBeRemoved.isEmpty()) {
-                    scrappingLimbMode = scrapEmptyLimb(locationMap,
-                          campaign,
-                          scrappingLimbMode,
-                          isSalvaging,
-                          unit);
+                    scrapEmptyLimb(locationMap, campaign, scrappingLimbMode, isSalvaging, unit);
+                    // The limb is gone, so there is nothing left to strip; carrying on would work on the scrapped limb
+                    LOGGER.debug("[MRMS] {}: Quick Strip finished, the empty limb was scrapped", unit.getName());
+                    return new MRMSUnitAction(unit, isSalvaging, MRMSUnitAction.STATUS.ACTIONS_PERFORMED);
                 } else {
                     processPartsInLocation(campaign, unit, countOfPartsPerLocation, locationMap);
 
