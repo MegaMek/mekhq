@@ -51,6 +51,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
@@ -697,6 +698,9 @@ public class FactionStandingUltimatumDialog {
      */
     public static @Nullable Person getThirdInCommand(Campaign campaign, @Nullable Person commander,
           @Nullable Person secondInCommand) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isClanCampaign = campaign.isClanCampaign();
+        LocalDate today = campaign.getLocalDate();
         Person thirdInCommand = null;
 
         for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
@@ -704,7 +708,8 @@ public class FactionStandingUltimatumDialog {
                 continue;
             }
 
-            if (thirdInCommand == null || person.outRanksUsingSkillTiebreaker(campaign, thirdInCommand)) {
+            if (thirdInCommand == null
+                      || person.outRanksUsingSkillTiebreaker(campaignOptions, isClanCampaign, today, thirdInCommand)) {
                 thirdInCommand = person;
             }
         }
