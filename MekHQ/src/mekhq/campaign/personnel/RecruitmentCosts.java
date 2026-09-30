@@ -87,7 +87,11 @@ public final class RecruitmentCosts {
         if (isUsingTrainingBasedCost(campaign.getCampaignOptions())) {
             return getTrainingBasedCost(campaign, person);
         }
-        return person.getSalary(campaign).multipliedBy(SALARY_MONTHS);
+
+        return person.getSalary(campaign.getCampaignOptions(),
+                    campaign.getPlayerForce().isClanForce(),
+                    campaign.getLocalDate())
+                     .multipliedBy(SALARY_MONTHS);
     }
 
     /**

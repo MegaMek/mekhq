@@ -151,7 +151,11 @@ class RecruitmentCostsTest {
     @Test
     void salaryIsIgnoredUnderTrainingBasedCost() {
         campaignOptions.set(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS, true);
-        when(person.getSalary(campaign)).thenReturn(Money.of(999_999_999));
+
+        when(person.getSalary(campaign.getCampaignOptions(),
+                    campaign.getPlayerForce().isClanForce(),
+                    campaign.getLocalDate()))
+                   .thenReturn(Money.of(999_999_999));
 
         assertEquals(SKILL_TRAINING.multipliedBy(1.5), RecruitmentCosts.getRecruitmentCost(campaign, person));
     }

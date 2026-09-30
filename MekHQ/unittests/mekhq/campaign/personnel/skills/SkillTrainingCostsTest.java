@@ -49,6 +49,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import megamek.codeUtilities.MathUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -285,7 +286,7 @@ class SkillTrainingCostsTest {
             for (int index = 0; index < skillNamesAndLevels.length; index += 2) {
                 String skillName = skillNamesAndLevels[index];
                 Skill skill = mock(Skill.class);
-                when(skill.getTotalSkillLevel(any())).thenReturn(Integer.parseInt(skillNamesAndLevels[index + 1]));
+                when(skill.getTotalSkillLevel(any())).thenReturn(MathUtility.parseInt(skillNamesAndLevels[index + 1]));
                 when(person.getSkill(skillName)).thenReturn(skill);
                 skillNames.add(skillName);
             }
