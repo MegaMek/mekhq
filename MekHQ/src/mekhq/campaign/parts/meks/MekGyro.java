@@ -106,6 +106,28 @@ public class MekGyro extends Part {
         return gyroBaseTonnage;
     }
 
+    /**
+     * The weight of a Mek's gyro, worked out as MegaMek's unit verifier does: the engine rating divided by 100 and
+     * rounded up, halved for an XL gyro, times 1.5 for a compact gyro, doubled for a heavy-duty or superheavy gyro, and
+     * nothing for a Mek without a gyro, rounded up to the half ton. It uses the engine rating rather than walking MP,
+     * so a primitive engine's larger rating gives the heavier gyro it needs.
+     *
+     * @param mek the Mek
+     *
+     * @return the gyro's weight in tons
+     */
+    public static double getGyroTonnage(Mek mek) {
+        double baseTonnage = Math.ceil(mek.getEngine().getRating() / 100.0);
+        double tonnage = switch (mek.getGyroType()) {
+            case Mek.GYRO_XL -> baseTonnage / 2;
+            case Mek.GYRO_COMPACT -> baseTonnage * 1.5;
+            case Mek.GYRO_HEAVY_DUTY, Mek.GYRO_SUPERHEAVY -> baseTonnage * 2;
+            case Mek.GYRO_NONE -> 0;
+            default -> baseTonnage;
+        };
+        return Math.ceil(tonnage * 2) / 2;
+    }
+
     @Override
     public double getTonnage() {
         return gyroTonnage;
@@ -117,8 +139,10 @@ public class MekGyro extends Part {
             return Money.of(750000.0 * getTonnage());
         } else if (getType() == Mek.GYRO_COMPACT) {
             return Money.of(400000.0 * getTonnage());
-        } else if (getType() == Mek.GYRO_HEAVY_DUTY) {
+        } else if ((getType() == Mek.GYRO_HEAVY_DUTY) || (getType() == Mek.GYRO_SUPERHEAVY)) {
             return Money.of(500000.0 * getTonnage());
+        } else if (getType() == Mek.GYRO_NONE) {
+            return Money.zero();
         } else {
             return Money.of(300000.0 * getTonnage());
         }
