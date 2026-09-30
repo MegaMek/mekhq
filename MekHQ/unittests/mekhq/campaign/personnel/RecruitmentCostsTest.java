@@ -34,6 +34,7 @@ package mekhq.campaign.personnel;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -77,7 +78,7 @@ class RecruitmentCostsTest {
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
         person = mock(Person.class);
-        when(person.getSalary(campaign)).thenReturn(SALARY);
+        when(person.getSalary(any(CampaignOptions.class), anyBoolean(), any())).thenReturn(SALARY);
 
         skillTrainingCosts = mockStatic(SkillTrainingCosts.class);
         skillTrainingCosts.when(() -> SkillTrainingCosts.getAccumulatedSkillTrainingCost(any(), any()))

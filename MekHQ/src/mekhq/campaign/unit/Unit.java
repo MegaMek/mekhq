@@ -1906,7 +1906,8 @@ public class Unit implements ITechnology, ILocatable {
                   String.format("%.2f", ALTERNATE_UNIT_COST_SELL_FRACTION))).append("<br>");
             breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.quality",
                   getQualityName(), String.format("%.2f", getAlternateQualityMultiplier()))).append("<br>");
-            double obsoleteMultiplier = entity.getObsoleteResaleModifier(campaign.getGameYear());
+            double obsoleteMultiplier = (entity == null) ? 1.0 :
+                                              entity.getObsoleteResaleModifier(campaign.getGameYear());
             if (obsoleteMultiplier < 1.0) {
                 int yearsObsolete = campaign.getGameYear() - entity.getObsoleteYearForModifiers(campaign.getGameYear());
                 breakdown.append(getFormattedTextAt(RESOURCE_BUNDLE, "Unit.sellBreakdown.obsolete",
