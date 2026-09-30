@@ -36,15 +36,7 @@ import static megamek.SuiteConstants.LAST_MILESTONE;
 import static mekhq.MHQConstants.CAMPAIGN_PRESET_DIRECTORY;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -85,6 +77,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
 
 /**
  * This is an object which holds a set of objects that collectively define the initial options setup for a campaign.
@@ -133,7 +126,6 @@ public class CampaignPreset {
     private Faction faction;
     private Planet planet;
     private RankSystem rankSystem;
-    private int contractCount;
     private boolean gm;
 
     // Continuous
@@ -157,7 +149,6 @@ public class CampaignPreset {
               null,
               null,
               null,
-              2,
               true,
               null,
               null,
@@ -168,7 +159,7 @@ public class CampaignPreset {
 
     public CampaignPreset(final String title, final String description, final boolean userData,
           final @Nullable LocalDate date, final @Nullable Faction faction, final @Nullable Planet planet,
-          final @Nullable RankSystem rankSystem, final int contractCount, final boolean gm,
+          final @Nullable RankSystem rankSystem, final boolean gm,
           final @Nullable GameOptions gameOptions,
           final @Nullable CampaignOptions campaignOptions,
           final @Nullable RandomSkillPreferences randomSkillPreferences, final Map<String, SkillType> skills,
@@ -183,7 +174,6 @@ public class CampaignPreset {
         setFaction(faction);
         setPlanet(planet);
         setRankSystem(rankSystem);
-        setContractCount(contractCount);
         setGM(gm);
 
         // Continuous
@@ -263,13 +253,7 @@ public class CampaignPreset {
         this.rankSystem = rankSystem;
     }
 
-    public int getContractCount() {
-        return contractCount;
-    }
 
-    public void setContractCount(final int contractCount) {
-        this.contractCount = contractCount;
-    }
 
     public boolean isGM() {
         return gm;
@@ -471,7 +455,6 @@ public class CampaignPreset {
         if (getRankSystem() != null) {
             getRankSystem().writeToXML(pw, indent, false);
         }
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "contractCount", getContractCount());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "gm", isGM());
         // endregion Startup
 
@@ -699,9 +682,6 @@ public class CampaignPreset {
                     case "rankSystem":
                         preset.setRankSystem(RankSystem.generateInstanceFromXML(wn.getChildNodes(), version));
                         break;
-                    case "contractCount":
-                        preset.setContractCount(Integer.parseInt(wn.getTextContent().trim()));
-                        break;
                     case "gm":
                         preset.setGM(Boolean.parseBoolean(wn.getTextContent().trim()));
                         break;
@@ -767,6 +747,36 @@ public class CampaignPreset {
             return null;
         }
         return preset;
+    }
+    /**
+     * Creates a copy of the given preset that shares no objects with it, by writing it to XML and parsing it back. This
+     * goes through exactly the same IO as a preset file, so the copy holds precisely what saving the source would
+     * store. Use this before editing values that belong to a running campaign (its options, skills and abilities) so
+     * the edits cannot leak back into that campaign.
+     *
+     * @param source the preset to copy
+     *
+     * @return the detached copy, or {@code null} if it could not be round-tripped
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable CampaignPreset createDetachedCopy(final CampaignPreset source) {
+        final StringWriter stringWriter = new StringWriter();
+        try (PrintWriter pw = new PrintWriter(stringWriter)) {
+            source.writeToXML(pw, 0);
+        }
+
+        try {
+            final Document xmlDoc = MHQXMLUtility.newSafeDocumentBuilder()
+                                          .parse(new InputSource(new StringReader(stringWriter.toString())));
+            final Element element = xmlDoc.getDocumentElement();
+            element.normalize();
+            return parseFromXML(element.getChildNodes(), new Version(element.getAttribute("version")));
+        } catch (Exception ex) {
+            LOGGER.error("Unable to create a detached copy of a campaign preset", ex);
+            return null;
+        }
     }
     // endregion File I/O
 

@@ -119,10 +119,6 @@ class CampaignOptionsSerializationTest {
             if (!simple) {
                 continue;
             }
-            // Derived through client preferences; not a plain stored value.
-            if (option == CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME) {
-                continue;
-            }
             // Read-only legacy marker; intentionally never written.
             if (option == CampaignOption.HAD_AT_B_ENABLED_MARKER) {
                 continue;

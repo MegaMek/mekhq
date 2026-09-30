@@ -32,10 +32,17 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -66,5 +73,43 @@ class MarketsOptionsModelTest {
         MarketsOptionsModel roundTripped = new MarketsOptionsModel(destination);
 
         OptionsModelTestSupport.assertAllFieldsMatch(model, roundTripped);
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void applyToWithACampaign_replacesThePersonnelMarketWhenTheStyleChanges() {
+        Campaign campaign = mockCampaign();
+        CampaignOptions source = new CampaignOptions();
+        source.set(CampaignOption.PERSONNEL_MARKET_STYLE, PersonnelMarketStyle.MEKHQ);
+        MarketsOptionsModel model = new MarketsOptionsModel(source);
+        model.personnelMarketStyle = PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
+
+        model.applyTo(campaign, source);
+
+        verify(campaign).setNewPersonnelMarket(any(NewPersonnelMarket.class));
+        assertEquals(PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED, source.get(CampaignOption.PERSONNEL_MARKET_STYLE));
+    }
+
+    /**
+     * Saving a preset passes no campaign: the running campaign's market must be left alone, while the new style is
+     * still written into the preset's options.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void applyToWithoutACampaign_writesTheStyleWithoutReplacingAMarket() {
+        CampaignOptions destination = new CampaignOptions();
+        destination.set(CampaignOption.PERSONNEL_MARKET_STYLE, PersonnelMarketStyle.MEKHQ);
+        MarketsOptionsModel model = new MarketsOptionsModel(destination);
+        model.personnelMarketStyle = PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
+
+        assertDoesNotThrow(() -> model.applyTo(null, destination));
+
+        assertEquals(PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED,
+              destination.get(CampaignOption.PERSONNEL_MARKET_STYLE));
     }
 }
