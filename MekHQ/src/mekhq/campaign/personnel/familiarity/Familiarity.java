@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.personnel.familiarity;
 
+import static mekhq.campaign.mission.utilities.ContractUtilities.hasArrivedAtContractLocation;
 import static mekhq.campaign.personnel.PersonnelOptions.FAMILIARITY_EMOTIONALLY_UNAVAILABLE;
 import static mekhq.campaign.personnel.PersonnelOptions.FAMILIARITY_IRON_BOND;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -40,10 +41,13 @@ import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getAmazingColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.List;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Entity;
+import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -51,6 +55,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.unit.Unit;
@@ -209,6 +214,67 @@ public enum Familiarity {
         for (Unit unit : units) {
             assignFamiliarity(campaign, unit, familiarityCap, familiaritySpeed, gainType);
         }
+    }
+
+    /**
+     * Awards off-contract training Familiarity (sim pods, drills and the like) to every unit in the hangar.
+     *
+     * <p>Normally this happens on the first of each month. While the campaign is on an offensive contract, or on a
+     * defensive contract whose enemy morale isn't Routed, it happens every Monday instead. Each unit gains Familiarity
+     * as if it had returned from a scenario, following all the usual restrictions (eligible chassis, single-unit
+     * techs, trait modifiers, and the mode's cap).</p>
+     *
+     * @param campaign the current campaign
+     * @param today    the date being processed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void processPeriodicFamiliarity(Campaign campaign, LocalDate today) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        Familiarity mode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
+        if (!mode.isEnabled()) {
+            return;
+        }
+
+        int familiaritySpeed = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
+        if (familiaritySpeed <= 0) {
+            return;
+        }
+
+        boolean isFirstOfMonth = today.getDayOfMonth() == 1;
+        boolean isMonday = today.getDayOfWeek() == DayOfWeek.MONDAY;
+        boolean isWeeklyGain = isMonday && isOnActiveCombatContract(campaign);
+        if (!isFirstOfMonth && !isWeeklyGain) {
+            return;
+        }
+
+        int familiarityCap = mode.getFamiliarityCap();
+        for (Unit unit : campaign.getPlayerForce().getHangar().getUnits()) {
+            assignFamiliarity(campaign, unit, familiarityCap, familiaritySpeed, FamiliarityGainType.D6);
+        }
+    }
+
+    /**
+     * @return {@code true} if the campaign has arrived at any active contract that is offensive, or is defensive with
+     *       enemy morale that isn't Routed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isOnActiveCombatContract(Campaign campaign) {
+        AbstractLocation currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
+        for (AbstractContract contract : campaign.getActiveContracts()) {
+            if (!hasArrivedAtContractLocation(currentLocation, contract)) {
+                continue;
+            }
+
+            if (contract.isPlayerAttacker() || !contract.getMoraleLevel().isRouted()) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public static void assignFamiliarity(Campaign campaign, Unit unit, int cap, int speed,

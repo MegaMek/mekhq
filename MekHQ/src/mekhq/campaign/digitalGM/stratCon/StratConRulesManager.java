@@ -1372,6 +1372,11 @@ public class StratConRulesManager {
             StratConGMs.mapGeneration(campaignOptions)
                   .setScenarioTerrain(track, scenario, campaign.getCampaignOptions().get(CampaignOption.USE_NO_TORNADOES));
             StratConGMs.opForGeneration(campaignOptions).generateOpFor(backingScenario, contract, campaign);
+        } else {
+            // The OpFor was already generated (typically against the primary auto-assigned at scenario generation), so
+            // its objectives still name that force. Rebuild them against the primary the player actually committed.
+            AtBDynamicScenarioFactory.translateTemplateObjectives(backingScenario, campaign);
+            AtBDynamicScenarioFactory.scaleObjectiveTimeLimits(backingScenario, campaign);
         }
     }
 

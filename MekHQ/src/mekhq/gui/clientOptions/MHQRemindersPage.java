@@ -104,6 +104,7 @@ class MHQRemindersPage extends MHQOptionsPage {
               { "optionCombatChallengeNag", MHQConstants.NAG_COMBAT_CHALLENGE },
               { "optionUnresolvedStratConContactsNag", MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS },
               { "optionOutstandingScenariosNag", MHQConstants.NAG_OUTSTANDING_SCENARIOS },
+              { "optionExpiringNavPointsNag", MHQConstants.NAG_EXPIRING_NAV_POINTS },
               { "optionInvalidFactionNag", MHQConstants.NAG_INVALID_FACTION },
               { "optionUnableToAffordExpensesNag", MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES },
               { "optionUnableToAffordRentNag", MHQConstants.NAG_UNABLE_TO_AFFORD_RENT },
@@ -116,6 +117,7 @@ class MHQRemindersPage extends MHQOptionsPage {
               { "optionSomeoneRandomlyDiedCivilianNag", MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN },
               { "optionSomeoneRandomlyDiedCampFollowerNag", MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER },
               { "optionSomeoneRandomlyDiedRetiredNag", MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_RETIREE },
+              { "optionContractJournalPromptNag", MHQConstants.NAG_CONTRACT_JOURNAL_PROMPT },
         };
         return nagCheckBoxGrid("MHQNagContent", nagOptions);
     }

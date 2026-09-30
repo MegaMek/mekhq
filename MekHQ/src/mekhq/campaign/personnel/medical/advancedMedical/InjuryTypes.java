@@ -377,6 +377,8 @@ public final class InjuryTypes {
             InjuryType.register(244, "alt:OLD_WOUND", AlternateInjuries.OLD_WOUND);
             InjuryType.register(245, "alt:AMPUTATION_RECOVERY", AlternateInjuries.AMPUTATION_RECOVERY);
             InjuryType.register(246, "alt:MEDICAL_COMPLICATION", AlternateInjuries.MEDICAL_COMPLICATION);
+            InjuryType.register(247, "alt:FRACTURE_REPAIR", AlternateInjuries.FRACTURE_REPAIR);
+            InjuryType.register(248, "alt:FRACTURE_REPAIR_RECOVERY", AlternateInjuries.FRACTURE_REPAIR_RECOVERY);
 
 
             InjuryType.register("am:severed_spine", SEVERED_SPINE);

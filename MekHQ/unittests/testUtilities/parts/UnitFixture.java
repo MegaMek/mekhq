@@ -52,6 +52,7 @@ import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.SpaceStation;
+import megamek.common.units.SupportTank;
 import megamek.common.units.Tank;
 import megamek.common.units.VTOL;
 import megamek.common.units.Warship;
@@ -86,8 +87,15 @@ public enum UnitFixture {
     HUNCHBACK_HBK_4G("Hunchback HBK-4G", false, Mek.class),
     /** Hunchback HBK-4P, the refit target of the HBK-4G. Source: {@code meks/3039u/Hunchback HBK-4P.mtf}. */
     HUNCHBACK_HBK_4P("Hunchback HBK-4P", false, Mek.class),
+    /** Hoplite C, a Clan Mek (not an OmniMek) with Clan ferro-fibrous armor. Source: {@code meks/3050U/Hoplite C.mtf}. */
+    HOPLITE_C("Hoplite C", false, Mek.class),
     /** Vedette Medium Tank, a tracked combat vehicle. Source: {@code vehicles/3039u/Vedette Medium Tank.blk}. */
     VEDETTE_MEDIUM_TANK("Vedette Medium Tank", true, Tank.class),
+    /**
+     * Cellco Ranger UPU-3000, a tracked support vehicle with BAR 8 armor. Source:
+     * {@code vehicles/TRO Vehicle Annex/Tracked/Cellco Ranger UPU-3000.blk}.
+     */
+    CELLCO_RANGER_UPU_3000("Cellco Ranger UPU-3000", true, SupportTank.class),
     /**
      * Epona Pursuit Tank Prime, a Clan hover OmniVehicle with its weapons in the turret. Source:
      * {@code vehicles/3060u/Epona Pursuit Tank Prime.blk}.
@@ -129,10 +137,43 @@ public enum UnitFixture {
     MINOTAUR_PROTOMEK("Minotaur", true, ProtoMek.class),
     /** Shilone SL-17, an aerospace fighter. Source: {@code fighters/TRO3039u/Shilone SL-17.blk}. */
     SHILONE_SL_17("Shilone SL-17", true, AeroSpaceFighter.class),
+    /**
+     * Shilone SL-17AC, the SL-17 with one heat sink fewer. Source: {@code fighters/TRO3039u/Shilone SL-17AC.blk}.
+     */
+    SHILONE_SL_17AC("Shilone SL-17AC", true, AeroSpaceFighter.class),
+    /**
+     * Shilone SL-17R, the SL-17 with double heat sinks instead of single ones, including those in the engine.
+     * Source: {@code fighters/TRO3039u/Shilone SL-17R.blk}.
+     */
+    SHILONE_SL_17R("Shilone SL-17R", true, AeroSpaceFighter.class),
+    /**
+     * Batu Prime, a Clan OmniFighter with two pod-mounted heat sinks. Source: {@code fighters/TRO3055U/Batu Prime.blk}.
+     */
+    BATU_PRIME("Batu Prime", true, AeroSpaceFighter.class),
+    /**
+     * Batu D, another configuration of the Batu with four pod-mounted heat sinks. Source:
+     * {@code fighters/TRO3055U/Batu D.blk}.
+     */
+    BATU_D("Batu D", true, AeroSpaceFighter.class),
     /** Shuttle ST-46, a small craft. Source: {@code smallcraft/TRO 3057r/Shuttle ST-46.blk}. */
     SHUTTLE_ST_46("Shuttle ST-46", true, SmallCraft.class),
     /** Leopard (2537), a DropShip. Source: {@code dropships/TRO3057R/IS/Leopard (2537).blk}. */
     LEOPARD_DROPSHIP("Leopard (2537)", true, Dropship.class),
+    /**
+     * Leopard (3056), the Leopard refitted with double heat sinks and newer weapons and ammunition. Source:
+     * {@code dropships/TRO3057R/IS/Leopard (3056).blk}.
+     */
+    LEOPARD_DROPSHIP_3056("Leopard (3056)", true, Dropship.class),
+    /**
+     * Leopard CV (2581), the carrier Leopard: three fighter bays in place of the BattleMek bay. Source:
+     * {@code dropships/TRO3057R/IS/Leopard CV (2581).blk}.
+     */
+    LEOPARD_CV_DROPSHIP("Leopard CV (2581)", true, Dropship.class),
+    /**
+     * Leopard PA, a pirate Leopard with guns in all six arcs where the standard Leopard has four. Source:
+     * {@code dropships/XTRs/Pirates/Leopard PA.blk}.
+     */
+    LEOPARD_PA_DROPSHIP("Leopard PA", true, Dropship.class),
     /**
      * Invader JumpShip (2631), a JumpShip with docking collars and a grav deck. Source:
      * {@code jumpships/3057R/IS/Invader Jumpship (2631).blk}.

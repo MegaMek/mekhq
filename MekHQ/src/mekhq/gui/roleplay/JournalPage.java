@@ -65,23 +65,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.DefaultListModel;
-import javax.swing.JComponent;
-import javax.swing.JFileChooser;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.JScrollPane;
-import javax.swing.JTextField;
-import javax.swing.ListCellRenderer;
-import javax.swing.ListSelectionModel;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
 import javax.swing.event.PopupMenuListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -712,6 +696,24 @@ class JournalPage implements ConsoleSection {
         if (quote != null) {
             note.setText("<html><body><blockquote>" + quoteHtml(quote) + "</blockquote><p></p></body></html>");
         }
+        addNote(note);
+    }
+
+    /**
+     * Starts a new note dated today with the given text already written.
+     *
+     * @param html the note's opening text, as HTML
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void newNote(final String html) {
+        JournalEntry note = JournalEntry.newNote(console.campaign().getLocalDate());
+        note.setText(html);
+        addNote(note);
+    }
+
+    private void addNote(final JournalEntry note) {
         console.roleplay().getJournal().add(note);
         if (!currentFilter().matches(note)) {
             clearFilters();

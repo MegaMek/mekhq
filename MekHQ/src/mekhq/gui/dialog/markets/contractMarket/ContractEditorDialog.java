@@ -91,6 +91,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.DateChooser;
 import mekhq.gui.displayWrappers.RankDisplay;
 import mekhq.gui.utilities.JSuggestField;
+import mekhq.gui.utilities.MarkdownEditorPanel;
 import mekhq.gui.utilities.SkillLevelPickerUtility;
 
 /**
@@ -136,7 +137,7 @@ public class ContractEditorDialog extends JDialog {
     // Identity
     private JComboBox<ContractSearchType> bucketCombo; // create mode only
     private JTextField nameField;
-    private JTextArea descriptionArea;
+    private MarkdownEditorPanel descriptionEditor;
     private JComboBox<MissionStatus> statusCombo;
     private boolean statusEditable;
     private JComboBox<ContractNature> natureCombo;
@@ -429,12 +430,10 @@ public class ContractEditorDialog extends JDialog {
         nameField = new JTextField(contract.getName(), 24);
         rows.add(formRow("edit.contractMarket.field.name", nameField));
 
-        descriptionArea = new JTextArea(contract.getDescription(), 4, 24);
-        descriptionArea.setLineWrap(true);
-        descriptionArea.setWrapStyleWord(true);
-        JScrollPane descriptionScroll = new JScrollPane(descriptionArea);
-        descriptionScroll.setPreferredSize(new Dimension(scaleForGUI(260), scaleForGUI(90)));
-        rows.add(formRow("edit.contractMarket.field.description", descriptionScroll));
+        descriptionEditor = new MarkdownEditorPanel();
+        descriptionEditor.setText(contract.getDescription());
+        descriptionEditor.setPreferredSize(new Dimension(scaleForGUI(260), scaleForGUI(184)));
+        rows.add(formRow("edit.contractMarket.field.description", descriptionEditor));
 
         // A market offer has no status, and an accepted-but-active contract is finalized through the normal completion
         // flow, so status is only hand-editable once the contract has actually concluded. Even then it may only move
@@ -1125,7 +1124,7 @@ public class ContractEditorDialog extends JDialog {
         if (!name.isBlank()) {
             contract.setContractName(name);
         }
-        contract.setDescription(descriptionArea.getText());
+        contract.setDescription(descriptionEditor.getText());
         // Only write status back when the field was editable; otherwise leave the contract's status as-is (an offer's
         // absent status, or an active contract's ACTIVE) rather than stamping the combo's fallback onto it.
         if (statusEditable) {

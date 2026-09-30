@@ -6238,6 +6238,9 @@ public class Unit implements ITechnology, ILocatable {
      */
     public void resetEngineer() {
         if (!isSelfCrewed()) {
+            // A unit that is not self-crewed has no engineer. This matters for conventional infantry, which may have
+            // picked one up while they were maintaining themselves before Techs were made responsible for them
+            clearEngineer();
             return;
         }
 
@@ -6370,7 +6373,8 @@ public class Unit implements ITechnology, ILocatable {
             return SkillType.S_TECH_MEK;
         } else if (entity instanceof BattleArmor) {
             return SkillType.S_TECH_BA;
-        } else if (entity instanceof Tank || entity instanceof AbstractBuildingEntity) {
+        } else if (entity instanceof Tank || entity instanceof AbstractBuildingEntity
+                         || (isConventionalInfantry() && !isSelfMaintainedInfantry())) {
             return SkillType.S_TECH_VEHICLE;
         } else if ((entity instanceof Dropship) || (entity instanceof Jumpship)) {
             return SkillType.S_TECH_VESSEL;
@@ -6989,7 +6993,7 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         // set this person as tech
-        if (!isSelfCrewed() && (tech != null) && !tech.equals(mothballTech)) {
+        if ((!isSelfCrewed() || isSelfMaintainedInfantry()) && (tech != null) && !tech.equals(mothballTech)) {
             remove(tech, true);
         }
         tech = mothballTech;
@@ -7411,7 +7415,53 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public Person getEngineer() {
-        return engineer;
+        // Guards against a stale engineer on conventional infantry now maintained by Techs, which would otherwise be
+        // returned by getTech() in place of the assigned Mechanic
+        return isSelfCrewed() ? engineer : null;
+    }
+
+    /**
+     * Drops this unit's engineer, cancelling any tasks scheduled to them. Unlike {@link #resetEngineer()} this never
+     * cancels mothballing, as a unit that is not self-crewed mothballs with its assigned Tech instead.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void clearEngineer() {
+        if (engineer == null) {
+            return;
+        }
+
+        for (Part part : getParts()) {
+            if (part.isBeingWorkedOn() && engineer.equals(part.getTech())) {
+                part.cancelAssignment(true);
+            }
+        }
+
+        engineer = null;
+    }
+
+    /**
+     * Brings a conventional infantry unit's Tech and engineer in line with the current
+     * {@link CampaignOption#TECHS_MAINTAIN_CONVENTIONAL_INFANTRY} setting, for use after that option changes
+     * mid-campaign. Self-maintaining infantry lose any assigned Tech and have their ranking soldier made engineer
+     * again; Tech-maintained infantry lose their engineer so that their assigned Mechanic is used instead.
+     *
+     * <p>Does nothing for any other unit type, or for units that are deployed.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void reconcileInfantryMaintenance() {
+        if (!isConventionalInfantry() || isDeployed()) {
+            return;
+        }
+
+        if (isSelfMaintainedInfantry() && (tech != null)) {
+            removeTech();
+        }
+
+        resetEngineer();
     }
 
     public @Nullable Part getPartForEquipmentNum(int index, int loc) {
@@ -7749,7 +7799,7 @@ public class Unit implements ITechnology, ILocatable {
         if (!isAvailable()) {
             return false;
         }
-        return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor;
+        return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor || !isSelfMaintainedInfantry();
     }
 
     /**
@@ -7795,7 +7845,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public boolean isSelfCrewed() {
-        return (getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship) || isConventionalInfantry();
+        return (getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship) || isSelfMaintainedInfantry();
     }
 
     public boolean isUnderRepair() {
@@ -7934,6 +7984,27 @@ public class Unit implements ITechnology, ILocatable {
      */
     public boolean isConventionalInfantry() {
         return (getEntity() != null) && getEntity().isConventionalInfantry();
+    }
+
+    /**
+     * Whether this unit is conventional infantry that repairs and maintains itself, using its own soldiers rather than
+     * an assigned Tech. This is the default behavior; when
+     * {@link CampaignOption#TECHS_MAINTAIN_CONVENTIONAL_INFANTRY} is enabled, conventional infantry are instead
+     * maintained and repaired by Mechanics like any other non-self-crewed unit.
+     *
+     * @return {@code true} if this is conventional infantry that looks after itself
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isSelfMaintainedInfantry() {
+        if (!isConventionalInfantry()) {
+            return false;
+        }
+
+        Campaign unitCampaign = getCampaign();
+        return (unitCampaign == null)
+                     || !unitCampaign.getCampaignOptions().get(CampaignOption.TECHS_MAINTAIN_CONVENTIONAL_INFANTRY);
     }
 
     /**
