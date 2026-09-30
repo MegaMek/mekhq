@@ -34,6 +34,7 @@ package mekhq.campaign.digitalGM.stratCon.facility;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -71,6 +72,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -126,6 +128,8 @@ class StratConFacilityOperationsTest {
         when(newContract.getScale()).thenReturn(10);
         when(newContract.getStratConCampaignState()).thenReturn(campaignState);
         when(newContract.getMoraleLevel()).thenReturn(ContractMoraleLevel.STALEMATE);
+        Faction enemyFaction = mock(Faction.class);
+        when(newContract.getEnemyFaction()).thenReturn(enemyFaction);
         return newContract;
     }
 
@@ -266,11 +270,22 @@ class StratConFacilityOperationsTest {
         @Test
         void aBatchallForbidsRaidsAndSabotageButNotAssaults() {
             placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+            when(contract.getEnemyFaction().isClan()).thenReturn(true);
             when(contract.isBatchallAccepted()).thenReturn(true);
 
             assertEquals("reason.batchall", reason(FacilityOperation.RAID));
             assertEquals("reason.batchall", reason(FacilityOperation.SABOTAGE));
             assertNull(reason(FacilityOperation.ASSAULT));
+        }
+
+        @Test
+        void aNonClanEnemyIsNeverBoundByABatchall() {
+            // contracts default to an accepted Batchall even when none was offered
+            placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+            when(contract.isBatchallAccepted()).thenReturn(true);
+
+            assertNull(reason(FacilityOperation.RAID));
+            assertNotEquals("reason.batchall", reason(FacilityOperation.SABOTAGE));
         }
 
         @Test

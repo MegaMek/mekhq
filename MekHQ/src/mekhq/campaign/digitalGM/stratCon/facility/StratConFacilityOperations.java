@@ -265,15 +265,26 @@ public final class StratConFacilityOperations {
 
         return switch (operation) {
             case RECON -> facility.getIntel().isAtLeast(FacilityIntel.DETAILED) ? "reason.fullyScouted" : null;
-            case RAID -> contract.isBatchallAccepted() ? "reason.batchall" : null;
+            case RAID -> isBoundByBatchall(contract) ? "reason.batchall" : null;
             case SABOTAGE -> getSabotageUnavailableReasonKey(campaignState, contract, facility);
             default -> null;
         };
     }
 
+    /**
+     * Contracts default to an accepted Batchall even when no Batchall was ever offered, so the flag only means
+     * something against a Clan enemy.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isBoundByBatchall(AbstractContract contract) {
+        return contract.getEnemyFaction().isClan() && contract.isBatchallAccepted();
+    }
+
     private static @Nullable String getSabotageUnavailableReasonKey(StratConCampaignState campaignState,
           AbstractContract contract, StratConFacility facility) {
-        if (contract.isBatchallAccepted()) {
+        if (isBoundByBatchall(contract)) {
             return "reason.batchall";
         }
 
