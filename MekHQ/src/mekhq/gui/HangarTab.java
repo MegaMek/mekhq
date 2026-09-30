@@ -67,6 +67,7 @@ import megamek.common.units.UnitType;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
@@ -97,7 +98,6 @@ import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.gui.sorter.UnitTypeSorter;
 import mekhq.gui.sorter.WeightClassSorter;
 import mekhq.gui.view.UnitViewPanel;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * Displays a table of all units in the force.
@@ -612,7 +612,7 @@ public final class HangarTab extends CampaignGuiTab {
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_CREW), true);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_TECH_CRW), false);
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN),
-                  getCampaign().getCampaignOptions().get(CampaignOption.PAY_FOR_MAINTAIN));
+                  getCampaign().getCampaignOptions().isChargingMaintenance());
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_MAINTAIN_CYCLE),
                   getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE));
             columnModel.setColumnVisible(columnModel.getColumnByModelIndex(UnitTableModel.COL_BV), false);

@@ -33,6 +33,7 @@
 package mekhq.gui;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -56,7 +57,6 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.GMModeEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
@@ -120,6 +120,7 @@ public final class FinancesTab extends CampaignGuiTab {
 
     private boolean chartsInitialized = false;
 
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.FinancesTab";
     private static final ResourceBundle resourceMap = ResourceBundle.getBundle("mekhq.resources.FinancesTab",
           MekHQ.getMHQOptions().getLocale());
 
@@ -664,13 +665,18 @@ public final class FinancesTab extends CampaignGuiTab {
                   String.format(formatted, report.getOverheadCosts().toAmountAndSymbolString())));
         }
 
+        if (!report.getHotSpotsUpkeepCosts().isZero()) {
+            financialLine.append(formattingFinancialReport(getTextAt(RESOURCE_BUNDLE, "hotSpotsUpkeep.text"), 2,
+                  String.format(formatted, report.getHotSpotsUpkeepCosts().toAmountAndSymbolString())));
+        }
+
         Money rentals = report.getRentals();
         if (!rentals.isZero()) {
             financialLine.append(formattingFinancialReport(resourceMap.getString("rentalFacilities.text"), 2,
                   String.format(formatted, rentals.toAmountAndSymbolString())));
         }
 
-        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_PEACETIME_COST)) {
+        if (getCampaign().getCampaignOptions().isChargingPeacetimeCost()) {
             financialLine.append(formattingFinancialReport(resourceMap.getString("spareParts.text"), 2,
                   String.format(formatted, report.getMonthlySparePartCosts().toAmountAndSymbolString())));
             financialLine.append(formattingFinancialReport(resourceMap.getString("trainingMunitions.text"), 2,

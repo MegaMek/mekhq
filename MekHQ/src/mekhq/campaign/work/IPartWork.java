@@ -161,6 +161,9 @@ public interface IPartWork extends IWork {
         }
     }
 
+    /** The share of a part's undamaged value that a paid repair costs. */
+    double REPAIR_COST_SHARE_OF_VALUE = 0.2;
+
     static PartRepairType findCorrectMRMSType(IPartWork part) {
         if ((part instanceof EquipmentPart equipmentPart) && (equipmentPart.getType() instanceof WeaponType)) {
             return PartRepairType.WEAPON;
@@ -205,6 +208,16 @@ public interface IPartWork extends IWork {
      * @return the part's actual value if it wasn't damaged
      */
     Money getUndamagedValue();
+
+    /**
+     * The cost of repairing this part when the campaign pays for repairs: a fifth of its undamaged value. The task
+     * list quotes this figure and a successful repair charges it, so the two always agree.
+     *
+     * @return the cost of the repair
+     */
+    default Money getRepairCost() {
+        return getUndamagedValue().multipliedBy(REPAIR_COST_SHARE_OF_VALUE);
+    }
 
 
     boolean isPriceAdjustedForAmount();

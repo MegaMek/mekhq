@@ -207,6 +207,7 @@ public class ForceViewPanel extends JScrollablePanel {
 
         long bv = 0;
         Money cost = Money.zero();
+        boolean isUseAlternateUnitCost = campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATE_UNIT_COST);
         double ton = 0;
         String lanceTech = "";
         String assigned = "";
@@ -227,7 +228,9 @@ public class ForceViewPanel extends JScrollablePanel {
             if (null != unit) {
                 // Never factor in C3 or the TAG force bonus in this check. It will cause the TO&E to lock up for large campaigns.
                 bv += unit.getEntity().calculateBattleValue(true, !unit.hasPilot(), true);
-                cost = cost.plus(unit.getEntity().getCost(true));
+                cost = cost.plus(isUseAlternateUnitCost
+                                       ? unit.getBuyCost()
+                                       : Money.of(unit.getEntity().getCost(true)));
                 ton += unit.getEntity().getWeight();
                 String unitTypeName = UnitType.getTypeDisplayableName(unit.getEntity().getUnitType());
                 if (null == type) {
@@ -718,6 +721,7 @@ public class ForceViewPanel extends JScrollablePanel {
     public String getForceSummary(Formation formation) {
         int battleValue = 0;
         Money cost = Money.zero();
+        boolean isUseAlternateUnitCost = campaign.getCampaignOptions().get(CampaignOption.USE_ALTERNATE_UNIT_COST);
         double tonnage = 0;
         int number = 0;
         String commander = "No personnel found";
@@ -727,7 +731,9 @@ public class ForceViewPanel extends JScrollablePanel {
             if (null != unit) {
                 boolean crewExists = unit.getCommander() != null;
                 battleValue += unit.getEntity().calculateBattleValue(true, !crewExists, true);
-                cost = cost.plus(unit.getEntity().getCost(true));
+                cost = cost.plus(isUseAlternateUnitCost
+                                       ? unit.getBuyCost()
+                                       : Money.of(unit.getEntity().getCost(true)));
                 tonnage += unit.getEntity().getWeight();
                 number++;
             }

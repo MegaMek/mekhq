@@ -153,6 +153,7 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.RepairCosts;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Detachment;
@@ -181,16 +182,7 @@ import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.utilities.TransportCostCalculations;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.BAArmor;
-import mekhq.campaign.parts.CampaignDice;
-import mekhq.campaign.parts.Dice;
-import mekhq.campaign.parts.OmniPod;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PartInventory;
-import mekhq.campaign.parts.Refit;
-import mekhq.campaign.parts.RefitWorkCheck;
-import mekhq.campaign.parts.SpacecraftCoolingSystem;
+import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -3091,7 +3083,8 @@ public class Campaign implements ITechManager {
                 UnitLogger.repaired(repairedUnit, getLocalDate(), repairedPartName, tech.getFullName());
             }
             if (getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS) && action.equals(" fix ") && !(partWork instanceof Armor)) {
-                Money cost = partWork.getUndamagedValue().multipliedBy(0.2);
+                Money cost = partWork.getRepairCost()
+                                   .multipliedBy(RepairCosts.getRepairCostMultiplier(this, repairedUnit));
                 report += "<br>Repairs cost " + cost.toAmountAndSymbolString() + " worth of parts.";
                 getPlayerForce().getFinances().debit(TransactionType.REPAIRS,
                       getLocalDate(),
@@ -3373,6 +3366,9 @@ public class Campaign implements ITechManager {
             LOGGER.debug("[Refit] {} leaves the campaign mid-refit; cancelling the refit", unit.getName());
             unit.getRefit().cancel();
         }
+
+        // An overnight replacement in progress gives back the spare it set aside
+        ReservedSpares.releaseForDepartingUnit(unit);
 
         // remove all parts for this unit as well
         for (Part p : unit.getParts()) {

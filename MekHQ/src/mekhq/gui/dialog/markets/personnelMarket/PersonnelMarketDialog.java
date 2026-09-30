@@ -558,7 +558,8 @@ public class PersonnelMarketDialog extends JDialog {
                                   "finances.personnelMarket.hire",
                                   applicant.getFullTitle()));
             }
-            campaign.getPlayerForce().getHumanResources().recruitPerson(campaign, applicant, isGMHire, true);
+            // The market has already charged its hiring cost, so recruitment isn't charged again
+            campaign.getPlayerForce().getHumanResources().recruitPrepaidPerson(campaign, applicant, isGMHire);
         }
 
         // Remove all recruited persons from the applicant list

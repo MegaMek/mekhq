@@ -457,7 +457,7 @@ public class ScenarioObjectiveProcessor {
                         int effectMultiplier = effect.effectScaling == EffectScalingType.Fixed ? 1 : scaleFactor;
                         int numSupportPoints = effect.howMuch * effectMultiplier;
                         if (dryRun) {
-                            return String.format("%d support points will be added", numSupportPoints);
+                            return String.format("%d Employer Support will be added", numSupportPoints);
                         } else {
                             tracker.getMission().getStratConCampaignState().changeSupportPoints(numSupportPoints);
                         }
