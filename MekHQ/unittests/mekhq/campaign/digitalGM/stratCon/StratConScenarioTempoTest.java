@@ -89,35 +89,6 @@ class StratConScenarioTempoTest {
         assertEquals(1, StratConScenarioTempo.getRollCount(true, false, 0));
     }
 
-    // Operations tempo
-
-    @Test
-    void aWholeTempoMultipliesTheRollsExactly() {
-        assertEquals(6, StratConScenarioTempo.applyTempoMultiplier(3, 2.0));
-    }
-
-    @RepeatedTest(20)
-    void aFractionalTempoRoundsToOneSideOrTheOther() {
-        int rollCount = StratConScenarioTempo.applyTempoMultiplier(1, 1.6);
-
-        assertTrue((rollCount == 1) || (rollCount == 2), String.valueOf(rollCount));
-    }
-
-    @Test
-    void aTempoOfZeroRollsNothing() {
-        assertEquals(0, StratConScenarioTempo.applyTempoMultiplier(4, 0.0));
-    }
-
-    @RepeatedTest(20)
-    void theTempoAppliesToEachBlock() {
-        LocalDate endDate = START_DATE.plusWeeks(12);
-
-        List<LocalDate> scenarioDates = StratConScenarioTempo.rollScenarioDates(START_DATE, endDate,
-              3, 1, 1, 2.0, false);
-
-        assertEquals(4, scenarioDates.size());
-    }
-
     // Weekly scheduling
 
     @RepeatedTest(20)
@@ -125,7 +96,7 @@ class StratConScenarioTempoTest {
         LocalDate endDate = START_DATE.plusWeeks(12);
 
         List<LocalDate> scenarioDates = StratConScenarioTempo.rollScenarioDates(START_DATE, endDate,
-              3, 1, 2, 1.0, false);
+              3, 1, 2, false);
 
         assertEquals(4, scenarioDates.size());
         LocalDate secondBlockStart = START_DATE.plusWeeks(6);
@@ -137,7 +108,7 @@ class StratConScenarioTempoTest {
         LocalDate endDate = START_DATE.plusDays(10);
 
         List<LocalDate> scenarioDates = StratConScenarioTempo.rollScenarioDates(START_DATE, endDate,
-              1, 6, 2, 1.0, false);
+              1, 6, 2, false);
 
         for (LocalDate scenarioDate : scenarioDates) {
             assertFalse(scenarioDate.isBefore(START_DATE), scenarioDate.toString());
@@ -152,7 +123,7 @@ class StratConScenarioTempoTest {
         LocalDate endDate = START_DATE.plusMonths(3);
 
         List<LocalDate> scenarioDates = StratConScenarioTempo.rollScenarioDates(START_DATE, endDate,
-              3, 1, 3, 1.0, true);
+              3, 1, 3, true);
 
         assertEquals(3, scenarioDates.size());
         for (LocalDate scenarioDate : scenarioDates) {
@@ -167,14 +138,14 @@ class StratConScenarioTempoTest {
 
         // Twelve months overruns the six-month table, so it is rolled a second time rather than leaving months empty.
         List<LocalDate> scenarioDates = StratConScenarioTempo.rollScenarioDates(START_DATE, endDate,
-              12, 1, 1, 1.0, true);
+              12, 1, 1, true);
 
         assertEquals(2, scenarioDates.size());
     }
 
     @Test
     void aContractEndingOnItsStartSchedulesNothing() {
-        assertTrue(StratConScenarioTempo.rollScenarioDates(START_DATE, START_DATE, 3, 1, 1, 1.0, false).isEmpty());
+        assertTrue(StratConScenarioTempo.rollScenarioDates(START_DATE, START_DATE, 3, 1, 1, false).isEmpty());
     }
 
     // Campaign state

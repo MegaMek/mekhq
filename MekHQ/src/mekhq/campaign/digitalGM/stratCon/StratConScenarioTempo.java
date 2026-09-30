@@ -49,7 +49,6 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
 import mekhq.campaign.mission.contract.contractGeneration.TrackIntensityTable;
 
@@ -60,10 +59,9 @@ import mekhq.campaign.mission.contract.contractGeneration.TrackIntensityTable;
  * <p>Ordinary scenarios are scheduled the way Essential scenarios are: up front, by rolling the Track Intensity Tables
  * for the contract's track count (see {@link TrackIntensityTable#rollSchedule}). The table is rolled once per point of
  * scale when "Multiply Track Intensity by Scale" is on and once otherwise, and three times as often when battlefield
- * support points are factored into scale, since that makes for smaller scales. The rolls are then multiplied by the
- * contract type's operations tempo (see {@link ContractObjectiveType#getOperationsTempoMultiplier()}). Where
- * Essential scenarios read the table's columns as months, ordinary scenarios read them as weeks, rolling the
- * six-column table afresh for each six weeks of the contract. The "Fewer Weekly Scenarios" option reads them as months
+ * support points are factored into scale, since that makes for smaller scales. Where Essential scenarios read the
+ * table's columns as months, ordinary scenarios read them as weeks, rolling the six-column table afresh for each six
+ * weeks of the contract. The "Fewer Weekly Scenarios" option reads them as months
  * instead, as Essential scenarios do.</p>
  *
  * <p>Single Drop play keeps its own pace of one scenario a week, and schedules nothing here.</p>
@@ -106,25 +104,6 @@ public final class StratConScenarioTempo {
     }
 
     /**
-     * Multiplies a roll count by a contract type's operations tempo. The fraction left over becomes one more roll with
-     * that chance, so the tempo holds on average even when it is applied to a single roll.
-     *
-     * @param rollCount       the roll count before the tempo (see {@link #getRollCount})
-     * @param tempoMultiplier the contract type's operations tempo multiplier
-     *
-     * @return the roll count after the tempo; never negative
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    static int applyTempoMultiplier(int rollCount, double tempoMultiplier) {
-        double scaledRolls = max(0.0, rollCount * tempoMultiplier);
-        int wholeRolls = (int) Math.floor(scaledRolls);
-        double remainder = scaledRolls - wholeRolls;
-        return ((remainder > 0) && (Compute.randomFloat() < remainder)) ? wholeRolls + 1 : wholeRolls;
-    }
-
-    /**
      * Rolls the days on which a contract's ordinary scenarios appear over its whole run.
      *
      * <p>In weekly play the six-column table is rolled afresh for each six weeks, its columns read as weeks; the
@@ -138,8 +117,6 @@ public final class StratConScenarioTempo {
      * @param lengthInMonths         the contract's length in months
      * @param trackCount             the contract's track count, choosing the table column
      * @param rollCount              how many times to roll the table for each block (see {@link #getRollCount})
-     * @param tempoMultiplier        the contract type's operations tempo, applied to each block's roll count (see
-     *                               {@link #applyTempoMultiplier})
      * @param isFewerWeeklyScenarios whether the "Fewer Weekly Scenarios" option is on
      *
      * @return one day per scenario, in calendar order of their windows
@@ -148,7 +125,7 @@ public final class StratConScenarioTempo {
      * @since 0.51.01
      */
     static List<LocalDate> rollScenarioDates(LocalDate startDate, LocalDate endDate, int lengthInMonths,
-          int trackCount, int rollCount, double tempoMultiplier, boolean isFewerWeeklyScenarios) {
+          int trackCount, int rollCount, boolean isFewerWeeklyScenarios) {
         List<LocalDate> scenarioDates = new ArrayList<>();
         if (!endDate.isAfter(startDate)) {
             return scenarioDates;
@@ -161,9 +138,7 @@ public final class StratConScenarioTempo {
 
         int window = 0;
         while (window < windowCount) {
-            List<Integer> schedule = TrackIntensityTable.rollSchedule(tableLength,
-                  trackCount,
-                  applyTempoMultiplier(rollCount, tempoMultiplier));
+            List<Integer> schedule = TrackIntensityTable.rollSchedule(tableLength, trackCount, rollCount);
             if (schedule.isEmpty()) {
                 break;
             }
@@ -225,11 +200,8 @@ public final class StratConScenarioTempo {
         int rollCount = getRollCount(campaignOptions.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE),
               campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
               contract.getScale());
-        ContractObjectiveType objectiveType = contract.getObjectiveType();
-        double tempoMultiplier = (objectiveType == null) ? 1.0 : objectiveType.getOperationsTempoMultiplier();
         List<LocalDate> scenarioDates = rollScenarioDates(startDate, endDate, contract.getLengthInMonths(),
-              contract.getTrackCount(), rollCount, tempoMultiplier,
-              campaignOptions.get(CampaignOption.FEWER_WEEKLY_SCENARIOS));
+              contract.getTrackCount(), rollCount, campaignOptions.get(CampaignOption.FEWER_WEEKLY_SCENARIOS));
 
         List<LocalDate> scheduledDates = campaignState.getWeeklyScenarios();
         scheduledDates.removeIf(scenarioDate -> !scenarioDate.isBefore(firstDate));
@@ -242,12 +214,11 @@ public final class StratConScenarioTempo {
         }
         campaignState.setNormalTempoScheduled(true);
 
-        LOGGER.info("Scheduled {} StratCon scenarios on contract {} from {} ({} rolls per block, tempo x{}).",
+        LOGGER.info("Scheduled {} StratCon scenarios on contract {} from {} ({} rolls per block).",
               scheduledCount,
               contract.getName(),
               firstDate,
-              rollCount,
-              tempoMultiplier);
+              rollCount);
     }
 
     /**
