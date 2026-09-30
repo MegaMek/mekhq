@@ -157,10 +157,6 @@ public class StratConContractInitializer {
     public static void initializeCampaignState(AbstractContract contract, Campaign campaign,
           StratConContractDefinition contractDefinition) {
         StratConCampaignState campaignState = new StratConCampaignState(contract);
-        campaignState.setBriefingText(contractDefinition.getBriefing() +
-                                            "<br/>" +
-                                            contract.getCommandRights().getStratConText());
-        campaignState.setAllowEarlyVictory(contractDefinition.isAllowEarlyVictory());
 
         // dependency: this is required here in order for scenario initialization to
         // work properly
@@ -222,6 +218,30 @@ public class StratConContractInitializer {
             }
             campaignState.addTrack(track);
         }
+
+        seedCampaignState(contract, campaign, contractDefinition, campaignState);
+    }
+
+    /**
+     * Seeds a campaign state's existing tracks with everything the contract definition calls for: the briefing,
+     * objectives and facilities, global scenario modifiers, the scheduled strategic scenarios and points of interest,
+     * any special mechanics, required victory points, and starting Support Points.
+     *
+     * <p>Split out of {@link #initializeCampaignState} so a running contract whose objective changes can have its new
+     * objectives laid over the map it already has (see {@link #reseedForNewObjective}).</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void seedCampaignState(AbstractContract contract, Campaign campaign,
+          StratConContractDefinition contractDefinition, StratConCampaignState campaignState) {
+        campaignState.setBriefingText(contractDefinition.getBriefing() +
+                                            "<br/>" +
+                                            contract.getCommandRights().getStratConText());
+        campaignState.setAllowEarlyVictory(contractDefinition.isAllowEarlyVictory());
+
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
 
         // now seed the tracks with objectives and facilities
         if (!isUseMaplessMode) {
@@ -384,6 +404,54 @@ public class StratConContractInitializer {
 
         // Determine starting Support Points
         negotiateInitialSupportPoints(campaign, contract);
+    }
+
+    /**
+     * Lays a running contract's new objectives over the StratCon map it already has, after its objective type has
+     * changed (for example, a defensive contract regenerated as Guerrilla Warfare when its employer loses the planet).
+     *
+     * <p>The sectors, their terrain, and any forces deployed to them are kept. Everything the old objective type set
+     * up is cleared: strategic objectives (facilities that were objectives remain, as ordinary facilities), points of
+     * interest, scheduled scenarios and points of interest, global scenario modifiers, Escalation, and Victory Points.
+     * The tracks' scenario odds and deployment times are re-rolled for the new definition, and then the map is seeded
+     * as a new contract's would be (see {@link #seedCampaignState}).</p>
+     *
+     * <p>Facility ownership is left to the caller; this method does not change who holds what.</p>
+     *
+     * @param contract           the contract, already carrying its new objective type, terms, and schedule
+     * @param campaign           the current campaign
+     * @param contractDefinition the StratCon definition of the contract's new objective type
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void reseedForNewObjective(AbstractContract contract, Campaign campaign,
+          StratConContractDefinition contractDefinition) {
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        if (campaignState == null) {
+            return;
+        }
+
+        boolean isUseMaplessMode = campaign.getCampaignOptions().isUseStratConMaplessMode();
+        for (StratConTrackState track : campaignState.getTracks()) {
+            track.setStrategicObjectives(new ArrayList<>());
+            for (StratConFacility facility : track.getFacilities().values()) {
+                facility.setStrategicObjective(false);
+            }
+            track.setPointsOfInterest(new ArrayList<>());
+
+            track.setScenarioOdds(getScenarioOdds(contractDefinition));
+            track.setDeploymentTime(isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition));
+        }
+
+        campaignState.getStrategicScenarioSpawnDates().clear();
+        campaignState.getScheduledPointsOfInterest().clear();
+        campaignState.setGlobalScenarioModifiers(new ArrayList<>());
+        campaignState.setEscalation(0);
+        campaignState.setVictoryPoints(0);
+        campaignState.setSupportPoints(0);
+
+        seedCampaignState(contract, campaign, contractDefinition, campaignState);
     }
 
     /**

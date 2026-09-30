@@ -109,6 +109,11 @@ public abstract class AbstractContract {
     private @Nonnull Money withheldSupportPayments = Money.zero();
 
     private MissionStatus missionStatus;
+    /**
+     * The outcome this contract must be recorded with when it is completed, overriding the outcome its performance
+     * would otherwise recommend. {@code null} when the contract's performance decides.
+     */
+    private @Nullable MissionStatus mandatedCompletionStatus;
     private ContractScheduleData scheduleData;
     private SystemsTargetData systemsTargetData;
 
@@ -165,6 +170,12 @@ public abstract class AbstractContract {
     private transient UUID pendingPlayerNegotiatorId;
     private transient Double pendingLegacySettlementMultiplier;
     private transient CampaignOptions campaignOptions;
+
+    /**
+     * The player's response to their employer losing control of this contract's planet, chosen in the end-of-day nag
+     * and applied as the new day is processed. Transient; the choice and the day advance happen together.
+     */
+    private transient @Nullable PlanetLossResponse pendingPlanetLossResponse;
 
     public @Nonnull List<Scenario> getScenarios() {
         return scenarios;
@@ -388,6 +399,50 @@ public abstract class AbstractContract {
 
     public void setStatus(MissionStatus missionStatus) {
         this.missionStatus = missionStatus;
+    }
+
+    /**
+     * @return the outcome this contract must be recorded with on completion, or {@code null} when its performance
+     *       decides
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable MissionStatus getMandatedCompletionStatus() {
+        return mandatedCompletionStatus;
+    }
+
+    /**
+     * @param mandatedCompletionStatus the outcome this contract must be recorded with on completion, or {@code null} to
+     *                                 let its performance decide
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setMandatedCompletionStatus(@Nullable MissionStatus mandatedCompletionStatus) {
+        this.mandatedCompletionStatus = mandatedCompletionStatus;
+    }
+
+    /**
+     * @return the player's pending response to their employer losing control of this contract's planet, or
+     *       {@code null} when there is none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable PlanetLossResponse getPendingPlanetLossResponse() {
+        return pendingPlanetLossResponse;
+    }
+
+    /**
+     * @param pendingPlanetLossResponse the player's response to their employer losing control of this contract's
+     *                                  planet, or {@code null} to clear it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setPendingPlanetLossResponse(@Nullable PlanetLossResponse pendingPlanetLossResponse) {
+        this.pendingPlanetLossResponse = pendingPlanetLossResponse;
     }
 
     public ContractScheduleData getScheduleData() {
