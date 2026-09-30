@@ -8491,12 +8491,8 @@ public class Person implements ILocatable {
         return bloodmark;
     }
 
-    public Money getBloodmarkValue() {
-        return Money.of(bloodmark);
-    }
-
-    public void setBloodmark(final int unlucky) {
-        this.bloodmark = clamp(unlucky, BLOODMARK.getMinimum(), BLOODMARK.getMaximum());
+    public void setBloodmark(final int bloodmark) {
+        this.bloodmark = clamp(bloodmark, BLOODMARK.getMinimum(), BLOODMARK.getMaximum());
     }
 
     public void changeBloodmark(final int delta) {
