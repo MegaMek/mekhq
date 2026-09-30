@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.parts;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.io.PrintWriter;
 
 import jakarta.annotation.Nonnull;
@@ -68,9 +70,12 @@ import org.w3c.dom.NodeList;
  */
 public class OmniPod extends Part {
     private static final MMLogger LOGGER = MMLogger.create(OmniPod.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
     // Pods are specific to the type of equipment they contain.
     private Part partType;
+    /** Set once the pod has left the repair bench: filled with equipment, destroyed, or put back after a failure. */
+    private transient boolean isUsedUp;
 
     public OmniPod() {
         this(new EquipmentPart(), null);
@@ -267,13 +272,44 @@ public class OmniPod extends Part {
 
     @Override
     public void fix() {
-        Part newPart = partType.clone();
-        Part oldPart = getWarehouse().checkForExistingSparePart(newPart.clone());
-        if (null != oldPart) {
-            newPart.setOmniPodded(true);
-            campaign.getQuartermaster().addPart(newPart, 0, false);
-            oldPart.changeQuantity(-1);
+        podSpareEquipment();
+    }
+
+    /**
+     * Puts a spare of the pod's equipment into the pod. The spare is found the way {@link #checkFixable()} finds one,
+     * so any quality will do, and the podded equipment keeps the spare's quality.
+     *
+     * @return {@code true} if a spare was podded, which uses up the pod
+     */
+    private boolean podSpareEquipment() {
+        Part spare = partType.getMissingPart().findReplacement(false);
+        if (spare == null) {
+            LOGGER.debug("[OmniPod] no spare {} to pod; the pod goes back to the warehouse", partType.getName());
+            return false;
         }
+        Part poddedEquipment = spare.clone();
+        poddedEquipment.setOmniPodded(true);
+        campaign.getQuartermaster().addPart(poddedEquipment, 0, false);
+        spare.changeQuantity(-1);
+        isUsedUp = true;
+        return true;
+    }
+
+    @Override
+    public String succeed() {
+        if (!podSpareEquipment()) {
+            return ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
+                  getTextAt(RESOURCE_BUNDLE, "OmniPod.noEquipmentToPod.report"));
+        }
+        return super.succeed();
+    }
+
+    /**
+     * @return {@code true} if the pod has left the repair bench: filled with equipment, destroyed, or already put back
+     *       in the warehouse after a failed attempt
+     */
+    public boolean isUsedUp() {
+        return isUsedUp;
     }
 
     @Override
@@ -281,14 +317,16 @@ public class OmniPod extends Part {
         skillMin = ++rating;
         timeSpent = 0;
         shorthandedMod = 0;
+        isUsedUp = true;
         if (skillMin > SkillType.EXP_LEGENDARY) {
-            return " <font color='" + ReportingUtilities.getNegativeColor()
-                         + "'><b> failed and part destroyed.</b></font>";
+            return " " + ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
+                  getTextAt(RESOURCE_BUNDLE, "OmniPod.failedAndDestroyed.report"));
         } else {
             // OmniPod is only added back to the warehouse if repair fails without
             // destroying part.
             campaign.getQuartermaster().addPart(this, 0, false);
-            return " <font color='" + ReportingUtilities.getNegativeColor() + "'><b> failed.</b></font>";
+            return " " + ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
+                  getTextAt(RESOURCE_BUNDLE, "OmniPod.failed.report"));
         }
     }
 
