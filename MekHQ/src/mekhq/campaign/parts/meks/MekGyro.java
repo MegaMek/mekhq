@@ -35,10 +35,14 @@ package mekhq.campaign.parts.meks;
 
 import java.io.PrintWriter;
 
+import megamek.common.Configuration;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Mek;
+import megamek.common.util.fileUtils.MegaMekFile;
+import megamek.common.verifier.EntityVerifier;
+import megamek.common.verifier.TestMek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -107,25 +111,18 @@ public class MekGyro extends Part {
     }
 
     /**
-     * The weight of a Mek's gyro, worked out as MegaMek's unit verifier does: the engine rating divided by 100 and
-     * rounded up, halved for an XL gyro, times 1.5 for a compact gyro, doubled for a heavy-duty or superheavy gyro, and
-     * nothing for a Mek without a gyro, rounded up to the half ton. It uses the engine rating rather than walking MP,
-     * so a primitive engine's larger rating gives the heavier gyro it needs.
+     * The weight of a Mek's gyro, as MegaMek's unit verifier works it out: from the engine rating, so a primitive
+     * engine gets the heavier gyro its rating calls for, doubled for a superheavy gyro and nothing for a Mek without a
+     * gyro.
      *
      * @param mek the Mek
      *
      * @return the gyro's weight in tons
      */
     public static double getGyroTonnage(Mek mek) {
-        double baseTonnage = Math.ceil(mek.getEngine().getRating() / 100.0);
-        double tonnage = switch (mek.getGyroType()) {
-            case Mek.GYRO_XL -> baseTonnage / 2;
-            case Mek.GYRO_COMPACT -> baseTonnage * 1.5;
-            case Mek.GYRO_HEAVY_DUTY, Mek.GYRO_SUPERHEAVY -> baseTonnage * 2;
-            case Mek.GYRO_NONE -> 0;
-            default -> baseTonnage;
-        };
-        return Math.ceil(tonnage * 2) / 2;
+        EntityVerifier verifier = EntityVerifier.getInstance(new MegaMekFile(Configuration.unitsDir(),
+              EntityVerifier.CONFIG_FILENAME).getFile());
+        return new TestMek(mek, verifier.mekOption, null).getWeightGyro();
     }
 
     @Override
