@@ -439,7 +439,7 @@ public class StratConContractInitializer {
             }
             track.setPointsOfInterest(new ArrayList<>());
 
-            track.setScenarioOdds(getScenarioOdds(contractDefinition));
+            track.setScenarioOdds(getDeploymentEncounterOdds(contractDefinition));
             track.setDeploymentTime(isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition));
         }
 
