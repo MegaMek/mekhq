@@ -38,8 +38,8 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.ranks.RankSystem;
 
 /**
@@ -250,8 +250,10 @@ public class BiographyPages {
         updateModelFromCreatedControls();
         model.applyTo(options, originOptions);
 
-        // Ranks
-        rankPage.applyToCampaign();
+        // Ranks. A preset takes its rank system from the preset builder, so saving one must not change the campaign's.
+        if (presetCampaignOptions == null) {
+            rankPage.applyToCampaign();
+        }
     }
 
     private void updateCreatedControlsFromModel() {

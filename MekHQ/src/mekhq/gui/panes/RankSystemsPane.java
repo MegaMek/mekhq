@@ -753,6 +753,42 @@ public class RankSystemsPane extends AbstractMHQScrollPane {
     }
     // endregion Button Actions
 
+    /**
+     * Selects the given rank system in the combo box. {@link RankSystem} equality compares codes only, so a campaign
+     * rank system (e.g. one read from a preset) would otherwise select whichever entry shares its code, dropping its
+     * customized ranks. Campaign rank systems therefore replace any same-code entry with a copy of themselves first.
+     *
+     * @param rankSystem the rank system to select
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void selectRankSystem(final @Nullable RankSystem rankSystem) {
+        if (rankSystem == null) {
+            return;
+        }
+
+        if (!rankSystem.getType().isCampaign()) {
+            getComboRankSystems().setSelectedItem(rankSystem);
+            return;
+        }
+
+        for (int i = getRankSystemModel().getSize() - 1; i >= 0; i--) {
+            final RankSystem existing = getRankSystemModel().getElementAt(i);
+            if (existing == rankSystem) {
+                getComboRankSystems().setSelectedItem(existing);
+                return;
+            }
+            if (rankSystem.equals(existing)) {
+                getRankSystemModel().removeElementAt(i);
+            }
+        }
+
+        final RankSystem rankSystemCopy = new RankSystem(rankSystem);
+        getRankSystemModel().addElement(rankSystemCopy);
+        getComboRankSystems().setSelectedItem(rankSystemCopy);
+    }
+
     public void applyToCampaign() {
         exportUserDataRankSystems(false);
         Ranks.reinitializeRankSystems(getCampaign());
