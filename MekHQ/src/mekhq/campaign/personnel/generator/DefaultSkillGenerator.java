@@ -343,7 +343,7 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
               EXTRA_INCOME.getMinimum(),
               EXTRA_INCOME.getMaximum()));
 
-        int baseUnluckyDiceSize = 5;
+        int baseUnluckyDiceSize = 20;
         int unluckyRoll = randomInt(baseUnluckyDiceSize);
         if (unluckyRoll == 0) { // 5% chance of positive value
             person.setUnlucky(Math.clamp(performTraitRoll(), UNLUCKY.getMinimum(), UNLUCKY.getMaximum()));

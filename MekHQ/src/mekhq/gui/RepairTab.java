@@ -557,7 +557,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 tech = u.getEngineer();
                 if (null == tech) {
                     target = new TargetRoll(TargetRoll.IMPOSSIBLE,
-                          "You must have a crew assigned to large vessels to attempt repairs.");
+                          u.isSelfMaintainedInfantry() ?
+                                "You must have soldiers assigned to this infantry unit to attempt repairs." :
+                                "You must have a crew assigned to large vessels to attempt repairs.");
                 }
             }
             if (null != tech) {
@@ -841,11 +843,17 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 if (!tech.isRightTechTypeFor(part)) {
                     return false;
                 }
-                if (getCampaignOptions().get(CampaignOption.TECHS_NEED_TOOL_KIT) &&
+                if (EquipmentKitCatalog.isToolKitRequired(getCampaignOptions(), unit) &&
                           !EquipmentKitCatalog.hasToolKit(tech)) {
                     return false;
                 }
-                if ((unit != null) && unit.isSelfCrewed()) {
+                if ((unit != null) && unit.isSelfMaintainedInfantry()) {
+                    // Self-maintaining infantry repair their own gear, led by the unit's engineer (its ranking
+                    // soldier), who is the only person the repair is actually attributed to
+                    if (!tech.equals(unit.getEngineer())) {
+                        return false;
+                    }
+                } else if ((unit != null) && unit.isSelfCrewed()) {
                     // Only the vessel crew assigned to this unit may work on it; they then face the same skill-level
                     // and time checks as any other tech below
                     if (!tech.getPrimaryRole().isVesselCrew() || !unit.equals(tech.getUnit())) {

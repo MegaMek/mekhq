@@ -560,10 +560,7 @@ public final class BriefingTab extends CampaignGuiTab {
         JTable table = new JTable(model);
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        TableRowSorter<ScenarioTableModel> scenarioSorter = new TableRowSorter<>(model);
-        scenarioSorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
-        scenarioSorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator());
-        table.setRowSorter(scenarioSorter);
+        table.setRowSorter(createScenarioSorter(model));
         table.setShowGrid(false);
         table.setIntercellSpacing(new Dimension(0, 0));
         table.setFillsViewportHeight(true);
@@ -587,6 +584,18 @@ public final class BriefingTab extends CampaignGuiTab {
         });
 
         return table;
+    }
+
+    /**
+     * Creates the scenario queue sorter with the newest dates first. Set the default only when the table is created
+     * so refreshing its data preserves the player's chosen sort order.
+     */
+    static TableRowSorter<ScenarioTableModel> createScenarioSorter(ScenarioTableModel model) {
+        TableRowSorter<ScenarioTableModel> sorter = new TableRowSorter<>(model);
+        sorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
+        sorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator());
+        sorter.setSortKeys(List.of(new RowSorter.SortKey(ScenarioTableModel.COL_DATE, SortOrder.DESCENDING)));
+        return sorter;
     }
 
     private MMComboBox<ScenarioQueueFilter> createScenarioFilterCombo(String name, ScenarioQueueFilter[] filters) {

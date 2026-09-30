@@ -1,0 +1,188 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+uuid:019f583e-cecc-7c4a-8d07-d6228115e73b
+generator:MegaMek Suite 0.51.01 on 2026-07-12
+chassis:Lumberjack
+model:LM1/A
+mul id:4545
+
+Config:Biped
+techbase:Inner Sphere
+era:2355
+source:TR:3075
+published:RS:3075u-AW
+rules level:4
+role:Ambusher
+
+
+mass:60
+engine:220 ICE Engine
+structure:IS Industrial
+myomer:Standard
+cockpit:Primitive Industrial Cockpit
+gyro:Standard Gyro
+
+heat sinks:0 Single
+walk mp:3
+jump mp:0
+
+armor:Commercial(Inner Sphere)
+LA armor:8
+RA armor:8
+LT armor:9
+RT armor:9
+CT armor:10
+HD armor:6
+LL armor:9
+RL armor:9
+RTL armor:5
+RTR armor:5
+RTC armor:6
+
+Weapons:0
+
+Left Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+Hand Actuator
+Lift Hoist/Arresting Hoist
+Lift Hoist/Arresting Hoist
+Lift Hoist/Arresting Hoist
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+Chainsaw
+Chainsaw
+Chainsaw
+Chainsaw
+Chainsaw
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Torso:
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Torso:
+Cargo:SIZE:1.0
+Cargo:SIZE:1.0
+Cargo:SIZE:1.0
+Cargo:SIZE:1.0
+Cargo:SIZE:1.0
+Cargo:SIZE:1.0
+Cargo:SIZE:1.0
+Cargo:SIZE:1.0
+Dumper (Rear)
+-Empty-
+-Empty-
+-Empty-
+
+Center Torso:
+Fusion Engine
+Fusion Engine
+Fusion Engine
+Gyro
+Gyro
+Gyro
+Gyro
+Fusion Engine
+Fusion Engine
+Fusion Engine
+-Empty-
+-Empty-
+
+Head:
+Life Support
+Sensors
+Cockpit
+-Empty-
+Sensors
+Life Support
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+overview:<p>The Lumberjack is a dedicated ForestryMech originally introduced in 2355 by Harrow-Deerfield Heavy Industrial Works on Tamar. The design was a departure for the company, which had previously focused on traditional construction, mining, and logging vehicles rather than bipedal WorkMechs. Filling a growing demand for a self-contained timber-harvesting platform capable of operating in rugged, remote terrain without external support, the Lumberjack became one of the longest-serving IndustrialMech designs in the Lyran Commonwealth. Produced by multiple manufacturers over the centuries, this venerable seventy-ton WorkMech remains in active service across the Inner Sphere wherever heavy forestry work demands a rugged, reliable platform.</p>
+
+capabilities:<p>The Lumberjack was designed as a self-contained timber-harvesting vehicle, and every aspect of its engineering reflects that purpose. Its bipedal configuration enables it to traverse rough woodland terrain that would bog down wheeled or tracked equipment, while the powerful Wagner 210 HeavyDuty internal combustion engine provides reliable power without the expense of a fusion reactor. The five-ton Deerfield-690 chainsaw mounted in place of the right hand actuator can fell trees up to three meters thick in seconds, and a reinforced lift hoist on the left arm allows the operator to haul raw timber into the broad torso-mounted cargo bays.</p><p>Two ten-ton cargo modules and a pair of dumpers give the Lumberjack considerable hauling capacity, making it effective as both a felling and transport platform. Three tons of HD Plasteel commercial-grade armor protect the chassis from random collision damage, falling debris, and similar workplace hazards, though Harrow-Deerfield issued stern warnings against using the machine in combat situations, as the light industrial armor can be easily breached by military weapons. The TigerCom 23/C communications system provides adequate coordination with ground crews, though the absence of any targeting or tracking system reflects the purely civilian origins of the design.</p>
+
+deployment:<p>The original LM1/A was the first Lumberjack produced by Harrow-Deerfield Heavy Industrial Works, entering service in 2355 as a sixty-ton ForestryMech. Lighter than the later LM4/C revision, this variant utilized primitive construction techniques and components reflective of the early age of IndustrialMech development. Few examples of this variant survived into the modern era, as the design was superseded by the heavier and more capable LM4/C more than a century later. Those that endured became prized curiosities among collectors and frontier communities too remote to acquire newer models.</p>
+
+history:<p>The Lumberjack traces its origins to the earliest days of IndustrialMech development in the Lyran Commonwealth. When Harrow-Deerfield Heavy Industrial Works introduced the LM1/A in 2355, the company was venturing into untested territory, applying their experience with conventional logging and construction equipment to the new field of bipedal WorkMechs. The sixty-ton original proved the concept, and over a century of refinement led to the seventy-ton LM4/C in 2489, which became the standard Lumberjack for generations of operators across Lyran space.</p><p>Harrow-Deerfield produced the Lumberjack on Tamar for over four centuries, building the machines sporadically to meet civilian demand. The design found its way into timber harvesting and land development operations across the Inner Sphere, sustained by ample spare parts and third-party production licenses. However, the destruction of the Harrow-Deerfield plant during a Combine raid in 2820, early in the Second Succession War, ended original production. Surviving Lumberjacks continued to operate through careful maintenance, but their numbers dwindled steadily over the following centuries as parts became scarce.</p><p>The Jihad breathed new life into the Lumberjack program. As the Word of Blake ravaged BattleMech production facilities across the Inner Sphere, desperate planetary governments and military commands turned to any available armed platform. Rastaban Agricultural Products on Duran, already a licensee of the Lumberjack design, seized the opportunity to restart production. The company not only resumed manufacturing the civilian LM4/C but also formalized the long-standing LM4/P field modification into a proper production variant, supplying armed Lumberjacks to LAAF forces and security units throughout the Lyran Alliance. The success of the LM4/P led directly to the development of the LM5/M MilitiaMech in 3076, a fully militarized variant that served with distinction during the final years of the Jihad.</p><p>In the post-Jihad era, Rastaban continued Lumberjack production on Duran, returning focus to the core civilian LM4/C model while maintaining the LM4/P line for ongoing security needs. The design's long service history across multiple eras and its proven adaptability from civilian workhorse to improvised combat platform have ensured that the Lumberjack remains a fixture on Lyran worlds wherever heavy forestry work or local defense requirements demand a rugged, reliable platform.</p>
+
+manufacturer:Harrow-Deerfield Heavy Industrial Works
+
+primaryfactory:Tamar
+
+fluffdate:2026-02-21 18:24:59
+
+systemmanufacturer:CHASSIS:Unknown
+systemmanufacturer:ENGINE:Unknown
+systemmanufacturer:ARMOR:Unknown
+systemmanufacturer:COMMUNICATIONS:Unknown

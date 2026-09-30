@@ -2403,9 +2403,9 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         }
 
         changeRankMenu.add(changeRankSystemMenu);
-        changeRankMenu.addSeparator();
 
         if (StaticChecks.areAllEligible(true, selected)) {
+            changeRankMenu.addSeparator();
             final Profession initialProfession = Profession.getProfessionFromPersonnelRole(person.getPrimaryRole());
             for (final RankDisplay rankDisplay : RankDisplay.getRankDisplaysForSystem(person.getRankSystem(),
                   initialProfession)) {
@@ -2436,8 +2436,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     changeRankMenu.add(cbMenuItem);
                 }
             }
-            JMenuHelpers.addMenuIfNonEmpty(popup, changeRankMenu);
         }
+        JMenuHelpers.addMenuIfNonEmpty(popup, changeRankMenu);
 
         if (Stream.of(selected).allMatch(p -> p.getRankSystem().isUseManeiDomini())) {
             // MD Classes

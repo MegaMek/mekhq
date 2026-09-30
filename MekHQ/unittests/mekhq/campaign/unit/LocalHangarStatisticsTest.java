@@ -81,6 +81,21 @@ class LocalHangarStatisticsTest {
         assertEquals(3, hangarStatistics.getTotalSuperHeavyVehicleBays());
     }
 
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void tallyBaysByTypeIgnoresSupportCarriers() {
+        Unit supportCarrier = presentUnitWithEntity(vehicleWithWeight(150.0));
+        when(supportCarrier.isCarrier()).thenReturn(true);
+        Unit superHeavyVehicle = presentUnitWithEntity(vehicleWithWeight(150.0));
+
+        when(hangar.getUnits()).thenReturn(List.of(supportCarrier, superHeavyVehicle));
+
+        assertEquals(1, hangarStatistics.getNumberOfSuperHeavyVehicles());
+    }
+
     private static Unit presentUnitWithEntity(Entity entity) {
         Unit unit = unitWithEntity(entity);
         when(unit.isPresent()).thenReturn(true);
