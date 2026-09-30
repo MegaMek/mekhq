@@ -302,8 +302,8 @@ class RepairEngineCharacterizationTest {
         assertSame(tech, actuator.getTech());
         assertEquals(0, tech.getMinutesLeft());
         assertFalse(actuator.hasWorkedOvertime());
-        // Current behaviour, see REP-05: the 30 minutes worked today cost no AsTech time; changes when that is fixed
-        assertEquals(FULL_ASTECH_POOL_MINUTES, asTechPoolMinutes());
+        // The 30 minutes worked today are charged to the AsTech pool the same day (REP-05)
+        assertEquals(FULL_ASTECH_POOL_MINUTES - (30 * FULL_ASTECH_TEAM), asTechPoolMinutes());
     }
 
     @Test
