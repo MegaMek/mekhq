@@ -178,7 +178,9 @@ public class CampaignSummary {
         int squadCount = 0;
         for (Unit unit : campaign.getPlayerForce().getHangar().getUnits()) {
             Entity entity = unit.getEntity();
-            if (unit.isUnmanned() ||
+            // Support carriers are an organisational wrapper; their occupants are ordinary support personnel
+            if (unit.isCarrier() ||
+                      unit.isUnmanned() ||
                       unit.isSalvage() ||
                       unit.isMothballed() ||
                       unit.isMothballing() ||
