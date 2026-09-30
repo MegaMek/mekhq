@@ -46,10 +46,10 @@ import javax.swing.JSpinner;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.finances.enums.FinancialYearDuration;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -82,6 +82,11 @@ class FinancesGeneralPage {
     private MMComboBox<FinancialYearDuration> comboFinancialYearDuration;
     private JCheckBox newFinancialYearFinancesToCSVExportBox;
     private JCheckBox chkSimulateGrayMonday;
+    private JCheckBox chkUsePlanetaryCostReductions;
+    private JCheckBox chkPlanetaryCostReductionsOnContract;
+    private JCheckBox chkPlanetaryCostReductionsForMaintenance;
+    private JCheckBox chkIncreaseClanRepairCosts;
+    private JCheckBox chkUseAlternateUnitCost;
 
     private JPanel pnlPayments;
     private JCheckBox payForPartsBox;
@@ -90,10 +95,14 @@ class FinancesGeneralPage {
     private JCheckBox payForSalariesBox;
     private JCheckBox payForOverheadBox;
     private JCheckBox payForMaintainBox;
+    private JCheckBox payForHotSpotsUpkeepBox;
+    private JCheckBox escalatingHotSpotsUpkeepBox;
     private JCheckBox payForTransportBox;
     private JCheckBox payForRecruitmentBox;
     private JCheckBox payForFoodBox;
     private JCheckBox payForHousingBox;
+    private JLabel lblRecruitmentTrainingCostMultiplier;
+    private JSpinner spnRecruitmentTrainingCostMultiplier;
 
     private JPanel pnlSales;
     private JCheckBox sellUnitsBox;
@@ -214,6 +223,11 @@ class FinancesGeneralPage {
         payForOverheadBox.addMouseListener(createTipPanelUpdater("PayForOverheadBox"));
         payForMaintainBox = new CampaignOptionsCheckBox("PayForMaintainBox");
         payForMaintainBox.addMouseListener(createTipPanelUpdater("PayForMaintainBox"));
+        payForHotSpotsUpkeepBox = new CampaignOptionsCheckBox("PayForHotSpotsUpkeepBox");
+        payForHotSpotsUpkeepBox.addMouseListener(createTipPanelUpdater("PayForHotSpotsUpkeepBox"));
+        payForHotSpotsUpkeepBox.addItemListener(event -> updateHotSpotsUpkeepExclusions());
+        escalatingHotSpotsUpkeepBox = new CampaignOptionsCheckBox("EscalatingHotSpotsUpkeepBox");
+        escalatingHotSpotsUpkeepBox.addMouseListener(createTipPanelUpdater("EscalatingHotSpotsUpkeepBox"));
         payForTransportBox = new CampaignOptionsCheckBox("PayForTransportBox");
         payForTransportBox.addMouseListener(createTipPanelUpdater("PayForTransportBox"));
         payForRecruitmentBox = new CampaignOptionsCheckBox("PayForRecruitmentBox");
@@ -225,6 +239,13 @@ class FinancesGeneralPage {
         payForHousingBox = new CampaignOptionsCheckBox("PayForHousingBox",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         payForHousingBox.addMouseListener(createTipPanelUpdater("PayForHousingBox"));
+        lblRecruitmentTrainingCostMultiplier = new CampaignOptionsLabel("RecruitmentTrainingCostMultiplier");
+        lblRecruitmentTrainingCostMultiplier
+              .addMouseListener(createTipPanelUpdater("RecruitmentTrainingCostMultiplier"));
+        spnRecruitmentTrainingCostMultiplier = new CampaignOptionsSpinner("RecruitmentTrainingCostMultiplier",
+              1.5, 0.0, 10.0, 0.1);
+        spnRecruitmentTrainingCostMultiplier
+              .addMouseListener(createTipPanelUpdater("RecruitmentTrainingCostMultiplier"));
 
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("PaymentsPanel",
@@ -237,10 +258,13 @@ class FinancesGeneralPage {
                 payForSalariesBox,
                 payForOverheadBox,
                 payForMaintainBox,
+                payForHotSpotsUpkeepBox,
+                escalatingHotSpotsUpkeepBox,
                 payForTransportBox,
                 payForRecruitmentBox,
                 payForFoodBox,
                 payForHousingBox);
+        panel.addRow(lblRecruitmentTrainingCostMultiplier, spnRecruitmentTrainingCostMultiplier);
 
         return panel;
     }
@@ -283,6 +307,20 @@ class FinancesGeneralPage {
         chkSimulateGrayMonday = new CampaignOptionsCheckBox("SimulateGrayMonday");
         chkSimulateGrayMonday.addMouseListener(createTipPanelUpdater("SimulateGrayMonday"));
 
+        chkUsePlanetaryCostReductions = new CampaignOptionsCheckBox("UsePlanetaryCostReductions");
+        chkUsePlanetaryCostReductions.addMouseListener(createTipPanelUpdater("UsePlanetaryCostReductions"));
+        chkUsePlanetaryCostReductions.addItemListener(event -> updatePlanetaryCostReductionDependents());
+        chkPlanetaryCostReductionsOnContract = new CampaignOptionsCheckBox("PlanetaryCostReductionsOnContract");
+        chkPlanetaryCostReductionsOnContract.addMouseListener(
+              createTipPanelUpdater("PlanetaryCostReductionsOnContract"));
+        chkPlanetaryCostReductionsForMaintenance = new CampaignOptionsCheckBox("PlanetaryCostReductionsForMaintenance");
+        chkPlanetaryCostReductionsForMaintenance.addMouseListener(
+              createTipPanelUpdater("PlanetaryCostReductionsForMaintenance"));
+        chkIncreaseClanRepairCosts = new CampaignOptionsCheckBox("IncreaseClanRepairCosts");
+        chkIncreaseClanRepairCosts.addMouseListener(createTipPanelUpdater("IncreaseClanRepairCosts"));
+        chkUseAlternateUnitCost = new CampaignOptionsCheckBox("UseAlternateUnitCost");
+        chkUseAlternateUnitCost.addMouseListener(createTipPanelUpdater("UseAlternateUnitCost"));
+
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("GeneralOptionsPanel",
                 LABEL_COLUMN_WIDTH,
@@ -294,7 +332,12 @@ class FinancesGeneralPage {
                 usePeacetimeCostBox,
                 showPeacetimeCostBox,
                 newFinancialYearFinancesToCSVExportBox,
-                chkSimulateGrayMonday);
+                chkSimulateGrayMonday,
+                chkUsePlanetaryCostReductions,
+                chkPlanetaryCostReductionsOnContract,
+                chkPlanetaryCostReductionsForMaintenance,
+                chkIncreaseClanRepairCosts,
+                chkUseAlternateUnitCost);
         panel.addRow(lblFinancialYearDuration, comboFinancialYearDuration);
 
         return panel;
@@ -469,14 +512,22 @@ class FinancesGeneralPage {
         comboFinancialYearDuration.setSelectedItem(model.financialYearDuration);
         newFinancialYearFinancesToCSVExportBox.setSelected(model.newFinancialYearFinancesToCSVExport);
         chkSimulateGrayMonday.setSelected(model.simulateGrayMonday);
+        chkUsePlanetaryCostReductions.setSelected(model.usePlanetaryCostReductions);
+        chkPlanetaryCostReductionsOnContract.setSelected(model.planetaryCostReductionsOnContract);
+        chkPlanetaryCostReductionsForMaintenance.setSelected(model.planetaryCostReductionsForMaintenance);
+        chkIncreaseClanRepairCosts.setSelected(model.increaseClanRepairCosts);
+        chkUseAlternateUnitCost.setSelected(model.useAlternateUnitCost);
         payForPartsBox.setSelected(model.payForParts);
         payForRepairsBox.setSelected(model.payForRepairs);
         payForUnitsBox.setSelected(model.payForUnits);
         payForSalariesBox.setSelected(model.payForSalaries);
         payForOverheadBox.setSelected(model.payForOverhead);
         payForMaintainBox.setSelected(model.payForMaintain);
+        payForHotSpotsUpkeepBox.setSelected(model.payForHotSpotsUpkeep);
+        escalatingHotSpotsUpkeepBox.setSelected(model.escalatingHotSpotsUpkeep);
         payForTransportBox.setSelected(model.payForTransport);
         payForRecruitmentBox.setSelected(model.payForRecruitment);
+        spnRecruitmentTrainingCostMultiplier.setValue(model.recruitmentTrainingCostMultiplier);
         payForFoodBox.setSelected(model.payForFood);
         payForHousingBox.setSelected(model.payForHousing);
         sellUnitsBox.setSelected(model.sellUnits);
@@ -492,6 +543,44 @@ class FinancesGeneralPage {
         spnRentedFacilitiesCostKitchens.setValue(model.rentedFacilitiesCostKitchens);
         spnRentedFacilitiesCostHoldingCells.setValue(model.rentedFacilitiesCostHoldingCells);
         spnRentedFacilitiesCostRepairBays.setValue(model.rentedFacilitiesCostRepairBays);
+
+        updateHotSpotsUpkeepExclusions();
+        updatePlanetaryCostReductionDependents();
+    }
+
+    /**
+     * The on-contract and maintenance planetary cost reduction options only matter while planetary cost reductions are
+     * enabled, so they are disabled otherwise.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void updatePlanetaryCostReductionDependents() {
+        boolean isUsePlanetaryCostReductions = chkUsePlanetaryCostReductions.isSelected();
+        chkPlanetaryCostReductionsOnContract.setEnabled(isUsePlanetaryCostReductions);
+        chkPlanetaryCostReductionsForMaintenance.setEnabled(isUsePlanetaryCostReductions);
+    }
+
+    /**
+     * Hot Spots upkeep replaces maintenance, peacetime operating costs, and overhead. While it is selected, those
+     * options are cleared and disabled so they can't be combined with it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void updateHotSpotsUpkeepExclusions() {
+        boolean isPayForHotSpotsUpkeep = payForHotSpotsUpkeepBox.isSelected();
+        JCheckBox[] excludedBoxes = { payForMaintainBox, payForOverheadBox, usePeacetimeCostBox,
+                                      showPeacetimeCostBox };
+
+        for (JCheckBox excludedBox : excludedBoxes) {
+            if (isPayForHotSpotsUpkeep) {
+                excludedBox.setSelected(false);
+            }
+            excludedBox.setEnabled(!isPayForHotSpotsUpkeep);
+        }
+
+        escalatingHotSpotsUpkeepBox.setEnabled(isPayForHotSpotsUpkeep);
     }
 
     /**
@@ -513,14 +602,22 @@ class FinancesGeneralPage {
         model.financialYearDuration = comboFinancialYearDuration.getSelectedItem();
         model.newFinancialYearFinancesToCSVExport = newFinancialYearFinancesToCSVExportBox.isSelected();
         model.simulateGrayMonday = chkSimulateGrayMonday.isSelected();
+        model.usePlanetaryCostReductions = chkUsePlanetaryCostReductions.isSelected();
+        model.planetaryCostReductionsOnContract = chkPlanetaryCostReductionsOnContract.isSelected();
+        model.planetaryCostReductionsForMaintenance = chkPlanetaryCostReductionsForMaintenance.isSelected();
+        model.increaseClanRepairCosts = chkIncreaseClanRepairCosts.isSelected();
+        model.useAlternateUnitCost = chkUseAlternateUnitCost.isSelected();
         model.payForParts = payForPartsBox.isSelected();
         model.payForRepairs = payForRepairsBox.isSelected();
         model.payForUnits = payForUnitsBox.isSelected();
         model.payForSalaries = payForSalariesBox.isSelected();
         model.payForOverhead = payForOverheadBox.isSelected();
         model.payForMaintain = payForMaintainBox.isSelected();
+        model.payForHotSpotsUpkeep = payForHotSpotsUpkeepBox.isSelected();
+        model.escalatingHotSpotsUpkeep = escalatingHotSpotsUpkeepBox.isSelected();
         model.payForTransport = payForTransportBox.isSelected();
         model.payForRecruitment = payForRecruitmentBox.isSelected();
+        model.recruitmentTrainingCostMultiplier = (double) spnRecruitmentTrainingCostMultiplier.getValue();
         model.payForFood = payForFoodBox.isSelected();
         model.payForHousing = payForHousingBox.isSelected();
         model.sellUnits = sellUnitsBox.isSelected();

@@ -208,7 +208,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
                 btnRecruitment.setText(getTextAt("recruitment.hiringHall.none"));
             } else {
                 btnRecruitment.setText(getFormattedTextAt("recruitment.hiringHall.some",
-                      StringUtils.capitalize(hiringHallLevel.name().toLowerCase())));
+                      hiringHallLevel.getLabel()));
             }
         }
         if (location.isOnPlanet()) {

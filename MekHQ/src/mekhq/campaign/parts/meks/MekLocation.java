@@ -61,6 +61,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.RepairCosts;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -672,9 +673,7 @@ public class MekLocation extends Part {
             } else if (getPercent() < 1.0) {
                 toReturn.append(" (").append(Math.round(100 * getPercent())).append("%)");
                 if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
-                    toReturn.append(", ")
-                          .append(getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairCost.details",
-                                getRepairCost().toAmountAndSymbolString()));
+                    toReturn.append(", ").append(getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairCost.details", getRepairCost().multipliedBy(RepairCosts.getRepairCostMultiplier(campaign, unit)).toAmountAndSymbolString()));
                 }
             }
         }

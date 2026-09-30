@@ -32,18 +32,16 @@
  */
 package mekhq.gui.dialog.nagDialogs.nagLogic;
 
-import mekhq.campaign.campaignOptions.CampaignOption;
-
-import static org.mockito.Mockito.lenient;
-
 import static mekhq.gui.dialog.nagDialogs.nagLogic.UnableToAffordExpensesNagLogic.unableToAffordExpenses;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.FinancialReport;
@@ -94,6 +92,7 @@ class UnableToAffordExpensesNagLogicTest {
         lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_OVERHEAD)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_SALARIES)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_MAINTAIN)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)).thenReturn(false);
     }
 
     @Test

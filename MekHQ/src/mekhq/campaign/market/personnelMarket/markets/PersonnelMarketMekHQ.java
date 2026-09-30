@@ -38,6 +38,7 @@ import static java.lang.Math.round;
 import static megamek.codeUtilities.ObjectUtility.getRandomItem;
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
+import static mekhq.campaign.personnel.RecruitmentCosts.SALARY_MONTHS;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -61,6 +62,7 @@ import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.market.personnelMarket.yaml.PersonnelMarketLibraries;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.RecruitmentCosts;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
@@ -91,6 +93,8 @@ import mekhq.campaign.universe.factionStanding.FactionStandings;
  */
 public class PersonnelMarketMekHQ extends NewPersonnelMarket {
     public static final int ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER = 2;
+    /** Months of salary a recruit costs with a Golden Hello */
+    static final int GOLDEN_HELLO_SALARY_MONTHS = 24;
 
     private static final int DEFAULT_UNIT_REPUTATION_RECRUITMENT_CUTOFF = -25;
     private static final int CHAOS_UNIT_REPUTATION_RECRUITMENT_CUTOFF = -3;
@@ -484,8 +488,14 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         // Personnel are hired without a rank, meaning they have a 0.5 salary multiplier. As a Golden Hello is
         // 12 months' salary, we double the multiplier from 12 to 24. And a normal hiring cost is one month's salary
         // we increase 1 to 2.
-        int hiringCostMultiplier = isWasOfferingGoldenHello() ? 24 : 2;
+        int hiringCostMultiplier = isWasOfferingGoldenHello() ? GOLDEN_HELLO_SALARY_MONTHS : SALARY_MONTHS;
         Money salary = applicant.getSalary(getCampaign());
-        return salary.multipliedBy(hiringCostMultiplier);
+        if (!RecruitmentCosts.isUsingTrainingBasedCost(getCampaign().getCampaignOptions())) {
+            return salary.multipliedBy(hiringCostMultiplier);
+        }
+
+        // Training-based pricing replaces the normal hiring cost; a Golden Hello still adds its extra salary on top
+        Money goldenHelloExtra = salary.multipliedBy(hiringCostMultiplier - SALARY_MONTHS);
+        return RecruitmentCosts.getTrainingBasedCost(getCampaign(), applicant).plus(goldenHelloExtra);
     }
 }

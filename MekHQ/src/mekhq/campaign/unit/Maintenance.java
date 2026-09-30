@@ -66,6 +66,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.PlanetaryCostReductions;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
@@ -157,8 +158,9 @@ public class Maintenance {
             }
 
             // maybe use the money
-            if (campaignOptions.get(CampaignOption.PAY_FOR_MAINTAIN)) {
-                Money maintenanceCost = unit.getMaintenanceCost();
+            if (campaignOptions.isChargingMaintenance()) {
+                Money maintenanceCost = unit.getMaintenanceCost()
+                                              .multipliedBy(PlanetaryCostReductions.getMaintenanceMultiplier(campaign));
                 if (!(campaign.getPlayerForce().getFinances().debit(TransactionType.MAINTENANCE,
                       campaign.getLocalDate(),
                       maintenanceCost,
