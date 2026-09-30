@@ -673,9 +673,7 @@ public class MekLocation extends Part {
             } else if (getPercent() < 1.0) {
                 toReturn.append(" (").append(Math.round(100 * getPercent())).append("%)");
                 if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
-                    toReturn.append(", ")
-                          .append(getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairCost.details",
-                                getRepairCost().multipliedBy(RepairCosts.getRepairCostMultiplier(campaign, unit)).toAmountAndSymbolString()));
+                    toReturn.append(", ").append(getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairCost.details", getRepairCost().multipliedBy(RepairCosts.getRepairCostMultiplier(campaign, unit)).toAmountAndSymbolString()));
                 }
             }
         }
