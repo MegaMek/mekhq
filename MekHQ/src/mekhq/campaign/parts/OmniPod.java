@@ -319,13 +319,14 @@ public class OmniPod extends Part {
         shorthandedMod = 0;
         isUsedUp = true;
         if (skillMin > SkillType.EXP_LEGENDARY) {
-            return " <font color='" + ReportingUtilities.getNegativeColor()
-                         + "'><b> failed and part destroyed.</b></font>";
+            return " " + ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
+                  getTextAt(RESOURCE_BUNDLE, "OmniPod.failedAndDestroyed.report"));
         } else {
             // OmniPod is only added back to the warehouse if repair fails without
             // destroying part.
             campaign.getQuartermaster().addPart(this, 0, false);
-            return " <font color='" + ReportingUtilities.getNegativeColor() + "'><b> failed.</b></font>";
+            return " " + ReportingUtilities.messageSurroundedBySpanWithColor(ReportingUtilities.getNegativeColor(),
+                  getTextAt(RESOURCE_BUNDLE, "OmniPod.failed.report"));
         }
     }
 
