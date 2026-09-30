@@ -146,10 +146,10 @@ class AbstractStratConGMTest {
     }
 
     private static StratConCampaignState campaignStateWith(List<StratConTrackState> tracks,
-          List<LocalDate> weeklyScenarios) {
+          List<LocalDate> scheduledScenarioDates) {
         StratConCampaignState campaignState = mock(StratConCampaignState.class);
         when(campaignState.getTracks()).thenReturn(tracks);
-        when(campaignState.getWeeklyScenarios()).thenReturn(weeklyScenarios);
+        when(campaignState.getScheduledScenarioDates()).thenReturn(scheduledScenarioDates);
         return campaignState;
     }
 
@@ -201,7 +201,6 @@ class AbstractStratConGMTest {
         CampaignOptions options = event.getCampaign().getCampaignOptions();
         when(options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)).thenReturn(true);
         when(options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
-        when(options.get(CampaignOption.FEWER_WEEKLY_SCENARIOS)).thenReturn(false);
 
         gm.handleNewDay(event);
 

@@ -59,10 +59,9 @@ import mekhq.campaign.mission.contract.contractGeneration.TrackIntensityTable;
  * <p>Ordinary scenarios are scheduled the way Essential scenarios are: up front, by rolling the Track Intensity Tables
  * for the contract's track count (see {@link TrackIntensityTable#rollSchedule}). The table is rolled once per point of
  * scale when "Multiply Track Intensity by Scale" is on and once otherwise, and three times as often when battlefield
- * support points are factored into scale, since that makes for smaller scales. Where Essential scenarios read the
- * table's columns as months, ordinary scenarios read them as weeks, rolling the six-column table afresh for each six
- * weeks of the contract. The "Fewer Weekly Scenarios" option reads them as months
- * instead, as Essential scenarios do.</p>
+ * support points are factored into scale, since that makes for smaller scales. As for Essential scenarios, the
+ * table's columns are read as months; unlike them, the table is rolled afresh for however many months it falls short of
+ * the contract, so no month of a long contract is left without scenarios.</p>
  *
  * <p>Single Drop play keeps its own pace of one scenario a week, and schedules nothing here.</p>
  *
@@ -74,14 +73,6 @@ public final class StratConScenarioTempo {
 
     /** How much more often the table is rolled when battlefield support points are factored into scale. */
     static final int SUPPORT_POINT_SCALE_ROLL_MULTIPLIER = 3;
-
-    /**
-     * A contract length long enough to pick the six-column table (see {@link TrackIntensityTable#rollSchedule}), whose
-     * columns weekly play reads as weeks, whatever the contract's real length.
-     */
-    static final int WEEKLY_TABLE_LENGTH = 6;
-
-    private static final int DAYS_PER_WEEK = 7;
 
     private StratConScenarioTempo() {}
 
@@ -106,63 +97,52 @@ public final class StratConScenarioTempo {
     /**
      * Rolls the days on which a contract's ordinary scenarios appear over its whole run.
      *
-     * <p>In weekly play the six-column table is rolled afresh for each six weeks, its columns read as weeks; the
-     * contract's final, partial block keeps only the weeks the contract still runs. With {@code isFewerWeeklyScenarios}
-     * the table for the contract's length is rolled instead, its columns read as months, and rolled afresh for however
-     * many months the table falls short of the contract. Each scenario gets a random day within its week or month, cut
-     * off at the contract's end.</p>
+     * <p>The table for the contract's length is rolled, its columns read as months, and rolled afresh for however many
+     * months the table falls short of the contract. Each scenario gets a random day within its month, cut off at the
+     * contract's end.</p>
      *
-     * @param startDate              the contract's start date
-     * @param endDate                the contract's end date
-     * @param lengthInMonths         the contract's length in months
-     * @param trackCount             the contract's track count, choosing the table column
-     * @param rollCount              how many times to roll the table for each block (see {@link #getRollCount})
-     * @param isFewerWeeklyScenarios whether the "Fewer Weekly Scenarios" option is on
+     * @param startDate      the contract's start date
+     * @param endDate        the contract's end date
+     * @param lengthInMonths the contract's length in months, choosing which table applies
+     * @param trackCount     the contract's track count, choosing the table column
+     * @param rollCount      how many times to roll the table for each block (see {@link #getRollCount})
      *
-     * @return one day per scenario, in calendar order of their windows
+     * @return one day per scenario, in calendar order of their months
      *
      * @author Illiani
      * @since 0.51.01
      */
     static List<LocalDate> rollScenarioDates(LocalDate startDate, LocalDate endDate, int lengthInMonths,
-          int trackCount, int rollCount, boolean isFewerWeeklyScenarios) {
+          int trackCount, int rollCount) {
         List<LocalDate> scenarioDates = new ArrayList<>();
         if (!endDate.isAfter(startDate)) {
             return scenarioDates;
         }
 
-        int windowCount = isFewerWeeklyScenarios ?
-                                max(1, lengthInMonths) :
-                                (int) Math.ceil(ChronoUnit.DAYS.between(startDate, endDate) / (double) DAYS_PER_WEEK);
-        int tableLength = isFewerWeeklyScenarios ? lengthInMonths : WEEKLY_TABLE_LENGTH;
-
-        int window = 0;
-        while (window < windowCount) {
-            List<Integer> schedule = TrackIntensityTable.rollSchedule(tableLength, trackCount, rollCount);
+        int monthCount = max(1, lengthInMonths);
+        int month = 0;
+        while (month < monthCount) {
+            List<Integer> schedule = TrackIntensityTable.rollSchedule(lengthInMonths, trackCount, rollCount);
             if (schedule.isEmpty()) {
                 break;
             }
 
             for (int scenarioCount : schedule) {
-                if (window >= windowCount) {
+                if (month >= monthCount) {
                     break;
                 }
 
-                LocalDate windowStart = isFewerWeeklyScenarios ?
-                                              startDate.plusMonths(window) :
-                                              startDate.plusDays((long) window * DAYS_PER_WEEK);
-                LocalDate windowEnd = isFewerWeeklyScenarios ?
-                                            startDate.plusMonths(window + 1L) :
-                                            windowStart.plusDays(DAYS_PER_WEEK);
-                if (windowEnd.isAfter(endDate)) {
-                    windowEnd = endDate;
+                LocalDate monthStart = startDate.plusMonths(month);
+                LocalDate monthEnd = startDate.plusMonths(month + 1L);
+                if (monthEnd.isAfter(endDate)) {
+                    monthEnd = endDate;
                 }
-                int windowDays = max(1, (int) ChronoUnit.DAYS.between(windowStart, windowEnd));
+                int monthDays = max(1, (int) ChronoUnit.DAYS.between(monthStart, monthEnd));
 
                 for (int scenario = 0; scenario < scenarioCount; scenario++) {
-                    scenarioDates.add(windowStart.plusDays(Compute.randomInt(windowDays)));
+                    scenarioDates.add(monthStart.plusDays(Compute.randomInt(monthDays)));
                 }
-                window++;
+                month++;
             }
         }
 
@@ -201,20 +181,20 @@ public final class StratConScenarioTempo {
               campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
               contract.getScale());
         List<LocalDate> scenarioDates = rollScenarioDates(startDate, endDate, contract.getLengthInMonths(),
-              contract.getTrackCount(), rollCount, campaignOptions.get(CampaignOption.FEWER_WEEKLY_SCENARIOS));
+              contract.getTrackCount(), rollCount);
 
-        List<LocalDate> scheduledDates = campaignState.getWeeklyScenarios();
+        List<LocalDate> scheduledDates = campaignState.getScheduledScenarioDates();
         scheduledDates.removeIf(scenarioDate -> !scenarioDate.isBefore(firstDate));
         int scheduledCount = 0;
         for (LocalDate scenarioDate : scenarioDates) {
             if (!scenarioDate.isBefore(firstDate)) {
-                campaignState.addWeeklyScenario(scenarioDate);
+                campaignState.addScheduledScenarioDate(scenarioDate);
                 scheduledCount++;
             }
         }
         campaignState.setNormalTempoScheduled(true);
 
-        LOGGER.info("Scheduled {} StratCon scenarios on contract {} from {} ({} rolls per block).",
+        LOGGER.info("Scheduled {} StratCon scenarios on contract {} from {} ({} rolls per block of months).",
               scheduledCount,
               contract.getName(),
               firstDate,

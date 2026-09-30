@@ -268,16 +268,16 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 }
             }
 
-            List<LocalDate> weeklyScenarioDates = campaignState.getWeeklyScenarios();
+            List<LocalDate> scheduledScenarioDates = campaignState.getScheduledScenarioDates();
 
-            if (!essentialScenariosOnly && weeklyScenarioDates.contains(today)) {
+            if (!essentialScenariosOnly && scheduledScenarioDates.contains(today)) {
                 int scenarioCount = 0;
-                for (LocalDate date : weeklyScenarioDates) {
+                for (LocalDate date : scheduledScenarioDates) {
                     if (date.equals(today)) {
                         scenarioCount++;
                     }
                 }
-                weeklyScenarioDates.removeIf(date -> date.equals(today));
+                scheduledScenarioDates.removeIf(date -> date.equals(today));
 
                 // If the OpFor is routed, we want to just discard any scheduled scenarios, clearly they've been
                 // canceled due to impending defeat

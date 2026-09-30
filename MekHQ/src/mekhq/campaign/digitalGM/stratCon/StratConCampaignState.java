@@ -57,7 +57,9 @@ import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBScenario;
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 /**
  * Contract-level state object for a StratCon campaign.
@@ -69,6 +71,12 @@ public class StratConCampaignState {
     private static final MMLogger LOGGER = MMLogger.create(StratConCampaignState.class);
 
     public static final String ROOT_XML_ELEMENT_NAME = "StratConCampaignState";
+
+    private static final String SCHEDULED_SCENARIO_DATES_ELEMENT = "scheduledScenarioDates";
+    private static final String SCHEDULED_SCENARIO_DATE_ELEMENT = "scheduledScenarioDate";
+    // What saves from before 0.51.01 call the scheduled scenario dates; see renameLegacyElements
+    private static final String LEGACY_SCHEDULED_SCENARIO_DATES_ELEMENT = "weeklyScenarios";
+    private static final String LEGACY_SCHEDULED_SCENARIO_DATE_ELEMENT = "weeklyScenario";
 
     @XmlTransient
     private AbstractContract contract;
@@ -98,7 +106,7 @@ public class StratConCampaignState {
     @XmlElement(name = "campaignTrack")
     private final List<StratConTrackState> tracks;
 
-    private List<LocalDate> weeklyScenarios;
+    private List<LocalDate> scheduledScenarioDates;
     private final List<LocalDate> strategicScenarioSpawnDates;
     private final List<StratConScheduledPointOfInterest> scheduledPointsOfInterest;
 
@@ -113,14 +121,14 @@ public class StratConCampaignState {
 
     public StratConCampaignState() {
         tracks = new ArrayList<>();
-        weeklyScenarios = new ArrayList<>();
+        scheduledScenarioDates = new ArrayList<>();
         strategicScenarioSpawnDates = new ArrayList<>();
         scheduledPointsOfInterest = new ArrayList<>();
     }
 
     public StratConCampaignState(AbstractContract contract) {
         tracks = new ArrayList<>();
-        weeklyScenarios = new ArrayList<>();
+        scheduledScenarioDates = new ArrayList<>();
         strategicScenarioSpawnDates = new ArrayList<>();
         scheduledPointsOfInterest = new ArrayList<>();
         setContract(contract);
@@ -142,20 +150,24 @@ public class StratConCampaignState {
         tracks.add(track);
     }
 
+    /**
+     * @return the still-to-come days on which the contract's ordinary scenarios appear, one entry per scenario
+     *       (mutable; drained as they are generated)
+     */
     @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
-    @XmlElementWrapper(name = "weeklyScenarios")
-    @XmlElement(name = "weeklyScenario")
-    public List<LocalDate> getWeeklyScenarios() {
-        return weeklyScenarios;
+    @XmlElementWrapper(name = SCHEDULED_SCENARIO_DATES_ELEMENT)
+    @XmlElement(name = SCHEDULED_SCENARIO_DATE_ELEMENT)
+    public List<LocalDate> getScheduledScenarioDates() {
+        return scheduledScenarioDates;
     }
 
-    public void addWeeklyScenario(LocalDate weeklyScenario) {
-        weeklyScenarios.add(weeklyScenario);
+    public void addScheduledScenarioDate(LocalDate scheduledScenarioDate) {
+        scheduledScenarioDates.add(scheduledScenarioDate);
     }
 
     @Deprecated(since = "0.51.0", forRemoval = true)
-    public void setWeeklyScenarios(final List<LocalDate> weeklyScenarios) {
-        this.weeklyScenarios = weeklyScenarios;
+    public void setScheduledScenarioDates(final List<LocalDate> scheduledScenarioDates) {
+        this.scheduledScenarioDates = scheduledScenarioDates;
     }
 
     /** @return the still-to-come days on which strategic-objective scenarios appear (mutable; drained as they spawn) */
@@ -207,7 +219,7 @@ public class StratConCampaignState {
             return;
         }
 
-        weeklyScenarios.replaceAll(scenarioDate -> scenarioDate.plusDays(days));
+        scheduledScenarioDates.replaceAll(scenarioDate -> scenarioDate.plusDays(days));
         strategicScenarioSpawnDates.replaceAll(spawnDate -> spawnDate.plusDays(days));
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
             LocalDate spawnDate = scheduledPointOfInterest.getSpawnDate();
@@ -632,6 +644,7 @@ public class StratConCampaignState {
         StratConCampaignState resultingCampaignState = null;
 
         try {
+            renameLegacyElements(xmlNode);
             JAXBContext context = JAXBContext.newInstance(StratConCampaignState.class);
             Unmarshaller um = context.createUnmarshaller();
             JAXBElement<StratConCampaignState> templateElement = um.unmarshal(xmlNode, StratConCampaignState.class);
@@ -651,6 +664,41 @@ public class StratConCampaignState {
         }
 
         return resultingCampaignState;
+    }
+
+    /**
+     * Renames the elements older saves wrote under names since changed, so they load into the renamed properties.
+     * Saves from before 0.51.01 hold the scheduled scenario dates as {@code weeklyScenarios}.
+     *
+     * @param xmlNode the node with the campaign state, changed in place
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void renameLegacyElements(Node xmlNode) {
+        Document document = xmlNode.getOwnerDocument();
+        if (document == null) {
+            return;
+        }
+
+        NodeList childNodes = xmlNode.getChildNodes();
+        for (int index = 0; index < childNodes.getLength(); index++) {
+            Node childNode = childNodes.item(index);
+            if ((childNode.getNodeType() != Node.ELEMENT_NODE)
+                      || !LEGACY_SCHEDULED_SCENARIO_DATES_ELEMENT.equals(childNode.getNodeName())) {
+                continue;
+            }
+
+            NodeList dateNodes = childNode.getChildNodes();
+            for (int dateIndex = 0; dateIndex < dateNodes.getLength(); dateIndex++) {
+                Node dateNode = dateNodes.item(dateIndex);
+                if ((dateNode.getNodeType() == Node.ELEMENT_NODE)
+                          && LEGACY_SCHEDULED_SCENARIO_DATE_ELEMENT.equals(dateNode.getNodeName())) {
+                    document.renameNode(dateNode, dateNode.getNamespaceURI(), SCHEDULED_SCENARIO_DATE_ELEMENT);
+                }
+            }
+            document.renameNode(childNode, childNode.getNamespaceURI(), SCHEDULED_SCENARIO_DATES_ELEMENT);
+        }
     }
 
     /**

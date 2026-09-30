@@ -38,23 +38,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.StringReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConAssassinationLeadBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.mission.contract.AbstractContract;
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 /**
  * Tests for scheduling a StratCon contract's ordinary scenarios up front (see {@link StratConScenarioTempo}), and for
  * the campaign state that rolling the schedule again relies on.
  *
  * <p>With a single track, every row of the Track Intensity Tables' first column holds exactly one item, so each roll
- * schedules exactly one scenario per block whatever the die shows.</p>
+ * schedules exactly one scenario per block of months whatever the die shows.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -89,41 +93,14 @@ class StratConScenarioTempoTest {
         assertEquals(1, StratConScenarioTempo.getRollCount(true, false, 0));
     }
 
-    // Weekly scheduling
+    // Scheduling
 
     @RepeatedTest(20)
-    void weeklyPlayRollsTheTableAfreshForEachSixWeeks() {
-        LocalDate endDate = START_DATE.plusWeeks(12);
-
-        List<LocalDate> scenarioDates = StratConScenarioTempo.rollScenarioDates(START_DATE, endDate,
-              3, 1, 2, false);
-
-        assertEquals(4, scenarioDates.size());
-        LocalDate secondBlockStart = START_DATE.plusWeeks(6);
-        assertEquals(2, countBefore(scenarioDates, secondBlockStart));
-    }
-
-    @RepeatedTest(20)
-    void weeklyPlayKeepsEveryScenarioWithinTheContract() {
-        LocalDate endDate = START_DATE.plusDays(10);
-
-        List<LocalDate> scenarioDates = StratConScenarioTempo.rollScenarioDates(START_DATE, endDate,
-              1, 6, 2, false);
-
-        for (LocalDate scenarioDate : scenarioDates) {
-            assertFalse(scenarioDate.isBefore(START_DATE), scenarioDate.toString());
-            assertTrue(scenarioDate.isBefore(endDate), scenarioDate.toString());
-        }
-    }
-
-    // Monthly scheduling ("Fewer Weekly Scenarios")
-
-    @RepeatedTest(20)
-    void fewerWeeklyScenariosReadsTheColumnsAsMonths() {
+    void theColumnsAreReadAsMonths() {
         LocalDate endDate = START_DATE.plusMonths(3);
 
         List<LocalDate> scenarioDates = StratConScenarioTempo.rollScenarioDates(START_DATE, endDate,
-              3, 1, 3, true);
+              3, 1, 3);
 
         assertEquals(3, scenarioDates.size());
         for (LocalDate scenarioDate : scenarioDates) {
@@ -133,19 +110,19 @@ class StratConScenarioTempoTest {
     }
 
     @Test
-    void fewerWeeklyScenariosRollsTheTableAgainForALongContract() {
+    void theTableIsRolledAgainForALongContract() {
         LocalDate endDate = START_DATE.plusMonths(12);
 
         // Twelve months overruns the six-month table, so it is rolled a second time rather than leaving months empty.
         List<LocalDate> scenarioDates = StratConScenarioTempo.rollScenarioDates(START_DATE, endDate,
-              12, 1, 1, true);
+              12, 1, 1);
 
         assertEquals(2, scenarioDates.size());
     }
 
     @Test
     void aContractEndingOnItsStartSchedulesNothing() {
-        assertTrue(StratConScenarioTempo.rollScenarioDates(START_DATE, START_DATE, 3, 1, 1, false).isEmpty());
+        assertTrue(StratConScenarioTempo.rollScenarioDates(START_DATE, START_DATE, 3, 1, 1).isEmpty());
     }
 
     // Campaign state
@@ -153,11 +130,24 @@ class StratConScenarioTempoTest {
     @Test
     void movingTheStartDateMovesTheOrdinaryScenariosToo() {
         StratConCampaignState campaignState = new StratConCampaignState();
-        campaignState.addWeeklyScenario(START_DATE);
+        campaignState.addScheduledScenarioDate(START_DATE);
 
         campaignState.shiftScheduledDates(3);
 
-        assertEquals(List.of(START_DATE.plusDays(3)), campaignState.getWeeklyScenarios());
+        assertEquals(List.of(START_DATE.plusDays(3)), campaignState.getScheduledScenarioDates());
+    }
+
+    @Test
+    void anOlderSaveLoadsItsWeeklyScenariosAsScheduledScenarioDates() throws Exception {
+        String xml = "<StratConCampaignState><weeklyScenarios><weeklyScenario>" + START_DATE
+                           + "</weeklyScenario></weeklyScenarios></StratConCampaignState>";
+        Document document = DocumentBuilderFactory.newInstance()
+                                  .newDocumentBuilder()
+                                  .parse(new InputSource(new StringReader(xml)));
+
+        StratConCampaignState campaignState = StratConCampaignState.Deserialize(document.getDocumentElement());
+
+        assertEquals(List.of(START_DATE), campaignState.getScheduledScenarioDates());
     }
 
     @Test
@@ -219,16 +209,6 @@ class StratConScenarioTempoTest {
               Map.of(StratConAssassinationLeadBehavior.REAL_TARGET_STATE_KEY, 2));
 
         assertEquals(0, countRealTargets(scheduled));
-    }
-
-    private static int countBefore(List<LocalDate> dates, LocalDate cutoff) {
-        int count = 0;
-        for (LocalDate date : dates) {
-            if (date.isBefore(cutoff)) {
-                count++;
-            }
-        }
-        return count;
     }
 
     private static int countRealTargets(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest) {

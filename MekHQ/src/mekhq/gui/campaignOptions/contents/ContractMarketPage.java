@@ -107,7 +107,6 @@ class ContractMarketPage {
     private JCheckBox chkUseBolsterContractSkill;
     private JCheckBox chkUseChaosScaleSupportPointConversion;
     private JCheckBox chkMultiplyTrackIntensityByScale;
-    private JCheckBox chkFewerWeeklyScenarios;
     private JCheckBox chkUseContractFactionModifiers;
     private JCheckBox chkUseIntelObfuscation;
     private JCheckBox chkUseNonNegotiableTerms;
@@ -285,10 +284,6 @@ class ContractMarketPage {
         chkMultiplyTrackIntensityByScale.addMouseListener(
               createTipPanelUpdater("MultiplyTrackIntensityByScale"));
 
-        chkFewerWeeklyScenarios = new CampaignOptionsCheckBox("FewerWeeklyScenarios",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
-        chkFewerWeeklyScenarios.addMouseListener(createTipPanelUpdater("FewerWeeklyScenarios"));
-
         chkUseContractFactionModifiers = new CampaignOptionsCheckBox("UseContractFactionModifiers",
               getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
         chkUseContractFactionModifiers.addMouseListener(createTipPanelUpdater("UseContractFactionModifiers"));
@@ -349,7 +344,6 @@ class ContractMarketPage {
                 chkUseBolsterContractSkill,
               chkUseChaosScaleSupportPointConversion,
               chkMultiplyTrackIntensityByScale,
-              chkFewerWeeklyScenarios,
               chkUseContractFactionModifiers,
               chkUseIntelObfuscation,
               chkUseNonNegotiableTerms,
@@ -690,7 +684,6 @@ class ContractMarketPage {
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
         chkUseChaosScaleSupportPointConversion.setSelected(model.useChaosScaleSupportPointConversion);
         chkMultiplyTrackIntensityByScale.setSelected(model.multiplyTrackIntensityByScale);
-        chkFewerWeeklyScenarios.setSelected(model.fewerWeeklyScenarios);
         chkUseContractFactionModifiers.setSelected(model.useContractFactionModifiers);
         chkUseIntelObfuscation.setSelected(model.useIntelObfuscation);
         chkUseNonNegotiableTerms.setSelected(model.useNonNegotiableTerms);
@@ -749,7 +742,6 @@ class ContractMarketPage {
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
         model.useChaosScaleSupportPointConversion = chkUseChaosScaleSupportPointConversion.isSelected();
         model.multiplyTrackIntensityByScale = chkMultiplyTrackIntensityByScale.isSelected();
-        model.fewerWeeklyScenarios = chkFewerWeeklyScenarios.isSelected();
         model.useContractFactionModifiers = chkUseContractFactionModifiers.isSelected();
         model.useIntelObfuscation = chkUseIntelObfuscation.isSelected();
         model.useNonNegotiableTerms = chkUseNonNegotiableTerms.isSelected();

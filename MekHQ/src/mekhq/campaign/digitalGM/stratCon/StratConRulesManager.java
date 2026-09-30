@@ -238,7 +238,7 @@ public class StratConRulesManager {
         }
 
         LocalDate scenarioDate = campaign.getLocalDate().plusDays(randomInt(7));
-        campaignState.addWeeklyScenario(scenarioDate);
+        campaignState.addScheduledScenarioDate(scenarioDate);
         LOGGER.info("StratCon Single Drop scenario scheduled for {}", scenarioDate);
     }
 
