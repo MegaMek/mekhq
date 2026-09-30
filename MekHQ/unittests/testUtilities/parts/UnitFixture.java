@@ -52,6 +52,7 @@ import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.SpaceStation;
+import megamek.common.units.SuperHeavyTank;
 import megamek.common.units.SupportTank;
 import megamek.common.units.Tank;
 import megamek.common.units.VTOL;
@@ -108,6 +109,16 @@ public enum UnitFixture {
     HOPLITE_C("Hoplite C", false, Mek.class),
     /** Vedette Medium Tank, a tracked combat vehicle. Source: {@code vehicles/3039u/Vedette Medium Tank.blk}. */
     VEDETTE_MEDIUM_TANK("Vedette Medium Tank", true, Tank.class),
+    /**
+     * Zephyros Infantry Support Vehicle (Dual Turret), a tank with front and rear turrets. Source:
+     * {@code vehicles/3085u/Cutting Edge/Zephyros Infantry Support Vehicle (Dual Turret).blk}.
+     */
+    ZEPHYROS_DUAL_TURRET("Zephyros Infantry Support Vehicle (Dual Turret)", true, Tank.class),
+    /**
+     * Burke II Superheavy Tank, a superheavy tank whose turret is its eighth location. Source:
+     * {@code vehicles/XTRs/Gunslingers/Burke II Superheavy Tank.blk}.
+     */
+    BURKE_II_SUPERHEAVY_TANK("Burke II Superheavy Tank", true, SuperHeavyTank.class),
     /** Armored Personnel Carrier (Hover LRM), a hover APC without a turret. Source: {@code vehicles/3039u/APC (Hover LRM).blk}. */
     APC_HOVER_LRM("APC (Hover LRM)", true, Tank.class),
     /** Armored Personnel Carrier (Hover MG), the same APC with a turret. Source: {@code vehicles/3039u/APC (Hover MG).blk}. */
@@ -129,6 +140,11 @@ public enum UnitFixture {
     EPONA_PURSUIT_TANK_A("Epona Pursuit Tank A", true, Tank.class),
     /** Warrior H-7 Attack Helicopter, a VTOL. Source: {@code vehicles/3039u/Warrior H-7 Attack Helicopter.blk}. */
     WARRIOR_H_7_ATTACK_HELICOPTER("Warrior H-7 Attack Helicopter", true, VTOL.class),
+    /**
+     * Red Kite Attack VTOL, a VTOL with a chin turret. Source:
+     * {@code vehicles/3145/Marik/Red Kite Attack VTOL.blk}.
+     */
+    RED_KITE_ATTACK_VTOL("Red Kite Attack VTOL", true, VTOL.class),
     /**
      * Inner Sphere Standard battle armor, a squad of four. Source:
      * {@code battlearmor/3058Uu/IS Standard BA [Laser] (Sqd4).blk}.
@@ -154,6 +170,8 @@ public enum UnitFixture {
      * copy).
      */
     FOOT_PLATOON_LASER("Foot Platoon (DCMS) (Laser 2620+)", true, Infantry.class),
+    /** The same DCMS foot platoon armed with machine guns. Source: {@code infantry/Foot Platoon (DCMS) (MG 2620+).blk}. */
+    FOOT_PLATOON_MG("Foot Platoon (DCMS) (MG 2620+)", true, Infantry.class),
     /** Minotaur, a ProtoMek. Source: {@code protomeks/3060/Minotaur.blk}. */
     MINOTAUR_PROTOMEK("Minotaur", true, ProtoMek.class),
     /** Shilone SL-17, an aerospace fighter. Source: {@code fighters/TRO3039u/Shilone SL-17.blk}. */
