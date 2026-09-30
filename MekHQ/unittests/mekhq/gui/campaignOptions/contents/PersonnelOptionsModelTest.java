@@ -32,6 +32,10 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import mekhq.campaign.Campaign;
@@ -57,5 +61,38 @@ class PersonnelOptionsModelTest {
         PersonnelOptionsModel roundTripped = new PersonnelOptionsModel(destination);
 
         OptionsModelTestSupport.assertAllFieldsMatch(model, roundTripped, "resetTemporaryPrisonerCapacity");
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void applyToWithACampaign_resetsTemporaryPrisonerCapacityWhenFlagged() {
+        Campaign campaign = mockCampaign();
+        PersonnelOptionsModel model = new PersonnelOptionsModel(new CampaignOptions());
+        model.resetTemporaryPrisonerCapacity = true;
+
+        model.applyTo(campaign, new CampaignOptions());
+
+        verify(campaign.getPlayerForce()).setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
+    }
+
+    /**
+     * Saving a preset passes no campaign: the reset must wait for Apply, while the options are still written.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void applyToWithoutACampaign_writesTheOptionsWithoutResetting() {
+        PersonnelOptionsModel model = new PersonnelOptionsModel(new CampaignOptions());
+        model.resetTemporaryPrisonerCapacity = true;
+        model.awardSetFilterList = "Alpha,Beta";
+
+        CampaignOptions destination = new CampaignOptions();
+        assertDoesNotThrow(() -> model.applyTo(null, destination));
+
+        assertEquals("Alpha,Beta", new PersonnelOptionsModel(destination).awardSetFilterList);
     }
 }

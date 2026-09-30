@@ -38,8 +38,8 @@ import java.util.Map;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.SkillType;
 
 class SkillsOptionsModel {
@@ -60,10 +60,15 @@ class SkillsOptionsModel {
 
     void loadFrom(@Nonnull CampaignOptions options, @Nullable Map<String, SkillType> presetSkillValues) {
         Map<String, SkillType> skillValues = presetSkillValues == null ? Map.of() : presetSkillValues;
+        // A preset that lists skills gives any skill it lacks (e.g. one added since it was saved) its default values,
+        // rather than whatever the running campaign happens to use. With no preset skills, keep the current values.
+        Map<String, SkillType> fallbackValues = skillValues.isEmpty() ? null : SkillType.createDefaultTypes();
         String[] skills = SkillType.getSkillList();
 
         for (String skillName : skills) {
-            SkillType skill = skillValues.getOrDefault(skillName, SkillType.getType(skillName));
+            SkillType fallbackSkill = fallbackValues == null ? SkillType.getType(skillName) :
+                                            fallbackValues.get(skillName);
+            SkillType skill = skillValues.getOrDefault(skillName, fallbackSkill);
             if (skill == null) {
                 LOGGER.info("(loadValuesFromCampaignOptions) Skipping outdated or missing skill: {}", skillName);
                 continue;

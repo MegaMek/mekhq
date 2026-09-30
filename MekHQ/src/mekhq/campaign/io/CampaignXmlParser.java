@@ -1741,6 +1741,28 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /**
+     * Carries the percent female and name generator faction over from older saves, which stored them in the
+     * {@code <nameGen>} block of {@code <info>} rather than in the campaign options. That block is parsed first and
+     * writes straight into the name and gender generators, so when the options lack their own tags we read the values
+     * back from the generators.
+     *
+     * @param campaignOptionsNode the {@code <campaignOptions>} element from the save
+     * @param campaignOptions     the options just parsed from that element
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void preserveLegacyNameGenerationSettings(Node campaignOptionsNode, CampaignOptions campaignOptions) {
+        if (!hasChildElement(campaignOptionsNode, CampaignOption.PERCENT_FEMALE.xmlTag())) {
+            campaignOptions.set(CampaignOption.PERCENT_FEMALE, RandomGenderGenerator.getPercentFemale());
+        }
+        if (!hasChildElement(campaignOptionsNode, CampaignOption.NAME_GENERATOR_FACTION.xmlTag())) {
+            campaignOptions.set(CampaignOption.NAME_GENERATOR_FACTION,
+                  RandomNameGenerator.getInstance().getChosenFaction());
+        }
+    }
+
+    /**
      * @return {@code true} if {@code parent} has a direct child element whose node name equals {@code tagName}. Used to
      *       distinguish "the save wrote this option" from "the option fell back to its default because the tag was
      *       absent" - which a plain value read cannot tell apart.
@@ -2216,6 +2238,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     CampaignOptions campaignOptions = CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(wn,
                           version);
                     preserveLegacyReputationForExistingCampaigns(wn, campaignOptions);
+                    preserveLegacyNameGenerationSettings(wn, campaignOptions);
+                    campaignOptions.applyGlobalSettings();
                     campaign.setCampaignOptions(campaignOptions);
                 } else if (xn.equalsIgnoreCase("gameOptions")) {
                     campaign.getGameOptions().fillFromXML(wn.getChildNodes());
