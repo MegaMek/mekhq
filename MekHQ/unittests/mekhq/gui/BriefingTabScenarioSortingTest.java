@@ -33,7 +33,10 @@
 package mekhq.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
@@ -42,13 +45,41 @@ import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.TableRowSorter;
 
+import mekhq.MHQOptions;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.gui.model.ScenarioTableModel;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 class BriefingTabScenarioSortingTest {
+    private MockedStatic<MekHQ> mekHQ;
+
+    /**
+     * Pins the display date format to ISO so date sorting doesn't depend on the local user's preferences.
+     */
+    @BeforeEach
+    void setUp() {
+        MHQOptions mhqOptions = mock(MHQOptions.class);
+        when(mhqOptions.getDisplayFormattedDate(any())).thenAnswer(invocation -> {
+            LocalDate date = invocation.getArgument(0);
+            return (date == null) ? "" : date.toString();
+        });
+        when(mhqOptions.parseDisplayFormattedDate(anyString())).thenAnswer(
+              invocation -> LocalDate.parse(invocation.getArgument(0)));
+        mekHQ = mockStatic(MekHQ.class);
+        mekHQ.when(MekHQ::getMHQOptions).thenReturn(mhqOptions);
+    }
+
+    @AfterEach
+    void tearDown() {
+        mekHQ.close();
+    }
+
     @Test
     void scenariosDefaultToNewestFirst() {
         Scenario past = scenario("Past", LocalDate.of(3078, 12, 31));

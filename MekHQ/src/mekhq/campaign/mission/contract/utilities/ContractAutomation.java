@@ -176,8 +176,8 @@ public class ContractAutomation {
 
         final MHQOptions mhqOptions = MekHQ.getMHQOptions();
         // Null during unit tests
-        final boolean skipUnitsInBays = mhqOptions.getDoNotMothballUnitsInBays();
-        final boolean skipSalvage = mhqOptions.getDoNotMothballSalvage();
+        final boolean skipUnitsInBays = (mhqOptions != null) && mhqOptions.getDoNotMothballUnitsInBays();
+        final boolean skipSalvage = (mhqOptions != null) && mhqOptions.getDoNotMothballSalvage();
 
         Set<UUID> detachmentUnitIds = detachment.getHangar().getUnits().stream()
                                             .map(Unit::getId)
