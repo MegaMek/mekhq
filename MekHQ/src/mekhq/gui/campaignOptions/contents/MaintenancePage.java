@@ -89,6 +89,7 @@ class MaintenancePage {
     private JCheckBox chkUsePlanetaryModifiers;
     private JCheckBox useUnofficialMaintenance;
     private JCheckBox logMaintenance;
+    private JCheckBox chkTechsMaintainConventionalInfantry;
     private JLabel lblLithiumFusionBatteryMode;
     private MMComboBox<LithiumFusionBatteryMode> comboLithiumFusionBatteryMode;
 
@@ -158,6 +159,11 @@ class MaintenancePage {
         logMaintenance = new CampaignOptionsCheckBox("LogMaintenance");
         logMaintenance.addMouseListener(createTipPanelUpdater("LogMaintenance"));
 
+        chkTechsMaintainConventionalInfantry = new CampaignOptionsCheckBox("TechsMaintainConventionalInfantry",
+                getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
+        chkTechsMaintainConventionalInfantry.addMouseListener(
+                createTipPanelUpdater("TechsMaintainConventionalInfantry"));
+
         JPanel schedulePanel = createMaintenanceSchedulePanel();
         JPanel qualityPanel = createMaintenanceQualityPanel();
         JPanel interstellarTravelPanel = createInterstellarTravelPanel();
@@ -190,6 +196,7 @@ class MaintenancePage {
         panel.addRow(lblMaintenanceBonus, spnMaintenanceBonus);
         panel.addRow(lblDefaultMaintenanceTime, spnDefaultMaintenanceTime);
         panel.addCheckBox(logMaintenance);
+        panel.addCheckBox(chkTechsMaintainConventionalInfantry);
 
         return panel;
     }
@@ -262,6 +269,7 @@ class MaintenancePage {
         chkUsePlanetaryModifiers.setSelected(model.usePlanetaryModifiers);
         useUnofficialMaintenance.setSelected(model.useUnofficialMaintenance);
         logMaintenance.setSelected(model.logMaintenance);
+        chkTechsMaintainConventionalInfantry.setSelected(model.techsMaintainConventionalInfantry);
         comboLithiumFusionBatteryMode.setSelectedItem(model.lithiumFusionBatteryMode);
     }
 
@@ -286,6 +294,7 @@ class MaintenancePage {
         model.usePlanetaryModifiers = chkUsePlanetaryModifiers.isSelected();
         model.useUnofficialMaintenance = useUnofficialMaintenance.isSelected();
         model.logMaintenance = logMaintenance.isSelected();
+        model.techsMaintainConventionalInfantry = chkTechsMaintainConventionalInfantry.isSelected();
         model.lithiumFusionBatteryMode = comboLithiumFusionBatteryMode.getSelectedItem();
     }
 }

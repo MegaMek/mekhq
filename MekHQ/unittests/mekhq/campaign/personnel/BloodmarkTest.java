@@ -32,15 +32,18 @@
  */
 package mekhq.campaign.personnel;
 
-import mekhq.campaign.campaignOptions.CampaignOption;
-
-import static org.mockito.Mockito.lenient;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
@@ -50,7 +53,10 @@ import java.util.List;
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Finances;
+import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.Unit;
@@ -299,5 +305,116 @@ class BloodmarkTest {
         Bloodmark.processWounds(campaign, target, CURRENT_DATE, 6);
 
         assertTrue(target.getStatus().isDead());
+    }
+
+    @Test
+    void testCheckForAssassinationAttempt_childSkippedAndDateRemoved() {
+        target.setDateOfBirth(CURRENT_DATE.minusYears(10));
+        target.addBloodhuntDate(CURRENT_DATE);
+
+        boolean result = Bloodmark.checkForAssassinationAttempt(target, CURRENT_DATE, true);
+
+        assertFalse(result);
+        assertFalse(target.getBloodhuntSchedule().contains(CURRENT_DATE),
+              "A child's bloodhunt date should still be cleared so it doesn't linger in the schedule.");
+    }
+
+    @Test
+    void testCheckForAssassinationAttempt_studentSkippedAndDateRemoved() {
+        target.setEduEducationTime(5);
+        target.addBloodhuntDate(CURRENT_DATE);
+
+        boolean result = Bloodmark.checkForAssassinationAttempt(target, CURRENT_DATE, true);
+
+        assertFalse(result);
+        assertFalse(target.getBloodhuntSchedule().contains(CURRENT_DATE),
+              "A student's bloodhunt date should still be cleared so it doesn't linger in the schedule.");
+    }
+
+    @Test
+    void testCheckForAssassinationAttempt_childKeepsFutureDates() {
+        LocalDate futureDate = CURRENT_DATE.plusDays(3);
+        target.setDateOfBirth(CURRENT_DATE.minusYears(10));
+        target.addBloodhuntDate(futureDate);
+
+        assertFalse(Bloodmark.checkForAssassinationAttempt(target, CURRENT_DATE, true));
+        assertTrue(target.getBloodhuntSchedule().contains(futureDate));
+    }
+
+    @Test
+    void testGetBloodhuntSchedule_AlternativeIdDoublesFrequency() {
+        BloodmarkLevel level = BloodmarkLevel.BLOODMARK_TWO;
+
+        try (MockedStatic<Compute> mockedCompute = mockStatic(Compute.class)) {
+            // Only the doubled frequency is set to trigger a hunt
+            mockedCompute.when(() -> Compute.randomInt(level.getRollFrequency())).thenReturn(0);
+            mockedCompute.when(() -> Compute.randomInt(level.getRollFrequency() * 2)).thenReturn(1);
+            mockedCompute.when(() -> Compute.d6(1)).thenReturn(6, 1, 1, 1);
+
+            assertTrue(Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, true).isEmpty());
+            assertFalse(Bloodmark.getBloodhuntSchedule(level, CURRENT_DATE, false).isEmpty());
+        }
+    }
+
+    @Test
+    void testGetWounds_noHitsWhenBountyHunterFails() {
+        try (MockedStatic<Compute> mockedCompute = mockStatic(Compute.class)) {
+            mockedCompute.when(() -> Compute.randomInt(10)).thenReturn(1);
+
+            assertEquals(0, Bloodmark.getWounds(10));
+        }
+    }
+
+    @Test
+    void testGetWounds_eachSuccessAddsOneD6() {
+        try (MockedStatic<Compute> mockedCompute = mockStatic(Compute.class)) {
+            mockedCompute.when(() -> Compute.randomInt(10)).thenReturn(0, 0, 1);
+            mockedCompute.when(() -> Compute.d6(1)).thenReturn(2, 3);
+
+            assertEquals(5, Bloodmark.getWounds(10));
+        }
+    }
+
+    @Test
+    void testGetWounds_cappedAtSix() {
+        try (MockedStatic<Compute> mockedCompute = mockStatic(Compute.class)) {
+            mockedCompute.when(() -> Compute.randomInt(10)).thenReturn(0);
+            mockedCompute.when(() -> Compute.d6(1)).thenReturn(5);
+
+            assertEquals(6, Bloodmark.getWounds(10));
+        }
+    }
+
+    @Test
+    void testPerformAssassinationAttempt_noBloodmarkDoesNothing() {
+        Finances finances = mock(Finances.class);
+        when(campaign.getPlayerForce().getFinances()).thenReturn(finances);
+        target.setUnderProtection(true);
+
+        Bloodmark.performAssassinationAttempt(campaign, target, CURRENT_DATE);
+
+        verify(finances, never()).debit(any(), any(), any(), anyString());
+        assertEquals(0, target.getHits());
+    }
+
+    @Test
+    void testPerformAssassinationAttempt_protectionPaysDoubleBounty() {
+        Finances finances = mock(Finances.class);
+        when(campaign.getPlayerForce().getFinances()).thenReturn(finances);
+        when(finances.debit(any(), any(), any(), anyString())).thenReturn(true);
+        target.setBloodmark(2);
+        target.setUnderProtection(true);
+
+        try (MockedStatic<Compute> mockedCompute = mockStatic(Compute.class)) {
+            mockedCompute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+            mockedCompute.when(() -> Compute.d6(1)).thenReturn(6);
+
+            Bloodmark.performAssassinationAttempt(campaign, target, CURRENT_DATE);
+        }
+
+        verify(finances).debit(eq(TransactionType.MISCELLANEOUS), any(),
+              eq(BloodmarkLevel.BLOODMARK_TWO.getBounty().multipliedBy(2.0)), anyString());
+        assertEquals(0, target.getHits());
+        assertFalse(target.getStatus().isDead());
     }
 }

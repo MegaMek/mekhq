@@ -838,7 +838,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     private @Nullable Person pickTechForMothballOrActivation(Unit unit, String description) {
         Person tech = null;
 
-        if (unit.isConventionalInfantry()) {
+        if (unit.isSelfMaintainedInfantry()) {
             return null;
         }
 
