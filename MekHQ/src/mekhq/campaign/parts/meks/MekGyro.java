@@ -35,10 +35,14 @@ package mekhq.campaign.parts.meks;
 
 import java.io.PrintWriter;
 
+import megamek.common.Configuration;
 import megamek.common.CriticalSlot;
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
 import megamek.common.units.Mek;
+import megamek.common.util.fileUtils.MegaMekFile;
+import megamek.common.verifier.EntityVerifier;
+import megamek.common.verifier.TestMek;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -106,6 +110,21 @@ public class MekGyro extends Part {
         return gyroBaseTonnage;
     }
 
+    /**
+     * The weight of a Mek's gyro, as MegaMek's unit verifier works it out: from the engine rating, so a primitive
+     * engine gets the heavier gyro its rating calls for, doubled for a superheavy gyro and nothing for a Mek without a
+     * gyro.
+     *
+     * @param mek the Mek
+     *
+     * @return the gyro's weight in tons
+     */
+    public static double getGyroTonnage(Mek mek) {
+        EntityVerifier verifier = EntityVerifier.getInstance(new MegaMekFile(Configuration.unitsDir(),
+              EntityVerifier.CONFIG_FILENAME).getFile());
+        return new TestMek(mek, verifier.mekOption, null).getWeightGyro();
+    }
+
     @Override
     public double getTonnage() {
         return gyroTonnage;
@@ -117,8 +136,10 @@ public class MekGyro extends Part {
             return Money.of(750000.0 * getTonnage());
         } else if (getType() == Mek.GYRO_COMPACT) {
             return Money.of(400000.0 * getTonnage());
-        } else if (getType() == Mek.GYRO_HEAVY_DUTY) {
+        } else if ((getType() == Mek.GYRO_HEAVY_DUTY) || (getType() == Mek.GYRO_SUPERHEAVY)) {
             return Money.of(500000.0 * getTonnage());
+        } else if (getType() == Mek.GYRO_NONE) {
+            return Money.zero();
         } else {
             return Money.of(300000.0 * getTonnage());
         }

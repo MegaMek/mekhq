@@ -1298,6 +1298,37 @@ public class Unit implements ITechnology, ILocatable {
         return value;
     }
 
+    /**
+     * Earlier versions gave a ProtoMek a second set of jump jets the first time its campaign was loaded: one
+     * {@link JumpJet} per jump jet mount and one {@link ProtoMekJumpJet} per point of jump MP. The jump jets tied to
+     * the mounts stay; the extra ProtoMek jump jets are removed from the unit and the warehouse.
+     *
+     * @param protoJumpJets the ProtoMek's jump jet parts of both kinds; the removed ones are taken out of it
+     * @param jumpMP        the ProtoMek's jump MP, one jump jet per point
+     */
+    private void removeDuplicateProtoMekJumpJets(List<Part> protoJumpJets, int jumpMP) {
+        int duplicates = protoJumpJets.size() - jumpMP;
+        int removed = 0;
+        for (Iterator<Part> jumpJetIterator = protoJumpJets.iterator();
+              jumpJetIterator.hasNext() && (removed < duplicates); ) {
+            Part jumpJet = jumpJetIterator.next();
+            boolean isProtoMekJumpJet = (jumpJet instanceof ProtoMekJumpJet)
+                  || (jumpJet instanceof MissingProtoMekJumpJet);
+            if (isProtoMekJumpJet) {
+                jumpJetIterator.remove();
+                removePart(jumpJet);
+                jumpJet.setUnit(null);
+                if (campaign != null) {
+                    getWarehouse().removePart(jumpJet);
+                }
+                removed++;
+            }
+        }
+        if (removed > 0) {
+            LOGGER.info("{}: removed {} duplicate ProtoMek jump jet parts", getName(), removed);
+        }
+    }
+
     public void removePart(Part part) {
         parts.remove(part);
     }
@@ -4232,9 +4263,9 @@ public class Unit implements ITechnology, ILocatable {
                           getCampaign());
                     addPart(epart);
                     partsToAdd.add(epart);
-                    if (entity.hasETypeFlag(Entity.ETYPE_PROTOMEK)) {
-                        protoJumpJets.add(epart);
-                    }
+                }
+                if (entity.hasETypeFlag(Entity.ETYPE_PROTOMEK)) {
+                    protoJumpJets.add(epart);
                 }
             } else {
                 int equipmentNum = entity.getEquipmentNum(m);
@@ -4399,11 +4430,11 @@ public class Unit implements ITechnology, ILocatable {
             }
         }
 
-        if (entity instanceof Mek) {
+        if (entity instanceof Mek mek) {
             if (null == gyro) {
                 gyro = new MekGyro((int) entity.getWeight(),
                       entity.getGyroType(),
-                      entity.getOriginalWalkMP(),
+                      MekGyro.getGyroTonnage(mek),
                       entity.isClan(),
                       getCampaign());
                 addPart(gyro);
@@ -4855,6 +4886,7 @@ public class Unit implements ITechnology, ILocatable {
                 addPart(sensor);
                 partsToAdd.add(sensor);
             }
+            removeDuplicateProtoMekJumpJets(protoJumpJets, entity.getOriginalJumpMP());
             int jj = (entity).getOriginalJumpMP() - protoJumpJets.size();
             while (jj > 0) {
                 ProtoMekJumpJet protoJJ = new ProtoMekJumpJet((int) entity.getWeight(), getCampaign());

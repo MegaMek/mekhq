@@ -44,7 +44,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -544,127 +543,6 @@ public class MekHQMenuBar extends JMenuBar {
         miNavigationMap.getAccessibleContext().setAccessibleName(miNavigationMap.getText());
         miNavigationMap.getAccessibleContext().setAccessibleDescription(miNavigationMap.getToolTipText());
         menuView.add(miNavigationMap);
-          if (Boolean.getBoolean("mekhq.experimental.skikoMap")) {
-            JCheckBoxMenuItem skiaMap = new JCheckBoxMenuItem(getTextAt("miExperimentalSkiaMap.text"));
-            skiaMap.setEnabled(false);
-            JMenu mapModeMenu = new JMenu(MHQInternationalization.getTextAt(
-                "mekhq.resources.CampaignGUI", "map.layer.heading.text"));
-            mapModeMenu.setEnabled(false);
-            ButtonGroup mapModeGroup = new ButtonGroup();
-            EnumMap<mekhq.gui.InterstellarMapPanel.MapMode, JRadioButtonMenuItem> mapModeItems =
-                new EnumMap<>(mekhq.gui.InterstellarMapPanel.MapMode.class);
-            for (var mode : mekhq.gui.InterstellarMapPanel.MapMode.values()) {
-                JRadioButtonMenuItem item = new JRadioButtonMenuItem(MHQInternationalization.getTextAt(
-                    "mekhq.resources.CampaignGUI", mode.resourceKey() + ".text"));
-                item.setToolTipText(MHQInternationalization.getTextAt(
-                    "mekhq.resources.CampaignGUI", mode.resourceKey() + ".toolTipText"));
-                item.getAccessibleContext().setAccessibleDescription(item.getToolTipText());
-                mapModeGroup.add(item);
-                mapModeMenu.add(item);
-                mapModeItems.put(mode, item);
-            }
-            JCheckBoxMenuItem emptySystems = new JCheckBoxMenuItem(getTextAt("miMapEmptySystems.text"));
-            emptySystems.setEnabled(false);
-            JCheckBoxMenuItem territories = new JCheckBoxMenuItem(getTextAt("miMapTerritories.text"));
-            territories.setEnabled(false);
-            JCheckBoxMenuItem emblems = new JCheckBoxMenuItem(getTextAt("miMapEmblems.text"));
-            emblems.setEnabled(false);
-            JMenu administrative = new JMenu(getTextAt("menuMapAdministrative.text"));
-            administrative.setEnabled(false);
-            JMenu capitals = new JMenu(getTextAt("menuMapCapitals.text"));
-            capitals.setEnabled(false);
-            ButtonGroup capitalGroup = new ButtonGroup();
-            EnumMap<CapitalDetail, JRadioButtonMenuItem> capitalItems = new EnumMap<>(CapitalDetail.class);
-            for (CapitalDetail detail : CapitalDetail.values()) {
-                JRadioButtonMenuItem item = new JRadioButtonMenuItem(getTextAt("miMapCapitals." + detail + ".text"));
-                capitalGroup.add(item);
-                capitals.add(item);
-                capitalItems.put(detail, item);
-            }
-            JCheckBoxMenuItem rechargeStations = new JCheckBoxMenuItem(getTextAt("miMapRechargeStations.text"));
-            rechargeStations.setEnabled(false);
-            ButtonGroup detailGroup = new ButtonGroup();
-            EnumMap<BoundaryDetail, JRadioButtonMenuItem> detailItems = new EnumMap<>(BoundaryDetail.class);
-            for (BoundaryDetail detail : BoundaryDetail.values()) {
-                JRadioButtonMenuItem item = new JRadioButtonMenuItem(getTextAt("miMapAdministrative." + detail + ".text"));
-                detailGroup.add(item);
-                administrative.add(item);
-                detailItems.put(detail, item);
-            }
-            javax.swing.SwingUtilities.invokeLater(() -> {
-                var mapTab = getGui().getNavigationTab().getMapTab();
-                mapModeItems.get(mapTab.getMapMode()).setSelected(true);
-                mapModeMenu.setEnabled(true);
-                for (var entry : mapModeItems.entrySet()) {
-                    entry.getValue().addActionListener(event -> mapTab.setMapMode(entry.getKey()));
-                }
-                mapTab.addPropertyChangeListener("mapMode", event ->
-                      mapModeItems.get(mapTab.getMapMode()).setSelected(true));
-                Runnable syncLandmarks = () -> {
-                    var landmarks = mapTab.getLandmarkLayers();
-                    capitalItems.get(landmarks.capitals()).setSelected(true);
-                    rechargeStations.setSelected(landmarks.rechargeStations());
-                };
-                syncLandmarks.run();
-                capitals.setEnabled(true);
-                rechargeStations.setEnabled(true);
-                for (var entry : capitalItems.entrySet()) {
-                    entry.getValue().addActionListener(event -> mapTab.setLandmarkLayers(
-                          new LandmarkLayers(entry.getKey(), mapTab.getLandmarkLayers().rechargeStations())));
-                }
-                rechargeStations.addActionListener(event -> mapTab.setLandmarkLayers(
-                      new LandmarkLayers(mapTab.getLandmarkLayers().capitals(), rechargeStations.isSelected())));
-                mapTab.addPropertyChangeListener("landmarkLayers", event -> syncLandmarks.run());
-                Runnable syncLayers = () -> {
-                    var layers = mapTab.getCartographyLayers();
-                    territories.setSelected(layers.territories());
-                    emblems.setSelected(layers.emblems());
-                    detailItems.get(layers.administrative()).setSelected(true);
-                };
-                syncLayers.run();
-                territories.setEnabled(true);
-                emblems.setEnabled(true);
-                administrative.setEnabled(true);
-                territories.addActionListener(event -> {
-                    var layers = mapTab.getCartographyLayers();
-                    mapTab.setCartographyLayers(new CartographyLayers(territories.isSelected(), layers.emblems(),
-                          layers.administrative()));
-                });
-                emblems.addActionListener(event -> {
-                    var layers = mapTab.getCartographyLayers();
-                    mapTab.setCartographyLayers(new CartographyLayers(layers.territories(), emblems.isSelected(),
-                          layers.administrative()));
-                });
-                for (var entry : detailItems.entrySet()) {
-                    entry.getValue().addActionListener(event -> {
-                        var layers = mapTab.getCartographyLayers();
-                        mapTab.setCartographyLayers(new CartographyLayers(layers.territories(), layers.emblems(), entry.getKey()));
-                    });
-                }
-                mapTab.addPropertyChangeListener("cartographyLayers", event -> syncLayers.run());
-                skiaMap.setVisible(mapTab.isExperimentalMapAvailable());
-                skiaMap.setEnabled(mapTab.isExperimentalMapAvailable());
-                skiaMap.setSelected(mapTab.isExperimentalMapActive());
-                    emptySystems.setSelected(mapTab.isShowingEmptySystems());
-                    emptySystems.setEnabled(true);
-                    emptySystems.addActionListener(event -> mapTab.setShowingEmptySystems(emptySystems.isSelected()));
-                    mapTab.addPropertyChangeListener("showEmptySystems",
-                        event -> emptySystems.setSelected(mapTab.isShowingEmptySystems()));
-                skiaMap.addActionListener(event -> skiaMap.setSelected(mapTab.setExperimentalMapActive(skiaMap.isSelected())));
-                mapTab.addPropertyChangeListener("experimentalMapActive",
-                    event -> skiaMap.setSelected(mapTab.isExperimentalMapActive()));
-                mapTab.addPropertyChangeListener("experimentalMapAvailable",
-                    event -> skiaMap.setEnabled(mapTab.isExperimentalMapAvailable()));
-            });
-            menuView.add(skiaMap);
-            menuView.add(mapModeMenu);
-            menuView.add(emptySystems);
-            menuView.add(territories);
-            menuView.add(emblems);
-            menuView.add(administrative);
-            menuView.add(capitals);
-            menuView.add(rechargeStations);
-          }
         menuView.addSeparator();
 
         JMenuItem miHistoricalDailyReportDialog = createMenuItem("miShowHistoricalReportLog.text",

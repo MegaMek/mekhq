@@ -162,6 +162,7 @@ import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
 import mekhq.campaign.personnel.enums.ExtraIncome;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -472,6 +473,8 @@ public class CampaignNewDayManager {
         if (campaignOptions.isUseStratCon()) {
             processNewDayATB();
         }
+
+        Familiarity.processPeriodicFamiliarity(campaign, today);
 
         if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)) {
             ChaosReputation.processChaosCampaignReputationChanges(campaignOptions, campaign.getPlayerForce(), today);

@@ -52,6 +52,7 @@ import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.SpaceStation;
+import megamek.common.units.SupportTank;
 import megamek.common.units.Tank;
 import megamek.common.units.VTOL;
 import megamek.common.units.Warship;
@@ -86,8 +87,36 @@ public enum UnitFixture {
     HUNCHBACK_HBK_4G("Hunchback HBK-4G", false, Mek.class),
     /** Hunchback HBK-4P, the refit target of the HBK-4G. Source: {@code meks/3039u/Hunchback HBK-4P.mtf}. */
     HUNCHBACK_HBK_4P("Hunchback HBK-4P", false, Mek.class),
+    /** Griffin GRF-1A, a primitive Griffin. Source: {@code meks/XTRs/Primitives IV/Griffin GRF-1A.mtf}. */
+    GRIFFIN_GRF_1A("Griffin GRF-1A", false, Mek.class),
+    /** Griffin GRF-1N, the standard Griffin. Source: {@code meks/3039u/Griffin GRF-1N.mtf}. */
+    GRIFFIN_GRF_1N("Griffin GRF-1N", false, Mek.class),
+    /**
+     * Lumberjack LM1A, an IndustrialMek with a primitive engine rated above its walking MP times its tonnage. Source:
+     * {@code meks/3075/Lumberjack LM1A.mtf}.
+     */
+    LUMBERJACK_LM1A("Lumberjack LM1A", false, Mek.class),
+    /** Omega SHP-5R, a superheavy Mek with a superheavy gyro. Source: {@code meks/3145/NTNU RS/NTNU/Omega SHP-5R.mtf}. */
+    OMEGA_SHP_5R("Omega SHP-5R", false, Mek.class),
+    /** Omega SHP-4X, the earlier superheavy Omega. Source: {@code meks/Jihad Final Reckoning/OMEGA SHP-4X.mtf}. */
+    OMEGA_SHP_4X("OMEGA SHP-4X", false, Mek.class),
+    /**
+     * Skinwalker A, a Mek with an interface cockpit and no gyro. Source: {@code meks/Rec Guides ilClan/Vol 24/(Ryoken III) Skinwalker A.mtf}.
+     */
+    SKINWALKER_A("(Ryoken III) Skinwalker A", false, Mek.class),
+    /** Hoplite C, a Clan Mek (not an OmniMek) with Clan ferro-fibrous armor. Source: {@code meks/3050U/Hoplite C.mtf}. */
+    HOPLITE_C("Hoplite C", false, Mek.class),
     /** Vedette Medium Tank, a tracked combat vehicle. Source: {@code vehicles/3039u/Vedette Medium Tank.blk}. */
     VEDETTE_MEDIUM_TANK("Vedette Medium Tank", true, Tank.class),
+    /** Armored Personnel Carrier (Hover LRM), a hover APC without a turret. Source: {@code vehicles/3039u/APC (Hover LRM).blk}. */
+    APC_HOVER_LRM("APC (Hover LRM)", true, Tank.class),
+    /** Armored Personnel Carrier (Hover MG), the same APC with a turret. Source: {@code vehicles/3039u/APC (Hover MG).blk}. */
+    APC_HOVER_MG("APC (Hover MG)", true, Tank.class),
+    /**
+     * Cellco Ranger UPU-3000, a tracked support vehicle with BAR 8 armor. Source:
+     * {@code vehicles/TRO Vehicle Annex/Tracked/Cellco Ranger UPU-3000.blk}.
+     */
+    CELLCO_RANGER_UPU_3000("Cellco Ranger UPU-3000", true, SupportTank.class),
     /**
      * Epona Pursuit Tank Prime, a Clan hover OmniVehicle with its weapons in the turret. Source:
      * {@code vehicles/3060u/Epona Pursuit Tank Prime.blk}.
@@ -125,6 +154,8 @@ public enum UnitFixture {
      * copy).
      */
     FOOT_PLATOON_LASER("Foot Platoon (DCMS) (Laser 2620+)", true, Infantry.class),
+    /** The same DCMS foot platoon armed with machine guns. Source: {@code infantry/Foot Platoon (DCMS) (MG 2620+).blk}. */
+    FOOT_PLATOON_MG("Foot Platoon (DCMS) (MG 2620+)", true, Infantry.class),
     /** Minotaur, a ProtoMek. Source: {@code protomeks/3060/Minotaur.blk}. */
     MINOTAUR_PROTOMEK("Minotaur", true, ProtoMek.class),
     /** Shilone SL-17, an aerospace fighter. Source: {@code fighters/TRO3039u/Shilone SL-17.blk}. */
