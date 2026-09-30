@@ -226,10 +226,15 @@ public class StratConContractInitializer {
         // now seed the tracks with objectives and facilities
         if (!isUseMaplessMode) {
             for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
-                int objectiveCount = objectiveParams.objectiveCount > 0 ?
-                                           (int) objectiveParams.objectiveCount :
-                                           (int) max(1,
-                                                 -objectiveParams.objectiveCount * contract.getScale());
+                int objectiveCount;
+                if (objectiveParams.objectiveCount > 0) {
+                    objectiveCount = (int) objectiveParams.objectiveCount;
+                } else if (isFacilityObjective(objectiveParams.objectiveType)) {
+                    objectiveCount = getObjectiveFacilityCount(contract.getScale(),
+                          campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION));
+                } else {
+                    objectiveCount = (int) max(1, -objectiveParams.objectiveCount * contract.getScale());
+                }
 
                 List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTrackCount());
 
@@ -295,12 +300,16 @@ public class StratConContractInitializer {
             }
         }
 
-        // non-objective allied facilities
+        // Non-objective facilities: the defender's, so allied on a defensive contract and hostile on an offensive one.
+        // The objective facilities placed above are the only facilities so far, and count against the scale's share.
         if (!isUseMaplessMode) {
-            int facilityCount = contractDefinition.getAlliedFacilityCount() > 0 ?
-                                      (int) contractDefinition.getAlliedFacilityCount() :
-                                      (int) (-contractDefinition.getAlliedFacilityCount() *
-                                                   contract.getScale());
+            int objectiveFacilityCount = campaignState.getTracks().stream()
+                                               .mapToInt(track -> track.getFacilities().size())
+                                               .sum();
+            int facilityCount = getNonObjectiveFacilityCount(contract.getScale(),
+                  campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
+                  objectiveFacilityCount);
+            ForceAlignment facilityOwner = contract.isPlayerAttacker() ? ForceAlignment.Opposing : ForceAlignment.Allied;
 
             List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
 
@@ -309,25 +318,7 @@ public class StratConContractInitializer {
 
                 initializeTrackFacilities(campaignState.getTrack(x),
                       numObjects,
-                      ForceAlignment.Allied,
-                      false,
-                      Collections.emptyList());
-            }
-
-            // non-objective hostile facilities
-            facilityCount = contractDefinition.getHostileFacilityCount() > 0 ?
-                                  (int) contractDefinition.getHostileFacilityCount() :
-                                  (int) (-contractDefinition.getHostileFacilityCount() *
-                                               contract.getScale());
-
-            trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
-
-            for (int x = 0; x < trackObjects.size(); x++) {
-                int numObjects = trackObjects.get(x);
-
-                initializeTrackFacilities(campaignState.getTrack(x),
-                      numObjects,
-                      ForceAlignment.Opposing,
+                      facilityOwner,
                       false,
                       Collections.emptyList());
             }
@@ -780,6 +771,68 @@ public class StratConContractInitializer {
         // A new base belongs on the road grid if the planet's owner holds it, as any other placed base does.
         connectFacilitiesToRoads(track, contract, campaign);
         return coords;
+    }
+
+    /** Objective facilities are three times as scarce as the contract's whole share of facilities. */
+    static final int OBJECTIVE_FACILITY_SCALE_DIVISOR = 3;
+
+    /**
+     * @param objectiveType a strategic objective type
+     *
+     * @return {@code true} if the objective places facilities: allied to hold, or hostile to take or destroy
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isFacilityObjective(StrategicObjectiveType objectiveType) {
+        return (objectiveType == StrategicObjectiveType.AlliedFacilityControl) ||
+                     (objectiveType == StrategicObjectiveType.HostileFacilityControl) ||
+                     (objectiveType == StrategicObjectiveType.FacilityDestruction);
+    }
+
+    /**
+     * Works out how many facilities a facility objective with a scaled count places: one per three points of scale
+     * when battlefield support points are factored into scale, and one per nine points otherwise, rounded down. As for
+     * every other scaled objective, it never drops below one.
+     *
+     * @param scale                          the contract's scale
+     * @param isFactorSupportPointsIntoScale whether battlefield support points are factored into scale
+     *
+     * @return the number of objective facilities, at least one
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the counting rule can be tested directly.
+    static int getObjectiveFacilityCount(int scale, boolean isFactorSupportPointsIntoScale) {
+        int divisor = isFactorSupportPointsIntoScale ?
+                            OBJECTIVE_FACILITY_SCALE_DIVISOR :
+                            OBJECTIVE_FACILITY_SCALE_DIVISOR * StratConScenarioTempo.SUPPORT_POINT_SCALE_ROLL_MULTIPLIER;
+        return max(1, scale / divisor);
+    }
+
+    /**
+     * Works out how many non-objective facilities a contract places. The contract's share of facilities is one per
+     * point of scale when battlefield support points are factored into scale, since that makes for smaller scales, and
+     * one per three points otherwise, rounded down. Objective facilities count against that share; non-objective
+     * facilities only fill what they leave over.
+     *
+     * @param scale                          the contract's scale
+     * @param isFactorSupportPointsIntoScale whether battlefield support points are factored into scale
+     * @param objectiveFacilityCount         how many objective facilities the contract has already placed
+     *
+     * @return the number of non-objective facilities, never negative
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the counting rule can be tested directly.
+    static int getNonObjectiveFacilityCount(int scale, boolean isFactorSupportPointsIntoScale,
+          int objectiveFacilityCount) {
+        int facilityShare = isFactorSupportPointsIntoScale ?
+                                  scale :
+                                  scale / StratConScenarioTempo.SUPPORT_POINT_SCALE_ROLL_MULTIPLIER;
+        return max(0, facilityShare - objectiveFacilityCount);
     }
 
     /**

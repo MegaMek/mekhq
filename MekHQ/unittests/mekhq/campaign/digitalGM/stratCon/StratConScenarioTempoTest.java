@@ -116,6 +116,55 @@ class StratConScenarioTempoTest {
         assertEquals(1, StratConScenarioTempo.getRollCount(true, false, 0, 1.0));
     }
 
+    // Non-objective facilities
+
+    @Test
+    void supportPointsInScalePlaceOneFacilityPerPointOfScale() {
+        assertEquals(4, StratConContractInitializer.getNonObjectiveFacilityCount(4, true, 0));
+    }
+
+    @Test
+    void withoutSupportPointsOneFacilityPerThreePointsOfScaleRoundedDown() {
+        assertEquals(0, StratConContractInitializer.getNonObjectiveFacilityCount(2, false, 0));
+        assertEquals(1, StratConContractInitializer.getNonObjectiveFacilityCount(3, false, 0));
+        assertEquals(1, StratConContractInitializer.getNonObjectiveFacilityCount(5, false, 0));
+        assertEquals(2, StratConContractInitializer.getNonObjectiveFacilityCount(6, false, 0));
+    }
+
+    @Test
+    void objectiveFacilitiesCountAgainstTheShare() {
+        assertEquals(0, StratConContractInitializer.getNonObjectiveFacilityCount(1, true, 1));
+        assertEquals(2, StratConContractInitializer.getNonObjectiveFacilityCount(4, true, 2));
+    }
+
+    @Test
+    void objectiveFacilitiesBeyondTheShareLeaveNoneOver() {
+        assertEquals(0, StratConContractInitializer.getNonObjectiveFacilityCount(3, false, 2));
+    }
+
+    @Test
+    void supportPointsInScalePlaceOneObjectiveFacilityPerThreePointsOfScale() {
+        assertEquals(1, StratConContractInitializer.getObjectiveFacilityCount(5, true));
+        assertEquals(2, StratConContractInitializer.getObjectiveFacilityCount(6, true));
+    }
+
+    @Test
+    void withoutSupportPointsOneObjectiveFacilityPerNinePointsOfScale() {
+        assertEquals(1, StratConContractInitializer.getObjectiveFacilityCount(17, false));
+        assertEquals(2, StratConContractInitializer.getObjectiveFacilityCount(18, false));
+    }
+
+    @Test
+    void aFacilityObjectiveAlwaysPlacesAtLeastOne() {
+        assertEquals(1, StratConContractInitializer.getObjectiveFacilityCount(1, true));
+        assertEquals(1, StratConContractInitializer.getObjectiveFacilityCount(1, false));
+    }
+
+    @Test
+    void aNegativeScalePlacesNoFacilities() {
+        assertEquals(0, StratConContractInitializer.getNonObjectiveFacilityCount(-1, true, 0));
+    }
+
     // Scheduling
 
     @RepeatedTest(20)
