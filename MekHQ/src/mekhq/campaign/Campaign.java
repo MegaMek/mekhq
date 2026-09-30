@@ -247,6 +247,7 @@ import mekhq.campaign.utilities.LithiumFusionBatteries;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.RepairTaskHold;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -2930,6 +2931,10 @@ public class Campaign implements ITechManager {
                 return report;
             }
         }
+        String heldReport = RepairTaskHold.holdIfItCannotGoAhead(this, partWork, tech, target);
+        if (heldReport != null) {
+            return heldReport;
+        }
         if (partWork instanceof SpacecraftCoolingSystem) {
             // Change the string since we're not working on the part itself
             report += tech.getHyperlinkedFullTitle() + " attempts to" + action + "a heat sink";
@@ -2960,6 +2965,9 @@ public class Campaign implements ITechManager {
                     // Can't use more overtime than there are minutes remaining on the part
                     overtimeUsed = Math.min(minutes, tech.getOvertimeLeft());
                     minutesUsed += overtimeUsed;
+                }
+                // Only overtime actually worked counts, for the +3 overtime modifier and the AsTech helpers
+                if (overtimeUsed > 0) {
                     partWork.setWorkedOvertime(true);
                     usedOvertime = true;
                 }

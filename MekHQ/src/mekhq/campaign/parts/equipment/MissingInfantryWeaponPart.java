@@ -79,24 +79,24 @@ public class MissingInfantryWeaponPart extends MissingEquipmentPart {
     }
 
     @Override
-    public void writeToXML(final PrintWriter pw, int indent) {
-        indent = writeToXMLBegin(pw, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "typeName", type.getInternalName());
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipmentNum", equipmentNum);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "size", size);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "equipTonnage", equipTonnage);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "primary", primary);
-        writeToXMLEnd(pw, indent);
+    public void writeToXML(final PrintWriter printWriter, int indent) {
+        indent = writeToXMLBegin(printWriter, indent);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "typeName", type.getInternalName());
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "equipmentNum", equipmentNum);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "size", size);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "equipTonnage", equipTonnage);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "primary", primary);
+        writeToXMLEnd(printWriter, indent);
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) {
-        super.loadFieldsFromXmlNode(wn);
-        NodeList nodes = wn.getChildNodes();
-        for (int index = 0; index < nodes.getLength(); index++) {
-            Node node = nodes.item(index);
-            if (node.getNodeName().equalsIgnoreCase("primary")) {
-                primary = Boolean.parseBoolean(node.getTextContent().trim());
+    protected void loadFieldsFromXmlNode(Node node) {
+        super.loadFieldsFromXmlNode(node);
+        NodeList childNodes = node.getChildNodes();
+        for (int index = 0; index < childNodes.getLength(); index++) {
+            Node childNode = childNodes.item(index);
+            if (childNode.getNodeName().equalsIgnoreCase("primary")) {
+                primary = Boolean.parseBoolean(childNode.getTextContent().trim());
             }
         }
     }
