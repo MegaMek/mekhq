@@ -1,0 +1,199 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+uuid:019f583e-dff7-7f4d-804d-6fda6a4428f4
+generator:MegaMek Suite 0.51.01 on 2026-07-12
+chassis:Griffin
+model:GRF-1A
+mul id:7185
+
+Config:Biped
+techbase:Inner Sphere
+era:2465
+source:XTR:Primitives IV
+published:XTR:Primitives IV
+rules level:4
+role:Sniper
+
+quirk:poor_sealing
+quirk:obsolete:2595
+weaponquirk:imp_cooling:RA:3:Primitive Prototype PPC
+
+mass:60
+engine:290 Fusion Engine
+structure:IS Standard
+myomer:Standard
+cockpit:Primitive Cockpit
+gyro:Standard Gyro
+
+heat sinks:11 Single
+walk mp:4
+jump mp:3
+
+armor:Primitive(Inner Sphere)
+LA armor:14
+RA armor:14
+LT armor:21
+RT armor:21
+CT armor:21
+HD armor:9
+LL armor:18
+RL armor:18
+RTL armor:6
+RTR armor:6
+RTC armor:7
+
+Weapons:2
+Primitive Prototype PPC, Right Arm
+LRM 5, Right Torso
+
+Left Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+Hand Actuator
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Arm:
+Shoulder
+Upper Arm Actuator
+Lower Arm Actuator
+Primitive Prototype PPC
+Primitive Prototype PPC
+Primitive Prototype PPC
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Torso:
+ISPrototypeJumpJet
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Torso:
+ISPrototypeJumpJet
+LRM 5
+IS Ammo LRM-5
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Center Torso:
+Fusion Engine
+Fusion Engine
+Fusion Engine
+Gyro
+Gyro
+Gyro
+Gyro
+Fusion Engine
+Fusion Engine
+Fusion Engine
+ISPrototypeJumpJet
+-Empty-
+
+Head:
+Life Support
+Sensors
+Cockpit
+-Empty-
+Sensors
+Life Support
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Left Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+Right Leg:
+Hip
+Upper Leg Actuator
+Lower Leg Actuator
+Foot Actuator
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+-Empty-
+
+overview:<p>The Griffin is one of the oldest BattleMech designs still in active service, with origins stretching back over six centuries. Originally conceived by Maxwell Manufacturing, Inc. on Procyon as a sixty-ton heavy 'Mech for the Hegemony Armed Forces, the prototype GRF-1A first walked in 2465 and entered full production by 2492. Earthwerks Incorporated later acquired and overhauled the design into the lighter, faster fifty-five-ton GRF-1N that became the definitive Griffin. Reclassified as a medium fire support platform, the Griffin proved enormously popular with commanders and pilots across the Inner Sphere. Licensed production across numerous manufacturers ensured the design survived the devastation of the Succession Wars largely intact. Built by the tens of thousands, the Griffin has served continuously through the Age of War, the Succession Wars, the Clan Invasion, the Jihad, and into the ilClan era.</p>
+
+capabilities:<p>The Griffin's enduring success rests on a simple but effective combination of long-range firepower and battlefield mobility. The standard GRF-1N mounts a Fusigon PPC in a detachable right-arm housing paired with a Delta Dart LRM-10 launcher in a drum over the right shoulder, giving the design both direct and indirect fire support capability. A CoreTek 275 fusion engine drives the chassis to a top speed of eighty-six kilometers per hour, while five Rawlings 55 jump jets provide a hundred and fifty meters of jumping distance, a combination that allows the Griffin to dictate engagement range against most opponents.</p><p>This firepower comes with notable compromises. All weapons are concentrated on the right side of the chassis, creating a critical vulnerability if that flank is compromised. The design also lacks any short-range defensive armament, leaving Griffin pilots dangerously exposed when enemies close to knife-fighting range. Nine and a half tons of Starshield A armor compares favorably to many medium 'Mechs, though the Griffin frequently faces heavier opponents. Twelve single heat sinks prove insufficient for sustained fire, forcing pilots to choose between engaging and withdrawing rather than doing both simultaneously. The design's forgiving heat curve at walking speeds partially mitigates this limitation during disciplined long-range engagements.</p>
+
+deployment:<p>The original Griffin design produced by Maxwell Manufacturing, Inc. on Procyon debuted in 2465 as a sixty-ton heavy BattleMech for the Hegemony Armed Forces. Armed with a prototype PPC and a single LRM-5, the design relied on primitive components throughout, including a primitive cockpit, primitive armor, and prototype jump jets capable of covering ninety meters per leap. Despite these limitations, this variant proved the viability of combining ranged firepower with jump capability in a single chassis. Maxwell's subsequent dissolution due to financial misconduct transferred the design to Earthwerks Incorporated, who would overhaul it into the lighter GRF-1N. Remarkably, limited production of the original sixty-ton configuration continued for over six hundred years after its introduction.</p>
+
+history:<p>The Griffin's history begins with Maxwell Manufacturing's successful bid to produce a highly mobile BattleMech for the Hegemony Armed Forces. The original sixty-ton GRF-1A quickly earned a prominent role in HAF assault battalions, remaining on front lines even as newer designs superseded it. Maxwell's dissolution due to corporate misconduct in the late twenty-fifth century transferred the design to Earthwerks Incorporated, who overhauled it into the fifty-five-ton GRF-1N, lighter, faster, with greater jump capacity and a more powerful missile launcher. This reclassified medium 'Mech became one of the most widely produced BattleMechs in history.</p><p>Production spread across the Inner Sphere through licensing agreements with Defiance Industries on Hesperus II, Kallon Industries on Talon, Brigadier Corporation on Oliver, and Norse BattleMech Works on Marduk. Vandenberg Mechanized Industries even manufactured the design in the Periphery on Illiushin. Only the Capellan Confederation lacked domestic production capability, purchasing limited numbers from the Taurian Concordat. By 2857, Defiance Industries had introduced the GRF-1S, the first production variant, reconfiguring the design as a medium-range brawler for the Lyran Commonwealth.</p><p>The Fourth Succession War reshuffled production lines when the Draconis Combine captured Marduk from the Federated Suns and the Lyran Commonwealth took Oliver from the Free Worlds League. This coincided with the rediscovery of lostech, spawning new variants that quickly spread beyond their intended factions. The Clan Invasion accelerated this trend, with manufacturers rushing upgraded designs into production. Vicore Industries' Project Phoenix initiative prompted Defiance and Kallon to produce the completely redesigned GRF-6S, while Victory Industries joined after acquiring light fusion engine technology. The Free Worlds League and ComStar each developed their own updates, with ComStar's variant ominously appearing in Word of Blake Militia ranks.</p><p>The Jihad saw the Griffin deployed on all sides of the conflict, with the Word of Blake fielding the deadly GRF-4R refit and the Capellan Confederation finally fielding indigenous variants incorporating stealth armor. Following the Jihad, Brigadier Corporation introduced the advanced GRF-6R, and production continued within the Free Worlds League at Earthwerks' facilities. The Wolf Empire's conquest of Terra brought further evolution as Earthwerks' Keystone plant began producing the Griffin C, a Clan-specification refit of older models using captured Clan weapons technology. Spread across the Inner Sphere by Clan Sea Fox traders, the Griffin C ensured the venerable design remained competitive into the ilClan era. Notable engagements throughout this long history include the War Griffins mercenary cadre's exclusive use of the chassis during the Second Succession War, pirate-hunting operations on Hazeldean, and distinguished service during the siege of Odin Manufacturing Works on Orestes during the Second Combine-Dominion War.</p>
+
+manufacturer:Maxwell Manufacturing, Inc.
+
+primaryfactory:Procyon
+
+fluffdate:2026-02-26 19:50:04
+
+systemmanufacturer:CHASSIS:Maxwell Manufacturing
+systemmode:CHASSIS:Maxwell GRF Primitive
+systemmanufacturer:ENGINE:Unknown
+systemmode:ENGINE:290 Primitive
+systemmanufacturer:ARMOR:Maximillian
+systemmode:ARMOR:Primitive Armor
+systemmanufacturer:JUMP_JET:Northrup
+systemmode:JUMP_JET:Prototype Jump Jets
+systemmanufacturer:COMMUNICATIONS:Unknown
+systemmanufacturer:TARGETING:Unknown

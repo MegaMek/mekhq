@@ -59,6 +59,7 @@ class RepairAndMaintenanceOptionsModel {
     boolean usePlanetaryModifiers;
     boolean useUnofficialMaintenance;
     boolean logMaintenance;
+    boolean techsMaintainConventionalInfantry;
     boolean useFabrication;
     boolean useBalancedFabrication;
     boolean maintenanceFabrication;
@@ -87,6 +88,7 @@ class RepairAndMaintenanceOptionsModel {
         usePlanetaryModifiers = options.get(CampaignOption.USE_PLANETARY_MODIFIERS);
         useUnofficialMaintenance = options.get(CampaignOption.USE_UNOFFICIAL_MAINTENANCE);
         logMaintenance = options.get(CampaignOption.LOG_MAINTENANCE);
+        techsMaintainConventionalInfantry = options.get(CampaignOption.TECHS_MAINTAIN_CONVENTIONAL_INFANTRY);
         useFabrication = options.get(CampaignOption.USE_FABRICATION);
         useBalancedFabrication = options.get(CampaignOption.USE_BALANCED_FABRICATION);
         maintenanceFabrication = options.get(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY);
@@ -116,6 +118,7 @@ class RepairAndMaintenanceOptionsModel {
         options.set(CampaignOption.USE_PLANETARY_MODIFIERS, usePlanetaryModifiers);
         options.set(CampaignOption.USE_UNOFFICIAL_MAINTENANCE, useUnofficialMaintenance);
         options.set(CampaignOption.LOG_MAINTENANCE, logMaintenance);
+        options.set(CampaignOption.TECHS_MAINTAIN_CONVENTIONAL_INFANTRY, techsMaintainConventionalInfantry);
         options.set(CampaignOption.USE_FABRICATION, useFabrication);
         options.set(CampaignOption.USE_BALANCED_FABRICATION, useBalancedFabrication);
         options.set(CampaignOption.FABRICATE_D_IN_MAINTENANCE_FACILITY, maintenanceFabrication);

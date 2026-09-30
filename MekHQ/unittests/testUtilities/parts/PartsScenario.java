@@ -137,7 +137,8 @@ public final class PartsScenario {
             int skillLevel = SkillType.getType(techSkillName).getLevelFromExperience(experienceLevel);
             tech.addSkill(techSkillName, skillLevel, 0);
         }
-        campaign.getPlayerForce().getHumanResources().importPerson(tech);
+        // Imported the way the campaign imports a person, so the tech stands at the main force like its units
+        campaign.importPerson(tech);
         tech.resetMinutesLeft(false);
         return tech;
     }

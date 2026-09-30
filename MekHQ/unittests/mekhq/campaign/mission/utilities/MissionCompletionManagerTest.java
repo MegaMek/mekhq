@@ -90,6 +90,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.roleplay.ContractJournalPrompt;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedConstruction;
@@ -690,6 +691,7 @@ public class MissionCompletionManagerTest {
             Fixture fixture = new Fixture();
 
             try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractJournalPrompt> contractJournalPrompt = mockStatic(ContractJournalPrompt.class);
                   MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
                         ContractCharacteristics.class);
                   MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
@@ -700,6 +702,8 @@ public class MissionCompletionManagerTest {
 
                 assertTrue(completed);
                 verify(fixture.campaign).completeMission(fixture.mission, MissionStatus.SUCCESS);
+                contractJournalPrompt.verify(() -> ContractJournalPrompt.offer(any(), eq(fixture.campaign),
+                      eq(fixture.mission), eq(MissionStatus.SUCCESS)));
                 mekHQ.verify(() -> MekHQ.triggerEvent(any()));
             }
         }
@@ -824,6 +828,7 @@ public class MissionCompletionManagerTest {
             when(fixture.campaign.applyRetirement(any(), any())).thenReturn(true);
 
             try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractJournalPrompt> contractJournalPrompt = mockStatic(ContractJournalPrompt.class);
                   MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
                         ContractCharacteristics.class);
                   MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
@@ -882,6 +887,7 @@ public class MissionCompletionManagerTest {
             when(fixture.campaignOptions.get(CampaignOption.ENABLE_AUTO_AWARDS)).thenReturn(true);
 
             try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractJournalPrompt> contractJournalPrompt = mockStatic(ContractJournalPrompt.class);
                   MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
                         ContractCharacteristics.class);
                   MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
@@ -904,6 +910,7 @@ public class MissionCompletionManagerTest {
             when(fixture.newPersonnelMarket.getAvailabilityMessage()).thenReturn("Disabled");
 
             try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractJournalPrompt> contractJournalPrompt = mockStatic(ContractJournalPrompt.class);
                   MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
                         ContractCharacteristics.class);
                   MockedStatic<CampaignNewDayManager> campaignNewDayManager = mockStatic(CampaignNewDayManager.class);
@@ -931,6 +938,7 @@ public class MissionCompletionManagerTest {
             when(formation.getScenarioId()).thenReturn(NO_ASSIGNED_SCENARIO);
 
             try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractJournalPrompt> contractJournalPrompt = mockStatic(ContractJournalPrompt.class);
                   MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
                         ContractCharacteristics.class);
                   MockedConstruction<CompleteMissionDialog> completeMissionDialog = confirmedDialog(
@@ -953,6 +961,7 @@ public class MissionCompletionManagerTest {
             when(fixture.campaignOptions.isUseStratCon()).thenReturn(true);
 
             try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractJournalPrompt> contractJournalPrompt = mockStatic(ContractJournalPrompt.class);
                   MockedStatic<ContractCharacteristics> contractCharacteristics = mockStatic(
                         ContractCharacteristics.class);
                   MockedStatic<ContractEmergencyExtension> contractEmergencyExtension = mockStatic(

@@ -623,7 +623,9 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                 tech = u.getEngineer();
                 if (null == tech) {
                     target = new TargetRoll(TargetRoll.IMPOSSIBLE,
-                          "You must have a crew assigned to large vessels to attempt repairs.");
+                          u.isSelfMaintainedInfantry() ?
+                                "You must have soldiers assigned to this infantry unit to attempt repairs." :
+                                "You must have a crew assigned to large vessels to attempt repairs.");
                 }
             }
             if (null != tech) {
