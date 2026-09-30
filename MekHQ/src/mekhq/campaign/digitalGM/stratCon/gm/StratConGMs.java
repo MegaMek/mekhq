@@ -35,6 +35,7 @@ package mekhq.campaign.digitalGM.stratCon.gm;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.DigitalGMRegistry;
 import mekhq.campaign.digitalGM.IDigitalGM;
+import mekhq.campaign.digitalGM.IFacilityStrategy;
 import mekhq.campaign.digitalGM.IForceDeploymentStrategy;
 import mekhq.campaign.digitalGM.IMapGenerationStrategy;
 import mekhq.campaign.digitalGM.IOpForDeploymentStrategy;
@@ -99,6 +100,21 @@ public final class StratConGMs {
      */
     public static IOpForDeploymentStrategy opForDeployment(CampaignOptions campaignOptions) {
         return resolveGM(campaignOptions).getOpForDeploymentStrategy();
+    }
+
+    /**
+     * Resolves the facility strategy of the digital GM governing the given campaign.
+     *
+     * @param campaignOptions the campaign options used to consult the right GM
+     *
+     * @return the active StratCon GM's {@link IFacilityStrategy}, or the default StratCon strategy when no StratCon GM
+     *       is active
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static IFacilityStrategy facility(CampaignOptions campaignOptions) {
+        return resolveGM(campaignOptions).getFacilityStrategy();
     }
 
     /**

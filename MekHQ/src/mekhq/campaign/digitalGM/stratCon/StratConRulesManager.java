@@ -308,7 +308,7 @@ public class StratConRulesManager {
                 Set<Integer> assignedForceIDs = track.getAssignedCoordForces().get(scenarioCoords);
 
                 if (!assignedForceIDs.isEmpty()) {
-                    ambushTemplate = getAmbushTemplateForForce(campaign, assignedForceIDs.iterator().next());
+                    ambushTemplate = getAmbushTemplateForForce(campaign, track, assignedForceIDs.iterator().next());
                 }
 
                 scenario = generateScenarioForExistingForces(scenarioCoords,
@@ -355,11 +355,13 @@ public class StratConRulesManager {
      * using the force's primary unit type.</p>
      *
      * @param campaign the current {@link Campaign} context
+     * @param track    the track the ambush happens on; one that prevents aerospace rules out air and space templates
      * @param forceID  the ID of the force being ambushed; used to determine unit type and role
      *
      * @return a suitable ambush {@link ScenarioTemplate}, or {@code null} if none is configured for the unit type
      */
-    private static @Nullable ScenarioTemplate getAmbushTemplateForForce(Campaign campaign, int forceID) {
+    private static @Nullable ScenarioTemplate getAmbushTemplateForForce(Campaign campaign, StratConTrackState track,
+          int forceID) {
         int unitType = MEK;
         Formation formation = campaign.getPlayerForce().getFormation(forceID);
         if (formation != null) {
@@ -373,7 +375,7 @@ public class StratConRulesManager {
             isBungledPatrol = (role != null) && role.isPatrol();
         }
 
-        return StratConScenarioFactory.getRandomScenario(unitType, true, isBungledPatrol);
+        return getRandomScenarioForTrack(track, unitType, true, isBungledPatrol);
     }
 
     /**
@@ -1266,7 +1268,7 @@ public class StratConRulesManager {
             // is always pinned to (and present at) the deployed hex, so template selection uses its unit type.
             ScenarioTemplate ambushTemplate = null;
             if (isAmbushed) {
-                ambushTemplate = getAmbushTemplateForForce(campaign, forceID);
+                ambushTemplate = getAmbushTemplateForForce(campaign, track, forceID);
             }
 
             // Do we already have forces deployed to the target coordinates?
@@ -2604,21 +2606,110 @@ public class StratConRulesManager {
      * {@link megamek.common.units.UnitType#MEK} - a representative aerospace unit type is substituted so a suitable
      * scenario is still found instead of coming up empty.</p>
      *
+     * <p>A track holding a facility that prevents aerospace (see {@link StratConTrackState#isAerospacePrevented()})
+     * also rules out air and space templates.</p>
+     *
      * @param campaign the current {@link Campaign}
+     * @param track    the track the scenario is for
      * @param unitType the primary unit type of the deploying force, or {@code MEK} if none is available
      *
      * @return a suitable {@link ScenarioTemplate}, or {@code null} if none could be selected
      */
-    private static @Nullable ScenarioTemplate getFleetAppropriateRandomScenario(Campaign campaign, int unitType) {
-        Set<MapLocation> allowedLocations = getFleetRestrictedMapLocations(campaign);
+    private static @Nullable ScenarioTemplate getFleetAppropriateRandomScenario(Campaign campaign,
+          StratConTrackState track, int unitType) {
+        Set<MapLocation> allowedLocations = restrictMapLocationsForTrack(getFleetRestrictedMapLocations(campaign),
+              track);
+        return StratConScenarioFactory.getRandomScenario(adjustUnitTypeForMapLocations(unitType, allowedLocations),
+              false,
+              false,
+              allowedLocations);
+    }
 
-        if ((allowedLocations != null) &&
-                  (convertSpecificUnitTypeToGeneral(unitType) !=
-                         ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX)) {
-            unitType = allowedLocations.contains(Space) ? AEROSPACE_FIGHTER : CONV_FIGHTER;
+    /**
+     * Selects a random scenario template for the given unit type that is allowed on the given track: a track holding a
+     * facility that prevents aerospace (see {@link StratConTrackState#isAerospacePrevented()}) never gets an air or
+     * space template. Unlike {@link #getFleetAppropriateRandomScenario}, this does not apply the fleet-capability
+     * restriction.
+     *
+     * @param track           the track the scenario is for
+     * @param unitType        the primary unit type of the force involved
+     * @param isAmbushed      whether the scenario is an ambush
+     * @param isBungledPatrol whether the scenario is a bungled patrol
+     *
+     * @return a suitable {@link ScenarioTemplate}, or {@code null} if none could be selected
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable ScenarioTemplate getRandomScenarioForTrack(StratConTrackState track, int unitType,
+          boolean isAmbushed, boolean isBungledPatrol) {
+        Set<MapLocation> allowedLocations = restrictMapLocationsForTrack(null, track);
+        return StratConScenarioFactory.getRandomScenario(adjustUnitTypeForMapLocations(unitType, allowedLocations),
+              isAmbushed,
+              isBungledPatrol,
+              allowedLocations);
+    }
+
+    /**
+     * Narrows a set of allowed map locations to what the given track permits. A track holding a facility that prevents
+     * aerospace permits no air or space scenarios.
+     *
+     * @param allowedLocations the locations already allowed, or {@code null} for no restriction
+     * @param track            the track the scenario is for, or {@code null} to add no restriction
+     *
+     * @return the allowed locations, or {@code null} if there is no restriction at all
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable Set<MapLocation> restrictMapLocationsForTrack(@Nullable Set<MapLocation> allowedLocations,
+          @Nullable StratConTrackState track) {
+        if ((track == null) || !track.isAerospacePrevented()) {
+            return allowedLocations;
         }
 
-        return StratConScenarioFactory.getRandomScenario(unitType, false, false, allowedLocations);
+        Set<MapLocation> restrictedLocations = (allowedLocations == null) ?
+                                                     EnumSet.allOf(MapLocation.class) :
+                                                     EnumSet.copyOf(allowedLocations);
+        restrictedLocations.remove(LowAtmosphere);
+        restrictedLocations.remove(Space);
+        return restrictedLocations;
+    }
+
+    /**
+     * Substitutes a representative unit type when the given one would only pull templates from locations that are not
+     * allowed: an aerospace type when no ground location is allowed (most commonly because no deploying force was
+     * supplied, so the type defaulted to {@link megamek.common.units.UnitType#MEK}), or a Mek when no air or space
+     * location is allowed. This way a suitable scenario is still found instead of coming up empty.
+     *
+     * @param unitType         the primary unit type of the force involved
+     * @param allowedLocations the allowed locations, or {@code null} for no restriction
+     *
+     * @return the unit type to select templates for
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int adjustUnitTypeForMapLocations(int unitType, @Nullable Set<MapLocation> allowedLocations) {
+        if (allowedLocations == null) {
+            return unitType;
+        }
+
+        boolean isAerospaceUnitType = convertSpecificUnitTypeToGeneral(unitType) ==
+                                            ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_AERO_MIX;
+        boolean isGroundAllowed = allowedLocations.contains(AllGroundTerrain) ||
+                                        allowedLocations.contains(SpecificGroundTerrain);
+        boolean isAirAllowed = allowedLocations.contains(LowAtmosphere) || allowedLocations.contains(Space);
+
+        if (!isAerospaceUnitType && !isGroundAllowed && isAirAllowed) {
+            return allowedLocations.contains(Space) ? AEROSPACE_FIGHTER : CONV_FIGHTER;
+        }
+
+        if (isAerospaceUnitType && !isAirAllowed && isGroundAllowed) {
+            return MEK;
+        }
+
+        return unitType;
     }
 
     /**
@@ -2656,7 +2747,7 @@ public class StratConRulesManager {
         // produces an ambush. Ambushes (a scenario spawning on top of an already-deployed force) are handled up
         // front by generateScenarioForExistingForces in deployForceToCoords and generateDailyScenariosForTrack,
         // which pass an explicit ambush template instead of the random one selected here.
-        ScenarioTemplate template = getFleetAppropriateRandomScenario(campaign, unitType);
+        ScenarioTemplate template = getFleetAppropriateRandomScenario(campaign, track, unitType);
         // useful for debugging specific scenario types
         // template = StratConScenarioFactory.getSpecificScenario("Defend Grounded
         // Dropship.xml");
@@ -2713,7 +2804,7 @@ public class StratConRulesManager {
                 // This just means the player has no units
             }
 
-            template = getFleetAppropriateRandomScenario(campaign, unitType);
+            template = getFleetAppropriateRandomScenario(campaign, track, unitType);
         }
 
         if (template == null) {

@@ -251,7 +251,7 @@ public class StratConContractInitializer {
                             initializeTrackFacilities(campaignState.getTrack(x),
                                   numObjects,
                                   ForceAlignment.Allied,
-                                  true,
+                                  StrategicObjectiveType.AlliedFacilityControl,
                                   objectiveParams.objectiveScenarioModifiers);
                             break;
                         case HostileFacilityControl:
@@ -259,7 +259,7 @@ public class StratConContractInitializer {
                             initializeTrackFacilities(campaignState.getTrack(x),
                                   numObjects,
                                   ForceAlignment.Opposing,
-                                  true,
+                                  objectiveParams.objectiveType,
                                   objectiveParams.objectiveScenarioModifiers);
                             break;
                         case PointOfInterest:
@@ -301,15 +301,14 @@ public class StratConContractInitializer {
         }
 
         // Non-objective facilities: the defender's, so allied on a defensive contract and hostile on an offensive one.
-        // The objective facilities placed above are the only facilities so far, and count against the scale's share.
+        // The objective facilities placed above are the only facilities so far. Those the defender owns count against
+        // the scale's share; the other side's objective facilities do not, or they would crowd out the defender's own.
         if (!isUseMaplessMode) {
-            int objectiveFacilityCount = campaignState.getTracks().stream()
-                                               .mapToInt(track -> track.getFacilities().size())
-                                               .sum();
+            ForceAlignment facilityOwner = contract.isPlayerAttacker() ? ForceAlignment.Opposing : ForceAlignment.Allied;
+            int objectiveFacilityCount = countFacilitiesOwnedBy(campaignState.getTracks(), facilityOwner);
             int facilityCount = getNonObjectiveFacilityCount(contract.getScale(),
                   campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
                   objectiveFacilityCount);
-            ForceAlignment facilityOwner = contract.isPlayerAttacker() ? ForceAlignment.Opposing : ForceAlignment.Allied;
 
             List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
 
@@ -319,7 +318,7 @@ public class StratConContractInitializer {
                 initializeTrackFacilities(campaignState.getTrack(x),
                       numObjects,
                       facilityOwner,
-                      false,
+                      null,
                       Collections.emptyList());
             }
         }
@@ -773,6 +772,31 @@ public class StratConContractInitializer {
         return coords;
     }
 
+    /**
+     * Counts the facilities on the given tracks that belong to the given side.
+     *
+     * @param tracks the tracks to look over
+     * @param owner  the side whose facilities to count
+     *
+     * @return how many facilities that side owns across the tracks
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the non-objective share rule can be tested directly.
+    static int countFacilitiesOwnedBy(List<StratConTrackState> tracks, ForceAlignment owner) {
+        int count = 0;
+        for (StratConTrackState track : tracks) {
+            for (StratConFacility facility : track.getFacilities().values()) {
+                if (facility.getOwner() == owner) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
     /** Objective facilities are three times as scarce as the contract's whole share of facilities. */
     static final int OBJECTIVE_FACILITY_SCALE_DIVISOR = 3;
 
@@ -814,12 +838,13 @@ public class StratConContractInitializer {
     /**
      * Works out how many non-objective facilities a contract places. The contract's share of facilities is one per
      * point of scale when battlefield support points are factored into scale, since that makes for smaller scales, and
-     * one per three points otherwise, rounded down. Objective facilities count against that share; non-objective
-     * facilities only fill what they leave over.
+     * one per three points otherwise, rounded down. Objective facilities owned by the same side count against that
+     * share; non-objective facilities only fill what they leave over.
      *
      * @param scale                          the contract's scale
      * @param isFactorSupportPointsIntoScale whether battlefield support points are factored into scale
-     * @param objectiveFacilityCount         how many objective facilities the contract has already placed
+     * @param objectiveFacilityCount         how many objective facilities the contract has already placed for the side
+     *                                       that owns the non-objective facilities
      *
      * @return the number of non-objective facilities, never negative
      *
@@ -1916,11 +1941,15 @@ public class StratConContractInitializer {
      * Worker function that takes a track state and plops down the given number of facilities owned by the given faction
      * Avoids places with existing facilities and scenarios, capable of taking facility sub set and setting strategic
      * objective flag.
+     *
+     * @param objectiveType the strategic objective each facility is tied to, or {@code null} for facilities that are no
+     *                      objective at all
      */
     // Package-private rather than private so the capacity rules can be tested directly; reaching them through contract
     // initialization would mean standing up a whole contract to assert on a placement loop.
     static void initializeTrackFacilities(StratConTrackState trackState, int numFacilities, ForceAlignment owner,
-          boolean strategicObjective, List<String> modifiers) {
+          @Nullable StrategicObjectiveType objectiveType, List<String> modifiers) {
+        boolean strategicObjective = objectiveType != null;
 
         int capacity = facilityCapacity(trackState);
         int placed = 0;
@@ -1955,11 +1984,11 @@ public class StratConContractInitializer {
                 if (sf.getOwner() == ForceAlignment.Allied) {
                     trackState.getRevealedCoords().add(coords);
                     sf.setVisible(true);
-                    sso.setObjectiveType(StrategicObjectiveType.AlliedFacilityControl);
                 } else {
                     sf.setVisible(false);
-                    sso.setObjectiveType(StrategicObjectiveType.HostileFacilityControl);
                 }
+
+                sso.setObjectiveType(objectiveType);
 
                 trackState.addStrategicObjective(sso);
             }
