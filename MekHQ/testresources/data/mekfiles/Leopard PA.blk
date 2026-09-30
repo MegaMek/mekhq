@@ -1,0 +1,254 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-ac4d-7fb0-87c6-ec026c31e73f
+</UUID>
+
+<UnitType>
+Dropship
+</UnitType>
+
+<Name>
+Leopard
+</Name>
+
+<Model>
+PA-Class Dropship
+</Model>
+
+<mul id:>
+1867
+</mul id:>
+
+<year>
+3073
+</year>
+
+<type>
+IS Level 4
+</type>
+
+<role>
+None
+</role>
+
+<motion_type>
+Aerodyne
+</motion_type>
+
+<transporters>
+smallcraftbay:2.0:2:1::-1:0
+asfbay:2.0:2:2::-1:0
+1stclassquarters:20.0:0:-1::-1:0
+2ndclassquarters:0.0:0:-1::-1:0
+infantrybay:4.0:1:5:Jump:-1:0
+crewquarters:77.0:0:-1::-1:0
+</transporters>
+
+<SafeThrust>
+4
+</SafeThrust>
+
+<heatsinks>
+129
+</heatsinks>
+
+<sink_type>
+1
+</sink_type>
+
+<fuel>
+4840
+</fuel>
+
+<engine_type>
+1
+</engine_type>
+
+<armor_type>
+19
+</armor_type>
+
+<armor_tech_rating>
+0
+</armor_tech_rating>
+
+<armor_tech_level>
+7
+</armor_tech_level>
+
+<armor>
+230
+180
+180
+130
+</armor>
+
+<Nose Equipment>
+(B) ISERPPC
+ISERPPC
+ISERPPC
+ISERPPC
+ISERPPC
+PPC Capacitor
+PPC Capacitor
+PPC Capacitor
+PPC Capacitor
+PPC Capacitor
+(B) LRM 20
+LRM 20
+IS Ammo LRM-20 Artemis-capable:24
+ISArtemisIV
+ISArtemisIV
+(B) ISSmallPulseLaser
+ISSmallPulseLaser
+</Nose Equipment>
+
+<Left Side Equipment>
+(B) LRM 20
+LRM 20
+IS Ammo LRM-20 Artemis-capable:36
+ISArtemisIV
+ISArtemisIV
+(B) Binary Laser (Blazer) Cannon
+Binary Laser (Blazer) Cannon
+(R) (B) ISSmallPulseLaser
+(R) ISSmallPulseLaser
+</Left Side Equipment>
+
+<Right Side Equipment>
+(B) LRM 20
+LRM 20
+IS Ammo LRM-20 Artemis-capable:36
+ISArtemisIV
+ISArtemisIV
+(B) Binary Laser (Blazer) Cannon
+Binary Laser (Blazer) Cannon
+(R) (B) ISSmallPulseLaser
+(R) ISSmallPulseLaser
+</Right Side Equipment>
+
+<Aft Equipment>
+(B) Binary Laser (Blazer) Cannon
+Binary Laser (Blazer) Cannon
+(B) ISMediumPulseLaser
+ISMediumPulseLaser
+ISMediumPulseLaser
+ISMediumPulseLaser
+</Aft Equipment>
+
+<Hull Equipment>
+</Hull Equipment>
+
+<structural_integrity>
+10
+</structural_integrity>
+
+<capabilities>
+<p>The PA variant is a pirate-engineered assault conversion that transforms the standard Leopard into a heavily armed combat platform. The 'Mech bays have been removed and replaced with infantry facilities for four platoons, while a pair of small craft bays and two fighter cubicles provide auxiliary force projection. Forty-two and a half tons of ferro-aluminum armor increase protection to 720 points, and structural integrity was reinforced to 10.</p><p>The weapons fit is dramatically upgraded using advanced technology, with five ER PPCs in the nose, each equipped with a PPC capacitor for devastating alpha strikes. An LRM-20 with Artemis IV and a pair of small pulse lasers supplement the nose battery. Each broadside and the aft arc mount pairs of binary laser cannons, providing heavy firepower across all aspects. One hundred twenty-nine double heat sinks manage the enormous thermal load of this weapons-heavy configuration. While crude in execution, the PA conversion demonstrates the Leopard hull's remarkable adaptability to roles far beyond its original design intent.</p>
+</capabilities>
+
+<overview>
+<p>The Leopard class DropShip is arguably the most iconic military transport in the Inner Sphere. First launched in 2537, this 1,900-ton Aerodyne was among the first DropShip classes designed specifically as a BattleMech carrier rather than a converted infantry or vehicle transport. Its simple, reliable design and relatively low operating costs allowed it to survive the technological devastation of the Succession Wars, and it has served as the standard lance-sized 'Mech carrier for virtually every military power in known space.</p><p>Carrying four BattleMechs and a pair of aerospace fighters, the Leopard provides the basic tactical unit needed for reconnaissance, raiding, planetary assault, and special operations missions. The vessel's boxy hull has earned it the near-universal nickname of "the Brick" among pilots and crew, a reference to both its angular profile and its atmospheric handling characteristics. Despite this unflattering moniker, the Leopard's abundance of replacement parts and the sheer number in service have made it the most common entry vehicle for BattleMech operations across the Inner Sphere and beyond.</p>
+</overview>
+
+<deployment>
+<p>The PA variant first appeared in 3075 over the world of Repulse, operated by pirate forces in the Periphery. Intelligence reports confirmed that the vessel was a custom conversion incorporating advanced technology enhancements scavenged or purchased from various sources during the chaos of the Jihad. The PA demonstrates both the desperation and ingenuity of Periphery operators who lacked access to purpose-built assault DropShips and instead adapted the ubiquitous Leopard hull to serve as a makeshift warship.</p>
+</deployment>
+
+<history>
+<p>The Leopard class DropShip entered service in 2537, during the golden age of the Star League's military expansion. Its original designers created a straightforward BattleMech transport that could carry the Star League Defense Force's standard AirLance of four 'Mechs and two aerospace fighters. Under SLDF doctrine, one in every three lances was organized as an AirLance, and each was typically assigned a dedicated Leopard. This close association between unit and vessel fostered strong bonds between ground forces and their transport crews, particularly during the low-level conflicts of the later Succession Wars when individual Leopards often served the same unit for decades.</p><p>Multiple manufacturers produced the Leopard from the Star League era onward, including Bowie Industries, Federated-Boeing Interstellar, Irian Naval Systems, Majesty Metals and Manufacturing, and Taurus Territorial Industries. This broad production base was critical to the class's survival through the Succession Wars, as the loss of any single facility could not eliminate the design from service. The Leopard's simple construction also meant that field repairs were feasible even at facilities lacking sophisticated shipyard capabilities, though its drive system remained one of the few components that consistently required specialized maintenance.</p><p>A carrier variant emerged in 2581, replacing the 'Mech bays with additional fighter cubicles to create a dedicated six-fighter carrier. The Leopard CV became the standard small fighter carrier for escort and patrol duties, frequently operating alongside the standard model and the Fury infantry transport in combined assault formations. The curved armor plating that became possible roughly fifty years after the original design benefited the CV variant's aerodynamic profile.</p><p>In 3056, both Irian Naval Systems and Federated-Boeing Interstellar independently released upgraded versions of the Leopard incorporating recovered Star League technology. The near-identical specifications of these two redesigns led to allegations of industrial espionage, with Federated-Boeing formally protesting that Irian had stolen their design plans during a raid on the Floating Tower facility at Galax in 3053. The accusations were never resolved, but both versions entered production and distributed widely. Starting in 2845, the Magistracy of Canopus modified several of their Leopards with an alternative weapons fit, a change that went largely unnoticed by the other Successor States for years.</p><p>The Word of Blake's Jihad brought more radical modifications to the venerable design. Using Irian Naval Systems' Clipperton yards, Blakist engineers converted Leopards into Pocket WarShips by replacing the 'Mech and fighter bays with capital missile systems and dramatically increasing the armor and drive power. These converted vessels proved a significant threat during the Jihad. Separately, pirate forces in the Periphery produced their own assault conversion, demonstrating the Leopard's enduring adaptability. Through all of these variations, the standard Leopard has remained in production and continues to serve as the quintessential BattleMech transport throughout the Inner Sphere.</p>
+</history>
+
+<manufacturer>
+Majesty Metals and Manufacturing|Unknown (Pirate conversion)
+</manufacturer>
+
+<primaryFactory>
+Dunianshire|Unknown
+</primaryFactory>
+
+<systemManufacturers>
+CHASSIS:Unknown
+ENGINE:Unknown
+ARMOR:Unknown
+COMMUNICATIONS:Unknown
+TARGETING:Unknown
+</systemManufacturers>
+
+<systemModels>
+CHASSIS:Unknown
+ENGINE:Star League V84
+ARMOR:Unknown
+COMMUNICATIONS:Unknown
+TARGETING:Unknown
+</systemModels>
+
+<source>
+XTR:Pirates
+</source>
+
+<published>
+XTR:Pirates
+</published>
+
+<tonnage>
+1900.0
+</tonnage>
+
+<designtype>
+1
+</designtype>
+
+<crew>
+111
+</crew>
+
+<officers>
+2
+</officers>
+
+<gunners>
+8
+</gunners>
+
+<passengers>
+0
+</passengers>
+
+<marines>
+0
+</marines>
+
+<battlearmor>
+0
+</battlearmor>
+
+<otherpassenger>
+0
+</otherpassenger>
+
+<life_boat>
+0
+</life_boat>
+
+<escape_pod>
+2
+</escape_pod>
+

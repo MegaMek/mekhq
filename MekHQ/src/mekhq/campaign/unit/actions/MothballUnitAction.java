@@ -62,7 +62,7 @@ public record MothballUnitAction(Person tech, boolean isGM) implements IUnitActi
         if (isGM) {
             unit.startMothballing(null, true);
         } else {
-            if (!unit.isConventionalInfantry() && (null == tech)) {
+            if (!unit.isSelfMaintainedInfantry() && (null == tech)) {
                 return;
             }
 

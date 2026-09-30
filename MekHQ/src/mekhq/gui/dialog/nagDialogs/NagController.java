@@ -237,6 +237,14 @@ public class NagController {
             }
         }
 
+        // Expiring StratCon Nav Points
+        if (ExpiringNavPointsNagDialog.checkNag(isUseStratCon, activeContracts, today)) {
+            ExpiringNavPointsNagDialog expiringNavPointsNagDialog = new ExpiringNavPointsNagDialog(campaign);
+            if (expiringNavPointsNagDialog.shouldCancelAdvanceDay()) {
+                return true;
+            }
+        }
+
         // Outstanding Scenarios
         if (OutstandingScenariosNagDialog.checkNag(campaign)) {
             OutstandingScenariosNagDialog outstandingScenariosNagDialog = new OutstandingScenariosNagDialog(campaign);
