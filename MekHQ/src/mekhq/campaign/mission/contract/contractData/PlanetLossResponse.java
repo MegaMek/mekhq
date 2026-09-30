@@ -30,27 +30,17 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.campaignOptions.contents;
-
-import mekhq.campaign.campaignOptions.CampaignOptions;
-import org.junit.jupiter.api.Test;
+package mekhq.campaign.mission.contract.contractData;
 
 /**
- * Exhaustive round-trip test for {@link RulesetsOptionsModel}. {@link OptionsModelTestSupport#mutateScalarFields}
- * mutates every boolean, enum, and int field and {@link OptionsModelTestSupport#assertAllFieldsMatch} verifies each one
- * survives a save/reload. {@code strategicViewTheme} is a {@link String}, so it is set by hand.
+ * How the player responds when their employer loses control of the planet a defensive contract is being fought on.
+ *
+ * @author Illiani
+ * @since 0.51.01
  */
-class RulesetsOptionsModelTest {
-    @Test
-    void applyToRoundTripsEveryField() {
-        RulesetsOptionsModel model = new RulesetsOptionsModel(new CampaignOptions());
-        OptionsModelTestSupport.mutateScalarFields(model);
-        model.strategicViewTheme = "test.theme";
-
-        CampaignOptions destination = new CampaignOptions();
-        model.applyTo(destination);
-        RulesetsOptionsModel roundTripped = new RulesetsOptionsModel(destination);
-
-        OptionsModelTestSupport.assertAllFieldsMatch(model, roundTripped);
-    }
+public enum PlanetLossResponse {
+    /** The contract ends the next day, like a rout, as a partial success with no remaining pay. */
+    JOIN_EVACUATION,
+    /** The contract is regenerated as a Guerrilla Warfare contract against the planet's new owner. */
+    LEAD_RESISTANCE
 }

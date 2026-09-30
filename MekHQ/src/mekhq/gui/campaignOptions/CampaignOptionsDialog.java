@@ -44,16 +44,7 @@ import java.awt.FlowLayout;
 import java.awt.GridBagLayout;
 import java.io.File;
 import java.util.ResourceBundle;
-import javax.swing.BoxLayout;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
-import javax.swing.UIManager;
+import javax.swing.*;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
@@ -300,7 +291,11 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
                 continue;
             }
 
-            campaignOptionsPane.applyCampaignOptionsToCampaign(preset, mode, true);
+            // Without campaign options the preset has nothing for the pages to write into, and they would fall back to
+            // writing into the running campaign's options
+            if (preset.getCampaignOptions() != null) {
+                campaignOptionsPane.applyCampaignOptionsToCampaign(preset, mode, true);
+            }
             if (!preset.writeToFile(getFrame(), presetFile)) {
                 return;
             }

@@ -87,6 +87,7 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.ImageType;
 import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
@@ -2331,7 +2332,8 @@ public class StratConPanel extends JPanel implements ActionListener {
                 recalculateRoads();
                 break;
             case RIGHT_CLICK_COMMAND_CAPTURE_FACILITY:
-                StratConRulesManager.switchFacilityOwner(currentTrack.getFacility(selectedCoords));
+                StratConGMs.facility(campaign.getCampaignOptions())
+                      .switchFacilityOwner(currentTrack.getFacility(selectedCoords));
                 // Deliberately does NOT recalculate roads. A road is built ground: taking the base at the end of it
                 // neither lays new road nor tears up the old. Recalculating would also rebuild the whole network from
                 // scratch, so a single capture could redraw roads across the sector. Capturing the same facility by

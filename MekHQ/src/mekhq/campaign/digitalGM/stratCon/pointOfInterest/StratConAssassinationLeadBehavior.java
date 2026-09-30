@@ -36,6 +36,7 @@ import static java.lang.Math.max;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 
 import java.util.List;
+import java.util.Map;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
@@ -88,16 +89,17 @@ public class StratConAssassinationLeadBehavior extends StratConContestedPointOfI
 
     /**
      * Settles, when the contract is accepted, which leads point to the real target: one per point of the contract's
-     * scale, or all of them if there are fewer. The rest turn up body doubles.
+     * scale, or all of them if there are fewer. The rest turn up body doubles. When the schedule is rolled again,
+     * real targets already placed count against that share.
      *
      * @author Illiani
      * @since 0.51.01
      */
     @Override
     public void onScheduled(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest,
-          AbstractContract contract) {
+          AbstractContract contract, Map<String, Integer> alreadyMarkedCounts) {
         StratConScheduledPointOfInterest.markAtRandom(scheduledPointsOfInterest,
-              max(1, contract.getScale()),
+              max(0, max(1, contract.getScale()) - alreadyMarkedCounts.getOrDefault(REAL_TARGET_STATE_KEY, 0)),
               REAL_TARGET_STATE_KEY);
     }
 
