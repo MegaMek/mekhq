@@ -42,6 +42,7 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.enums.MiscTypeFlag;
 import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -57,6 +58,8 @@ import org.w3c.dom.NodeList;
  * @author Jay Lawson (jaylawson39 at yahoo.com)
  */
 public class InfantryArmorPart extends Part {
+    private static final MMLogger LOGGER = MMLogger.create(InfantryArmorPart.class);
+
     private double damageDivisor;
     private boolean encumbering;
     private boolean spaceSuit;
@@ -72,27 +75,50 @@ public class InfantryArmorPart extends Part {
         this(0, null, 1.0, false, false, false, false, false, false);
     }
 
-    public InfantryArmorPart(int tonnage, Campaign c, double divisor, boolean enc, boolean dest, boolean camo,
-          boolean ir, boolean ecm, boolean space) {
-        this(tonnage, c, null, divisor, enc, dest, camo, ir, ecm, space);
+    /**
+     * Armor described only by its properties, with no armor kit.
+     *
+     * @param tonnage       the platoon's tonnage
+     * @param campaign      the campaign, or {@code null} while the part is being loaded from a save
+     * @param damageDivisor the armor's damage divisor
+     * @param isEncumbering {@code true} if the armor is encumbering
+     * @param hasDEST       {@code true} for a DEST infiltration suit
+     * @param hasSneakCamo  {@code true} for a sneak suit with camouflage
+     * @param hasSneakIR    {@code true} for a sneak suit with infrared baffling
+     * @param hasSneakECM   {@code true} for a sneak suit with ECM
+     * @param isSpaceSuit   {@code true} for a space suit
+     */
+    public InfantryArmorPart(int tonnage, @Nullable Campaign campaign, double damageDivisor, boolean isEncumbering,
+          boolean hasDEST, boolean hasSneakCamo, boolean hasSneakIR, boolean hasSneakECM, boolean isSpaceSuit) {
+        this(tonnage, campaign, null, damageDivisor, isEncumbering, hasDEST, hasSneakCamo, hasSneakIR, hasSneakECM,
+              isSpaceSuit);
     }
 
     /**
-     * @param c        the campaign, or {@code null} while the part is being loaded from a save
-     * @param armorKit the armor kit this part is, or {@code null} for armor described only by its properties; a kit
-     *                 names and prices the part
+     * @param tonnage       the platoon's tonnage
+     * @param campaign      the campaign, or {@code null} while the part is being loaded from a save
+     * @param armorKit      the armor kit this part is, or {@code null} for armor described only by its properties; a kit
+     *                      names and prices the part
+     * @param damageDivisor the armor's damage divisor
+     * @param isEncumbering {@code true} if the armor is encumbering
+     * @param hasDEST       {@code true} for a DEST infiltration suit
+     * @param hasSneakCamo  {@code true} for a sneak suit with camouflage
+     * @param hasSneakIR    {@code true} for a sneak suit with infrared baffling
+     * @param hasSneakECM   {@code true} for a sneak suit with ECM
+     * @param isSpaceSuit   {@code true} for a space suit
      */
-    public InfantryArmorPart(int tonnage, @Nullable Campaign c, @Nullable EquipmentType armorKit, double divisor,
-          boolean enc, boolean dest, boolean camo, boolean ir, boolean ecm, boolean space) {
-        super(tonnage, c);
+    public InfantryArmorPart(int tonnage, @Nullable Campaign campaign, @Nullable EquipmentType armorKit,
+          double damageDivisor, boolean isEncumbering, boolean hasDEST, boolean hasSneakCamo, boolean hasSneakIR,
+          boolean hasSneakECM, boolean isSpaceSuit) {
+        super(tonnage, campaign);
         this.armorKit = armorKit;
-        this.damageDivisor = divisor;
-        this.encumbering = enc;
-        this.dest = dest;
-        this.sneak_camo = camo;
-        this.sneak_ecm = ecm;
-        this.sneak_ir = ir;
-        this.spaceSuit = space;
+        this.damageDivisor = damageDivisor;
+        this.encumbering = isEncumbering;
+        this.dest = hasDEST;
+        this.sneak_camo = hasSneakCamo;
+        this.sneak_ecm = hasSneakECM;
+        this.sneak_ir = hasSneakIR;
+        this.spaceSuit = isSpaceSuit;
         assignName();
     }
 
@@ -345,43 +371,47 @@ public class InfantryArmorPart extends Part {
     }
 
     @Override
-    public void writeToXML(final PrintWriter pw, int indent) {
-        indent = writeToXMLBegin(pw, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "damageDivisor", damageDivisor);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "dest", dest);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "encumbering", encumbering);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sneak_camo", sneak_camo);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sneak_ecm", sneak_ecm);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sneak_ir", sneak_ir);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaceSuit", spaceSuit);
+    public void writeToXML(final PrintWriter printWriter, int indent) {
+        indent = writeToXMLBegin(printWriter, indent);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "damageDivisor", damageDivisor);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "dest", dest);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "encumbering", encumbering);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sneak_camo", sneak_camo);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sneak_ecm", sneak_ecm);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "sneak_ir", sneak_ir);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "spaceSuit", spaceSuit);
         if (armorKit != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "armorKit", armorKit.getInternalName());
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "armorKit", armorKit.getInternalName());
         }
-        writeToXMLEnd(pw, indent);
+        writeToXMLEnd(printWriter, indent);
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) {
-        NodeList nl = wn.getChildNodes();
+    protected void loadFieldsFromXmlNode(Node node) {
+        NodeList childNodes = node.getChildNodes();
 
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("damageDivisor")) {
-                damageDivisor = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("dest")) {
-                dest = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("encumbering")) {
-                encumbering = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("sneak_camo")) {
-                sneak_camo = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("sneak_ecm")) {
-                sneak_ecm = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("sneak_ir")) {
-                sneak_ir = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("spaceSuit")) {
-                spaceSuit = wn2.getTextContent().equalsIgnoreCase("true");
-            } else if (wn2.getNodeName().equalsIgnoreCase("armorKit")) {
-                armorKit = EquipmentType.get(wn2.getTextContent().trim());
+        for (int index = 0; index < childNodes.getLength(); index++) {
+            Node childNode = childNodes.item(index);
+            try {
+                if (childNode.getNodeName().equalsIgnoreCase("damageDivisor")) {
+                    damageDivisor = Double.parseDouble(childNode.getTextContent());
+                } else if (childNode.getNodeName().equalsIgnoreCase("dest")) {
+                    dest = childNode.getTextContent().equalsIgnoreCase("true");
+                } else if (childNode.getNodeName().equalsIgnoreCase("encumbering")) {
+                    encumbering = childNode.getTextContent().equalsIgnoreCase("true");
+                } else if (childNode.getNodeName().equalsIgnoreCase("sneak_camo")) {
+                    sneak_camo = childNode.getTextContent().equalsIgnoreCase("true");
+                } else if (childNode.getNodeName().equalsIgnoreCase("sneak_ecm")) {
+                    sneak_ecm = childNode.getTextContent().equalsIgnoreCase("true");
+                } else if (childNode.getNodeName().equalsIgnoreCase("sneak_ir")) {
+                    sneak_ir = childNode.getTextContent().equalsIgnoreCase("true");
+                } else if (childNode.getNodeName().equalsIgnoreCase("spaceSuit")) {
+                    spaceSuit = childNode.getTextContent().equalsIgnoreCase("true");
+                } else if (childNode.getNodeName().equalsIgnoreCase("armorKit")) {
+                    armorKit = EquipmentType.get(childNode.getTextContent().trim());
+                }
+            } catch (Exception exception) {
+                LOGGER.error("", exception);
             }
         }
     }
