@@ -97,6 +97,8 @@ public enum UnitFixture {
     LUMBERJACK_LM1A("Lumberjack LM1A", false, Mek.class),
     /** Omega SHP-5R, a superheavy Mek with a superheavy gyro. Source: {@code meks/3145/NTNU RS/NTNU/Omega SHP-5R.mtf}. */
     OMEGA_SHP_5R("Omega SHP-5R", false, Mek.class),
+    /** Omega SHP-4X, the earlier superheavy Omega. Source: {@code meks/Jihad Final Reckoning/OMEGA SHP-4X.mtf}. */
+    OMEGA_SHP_4X("OMEGA SHP-4X", false, Mek.class),
     /**
      * Skinwalker A, a Mek with an interface cockpit and no gyro. Source: {@code meks/Rec Guides ilClan/Vol 24/(Ryoken III) Skinwalker A.mtf}.
      */
