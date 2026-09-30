@@ -592,8 +592,7 @@ public final class BriefingTab extends CampaignGuiTab {
     static TableRowSorter<ScenarioTableModel> createScenarioSorter(ScenarioTableModel model) {
         TableRowSorter<ScenarioTableModel> sorter = new ScenarioRowSorter(model);
         sorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
-        sorter.setComparator(ScenarioTableModel.COL_DATE,
-              Comparator.<LocalDate>nullsFirst(Comparator.naturalOrder()));
+        sorter.setComparator(ScenarioTableModel.COL_DATE, Comparator.<ScenarioTableModel.DisplayDate>naturalOrder());
         sorter.setSortKeys(List.of(new RowSorter.SortKey(ScenarioTableModel.COL_DATE, SortOrder.DESCENDING)));
         return sorter;
     }
