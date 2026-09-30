@@ -42,6 +42,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.common.units.Entity;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -67,6 +68,8 @@ import mekhq.campaign.unit.UnitAcquisitionType;
  * Manages machines and material for a campaign.
  */
 public record ForceQuartermaster(Campaign campaign) {
+    private static final MMLogger LOGGER = MMLogger.create(ForceQuartermaster.class);
+
     public enum PartAcquisitionResult {
         PartInherentFailure,
         PlanetSpecificFailure,
@@ -749,6 +752,12 @@ public record ForceQuartermaster(Campaign campaign) {
             return;
         } else if (part instanceof Armor) {
             sellArmor((Armor) part, quantity);
+            return;
+        }
+
+        // A part on a unit, reserved or being worked on is not for sale; paying for it would keep the part as well
+        if (!part.isSpare()) {
+            LOGGER.warn("[Quartermaster] {} was not sold: it is not a spare", part.getName());
             return;
         }
 

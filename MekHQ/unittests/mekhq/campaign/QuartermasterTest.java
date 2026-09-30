@@ -1041,6 +1041,7 @@ public class QuartermasterTest {
 
         // Two parts on hand worth 1 C-bill each...
         Part mockPart = mock(Part.class);
+        when(mockPart.isSpare()).thenReturn(true);
         when(mockPart.getQuantity()).thenReturn(2);
         when(mockPart.getActualValue()).thenReturn(Money.of(1.0));
 
@@ -1065,6 +1066,7 @@ public class QuartermasterTest {
 
         // Ten parts on hand worth 1 C-bill each...
         Part mockPart = mock(Part.class);
+        when(mockPart.isSpare()).thenReturn(true);
         when(mockPart.getQuantity()).thenReturn(10);
         when(mockPart.getActualValue()).thenReturn(Money.of(1.0));
 
@@ -1087,6 +1089,7 @@ public class QuartermasterTest {
 
         // Five parts on hand worth 1 C-bill each...
         Part mockPart = mock(Part.class);
+        when(mockPart.isSpare()).thenReturn(true);
         int warehouseQuantity = 5;
         when(mockPart.getQuantity()).thenReturn(warehouseQuantity);
         when(mockPart.getActualValue()).thenReturn(Money.of(1.0));
@@ -1110,6 +1113,7 @@ public class QuartermasterTest {
 
         // Five parts on hand worth 1 C-bill each...
         Part mockPart = mock(Part.class);
+        when(mockPart.isSpare()).thenReturn(true);
         int warehouseQuantity = 5;
         when(mockPart.getQuantity()).thenReturn(warehouseQuantity);
         double value = 1.0;
@@ -1156,6 +1160,7 @@ public class QuartermasterTest {
 
         // Ten parts on hand worth 1 C-bill each...
         Part mockPart = mock(Part.class);
+        when(mockPart.isSpare()).thenReturn(true);
         int warehouseQuantity = 10;
         when(mockPart.getQuantity()).thenReturn(warehouseQuantity);
         when(mockPart.getActualValue()).thenReturn(Money.of(1.0));
