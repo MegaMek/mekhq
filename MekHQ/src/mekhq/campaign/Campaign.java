@@ -2870,11 +2870,18 @@ public class Campaign implements ITechManager {
         // Capture the original's effective warehouse before decrementing, since
         // decrementing to zero would remove the original and clear its locationNode.
         LocalWarehouse targetWarehouse = part.getWarehouse();
+        boolean isBaseSpare = targetWarehouse != getPlayerForce().getWarehouse();
+        if (isBaseSpare) {
+            // The tech's location is checked against the copy, so the copy must be at the spare's base first
+            LocationNode.LocationManager.setLocation(repairable, targetWarehouse);
+        }
         part.changeQuantity(-1);
 
         fixPart(repairable, tech);
-        if (!(repairable instanceof OmniPod)) {
-            if (targetWarehouse == getPlayerForce().getWarehouse()) {
+        // An OmniPod leaves the bench only when it is filled with equipment or destroyed; otherwise it goes back
+        boolean isPodUsedUp = (repairable instanceof OmniPod omniPod) && omniPod.isUsedUp();
+        if (!isPodUsedUp) {
+            if (!isBaseSpare) {
                 // Main-force spare: use the Quartermaster for full processing.
                 getQuartermaster().addPart(repairable, 0, false);
             } else {
