@@ -78,11 +78,12 @@ public class InfantryArmorPart extends Part {
     }
 
     /**
+     * @param c        the campaign, or {@code null} while the part is being loaded from a save
      * @param armorKit the armor kit this part is, or {@code null} for armor described only by its properties; a kit
      *                 names and prices the part
      */
-    public InfantryArmorPart(int tonnage, Campaign c, @Nullable EquipmentType armorKit, double divisor, boolean enc,
-          boolean dest, boolean camo, boolean ir, boolean ecm, boolean space) {
+    public InfantryArmorPart(int tonnage, @Nullable Campaign c, @Nullable EquipmentType armorKit, double divisor,
+          boolean enc, boolean dest, boolean camo, boolean ir, boolean ecm, boolean space) {
         super(tonnage, c);
         this.armorKit = armorKit;
         this.damageDivisor = divisor;
