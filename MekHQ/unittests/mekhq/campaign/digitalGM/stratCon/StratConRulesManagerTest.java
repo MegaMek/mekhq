@@ -463,7 +463,7 @@ class StratConRulesManagerTest {
      */
     private void stubScenarioGeneration(MockedStatic<StratConScenarioFactory> scenarioFactory,
           MockedStatic<StratConRulesManager> rulesManager) {
-        scenarioFactory.when(() -> StratConScenarioFactory.getRandomScenario(anyInt(), anyBoolean(), anyBoolean()))
+        scenarioFactory.when(() -> StratConScenarioFactory.getRandomScenario(anyInt(), anyBoolean(), anyBoolean(), any()))
               .thenReturn(mock(ScenarioTemplate.class));
         rulesManager.when(() -> StratConRulesManager.calculateScenarioOdds(any(), any(), anyBoolean()))
               .thenReturn(100);
@@ -495,7 +495,7 @@ class StratConRulesManagerTest {
             StratConRulesManager.deployForceToCoords(fixture.coords(), fixture.forceID(), fixture.campaign(),
                   fixture.contract(), fixture.track(), false);
 
-            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(false)));
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(false), any()));
             assertEquals(List.of(false), dialogBungledArgs);
         }
     }
@@ -520,7 +520,7 @@ class StratConRulesManagerTest {
             StratConRulesManager.deployForceToCoords(fixture.coords(), fixture.forceID(), fixture.campaign(),
                   fixture.contract(), fixture.track(), false);
 
-            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(true)));
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(true), any()));
             assertEquals(List.of(true), dialogBungledArgs);
             // Pinned to the deployed hex: the scenario is built for the force already there, not migrated away.
             rulesManager.verify(() -> StratConRulesManager.generateScenarioForExistingForces(eq(fixture.coords()),
@@ -547,7 +547,7 @@ class StratConRulesManagerTest {
             StratConRulesManager.deployForceToCoords(fixture.coords(), fixture.forceID(), fixture.campaign(),
                   fixture.contract(), fixture.track(), false);
 
-            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), anyBoolean()),
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), anyBoolean(), any()),
                   never());
             assertTrue(dialogBungledArgs.isEmpty());
         }
@@ -735,7 +735,7 @@ class StratConRulesManagerTest {
           MockedStatic<StratConRulesManager> rulesManager,
           MockedStatic<StratConContractInitializer> contractInitializer, StratConCoords coords) {
         ScenarioTemplate ambushTemplate = mock(ScenarioTemplate.class);
-        scenarioFactory.when(() -> StratConScenarioFactory.getRandomScenario(anyInt(), anyBoolean(), anyBoolean()))
+        scenarioFactory.when(() -> StratConScenarioFactory.getRandomScenario(anyInt(), anyBoolean(), anyBoolean(), any()))
               .thenReturn(ambushTemplate);
         rulesManager.when(() -> StratConRulesManager.getAvailableForceIDs(any(), any(), anyBoolean()))
               .thenReturn(new ArrayList<>());
@@ -769,7 +769,7 @@ class StratConRulesManagerTest {
                   fixture.contract(), 1);
 
             // Ambush template requested for the deployed force (non-patrol, so not a bungled patrol) ...
-            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(false)));
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(false), any()));
             // ... and passed through to the existing-forces generation for the occupied hex.
             rulesManager.verify(() -> StratConRulesManager.generateScenarioForExistingForces(eq(fixture.coords()),
                   eq(fixture.assignedForceIDs()), eq(fixture.contract()), eq(fixture.campaign()), eq(fixture.track()),
@@ -796,7 +796,7 @@ class StratConRulesManagerTest {
             StratConRulesManager.generateDailyScenariosForTrack(fixture.campaign(), fixture.campaignState(),
                   fixture.contract(), 1);
 
-            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(true)));
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(true), any()));
             rulesManager.verify(() -> StratConRulesManager.generateScenarioForExistingForces(eq(fixture.coords()),
                   any(), any(), any(), any(), eq(ambushTemplate), isNull()));
         }
@@ -823,7 +823,7 @@ class StratConRulesManagerTest {
             StratConRulesManager.generateDailyScenariosForTrack(fixture.campaign(), fixture.campaignState(),
                   fixture.contract(), 1);
 
-            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), anyBoolean()),
+            scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), anyBoolean(), any()),
                   never());
             rulesManager.verify(() -> StratConRulesManager.generateScenarioForExistingForces(any(), any(), any(),
                   any(), any(), any(), any()), never());

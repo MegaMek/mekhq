@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon.pointOfInterest;
 
 import java.util.List;
+import java.util.Map;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.Campaign;
@@ -69,6 +70,25 @@ public interface IStratConPointOfInterestBehavior {
      */
     default void onScheduled(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest,
           AbstractContract contract) {
+        onScheduled(scheduledPointsOfInterest, contract, Map.of());
+    }
+
+    /**
+     * As {@link #onScheduled(List, AbstractContract)}, but for a schedule rolled again partway through the contract,
+     * when some points of interest of this type have already been placed or are overdue. Whatever those already settled
+     * counts against what is settled now, so a contract never ends up with more than its share - more real
+     * assassination targets, say, than its scale allows. By default, nothing.
+     *
+     * @param scheduledPointsOfInterest the newly scheduled points of interest of this type, not yet placed
+     * @param contract                  the contract
+     * @param alreadyMarkedCounts       how many points of interest earlier in the contract were marked under each
+     *                                  initial state key; empty for a newly accepted contract
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    default void onScheduled(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest,
+          AbstractContract contract, Map<String, Integer> alreadyMarkedCounts) {
     }
 
     /**

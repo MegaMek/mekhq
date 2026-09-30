@@ -38,6 +38,7 @@ import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.List;
+import java.util.Map;
 
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -103,16 +104,17 @@ public class StratConTargetIntelligenceBehavior extends StratConAmbushPointOfInt
 
     /**
      * Settles, when the contract is accepted, which intelligence leads to a facility: one piece per point of the
-     * contract's scale, at most, so the facilities it turns up never overwhelm the contract.
+     * contract's scale, at most, so the facilities it turns up never overwhelm the contract. When the schedule is rolled
+     * again, facility leads already placed count against that share.
      *
      * @author Illiani
      * @since 0.51.01
      */
     @Override
     public void onScheduled(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest,
-          AbstractContract contract) {
+          AbstractContract contract, Map<String, Integer> alreadyMarkedCounts) {
         StratConScheduledPointOfInterest.markAtRandom(scheduledPointsOfInterest,
-              max(1, contract.getScale()),
+              max(0, max(1, contract.getScale()) - alreadyMarkedCounts.getOrDefault(FACILITY_LEAD_STATE_KEY, 0)),
               FACILITY_LEAD_STATE_KEY);
     }
 

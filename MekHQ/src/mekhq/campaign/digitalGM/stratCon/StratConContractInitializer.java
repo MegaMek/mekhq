@@ -199,7 +199,7 @@ public class StratConContractInitializer {
         int[] letterSeen = new int[greekLetters.length];
 
         for (int index = 0; index < sectorSpecs.size(); index++) {
-            int scenarioOdds = getScenarioOdds(contractDefinition);
+            int scenarioOdds = getDeploymentEncounterOdds(contractDefinition);
             int deploymentTime = isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition);
 
             StratConTrackState track = initializeTrackState(sectorSpecs.get(index),
@@ -246,10 +246,15 @@ public class StratConContractInitializer {
         // now seed the tracks with objectives and facilities
         if (!isUseMaplessMode) {
             for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
-                int objectiveCount = objectiveParams.objectiveCount > 0 ?
-                                           (int) objectiveParams.objectiveCount :
-                                           (int) max(1,
-                                                 -objectiveParams.objectiveCount * contract.getScale());
+                int objectiveCount;
+                if (objectiveParams.objectiveCount > 0) {
+                    objectiveCount = (int) objectiveParams.objectiveCount;
+                } else if (isFacilityObjective(objectiveParams.objectiveType)) {
+                    objectiveCount = getObjectiveFacilityCount(contract.getScale(),
+                          campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION));
+                } else {
+                    objectiveCount = (int) max(1, -objectiveParams.objectiveCount * contract.getScale());
+                }
 
                 List<Integer> trackObjects = trackObjectDistribution(objectiveCount, campaignState.getTrackCount());
 
@@ -266,7 +271,7 @@ public class StratConContractInitializer {
                             initializeTrackFacilities(campaignState.getTrack(x),
                                   numObjects,
                                   ForceAlignment.Allied,
-                                  true,
+                                  StrategicObjectiveType.AlliedFacilityControl,
                                   objectiveParams.objectiveScenarioModifiers);
                             break;
                         case HostileFacilityControl:
@@ -274,7 +279,7 @@ public class StratConContractInitializer {
                             initializeTrackFacilities(campaignState.getTrack(x),
                                   numObjects,
                                   ForceAlignment.Opposing,
-                                  true,
+                                  objectiveParams.objectiveType,
                                   objectiveParams.objectiveScenarioModifiers);
                             break;
                         case PointOfInterest:
@@ -315,12 +320,15 @@ public class StratConContractInitializer {
             }
         }
 
-        // non-objective allied facilities
+        // Non-objective facilities: the defender's, so allied on a defensive contract and hostile on an offensive one.
+        // The objective facilities placed above are the only facilities so far. Those the defender owns count against
+        // the scale's share; the other side's objective facilities do not, or they would crowd out the defender's own.
         if (!isUseMaplessMode) {
-            int facilityCount = contractDefinition.getAlliedFacilityCount() > 0 ?
-                                      (int) contractDefinition.getAlliedFacilityCount() :
-                                      (int) (-contractDefinition.getAlliedFacilityCount() *
-                                                   contract.getScale());
+            ForceAlignment facilityOwner = contract.isPlayerAttacker() ? ForceAlignment.Opposing : ForceAlignment.Allied;
+            int objectiveFacilityCount = countFacilitiesOwnedBy(campaignState.getTracks(), facilityOwner);
+            int facilityCount = getNonObjectiveFacilityCount(contract.getScale(),
+                  campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
+                  objectiveFacilityCount);
 
             List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
 
@@ -329,26 +337,8 @@ public class StratConContractInitializer {
 
                 initializeTrackFacilities(campaignState.getTrack(x),
                       numObjects,
-                      ForceAlignment.Allied,
-                      false,
-                      Collections.emptyList());
-            }
-
-            // non-objective hostile facilities
-            facilityCount = contractDefinition.getHostileFacilityCount() > 0 ?
-                                  (int) contractDefinition.getHostileFacilityCount() :
-                                  (int) (-contractDefinition.getHostileFacilityCount() *
-                                               contract.getScale());
-
-            trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
-
-            for (int x = 0; x < trackObjects.size(); x++) {
-                int numObjects = trackObjects.get(x);
-
-                initializeTrackFacilities(campaignState.getTrack(x),
-                      numObjects,
-                      ForceAlignment.Opposing,
-                      false,
+                      facilityOwner,
+                      null,
                       Collections.emptyList());
             }
         }
@@ -359,6 +349,15 @@ public class StratConContractInitializer {
             for (StratConTrackState track : campaignState.getTracks()) {
                 connectFacilitiesToRoads(track, contract, campaign);
             }
+        }
+
+        // A new contract has placed nothing yet, so its point of interest ledger starts empty rather than from the map.
+        campaignState.setPointOfInterestLedgerSeeded(true);
+
+        // Pre-roll the days on which the contract's ordinary scenarios appear. Mapless play has them too; Single Drop
+        // play keeps its own weekly pace instead.
+        if (!campaignOptions.isUseStratConSinglesMode()) {
+            StratConScenarioTempo.scheduleNormalScenarios(campaign, contract, campaignState, contract.getStartDate());
         }
 
         // Pre-roll the days on which each strategic-objective scenario, and each point of interest, appears over the
@@ -373,7 +372,7 @@ public class StratConContractInitializer {
             // Most contracts with special points of interest get no Essential scenarios: those points of interest, and
             // the combat bonus paid for each one dealt with, take their place.
             if (!isReplacingEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
-                scheduleStrategicScenarioSpawnDates(contract, campaignState);
+                scheduleStrategicScenarioSpawnDates(contract, campaignState, contract.getStartDate());
             }
 
             schedulePointsOfInterest(contract,
@@ -461,7 +460,8 @@ public class StratConContractInitializer {
      * gives, per contract month, how many strategic scenarios appear that month. Each such scenario is assigned an
      * independent random day within that month's window, so they trickle in over the month rather than all landing on
      * the first day. The dates are stored on the campaign state and drained by the daily StratCon lifecycle, which
-     * spawns whatever is due via {@link #spawnScheduledStrategicScenarios}.</p>
+     * spawns whatever is due via {@link #spawnScheduledStrategicScenarios}. Only days on or after {@code fromDate} are
+     * kept, so a schedule rolled again partway through the contract leaves the days already past alone.</p>
      *
      * <p>Schedule entries at or beyond the contract's final month are folded into that final month's window, so a
      * schedule longer than the contract still delivers every scenario (its tail lands in the last month); a schedule
@@ -470,9 +470,10 @@ public class StratConContractInitializer {
      *
      * @param contract      the contract whose schedule is being laid out
      * @param campaignState the campaign state to store the rolled spawn dates on
+     * @param fromDate      the first day to keep; the contract's start date when it is accepted
      */
-    private static void scheduleStrategicScenarioSpawnDates(AbstractContract contract,
-          StratConCampaignState campaignState) {
+    static void scheduleStrategicScenarioSpawnDates(AbstractContract contract, StratConCampaignState campaignState,
+          @Nullable LocalDate fromDate) {
         LocalDate startDate = contract.getStartDate();
         List<Integer> schedule = contract.getScenarioSchedule();
         if ((startDate == null) || schedule.isEmpty()) {
@@ -480,7 +481,9 @@ public class StratConContractInitializer {
         }
 
         for (LocalDate spawnDate : rollSpawnDates(startDate, schedule, contract.getLengthInMonths())) {
-            campaignState.addStrategicScenarioSpawnDate(spawnDate);
+            if ((fromDate == null) || !spawnDate.isBefore(fromDate)) {
+                campaignState.addStrategicScenarioSpawnDate(spawnDate);
+            }
         }
     }
 
@@ -559,6 +562,37 @@ public class StratConContractInitializer {
     static void schedulePointsOfInterest(AbstractContract contract, StratConContractDefinition contractDefinition,
           StratConCampaignState campaignState, boolean isMultiplyTrackIntensityByScale,
           boolean isContractsUseSpecialMechanics) {
+        schedulePointsOfInterest(contract, contractDefinition, campaignState, isMultiplyTrackIntensityByScale,
+              isContractsUseSpecialMechanics, contract.getStartDate(), 0, Map.of());
+    }
+
+    /**
+     * As {@link #schedulePointsOfInterest(AbstractContract, StratConContractDefinition, StratConCampaignState, boolean,
+     * boolean)}, but for a schedule rolled from a given day on, after some points of interest have already been placed
+     * or fallen due (see {@link StratConScenarioTempo#regenerateSchedules}).
+     *
+     * <p>Special points of interest are rolled for the whole contract as usual, and only the days from
+     * {@code fromDate} on are kept; the marks already made count against what is marked now. A definition's points of
+     * interest are a fixed number, so those already placed or due are taken off it, and the rest are spread across the
+     * contract's remaining months instead.</p>
+     *
+     * @param contract                        the contract
+     * @param contractDefinition              its StratCon contract definition
+     * @param campaignState                   the campaign state to store the scheduled points of interest on
+     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
+     * @param isContractsUseSpecialMechanics  whether the contract uses its type's special mechanics
+     * @param fromDate                        the first day to schedule on; the contract's start date when it is
+     *                                        accepted
+     * @param committedCount                  how many points of interest have already been placed or fallen due
+     * @param alreadyMarkedCounts             how many of those were marked under each initial state key
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void schedulePointsOfInterest(AbstractContract contract, StratConContractDefinition contractDefinition,
+          StratConCampaignState campaignState, boolean isMultiplyTrackIntensityByScale,
+          boolean isContractsUseSpecialMechanics, @Nullable LocalDate fromDate, int committedCount,
+          Map<String, Integer> alreadyMarkedCounts) {
         // A Recon Raid using special mechanics has no points of interest at all: its sectors are scouted instead.
         if (StratConReconnaissance.usesReconnaissance(contract, isContractsUseSpecialMechanics)) {
             return;
@@ -566,12 +600,18 @@ public class StratConContractInitializer {
 
         String specialTypeId = getSpecialPointOfInterestTypeId(contract, isContractsUseSpecialMechanics);
         if (specialTypeId != null) {
-            scheduleSpecialPointsOfInterest(contract, campaignState, isMultiplyTrackIntensityByScale, specialTypeId);
+            scheduleSpecialPointsOfInterest(contract, campaignState, isMultiplyTrackIntensityByScale, specialTypeId,
+                  fromDate, alreadyMarkedCounts);
             return;
         }
 
         List<StratConScheduledPointOfInterest> requestedPointsOfInterest =
               getRequestedPointsOfInterest(contractDefinition, contract.getScale());
+        // Those already placed or due are taken off at random, since which type each was drawn as is not remembered.
+        int removedCount = min(committedCount, requestedPointsOfInterest.size());
+        for (int index = 0; index < removedCount; index++) {
+            requestedPointsOfInterest.remove(Compute.randomInt(requestedPointsOfInterest.size()));
+        }
         if (requestedPointsOfInterest.isEmpty()) {
             return;
         }
@@ -584,10 +624,18 @@ public class StratConContractInitializer {
             return;
         }
 
-        List<Integer> schedule = TrackIntensityTable.rollScheduleForCount(contract.getLengthInMonths(),
+        // Spread across the months still to come: from the start date on acceptance, from fromDate when rolled again.
+        LocalDate windowStart = ((fromDate == null) || fromDate.isBefore(startDate)) ? startDate : fromDate;
+        int elapsedMonths = (int) ChronoUnit.MONTHS.between(startDate, windowStart);
+        int remainingMonths = max(1, contract.getLengthInMonths() - elapsedMonths);
+        List<Integer> schedule = TrackIntensityTable.rollScheduleForCount(remainingMonths,
               requestedPointsOfInterest.size());
 
-        List<LocalDate> spawnDates = rollSpawnDates(startDate, schedule, contract.getLengthInMonths());
+        List<LocalDate> spawnDates = rollSpawnDates(windowStart, schedule, remainingMonths);
+        LocalDate endDate = contract.getEndingDate();
+        if ((endDate != null) && endDate.isAfter(windowStart)) {
+            spawnDates.replaceAll(spawnDate -> spawnDate.isBefore(endDate) ? spawnDate : endDate.minusDays(1));
+        }
 
         int scheduledCount = min(requestedPointsOfInterest.size(), spawnDates.size());
         for (int index = 0; index < scheduledCount; index++) {
@@ -687,6 +735,30 @@ public class StratConContractInitializer {
     // Package-private rather than private so scheduling can be tested without standing up a whole contract.
     static void scheduleSpecialPointsOfInterest(AbstractContract contract, StratConCampaignState campaignState,
           boolean isMultiplyTrackIntensityByScale, String typeId) {
+        scheduleSpecialPointsOfInterest(contract, campaignState, isMultiplyTrackIntensityByScale, typeId,
+              contract.getStartDate(), Map.of());
+    }
+
+    /**
+     * As {@link #scheduleSpecialPointsOfInterest(AbstractContract, StratConCampaignState, boolean, String)}, but
+     * keeping only the days from {@code fromDate} on, with the marks already made earlier in the contract counting
+     * against what is marked now (see {@link IStratConPointOfInterestBehavior#onScheduled(List, AbstractContract,
+     * Map)}).
+     *
+     * @param contract                        the contract
+     * @param campaignState                   the campaign state to store the scheduled points of interest on
+     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
+     * @param typeId                          the type ID of the special point of interest to schedule
+     * @param fromDate                        the first day to keep; the contract's start date when it is accepted
+     * @param alreadyMarkedCounts             how many points of interest earlier in the contract were marked under
+     *                                        each initial state key
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void scheduleSpecialPointsOfInterest(AbstractContract contract, StratConCampaignState campaignState,
+          boolean isMultiplyTrackIntensityByScale, String typeId, @Nullable LocalDate fromDate,
+          Map<String, Integer> alreadyMarkedCounts) {
         LocalDate startDate = contract.getStartDate();
         if (startDate == null) {
             LOGGER.warn("Contract {} has no start date, so its {} points of interest cannot be scheduled.",
@@ -704,8 +776,10 @@ public class StratConContractInitializer {
         boolean isStrategicObjective = isSpecialPointOfInterestObjective(typeId);
         List<StratConScheduledPointOfInterest> scheduledPointsOfInterest = new ArrayList<>();
         for (LocalDate spawnDate : rollSpawnDates(startDate, schedule, contract.getLengthInMonths())) {
-            scheduledPointsOfInterest.add(new StratConScheduledPointOfInterest(spawnDate, typeId,
-                  isStrategicObjective));
+            if ((fromDate == null) || !spawnDate.isBefore(fromDate)) {
+                scheduledPointsOfInterest.add(new StratConScheduledPointOfInterest(spawnDate, typeId,
+                      isStrategicObjective));
+            }
         }
 
         // Anything a type settles up front - such as which leads pan out - is settled now, so it cannot be gamed later.
@@ -716,7 +790,7 @@ public class StratConContractInitializer {
                               + "accepted.", typeId, contract.getName());
         } else {
             StratConPointOfInterestBehaviors.getBehavior(definition.getBehaviorId())
-                  .onScheduled(scheduledPointsOfInterest, contract);
+                  .onScheduled(scheduledPointsOfInterest, contract, alreadyMarkedCounts);
         }
 
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
@@ -764,6 +838,94 @@ public class StratConContractInitializer {
         // A new base belongs on the road grid if the planet's owner holds it, as any other placed base does.
         connectFacilitiesToRoads(track, contract, campaign);
         return coords;
+    }
+
+    /**
+     * Counts the facilities on the given tracks that belong to the given side.
+     *
+     * @param tracks the tracks to look over
+     * @param owner  the side whose facilities to count
+     *
+     * @return how many facilities that side owns across the tracks
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the non-objective share rule can be tested directly.
+    static int countFacilitiesOwnedBy(List<StratConTrackState> tracks, ForceAlignment owner) {
+        int count = 0;
+        for (StratConTrackState track : tracks) {
+            for (StratConFacility facility : track.getFacilities().values()) {
+                if (facility.getOwner() == owner) {
+                    count++;
+                }
+            }
+        }
+
+        return count;
+    }
+
+    /** Objective facilities are three times as scarce as the contract's whole share of facilities. */
+    static final int OBJECTIVE_FACILITY_SCALE_DIVISOR = 3;
+
+    /**
+     * @param objectiveType a strategic objective type
+     *
+     * @return {@code true} if the objective places facilities: allied to hold, or hostile to take or destroy
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isFacilityObjective(StrategicObjectiveType objectiveType) {
+        return (objectiveType == StrategicObjectiveType.AlliedFacilityControl) ||
+                     (objectiveType == StrategicObjectiveType.HostileFacilityControl) ||
+                     (objectiveType == StrategicObjectiveType.FacilityDestruction);
+    }
+
+    /**
+     * Works out how many facilities a facility objective with a scaled count places: one per three points of scale
+     * when battlefield support points are factored into scale, and one per nine points otherwise, rounded down. As for
+     * every other scaled objective, it never drops below one.
+     *
+     * @param scale                          the contract's scale
+     * @param isFactorSupportPointsIntoScale whether battlefield support points are factored into scale
+     *
+     * @return the number of objective facilities, at least one
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the counting rule can be tested directly.
+    static int getObjectiveFacilityCount(int scale, boolean isFactorSupportPointsIntoScale) {
+        int divisor = isFactorSupportPointsIntoScale ?
+                            OBJECTIVE_FACILITY_SCALE_DIVISOR :
+                            OBJECTIVE_FACILITY_SCALE_DIVISOR * StratConScenarioTempo.SUPPORT_POINT_SCALE_ROLL_MULTIPLIER;
+        return max(1, scale / divisor);
+    }
+
+    /**
+     * Works out how many non-objective facilities a contract places. The contract's share of facilities is one per
+     * point of scale when battlefield support points are factored into scale, since that makes for smaller scales, and
+     * one per three points otherwise, rounded down. Objective facilities owned by the same side count against that
+     * share; non-objective facilities only fill what they leave over.
+     *
+     * @param scale                          the contract's scale
+     * @param isFactorSupportPointsIntoScale whether battlefield support points are factored into scale
+     * @param objectiveFacilityCount         how many objective facilities the contract has already placed for the side
+     *                                       that owns the non-objective facilities
+     *
+     * @return the number of non-objective facilities, never negative
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the counting rule can be tested directly.
+    static int getNonObjectiveFacilityCount(int scale, boolean isFactorSupportPointsIntoScale,
+          int objectiveFacilityCount) {
+        int facilityShare = isFactorSupportPointsIntoScale ?
+                                  scale :
+                                  scale / StratConScenarioTempo.SUPPORT_POINT_SCALE_ROLL_MULTIPLIER;
+        return max(0, facilityShare - objectiveFacilityCount);
     }
 
     /**
@@ -904,22 +1066,23 @@ public class StratConContractInitializer {
     }
 
     /**
-     * Retrieves a random scenario odds value from the provided {@link StratConContractDefinition}.
+     * Retrieves a random deployment encounter odds value from the provided {@link StratConContractDefinition}.
      *
-     * <p>The scenario odds are selected randomly from the list of scenario odds in the
+     * <p>The odds are selected randomly from the list of deployment encounter odds in the
      * given {@code StratConContractDefinition}.</p>
      *
-     * @param contractDefinition the contract definition containing scenario odds options
+     * @param contractDefinition the contract definition containing deployment encounter odds options
      *
-     * @return a randomly selected scenario odds value
+     * @return a randomly selected deployment encounter odds value
      *
-     * @throws IllegalArgumentException if the list of scenario odds is empty
-     * @throws NullPointerException     if {@code contractDefinition} or its scenario odds list is null
+     * @throws IllegalArgumentException if the list of deployment encounter odds is empty
+     * @throws NullPointerException     if {@code contractDefinition} or its deployment encounter odds list is null
      * @author Illiani
      * @since 0.50.05
      */
-    public static int getScenarioOdds(StratConContractDefinition contractDefinition) {
-        return contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
+    public static int getDeploymentEncounterOdds(StratConContractDefinition contractDefinition) {
+        List<Integer> deploymentEncounterOdds = contractDefinition.getDeploymentEncounterOdds();
+        return deploymentEncounterOdds.get(Compute.randomInt(deploymentEncounterOdds.size()));
     }
 
 
@@ -1846,11 +2009,15 @@ public class StratConContractInitializer {
      * Worker function that takes a track state and plops down the given number of facilities owned by the given faction
      * Avoids places with existing facilities and scenarios, capable of taking facility sub set and setting strategic
      * objective flag.
+     *
+     * @param objectiveType the strategic objective each facility is tied to, or {@code null} for facilities that are no
+     *                      objective at all
      */
     // Package-private rather than private so the capacity rules can be tested directly; reaching them through contract
     // initialization would mean standing up a whole contract to assert on a placement loop.
     static void initializeTrackFacilities(StratConTrackState trackState, int numFacilities, ForceAlignment owner,
-          boolean strategicObjective, List<String> modifiers) {
+          @Nullable StrategicObjectiveType objectiveType, List<String> modifiers) {
+        boolean strategicObjective = objectiveType != null;
 
         int capacity = facilityCapacity(trackState);
         int placed = 0;
@@ -1885,11 +2052,11 @@ public class StratConContractInitializer {
                 if (sf.getOwner() == ForceAlignment.Allied) {
                     trackState.getRevealedCoords().add(coords);
                     sf.setVisible(true);
-                    sso.setObjectiveType(StrategicObjectiveType.AlliedFacilityControl);
                 } else {
                     sf.setVisible(false);
-                    sso.setObjectiveType(StrategicObjectiveType.HostileFacilityControl);
                 }
+
+                sso.setObjectiveType(objectiveType);
 
                 trackState.addStrategicObjective(sso);
             }

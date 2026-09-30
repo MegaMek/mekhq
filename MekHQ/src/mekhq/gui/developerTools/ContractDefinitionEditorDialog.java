@@ -73,10 +73,8 @@ public class ContractDefinitionEditorDialog extends JDialog {
 
     private final JTextField txtContractTypeName = new JTextField(30);
     private final JTextArea txtBriefing = new JTextArea(4, 40);
-    private final JSpinner spnAlliedFacilityCount = new JSpinner(new SpinnerNumberModel(0.0, -100.0, 100.0, 0.25));
-    private final JSpinner spnHostileFacilityCount = new JSpinner(new SpinnerNumberModel(0.0, -100.0, 100.0, 0.25));
     private final JCheckBox chkAllowEarlyVictory = new JCheckBox();
-    private final JTextField txtScenarioOdds = new JTextField(30);
+    private final JTextField txtDeploymentEncounterOdds = new JTextField(30);
     private final JTextField txtDeploymentTimes = new JTextField(30);
     private final JTextArea txtGlobalModifiers = new JTextArea(3, 40);
     private final DefaultListModel<ObjectiveParameters> objectiveModel = new DefaultListModel<>();
@@ -112,10 +110,8 @@ public class ContractDefinitionEditorDialog extends JDialog {
 
         addRow(panel, constraints, "contractEditor.contractTypeName", txtContractTypeName);
         addRow(panel, constraints, "contractEditor.briefing", new FastJScrollPane(txtBriefing));
-        addRow(panel, constraints, "contractEditor.alliedFacilityCount", spnAlliedFacilityCount);
-        addRow(panel, constraints, "contractEditor.hostileFacilityCount", spnHostileFacilityCount);
         addRow(panel, constraints, "contractEditor.allowEarlyVictory", chkAllowEarlyVictory);
-        addRow(panel, constraints, "contractEditor.scenarioOdds", txtScenarioOdds);
+        addRow(panel, constraints, "contractEditor.deploymentEncounterOdds", txtDeploymentEncounterOdds);
         addRow(panel, constraints, "contractEditor.deploymentTimes", txtDeploymentTimes);
         addRow(panel, constraints, "contractEditor.globalScenarioModifiers", new FastJScrollPane(txtGlobalModifiers));
 
@@ -243,10 +239,8 @@ public class ContractDefinitionEditorDialog extends JDialog {
     private void load(StratConContractDefinition source) {
         txtContractTypeName.setText(nullToEmpty(source.getContractTypeName()));
         txtBriefing.setText(nullToEmpty(source.getBriefing()));
-        spnAlliedFacilityCount.setValue(source.getAlliedFacilityCount());
-        spnHostileFacilityCount.setValue(source.getHostileFacilityCount());
         chkAllowEarlyVictory.setSelected(source.isAllowEarlyVictory());
-        txtScenarioOdds.setText(joinInts(source.getScenarioOdds()));
+        txtDeploymentEncounterOdds.setText(joinInts(source.getDeploymentEncounterOdds()));
         txtDeploymentTimes.setText(joinInts(source.getDeploymentTimes()));
         txtGlobalModifiers.setText(String.join("\n", nullToEmptyList(source.getGlobalScenarioModifiers())));
         objectiveModel.clear();
@@ -262,10 +256,8 @@ public class ContractDefinitionEditorDialog extends JDialog {
     private void writeInto(StratConContractDefinition target) {
         target.setContractTypeName(emptyToNull(txtContractTypeName.getText()));
         target.setBriefing(txtBriefing.getText());
-        target.setAlliedFacilityCount((double) spnAlliedFacilityCount.getValue());
-        target.setHostileFacilityCount((double) spnHostileFacilityCount.getValue());
         target.setAllowEarlyVictory(chkAllowEarlyVictory.isSelected());
-        target.setScenarioOdds(parseInts(txtScenarioOdds.getText()));
+        target.setDeploymentEncounterOdds(parseInts(txtDeploymentEncounterOdds.getText()));
         target.setDeploymentTimes(parseInts(txtDeploymentTimes.getText()));
         target.setGlobalScenarioModifiers(parseLines(txtGlobalModifiers.getText()));
         List<ObjectiveParameters> objectives = new ArrayList<>();
