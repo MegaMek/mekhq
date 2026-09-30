@@ -236,6 +236,7 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
 
                 // map-based play applies facility effects here; Mapless/Singles supply a no-op strategy
                 getFacilityStrategy().applyPeriodicEffects(track, campaignState, isStartOfMonth);
+                getFacilityStrategy().processFacilityOrders(track, campaign);
 
                 processPointsOfInterest(track, campaign);
 

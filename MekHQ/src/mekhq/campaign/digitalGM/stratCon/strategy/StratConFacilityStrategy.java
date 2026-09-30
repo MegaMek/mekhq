@@ -32,11 +32,13 @@
  */
 package mekhq.campaign.digitalGM.stratCon.strategy;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.IFacilityStrategy;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 
@@ -53,6 +55,11 @@ public class StratConFacilityStrategy implements IFacilityStrategy {
     public void applyPeriodicEffects(StratConTrackState track, StratConCampaignState campaignState,
           boolean isStartOfMonth) {
         StratConRulesManager.processFacilityEffects(track, campaignState, isStartOfMonth);
+    }
+
+    @Override
+    public void processFacilityOrders(StratConTrackState track, Campaign campaign) {
+        StratConFacilityOperations.processOrders(track, campaign);
     }
 
     @Override

@@ -995,6 +995,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "contractsUseSpecialMechanics");
     public static final CampaignOption<Boolean> USE_EMPLOYER_LOST_PLANET_REACTIONS =
           of(Boolean.class, true, "useEmployerLostPlanetReactions");
+    public static final CampaignOption<Boolean> USE_FACILITY_OPERATIONS =
+          of(Boolean.class, true, "useFacilityOperations");
     public static final CampaignOption<Boolean> RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY =
           of(Boolean.class, false, "restrictScenariosToFleetCapability");
     public static final CampaignOption<StratConSectorCountMethod> STRAT_CON_SECTOR_COUNT_METHOD =

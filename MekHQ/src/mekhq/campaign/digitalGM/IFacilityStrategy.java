@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.digitalGM;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
@@ -61,6 +62,17 @@ public interface IFacilityStrategy {
      * @param isStartOfMonth {@code true} on the first day of the month, when monthly effects also apply
      */
     void applyPeriodicEffects(StratConTrackState track, StratConCampaignState campaignState, boolean isStartOfMonth);
+
+    /**
+     * Moves the track's timed facility orders on by a day, completing or abandoning them as due.
+     *
+     * @param track    the track whose orders are processed
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void processFacilityOrders(StratConTrackState track, Campaign campaign);
 
     /**
      * Updates the facility associated with a resolved scenario, destroying or capturing it as required.

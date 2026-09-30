@@ -47,6 +47,7 @@ import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOrder;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInterestBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.utilities.MHQXMLUtility;
@@ -98,6 +99,9 @@ public class StratConTrackState {
     // points of interest: map objects that are neither scenarios nor facilities; each records its own coordinates
     private List<StratConPointOfInterest> pointsOfInterest;
 
+    // orders that take time, each held by a formation until it completes
+    private List<StratConFacilityOrder> facilityOrders;
+
     // don't serialize this
     private transient Map<Integer, StratConScenario> backingScenarioMap;
     private transient Map<StratConCoords, StratConStrategicObjective> specificStrategicObjectives;
@@ -136,6 +140,7 @@ public class StratConTrackState {
         roads = new HashSet<>();
         roadExits = new HashSet<>();
         pointsOfInterest = new ArrayList<>();
+        facilityOrders = new ArrayList<>();
     }
 
     public String getDisplayableName() {
@@ -834,6 +839,62 @@ public class StratConTrackState {
         return (pointsOfInterestOnHex == null) ?
                      Collections.emptyList() :
                      Collections.unmodifiableList(pointsOfInterestOnHex);
+    }
+
+    /**
+     * Used for serialization/deserialization. To change the orders, use {@link #addFacilityOrder} and
+     * {@link #removeFacilityOrder}.
+     *
+     * @return the orders under way in this sector that take time to complete
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElementWrapper(name = "facilityOrders")
+    @XmlElement(name = "facilityOrder")
+    public List<StratConFacilityOrder> getFacilityOrders() {
+        return facilityOrders;
+    }
+
+    public void setFacilityOrders(List<StratConFacilityOrder> facilityOrders) {
+        this.facilityOrders = (facilityOrders == null) ? new ArrayList<>() : facilityOrders;
+    }
+
+    /**
+     * @param order an order that has just been given
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addFacilityOrder(StratConFacilityOrder order) {
+        facilityOrders.add(order);
+    }
+
+    /**
+     * @param order an order that has completed or been abandoned
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void removeFacilityOrder(StratConFacilityOrder order) {
+        facilityOrders.remove(order);
+    }
+
+    /**
+     * @param formationId a formation's ID
+     *
+     * @return the order that formation is carrying out, or {@code null} if it has none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConFacilityOrder getFacilityOrder(int formationId) {
+        for (StratConFacilityOrder order : facilityOrders) {
+            if (order.getFormationId() == formationId) {
+                return order;
+            }
+        }
+        return null;
     }
 
     /**

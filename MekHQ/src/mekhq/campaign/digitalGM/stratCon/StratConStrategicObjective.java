@@ -36,7 +36,6 @@ import megamek.common.annotations.Nullable;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
-import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
  * This class is a data structure storing data relating to StratCon strategic objectives and also handles some small
@@ -136,13 +135,13 @@ public class StratConStrategicObjective {
             case AlliedFacilityControl -> {
                 // this is "ok" if the facility exists and is under allied control
                 StratConFacility alliedFacility = trackState.getFacility(getObjectiveCoords());
-                yield (alliedFacility != null) && (alliedFacility.getOwner() == ForceAlignment.Allied);
+                yield (alliedFacility != null) && alliedFacility.isOwnerAlliedToPlayer();
             }
             case HostileFacilityControl, FacilityDestruction -> {
                 // these are "ok" if the facility no longer exists or is under allied control
                 // we assume that we can slag a facility at any time if we control it
                 StratConFacility hostileFacility = trackState.getFacility(getObjectiveCoords());
-                yield (hostileFacility == null) || (hostileFacility.getOwner() == ForceAlignment.Allied);
+                yield (hostileFacility == null) || hostileFacility.isOwnerAlliedToPlayer();
             }
             case PointOfInterest -> isPointOfInterestObjectiveCompleted(trackState);
             default ->

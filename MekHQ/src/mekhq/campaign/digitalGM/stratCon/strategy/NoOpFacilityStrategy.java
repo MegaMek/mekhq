@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.strategy;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.IFacilityStrategy;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
@@ -55,6 +56,11 @@ public class NoOpFacilityStrategy implements IFacilityStrategy {
     public void applyPeriodicEffects(StratConTrackState track, StratConCampaignState campaignState,
           boolean isStartOfMonth) {
         // Intentionally empty: Mapless and Singles play have no facility map.
+    }
+
+    @Override
+    public void processFacilityOrders(StratConTrackState track, Campaign campaign) {
+        // Intentionally empty: Mapless and Singles play have no facilities to give orders at.
     }
 
     @Override

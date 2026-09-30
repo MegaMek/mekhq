@@ -48,6 +48,7 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
+import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
@@ -390,6 +391,29 @@ class StratConFacilityStateTest {
             StratConRulesManager.processFacilityAftermath(facility, false, false);
 
             assertEquals(FacilityIntel.DETAILED, facility.getIntel());
+        }
+
+        @Test
+        void escapingAFailedReconOrSabotageLeavesTheFacilityAlone() {
+            for (FacilityOperation operation : List.of(FacilityOperation.RECON, FacilityOperation.SABOTAGE)) {
+                StratConFacility facility = mekBase(ForceAlignment.Opposing);
+
+                StratConRulesManager.processFacilityAftermath(facility, true, false, operation);
+
+                assertEquals(FacilityCondition.INTACT, facility.getCondition(), operation.name());
+                assertEquals(2, facility.getGarrison(), operation.name());
+                assertEquals(FacilityIntel.DETAILED, facility.getIntel(), operation.name());
+            }
+        }
+
+        @Test
+        void aWonRaidDamagesTheFacility() {
+            StratConFacility facility = mekBase(ForceAlignment.Opposing);
+
+            StratConRulesManager.processFacilityAftermath(facility, true, false, FacilityOperation.RAID);
+
+            assertEquals(FacilityCondition.DAMAGED, facility.getCondition());
+            assertEquals(1, facility.getGarrison());
         }
     }
 

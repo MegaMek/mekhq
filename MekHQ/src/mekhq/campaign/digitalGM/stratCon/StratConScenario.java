@@ -52,6 +52,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Formation;
@@ -120,6 +121,7 @@ public class StratConScenario implements IStratConDisplayable {
     private int leadershipPointsUsed;
     private Set<Integer> failedReinforcements = new HashSet<>();
     private ArrayList<Integer> primaryForceIDs = new ArrayList<>();
+    private FacilityOperation facilityOperation;
 
     /**
      * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the
@@ -370,6 +372,20 @@ public class StratConScenario implements IStratConDisplayable {
 
     public void setTurningPoint(boolean turningPoint) {
         this.turningPoint = turningPoint;
+    }
+
+    /**
+     * @return the order that started this scenario on a facility, or {@code null} if no order did
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable FacilityOperation getFacilityOperation() {
+        return facilityOperation;
+    }
+
+    public void setFacilityOperation(@Nullable FacilityOperation facilityOperation) {
+        this.facilityOperation = facilityOperation;
     }
 
     @XmlTransient

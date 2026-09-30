@@ -149,6 +149,16 @@ public class StratConFacility {
         public boolean isAtLeast(FacilityIntel level) {
             return ordinal() >= level.ordinal();
         }
+
+        /**
+         * @return the next level up, or {@link #DETAILED} if this is already the highest
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        public FacilityIntel next() {
+            return (this == DETAILED) ? DETAILED : values()[ordinal() + 1];
+        }
     }
 
     // The garrison ladder: garrison step 1 brings the profile's own local modifiers, and each step above that adds the
@@ -304,7 +314,7 @@ public class StratConFacility {
     }
 
     public String getFormattedDisplayableName() {
-        return String.format("%s %s", getOwner() == ForceAlignment.Allied ? "Allied" : "Hostile", getDisplayableName());
+        return String.format("%s %s", isOwnerAlliedToPlayer() ? "Allied" : "Hostile", getDisplayableName());
     }
 
     public String getDisplayableName() {

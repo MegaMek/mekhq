@@ -96,9 +96,11 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObj
 import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.PointOfInterestDeploymentOutcome;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
@@ -1223,7 +1225,11 @@ public class StratConRulesManager {
         }
 
         StratConFacility facility = track.getFacility(coords);
-        boolean isNonAlliedFacility = (facility != null) && (facility.getOwner() != Allied);
+        // With Facility Operations, arriving at an enemy facility starts nothing on its own: the player orders what
+        // the formation does there. Without it, deploying onto one starts an assault, as it always has.
+        boolean isNonAlliedFacility = (facility != null)
+                                            && !facility.isOwnerAlliedToPlayer()
+                                            && !StratConFacilityOperations.isEnabled(campaign);
 
         int targetNum = calculateScenarioOdds(track, contract, true);
         // Under "Essential Scenarios Only", deploying into an empty hex never rolls a random encounter - only the
@@ -1498,7 +1504,7 @@ public class StratConRulesManager {
 
         if (track.getFacilities().containsKey(coords) && !ignoreFacilities) {
             StratConFacility facility = track.getFacility(coords);
-            boolean alliedFacility = facility.getOwner() == Allied;
+            boolean alliedFacility = facility.isOwnerAlliedToPlayer();
             template = StratConScenarioFactory.getFacilityScenario(alliedFacility);
             if (template == null) {
                 return null;
@@ -1551,40 +1557,120 @@ public class StratConRulesManager {
      * carries out tasks relevant to facility scenarios
      */
     private static void setupFacilityScenario(StratConScenario scenario, StratConFacility facility) {
-        // this includes:
-        // for hostile facilities
-        // - add a destroy objective (always the option to level the facility)
-        // - add a capture objective (always the option to capture the facility)
-        // - if so indicated by parameter, roll a random hostile facility objective and
-        // add it if not capture/destroy
-        // for allied facilities
-        // - add a defend objective (always the option to defend the facility)
-        // - if so indicated by parameter, roll a random allied facility objective and
-        // add it if not defend
+        setupFacilityScenario(scenario, facility, null);
+    }
+
+    /**
+     * Gives a facility scenario its objectives.
+     *
+     * <p>With no order behind it, the objective is rolled at random, as it always was: a defend or evacuate objective
+     * for a facility on the player's side, or one of the hostile facility objectives for an enemy one. An enemy
+     * facility then also always gets the objectives to capture or destroy it.</p>
+     *
+     * <p>A scenario started by an order gets the objective that order calls for instead:</p>
+     * <ul>
+     *     <li>{@link FacilityOperation#ASSAULT}: capture, plus the usual capture and destroy objectives.</li>
+     *     <li>{@link FacilityOperation#RAID}: extract supplies, with no capture or destroy objective.</li>
+     *     <li>{@link FacilityOperation#RECON}: the recon objective, fought when a recon went wrong.</li>
+     *     <li>{@link FacilityOperation#SABOTAGE}: engage, with the enemy's forces enlarged, fought when saboteurs
+     *     were caught.</li>
+     * </ul>
+     *
+     * @param scenario  the scenario, set up but not yet finalized
+     * @param facility  the facility it is fought on
+     * @param operation the order that started it, or {@code null} for none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void setupFacilityScenario(StratConScenario scenario, StratConFacility facility,
+          @Nullable FacilityOperation operation) {
+        boolean alliedFacility = facility.isOwnerAlliedToPlayer();
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+
         AtBScenarioModifier objectiveModifier;
-        boolean alliedFacility = facility.getOwner() == Allied;
-
-        objectiveModifier = alliedFacility ?
-                                  AtBScenarioModifier.getRandomAlliedFacilityModifier() :
-                                  AtBScenarioModifier.getRandomHostileFacilityModifier();
-
-        if (objectiveModifier != null) {
-            scenario.getBackingScenario().addScenarioModifier(objectiveModifier);
-            scenario.getBackingScenario()
-                  .setName(String.format("%s - %s - %s",
-                        facility.getFacilityType(),
-                        alliedFacility ? "Allied" : "Hostile",
-                        objectiveModifier.getModifierName()));
+        if (operation == null) {
+            objectiveModifier = alliedFacility ?
+                                      AtBScenarioModifier.getRandomAlliedFacilityModifier() :
+                                      AtBScenarioModifier.getRandomHostileFacilityModifier();
+        } else {
+            objectiveModifier = AtBScenarioModifier.getScenarioModifier(
+                  StratConFacilityOperations.getObjectiveModifierId(operation));
         }
 
-        // add the "fixed" hostile facility modifiers after the primary ones
-        if (!alliedFacility) {
+        if (objectiveModifier != null) {
+            backingScenario.addScenarioModifier(objectiveModifier);
+            backingScenario.setName(String.format("%s - %s - %s",
+                  facility.getFacilityType(),
+                  alliedFacility ? "Allied" : "Hostile",
+                  objectiveModifier.getModifierName()));
+        }
+
+        if (operation == FacilityOperation.SABOTAGE) {
+            AtBScenarioModifier disadvantage = AtBScenarioModifier.getScenarioModifier(
+                  StratConFacilityOperations.SABOTAGE_CAUGHT_MODIFIER);
+            if ((disadvantage != null) && !backingScenario.alreadyHasModifier(disadvantage)) {
+                backingScenario.addScenarioModifier(disadvantage);
+            }
+        }
+
+        // add the "fixed" hostile facility modifiers after the primary ones; only an assault, or a fight no order
+        // started, can take or level the facility
+        boolean isCaptureOrDestroyPossible = (operation == null) || (operation == FacilityOperation.ASSAULT);
+        if (!alliedFacility && isCaptureOrDestroyPossible) {
             for (AtBScenarioModifier modifier : AtBScenarioModifier.getRequiredHostileFacilityModifiers()) {
-                if (!scenario.getBackingScenario().alreadyHasModifier(modifier)) {
-                    scenario.getBackingScenario().addScenarioModifier(modifier);
+                if (!backingScenario.alreadyHasModifier(modifier)) {
+                    backingScenario.addScenarioModifier(modifier);
                 }
             }
         }
+    }
+
+    /**
+     * Starts the scenario an order calls for on a facility, with the ordered formation assigned to it. The formation
+     * moves onto the facility's hex if it was next to it.
+     *
+     * @param campaign       the current campaign
+     * @param contract       the contract whose map holds the sector
+     * @param track          the sector
+     * @param facilityCoords the facility's hex
+     * @param formationId    the ID of the ordered formation
+     * @param operation      the order
+     *
+     * @return the scenario, or {@code null} if there is no facility there, a scenario is already there, or none could
+     *       be generated
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConScenario startFacilityOperationScenario(Campaign campaign,
+          AbstractContract contract, StratConTrackState track, StratConCoords facilityCoords, int formationId,
+          FacilityOperation operation) {
+        StratConFacility facility = track.getFacility(facilityCoords);
+        if ((facility == null) || (track.getScenario(facilityCoords) != null)) {
+            return null;
+        }
+
+        ScenarioTemplate template = StratConScenarioFactory.getFacilityScenario(facility.isOwnerAlliedToPlayer());
+        if (template == null) {
+            return null;
+        }
+
+        StratConScenario scenario = generateScenario(campaign,
+              contract,
+              track,
+              formationId,
+              facilityCoords,
+              template,
+              null);
+        if (scenario == null) {
+            return null;
+        }
+
+        scenario.setFacilityOperation(operation);
+        setupFacilityScenario(scenario, facility, operation);
+        finalizeBackingScenario(campaign, contract, track, true, scenario);
+        return scenario;
     }
 
     /**
@@ -3853,7 +3939,7 @@ public class StratConRulesManager {
         boolean nonCloakedOrNoScenario = (scenario == null) || scenario.getBackingScenario().isCloaked();
 
         StratConFacility facility = track.getFacility(coords);
-        boolean alliedFacility = (facility != null) && (facility.getOwner() == Allied);
+        boolean alliedFacility = (facility != null) && facility.isOwnerAlliedToPlayer();
 
         return (!track.areAnyForceDeployedTo(coords) || alliedFacility) && nonCloakedOrNoScenario;
     }
@@ -4051,7 +4137,19 @@ public class StratConRulesManager {
 
                 if (facility != null) {
                     boolean isDraw = backingScenario.getStatus().isDraw();
-                    processFacilityAftermath(facility, victory, isDraw);
+                    boolean wasHostile = !facility.isOwnerAlliedToPlayer();
+                    processFacilityAftermath(facility, victory, isDraw, scenario.getFacilityOperation());
+
+                    // The player has just taken an enemy facility: with Facility Operations, they decide its fate.
+                    if (wasHostile
+                              && facility.isOwnerAlliedToPlayer()
+                              && StratConFacilityOperations.isEnabled(campaign)) {
+                        StratConFacilityOperations.resolveCapture(campaign,
+                              mission,
+                              track,
+                              scenario.getCoords(),
+                              StratConFacilityOperations.askCaptureChoice(campaign, facility));
+                    }
                 }
 
                 // Deliberately does not touch the road network. Roads are laid when the sector is generated, and
@@ -4194,9 +4292,28 @@ public class StratConRulesManager {
      * @since 0.51.01
      */
     static void processFacilityAftermath(StratConFacility facility, boolean victory, boolean isDraw) {
+        processFacilityAftermath(facility, victory, isDraw, null);
+    }
+
+    /**
+     * As {@link #processFacilityAftermath(StratConFacility, boolean, boolean)}, except that a fight begun because a
+     * {@link FacilityOperation#RECON} or {@link FacilityOperation#SABOTAGE} order went wrong leaves the facility's
+     * condition and garrison alone: the formation was fighting its way clear, not attacking the facility.
+     *
+     * @param facility  the facility the scenario was fought on
+     * @param victory   whether the player won an overall victory
+     * @param isDraw    whether the scenario was a draw
+     * @param operation the order that started the scenario, or {@code null} for none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void processFacilityAftermath(StratConFacility facility, boolean victory, boolean isDraw,
+          @Nullable FacilityOperation operation) {
+        boolean isEscapeFight = (operation == FacilityOperation.RECON) || (operation == FacilityOperation.SABOTAGE);
         if (facility.getOwnershipChangeScore() > 0) {
             switchFacilityOwner(facility);
-        } else {
+        } else if (!isEscapeFight) {
             boolean isAttackerVictory = facility.isOwnerAlliedToPlayer() ? (!victory && !isDraw) : victory;
             if (isAttackerVictory) {
                 facility.applyAttackerVictory();
@@ -4348,7 +4465,7 @@ public class StratConRulesManager {
         if (localFacility == null) {
             // Fail the objective if no facility is found
             track.failObjective(scenario.getCoords());
-        } else if (localFacility.getOwner() == Allied) {
+        } else if (localFacility.isOwnerAlliedToPlayer()) {
             // Update the facility's ownership if it belongs to allies
             localFacility.setOwner(Opposing);
         }
