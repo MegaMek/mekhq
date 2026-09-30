@@ -132,16 +132,6 @@ public class DiscretionarySpending {
      */
     public DiscretionarySpending(Person person, Finances finances, LocalDate today) {
         final String fullTitle = person.getHyperlinkedFullTitle();
-        if (person.isHasPerformedExtremeExpenditure()) {
-            final String openingSpan = spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor());
-            reportMessage = getFormattedTextAt(RESOURCE_BUNDLE, "report.format.exhausted",
-                  fullTitle,
-                  openingSpan,
-                  CLOSING_SPAN_TAG);
-
-            return;
-        }
-
         int totalSpending = 0;
         final int wealth = person.getWealth();
         final SpendingLimits spendingLimits = discretionarySpendingTable.get(wealth);

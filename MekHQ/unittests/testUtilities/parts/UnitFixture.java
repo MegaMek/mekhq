@@ -88,6 +88,16 @@ public enum UnitFixture {
     HUNCHBACK_HBK_4P("Hunchback HBK-4P", false, Mek.class),
     /** Vedette Medium Tank, a tracked combat vehicle. Source: {@code vehicles/3039u/Vedette Medium Tank.blk}. */
     VEDETTE_MEDIUM_TANK("Vedette Medium Tank", true, Tank.class),
+    /**
+     * Epona Pursuit Tank Prime, a Clan hover OmniVehicle with its weapons in the turret. Source:
+     * {@code vehicles/3060u/Epona Pursuit Tank Prime.blk}.
+     */
+    EPONA_PURSUIT_TANK_PRIME("Epona Pursuit Tank Prime", true, Tank.class),
+    /**
+     * Epona Pursuit Tank A, another configuration of the same OmniVehicle, with weapons in the front and turret.
+     * Source: {@code vehicles/3060u/Epona Pursuit Tank A.blk}.
+     */
+    EPONA_PURSUIT_TANK_A("Epona Pursuit Tank A", true, Tank.class),
     /** Warrior H-7 Attack Helicopter, a VTOL. Source: {@code vehicles/3039u/Warrior H-7 Attack Helicopter.blk}. */
     WARRIOR_H_7_ATTACK_HELICOPTER("Warrior H-7 Attack Helicopter", true, VTOL.class),
     /**
@@ -101,6 +111,16 @@ public enum UnitFixture {
      */
     ELEMENTAL_BATTLE_ARMOR_LASER("Elemental BA [Laser] (Sqd5)", true, BattleArmor.class),
     /**
+     * Elemental battle armor with flamers instead of lasers, the same point of five. Source:
+     * {@code battlearmor/3058Uu/Elemental BA [Flamer] (Sqd5).blk}.
+     */
+    ELEMENTAL_BATTLE_ARMOR_FLAMER("Elemental BA [Flamer] (Sqd5)", true, BattleArmor.class),
+    /**
+     * Elemental battle armor with lasers in a squad of six, one trooper more than the point of five. Source:
+     * {@code battlearmor/3058Uu/Elemental BA [Laser] (Sqd6).blk}.
+     */
+    ELEMENTAL_BATTLE_ARMOR_LASER_SQUAD_OF_SIX("Elemental BA [Laser] (Sqd6)", true, BattleArmor.class),
+    /**
      * A conventional foot platoon. Source: {@code infantry/DCMS/Foot Platoon (DCMS) (Laser 2620+).blk} (older pinned
      * copy).
      */
@@ -109,10 +129,43 @@ public enum UnitFixture {
     MINOTAUR_PROTOMEK("Minotaur", true, ProtoMek.class),
     /** Shilone SL-17, an aerospace fighter. Source: {@code fighters/TRO3039u/Shilone SL-17.blk}. */
     SHILONE_SL_17("Shilone SL-17", true, AeroSpaceFighter.class),
+    /**
+     * Shilone SL-17AC, the SL-17 with one heat sink fewer. Source: {@code fighters/TRO3039u/Shilone SL-17AC.blk}.
+     */
+    SHILONE_SL_17AC("Shilone SL-17AC", true, AeroSpaceFighter.class),
+    /**
+     * Shilone SL-17R, the SL-17 with double heat sinks instead of single ones, including those in the engine.
+     * Source: {@code fighters/TRO3039u/Shilone SL-17R.blk}.
+     */
+    SHILONE_SL_17R("Shilone SL-17R", true, AeroSpaceFighter.class),
+    /**
+     * Batu Prime, a Clan OmniFighter with two pod-mounted heat sinks. Source: {@code fighters/TRO3055U/Batu Prime.blk}.
+     */
+    BATU_PRIME("Batu Prime", true, AeroSpaceFighter.class),
+    /**
+     * Batu D, another configuration of the Batu with four pod-mounted heat sinks. Source:
+     * {@code fighters/TRO3055U/Batu D.blk}.
+     */
+    BATU_D("Batu D", true, AeroSpaceFighter.class),
     /** Shuttle ST-46, a small craft. Source: {@code smallcraft/TRO 3057r/Shuttle ST-46.blk}. */
     SHUTTLE_ST_46("Shuttle ST-46", true, SmallCraft.class),
     /** Leopard (2537), a DropShip. Source: {@code dropships/TRO3057R/IS/Leopard (2537).blk}. */
     LEOPARD_DROPSHIP("Leopard (2537)", true, Dropship.class),
+    /**
+     * Leopard (3056), the Leopard refitted with double heat sinks and newer weapons and ammunition. Source:
+     * {@code dropships/TRO3057R/IS/Leopard (3056).blk}.
+     */
+    LEOPARD_DROPSHIP_3056("Leopard (3056)", true, Dropship.class),
+    /**
+     * Leopard CV (2581), the carrier Leopard: three fighter bays in place of the BattleMek bay. Source:
+     * {@code dropships/TRO3057R/IS/Leopard CV (2581).blk}.
+     */
+    LEOPARD_CV_DROPSHIP("Leopard CV (2581)", true, Dropship.class),
+    /**
+     * Leopard PA, a pirate Leopard with guns in all six arcs where the standard Leopard has four. Source:
+     * {@code dropships/XTRs/Pirates/Leopard PA.blk}.
+     */
+    LEOPARD_PA_DROPSHIP("Leopard PA", true, Dropship.class),
     /**
      * Invader JumpShip (2631), a JumpShip with docking collars and a grav deck. Source:
      * {@code jumpships/3057R/IS/Invader Jumpship (2631).blk}.

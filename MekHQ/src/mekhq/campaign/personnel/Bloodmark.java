@@ -171,14 +171,6 @@ public class Bloodmark {
      * @since 0.50.07
      */
     public static boolean checkForAssassinationAttempt(Person target, LocalDate today, boolean isCampaignPlanetside) {
-        if (target.isChild(today, true)) { // Children are not eligible for bloodmark assassinations
-            return false;
-        }
-
-        if (target.getEduEducationTime() != 0) { // Student Bloodmarks are handled by the education system
-            return false;
-        }
-
         List<LocalDate> bloodhuntSchedule = target.getBloodhuntSchedule();
         if (bloodhuntSchedule.isEmpty()) {
             return false;
@@ -192,6 +184,14 @@ public class Bloodmark {
         // Removing the date even if the hunt is skips is a way of representing the character getting lucky and just
         // not being accessible when the bounty hunter makes their move.
         target.removeBloodhuntDate(today);
+
+        if (target.isChild(today, true)) { // Children are not eligible for bloodmark assassinations
+            return false;
+        }
+
+        if (target.getEduEducationTime() != 0) { // Student Bloodmarks are handled by the education system
+            return false;
+        }
 
         if (!isCampaignPlanetside && !target.getStatus().isAbsent()) {
             return false;

@@ -1073,7 +1073,10 @@ public class CampaignNewDayManager {
                 }
 
                 if (person.getBurnedConnectionsEndDate() != null) {
-                    person.checkForConnectionsReestablishContact(today);
+                    String reestablishedReport = person.checkForConnectionsReestablishContact(today);
+                    if (!StringUtility.isNullOrBlank(reestablishedReport)) {
+                        campaign.addReport(PERSONNEL, reestablishedReport);
+                    }
                 }
 
                 if (campaignOptions.get(CampaignOption.ALLOW_MONTHLY_CONNECTIONS)) {

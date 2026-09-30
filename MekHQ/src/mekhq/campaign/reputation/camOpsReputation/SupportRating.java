@@ -152,12 +152,13 @@ public class SupportRating {
      *
      * @return The total personnel count required for the campaign.
      */
-    private static int getTotalPersonnelCount(Campaign campaign, int technicianRequirements) {
+    static int getTotalPersonnelCount(Campaign campaign, int technicianRequirements) {
         int totalPersonnelCount = technicianRequirements;
 
         // Count personnel
         for (Unit unit : campaign.getActiveUnits()) {
-            if (unit.isMothballed()) {
+            // Support carriers are an organisational wrapper; their occupants are support personnel, not crew
+            if (unit.isMothballed() || unit.isCarrier()) {
                 continue;
             }
 

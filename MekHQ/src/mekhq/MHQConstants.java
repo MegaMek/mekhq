@@ -273,6 +273,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_CONTRACT_SPECIAL_MECHANICS_PREFIX = "nagContractSpecialMechanics.";
     public static final String NAG_UNRESOLVED_STRAT_CON_CONTACTS = "nagUnresolvedStratConContacts";
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
+    public static final String NAG_EXPIRING_NAV_POINTS = "nagExpiringNavPoints";
     public static final String NAG_INVALID_FACTION = "nagInvalidFaction";
     public static final String NAG_UNABLE_TO_AFFORD_EXPENSES = "nagUnableToAffordExpenses";
     public static final String NAG_UNABLE_TO_AFFORD_RENT = "nagUnableToAffordRent";
@@ -285,6 +286,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String NAG_SOMEONE_RANDOMLY_DIED_CIVILIAN = "nagSomeoneRandomlyDiedCivilian";
     public static final String NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER = "nagSomeoneRandomlyDiedCampFollower";
     public static final String NAG_SOMEONE_RANDOMLY_DIED_RETIREE = "nagSomeoneRandomlyDiedRetired";
+    public static final String NAG_CONTRACT_JOURNAL_PROMPT = "nagContractJournalPrompt";
 
     public static final String CONFIRMATION_ACCEPT_CONTRACT = "confirmationAcceptContract";
     public static final String CONFIRMATION_FACTION_STANDINGS_ULTIMATUM = "confirmationFactionStandingsUltimatum";
