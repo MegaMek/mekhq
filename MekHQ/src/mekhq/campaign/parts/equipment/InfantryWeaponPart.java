@@ -71,8 +71,7 @@ public class InfantryWeaponPart extends EquipmentPart {
 
     @Override
     public MissingEquipmentPart getMissingPart() {
-        // shouldn't get here, but ok
-        return new MissingEquipmentPart(getUnitTonnage(), type, equipmentNum, size, campaign, getTonnage());
+        return new MissingInfantryWeaponPart(getUnitTonnage(), type, equipmentNum, campaign, getTonnage(), primary);
     }
 
     @Override
