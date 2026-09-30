@@ -189,6 +189,7 @@ import mekhq.campaign.parts.OmniPod;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitWorkCheck;
 import mekhq.campaign.parts.SpacecraftCoolingSystem;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -252,6 +253,7 @@ import mekhq.campaign.utilities.LithiumFusionBatteries;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.RepairTaskHold;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -2615,7 +2617,7 @@ public class Campaign implements ITechManager {
         }
 
         String report;
-        if (!unit.isConventionalInfantry()) {
+        if (!unit.isSelfMaintainedInfantry()) {
             Person tech = unit.getTech();
             if (null == tech) {
                 // uh-oh
@@ -2702,7 +2704,7 @@ public class Campaign implements ITechManager {
         }
 
         String report;
-        if (!unit.isConventionalInfantry()) {
+        if (!unit.isSelfMaintainedInfantry()) {
             Person tech = unit.getTech();
             if (null == tech) {
                 // uh-oh
@@ -2758,17 +2760,22 @@ public class Campaign implements ITechManager {
                             theRefit.getTech() :
                             theRefit.getUnit().getEngineer();
         if (tech == null) {
-            addReport(TECHNICAL, "No tech is assigned to refit " +
-                                       theRefit.getOriginalEntity().getShortName() +
-                                       ". Refit cancelled.");
-            theRefit.cancel();
+            // The tech left (transfer, death, removal); keep the progress and wait for a new tech
+            addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "refit.noTech",
+                  theRefit.getOriginalEntity().getShortName()));
             return;
         }
-        TargetRoll target = getTargetFor(theRefit, tech);
         // check that all parts have arrived
         if (!theRefit.acquireParts()) {
             return;
         }
+        String reasonTechCannotWork = RefitWorkCheck.reasonTechCannotWork(this, theRefit, tech);
+        if (reasonTechCannotWork != null) {
+            addReport(TECHNICAL, getFormattedTextAt(RESOURCE_BUNDLE, "refit.paused",
+                  tech.getHyperlinkedFullTitle(), theRefit.getPartName(), reasonTechCannotWork));
+            return;
+        }
+        TargetRoll target = getTargetFor(theRefit, tech);
         String report = tech.getHyperlinkedFullTitle() + " works on " + theRefit.getPartName();
         int minutes = theRefit.getTimeLeft();
         // FIXME: Overtime?
@@ -2930,6 +2937,10 @@ public class Campaign implements ITechManager {
                 return report;
             }
         }
+        String heldReport = RepairTaskHold.holdIfItCannotGoAhead(this, partWork, tech, target);
+        if (heldReport != null) {
+            return heldReport;
+        }
         if (partWork instanceof SpacecraftCoolingSystem) {
             // Change the string since we're not working on the part itself
             report += tech.getHyperlinkedFullTitle() + " attempts to" + action + "a heat sink";
@@ -2960,6 +2971,9 @@ public class Campaign implements ITechManager {
                     // Can't use more overtime than there are minutes remaining on the part
                     overtimeUsed = Math.min(minutes, tech.getOvertimeLeft());
                     minutesUsed += overtimeUsed;
+                }
+                // Only overtime actually worked counts, for the +3 overtime modifier and the AsTech helpers
+                if (overtimeUsed > 0) {
                     partWork.setWorkedOvertime(true);
                     usedOvertime = true;
                 }
@@ -3361,6 +3375,12 @@ public class Campaign implements ITechManager {
         Unit unit = getPlayerForce().getHangar().getUnit(id);
         if (unit == null) {
             return;
+        }
+
+        // A refit in progress gives back its reserved parts and removes its orders before the unit goes
+        if (unit.isRefitting()) {
+            LOGGER.debug("[Refit] {} leaves the campaign mid-refit; cancelling the refit", unit.getName());
+            unit.getRefit().cancel();
         }
 
         // remove all parts for this unit as well
@@ -4448,6 +4468,17 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * A tech working on a refit is tied up until it is completed or cancelled, including days spent waiting for parts,
+     * so they take no other work. Maintenance of units they already look after is separate and carries on.
+     *
+     * @return {@code true} if the tech is working on a refit and the task is anything other than that refit
+     */
+    private boolean isBusyWithAnotherRefit(IPartWork partWork, Person tech) {
+        Unit refittingUnit = getPlayerForce().getHumanResources().findUnitRefitBy(getPlayerForce().getHangar(), tech);
+        return (refittingUnit != null) && (partWork != refittingUnit.getRefit());
+    }
+
+    /**
      * Calculates the {@link TargetRoll} required for a technician to work on a specific part task.
      *
      * <p>This method determines task difficulty and eligibility by evaluating the technician's skills, penalties due
@@ -4477,9 +4508,12 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "This unit is not currently available!");
         } else if ((partWork.getTech() != null) && !partWork.getTech().equals(tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Already being worked on by another team");
+        } else if (isBusyWithAnotherRefit(partWork, tech)) {
+            return new TargetRoll(TargetRoll.IMPOSSIBLE, getFormattedTextAt(RESOURCE_BUNDLE, "refit.techBusy",
+                  getPlayerForce().getHumanResources().findUnitRefitBy(getPlayerForce().getHangar(), tech).getName()));
         } else if (skill == null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
-        } else if (getCampaignOptions().get(CampaignOption.TECHS_NEED_TOOL_KIT) &&
+        } else if (EquipmentKitCatalog.isToolKitRequired(getCampaignOptions(), partWork.getUnit()) &&
                          !EquipmentKitCatalog.hasToolKit(tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no tool kit");
         } else if (!getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN) && (partWork.getSkillMin() > effectiveSkillLevel)) {
@@ -4517,7 +4551,9 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
         }
 
-        // if this is an infantry refit, then automatic success
+        // if this is an infantry refit, then automatic success. Infantry refits take no time (they are a
+        // reorganization), so this holds even when Techs maintain conventional infantry: the Tech must still be the
+        // right profession (checked above via the refit skill), but a zero-time refit must never be failed and retried
         if ((partWork instanceof Refit) &&
                   (partWork.getUnit() != null) &&
                   partWork.getUnit().isConventionalInfantry()) {

@@ -99,6 +99,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useRandomUnitQualities");
     public static final CampaignOption<Boolean> USE_UNOFFICIAL_MAINTENANCE =
           of(Boolean.class, false, "useUnofficialMaintenance");
+    public static final CampaignOption<Boolean> TECHS_MAINTAIN_CONVENTIONAL_INFANTRY =
+          of(Boolean.class, false, "techsMaintainConventionalInfantry");
     public static final CampaignOption<Boolean> LOG_MAINTENANCE =
           of(Boolean.class, false, "logMaintenance");
     public static final CampaignOption<Integer> DEFAULT_MAINTENANCE_TIME =

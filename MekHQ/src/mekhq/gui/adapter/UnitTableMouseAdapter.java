@@ -207,6 +207,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_CUSTOMIZE = "CUSTOMIZE";
     public static final String COMMAND_CANCEL_CUSTOMIZE = "CANCEL_CUSTOMIZE";
     public static final String COMMAND_REFIT_GM_COMPLETE = "REFIT_GM_COMPLETE";
+    public static final String COMMAND_ASSIGN_REFIT_TECH = "ASSIGN_REFIT_TECH";
     public static final String COMMAND_REFURBISH = "REFURBISH";
     public static final String COMMAND_REFIT_KIT = "REFIT_KIT";
     public static final String COMMAND_FLUFF_NAME = "FLUFF_NAME";
@@ -611,6 +612,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             gui.setSelectedTab(gui.getMekLabTab());
         } else if (command.equals(COMMAND_CANCEL_CUSTOMIZE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().cancel());
+        } else if (command.equals(COMMAND_ASSIGN_REFIT_TECH)) { // Single Unit only
+            gui.assignRefitTech(selectedUnit.getRefit());
         } else if (command.equals(COMMAND_REFIT_GM_COMPLETE)) {
             Stream.of(units).filter(Unit::isRefitting).forEach(unit -> unit.getRefit().succeed());
         } else if (command.equals(COMMAND_REFURBISH)) {
@@ -835,7 +838,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     private @Nullable Person pickTechForMothballOrActivation(Unit unit, String description) {
         Person tech = null;
 
-        if (unit.isConventionalInfantry()) {
+        if (unit.isSelfMaintainedInfantry()) {
             return null;
         }
 
@@ -1232,6 +1235,17 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     menuItem.setActionCommand(COMMAND_CANCEL_CUSTOMIZE);
                     menuItem.addActionListener(this);
                     menu.add(menuItem);
+
+                    boolean isRefitWithoutTech = oneSelected
+                          && unit.isRefitting()
+                          && (unit.getRefit().getTech() == null)
+                          && !unit.isSelfCrewed();
+                    if (isRefitWithoutTech) {
+                        menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "assignRefitTech.text"));
+                        menuItem.setActionCommand(COMMAND_ASSIGN_REFIT_TECH);
+                        menuItem.addActionListener(this);
+                        menu.add(menuItem);
+                    }
 
                     if (isGM) {
                         menuItem = new JMenuItem("Complete Refit (GM)");

@@ -984,9 +984,10 @@ public class Unit implements ITechnology, ILocatable {
                 return false;
             }
         }
-        if (en instanceof Tank) {
+        if (en instanceof Tank tank) {
             for (int i = 0; i < en.locations(); i++) {
-                if (i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2) {
+                boolean isTurretOrRotor = VehicleLocations.isTurret(tank, i) || VehicleLocations.isRotor(tank, i);
+                if (isTurretOrRotor) {
                     continue;
                 }
                 if (en.isLocationBad(i)) {
@@ -1024,10 +1025,10 @@ public class Unit implements ITechnology, ILocatable {
                 return false;
             }
         }
-        if (en instanceof Tank) {
+        if (en instanceof Tank tank) {
             // can't repair a tank with a destroyed location
             for (int i = 0; i < en.locations(); i++) {
-                if (i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2 || i == Tank.LOC_BODY) {
+                if (VehicleLocations.canLoseWithoutWrecking(tank, i)) {
                     continue;
                 }
                 if (en.getInternal(i) <= 0) {
@@ -1296,6 +1297,94 @@ public class Unit implements ITechnology, ILocatable {
             }
         }
         return value;
+    }
+
+    /**
+     * Earlier versions gave a ProtoMek a second set of jump jets the first time its campaign was loaded: one
+     * {@link JumpJet} per jump jet mount and one {@link ProtoMekJumpJet} per point of jump MP. The jump jets tied to
+     * the mounts stay; the extra ProtoMek jump jets are removed from the unit and the warehouse.
+     *
+     * @param protoJumpJets the ProtoMek's jump jet parts of both kinds; the removed ones are taken out of it
+     * @param jumpMP        the ProtoMek's jump MP, one jump jet per point
+     */
+    private void removeDuplicateProtoMekJumpJets(List<Part> protoJumpJets, int jumpMP) {
+        int duplicates = protoJumpJets.size() - jumpMP;
+        int removed = 0;
+        for (Iterator<Part> jumpJetIterator = protoJumpJets.iterator();
+              jumpJetIterator.hasNext() && (removed < duplicates); ) {
+            Part jumpJet = jumpJetIterator.next();
+            boolean isProtoMekJumpJet = (jumpJet instanceof ProtoMekJumpJet)
+                  || (jumpJet instanceof MissingProtoMekJumpJet);
+            if (isProtoMekJumpJet) {
+                jumpJetIterator.remove();
+                removePart(jumpJet);
+                jumpJet.setUnit(null);
+                if (campaign != null) {
+                    getWarehouse().removePart(jumpJet);
+                }
+                removed++;
+            }
+        }
+        if (removed > 0) {
+            LOGGER.info("{}: removed {} duplicate ProtoMek jump jet parts", getName(), removed);
+        }
+    }
+
+    /**
+     * @return one trooper's armor part for the platoon: its armor kit, taking the kit's damage divisor and price, or
+     *       armor described by the platoon's armor properties when it has no kit
+     */
+    private InfantryArmorPart createInfantryArmorPart(ConvInfantry infantry) {
+        EquipmentType armorKit = infantry.getArmorKit();
+        double damageDivisor = (armorKit instanceof MiscType kit) ? kit.getDamageDivisor()
+              : infantry.getCustomArmorDamageDivisor();
+        return new InfantryArmorPart(0,
+              getCampaign(),
+              armorKit,
+              damageDivisor,
+              infantry.isArmorEncumbering(),
+              infantry.hasDEST(),
+              infantry.hasSneakCamo(),
+              infantry.hasSneakIR(),
+              infantry.hasSneakECM(),
+              infantry.hasSpaceSuit());
+    }
+
+    /**
+     * Armor parts saved before parts recorded their armor kit know only the kit's properties, so two different kits
+     * looked the same. They take the platoon's kit when the campaign loads.
+     */
+    private void giveArmorPartsTheirKit(ConvInfantry infantry) {
+        EquipmentType armorKit = infantry.getArmorKit();
+        if (armorKit == null) {
+            return;
+        }
+        int updated = 0;
+        for (Part part : parts) {
+            if ((part instanceof InfantryArmorPart armorPart) && (armorPart.getArmorKit() == null)) {
+                armorPart.setArmorKit(armorKit);
+                updated++;
+            }
+        }
+        if (updated > 0) {
+            LOGGER.info("{}: {} armor parts now record their {}", getName(), updated, armorKit.getName());
+        }
+    }
+
+    /**
+     * @return the part for one of a vehicle's locations: its rotor, one of its turrets, or plain structure. Turret and
+     *       rotor locations come from the vehicle, since superheavy tanks, large support tanks and VTOLs number them
+     *       differently from other tanks.
+     */
+    private TankLocation createVehicleLocationPart(Tank tank, int location) {
+        int tonnage = (int) tank.getWeight();
+        if (VehicleLocations.isRotor(tank, location)) {
+            return new Rotor(tonnage, getCampaign());
+        }
+        if (VehicleLocations.isTurret(tank, location)) {
+            return new Turret(location, tonnage, getCampaign());
+        }
+        return new TankLocation(location, tonnage, getCampaign());
     }
 
     public void removePart(Part part) {
@@ -3687,8 +3776,9 @@ public class Unit implements ITechnology, ILocatable {
                 }
             } else if (part instanceof MissingRotor) {
                 locations[VTOL.LOC_ROTOR] = part;
-            } else if (part instanceof MissingTurret && Tank.LOC_TURRET < locations.length) {
-                locations[Tank.LOC_TURRET] = part;
+            } else if ((part instanceof MissingTurret missingTurret)
+                             && (missingTurret.getTurretLocation() < locations.length)) {
+                locations[missingTurret.getTurretLocation()] = part;
             } else if (part instanceof ProtoMekLocation) {
                 if (((ProtoMekLocation) part).getLoc() < locations.length) {
                     locations[((ProtoMekLocation) part).getLoc()] = part;
@@ -4009,52 +4099,10 @@ public class Unit implements ITechnology, ILocatable {
                           getCampaign());
                     addPart(protoMekLocation);
                     partsToAdd.add(protoMekLocation);
-                } else if (entity instanceof Tank && i != Tank.LOC_BODY) {
-                    if (entity instanceof VTOL) {
-                        if (i == VTOL.LOC_ROTOR) {
-                            Rotor rotor = new Rotor((int) getEntity().getWeight(), getCampaign());
-                            addPart(rotor);
-                            partsToAdd.add(rotor);
-                        } else if (i == VTOL.LOC_TURRET) {
-                            if (((VTOL) entity).hasNoTurret()) {
-                                continue;
-                            }
-                            Turret turret = new Turret(i, (int) getEntity().getWeight(), getCampaign());
-                            addPart(turret);
-                            partsToAdd.add(turret);
-                        } else if (i == VTOL.LOC_TURRET_2) {
-                            if (((VTOL) entity).hasNoDualTurret()) {
-                                continue;
-                            }
-                            Turret turret = new Turret(i, (int) getEntity().getWeight(), getCampaign());
-                            addPart(turret);
-                            partsToAdd.add(turret);
-                        } else {
-                            TankLocation tankLocation = new TankLocation(i,
-                                  (int) getEntity().getWeight(),
-                                  getCampaign());
-                            addPart(tankLocation);
-                            partsToAdd.add(tankLocation);
-                        }
-                    } else if (i == Tank.LOC_TURRET) {
-                        if (((Tank) entity).hasNoTurret()) {
-                            continue;
-                        }
-                        Turret turret = new Turret(i, (int) getEntity().getWeight(), getCampaign());
-                        addPart(turret);
-                        partsToAdd.add(turret);
-                    } else if (i == Tank.LOC_TURRET_2) {
-                        if (((Tank) entity).hasNoDualTurret()) {
-                            continue;
-                        }
-                        Turret turret = new Turret(i, (int) getEntity().getWeight(), getCampaign());
-                        addPart(turret);
-                        partsToAdd.add(turret);
-                    } else {
-                        TankLocation tankLocation = new TankLocation(i, (int) getEntity().getWeight(), getCampaign());
-                        addPart(tankLocation);
-                        partsToAdd.add(tankLocation);
-                    }
+                } else if ((entity instanceof Tank tank) && (i != tank.getBodyLocation())) {
+                    Part tankLocation = createVehicleLocationPart(tank, i);
+                    addPart(tankLocation);
+                    partsToAdd.add(tankLocation);
                 } else if ((entity instanceof BattleArmor) &&
                                  (i != 0) &&
                                  (i <= ((BattleArmor) entity).getSquadSize())) {
@@ -4232,9 +4280,9 @@ public class Unit implements ITechnology, ILocatable {
                           getCampaign());
                     addPart(epart);
                     partsToAdd.add(epart);
-                    if (entity.hasETypeFlag(Entity.ETYPE_PROTOMEK)) {
-                        protoJumpJets.add(epart);
-                    }
+                }
+                if (entity.hasETypeFlag(Entity.ETYPE_PROTOMEK)) {
+                    protoJumpJets.add(epart);
                 }
             } else {
                 int equipmentNum = entity.getEquipmentNum(m);
@@ -4399,11 +4447,11 @@ public class Unit implements ITechnology, ILocatable {
             }
         }
 
-        if (entity instanceof Mek) {
+        if (entity instanceof Mek mek) {
             if (null == gyro) {
                 gyro = new MekGyro((int) entity.getWeight(),
                       entity.getGyroType(),
-                      entity.getOriginalWalkMP(),
+                      MekGyro.getGyroTonnage(mek),
                       entity.isClan(),
                       getCampaign());
                 addPart(gyro);
@@ -4855,6 +4903,7 @@ public class Unit implements ITechnology, ILocatable {
                 addPart(sensor);
                 partsToAdd.add(sensor);
             }
+            removeDuplicateProtoMekJumpJets(protoJumpJets, entity.getOriginalJumpMP());
             int jj = (entity).getOriginalJumpMP() - protoJumpJets.size();
             while (jj > 0) {
                 ProtoMekJumpJet protoJJ = new ProtoMekJumpJet((int) entity.getWeight(), getCampaign());
@@ -4879,37 +4928,18 @@ public class Unit implements ITechnology, ILocatable {
                 }
             }
             if (null == infantryArmor) {
-                EquipmentType eq = infantry.getArmorKit();
-                if (null != eq) {
-                    infantryArmor = new EquipmentPart(0, eq, 0, 1.0, false, getCampaign());
-                } else {
-                    infantryArmor = new InfantryArmorPart(0,
-                          getCampaign(),
-                          infantry.getCustomArmorDamageDivisor(),
-                          infantry.isArmorEncumbering(),
-                          infantry.hasDEST(),
-                          infantry.hasSneakCamo(),
-                          infantry.hasSneakECM(),
-                          infantry.hasSneakIR(),
-                          infantry.hasSpaceSuit());
-                }
+                infantryArmor = createInfantryArmorPart(infantry);
                 if (infantryArmor.getStickerPrice().isPositive()) {
                     int number = entity.getOInternal(ConvInfantry.LOC_INFANTRY);
                     while (number > 0) {
-                        infantryArmor = new InfantryArmorPart(0,
-                              getCampaign(),
-                              infantry.getCustomArmorDamageDivisor(),
-                              infantry.isArmorEncumbering(),
-                              infantry.hasDEST(),
-                              infantry.hasSneakCamo(),
-                              infantry.hasSneakECM(),
-                              infantry.hasSneakIR(),
-                              infantry.hasSpaceSuit());
+                        infantryArmor = createInfantryArmorPart(infantry);
                         addPart(infantryArmor);
                         partsToAdd.add(infantryArmor);
                         number--;
                     }
                 }
+            } else {
+                giveArmorPartsTheirKit(infantry);
             }
             InfantryWeapon primaryType = infantry.getPrimaryWeapon();
             InfantryWeapon secondaryType = infantry.getSecondaryWeapon();
@@ -6238,6 +6268,9 @@ public class Unit implements ITechnology, ILocatable {
      */
     public void resetEngineer() {
         if (!isSelfCrewed()) {
+            // A unit that is not self-crewed has no engineer. This matters for conventional infantry, which may have
+            // picked one up while they were maintaining themselves before Techs were made responsible for them
+            clearEngineer();
             return;
         }
 
@@ -6271,6 +6304,11 @@ public class Unit implements ITechnology, ILocatable {
                 if (part.isBeingWorkedOn()) {
                     part.setTech(engineer);
                 }
+            }
+            // a refit in progress is worked by the engineer too; otherwise the old engineer's name stays on it and
+            // the new engineer is refused as "another team"
+            if (refit != null) {
+                refit.setTech(engineer);
             }
         } else {
             // cancel any mothballing if this happens
@@ -6365,7 +6403,8 @@ public class Unit implements ITechnology, ILocatable {
             return SkillType.S_TECH_MEK;
         } else if (entity instanceof BattleArmor) {
             return SkillType.S_TECH_BA;
-        } else if (entity instanceof Tank || entity instanceof AbstractBuildingEntity) {
+        } else if (entity instanceof Tank || entity instanceof AbstractBuildingEntity
+                         || (isConventionalInfantry() && !isSelfMaintainedInfantry())) {
             return SkillType.S_TECH_VEHICLE;
         } else if ((entity instanceof Dropship) || (entity instanceof Jumpship)) {
             return SkillType.S_TECH_VESSEL;
@@ -6984,7 +7023,7 @@ public class Unit implements ITechnology, ILocatable {
         }
 
         // set this person as tech
-        if (!isSelfCrewed() && (tech != null) && !tech.equals(mothballTech)) {
+        if ((!isSelfCrewed() || isSelfMaintainedInfantry()) && (tech != null) && !tech.equals(mothballTech)) {
             remove(tech, true);
         }
         tech = mothballTech;
@@ -7406,7 +7445,53 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public Person getEngineer() {
-        return engineer;
+        // Guards against a stale engineer on conventional infantry now maintained by Techs, which would otherwise be
+        // returned by getTech() in place of the assigned Mechanic
+        return isSelfCrewed() ? engineer : null;
+    }
+
+    /**
+     * Drops this unit's engineer, cancelling any tasks scheduled to them. Unlike {@link #resetEngineer()} this never
+     * cancels mothballing, as a unit that is not self-crewed mothballs with its assigned Tech instead.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void clearEngineer() {
+        if (engineer == null) {
+            return;
+        }
+
+        for (Part part : getParts()) {
+            if (part.isBeingWorkedOn() && engineer.equals(part.getTech())) {
+                part.cancelAssignment(true);
+            }
+        }
+
+        engineer = null;
+    }
+
+    /**
+     * Brings a conventional infantry unit's Tech and engineer in line with the current
+     * {@link CampaignOption#TECHS_MAINTAIN_CONVENTIONAL_INFANTRY} setting, for use after that option changes
+     * mid-campaign. Self-maintaining infantry lose any assigned Tech and have their ranking soldier made engineer
+     * again; Tech-maintained infantry lose their engineer so that their assigned Mechanic is used instead.
+     *
+     * <p>Does nothing for any other unit type, or for units that are deployed.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void reconcileInfantryMaintenance() {
+        if (!isConventionalInfantry() || isDeployed()) {
+            return;
+        }
+
+        if (isSelfMaintainedInfantry() && (tech != null)) {
+            removeTech();
+        }
+
+        resetEngineer();
     }
 
     public @Nullable Part getPartForEquipmentNum(int index, int loc) {
@@ -7744,7 +7829,7 @@ public class Unit implements ITechnology, ILocatable {
         if (!isAvailable()) {
             return false;
         }
-        return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor;
+        return !(getEntity() instanceof Infantry) || getEntity() instanceof BattleArmor || !isSelfMaintainedInfantry();
     }
 
     /**
@@ -7790,7 +7875,7 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public boolean isSelfCrewed() {
-        return (getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship) || isConventionalInfantry();
+        return (getEntity() instanceof Dropship) || (getEntity() instanceof Jumpship) || isSelfMaintainedInfantry();
     }
 
     public boolean isUnderRepair() {
@@ -7929,6 +8014,27 @@ public class Unit implements ITechnology, ILocatable {
      */
     public boolean isConventionalInfantry() {
         return (getEntity() != null) && getEntity().isConventionalInfantry();
+    }
+
+    /**
+     * Whether this unit is conventional infantry that repairs and maintains itself, using its own soldiers rather than
+     * an assigned Tech. This is the default behavior; when
+     * {@link CampaignOption#TECHS_MAINTAIN_CONVENTIONAL_INFANTRY} is enabled, conventional infantry are instead
+     * maintained and repaired by Mechanics like any other non-self-crewed unit.
+     *
+     * @return {@code true} if this is conventional infantry that looks after itself
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isSelfMaintainedInfantry() {
+        if (!isConventionalInfantry()) {
+            return false;
+        }
+
+        Campaign unitCampaign = getCampaign();
+        return (unitCampaign == null)
+                     || !unitCampaign.getCampaignOptions().get(CampaignOption.TECHS_MAINTAIN_CONVENTIONAL_INFANTRY);
     }
 
     /**

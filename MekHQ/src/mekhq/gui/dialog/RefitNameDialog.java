@@ -69,7 +69,8 @@ public class RefitNameDialog extends JDialog {
     public RefitNameDialog(final JFrame frame, final boolean modal, final Refit refit) {
         super(frame, modal);
         this.refit = refit;
-        cancelled = false;
+        // Only OK confirms the name; closing the box with the window X counts as Cancel
+        cancelled = true;
         initComponents();
         setLocationRelativeTo(frame);
         setUserPreferences();
@@ -195,6 +196,7 @@ public class RefitNameDialog extends JDialog {
                   JOptionPane.ERROR_MESSAGE);
             return;
         }
+        cancelled = false;
         this.setVisible(false);
     }
 

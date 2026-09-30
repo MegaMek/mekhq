@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.personnel.procreation;
 
-import static org.mockito.Mockito.lenient;
-
 import static mekhq.campaign.personnel.PersonnelTestUtilities.matchPersonUUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -47,15 +45,18 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.enums.education.EducationLevel;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
@@ -898,5 +899,46 @@ public class AbstractProcreationTest {
         when(mockProcreation.canProcreate(any(), any(), anyBoolean())).thenReturn(null);
         when(mockProcreation.procreation(any())).thenReturn(true);
         assertTrue(mockProcreation.randomlyProcreates(LocalDate.ofYearDay(3025, 1), person));
+    }
+
+    /**
+     * Regression test for 'Dr Baby': background (historic) births used to keep whatever education and titles the
+     * personnel generator rolled for the dependent's random adult age, so newborns could arrive with doctorates.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testBirthHistoric_babiesHaveNoEducationOrTitles() {
+        when(mockCampaignOptions.get(CampaignOption.BABY_SURNAME_STYLE)).thenReturn(BabySurnameStyle.MOTHERS);
+        when(mockCampaignOptions.get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.LOG_PROCREATION)).thenReturn(false);
+
+        // Simulate the generator handing back a dependent that was rolled as a highly educated adult
+        when(mockCampaign.getPlayerForce().getHumanResources().newDependent(any(), any(), any(), any()))
+              .thenAnswer(invocation -> {
+                  Person generatedDependent = new Person(mockCampaign);
+                  generatedDependent.setDateOfBirth(LocalDate.of(2990, 1, 1));
+                  generatedDependent.setEduHighestEducation(EducationLevel.DOCTORATE);
+                  generatedDependent.setPreNominal("Dr");
+                  generatedDependent.setPostNominal("PhD");
+                  return generatedDependent;
+              });
+
+        final LocalDate dueDate = LocalDate.of(3025, 6, 1);
+        final Person mother = new Person(mockCampaign);
+        mother.setDueDate(dueDate);
+        mother.getExtraData().set(AbstractProcreation.PREGNANCY_CHILDREN_DATA, 3);
+
+        final AbstractProcreation procreation = new DisabledRandomProcreation(mockCampaignOptions);
+        final List<Person> babies = procreation.birthHistoric(mockCampaign, dueDate, mother, null);
+
+        assertEquals(3, babies.size());
+        for (Person baby : babies) {
+            assertEquals(dueDate, baby.getDateOfBirth());
+            assertEquals(EducationLevel.EARLY_CHILDHOOD, baby.getEduHighestEducation());
+            assertEquals("", baby.getPreNominal());
+            assertEquals("", baby.getPostNominal());
+        }
     }
 }

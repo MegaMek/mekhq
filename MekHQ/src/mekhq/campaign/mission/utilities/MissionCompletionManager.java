@@ -76,6 +76,7 @@ import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.dialog.CompleteMissionDialog;
 import mekhq.gui.dialog.RetirementDefectionDialog;
+import mekhq.gui.roleplay.ContractJournalPrompt;
 
 /**
  * Orchestrates everything that happens when the player completes a mission (contract).
@@ -189,6 +190,8 @@ public class MissionCompletionManager {
         // Clear out any old StratCon campaign data (it's not going to be used, moving forward). We do this near the
         // end to ensure there isn't any risk of us accidentally killing the data when it's still required.
         clearStratConState(mission);
+
+        ContractJournalPrompt.offer(frame, campaign, mission, missionStatus);
 
         return true;
     }

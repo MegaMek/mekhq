@@ -39,6 +39,7 @@ import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.personnel.PersonUtility.setVeterancyAwardEligibility;
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_ILL_DO_IT_MYSELF;
+import static mekhq.campaign.personnel.education.EducationController.setInitialEducationLevel;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternateImplants.giveEIImplant;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
@@ -1523,8 +1524,43 @@ public class ForceHumanResources {
      */
     public List<Person> getSkilledTechs(Collection<Unit> units, CampaignOptions campaignOptions,
           boolean isClanCampaign, LocalDate today, boolean noZeroMinute) {
-        return getTechs(getActivePersonnel(false, false), units, campaignOptions, isClanCampaign, today,
-              noZeroMinute, false, Person::hasTechSkill);
+        List<Person> techs = getTechs(getActivePersonnel(false, false), units, campaignOptions, isClanCampaign,
+              today, noZeroMinute, false, Person::hasTechSkill);
+        addSelfMaintainedInfantryEngineers(techs, units, noZeroMinute);
+        return techs;
+    }
+
+    /**
+     * Adds the engineer (ranking soldier) of each self-maintaining conventional infantry unit to the given list, so
+     * the Repair tab can offer them for work on their own unit. They are deliberately left out of
+     * {@link #getTechs(Collection, Collection, CampaignOptions, boolean, LocalDate, boolean, boolean, Predicate)} so
+     * they never count towards tech or maintenance capacity.
+     *
+     * @param techs        the list to add the engineers to
+     * @param units        the units to check
+     * @param noZeroMinute if {@code true}, engineers with no remaining available minutes are skipped
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void addSelfMaintainedInfantryEngineers(List<Person> techs, Collection<Unit> units,
+          boolean noZeroMinute) {
+        for (Unit unit : units) {
+            if (!unit.isSelfMaintainedInfantry()) {
+                continue;
+            }
+
+            Person engineer = unit.getEngineer();
+            if ((engineer == null) || techs.contains(engineer)) {
+                continue;
+            }
+
+            if (noZeroMinute && (engineer.getMinutesLeft() <= 0)) {
+                continue;
+            }
+
+            techs.add(engineer);
+        }
     }
 
     /**
@@ -2379,6 +2415,8 @@ public class ForceHumanResources {
                 child.getOptions().getOption(option.getName()).clearValue();
             }
 
+            rerollBackgroundChildEducation(campaign, child);
+
             int experienceLevel = child.getExperienceLevel(campaign.getCampaignOptions(),
                   campaign.getPlayerForce().isClanForce(),
                   campaign.getLocalDate(),
@@ -2386,11 +2424,11 @@ public class ForceHumanResources {
                   false);
 
             if (experienceLevel <= 0) {
-                person.setLoyalty(d6(3) + 2);
+                child.setLoyalty(d6(3) + 2);
             } else if (experienceLevel == 1) {
-                person.setLoyalty(d6(3) + 1);
+                child.setLoyalty(d6(3) + 1);
             } else {
-                person.setLoyalty(d6(3));
+                child.setLoyalty(d6(3));
             }
 
             if (experienceLevel >= 0) {
@@ -2417,6 +2455,25 @@ public class ForceHumanResources {
         MekHQ.triggerEvent(new PersonChangedEvent(person));
     }
 
+
+    /**
+     * Re-rolls the education of a child generated as part of a new recruit's background family.
+     *
+     * <p>Background children are created by the personnel generator with a random adult age, which is used to roll
+     * their education (and any 'Dr' pre-nominal), and only afterwards have their date of birth backdated. This clears
+     * those titles and rolls education again against the child's real age.</p>
+     *
+     * @param campaign the current campaign
+     * @param child    the background child to update
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void rerollBackgroundChildEducation(Campaign campaign, Person child) {
+        child.setPreNominal("");
+        child.setPostNominal("");
+        setInitialEducationLevel(campaign, child);
+    }
 
     public void removePerson(Campaign campaign, final @Nullable Person person) {
         removePerson(campaign, person, true);
@@ -2813,9 +2870,21 @@ public class ForceHumanResources {
     }
 
     public boolean isWorkingOnRefit(LocalHangar hangar, Person person) {
+        return findUnitRefitBy(hangar, person) != null;
+    }
+
+    /**
+     * Finds the unit whose refit this person is working on. A refit ties its tech up from the day it starts until it
+     * is completed or cancelled, including days spent waiting for parts.
+     *
+     * @param hangar the hangar to search
+     * @param person the person to look for
+     *
+     * @return the unit being refitted by this person, or {@code null} if they are not working on a refit
+     */
+    public @Nullable Unit findUnitRefitBy(LocalHangar hangar, Person person) {
         Objects.requireNonNull(person);
-        Unit unit = hangar.findUnit(u -> u.isRefitting() && person.equals(u.getRefit().getTech()));
-        return unit != null;
+        return hangar.findUnit(unit -> unit.isRefitting() && person.equals(unit.getRefit().getTech()));
     }
 
     /**
