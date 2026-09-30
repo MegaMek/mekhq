@@ -42,8 +42,11 @@ import java.util.Map;
 import java.util.Set;
 
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.unit.Unit;
 
 /**
  * The catalog of CamOps specialized equipment kits MekHQ issues to technicians, and which {@code Tech/...} repair skills
@@ -412,6 +415,27 @@ public final class EquipmentKitCatalog extends AbstractKitCatalog {
             return 1;
         }
         return 0;
+    }
+
+    /**
+     * Whether a tool kit is required to work on the given unit. Kits are required when the "Techs Need a Tool Kit"
+     * campaign option is enabled, except for conventional infantry that maintain themselves (see
+     * {@link Unit#isSelfMaintainedInfantry()}): those soldiers are not technicians and so are exempt.
+     *
+     * @param campaignOptions the active campaign options
+     * @param unit            the unit being worked on, or {@code null} for unattached parts
+     *
+     * @return {@code true} if the person doing the work must carry a tool kit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isToolKitRequired(CampaignOptions campaignOptions, @Nullable Unit unit) {
+        if (!campaignOptions.get(CampaignOption.TECHS_NEED_TOOL_KIT)) {
+            return false;
+        }
+
+        return (unit == null) || !unit.isSelfMaintainedInfantry();
     }
 
     /**

@@ -611,6 +611,7 @@ public class Refit extends Part implements IAcquisitionWork {
         List<Part> tempOldParts = new ArrayList<>(oldUnitParts);
 
         armorNeeded = 0;
+        Map<ArmorFace, Integer> newArmorPointsByFace = new HashMap<>();
         int armorType = 0;
         boolean armorIsClan = false;
         Map<Part, Integer> partQuantity = new HashMap<>();
@@ -657,7 +658,9 @@ public class Refit extends Part implements IAcquisitionWork {
                 // NOT ANYMORE - I think this is overkill, lets just reuse existing armor parts
                 int totalAmount = newArmorPart.getTotalAmount();
                 time += totalAmount * newArmorPart.getBaseTimeFor(newEntity);
-                armorNeeded += totalAmount;
+                armorNeeded += Armor.toWarehousePoints(newEntity, totalAmount);
+                newArmorPointsByFace.merge(new ArmorFace(newArmorPart.getLocation(), newArmorPart.isRearMounted()),
+                      totalAmount, Integer::sum);
                 armorType = newArmorPart.getType();
                 armorIsClan = newPart.isClanTechBase();
 
@@ -873,9 +876,13 @@ public class Refit extends Part implements IAcquisitionWork {
                     continue;
                 }
                 case Armor oldArmor when sameArmorType -> {
-                    recycledArmorPoints += oldArmor.getAmount();
-                    // Refund the time we added above for the "new" armor that actually wasn't.
-                    time -= oldArmor.getAmount() * oldArmor.getBaseTimeFor(oldUnit.getEntity());
+                    recycledArmorPoints += Armor.toWarehousePoints(oldUnit.getEntity(), oldArmor.getAmount());
+                    // The points this location keeps were counted above as new armor, so refund their time; the
+                    // points taken off take as long to remove as to fit
+                    ArmorFace face = new ArmorFace(oldArmor.getLocation(), oldArmor.isRearMounted());
+                    int keptPoints = Math.min(oldArmor.getAmount(), newArmorPointsByFace.getOrDefault(face, 0));
+                    int removedPoints = oldArmor.getAmount() - keptPoints;
+                    time += (removedPoints - keptPoints) * oldArmor.getBaseTimeFor(oldUnit.getEntity());
                     continue;
                 }
                 default -> {
@@ -919,6 +926,8 @@ public class Refit extends Part implements IAcquisitionWork {
                                                                                   .multipliedBy(tonnageNeeded))
                                    .dividedBy(5.0));
             newArmorSupplies.setUnit(null);
+            LOGGER.debug("[Refit] {}: needs {} warehouse points ({} tons) of {} armor", oldUnit.getName(), armorNeeded,
+                  newArmorSupplies.getTonnageNeeded(), newArmorSupplies.getName());
         }
 
         // TODO : use ammo removed from the old unit in the case of changing between
@@ -1734,7 +1743,6 @@ public class Refit extends Part implements IAcquisitionWork {
      * Actually transform the old unit into the new one, and do all the cleanup that that entails
      */
     private void complete() {
-        boolean aClan = false;
         oldUnit.setRefit(null);
         Entity oldEntity = oldUnit.getEntity();
         List<Part> fixedPartsToKeep = getFixedPartsKeptByOmniRefit(oldEntity);
@@ -1776,7 +1784,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 // let's just re-use this armor part
                 if (!sameArmorType) {
                     // give the amount back to the warehouse since we are switching types
-                    armor.changeAmountAvailable(armor.getAmount());
+                    armor.changeAmountAvailable(Armor.toWarehousePoints(oldEntity, armor.getAmount()));
                     if (null != newArmorSupplies) {
                         armor.changeType(newArmorSupplies.getType(), newArmorSupplies.isClanTechBase());
                     }
@@ -1961,7 +1969,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         // FIXME: This doesn't deal properly with patchwork armor.
         if (sameArmorType && armorNeeded < 0) {
-            Armor armor = getArmor(aClan);
+            Armor armor = getSurplusArmor();
             armor.changeAmountAvailable(armor.getAmount());
         }
 
@@ -2002,9 +2010,14 @@ public class Refit extends Part implements IAcquisitionWork {
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
     }
 
-    private Armor getArmor(boolean aClan) {
+    /**
+     * @return the armor left over when the new design carries less armor of the same type, with the new design's armor
+     *       type and tech base
+     */
+    private Armor getSurplusArmor() {
         Armor armor;
         Entity en = oldUnit.getEntity();
+        boolean isClanArmor = en.isClanArmor(en.firstArmorIndex());
         if (en.isSupportVehicle() && en.getArmorType(en.firstArmorIndex()) == EquipmentType.T_ARMOR_STANDARD) {
             armor = new SVArmor(en.getBARRating(en.firstArmorIndex()),
                   en.getArmorTechRating(),
@@ -2017,7 +2030,7 @@ public class Refit extends Part implements IAcquisitionWork {
                   -1 * armorNeeded,
                   -1,
                   false,
-                  aClan,
+                  isClanArmor,
                   getCampaign());
         }
         armor.setUnit(oldUnit);
@@ -2078,6 +2091,14 @@ public class Refit extends Part implements IAcquisitionWork {
                   partsAdded);
         }
     }
+
+    /**
+     * One face of armor on a unit: a location, and whether it is the rear armor there.
+     *
+     * @param location the location
+     * @param isRear   {@code true} for rear armor
+     */
+    private record ArmorFace(int location, boolean isRear) {}
 
     /**
      * Deal with ammo bin changing munition type during a refit

@@ -1765,9 +1765,14 @@ public class AtBDynamicScenarioFactory {
      * Translates the template's objectives, filling them in with actual forces from the scenario.
      */
     public static void translateTemplateObjectives(AtBDynamicScenario scenario, Campaign campaign) {
+        ScenarioTemplate template = scenario.getTemplate();
+        if (template == null) {
+            return;
+        }
+
         scenario.getScenarioObjectives().clear();
 
-        for (ScenarioObjective templateObjective : scenario.getTemplate().scenarioObjectives) {
+        for (ScenarioObjective templateObjective : template.scenarioObjectives) {
             ScenarioObjective actualObjective = translateTemplateObjective(scenario, campaign, templateObjective);
 
             scenario.getScenarioObjectives().add(actualObjective);
