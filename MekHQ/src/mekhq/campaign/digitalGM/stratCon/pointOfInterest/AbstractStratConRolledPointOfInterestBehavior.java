@@ -308,7 +308,7 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
         } else {
             Formation formation = campaign.getPlayerForce().getFormation(formationId);
             int unitType = (formation == null) ? MEK : formation.getPrimaryUnitType(campaign);
-            template = StratConScenarioFactory.getRandomScenario(unitType, true, false);
+            template = StratConRulesManager.getRandomScenarioForTrack(track, unitType, true, false);
         }
 
         // Set up with the deploying formation as its seed, as every other StratCon scenario is: the opposition is

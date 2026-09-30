@@ -83,6 +83,7 @@ class RulesetsOptionsModel {
     boolean useAdvancedScouting;
     boolean essentialScenariosOnly;
     boolean contractsUseSpecialMechanics;
+    boolean useEmployerLostPlanetReactions;
     boolean noSeedForces;
     boolean useGenericBattleValue;
     boolean useVerboseBidding;
@@ -132,6 +133,7 @@ class RulesetsOptionsModel {
         useAdvancedScouting = options.get(CampaignOption.USE_ADVANCED_SCOUTING);
         essentialScenariosOnly = options.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
         contractsUseSpecialMechanics = options.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS);
+        useEmployerLostPlanetReactions = options.get(CampaignOption.USE_EMPLOYER_LOST_PLANET_REACTIONS);
         noSeedForces = options.get(CampaignOption.NO_SEED_FORCES);
         useGenericBattleValue = options.get(CampaignOption.USE_GENERIC_BATTLE_VALUE);
         useVerboseBidding = options.get(CampaignOption.USE_VERBOSE_BIDDING);
@@ -182,6 +184,7 @@ class RulesetsOptionsModel {
         options.set(CampaignOption.USE_ADVANCED_SCOUTING, useAdvancedScouting);
         options.set(CampaignOption.ESSENTIAL_SCENARIOS_ONLY, essentialScenariosOnly);
         options.set(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS, contractsUseSpecialMechanics);
+        options.set(CampaignOption.USE_EMPLOYER_LOST_PLANET_REACTIONS, useEmployerLostPlanetReactions);
         options.set(CampaignOption.NO_SEED_FORCES, noSeedForces);
         options.set(CampaignOption.USE_GENERIC_BATTLE_VALUE, useGenericBattleValue);
         options.set(CampaignOption.USE_VERBOSE_BIDDING, useVerboseBidding);

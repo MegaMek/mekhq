@@ -485,6 +485,25 @@ public class StratConTrackState {
     }
 
     /**
+     * Whether a facility on this track keeps air and space scenarios from being generated here, whichever side holds
+     * it (see {@link StratConFacility#preventAerospace()}).
+     *
+     * @return {@code true} if no random air or space scenario may be generated on this track
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isAerospacePrevented() {
+        for (StratConFacility facility : getFacilities().values()) {
+            if (facility.preventAerospace()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determines how many hexes are added to the scan range of every force scouting this track.
      *
      * <p>Each facility that increases scan range (see {@link StratConFacility#getIncreaseScanRange()}) adds one hex.

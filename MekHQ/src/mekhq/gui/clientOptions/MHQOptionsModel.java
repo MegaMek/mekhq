@@ -176,6 +176,8 @@ class MHQOptionsModel {
     boolean newDayOptimizeMedicalAssignments;
     boolean newDayAutomaticallyAssignUnmaintainedUnits;
     boolean selfCorrectMaintenance;
+    boolean doNotMothballUnitsInBays;
+    boolean doNotMothballSalvage;
     // endregion New Day - Automation
 
     // region New Day - Training
@@ -353,6 +355,8 @@ class MHQOptionsModel {
         newDayOptimizeMedicalAssignments = options.getNewDayOptimizeMedicalAssignments();
         newDayAutomaticallyAssignUnmaintainedUnits = options.getNewDayAutomaticallyAssignUnmaintainedUnits();
         selfCorrectMaintenance = options.getSelfCorrectMaintenance();
+        doNotMothballUnitsInBays = options.getDoNotMothballUnitsInBays();
+        doNotMothballSalvage = options.getDoNotMothballSalvage();
 
         // New Day - Training
         newMonthQuickTrain = options.getNewMonthQuickTrain();
@@ -542,6 +546,8 @@ class MHQOptionsModel {
         options.setNewDayOptimizeMedicalAssignments(newDayOptimizeMedicalAssignments);
         options.setNewDayAutomaticallyAssignUnmaintainedUnits(newDayAutomaticallyAssignUnmaintainedUnits);
         options.setSelfCorrectMaintenance(selfCorrectMaintenance);
+        options.setDoNotMothballUnitsInBays(doNotMothballUnitsInBays);
+        options.setDoNotMothballSalvage(doNotMothballSalvage);
 
         // New Day - Training
         options.setNewMonthQuickTrain(newMonthQuickTrain);

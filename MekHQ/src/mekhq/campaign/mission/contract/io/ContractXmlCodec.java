@@ -138,6 +138,10 @@ public final class ContractXmlCodec {
         if (contract.getStatus() != null) {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "missionStatus", contract.getStatus().name());
         }
+        if (contract.getMandatedCompletionStatus() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "mandatedCompletionStatus",
+                  contract.getMandatedCompletionStatus().name());
+        }
         // Running salvage totals, accumulated across the contract's scenarios.
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvagedByUnitValue", contract.getSalvagedByUnitValue());
         MHQXMLUtility.writeSimpleXMLTag(printWriter,
@@ -447,6 +451,9 @@ public final class ContractXmlCodec {
               (contract, node, campaign, version) -> contract.setConsecutiveTrackResultTally(parseInt(node)));
         readers.put("missionStatus",
               (contract, node, campaign, version) -> contract.setStatus(MissionStatus.parseFromString(text(node))));
+        readers.put("mandatedCompletionStatus",
+              (contract, node, campaign, version) -> contract.setMandatedCompletionStatus(
+                    MissionStatus.parseFromString(text(node))));
         readers.put("salvagedByUnitValue",
               (contract, node, campaign, version) -> contract.setSalvagedByUnitValue(Money.fromXmlString(text(node))));
         readers.put("salvagedByEmployerValue",

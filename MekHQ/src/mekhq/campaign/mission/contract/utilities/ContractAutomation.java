@@ -174,6 +174,11 @@ public class ContractAutomation {
         List<UUID> mothballTargets = new ArrayList<>();
         MothballUnitAction mothballUnitAction = new MothballUnitAction(null, true);
 
+        final MHQOptions mhqOptions = MekHQ.getMHQOptions();
+        // Null during unit tests
+        final boolean skipUnitsInBays = (mhqOptions != null) && mhqOptions.getDoNotMothballUnitsInBays();
+        final boolean skipSalvage = (mhqOptions != null) && mhqOptions.getDoNotMothballSalvage();
+
         Set<UUID> detachmentUnitIds = detachment.getHangar().getUnits().stream()
                                             .map(Unit::getId)
                                             .collect(Collectors.toSet());
@@ -190,6 +195,14 @@ public class ContractAutomation {
 
                 if (unit == null) {
                     logger.error("Failed to get unit for unit ID {}", unitId);
+                    continue;
+                }
+
+                if (skipUnitsInBays && unit.hasTransportShipAssignment()) {
+                    continue;
+                }
+
+                if (skipSalvage && unit.isSalvage()) {
                     continue;
                 }
 

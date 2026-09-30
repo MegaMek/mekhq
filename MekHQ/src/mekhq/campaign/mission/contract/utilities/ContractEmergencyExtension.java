@@ -42,6 +42,8 @@ import java.time.LocalDate;
 
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
@@ -87,6 +89,12 @@ public class ContractEmergencyExtension {
 
         LocalDate newEndDate = endingDate.plusMonths(extension);
         contract.updateScheduleData(null, newEndDate);
+
+        // StratCon's schedule was rolled to the old end date, so it is rolled again to cover the extension.
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        if (campaignState != null) {
+            StratConScenarioTempo.regenerateSchedules(campaign, contract, campaignState);
+        }
 
         // We spike morale to create a jump in contract difficulty - essentially the reason why the employer is using
         // the emergency clause.
