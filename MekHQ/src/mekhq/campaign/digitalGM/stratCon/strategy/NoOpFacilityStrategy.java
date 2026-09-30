@@ -69,6 +69,11 @@ public class NoOpFacilityStrategy implements IFacilityStrategy {
     }
 
     @Override
+    public void processSupply(StratConTrackState track, Campaign campaign, boolean isStartOfMonth) {
+        // Intentionally empty: Mapless and Singles play have no supply lines.
+    }
+
+    @Override
     public void processEnemyActivity(Campaign campaign, AbstractContract contract,
           StratConCampaignState campaignState) {
         // Intentionally empty: Mapless and Singles play have no map to build on.

@@ -89,6 +89,7 @@ public final class StratConFacilityOperations {
     static final int FORTIFY_COST = 3;
     static final int REINFORCE_COST = 1;
     static final int BUILD_COST = 3;
+    static final int INTERDICT_COST = 1;
 
     static final int RECON_DAYS = 7;
     static final int BUILD_DAYS = 14;
@@ -142,6 +143,7 @@ public final class StratConFacilityOperations {
             case FORTIFY -> FORTIFY_COST;
             case REINFORCE -> REINFORCE_COST;
             case BUILD -> BUILD_COST;
+            case INTERDICT -> INTERDICT_COST;
         };
     }
 
@@ -169,7 +171,7 @@ public final class StratConFacilityOperations {
      *
      * @return the orders that make sense on that hex, whether or not they can be given right now: the enemy facility
      *       orders on an enemy facility, Fortify and Reinforce on the player's side's facility, and Build on a hex
-     *       with nothing on it
+     *       with nothing on it, along with Interdict Supply if it carries a road
      *
      * @author Illiani
      * @since 0.51.01
@@ -180,7 +182,8 @@ public final class StratConFacilityOperations {
         for (FacilityOperation operation : FacilityOperation.values()) {
             boolean isSuitable;
             if (facility == null) {
-                isSuitable = operation == FacilityOperation.BUILD;
+                isSuitable = (operation == FacilityOperation.BUILD)
+                                   || ((operation == FacilityOperation.INTERDICT) && track.isRoad(coords));
             } else if (facility.isOwnerAlliedToPlayer()) {
                 isSuitable = operation.isOnOwnFacility();
             } else {
@@ -226,6 +229,10 @@ public final class StratConFacilityOperations {
                 return "reason.hexOccupied";
             }
             return getBuildableDefinitions().isEmpty() ? "reason.nothingToBuild" : null;
+        }
+
+        if (operation == FacilityOperation.INTERDICT) {
+            return getInterdictUnavailableReasonKey(campaign, track, coords);
         }
 
         if (facility == null) {
@@ -277,6 +284,20 @@ public final class StratConFacilityOperations {
             return "reason.needsDetailedIntel";
         }
         return (facility.getCondition() == FacilityCondition.CRIPPLED) ? "reason.alreadyCrippled" : null;
+    }
+
+    private static @Nullable String getInterdictUnavailableReasonKey(Campaign campaign, StratConTrackState track,
+          StratConCoords coords) {
+        if (!StratConFacilitySupply.isSupplyLinesActive(campaign)) {
+            return "reason.supplyLinesOff";
+        }
+        if (!track.isRoad(coords) || (track.getFacility(coords) != null)) {
+            return "reason.notRoad";
+        }
+        if (track.getScenario(coords) != null) {
+            return "reason.scenarioUnderway";
+        }
+        return track.isRoadCut(coords) ? "reason.alreadyCut" : null;
     }
 
     private static boolean isBuildUnderway(StratConTrackState track, StratConCoords coords) {
@@ -397,6 +418,11 @@ public final class StratConFacilityOperations {
                   coords,
                   formationId,
                   operation) != null;
+            case INTERDICT -> StratConRulesManager.startInterdictionScenario(campaign,
+                  contract,
+                  track,
+                  coords,
+                  formationId) != null;
             case SABOTAGE -> {
                 resolveSabotage(campaign, contract, track, coords, formationId, d6(2));
                 yield true;

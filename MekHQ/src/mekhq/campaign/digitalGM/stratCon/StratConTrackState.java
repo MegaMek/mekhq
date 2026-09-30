@@ -48,6 +48,7 @@ import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOrder;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConRoadCut;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInterestBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.utilities.MHQXMLUtility;
@@ -101,6 +102,9 @@ public class StratConTrackState {
 
     // orders that take time, each held by a formation until it completes
     private List<StratConFacilityOrder> facilityOrders;
+    // supply lines; see StratConFacilitySupply
+    private List<StratConRoadCut> roadCuts;
+    private Set<StratConCoords> cutOffFacilities;
 
     // don't serialize this
     private transient Map<Integer, StratConScenario> backingScenarioMap;
@@ -141,6 +145,8 @@ public class StratConTrackState {
         roadExits = new HashSet<>();
         pointsOfInterest = new ArrayList<>();
         facilityOrders = new ArrayList<>();
+        roadCuts = new ArrayList<>();
+        cutOffFacilities = new HashSet<>();
     }
 
     public String getDisplayableName() {
@@ -858,6 +864,56 @@ public class StratConTrackState {
 
     public void setFacilityOrders(List<StratConFacilityOrder> facilityOrders) {
         this.facilityOrders = (facilityOrders == null) ? new ArrayList<>() : facilityOrders;
+    }
+
+    /**
+     * @return the road hexes where the player has cut the enemy's supply line, and until when (mutable)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElementWrapper(name = "roadCuts")
+    @XmlElement(name = "roadCut")
+    public List<StratConRoadCut> getRoadCuts() {
+        return roadCuts;
+    }
+
+    public void setRoadCuts(List<StratConRoadCut> roadCuts) {
+        this.roadCuts = (roadCuts == null) ? new ArrayList<>() : roadCuts;
+    }
+
+    /**
+     * @param coords a hex
+     *
+     * @return {@code true} if the enemy's supply line through the hex is cut
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isRoadCut(StratConCoords coords) {
+        for (StratConRoadCut roadCut : roadCuts) {
+            if (coords.equals(roadCut.getCoords())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return the hexes of the facilities that were cut off from their supply lines when last checked (mutable); used
+     *       to report the facilities that are newly cut off or reconnected
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElementWrapper(name = "cutOffFacilities")
+    @XmlElement(name = "cutOffFacility")
+    public Set<StratConCoords> getCutOffFacilities() {
+        return cutOffFacilities;
+    }
+
+    public void setCutOffFacilities(Set<StratConCoords> cutOffFacilities) {
+        this.cutOffFacilities = (cutOffFacilities == null) ? new HashSet<>() : cutOffFacilities;
     }
 
     /**

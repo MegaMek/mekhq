@@ -40,6 +40,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 
@@ -66,6 +67,11 @@ public class StratConFacilityStrategy implements IFacilityStrategy {
     @Override
     public void applyWeeklyUpkeep(StratConTrackState track, Campaign campaign) {
         StratConEnemyFacilityActivity.applyWeeklyUpkeep(track, campaign);
+    }
+
+    @Override
+    public void processSupply(StratConTrackState track, Campaign campaign, boolean isStartOfMonth) {
+        StratConFacilitySupply.processSupply(track, campaign, isStartOfMonth);
     }
 
     @Override

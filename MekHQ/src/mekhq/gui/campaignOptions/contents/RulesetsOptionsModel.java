@@ -86,6 +86,8 @@ class RulesetsOptionsModel {
     boolean useEmployerLostPlanetReactions;
     boolean useFacilityOperations;
     double enemyFacilityActivity;
+    boolean useSupplyLines;
+    double facilityDensity;
     boolean noSeedForces;
     boolean useGenericBattleValue;
     boolean useVerboseBidding;
@@ -138,6 +140,8 @@ class RulesetsOptionsModel {
         useEmployerLostPlanetReactions = options.get(CampaignOption.USE_EMPLOYER_LOST_PLANET_REACTIONS);
         useFacilityOperations = options.get(CampaignOption.USE_FACILITY_OPERATIONS);
         enemyFacilityActivity = options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY);
+        useSupplyLines = options.get(CampaignOption.USE_SUPPLY_LINES);
+        facilityDensity = options.get(CampaignOption.FACILITY_DENSITY);
         noSeedForces = options.get(CampaignOption.NO_SEED_FORCES);
         useGenericBattleValue = options.get(CampaignOption.USE_GENERIC_BATTLE_VALUE);
         useVerboseBidding = options.get(CampaignOption.USE_VERBOSE_BIDDING);
@@ -191,6 +195,8 @@ class RulesetsOptionsModel {
         options.set(CampaignOption.USE_EMPLOYER_LOST_PLANET_REACTIONS, useEmployerLostPlanetReactions);
         options.set(CampaignOption.USE_FACILITY_OPERATIONS, useFacilityOperations);
         options.set(CampaignOption.ENEMY_FACILITY_ACTIVITY, enemyFacilityActivity);
+        options.set(CampaignOption.USE_SUPPLY_LINES, useSupplyLines);
+        options.set(CampaignOption.FACILITY_DENSITY, facilityDensity);
         options.set(CampaignOption.NO_SEED_FORCES, noSeedForces);
         options.set(CampaignOption.USE_GENERIC_BATTLE_VALUE, useGenericBattleValue);
         options.set(CampaignOption.USE_VERBOSE_BIDDING, useVerboseBidding);

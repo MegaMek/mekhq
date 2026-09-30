@@ -86,6 +86,18 @@ public interface IFacilityStrategy {
     void applyWeeklyUpkeep(StratConTrackState track, Campaign campaign);
 
     /**
+     * Checks which facilities on a track are cut off from their supply lines, and applies what being cut off does.
+     *
+     * @param track          the track whose facilities are processed
+     * @param campaign       the current campaign
+     * @param isStartOfMonth {@code true} on the first day of the month
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void processSupply(StratConTrackState track, Campaign campaign, boolean isStartOfMonth);
+
+    /**
      * Runs the enemy's contract-wide facility activity for the day, such as sending engineers to build outposts.
      *
      * @param campaign      the current campaign

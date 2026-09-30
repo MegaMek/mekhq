@@ -72,7 +72,9 @@ public class StratConFacility {
         CommandCenter,
         EarlyWarningSystem,
         OrbitalDefense,
-        BaseOfOperations
+        BaseOfOperations,
+        /** Links facilities within a few hexes into its holder's supply lines without a road. */
+        SupplyDepot
     }
 
     /**
@@ -194,6 +196,9 @@ public class StratConFacility {
     private boolean isAvailable = true;
     @XmlElement(name = "strategicObjective")
     private boolean isStrategicObjective;
+    // whether the facility has been on its holder's supply lines; see StratConFacilitySupply
+    @XmlElement
+    private boolean networked;
     @XmlElement(name = "additionalLocalModifier")
     private List<String> additionalLocalModifiers = new ArrayList<>();
 
@@ -312,7 +317,31 @@ public class StratConFacility {
     }
 
     public void setOwner(ForceAlignment owner) {
+        boolean isSideChanged = (this.owner != null) && (isAlliedToPlayer(this.owner) != isAlliedToPlayer(owner));
         this.owner = owner;
+        // A facility changing sides joins its new holder's supply lines afresh.
+        if (isSideChanged) {
+            networked = false;
+        }
+    }
+
+    private static boolean isAlliedToPlayer(@Nullable ForceAlignment alignment) {
+        return (alignment == ForceAlignment.Allied) || (alignment == ForceAlignment.Player);
+    }
+
+    /**
+     * @return {@code true} if the facility has been linked to its holder's supply lines since it last changed sides. Only
+     *       such a facility can be cut off; one that was never on them supplies itself.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isNetworked() {
+        return networked;
+    }
+
+    public void setNetworked(boolean networked) {
+        this.networked = networked;
     }
 
     /**

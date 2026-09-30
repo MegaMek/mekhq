@@ -95,6 +95,9 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityDefinition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySynergies;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConRoadCut;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
@@ -1860,14 +1863,20 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     /**
      * @param facility a facility on the map
+     * @param coords   the facility's hex
      *
-     * @return the facility's map label: its name, then as much of its tier, condition and garrison as the player knows
+     * @return the facility's map label: its name, marked if it is cut off from its supply lines, then as much of its
+     *       tier, condition and garrison as the player knows
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private String getFacilityLabel(StratConFacility facility) {
+    private String getFacilityLabel(StratConFacility facility, StratConCoords coords) {
         String name = facility.getFormattedDisplayableName();
+        // The broken-link mark shows as soon as the player can see the facility.
+        if (StratConFacilitySupply.isCutOff(currentTrack, coords)) {
+            name = getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.cutOff", name);
+        }
         FacilityIntel intel = facility.getIntel();
         if (!intel.isAtLeast(FacilityIntel.SCOUTED)) {
             return name;
@@ -1921,6 +1930,39 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
+     * Adds whether a facility is cut off from its supply lines, and which facilities it has a synergy with, to the hex
+     * information.
+     *
+     * @param infoBuilder the hex information being built
+     * @param coords      the facility's hex
+     * @param facility    the facility
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void appendFacilityNetworkInfo(StringBuilder infoBuilder, StratConCoords coords,
+          StratConFacility facility) {
+        if (StratConFacilitySupply.isSupplyLinesActive(campaign)) {
+            infoBuilder.append(getTextAt(RESOURCE_BUNDLE,
+                  StratConFacilitySupply.isCutOff(currentTrack, coords) ?
+                        "stratConTab.hexInfo.supplyCut" :
+                        "stratConTab.hexInfo.supplyConnected"));
+        }
+
+        List<StratConFacility> partners = StratConFacilitySynergies.getPartners(currentTrack, coords);
+        if (!partners.isEmpty()) {
+            StringBuilder partnerNames = new StringBuilder();
+            for (StratConFacility partner : partners) {
+                if (!partnerNames.isEmpty()) {
+                    partnerNames.append(", ");
+                }
+                partnerNames.append(partner.getDisplayableName());
+            }
+            infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.synergy", partnerNames));
+        }
+    }
+
+    /**
      * Worker function to render facility icons to the given surface.
      */
     private void drawFacilities(Graphics2D g2D) {
@@ -1956,7 +1998,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.drawPolygon(facilityMarker);
                     }
 
-                    drawTextEffect(g2D, facilityMarker, getFacilityLabel(facility), currentCoords);
+                    drawTextEffect(g2D, facilityMarker, getFacilityLabel(facility, currentCoords), currentCoords);
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -2364,8 +2406,17 @@ public class StratConPanel extends JPanel implements ActionListener {
                 }
 
                 appendFacilityStatus(infoBuilder, facility);
+                appendFacilityNetworkInfo(infoBuilder, boardState.getSelectedCoords(), facility);
 
                 infoBuilder.append("<span>");
+            }
+
+            for (StratConRoadCut roadCut : currentTrack.getRoadCuts()) {
+                if (roadCut.getCoords().equals(boardState.getSelectedCoords())) {
+                    infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "stratConTab.hexInfo.roadCut",
+                          roadCut.getEndDate()));
+                }
             }
 
         } else {

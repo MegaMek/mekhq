@@ -174,6 +174,7 @@ class StratConPage {
     private JCheckBox chkContractsUseSpecialMechanics;
     private JCheckBox chkUseEmployerLostPlanetReactions;
     private JCheckBox chkUseFacilityOperations;
+    private JCheckBox chkUseSupplyLines;
     private JCheckBox chkNoSeedForces;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
@@ -184,6 +185,8 @@ class StratConPage {
     private JSpinner spnStratConSectorSizeMultiplier;
     private JLabel lblEnemyFacilityActivity;
     private JSpinner spnEnemyFacilityActivity;
+    private JLabel lblFacilityDensity;
+    private JSpinner spnFacilityDensity;
     // end StratCon
 
     private boolean created;
@@ -336,6 +339,9 @@ class StratConPage {
         chkUseFacilityOperations = new CampaignOptionsCheckBox("UseFacilityOperations",
               getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseFacilityOperations.addMouseListener(createTipPanelUpdater("UseFacilityOperations"));
+        chkUseSupplyLines = new CampaignOptionsCheckBox("UseSupplyLines",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkUseSupplyLines.addMouseListener(createTipPanelUpdater("UseSupplyLines"));
         chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces",
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkNoSeedForces.addMouseListener(createTipPanelUpdater("NoSeedForces"));
@@ -359,6 +365,11 @@ class StratConPage {
         lblEnemyFacilityActivity.addMouseListener(createTipPanelUpdater("EnemyFacilityActivity"));
         spnEnemyFacilityActivity = new CampaignOptionsSpinner("EnemyFacilityActivity", 1.0, 0.0, 3.0, 0.1);
         spnEnemyFacilityActivity.addMouseListener(createTipPanelUpdater("EnemyFacilityActivity"));
+        lblFacilityDensity = new CampaignOptionsLabel("FacilityDensity",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        lblFacilityDensity.addMouseListener(createTipPanelUpdater("FacilityDensity"));
+        spnFacilityDensity = new CampaignOptionsSpinner("FacilityDensity", 1.0, 0.5, 2.0, 0.1);
+        spnFacilityDensity.addMouseListener(createTipPanelUpdater("FacilityDensity"));
 
         JPanel generalOptionsPanel = createStratConGeneralOptionsPanel();
         JPanel scenarioGenerationPanel = createStratConScenarioGenerationPanel();
@@ -542,6 +553,7 @@ class StratConPage {
               chkContractsUseSpecialMechanics,
               chkUseEmployerLostPlanetReactions,
               chkUseFacilityOperations,
+              chkUseSupplyLines,
               chkNoSeedForces,
               chkUseGenericBattleValue,
               chkUseVerboseBidding,
@@ -549,6 +561,7 @@ class StratConPage {
         panel.addRow(lblStratConSectorCountMethod, comboStratConSectorCountMethod);
         panel.addRow(lblStratConSectorSizeMultiplier, spnStratConSectorSizeMultiplier);
         panel.addRow(lblEnemyFacilityActivity, spnEnemyFacilityActivity);
+        panel.addRow(lblFacilityDensity, spnFacilityDensity);
 
         return panel;
     }
@@ -694,6 +707,7 @@ class StratConPage {
         chkContractsUseSpecialMechanics.setSelected(model.contractsUseSpecialMechanics);
         chkUseEmployerLostPlanetReactions.setSelected(model.useEmployerLostPlanetReactions);
         chkUseFacilityOperations.setSelected(model.useFacilityOperations);
+        chkUseSupplyLines.setSelected(model.useSupplyLines);
         chkNoSeedForces.setSelected(model.noSeedForces);
         chkUseGenericBattleValue.setSelected(model.useGenericBattleValue);
         chkUseVerboseBidding.setSelected(model.useVerboseBidding);
@@ -701,6 +715,7 @@ class StratConPage {
         chkUseStratConAlternateSectorTerrain.setSelected(model.useStratConAlternateSectorTerrain);
         spnStratConSectorSizeMultiplier.setValue(model.stratConSectorSizeMultiplier);
         spnEnemyFacilityActivity.setValue(model.enemyFacilityActivity);
+        spnFacilityDensity.setValue(model.facilityDensity);
     }
 
     /**
@@ -757,6 +772,7 @@ class StratConPage {
         model.contractsUseSpecialMechanics = chkContractsUseSpecialMechanics.isSelected();
         model.useEmployerLostPlanetReactions = chkUseEmployerLostPlanetReactions.isSelected();
         model.useFacilityOperations = chkUseFacilityOperations.isSelected();
+        model.useSupplyLines = chkUseSupplyLines.isSelected();
         model.noSeedForces = chkNoSeedForces.isSelected();
         model.useGenericBattleValue = chkUseGenericBattleValue.isSelected();
         model.useVerboseBidding = chkUseVerboseBidding.isSelected();
@@ -764,5 +780,6 @@ class StratConPage {
         model.useStratConAlternateSectorTerrain = chkUseStratConAlternateSectorTerrain.isSelected();
         model.stratConSectorSizeMultiplier = (double) spnStratConSectorSizeMultiplier.getValue();
         model.enemyFacilityActivity = (double) spnEnemyFacilityActivity.getValue();
+        model.facilityDensity = (double) spnFacilityDensity.getValue();
     }
 }

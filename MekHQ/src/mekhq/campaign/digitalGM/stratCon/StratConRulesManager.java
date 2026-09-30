@@ -102,6 +102,8 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySynergies;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.PointOfInterestDeploymentOutcome;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
@@ -167,6 +169,8 @@ public class StratConRulesManager {
     private static final List<String> COUNTERATTACK_SCENARIO_TEMPLATES = List.of("Base Defense.json",
           "Hold Until Relief.json");
     private static final String COUNTERATTACK_OBJECTIVE_MODIFIER = "FacilityAlliedDefend.json";
+    // what an Interdict Supply order is fought in; see startInterdictionScenario
+    private static final String INTERDICTION_SCENARIO_TEMPLATE = "Convoy Interdiction.json";
 
     /**
      * What makes a particular lance eligible to be reinforcements for a scenario
@@ -1679,6 +1683,43 @@ public class StratConRulesManager {
     }
 
     /**
+     * Starts the fight an Interdict Supply order calls for on a road hex: a Convoy Interdiction scenario, with the
+     * ordered formation assigned to it. Winning it cuts the enemy's supply through the hex (see
+     * {@link StratConFacilitySupply#cutRoad}).
+     *
+     * @param campaign    the current campaign
+     * @param contract    the contract whose map holds the sector
+     * @param track       the sector
+     * @param coords      the road hex
+     * @param formationId the ID of the ordered formation
+     *
+     * @return the scenario, or {@code null} if a scenario is already there or none could be generated
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConScenario startInterdictionScenario(Campaign campaign, AbstractContract contract,
+          StratConTrackState track, StratConCoords coords, int formationId) {
+        if (track.getScenario(coords) != null) {
+            return null;
+        }
+
+        ScenarioTemplate template = StratConScenarioFactory.getSpecificScenario(INTERDICTION_SCENARIO_TEMPLATE);
+        if (template == null) {
+            return null;
+        }
+
+        StratConScenario scenario = generateScenario(campaign, contract, track, formationId, coords, template, null);
+        if (scenario == null) {
+            return null;
+        }
+
+        scenario.setFacilityOperation(FacilityOperation.INTERDICT);
+        finalizeBackingScenario(campaign, contract, track, true, scenario);
+        return scenario;
+    }
+
+    /**
      * Starts an enemy counterattack on a facility held by the player or their employer: a Crisis, never a Turning
      * Point, fought in the Base Defense or Hold Until Relief template with the facility's defend objective. Nobody is
      * assigned to it; the player has until the deployment deadline to send a formation.
@@ -3152,6 +3193,11 @@ public class StratConRulesManager {
                   restrictAlliedModifiers,
                   restrictEnemyModifiers);
 
+            // A facility's synergy partners lend their shared modifiers to fights at it.
+            for (StratConFacility partner : StratConFacilitySynergies.getPartners(track, coords)) {
+                getFacilityModifiers(scenario, partner, false, restrictAlliedModifiers, restrictEnemyModifiers);
+            }
+
             if (localFacility.isOwnerAlliedToPlayer()) {
                 rollForAllied = false;
             } else {
@@ -4217,6 +4263,11 @@ public class StratConRulesManager {
                               scenario.getCoords(),
                               StratConFacilityOperations.askCaptureChoice(campaign, facility));
                     }
+                }
+
+                // A won convoy interdiction cuts the enemy's supply through the hex.
+                if (victory && (scenario.getFacilityOperation() == FacilityOperation.INTERDICT)) {
+                    StratConFacilitySupply.cutRoad(campaign, track, scenario.getCoords());
                 }
 
                 // Deliberately does not touch the road network. Roads are laid when the sector is generated, and

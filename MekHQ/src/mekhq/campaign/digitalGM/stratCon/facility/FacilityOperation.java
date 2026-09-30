@@ -53,7 +53,9 @@ public enum FacilityOperation {
     ASSAULT(true, true),
     FORTIFY(false, false),
     REINFORCE(false, false),
-    BUILD(false, false);
+    BUILD(false, false),
+    /** Ambush the enemy's supply convoys on a road hex, cutting their supply line through it if won. */
+    INTERDICT(true, false);
 
     private final boolean isCombat;
     private final boolean isAllowedFromAdjacentHex;
