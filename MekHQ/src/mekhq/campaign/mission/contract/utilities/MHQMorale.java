@@ -711,7 +711,7 @@ public class MHQMorale {
 
                     if (contractDefinition != null) {
                         for (StratConTrackState trackState : contract.getStratConCampaignState().getTracks()) {
-                            int scenarioOdds = StratConContractInitializer.getScenarioOdds(contractDefinition);
+                            int scenarioOdds = StratConContractInitializer.getDeploymentEncounterOdds(contractDefinition);
 
                             trackState.setScenarioOdds(scenarioOdds);
                         }

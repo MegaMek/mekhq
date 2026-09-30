@@ -134,6 +134,7 @@ import mekhq.campaign.mission.contract.contractData.EnemyData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAvailability;
 import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.mission.contract.utilities.ContractScore;
+import mekhq.campaign.mission.contract.utilities.EmployerLostPlanet;
 import mekhq.campaign.mission.contract.utilities.MHQMorale;
 import mekhq.campaign.mission.rentals.ContractRentalType;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -162,6 +163,7 @@ import mekhq.campaign.personnel.enums.BloodmarkLevel;
 import mekhq.campaign.personnel.enums.EdgeRefreshPeriod;
 import mekhq.campaign.personnel.enums.ExtraIncome;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
 import mekhq.campaign.personnel.generator.DefaultSkillGenerator;
 import mekhq.campaign.personnel.generator.SingleSpecialAbilityGenerator;
@@ -472,6 +474,8 @@ public class CampaignNewDayManager {
         if (campaignOptions.isUseStratCon()) {
             processNewDayATB();
         }
+
+        Familiarity.processPeriodicFamiliarity(campaign, today);
 
         if (campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)) {
             ChaosReputation.processChaosCampaignReputationChanges(campaignOptions, campaign.getPlayerForce(), today);
@@ -1073,7 +1077,10 @@ public class CampaignNewDayManager {
                 }
 
                 if (person.getBurnedConnectionsEndDate() != null) {
-                    person.checkForConnectionsReestablishContact(today);
+                    String reestablishedReport = person.checkForConnectionsReestablishContact(today);
+                    if (!StringUtility.isNullOrBlank(reestablishedReport)) {
+                        campaign.addReport(PERSONNEL, reestablishedReport);
+                    }
                 }
 
                 if (campaignOptions.get(CampaignOption.ALLOW_MONTHLY_CONNECTIONS)) {
@@ -1240,6 +1247,10 @@ public class CampaignNewDayManager {
      * month, and processes ATB scenarios.
      */
     private void processNewDayATB() {
+        // Before anything else touches the contracts: an employer losing its planet today resolves the contract's
+        // active scenarios and may end or regenerate the contract.
+        EmployerLostPlanet.processNewDay(campaign);
+
         if (today.getDayOfWeek() == DayOfWeek.MONDAY) {
             processTrainingCombatTeams(campaign);
         }
@@ -2211,8 +2222,11 @@ public class CampaignNewDayManager {
                 // Only push the dates back once the start has actually slipped past us. Re-dating every day would
                 // make the contract recede: the estimate does not shrink while the fleet sits recharging at a jump
                 // point, so "today + remaining journey" moves a day further out for each day spent recharging.
+                // A contract whose outcome is already decided (e.g. cancelled when its employer lost the planet) is
+                // left on the dates it was ended on.
                 LocalDate startDate = contract.getStartDate();
-                if ((startDate != null) && !today.isBefore(startDate)) {
+                if ((startDate != null) && !today.isBefore(startDate)
+                          && (contract.getMandatedCompletionStatus() == null)) {
                     int remainingJourneyDays = ContractUtilities.getTravelDays(campaign,
                           contract,
                           updatedLocation,

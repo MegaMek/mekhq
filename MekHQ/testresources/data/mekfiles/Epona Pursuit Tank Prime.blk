@@ -1,0 +1,175 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-e4e2-7e2f-9598-34f3a57c066b
+</UUID>
+
+<UnitType>
+Tank
+</UnitType>
+
+<Name>
+Epona Pursuit Tank
+</Name>
+
+<Model>
+Prime
+</Model>
+
+<mul id:>
+996
+</mul id:>
+
+<year>
+2884
+</year>
+
+<type>
+Clan Level 3
+</type>
+
+<role>
+Striker
+</role>
+
+<motion_type>
+Hover
+</motion_type>
+
+<transporters>
+BattleArmorHandles - troopers:-1
+</transporters>
+
+<cruiseMP>
+9
+</cruiseMP>
+
+<engine_type>
+0
+</engine_type>
+
+<clan_engine>
+false
+</clan_engine>
+
+<armor_type>
+1
+</armor_type>
+
+<armor_tech_rating>
+0
+</armor_tech_rating>
+
+<armor_tech_level>
+6
+</armor_tech_level>
+
+<omni>
+1
+</omni>
+
+<armor>
+21
+20
+20
+18
+17
+</armor>
+
+<Body Equipment>
+Clan Streak SRM 4 Ammo:OMNI
+CLCASE:OMNI
+</Body Equipment>
+
+<Front Equipment>
+</Front Equipment>
+
+<Right Equipment>
+</Right Equipment>
+
+<Left Equipment>
+</Left Equipment>
+
+<Rear Equipment>
+</Rear Equipment>
+
+<Turret Equipment>
+CLMediumPulseLaser:OMNI
+CLMediumPulseLaser:OMNI
+CLMediumPulseLaser:OMNI
+CLMediumPulseLaser:OMNI
+CLStreakSRM4:OMNI
+</Turret Equipment>
+
+<capabilities>
+<p>The Epona is constructed on the heaviest hovercraft chassis available, giving it a stable fifty-ton platform that maximizes both pod capacity and structural integrity. A Fusion 215 engine propels the vehicle to a flanking speed of 150 kilometers per hour, making it one of the fastest medium-weight combat vehicles in any Clan touman. This speed comes at a cost, as the chassis devotes only five tons to Compound VM20 ferro-fibrous armor, leaving the Epona lightly protected for its weight class. Seventeen tons of pod space are distributed across the hull, with a maximum of ten tons mountable in the turret.</p><p>The Epona's OmniPod technology allows rapid reconfiguration between missions, but this modularity introduces crew complexity. The roles of driver, gunner, and commander shift depending on the weapons loadout, requiring each crew station to be programmable for all possible tasks. New crews must train extensively before deploying, as the transitions between configurations demand proficiency across multiple combat roles. In its Prime configuration, the vehicle mounts four medium pulse lasers and a Streak SRM-4 in the turret, providing accurate close-quarters firepower capable of threatening even BattleMechs.</p>
+</capabilities>
+
+<overview>
+<p>The Epona is a fifty-ton Clan OmniVehicle designed and exclusively produced by Clan Hell's Horses. Introduced in 2884 at Niles Industriplex Alpha, the Epona was the first combat vehicle in Clan history to incorporate OmniPod technology, a reflection of the Horses' deep respect for conventional forces in an era dominated by BattleMech supremacy. Purpose-built as a fast pursuit and reconnaissance platform, the Epona operates in the most prestigious front-line Galaxies of the Horses' touman, a distinction typically reserved for OmniMechs in other Clans. The design's versatility and proven combat record have served the Hell's Horses for well over a century, yet other Clans have largely refused to adopt the concept. According to the Horses, it is only Clan bias toward BattleMechs and the hubris of rival warriors that prevents wider use of the Epona and OmniVehicles in general.</p>
+</overview>
+
+<deployment>
+<p>The Prime configuration emphasizes close-quarters engagement, concentrating all weaponry in the turret for maximum firing arc coverage. Four medium pulse lasers deliver accurate damage at short range, their inherent precision offsetting the instability of a high-speed hover platform. A single Streak SRM-4 adds an anti-vehicle punch, its lock-on capability ensuring no ammunition is wasted. This loadout makes the Prime the most commonly encountered configuration and a natural fit for pursuit operations where the Epona's speed brings it into close contact with fleeing targets.</p>
+</deployment>
+
+<history>
+<p>The Epona emerged from Clan Hell's Horses' scientist caste in the late twenty-ninth century, the product of a Clan that valued conventional armor more than any of its peers. While other Clans dismissed vehicles as second-line assets unworthy of front-line warriors, the Horses recognized the potential of applying OmniMech technology to combat vehicles. Production began at Niles Industriplex Alpha on the Hell's Horses homeworld, where the Epona became the first and only Clan OmniVehicle for nearly two centuries.</p><p>The design's influence extended beyond the Horses' borders in unexpected ways. Wolf's Dragoons, the deep-cover Clan Wolf unit operating in the Inner Sphere, fielded the Badger and Bandit transport vehicles beginning in 3008, both derived from the Epona's design. The Dragoons carefully concealed the advanced technology behind these vehicles, and Inner Sphere observers did not recognize their OmniVehicle nature until decades later.</p><p>Despite the Epona's proven effectiveness, other Clans' cultural prejudice against conventional vehicles kept it from spreading through Trials of Possession or trade. The Ghost Bears once launched a Trial of Possession for Niles Industriplex Alpha itself, a battle that cost the Horses their Khan Lair Seidman before the facility was successfully defended. The Epona remained a Hell's Horses exclusive throughout the Clan Invasion era and the conflicts that followed in the Occupation Zones.</p><p>When the Hell's Horses migrated to the Inner Sphere, they brought the Epona with them but initially relied on existing stocks and salvage. Production eventually restarted at Csesztreg Industriplex Beta in 3076, after the Horses established their new industrial base on the former Lyran world they had claimed from the Wolves in 3074. During the Jihad, two new configurations incorporating advanced Gauss technology proved devastating against the Ice Hellions and in clashes with both the Wolves and Jade Falcons in the Occupation Zones. Control of Niles eventually passed to Clan Stone Lion, though by that point the Horses' Inner Sphere production lines had secured the Epona's future.</p>
+</history>
+
+<manufacturer>
+Niles Industriplex Alpha|Csesztreg Industriplex Beta|Unnamed production site
+</manufacturer>
+
+<primaryFactory>
+Niles|Csesztreg|Gateway
+</primaryFactory>
+
+<systemManufacturers>
+CHASSIS:Unknown
+ENGINE:Unknown
+ARMOR:Unknown
+COMMUNICATIONS:Unknown
+TARGETING:Unknown
+</systemManufacturers>
+
+<systemModels>
+CHASSIS:Unknown
+ENGINE:Fusion 215
+ARMOR:Compound VM20 Ferro-Fibrous
+COMMUNICATIONS:Build 1700/5 Tacticom
+TARGETING:Series XL FWS
+</systemModels>
+
+<source>
+TR:3060
+</source>
+
+<published>
+RS:3060u
+</published>
+
+<tonnage>
+50.0
+</tonnage>
+
+<baseChassisTurretWeight>
+1.0
+</baseChassisTurretWeight>
+

@@ -45,6 +45,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.utilities.EmployerLostPlanet;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -96,6 +97,19 @@ public class NagController {
             InvalidFactionNagDialog invalidFactionNagDialog = new InvalidFactionNagDialog(campaign);
             if (invalidFactionNagDialog.shouldCancelAdvanceDay()) {
                 return true;
+            }
+        }
+
+        // Employer losing control of a contract's planet tomorrow. One dialog per affected contract; cancelling any of
+        // them cancels the day advance.
+        List<AbstractContract> contractsAwaitingResponse = EmployerLostPlanet.getContractsAwaitingResponse(campaign);
+        if (EmployerLostPlanetNagDialog.checkNag(EmployerLostPlanet.isEnabled(campaign), contractsAwaitingResponse)) {
+            for (AbstractContract contract : contractsAwaitingResponse) {
+                EmployerLostPlanetNagDialog employerLostPlanetNagDialog = new EmployerLostPlanetNagDialog(campaign,
+                      contract);
+                if (employerLostPlanetNagDialog.shouldCancelAdvanceDay()) {
+                    return true;
+                }
             }
         }
 
@@ -219,6 +233,14 @@ public class NagController {
             UnresolvedStratConContactsNagDialog unresolvedStratConContactsNagDialog = new UnresolvedStratConContactsNagDialog(
                   campaign);
             if (unresolvedStratConContactsNagDialog.shouldCancelAdvanceDay()) {
+                return true;
+            }
+        }
+
+        // Expiring StratCon Nav Points
+        if (ExpiringNavPointsNagDialog.checkNag(isUseStratCon, activeContracts, today)) {
+            ExpiringNavPointsNagDialog expiringNavPointsNagDialog = new ExpiringNavPointsNagDialog(campaign);
+            if (expiringNavPointsNagDialog.shouldCancelAdvanceDay()) {
                 return true;
             }
         }

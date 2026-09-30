@@ -147,6 +147,33 @@ class AverageExperienceRatingTest {
         assertEquals(7, invokeCalculateAverageExperienceRating(campaign, false));
     }
 
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void ignoresSupportCarriers_evenWhenCrewed() throws Exception {
+        Campaign campaign = mockCampaign();
+        mekhq.campaign.LocalHangar hangar = mock(mekhq.campaign.LocalHangar.class);
+        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
+
+        Unit supportCarrier = mock(Unit.class);
+        when(supportCarrier.isCarrier()).thenReturn(true);
+        when(supportCarrier.getEntity()).thenReturn(mock(Entity.class));
+        when(supportCarrier.getCommander()).thenReturn(mock(Person.class));
+
+        Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
+        when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
+        when(formation.getAllUnitsAsUnits(hangar, true)).thenReturn(List.of(supportCarrier));
+
+        CombatTeam team = mock(CombatTeam.class);
+        when(team.getFormation(campaign)).thenReturn(formation);
+
+        when(campaign.getPlayerForce().getCombatTeamsAsList(campaign)).thenReturn(new ArrayList<>(List.of(team)));
+
+        assertEquals(7, invokeCalculateAverageExperienceRating(campaign, false));
+    }
+
     @Test
     void computesAverage_forNonSmallCraftCommander_andRoundsHalfDown() throws Exception {
         // One unit: piloting=4, gunnery=3 => totalExperience=7

@@ -92,6 +92,7 @@ import mekhq.campaign.personnel.quartermaster.DefaultKitChanges;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
+import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.commandGeneration.SupportCapability;
@@ -901,6 +902,12 @@ public class CampaignOptionsPane extends JPanel {
         }
 
         campaign.resetRandomDeath();
+
+        // Conventional infantry may have switched between maintaining themselves and being maintained by Techs
+        for (Unit unit : campaign.getPlayerForce().getHangar().getUnits()) {
+            unit.reconcileInfantryMaintenance();
+        }
+
         if (campaignGui != null) {
             campaignGui.refreshMarketButtonLabels();
         }

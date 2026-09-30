@@ -80,7 +80,7 @@ class StratConFacilityCapacityTest {
         StratConContractInitializer.initializeTrackFacilities(track,
               count,
               ForceAlignment.Opposing,
-              false,
+              null,
               Collections.emptyList());
     }
 

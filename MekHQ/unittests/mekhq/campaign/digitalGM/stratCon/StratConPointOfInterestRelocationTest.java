@@ -182,7 +182,7 @@ class StratConPointOfInterestRelocationTest {
         addPointOfInterest(track, OCCUPYING_TYPE_ID, 0, 0);
         addPointOfInterest(track, OCCUPYING_TYPE_ID, 1, 1);
 
-        StratConContractInitializer.initializeTrackFacilities(track, 3, ForceAlignment.Allied, false, List.of());
+        StratConContractInitializer.initializeTrackFacilities(track, 3, ForceAlignment.Allied, null, List.of());
 
         assertTrue(track.getFacilities().isEmpty());
     }
