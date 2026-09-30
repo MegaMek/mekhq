@@ -1035,6 +1035,19 @@ public class MekLocation extends Part {
         return Entity.LOC_NONE;
     }
 
+    /**
+     * A location reports no location of its own through {@link #getLocation()}, so the Repair tab's location filter
+     * compares the location this part stands for instead. Filtering to "LA" then shows the left arm's own repair.
+     */
+    @Override
+    public boolean isInLocation(String locationAbbreviation) {
+        boolean hasEntity = (unit != null) && (unit.getEntity() != null);
+        if (!hasEntity) {
+            return false;
+        }
+        return getLoc() == unit.getEntity().getLocationFromAbbr(locationAbbreviation);
+    }
+
     @Override
     public TechAdvancement getTechAdvancement() {
         return EquipmentType.getStructureTechAdvancement(structureType, clan);
