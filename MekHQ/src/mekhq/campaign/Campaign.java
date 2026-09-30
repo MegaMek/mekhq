@@ -3083,7 +3083,7 @@ public class Campaign implements ITechManager {
                 UnitLogger.repaired(repairedUnit, getLocalDate(), repairedPartName, tech.getFullName());
             }
             if (getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS) && action.equals(" fix ") && !(partWork instanceof Armor)) {
-                Money cost = partWork.getUndamagedValue().multipliedBy(0.2)
+                Money cost = partWork.getRepairCost()
                                    .multipliedBy(RepairCosts.getRepairCostMultiplier(this, repairedUnit));
                 report += "<br>Repairs cost " + cost.toAmountAndSymbolString() + " worth of parts.";
                 getPlayerForce().getFinances().debit(TransactionType.REPAIRS,
@@ -3366,6 +3366,9 @@ public class Campaign implements ITechManager {
             LOGGER.debug("[Refit] {} leaves the campaign mid-refit; cancelling the refit", unit.getName());
             unit.getRefit().cancel();
         }
+
+        // An overnight replacement in progress gives back the spare it set aside
+        ReservedSpares.releaseForDepartingUnit(unit);
 
         // remove all parts for this unit as well
         for (Part p : unit.getParts()) {

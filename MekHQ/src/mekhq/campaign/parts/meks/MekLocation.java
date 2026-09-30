@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.parts.meks;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Objects;
@@ -80,6 +82,7 @@ import org.w3c.dom.NodeList;
  */
 public class MekLocation extends Part {
     private static final MMLogger LOGGER = MMLogger.create(MekLocation.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Parts";
 
     protected int loc;
     protected int structureType;
@@ -671,10 +674,8 @@ public class MekLocation extends Part {
                 toReturn.append(" (").append(Math.round(100 * getPercent())).append("%)");
                 if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
                     toReturn.append(", ")
-                          .append(getUndamagedValue().multipliedBy(0.2)
-                                        .multipliedBy(RepairCosts.getRepairCostMultiplier(campaign, unit))
-                                        .toAmountAndSymbolString())
-                          .append(" to repair");
+                          .append(getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairCost.details",
+                                getRepairCost().multipliedBy(RepairCosts.getRepairCostMultiplier(campaign, unit)).toAmountAndSymbolString()));
                 }
             }
         }

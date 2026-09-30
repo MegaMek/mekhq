@@ -208,7 +208,7 @@ public class Armor extends Part implements IAcquisitionWork {
                 toReturn.append(messageSurroundedBySpanWithColor(getNegativeColor(),
                       "None in stock"));
             } else if (!isSalvaging()) {
-                if (amountAvailable < amountNeeded) {
+                if (amountAvailable < getAmountNeededInWarehousePoints()) {
                     toReturn.append(spanOpeningWithCustomColor(getNegativeColor()))
                           .append("Only ")
                           .append(amountAvailable)
@@ -361,17 +361,12 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public void fix() {
-        if (unit.getEntity().isCapitalScale()) {
-            amountNeeded *= 10;
-        }
-        int amountFound = Math.min(getAmountAvailable(), amountNeeded);
-        int fixAmount = Math.min(amount +
-                                       // Make sure that we handle the capital scale conversion when setting the fix
-                                       // amount
-                                       (unit.getEntity().isCapitalScale() ? (amountFound / 10) : amountFound),
-              unit.getEntity().getOArmor(location, rear));
-        unit.getEntity().setArmor(fixAmount, location, rear);
-        changeAmountAvailable(-1 * amountFound);
+        Entity entity = unit.getEntity();
+        int pointsRepaired = getPointsRepairableFromStock();
+        int fixAmount = Math.min(amount + pointsRepaired, entity.getOArmor(location, rear));
+        entity.setArmor(fixAmount, location, rear);
+        // Only the stock for the points actually put on is used: ten standard points per capital point
+        changeAmountAvailable(-1 * toWarehousePoints(entity, pointsRepaired));
         updateConditionFromEntity(false);
         skillMin = SkillType.EXP_GREEN;
         shorthandedMod = 0;
@@ -447,6 +442,28 @@ public class Armor extends Part implements IAcquisitionWork {
         return entity.isCapitalScale() ? (armorPoints * 10) : armorPoints;
     }
 
+    /**
+     * @return the armor this location still needs, counted in the standard points the warehouse uses
+     */
+    private int getAmountNeededInWarehousePoints() {
+        return hasEntity() ? toWarehousePoints(unit.getEntity(), amountNeeded) : amountNeeded;
+    }
+
+    private boolean hasEntity() {
+        return (unit != null) && (unit.getEntity() != null);
+    }
+
+    /**
+     * @return how many of the points this location needs can be put on from the armor in stock, counted as the unit
+     *       counts them; for capital-scale armor, every ten standard points in stock make one capital point
+     */
+    private int getPointsRepairableFromStock() {
+        int amountAvailable = getAmountAvailable();
+        boolean isCapitalScale = hasEntity() && unit.getEntity().isCapitalScale();
+        int pointsInStock = isCapitalScale ? (amountAvailable / 10) : amountAvailable;
+        return Math.min(amountNeeded, pointsInStock);
+    }
+
     public int getBaseTimeFor(Entity entity) {
         if (entity == null) {
             return 5;
@@ -492,7 +509,7 @@ public class Armor extends Part implements IAcquisitionWork {
         if (isSalvaging()) {
             return getBaseTimeFor(entity) * amount;
         }
-        return getBaseTimeFor(entity) * Math.min(amountNeeded, getAmountAvailable());
+        return getBaseTimeFor(entity) * getPointsRepairableFromStock();
     }
 
     @Override
@@ -632,7 +649,7 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     public boolean isEnoughSpareArmorAvailable() {
-        return getAmountAvailable() >= amountNeeded;
+        return getAmountAvailable() >= getAmountNeededInWarehousePoints();
     }
 
     /**
@@ -690,11 +707,7 @@ public class Armor extends Part implements IAcquisitionWork {
                 remove(false);
             } else {
                 skillMin = SkillType.EXP_GREEN;
-                if ((unit != null) && (unit.getEntity() != null) && (unit.getEntity().isCapitalScale())) {
-                    changeAmountAvailable(-1 * (amountNeeded * 10));
-                } else {
-                    changeAmountAvailable(-1 * amountNeeded);
-                }
+                changeAmountAvailable(-1 * getAmountNeededInWarehousePoints());
             }
         }
         return " <font color='" +
@@ -713,7 +726,7 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isInSupply() {
-        return amountNeeded <= getAmountAvailable();
+        return getAmountNeededInWarehousePoints() <= getAmountAvailable();
     }
 
     @Override

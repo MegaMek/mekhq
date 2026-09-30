@@ -1371,9 +1371,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         if (includeRepairDetails && hits > 0) {
             details.add(hits + (hits == 1 ? " hit" : " hits"));
             if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
-                details.add(getActualValue().multipliedBy(0.2)
+                details.add(getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairCost.details",
+                      getRepairCost()
                                   .multipliedBy(RepairCosts.getRepairCostMultiplier(campaign, unit))
-                                  .toAmountAndSymbolString() + " to repair");
+                                  .toAmountAndSymbolString()));
             }
         }
         return details.toString();
