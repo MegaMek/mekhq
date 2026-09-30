@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -32,20 +32,29 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
- * Represents the core details about an agitator involved in a faction ultimatum scenario.
+ * One side the player can choose in a Faction Standing ultimatum, represented by the person asking for the campaign's
+ * support.
  *
- * @param name        the name of the agitator
- * @param role        the role of the agitator
- * @param factionCode the code identifier for the agitator's faction
+ * <p>The person is never added to the campaign's personnel, so the immersive dialogs and the side picker show their
+ * faction's logo rather than a portrait. That is why no gender or portrait data is stored here.</p>
+ *
+ * @param id          the side's ID, unique within its ultimatum and in upper case. It is used to build the side's text
+ *                    keys ({@code FactionStandingUltimatumDialog.<ultimatum>.side.<id>.pitch} and {@code .news}) and
+ *                    to name the side the dissenting officer prefers
+ * @param name        the name of the person leading this side, including any title
+ * @param role        the role of that person
+ * @param factionCode the code of the faction the campaign joins if it chooses this side
  *
  * @author Illiani
  * @since 0.50.07
  */
-record FactionStandingAgitatorData(
-      String name,
-      PersonnelRole role,
-      String factionCode
+public record FactionStandingUltimatumSide(
+      @JsonProperty("id") String id,
+      @JsonProperty("name") String name,
+      @JsonProperty("role") PersonnelRole role,
+      @JsonProperty("factionCode") String factionCode
 ) {}

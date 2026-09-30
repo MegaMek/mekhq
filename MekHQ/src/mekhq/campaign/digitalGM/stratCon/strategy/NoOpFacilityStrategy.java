@@ -64,6 +64,11 @@ public class NoOpFacilityStrategy implements IFacilityStrategy {
     }
 
     @Override
+    public void processSieges(StratConTrackState track, Campaign campaign) {
+        // Intentionally empty: Mapless and Singles play have no facilities to besiege.
+    }
+
+    @Override
     public void applyWeeklyUpkeep(StratConTrackState track, Campaign campaign) {
         // Intentionally empty: Mapless and Singles play have no facilities to repair.
     }

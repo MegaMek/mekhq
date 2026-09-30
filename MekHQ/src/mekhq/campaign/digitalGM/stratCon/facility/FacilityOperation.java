@@ -41,6 +41,8 @@ package mekhq.campaign.digitalGM.stratCon.facility;
  *     <li>{@link #FORTIFY} raises the tier of a facility the player's side holds, and {@link #REINFORCE} tops up its
  *     garrison, both from its hex.</li>
  *     <li>{@link #BUILD} raises a new player-held Outpost on an empty hex.</li>
+ *     <li>{@link #INTERDICT} ambushes the enemy's supply convoys on a road hex.</li>
+ *     <li>{@link #SIEGE} surrounds an enemy facility from a hex next to it, wearing its garrison down week by week.</li>
  * </ul>
  *
  * @author Illiani
@@ -55,7 +57,9 @@ public enum FacilityOperation {
     REINFORCE(false, false),
     BUILD(false, false),
     /** Ambush the enemy's supply convoys on a road hex, cutting their supply line through it if won. */
-    INTERDICT(true, false);
+    INTERDICT(true, false),
+    /** Besiege an enemy facility from a hex next to it, until it surrenders or the siege is broken or lifted. */
+    SIEGE(false, true);
 
     private final boolean isCombat;
     private final boolean isAllowedFromAdjacentHex;
@@ -86,6 +90,16 @@ public enum FacilityOperation {
     }
 
     /**
+     * @return {@code true} if a formation must be next to the facility to take the order, and may not stand on its hex
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isOnlyFromAdjacentHex() {
+        return this == SIEGE;
+    }
+
+    /**
      * @return {@code true} if the order improves a facility the player's side holds
      *
      * @author Illiani
@@ -102,6 +116,7 @@ public enum FacilityOperation {
      * @since 0.51.01
      */
     public boolean isAgainstEnemyFacility() {
-        return (this == RECON) || (this == RAID) || (this == SABOTAGE) || (this == ASSAULT);
+        return (this == RECON) || (this == RAID) || (this == SABOTAGE) || (this == ASSAULT)
+                     || (this == SIEGE);
     }
 }

@@ -160,6 +160,20 @@ public class ImmersiveDialogCore extends JDialog {
     }
 
     /**
+     * Reports whether the player picked a response, as opposed to closing the dialog from the window frame.
+     *
+     * <p>{@link #getDialogChoice()} returns the default choice in both cases, so use this to tell them apart.</p>
+     *
+     * @return {@code true} if a response button was activated
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean wasResponseSelected() {
+        return responseActivationController.isResponseActivated();
+    }
+
+    /**
      * Retrieves the current value of the spinner.
      *
      * <p><b>Note:</b> will return 0 if the dialog does not contain a {@link JSpinner} in the supplemental panel.</p>
@@ -1186,6 +1200,16 @@ public class ImmersiveDialogCore extends JDialog {
             captureResponse.run();
             dialogDisposer.run();
             return true;
+        }
+
+        /**
+         * @return {@code true} once a response button has been activated
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        boolean isResponseActivated() {
+            return responseActivated;
         }
     }
 

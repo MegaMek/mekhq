@@ -102,6 +102,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySiege;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySynergies;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
@@ -171,6 +172,8 @@ public class StratConRulesManager {
     private static final String COUNTERATTACK_OBJECTIVE_MODIFIER = "FacilityAlliedDefend.json";
     // what an Interdict Supply order is fought in; see startInterdictionScenario
     private static final String INTERDICTION_SCENARIO_TEMPLATE = "Convoy Interdiction.json";
+    // what an enemy relief force against besiegers is fought in; see startSiegeScenario
+    private static final String SIEGE_RELIEF_SCENARIO_TEMPLATE = "Hold Until Relief.json";
 
     /**
      * What makes a particular lance eligible to be reinforcements for a scenario
@@ -1720,6 +1723,70 @@ public class StratConRulesManager {
     }
 
     /**
+     * Starts a fight over a siege on the besieging formation's hex, with that formation assigned to it.
+     *
+     * <ul>
+     *     <li>A <b>sortie</b> is the garrison striking at the besiegers, in a template suited to the formation's unit
+     *     type.</li>
+     *     <li>A <b>relief</b> force is an enemy counterattack brought forward against the besiegers: a Crisis, never a
+     *     Turning Point, fought in the Hold Until Relief template.</li>
+     * </ul>
+     *
+     * <p>Either way, a loss breaks the siege (see {@link StratConFacilitySiege#resolveSiegeScenario}).</p>
+     *
+     * @param campaign        the current campaign
+     * @param contract        the contract whose map holds the sector
+     * @param track           the sector
+     * @param formationCoords the besieging formation's hex, where the fight is
+     * @param formationId     the ID of the besieging formation
+     * @param facilityCoords  the besieged facility's hex
+     * @param isSortie        {@code true} for a sortie, {@code false} for a relief force
+     *
+     * @return the scenario, or {@code null} if a scenario is already on the formation's hex or none could be generated
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConScenario startSiegeScenario(Campaign campaign, AbstractContract contract,
+          StratConTrackState track, StratConCoords formationCoords, int formationId, StratConCoords facilityCoords,
+          boolean isSortie) {
+        if (track.getScenario(formationCoords) != null) {
+            return null;
+        }
+
+        ScenarioTemplate template = isSortie ?
+                                          null :
+                                          StratConScenarioFactory.getSpecificScenario(SIEGE_RELIEF_SCENARIO_TEMPLATE);
+        StratConScenario scenario = (template == null) ?
+                                          generateScenario(campaign, contract, track, formationId, formationCoords,
+                                                null) :
+                                          generateScenario(campaign, contract, track, formationId, formationCoords,
+                                                template, null);
+        if (scenario == null) {
+            return null;
+        }
+
+        scenario.setFacilityOperation(FacilityOperation.SIEGE);
+        scenario.setSiegeCoords(facilityCoords);
+        scenario.setSiegeSortie(isSortie);
+
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        StratConFacility facility = track.getFacility(facilityCoords);
+        if (facility != null) {
+            backingScenario.setName(String.format("%s - %s",
+                  facility.getDisplayableName(),
+                  isSortie ? "Sortie" : "Relief"));
+        }
+
+        finalizeBackingScenario(campaign, contract, track, true, scenario);
+        if (!isSortie) {
+            backingScenario.setIsCrisis(true);
+            scenario.setTurningPoint(false);
+        }
+        return scenario;
+    }
+
+    /**
      * Starts an enemy counterattack on a facility held by the player or their employer: a Crisis, never a Turning
      * Point, fought in the Base Defense or Hold Until Relief template with the facility's defend objective. Nobody is
      * assigned to it; the player has until the deployment deadline to send a formation.
@@ -2236,7 +2303,7 @@ public class StratConRulesManager {
      * @param forceID  the ID of the force
      * @param campaign the campaign
      */
-    private static void increaseFatigue(int forceID, Campaign campaign) {
+    public static void increaseFatigue(int forceID, Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
         int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
@@ -4240,7 +4307,9 @@ public class StratConRulesManager {
                                                           && dynamicScenario.getTemplate().isHostileFacility();
                 StratConEscalation.onScenarioCompleted(campaign, mission, victory, isHostileFacilityScenario);
 
-                if (facility != null) {
+                // A fight over a siege is on the besiegers' hex, and leaves any facility standing there alone.
+                boolean isSiegeScenario = scenario.getFacilityOperation() == FacilityOperation.SIEGE;
+                if ((facility != null) && !isSiegeScenario) {
                     boolean isDraw = backingScenario.getStatus().isDraw();
                     boolean wasHostile = !facility.isOwnerAlliedToPlayer();
                     processFacilityAftermath(facility, victory, isDraw, scenario.getFacilityOperation());
@@ -4268,6 +4337,16 @@ public class StratConRulesManager {
                 // A won convoy interdiction cuts the enemy's supply through the hex.
                 if (victory && (scenario.getFacilityOperation() == FacilityOperation.INTERDICT)) {
                     StratConFacilitySupply.cutRoad(campaign, track, scenario.getCoords());
+                }
+
+                // A fight over a siege keeps or breaks it.
+                if (isSiegeScenario && (scenario.getSiegeCoords() != null)) {
+                    StratConFacilitySiege.resolveSiegeScenario(campaign,
+                          mission,
+                          track,
+                          scenario.getSiegeCoords(),
+                          scenario.isSiegeSortie(),
+                          victory);
                 }
 
                 // Deliberately does not touch the road network. Roads are laid when the sector is generated, and

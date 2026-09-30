@@ -40,6 +40,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySiege;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBScenario;
@@ -62,6 +63,11 @@ public class StratConFacilityStrategy implements IFacilityStrategy {
     @Override
     public void processFacilityOrders(StratConTrackState track, Campaign campaign) {
         StratConFacilityOperations.processOrders(track, campaign);
+    }
+
+    @Override
+    public void processSieges(StratConTrackState track, Campaign campaign) {
+        StratConFacilitySiege.processSieges(track, campaign);
     }
 
     @Override

@@ -74,7 +74,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * <p>Every order costs support points, paid when it is given. Raid and Assault start a scenario on the facility at
  * once. Sabotage is rolled at once, and only a caught saboteur fights. Fortify and Reinforce take effect at once.
  * Recon and Build take time: the formation stays deployed until the order completes, and the order is stored on the
- * sector until then.</p>
+ * sector until then. A siege is stored the same way, but has no set end (see {@link StratConFacilitySiege}).</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -90,6 +90,8 @@ public final class StratConFacilityOperations {
     static final int REINFORCE_COST = 1;
     static final int BUILD_COST = 3;
     static final int INTERDICT_COST = 1;
+    /** Pays for a siege's first week; each later week costs {@link StratConFacilitySiege#SIEGE_WEEKLY_COST}. */
+    static final int SIEGE_COST = 1;
 
     static final int RECON_DAYS = 7;
     static final int BUILD_DAYS = 14;
@@ -144,6 +146,7 @@ public final class StratConFacilityOperations {
             case REINFORCE -> REINFORCE_COST;
             case BUILD -> BUILD_COST;
             case INTERDICT -> INTERDICT_COST;
+            case SIEGE -> SIEGE_COST;
         };
     }
 
@@ -344,7 +347,8 @@ public final class StratConFacilityOperations {
      * @param targetCoords    the hex an order acts on
      * @param operation       the order
      *
-     * @return {@code true} if the formation is on the hex, or next to it for an order that allows that
+     * @return {@code true} if the formation is on the hex, or next to it for an order that allows that; only next to
+     *       it for a siege
      *
      * @author Illiani
      * @since 0.51.01
@@ -355,7 +359,7 @@ public final class StratConFacilityOperations {
             return false;
         }
         if (formationCoords.equals(targetCoords)) {
-            return true;
+            return !operation.isOnlyFromAdjacentHex();
         }
         if (!operation.isAllowedFromAdjacentHex()) {
             return false;
@@ -437,6 +441,10 @@ public final class StratConFacilityOperations {
                 StratConFacility facility = track.getFacility(coords);
                 facility.setGarrison(facility.getGarrisonMaximum());
                 report(campaign, "report.reinforced", facility.getDisplayableName());
+                yield true;
+            }
+            case SIEGE -> {
+                StratConFacilitySiege.startSiege(campaign, contract, track, coords, formationId);
                 yield true;
             }
             case RECON, BUILD -> {
@@ -521,6 +529,11 @@ public final class StratConFacilityOperations {
                 continue;
             }
 
+            // A siege has no set end; it is settled each Monday (see StratConFacilitySiege).
+            if (order.getOperation() == FacilityOperation.SIEGE) {
+                continue;
+            }
+
             if ((contract != null) && !today.isBefore(order.getCompletionDate())) {
                 endOrder(track, order);
                 if (order.getOperation() == FacilityOperation.RECON) {
@@ -549,7 +562,7 @@ public final class StratConFacilityOperations {
         }
 
         StratConFacility facility = track.getFacility(targetCoords);
-        if (order.getOperation() == FacilityOperation.RECON) {
+        if ((order.getOperation() == FacilityOperation.RECON) || (order.getOperation() == FacilityOperation.SIEGE)) {
             return (facility != null) && !facility.isOwnerAlliedToPlayer();
         }
 
@@ -557,7 +570,7 @@ public final class StratConFacilityOperations {
         return (facility == null) && (track.getScenario(targetCoords) == null);
     }
 
-    private static void endOrder(StratConTrackState track, StratConFacilityOrder order) {
+    static void endOrder(StratConTrackState track, StratConFacilityOrder order) {
         track.removeFacilityOrder(order);
         track.removeStickyForce(order.getFormationId());
     }
@@ -722,12 +735,12 @@ public final class StratConFacilityOperations {
                      || (facilityType == FacilityType.IndustrialFacility);
     }
 
-    private static String getFormationName(Campaign campaign, int formationId) {
+    static String getFormationName(Campaign campaign, int formationId) {
         Formation formation = campaign.getPlayerForce().getFormation(formationId);
         return (formation == null) ? String.valueOf(formationId) : formation.getName();
     }
 
-    private static void report(Campaign campaign, String key, String name) {
+    static void report(Campaign campaign, String key, String name) {
         campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE, key, name));
     }
 }

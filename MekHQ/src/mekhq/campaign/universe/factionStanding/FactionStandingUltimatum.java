@@ -33,12 +33,16 @@
 package mekhq.campaign.universe.factionStanding;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
+import jakarta.annotation.Nullable;
+import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.enums.PersonnelRole;
-import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.gui.dialog.factionStanding.FactionStandingUltimatumDialog;
+import mekhq.gui.dialog.factionStanding.FactionStandingUltimatumDialog.UltimatumSide;
 
 /**
  * Handles the orchestration and presentation of Faction Standing ultimatum events.
@@ -49,109 +53,98 @@ import mekhq.gui.dialog.factionStanding.FactionStandingUltimatumDialog;
  * Federated Commonwealth Civil War, ComStar Schism) are detected and surfaced to the player, accompanied by unique
  * dialog sequences involving prominent historical personalities.</p>
  *
- * <p>Key responsibilities include:</p>
- * <ul>
- *     <li>Tracking historically significant faction ultimatum dates and their context.</li>
- *     <li>Providing static checks for whether an ultimatum event is relevant to a given date and faction.</li>
- *     <li>Validating campaign and faction alignment before presenting a scenario dialog to the player.</li>
- *     <li>Constructing {@link Person} representations of event participants for use in dialogs.</li>
- * </ul>
- *
- * <p>See also: {@link FactionStandingUltimatumData} and {@link FactionStandingAgitatorData} for structure of scenario
+ * <p>See also: {@link FactionStandingUltimatumData} and {@link FactionStandingUltimatumSide} for structure of scenario
  * and participant data.</p>
  *
  * @author Illiani
  * @since 0.50.07
  */
-public class FactionStandingUltimatum {
-    private final Campaign campaign;
+public final class FactionStandingUltimatum {
+    private FactionStandingUltimatum() {}
 
     /**
-     * Checks whether a faction ultimatum is associated with the given date and matches the specified campaign faction
-     * code.
+     * Presents the Faction Standing ultimatum for the given date to the player, if the campaign's faction has one.
      *
-     * <p>This method provides a fast way to determine if a specific campaign faction has an ultimatum on a given date,
-     * without requiring initialization of the full {@link FactionStandingUltimatum} class.</p>
+     * <p>If an ultimatum applies, the agitators are built as {@link Person} entities and the ultimatum dialog is
+     * shown; it resolves the player's choice before returning. Otherwise, this method does nothing.</p>
      *
-     * @param date                the date to check for a faction ultimatum
-     * @param campaignFactionCode the faction code to check for association with the ultimatum
-     * @param ultimatumsLibrary   the library of ultimatums. Created in {@link Campaign} during initialization
+     * @param date              the date to check for a Faction Standing ultimatum event
+     * @param campaign          the current {@link Campaign} context in which the event occurs
+     * @param ultimatumsLibrary the data source containing all available Faction Standing ultimatum events; may be
+     *                          {@code null} if the library failed to load
      *
-     * @return {@code true} if an ultimatum for the given date matches the specified faction code, {@code false}
-     *       otherwise
+     * @return {@code true} if an ultimatum was presented
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    public static boolean checkUltimatumForDate(final LocalDate date, final String campaignFactionCode,
-          FactionStandingUltimatumsLibrary ultimatumsLibrary) {
-        FactionStandingUltimatumData ultimatum = ultimatumsLibrary.getUltimatums(date, campaignFactionCode);
-        return ultimatum != null;
+    public static boolean processUltimatum(final LocalDate date, final Campaign campaign,
+          @Nullable FactionStandingUltimatumsLibrary ultimatumsLibrary) {
+        String campaignFactionCode = campaign.getPlayerForce().getFaction().getShortName();
+        FactionStandingUltimatumData ultimatum = findUltimatum(date, campaignFactionCode, ultimatumsLibrary);
+        if (ultimatum == null) {
+            return false;
+        }
+
+        Factions factions = Factions.getInstance();
+        List<UltimatumSide> sides = new ArrayList<>();
+        for (FactionStandingUltimatumSide side : ultimatum.sides()) {
+            sides.add(new UltimatumSide(side.id(), createAgitator(campaign, side),
+                  factions.getFaction(side.factionCode())));
+        }
+
+        new FactionStandingUltimatumDialog(campaign,
+              sides,
+              ultimatum.dissenterPreference(),
+              ultimatum.isViolentTransition(),
+              ultimatum.getEffectiveDivisiveness(),
+              ultimatum.name(),
+              date);
+        return true;
     }
 
     /**
-     * Initializes and processes a Faction Standing ultimatum event for the specified date and campaign.
+     * Finds the ultimatum, if any, that the given faction receives on the given date.
      *
-     * <p>This constructor checks if a faction ultimatum is present for the given date and whether it applies to the
-     * current campaign's faction. If both checks pass, it instantiates and presents a dialog to the player detailing
-     * the scenario, complete with participants represented as {@link Person} entities. If no relevant ultimatum is
-     * found or the event does not pertain to the campaign's faction, the constructor exits without further action.</p>
+     * @param date                the date to check
+     * @param campaignFactionCode the campaign's current faction code
+     * @param ultimatumsLibrary   the library of ultimatums; may be {@code null} if it failed to load
      *
-     * <p><b>Usage:</b> Should be preceded by a call to
-     * {@link #checkUltimatumForDate(LocalDate, String, FactionStandingUltimatumsLibrary)} to avoid needing to pass
-     * around a {@link Campaign} object unnecessarily.</p>
-     *
-     * @param date              the date for which to check and process a Faction Standing ultimatum event
-     * @param campaign          the current {@link Campaign} context in which the event occurs
-     * @param ultimatumsLibrary the data source containing all available Faction Standing ultimatum events
+     * @return the matching ultimatum, or {@code null} if there is none
      *
      * @author Illiani
-     * @see #checkUltimatumForDate(LocalDate, String, FactionStandingUltimatumsLibrary)
-     * @since 0.50.07
+     * @since 0.51.01
      */
-    public FactionStandingUltimatum(final LocalDate date, final Campaign campaign,
-          FactionStandingUltimatumsLibrary ultimatumsLibrary) {
-        this.campaign = campaign;
-        Faction campaignFaction = campaign.getPlayerForce().getFaction();
-        String campaignFactionCode = campaignFaction.getShortName();
-
-        // We should have used 'checkUltimatumForDate' before initializing 'FactionStandingUltimatum', so we should
-        // never return here. However, I opted to include this check as added security.
-        FactionStandingUltimatumData ultimatum = ultimatumsLibrary.getUltimatums(date, campaignFactionCode);
-        if (ultimatum == null) {
-            return;
+    static @Nullable FactionStandingUltimatumData findUltimatum(final LocalDate date,
+          final String campaignFactionCode, @Nullable FactionStandingUltimatumsLibrary ultimatumsLibrary) {
+        if (ultimatumsLibrary == null) {
+            return null;
         }
 
-        // Security checks out of the way, process the ultimatum
-        Person challenger = createAgitator(ultimatum.challenger());
-        Person incumbent = createAgitator(ultimatum.incumbent());
-        new FactionStandingUltimatumDialog(campaign, challenger, incumbent, ultimatum.isViolentTransition(),
-              ultimatum.name());
+        return ultimatumsLibrary.getUltimatum(date, campaignFactionCode);
     }
 
     /**
      * Creates a {@link Person} entity within the campaign from the provided agitator data.
      *
      * <p>The agitator will receive the specified name, role, and faction code; surname and bloodname fields are set
-     * to empty strings. As this information is pushed into the givenName, instead.</p>
+     * to empty strings. As this information is pushed into the givenName, instead. The person is never added to the
+     * campaign, so dialogs show their faction logo rather than a portrait and their gender has no effect.</p>
      *
-     * @param agitator the data record containing the agitator's name, role, and faction code
+     * @param campaign the current campaign
+     * @param agitator the side whose leader to create, with their name, role, and faction code
      *
      * @return a new {@link Person} instance initialized with the specified attributes
      *
      * @author Illiani
      * @since 0.50.07
      */
-    private Person createAgitator(FactionStandingAgitatorData agitator) {
-        String name = agitator.name();
-        PersonnelRole role = agitator.role();
-        String factionCode = agitator.factionCode();
-
+    private static Person createAgitator(Campaign campaign, FactionStandingUltimatumSide agitator) {
         Person person = campaign.getPlayerForce()
                               .getHumanResources()
-                              .newPerson(campaign,
-                                    role,
-                                    factionCode,
-                                    megamek.common.enums.Gender.MALE); // Gender is irrelevant here
+                              .newPerson(campaign, agitator.role(), agitator.factionCode(), Gender.MALE);
 
-        person.setGivenName(name);
+        person.setGivenName(agitator.name());
         person.setSurname("");
         person.setBloodname("");
 

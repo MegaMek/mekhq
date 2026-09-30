@@ -1,0 +1,42 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+  "name": "CLAN_WOLF_SPLIT",
+  "date": "3057-10-05",
+  "notes": "This is the date that Phelan Kell takes Delta Galaxy towards Arc-Royale and effective becomes Clan Wolf-In-Exile",
+  "affectedFactionCodes": [
+    "CW"
+  ],
+  "sides": [
+    {
+      "id": "CWIE",
+      "name": "Khan Phelan Kell",
+      "role": "MEKWARRIOR",
+      "factionCode": "CWIE"
+    },
+    {
+      "id": "CW",
+      "name": "Khan Vlad Ward",
+      "role": "MEKWARRIOR",
+      "factionCode": "CW"
+    }
+  ],
+  "dissenterPreference": "CW",
+  "isViolentTransition": false,
+  "divisiveness": 0
+}

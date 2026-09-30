@@ -116,7 +116,15 @@ import megamek.common.options.IOption;
 import megamek.common.options.IOptionGroup;
 import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.rolls.TargetRoll;
-import megamek.common.units.*;
+import megamek.common.units.Aero;
+import megamek.common.units.Crew;
+import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.IBomber;
+import megamek.common.units.Mek;
+import megamek.common.units.Tank;
+import megamek.common.units.UnitNameTracker;
 import megamek.common.util.BuildingBlock;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
@@ -153,6 +161,7 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.RepairCosts;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Detachment;
@@ -181,16 +190,7 @@ import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.utilities.TransportCostCalculations;
-import mekhq.campaign.parts.Armor;
-import mekhq.campaign.parts.BAArmor;
-import mekhq.campaign.parts.CampaignDice;
-import mekhq.campaign.parts.Dice;
-import mekhq.campaign.parts.OmniPod;
-import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PartInventory;
-import mekhq.campaign.parts.Refit;
-import mekhq.campaign.parts.RefitWorkCheck;
-import mekhq.campaign.parts.SpacecraftCoolingSystem;
+import mekhq.campaign.parts.*;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.EquipmentPart;
@@ -253,6 +253,7 @@ import mekhq.campaign.utilities.LithiumFusionBatteries;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.RepairAsTechTime;
 import mekhq.campaign.work.RepairTaskHold;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -2869,11 +2870,18 @@ public class Campaign implements ITechManager {
         // Capture the original's effective warehouse before decrementing, since
         // decrementing to zero would remove the original and clear its locationNode.
         LocalWarehouse targetWarehouse = part.getWarehouse();
+        boolean isBaseSpare = targetWarehouse != getPlayerForce().getWarehouse();
+        if (isBaseSpare) {
+            // The tech's location is checked against the copy, so the copy must be at the spare's base first
+            LocationNode.LocationManager.setLocation(repairable, targetWarehouse);
+        }
         part.changeQuantity(-1);
 
         fixPart(repairable, tech);
-        if (!(repairable instanceof OmniPod)) {
-            if (targetWarehouse == getPlayerForce().getWarehouse()) {
+        // An OmniPod leaves the bench only when it is filled with equipment or destroyed; otherwise it goes back
+        boolean isPodUsedUp = (repairable instanceof OmniPod omniPod) && omniPod.isUsedUp();
+        if (!isPodUsedUp) {
+            if (!isBaseSpare) {
                 // Main-force spare: use the Quartermaster for full processing.
                 getQuartermaster().addPart(repairable, 0, false);
             } else {
@@ -2951,6 +2959,8 @@ public class Campaign implements ITechManager {
             report += " on " + partWork.getUnit().getName();
         }
 
+        RepairAsTechTime asTechTime = new RepairAsTechTime(getPlayerForce().getHumanResources(), isOvertimeAllowed(),
+              getCampaignOptions());
         int minutes = partWork.getTimeLeft();
         int minutesUsed = minutes;
         boolean usedOvertime = false;
@@ -2980,15 +2990,10 @@ public class Campaign implements ITechManager {
                 partWork.addTimeSpent(minutesUsed);
                 tech.setMinutesLeft(0);
                 tech.setOvertimeLeft(tech.getOvertimeLeft() - overtimeUsed);
-                int helpMod = getShorthandedMod(getPlayerForce().getHumanResources().getAvailableAsTechs(minutesUsed,
-                      usedOvertime,
-                      isOvertimeAllowed(),
-                      getCampaignOptions()), false);
-                if ((null != partWork.getUnit()) &&
-                          ((partWork.getUnit().getEntity() instanceof Dropship) ||
-                                 (partWork.getUnit().getEntity() instanceof Jumpship))) {
-                    helpMod = 0;
-                }
+                int helpers = asTechTime.chargeForMinutesWorked(partWork, minutesUsed, usedOvertime);
+                boolean isSelfCrewed = (partWork.getUnit() != null) && partWork.getUnit().isSelfCrewed();
+                // A self-crewed unit's own crew helps instead of AsTechs; getTargetFor applies their modifier
+                int helpMod = isSelfCrewed ? 0 : getShorthandedMod(helpers, false);
 
                 if (partWork.getShorthandedMod() < helpMod) {
                     partWork.setShorthandedMod(helpMod);
@@ -3019,21 +3024,7 @@ public class Campaign implements ITechManager {
         } else {
             tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
         }
-        int asTechMinutesUsed = minutesUsed * getPlayerForce().getHumanResources().getAvailableAsTechs(minutesUsed,
-              usedOvertime,
-              isOvertimeAllowed(),
-              getCampaignOptions());
-        if (getPlayerForce().getHumanResources().getAsTechPoolMinutes() < asTechMinutesUsed) {
-            asTechMinutesUsed -= getPlayerForce().getHumanResources().getAsTechPoolMinutes();
-            getPlayerForce().getHumanResources().setAsTechPoolMinutes(0);
-            getPlayerForce().getHumanResources()
-                  .setAsTechPoolOvertime(getPlayerForce().getHumanResources().getAsTechPoolOvertime() -
-                                               asTechMinutesUsed);
-        } else {
-            getPlayerForce().getHumanResources()
-                  .setAsTechPoolMinutes(getPlayerForce().getHumanResources().getAsTechPoolMinutes() -
-                                              asTechMinutesUsed);
-        }
+        asTechTime.chargeForMinutesWorked(partWork, minutesUsed, usedOvertime);
         // check for the type
         int roll;
         String wrongType = "";
@@ -3100,7 +3091,8 @@ public class Campaign implements ITechManager {
                 UnitLogger.repaired(repairedUnit, getLocalDate(), repairedPartName, tech.getFullName());
             }
             if (getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS) && action.equals(" fix ") && !(partWork instanceof Armor)) {
-                Money cost = partWork.getUndamagedValue().multipliedBy(0.2);
+                Money cost = partWork.getRepairCost()
+                                   .multipliedBy(RepairCosts.getRepairCostMultiplier(this, repairedUnit));
                 report += "<br>Repairs cost " + cost.toAmountAndSymbolString() + " worth of parts.";
                 getPlayerForce().getFinances().debit(TransactionType.REPAIRS,
                       getLocalDate(),
@@ -3382,6 +3374,9 @@ public class Campaign implements ITechManager {
             LOGGER.debug("[Refit] {} leaves the campaign mid-refit; cancelling the refit", unit.getName());
             unit.getRefit().cancel();
         }
+
+        // An overnight replacement in progress gives back the spare it set aside
+        ReservedSpares.releaseForDepartingUnit(unit);
 
         // remove all parts for this unit as well
         for (Part p : unit.getParts()) {

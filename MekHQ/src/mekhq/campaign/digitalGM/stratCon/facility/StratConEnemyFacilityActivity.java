@@ -70,7 +70,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  *
  * <ul>
  *     <li><b>Weekly upkeep.</b> Each Monday, every enemy facility repairs one condition step and reinforces one garrison
- *     step, unless a fight is under way there or it is cut off from its supply lines.</li>
+ *     step, unless a fight is under way there, it is cut off from its supply lines, or it is under siege.</li>
  *     <li><b>Counterattacks.</b> When one of the contract's ordinary scenarios comes due, it may instead become a
  *     counterattack on a facility held by the player or their employer. A counterattack is a Crisis, placed on the
  *     facility's hex with a deployment deadline of 3 to 7 days. Losing or ignoring it hands the facility to the enemy,
@@ -176,10 +176,11 @@ public final class StratConEnemyFacilityActivity {
 
         for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
             StratConFacility facility = entry.getValue();
-            // Neither a facility being fought over nor one cut off from its supply lines can be repaired.
+            // A facility being fought over, cut off from its supply lines, or under siege cannot be repaired.
             if ((facility.getOwner() != ForceAlignment.Opposing)
                       || (track.getScenario(entry.getKey()) != null)
-                      || StratConFacilitySupply.isCutOff(track, entry.getKey())) {
+                      || StratConFacilitySupply.isCutOff(track, entry.getKey())
+                      || StratConFacilitySiege.isBesieged(track, entry.getKey())) {
                 continue;
             }
 
@@ -295,7 +296,7 @@ public final class StratConEnemyFacilityActivity {
         return launchedCount;
     }
 
-    private static long getDaysSinceLastCounterattack(AbstractContract contract, StratConCampaignState campaignState,
+    static long getDaysSinceLastCounterattack(AbstractContract contract, StratConCampaignState campaignState,
           LocalDate today) {
         LocalDate lastAttackDate = campaignState.getLastCounterattackDate();
         if (lastAttackDate == null) {

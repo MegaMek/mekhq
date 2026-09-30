@@ -1170,7 +1170,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            if (oneSelected && !unit.isMothballed() && gui.getCampaign().getCampaignOptions().get(CampaignOption.USE_PEACETIME_COST)) {
+            if (oneSelected
+                      && !unit.isMothballed()
+                      && gui.getCampaign().getCampaignOptions().isChargingPeacetimeCost()) {
                 menuItem = new JMenuItem("Show Monthly Supply Cost Report");
                 menuItem.setActionCommand(COMMAND_SUPPLY_COST);
                 menuItem.addActionListener(this);

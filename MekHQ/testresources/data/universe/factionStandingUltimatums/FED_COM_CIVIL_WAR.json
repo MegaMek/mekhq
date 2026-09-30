@@ -1,0 +1,42 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+{
+  "name": "FED_COM_CIVIL_WAR",
+  "date": "3057-09-18",
+  "notes": "Represents the date marking the beginning of the Federated Commonwealth Civil War. Opted to go with the month Katherine Steiner-Davion chose to secede from the alliance.",
+  "affectedFactionCodes": [
+    "FC"
+  ],
+  "sides": [
+    {
+      "id": "LA",
+      "name": "Archon Katrina Steiner",
+      "role": "NOBLE",
+      "factionCode": "LA"
+    },
+    {
+      "id": "FS",
+      "name": "Archon-Prince Victor Steiner-Davion",
+      "role": "NOBLE",
+      "factionCode": "FS"
+    }
+  ],
+  "dissenterPreference": "FS",
+  "isViolentTransition": false,
+  "divisiveness": 0
+}

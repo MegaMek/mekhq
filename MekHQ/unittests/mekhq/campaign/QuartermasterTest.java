@@ -32,8 +32,6 @@
  */
 package mekhq.campaign;
 
-import static org.mockito.Mockito.lenient;
-
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static mekhq.campaign.parts.AmmoUtilities.getInfantryWeapon;
@@ -56,8 +54,8 @@ import megamek.common.units.Entity;
 import megamek.common.units.Infantry;
 import megamek.common.weapons.infantry.InfantryWeapon;
 import mekhq.EventSpy;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.parts.PartArrivedEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Finances;
@@ -272,6 +270,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -306,6 +305,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -338,6 +338,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
@@ -384,6 +385,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
         ForceQuartermaster quartermaster = new ForceQuartermaster(mockCampaign);
@@ -429,6 +431,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -480,6 +483,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -569,6 +573,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -597,6 +602,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -623,6 +629,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -654,6 +661,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -685,6 +693,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -717,6 +726,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -750,6 +760,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -782,6 +793,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -815,6 +827,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -846,6 +859,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -877,6 +891,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -905,6 +920,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);
@@ -933,6 +949,7 @@ public class QuartermasterTest {
         Campaign mockCampaign = mockCampaign();
         CampaignOptions mockOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockOptions);
+        lenient().when(mockOptions.get(CampaignOption.USE_ALTERNATE_UNIT_COST)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.INNER_SPHERE_UNIT_PRICE_MULTIPLIER)).thenReturn(0.0);
         lenient().when(mockOptions.get(CampaignOption.USE_AMMO_BY_TYPE)).thenReturn(false);
         lenient().when(mockOptions.get(CampaignOption.USE_RANDOM_UNIT_QUALITIES)).thenReturn(false);

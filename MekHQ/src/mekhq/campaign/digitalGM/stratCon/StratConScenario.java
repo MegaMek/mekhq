@@ -123,6 +123,8 @@ public class StratConScenario implements IStratConDisplayable {
     private ArrayList<Integer> primaryForceIDs = new ArrayList<>();
     private FacilityOperation facilityOperation;
     private boolean counterattack;
+    private StratConCoords siegeCoords;
+    private boolean siegeSortie;
 
     /**
      * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the
@@ -402,6 +404,36 @@ public class StratConScenario implements IStratConDisplayable {
 
     public void setCounterattack(boolean counterattack) {
         this.counterattack = counterattack;
+    }
+
+    /**
+     * @return for a fight over a siege (a {@link FacilityOperation#SIEGE} scenario), the besieged facility's hex;
+     *       otherwise {@code null}. The fight itself is on the besieging formation's hex.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConCoords getSiegeCoords() {
+        return siegeCoords;
+    }
+
+    public void setSiegeCoords(@Nullable StratConCoords siegeCoords) {
+        this.siegeCoords = siegeCoords;
+    }
+
+    /**
+     * @return {@code true} if this fight over a siege is the garrison's sortie; {@code false} if it is an enemy relief
+     *       force, or not a siege fight at all
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isSiegeSortie() {
+        return siegeSortie;
+    }
+
+    public void setSiegeSortie(boolean siegeSortie) {
+        this.siegeSortie = siegeSortie;
     }
 
     @XmlTransient

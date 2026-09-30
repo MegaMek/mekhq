@@ -318,7 +318,8 @@ public class PodSpace implements IPartWork {
 
     @Override
     public @Nonnull LocationNode getLocationNode() {
-        return locationNode;
+        // Pod space is part of its unit, so it is wherever the unit is
+        return (unit != null) ? unit.getLocationNode() : locationNode;
     }
 
     @Override

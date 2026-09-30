@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2025-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -33,52 +33,78 @@
 package mekhq.campaign.universe.factionStanding;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import megamek.common.annotations.Nullable;
+import jakarta.annotation.Nullable;
+import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 
 /**
- * Manages a library of {@link FactionStandingUltimatumData} objects loaded from a YAML file.
+ * Manages a library of {@link FactionStandingUltimatumData} objects, each loaded from its own JSON file.
  *
- * <p>This class provides loading, parsing, and retrieval utilities for the Faction Standing ultimatums, mapping each
- * ultimatum by its {@link LocalDate}.</p>
- *
- * <p>Data is loaded from {@code data/universe/factionStandingUltimatums.yml} upon instantiation.</p>
+ * <p>The files to load are listed in {@code data/universe/factionStandingUltimatums/ultimatummanifest.json}, and
+ * live alongside it. Ultimatums are mapped by their {@link LocalDate} and then by each of their affected faction
+ * codes.</p>
  *
  * @author Illiani
  * @since 0.50.07
  */
 public class FactionStandingUltimatumsLibrary {
-    private static final String DIRECTORY = "data" + File.separator + "universe" + File.separator;
-    private static final String EXTENSION = ".yml";
-    private static final String ULTIMATUMS_FILE = DIRECTORY + "factionStandingUltimatums" + EXTENSION;
+    private static final MMLogger LOGGER = MMLogger.create(FactionStandingUltimatumsLibrary.class);
 
     /**
-     * Map storing Faction Standing ultimatums, keyed by date, then by affected faction code, with a list of all
-     * matching ultimatums.
+     * Map storing Faction Standing ultimatums, keyed by date, then by affected faction code.
      */
     private final Map<LocalDate, Map<String, FactionStandingUltimatumData>> ultimatumMap = new HashMap<>();
 
     /**
-     * Constructs a new {@link FactionStandingUltimatumsLibrary} and loads the ultimatums from the YAML data file.
+     * Constructs a new {@link FactionStandingUltimatumsLibrary} and loads the ultimatums listed in the default
+     * manifest.
      *
      * @author Illiani
      * @since 0.50.07
      */
     public FactionStandingUltimatumsLibrary() {
-        loadUltimatums();
+        this(new File(MHQConstants.FACTION_STANDING_ULTIMATUM_MANIFEST));
+    }
+
+    /**
+     * Constructs a new {@link FactionStandingUltimatumsLibrary} and loads the ultimatums listed in the given manifest.
+     *
+     * @param manifestFile the manifest listing the ultimatum files, which sit in the same directory
+     *
+     * @throws RuntimeException if the manifest cannot be read
+     * @author Illiani
+     * @since 0.51.01
+     */
+    FactionStandingUltimatumsLibrary(File manifestFile) {
+        indexUltimatums(readUltimatums(manifestFile));
+    }
+
+    /**
+     * Constructs a new {@link FactionStandingUltimatumsLibrary} from already-parsed ultimatums.
+     *
+     * @param ultimatums the ultimatums to index
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    FactionStandingUltimatumsLibrary(List<FactionStandingUltimatumData> ultimatums) {
+        indexUltimatums(ultimatums);
     }
 
     /**
      * Returns an unmodifiable map of all loaded Faction Standing ultimatums.
      *
-     * <p>The map is keyed by {@link LocalDate} and affected faction code.</p>
+     * <p>The map is keyed by {@link LocalDate} and affected faction code. An ultimatum with several affected factions
+     * appears once under each of them.</p>
      *
      * @return unmodifiable map of ultimatums by date
      *
@@ -96,7 +122,7 @@ public class FactionStandingUltimatumsLibrary {
     }
 
     /**
-     * Looks up all {@link FactionStandingUltimatumData} for a given date and faction code.
+     * Looks up the {@link FactionStandingUltimatumData} for a given date and faction code.
      *
      * @param date                The date of interest
      * @param affectedFactionCode The code for the affected faction
@@ -106,7 +132,7 @@ public class FactionStandingUltimatumsLibrary {
      * @author Illiani
      * @since 0.50.07
      */
-    public @Nullable FactionStandingUltimatumData getUltimatums(LocalDate date, String affectedFactionCode) {
+    public @Nullable FactionStandingUltimatumData getUltimatum(LocalDate date, String affectedFactionCode) {
         Map<String, FactionStandingUltimatumData> ultimatumsOnDate = ultimatumMap.get(date);
         if (ultimatumsOnDate == null) {
             return null;
@@ -116,30 +142,143 @@ public class FactionStandingUltimatumsLibrary {
     }
 
     /**
-     * Loads Faction Standing ultimatums from the YAML file, parsing them into the internal ultimatumMap.
+     * Reads every ultimatum listed in a manifest. A listed file that is missing or unreadable is logged and skipped,
+     * so one bad file doesn't stop the others loading.
      *
-     * <p> Any IO or parsing errors will result in a {@link RuntimeException}.</p>
+     * @param manifestFile the manifest to read
+     *
+     * @return the ultimatums that loaded
+     *
+     * @throws RuntimeException if the manifest itself cannot be read
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static List<FactionStandingUltimatumData> readUltimatums(File manifestFile) {
+        FactionStandingUltimatumManifest manifest = FactionStandingUltimatumManifest.deserialize(manifestFile);
+        if (manifest == null) {
+            throw new RuntimeException("Could not read ultimatum manifest: " + manifestFile.getPath());
+        }
+
+        File ultimatumsDirectory = manifestFile.getAbsoluteFile().getParentFile();
+        List<FactionStandingUltimatumData> ultimatums = new ArrayList<>();
+        for (String fileName : manifest.ultimatumFileNames) {
+            FactionStandingUltimatumData ultimatum = FactionStandingUltimatumData.deserialize(
+                  new File(ultimatumsDirectory, fileName));
+            if (ultimatum == null) {
+                LOGGER.error("Ultimatum file {} listed in {} could not be loaded", fileName, manifestFile.getPath());
+                continue;
+            }
+
+            ultimatums.add(ultimatum);
+        }
+
+        return ultimatums;
+    }
+
+    /**
+     * Finds a problem that would break an ultimatum when it is presented: a missing name, which its text keys are
+     * built from, or a side missing its ID, leader name, role, or faction, or repeating another side's ID.
+     *
+     * @param ultimatum the ultimatum to check
+     *
+     * @return a description of the first problem found, or {@code null} if the ultimatum can be presented
      *
      * @author Illiani
-     * @since 0.50.07
+     * @since 0.51.01
      */
-    private void loadUltimatums() {
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        try {
-            FactionStandingUltimatumsWrapper wrapper = mapper.readValue(
-                  new File(ULTIMATUMS_FILE),
-                  FactionStandingUltimatumsWrapper.class
-            );
+    static @Nullable String findLoadProblem(FactionStandingUltimatumData ultimatum) {
+        if (isBlank(ultimatum.name())) {
+            return "it has no name";
+        }
 
-            for (FactionStandingUltimatumData data : wrapper.getUltimatums()) {
-                LocalDate date = data.getDate();
-                String faction = data.affectedFactionCode();
-                ultimatumMap
-                      .computeIfAbsent(date, d -> new HashMap<>())
-                      .put(faction, data);
+        Set<String> sideIds = new HashSet<>();
+        for (FactionStandingUltimatumSide side : ultimatum.sides()) {
+            if (isBlank(side.id()) || isBlank(side.name()) || side.role() == null || isBlank(side.factionCode())) {
+                return "a side is missing its id, name, role, or faction code";
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Could not read ultimatums YAML: " + ULTIMATUMS_FILE, e);
+            if (!sideIds.add(side.id())) {
+                return "more than one side uses the id " + side.id();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return {@code true} if the dissenter preference is {@link FactionStandingUltimatumData#ROGUE_PREFERENCE} or
+     *       names one of the ultimatum's sides
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isValidDissenterPreference(FactionStandingUltimatumData ultimatum) {
+        String preference = ultimatum.dissenterPreference();
+        return FactionStandingUltimatumData.ROGUE_PREFERENCE.equals(preference)
+                     || ultimatum.getSide(preference) != null;
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isBlank(@Nullable String value) {
+        return value == null || value.isBlank();
+    }
+
+    /**
+     * Adds each ultimatum to {@link #ultimatumMap} under its date and every one of its affected faction codes.
+     *
+     * <p>A faction can only receive one ultimatum per date. If two ultimatums claim the same date and faction, the
+     * first one loaded is kept and the other is logged and skipped for that faction. An ultimatum with a malformed
+     * date or no sides is logged and skipped.</p>
+     *
+     * @param ultimatums the ultimatums to index
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void indexUltimatums(List<FactionStandingUltimatumData> ultimatums) {
+        for (FactionStandingUltimatumData ultimatum : ultimatums) {
+            List<String> affectedFactionCodes = ultimatum.affectedFactionCodes();
+            if (affectedFactionCodes.isEmpty()) {
+                LOGGER.warn("Ultimatum {} has no affected factions and will never trigger", ultimatum.name());
+                continue;
+            }
+
+            if (ultimatum.sides().isEmpty()) {
+                LOGGER.warn("Ultimatum {} has no sides to choose between and will never trigger", ultimatum.name());
+                continue;
+            }
+
+            String problem = findLoadProblem(ultimatum);
+            if (problem != null) {
+                LOGGER.error("Ultimatum {} will never trigger: {}", ultimatum.name(), problem);
+                continue;
+            }
+
+            if (!isValidDissenterPreference(ultimatum)) {
+                LOGGER.warn("Ultimatum {} has dissenter preference '{}', which names no side; the dissenter will "
+                                  + "always leave", ultimatum.name(), ultimatum.dissenterPreference());
+            }
+
+            LocalDate date;
+            try {
+                date = ultimatum.getDate();
+            } catch (RuntimeException exception) {
+                LOGGER.error("Ultimatum {} has an invalid date '{}' and will never trigger", ultimatum.name(),
+                      ultimatum.date());
+                continue;
+            }
+
+            Map<String, FactionStandingUltimatumData> ultimatumsOnDate = ultimatumMap.computeIfAbsent(date,
+                  ignored -> new HashMap<>());
+
+            for (String factionCode : affectedFactionCodes) {
+                FactionStandingUltimatumData existingUltimatum = ultimatumsOnDate.putIfAbsent(factionCode, ultimatum);
+                if (existingUltimatum != null && existingUltimatum != ultimatum) {
+                    LOGGER.warn("Ultimatum {} skipped for faction {} on {}: {} already uses that date",
+                          ultimatum.name(), factionCode, ultimatum.date(), existingUltimatum.name());
+                }
+            }
         }
     }
 }

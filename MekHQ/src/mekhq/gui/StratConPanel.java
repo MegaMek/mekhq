@@ -87,17 +87,10 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.ImageType;
 import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
-import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.*;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityDefinition;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySynergies;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConRoadCut;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
@@ -816,6 +809,19 @@ public class StratConPanel extends JPanel implements ActionListener {
         JMenu ordersMenu = new JMenu(getTextAt(FACILITY_OPERATIONS_BUNDLE, "contextMenu.orders"));
         for (FacilityOperation operation : operations) {
             ordersMenu.add(buildFacilityOrderMenu(coords, contract, operation));
+        }
+
+        List<StratConFacilityOrder> sieges = StratConFacilitySiege.getSieges(currentTrack, coords);
+        if (!sieges.isEmpty()) {
+            JMenu liftSiegeMenu = new JMenu(getTextAt(FACILITY_OPERATIONS_BUNDLE, "contextMenu.liftSiege"));
+            for (StratConFacilityOrder siege : sieges) {
+                int formationId = siege.getFormationId();
+                Formation formation = campaign.getPlayerForce().getFormation(formationId);
+                String formationName = (formation == null) ? String.valueOf(formationId) : formation.getName();
+                liftSiegeMenu.add(buildFacilityOrderItem(formationName,
+                      () -> StratConFacilitySiege.liftSiege(campaign, currentTrack, formationId)));
+            }
+            ordersMenu.add(liftSiegeMenu);
         }
         rightClickMenu.add(ordersMenu);
     }
@@ -1865,7 +1871,8 @@ public class StratConPanel extends JPanel implements ActionListener {
      * @param facility a facility on the map
      * @param coords   the facility's hex
      *
-     * @return the facility's map label: its name, marked if it is cut off from its supply lines, then as much of its
+     * @return the facility's map label: its name, marked if it is cut off from its supply lines or besieged, then as
+     *       much of its
      *       tier, condition and garrison as the player knows
      *
      * @author Illiani
@@ -1876,6 +1883,9 @@ public class StratConPanel extends JPanel implements ActionListener {
         // The broken-link mark shows as soon as the player can see the facility.
         if (StratConFacilitySupply.isCutOff(currentTrack, coords)) {
             name = getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.cutOff", name);
+        }
+        if (StratConFacilitySiege.isBesieged(currentTrack, coords)) {
+            name = getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.besieged", name);
         }
         FacilityIntel intel = facility.getIntel();
         if (!intel.isAtLeast(FacilityIntel.SCOUTED)) {
@@ -1930,8 +1940,8 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Adds whether a facility is cut off from its supply lines, and which facilities it has a synergy with, to the hex
-     * information.
+     * Adds whether a facility is cut off from its supply lines, how many formations besiege it, and which facilities it
+     * has a synergy with, to the hex information.
      *
      * @param infoBuilder the hex information being built
      * @param coords      the facility's hex
@@ -1947,6 +1957,11 @@ public class StratConPanel extends JPanel implements ActionListener {
                   StratConFacilitySupply.isCutOff(currentTrack, coords) ?
                         "stratConTab.hexInfo.supplyCut" :
                         "stratConTab.hexInfo.supplyConnected"));
+        }
+
+        int besiegerCount = StratConFacilitySiege.getSieges(currentTrack, coords).size();
+        if (besiegerCount > 0) {
+            infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.besieged", besiegerCount));
         }
 
         List<StratConFacility> partners = StratConFacilitySynergies.getPartners(currentTrack, coords);

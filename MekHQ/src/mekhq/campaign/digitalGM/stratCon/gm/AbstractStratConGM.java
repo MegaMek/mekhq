@@ -245,6 +245,7 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 getFacilityStrategy().processFacilityOrders(track, campaign);
                 getFacilityStrategy().processSupply(track, campaign, isStartOfMonth);
                 if (isMonday) {
+                    getFacilityStrategy().processSieges(track, campaign);
                     getFacilityStrategy().applyWeeklyUpkeep(track, campaign);
                 }
 

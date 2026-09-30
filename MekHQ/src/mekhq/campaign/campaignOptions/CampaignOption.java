@@ -306,6 +306,12 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "useArtillery");
     public static final CampaignOption<Boolean> USE_ABILITIES =
           of(Boolean.class, false, "useAbilities");
+    public static final CampaignOption<Boolean> USE_SPA_TRAINING_COSTS =
+          of(Boolean.class, false, "useSpaTrainingCosts");
+    public static final CampaignOption<Boolean> CAP_TOTAL_SPAS =
+          of(Boolean.class, false, "capTotalSpas");
+    public static final CampaignOption<Boolean> SKILL_IMPROVEMENTS_COST_C_BILLS =
+          of(Boolean.class, false, "skillImprovementsCostCBills");
     public static final CampaignOption<Boolean> ONLY_COMMANDERS_MATTER_VEHICLES =
           of(Boolean.class, false, "onlyCommandersMatterVehicles");
     public static final CampaignOption<Boolean> ONLY_COMMANDERS_MATTER_INFANTRY =
@@ -767,6 +773,18 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "payForOverhead");
     public static final CampaignOption<Boolean> PAY_FOR_MAINTAIN =
           of(Boolean.class, false, "payForMaintain");
+    public static final CampaignOption<Boolean> PAY_FOR_HOT_SPOTS_UPKEEP =
+          of(Boolean.class, false, "payForHotSpotsUpkeep");
+    public static final CampaignOption<Boolean> USE_ALTERNATE_UNIT_COST =
+          of(Boolean.class, false, "useAlternateUnitCost");
+    public static final CampaignOption<Boolean> INCREASE_CLAN_REPAIR_COSTS =
+          of(Boolean.class, false, "increaseClanRepairCosts");
+    public static final CampaignOption<Boolean> USE_PLANETARY_COST_REDUCTIONS =
+          of(Boolean.class, false, "usePlanetaryCostReductions");
+    public static final CampaignOption<Boolean> PLANETARY_COST_REDUCTIONS_ON_CONTRACT =
+          of(Boolean.class, false, "planetaryCostReductionsOnContract");
+    public static final CampaignOption<Boolean> PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE =
+          of(Boolean.class, false, "planetaryCostReductionsForMaintenance");
     public static final CampaignOption<Boolean> PAY_FOR_TRANSPORT =
           of(Boolean.class, false, "payForTransport");
     public static final CampaignOption<Boolean> SELL_UNITS =
@@ -775,6 +793,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "sellParts");
     public static final CampaignOption<Boolean> PAY_FOR_RECRUITMENT =
           of(Boolean.class, false, "payForRecruitment");
+    public static final CampaignOption<Double> RECRUITMENT_TRAINING_COST_MULTIPLIER =
+          of(Double.class, 1.5, "recruitmentTrainingCostMultiplier");
     public static final CampaignOption<Boolean> PAY_FOR_FOOD =
           of(Boolean.class, false, "payForFood");
     public static final CampaignOption<Boolean> PAY_FOR_HOUSING =
@@ -837,6 +857,14 @@ public final class CampaignOption<T> {
           of(Integer.class, 0, "rentedFacilitiesCostHoldingCells");
     public static final CampaignOption<Integer> RENTED_FACILITIES_COST_REPAIR_BAYS =
           of(Integer.class, 0, "rentedFacilitiesCostRepairBays");
+    public static final CampaignOption<Boolean> CAP_CONTRACT_SCALE_BY_HIRING_HALL =
+          of(Boolean.class, false, "capContractScaleByHiringHall");
+    public static final CampaignOption<Boolean> TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE =
+          of(Boolean.class, false, "taperCombatPayAndSalvageByScale");
+    public static final CampaignOption<Boolean> ESCALATING_HOT_SPOTS_UPKEEP =
+          of(Boolean.class, false, "escalatingHotSpotsUpkeep");
+    public static final CampaignOption<Boolean> BASE_PAY_ONLY_CONSIDERS_SCALE =
+          of(Boolean.class, false, "basePayOnlyConsidersScale");
     public static final CampaignOption<Boolean> USE_CHAOS_SUPPORT_POINT_CONVERSION =
           of(Boolean.class, true, "useChaosSupportPointConversion");
     public static final CampaignOption<Boolean> USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION =
@@ -1091,6 +1119,8 @@ public final class CampaignOption<T> {
           of(SkillLevel.class, SkillLevel.VETERAN, "minimumCallsignSkillLevel");
     public static final CampaignOption<Boolean> TRACK_FACTION_STANDING =
           of(Boolean.class, false, "trackFactionStanding");
+    public static final CampaignOption<Boolean> USE_FACTION_STANDING_ULTIMATUMS =
+          of(Boolean.class, false, "useFactionStandingUltimatums");
     public static final CampaignOption<Boolean> TRACK_CLIMATE_REGARD_CHANGES =
           of(Boolean.class, false, "trackClimateRegardChanges");
     public static final CampaignOption<Boolean> USE_FACTION_STANDING_NEGOTIATION =
