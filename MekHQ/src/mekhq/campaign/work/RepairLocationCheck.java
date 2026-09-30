@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.work;
 
-import megamek.common.annotations.Nullable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Part;
@@ -58,13 +57,12 @@ public final class RepairLocationCheck {
     }
 
     /**
-     * @return the unit the task is on, or the task itself for a spare in a warehouse; {@code null} if the task has no
-     *       place of its own
+     * @return the unit the task is on, or the task itself for a spare in a warehouse
      */
-    private static @Nullable ILocation findWorkSite(IPartWork partWork) {
+    private static ILocation findWorkSite(IPartWork partWork) {
         if ((partWork instanceof Part part) && (part.getUnit() != null)) {
             return part.getUnit();
         }
-        return (partWork instanceof ILocation location) ? location : null;
+        return partWork;
     }
 }
