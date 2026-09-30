@@ -40,7 +40,6 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -214,18 +213,17 @@ class MassRepairCharacterizationTest {
     }
 
     @Test
-    void rushJobKeepsRushingPastThePreferredTarget() {
+    void rushJobDoesNotRushPastThePreferredTarget() {
         configureMassRepair(false, true);
         Person tech = withTechAndTeam(EXP_REGULAR);
         EquipmentPart laser = damagedMediumLaser();
 
         massRepairTheLocustWithEveryDieShowing(6);
 
-        // Current behaviour, see MRMS-02: the laser's normal target of 3 already meets the preferred 4, yet Mass
-        // Repair rushes it to the half-time job at a target of 5, and would rush further if the next step stayed
-        // within the maximum of 8 (for a Regular the quarter-time job is impossible); changes when that is fixed
+        // MRMS-02: the laser's normal target of 3 already meets the preferred 4, and the half-time job would reach
+        // 5, past it, so Mass Repair does the job at normal time
         int minutesUsed = FULL_SHIFT_MINUTES - tech.getMinutesLeft();
-        assertEquals(LASER_REPAIR_MINUTES / 2, minutesUsed);
+        assertEquals(LASER_REPAIR_MINUTES, minutesUsed);
         assertEquals(0, laser.getHits());
         laser.setHits(1);
         assertEquals(3, campaign.getTargetFor(laser, tech).getValue());
@@ -236,7 +234,7 @@ class MassRepairCharacterizationTest {
     }
 
     @Test
-    void equallySkilledTechsGiveTheJobToTheTechWithTheLeastTimeLeft() {
+    void equallySkilledTechsGiveTheJobToTheTechWithTheMostTimeLeft() {
         configureMassRepair(false, false);
         Person tiredTech = withTechAndTeam(EXP_REGULAR);
         tiredTech.setMinutesLeft(30);
@@ -245,13 +243,10 @@ class MassRepairCharacterizationTest {
 
         massRepairTheLocustWithEveryDieShowing(3);
 
-        // Current behaviour, see MRMS-08: the two-hour job goes to the tech with 30 minutes left and carries over
-        // to tomorrow, while the tech with a full day stands idle; changes when that is fixed
-        assertSame(tiredTech, actuator.getTech());
-        assertEquals(1, actuator.getHits());
-        assertEquals(0, tiredTech.getMinutesLeft());
-        assertEquals(FULL_SHIFT_MINUTES, freshTech.getMinutesLeft());
-        assertEquals(ACTUATOR_REPAIR_MINUTES - 30, actuator.getTimeLeft());
+        // MRMS-08: the two-hour job goes to the tech with a full day and is finished today
+        assertEquals(0, actuator.getHits());
+        assertEquals(30, tiredTech.getMinutesLeft());
+        assertEquals(FULL_SHIFT_MINUTES - ACTUATOR_REPAIR_MINUTES, freshTech.getMinutesLeft());
     }
 
     @Test

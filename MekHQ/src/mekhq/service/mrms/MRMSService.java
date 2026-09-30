@@ -139,11 +139,13 @@ public class MRMSService {
             if (!parts.isEmpty()) {
                 for (IPartWork partWork : parts) {
                     Part part = (Part) partWork;
+                    WorkTime playerChosenMode = part.getMode();
                     part.resetModeToNormal();
 
                     List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, campaign);
 
                     if (validTechs.isEmpty()) {
+                        restorePlayerChosenMode(part, playerChosenMode);
                         continue;
                     }
 
@@ -585,8 +587,6 @@ public class MRMSService {
             return new MRMSUnitAction(unit, salvaging, MRMSUnitAction.STATUS.NO_PARTS);
         }
 
-        resetPartsModeToNormal(parts);
-
         // If we're performing an action on a unit, and we allow auto-scrapping of parts
         // that can't be fixed by an elite tech, let's first get rid of those parts and start with
         // a cleaner slate
@@ -771,8 +771,6 @@ public class MRMSService {
             return new MRMSUnitAction(unit, false, MRMSUnitAction.STATUS.NO_TECHS);
         }
 
-        resetPartsModeToNormal(parts);
-
         // If we're a mek and we have a limb with a bad shoulder/hip, we're going to try to flip it to salvageable
         // and remove all the parts so that we can nuke the limb. If we do this, when we're finally done we need to
         // flip the mek back to repairable so that we don't accidentally strip everything off it.
@@ -879,6 +877,7 @@ public class MRMSService {
     private static void performPartWork(Campaign campaign, Unit unit, List<Person> techs,
           Map<PartRepairType, MRMSOption> mrmsOptionsByType, MRMSConfiguredOptions configuredOptions,
           IPartWork partWork, MRMSUnitAction unitAction) {
+        WorkTime playerChosenMode = partWork.getMode();
         if (partWork instanceof Part) {
             ((Part) partWork).resetModeToNormal();
         }
@@ -886,17 +885,23 @@ public class MRMSService {
         List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, campaign);
 
         if (validTechs.isEmpty()) {
+            restorePlayerChosenMode(partWork, playerChosenMode);
             unitAction.addPartAction(MRMSPartAction.createNoTechs(partWork));
             return;
         }
 
-        unitAction.addPartAction(repairPart(campaign,
+        MRMSPartAction partAction = repairPart(campaign,
               partWork,
               unit,
               validTechs,
               mrmsOptionsByType,
               configuredOptions,
-              false));
+              false);
+        boolean isAssigned = partAction.getStatus() == MRMSPartAction.STATUS.REPAIRED;
+        if (!isAssigned) {
+            restorePlayerChosenMode(partWork, playerChosenMode);
+        }
+        unitAction.addPartAction(partAction);
     }
 
     private static void processPartsInLocation(Campaign campaign, Unit unit,
@@ -951,11 +956,13 @@ public class MRMSService {
         return scrappingLimbMode;
     }
 
-    private static void resetPartsModeToNormal(List<IPartWork> parts) {
-        for (IPartWork partWork : parts) {
-            if (partWork instanceof Part) {
-                ((Part) partWork).resetModeToNormal();
-            }
+    /**
+     * Mass Repair tries out work times on a task while it looks for a tech. A task it does not end up assigning gets
+     * back the work time the player chose for it.
+     */
+    private static void restorePlayerChosenMode(IPartWork partWork, WorkTime playerChosenMode) {
+        if (partWork instanceof Part part) {
+            part.setMode(playerChosenMode);
         }
     }
 
@@ -1493,17 +1500,19 @@ public class MRMSService {
 
                 targetRoll = campaign.getTargetFor(partWork, tech);
 
-                WorkTimeCalculation wtc = new WorkTimeCalculation(null);
-                if (targetRoll.getValue() <= mrmsOption.getTargetNumberMax()) {
-                    wtc.setWorkTime(previousNewWorkTime);
+                WorkTimeCalculation workTimeCalculation = new WorkTimeCalculation(null);
+                int targetNumberLimit = increaseTime ? mrmsOption.getTargetNumberMax()
+                      : getRushTargetNumberLimit(mrmsOption);
+                if (targetRoll.getValue() <= targetNumberLimit) {
+                    workTimeCalculation.setWorkTime(previousNewWorkTime);
                 }
 
                 if (skill.getExperienceLevel(skillModifierData) >=
                           highestAvailableTechSkill) {
-                    wtc.setReachedMaxSkill(true);
+                    workTimeCalculation.setReachedMaxSkill(true);
                 }
 
-                return wtc;
+                return workTimeCalculation;
             }
 
             // Set our new workTime and calculate the new targetRoll
@@ -1536,7 +1545,8 @@ public class MRMSService {
                     return new WorkTimeCalculation(newWorkTime);
                 }
             } else {
-                if (targetRoll.getValue() > mrmsOption.getTargetNumberMax()) {
+                // Rushing trades a harder roll for time, but never past the preferred target number
+                if (targetRoll.getValue() > getRushTargetNumberLimit(mrmsOption)) {
                     debugLog(
                           "...... ending calculateNewMRMSWorktime because we have reached our TN goal - %s ns",
                           "calculateNewMRMSWorktime",
@@ -1548,6 +1558,14 @@ public class MRMSService {
         }
 
         return new WorkTimeCalculation();
+    }
+
+    /**
+     * @return the highest target number a Rush Job may push a task to: the preferred target number, or the maximum if
+     *       that is lower
+     */
+    private static int getRushTargetNumberLimit(MRMSOption mrmsOption) {
+        return Math.min(mrmsOption.getTargetNumberPreferred(), mrmsOption.getTargetNumberMax());
     }
 
     private static void debugLog(String msg, String methodName, Object... replacements) {
@@ -1600,7 +1618,7 @@ public class MRMSService {
 
             // Nulls at the end
             if (skill1 == null && skill2 == null) {
-                return Integer.compare(tech1.getMinutesLeft(), tech2.getMinutesLeft());
+                return compareMostTimeFirst(tech1, tech2);
             }
             if (skill1 == null) {
                 return 1;
@@ -1618,7 +1636,12 @@ public class MRMSService {
                 return experienceCompare;
             }
 
-            return Integer.compare(tech1.getMinutesLeft(), tech2.getMinutesLeft());
+            return compareMostTimeFirst(tech1, tech2);
+        }
+
+        /** Puts the tech with more minutes left first, so the job is most likely to be finished today. */
+        private static int compareMostTimeFirst(Person tech1, Person tech2) {
+            return Integer.compare(tech2.getMinutesLeft(), tech1.getMinutesLeft());
         }
     }
 
