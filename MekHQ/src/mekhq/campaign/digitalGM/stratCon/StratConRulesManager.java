@@ -1527,6 +1527,9 @@ public class StratConRulesManager {
                     StratConFacility facility = scenario.getBackingScenario().getTemplate().isHostileFacility() ?
                                                       StratConFacilityFactory.getRandomHostileFacility() :
                                                       StratConFacilityFactory.getRandomAlliedFacility();
+                    if (facility == null) {
+                        return scenario;
+                    }
                     facility.setVisible(true);
                     track.addFacility(coords, facility);
                     setupFacilityScenario(scenario, facility);
@@ -1587,7 +1590,7 @@ public class StratConRulesManager {
           boolean isStartOfMonth) {
         for (StratConFacility facility : track.getFacilities().values()) {
             if (isStartOfMonth) {
-                campaignState.changeSupportPoints(facility.getMonthlySPModifier());
+                campaignState.changeSupportPoints(facility.getMonthlySupportPoints());
             }
         }
     }
@@ -4166,22 +4169,14 @@ public class StratConRulesManager {
     }
 
     /**
-     * Contains logic for what should happen when a facility gets captured: modifier/type/alignment switches etc.
+     * Hands a facility to the other side. Its effects follow from its definition's profile for the new owner, so only
+     * the owner changes. A facility the player could see stays visible: allied facilities are always shown, so one
+     * taken by the enemy keeps being shown rather than vanishing.
      */
     public static void switchFacilityOwner(StratConFacility facility) {
-        if ((facility.getCapturedDefinition() != null) && !facility.getCapturedDefinition().isBlank()) {
-            StratConFacility newOwnerData = StratConFacilityFactory.getFacilityByName(facility.getCapturedDefinition());
+        facility.setVisible(facility.isVisible());
 
-            if (newOwnerData != null) {
-                facility.copyRulesDataFrom(newOwnerData);
-                return;
-            }
-        }
-
-        // if we have the facility didn't have any data defined for what happens when it's
-        // captured
-        // fall back to the default of just switching the owner
-        if (facility.getOwner() == Allied) {
+        if (facility.isOwnerAlliedToPlayer()) {
             facility.setOwner(Opposing);
         } else {
             facility.setOwner(Allied);

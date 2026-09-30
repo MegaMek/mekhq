@@ -32,21 +32,33 @@
  */
 package mekhq.campaign.digitalGM.stratCon.facility;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
- * This represents a facility in the StratCon context
+ * A facility placed on a StratCon sector. It refers to its {@link StratConFacilityDefinition} by ID and keeps only its
+ * own state: who holds it, whether the player has seen it, whether it has lent its modifiers this week, whether it is
+ * a strategic objective, and any scenario modifiers added when it was placed. What it does comes from the definition's
+ * profile for its current owner, so capturing it is just a change of owner.
+ *
+ * <p>Saves from before 0.51.01 held a full copy of the facility's old-format definition instead of an ID. Those
+ * fields are still read, and {@link #resolveLegacyData()} turns them into a definition ID once loading is done.</p>
  *
  * @author NickAragua
  */
-public class StratConFacility implements Cloneable {
+@XmlAccessorType(XmlAccessType.FIELD)
+public class StratConFacility {
     private static final MMLogger LOGGER = MMLogger.create(StratConFacility.class);
 
     public enum FacilityType {
@@ -63,79 +75,121 @@ public class StratConFacility implements Cloneable {
         BaseOfOperations
     }
 
+    @XmlElement
+    private String definitionId;
+    @XmlElement
     private ForceAlignment owner;
-    private String displayableName;
-    private FacilityType facilityType;
-    private String userDescription;
+    @XmlElement
     private boolean visible;
+    @XmlElement(name = "isAvailable")
     private boolean isAvailable = true;
-    private int aggroRating;
-    private List<String> sharedModifiers = new ArrayList<>();
-    private List<String> localModifiers = new ArrayList<>();
-    private String capturedDefinition;
-    private boolean revealTrack;
-    private boolean increaseScanRange;
-    private int scenarioOddsModifier;
-    private int monthlySPModifier;
-    private boolean preventAerospace;
-    // TODO: post-MVP
-    // private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
+    @XmlElement(name = "strategicObjective")
     private boolean isStrategicObjective;
-    private List<StratConBiome> biomes = new ArrayList<>();
+    @XmlElement(name = "additionalLocalModifier")
+    private List<String> additionalLocalModifiers = new ArrayList<>();
 
-    private final transient TreeMap<Integer, StratConBiome> biomeTempMap = new TreeMap<>();
+    // Read from saves written before 0.51.01, which held a copy of the whole old-format definition. Emptied once the
+    // facility is matched to a definition, so they are only written back for a facility that could not be matched.
+    @XmlElement(name = "displayableName")
+    private String legacyDisplayableName;
+    @XmlElement(name = "facilityType")
+    private FacilityType legacyFacilityType;
+    @XmlElement(name = "userDescription")
+    private String legacyUserDescription;
+    @XmlElement(name = "sharedModifiers")
+    private List<String> legacySharedModifiers;
+    @XmlElement(name = "localModifiers")
+    private List<String> legacyLocalModifiers;
+    @XmlElement(name = "revealTrack")
+    private Boolean legacyRevealTrack;
+    @XmlElement(name = "increaseScanRange")
+    private Boolean legacyIncreaseScanRange;
+    @XmlElement(name = "scenarioOddsModifier")
+    private Integer legacyScenarioOddsModifier;
+    @XmlElement(name = "monthlySPModifier")
+    private Integer legacyMonthlySPModifier;
+
+    /**
+     * A definition held by this facility alone rather than looked up by ID: one built in code (tests, tools), one
+     * made from an unmatched old save, or a placeholder for an ID that no loaded definition has.
+     */
+    @XmlTransient
+    private StratConFacilityDefinition detachedDefinition;
 
     /**
      * A temporary variable used to track situations where changing the ownership of this facility hinges upon multiple
      * objectives
      */
-    private transient int ownershipChangeScore;
+    @XmlTransient
+    private int ownershipChangeScore;
 
-    @Override
-    public StratConFacility clone() {
-        StratConFacility clone = new StratConFacility();
-        clone.owner = owner;
-        clone.displayableName = displayableName;
-        clone.facilityType = facilityType;
-        clone.visible = visible;
-        clone.isAvailable = isAvailable;
-        clone.sharedModifiers = new ArrayList<>(sharedModifiers);
-        clone.localModifiers = new ArrayList<>(localModifiers);
-        clone.setCapturedDefinition(capturedDefinition);
-        clone.revealTrack = revealTrack;
-        clone.increaseScanRange = increaseScanRange;
-        clone.scenarioOddsModifier = scenarioOddsModifier;
-        clone.monthlySPModifier = monthlySPModifier;
-        clone.preventAerospace = preventAerospace;
-        clone.userDescription = userDescription;
-        clone.biomes = new ArrayList<>(biomes);
-        ReconstructTransientData(clone);
-        return clone;
+    /**
+     * For loading from saves only.
+     */
+    public StratConFacility() {
     }
 
     /**
-     * Copies data from the source facility to here, including its name and type. Reconstructs file-driven transient
-     * data.
+     * Creates a facility of the given type, held by the given side.
      *
-     * <p>Visibility is only ever gained, never lost: a facility the player has already seen stays visible after it
-     * changes hands, even when the new owner's definition would start hidden.</p>
+     * @param definition the facility's type
+     * @param owner      the side that holds it
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    public void copyRulesDataFrom(StratConFacility facility) {
-        setDisplayableName(facility.getDisplayableName());
-        setFacilityType(facility.getFacilityType());
-        setVisible(visible || facility.getVisible());
-        setCapturedDefinition(facility.getCapturedDefinition());
-        setLocalModifiers(new ArrayList<>(facility.getLocalModifiers()));
-        setSharedModifiers(new ArrayList<>(facility.getSharedModifiers()));
-        setOwner(facility.getOwner());
-        setRevealTrack(facility.getRevealTrack());
-        setIncreaseScanRange(facility.getIncreaseScanRange());
-        setScenarioOddsModifier(facility.getScenarioOddsModifier());
-        setMonthlySPModifier(facility.getMonthlySPModifier());
-        setPreventAerospace(facility.preventAerospace());
-        setBiomes(new ArrayList<>(facility.getBiomes()));
-        setUserDescription(facility.getUserDescription());
-        ReconstructTransientData(this);
+    public StratConFacility(StratConFacilityDefinition definition, ForceAlignment owner) {
+        this.definitionId = definition.getId();
+        this.owner = owner;
+        if (StratConFacilityFactory.getDefinition(definition.getId()) != definition) {
+            detachedDefinition = definition;
+        }
+    }
+
+    /**
+     * @return the ID of the facility's definition
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String getDefinitionId() {
+        return definitionId;
+    }
+
+    /**
+     * @return the facility's definition. If no loaded definition has its ID, an empty placeholder named after the ID,
+     *       so a facility whose data has gone missing does nothing rather than breaking the sector.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConFacilityDefinition getDefinition() {
+        if (detachedDefinition != null) {
+            return detachedDefinition;
+        }
+
+        StratConFacilityDefinition definition = StratConFacilityFactory.getDefinition(definitionId);
+        if (definition == null) {
+            LOGGER.warn("No facility definition {} is loaded; the facility will have no effects", definitionId);
+            detachedDefinition = new StratConFacilityDefinition(definitionId,
+                  String.valueOf(definitionId),
+                  FacilityType.BaseOfOperations,
+                  null,
+                  null);
+            return detachedDefinition;
+        }
+
+        return definition;
+    }
+
+    /**
+     * @return the profile that applies while the facility's current owner holds it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConFacilityProfile getProfile() {
+        return getDefinition().getProfileFor(owner);
     }
 
     public ForceAlignment getOwner() {
@@ -151,7 +205,7 @@ public class StratConFacility implements Cloneable {
      *       {@code false} otherwise.
      */
     public boolean isOwnerAlliedToPlayer() {
-        return owner == ForceAlignment.Allied || owner == ForceAlignment.Player;
+        return StratConFacilityDefinition.isAlliedToPlayer(owner);
     }
 
     public String getFormattedDisplayableName() {
@@ -159,19 +213,19 @@ public class StratConFacility implements Cloneable {
     }
 
     public String getDisplayableName() {
-        return displayableName;
-    }
-
-    public void setDisplayableName(String displayableName) {
-        this.displayableName = displayableName;
+        return getDefinition().getDisplayableName();
     }
 
     public FacilityType getFacilityType() {
-        return facilityType;
+        return getDefinition().getFacilityType();
     }
 
-    public void setFacilityType(FacilityType facilityType) {
-        this.facilityType = facilityType;
+    /**
+     * @return what the facility does while its current owner holds it, or {@code null} if the profile has no
+     *       description
+     */
+    public @Nullable String getUserDescription() {
+        return getProfile().getDescription();
     }
 
     public boolean getVisible() {
@@ -202,32 +256,40 @@ public class StratConFacility implements Cloneable {
      * This is a list of scenario modifier IDs that affect scenarios in the same track as this facility.
      */
     public List<String> getSharedModifiers() {
-        return sharedModifiers;
-    }
-
-    public void setSharedModifiers(List<String> sharedModifiers) {
-        this.sharedModifiers = sharedModifiers;
+        return getProfile().getSharedModifierIds();
     }
 
     /**
-     * This is a list of scenario modifier IDs that affect scenarios involving this facility directly.
+     * This is a list of scenario modifier IDs that affect scenarios involving this facility directly: the current
+     * profile's, then any added when the facility was placed.
      */
     public List<String> getLocalModifiers() {
-        return localModifiers;
+        List<String> modifiers = getProfile().getLocalModifierIds();
+        modifiers.addAll(additionalLocalModifiers);
+        return modifiers;
     }
 
-    public void setLocalModifiers(List<String> localModifiers) {
-        this.localModifiers = localModifiers;
+    /**
+     * @return the scenario modifier IDs added to this facility alone when it was placed, such as those of the
+     *       objective it serves
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<String> getAdditionalLocalModifiers() {
+        return Collections.unmodifiableList(additionalLocalModifiers);
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public int getAggroRating() {
-        return aggroRating;
-    }
-
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public void setAggroRating(int rating) {
-        aggroRating = rating;
+    /**
+     * Adds scenario modifiers to this facility alone, on top of its profile's local modifiers.
+     *
+     * @param modifiers the scenario modifier IDs to add
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addAdditionalLocalModifiers(List<String> modifiers) {
+        additionalLocalModifiers.addAll(modifiers);
     }
 
     public boolean isStrategicObjective() {
@@ -239,11 +301,14 @@ public class StratConFacility implements Cloneable {
     }
 
     public List<StratConBiome> getBiomes() {
-        return biomes;
+        return getDefinition().getBiomes();
     }
 
-    public void setBiomes(List<StratConBiome> biomes) {
-        this.biomes = biomes;
+    /**
+     * Returns the biome temperature map (note: temperature mapping is in kelvins but stored in Celsius)
+     */
+    public TreeMap<Integer, StratConBiome> getBiomeTempMap() {
+        return getDefinition().getBiomeTempMap();
     }
 
     public void incrementOwnershipChangeScore() {
@@ -254,134 +319,105 @@ public class StratConFacility implements Cloneable {
         ownershipChangeScore--;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public void clearOwnershipChangeScore() {
-        ownershipChangeScore = 0;
-    }
-
     public int getOwnershipChangeScore() {
         return ownershipChangeScore;
     }
 
     /**
-     * If present, this is the name of the definition file to draw from when switching facility ownership.
+     * @return whether the facility reveals its whole sector while its current owner holds it
      */
-    public String getCapturedDefinition() {
-        return capturedDefinition;
+    public boolean isRevealingTrack() {
+        return getProfile().isRevealingTrack();
     }
 
-    public void setCapturedDefinition(String capturedDefinition) {
-        this.capturedDefinition = capturedDefinition;
-    }
-
-    public boolean getRevealTrack() {
-        return revealTrack;
-    }
-
-    public void setRevealTrack(boolean revealTrack) {
-        this.revealTrack = revealTrack;
-    }
-
-    public boolean getIncreaseScanRange() {
-        return increaseScanRange;
-    }
-
-    public void setIncreaseScanRange(boolean increaseScanRange) {
-        this.increaseScanRange = increaseScanRange;
+    /**
+     * @return hexes the facility adds to the scan range of forces scouting its sector while its current owner holds it
+     */
+    public int getScanRangeIncrease() {
+        return getProfile().getScanRangeIncrease();
     }
 
     public int getScenarioOddsModifier() {
-        return scenarioOddsModifier;
-    }
-
-    public void setScenarioOddsModifier(int scenarioOddsModifier) {
-        this.scenarioOddsModifier = scenarioOddsModifier;
+        return getProfile().getScenarioOddsModifier();
     }
 
     /**
-     * @return The facility's monthly SP (Support Points) modifier as an integer.
+     * @return the facility's monthly SP (Support Points) change while its current owner holds it
      */
-    public int getMonthlySPModifier() {
-        return monthlySPModifier;
+    public int getMonthlySupportPoints() {
+        return getProfile().getMonthlySupportPoints();
     }
 
     /**
-     * Sets a new value for the monthly SP (Support Points) modifier.
+     * @return whether the facility keeps air and space scenarios out of its sector
+     */
+    public boolean isPreventingAerospace() {
+        return getProfile().isPreventingAerospace();
+    }
+
+    /**
+     * Turns the old-format definition copy held by a facility from a save written before 0.51.01 into a definition ID.
+     * The facility is matched to the loaded definition of the same {@link FacilityType}; any local modifiers beyond
+     * that definition's own are kept as the facility's additional ones. A facility that matches no loaded definition
+     * keeps its old data as a detached definition, so it still behaves as it did.
      *
-     * @param monthlySPModifier The new monthly SP modifier value.
-     */
-    public void setMonthlySPModifier(int monthlySPModifier) {
-        this.monthlySPModifier = monthlySPModifier;
-    }
-
-    /**
-     * Returns the biome temperature map (note: temperature mapping is in kelvins but stored in Celsius)
-     */
-    public TreeMap<Integer, StratConBiome> getBiomeTempMap() {
-        return biomeTempMap;
-    }
-
-    /**
-     * Attempt to deserialize an instance of a StratConFacility from the passed-in file name
+     * <p>Does nothing for a facility that already has a definition ID.</p>
      *
-     * @return Possibly an instance of a StratConFacility
+     * @author Illiani
+     * @since 0.51.01
      */
-    public static StratConFacility deserialize(String fileName) {
-        File inputFile = new File(fileName);
-        if (!inputFile.exists()) {
-            LOGGER.warn("Specified file {} does not exist", fileName);
-            return null;
+    public void resolveLegacyData() {
+        if ((definitionId != null) || (legacyFacilityType == null)) {
+            return;
         }
 
-        StratConFacility resultingFacility;
-        try {
-            resultingFacility = StratConFacilityJson.fromFile(inputFile);
-        } catch (Exception e) {
-            LOGGER.error("Error Deserializing Facility {}", fileName, e);
-            return null;
+        StratConFacilityDefinition definition = StratConFacilityFactory.getDefinitionForType(legacyFacilityType);
+        if (definition == null) {
+            detachedDefinition = buildLegacyDefinition();
+            definitionId = detachedDefinition.getId();
+            LOGGER.warn("No facility definition of type {} is loaded; keeping the saved data for {}",
+                  legacyFacilityType,
+                  legacyDisplayableName);
+            return;
         }
 
-        if (resultingFacility == null) {
-            return null;
+        definitionId = definition.getId();
+
+        List<String> remainingModifiers = new ArrayList<>();
+        if (legacyLocalModifiers != null) {
+            remainingModifiers.addAll(legacyLocalModifiers);
         }
+        for (String profileModifier : definition.getProfileFor(owner).getLocalModifierIds()) {
+            remainingModifiers.remove(profileModifier);
+        }
+        additionalLocalModifiers.addAll(remainingModifiers);
 
-        ReconstructTransientData(resultingFacility);
-
-        return resultingFacility;
+        legacyDisplayableName = null;
+        legacyFacilityType = null;
+        legacyUserDescription = null;
+        legacySharedModifiers = null;
+        legacyLocalModifiers = null;
+        legacyRevealTrack = null;
+        legacyIncreaseScanRange = null;
+        legacyScenarioOddsModifier = null;
+        legacyMonthlySPModifier = null;
     }
 
     /**
-     * Serialize this facility to a JSON file, led by the MegaMek Data license header. Please pass in a non-null file.
-     *
-     * @param outputFile The destination file.
+     * @return a one-sided definition built from the old-format data a save held for this facility
      */
-    public void Serialize(File outputFile) {
-        try {
-            StratConFacilityJson.toFile(this, outputFile);
-        } catch (Exception e) {
-            LOGGER.error("Error serializing {}", outputFile.getPath(), e);
-        }
-    }
-
-    private static void ReconstructTransientData(StratConFacility facility) {
-        for (StratConBiome biome : facility.getBiomes()) {
-            facility.getBiomeTempMap().put(biome.allowedTemperatureLowerBound, biome);
-        }
-    }
-
-    public boolean preventAerospace() {
-        return preventAerospace;
-    }
-
-    public void setPreventAerospace(boolean preventAerospace) {
-        this.preventAerospace = preventAerospace;
-    }
-
-    public String getUserDescription() {
-        return userDescription;
-    }
-
-    public void setUserDescription(String userDescription) {
-        this.userDescription = userDescription;
+    private StratConFacilityDefinition buildLegacyDefinition() {
+        LegacyStratConFacilityData legacyData = new LegacyStratConFacilityData();
+        legacyData.owner = owner;
+        legacyData.displayableName = legacyDisplayableName;
+        legacyData.facilityType = legacyFacilityType;
+        legacyData.userDescription = legacyUserDescription;
+        legacyData.sharedModifiers = legacySharedModifiers;
+        legacyData.localModifiers = legacyLocalModifiers;
+        legacyData.revealTrack = Boolean.TRUE.equals(legacyRevealTrack);
+        legacyData.increaseScanRange = Boolean.TRUE.equals(legacyIncreaseScanRange);
+        legacyData.scenarioOddsModifier = (legacyScenarioOddsModifier == null) ? 0 : legacyScenarioOddsModifier;
+        legacyData.monthlySPModifier = (legacyMonthlySPModifier == null) ? 0 : legacyMonthlySPModifier;
+        return legacyData.toDefinition("legacy-" + legacyFacilityType.name());
     }
 }

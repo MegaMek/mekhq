@@ -45,46 +45,52 @@ import java.util.List;
 import javax.swing.*;
 
 import megamek.common.ui.FastJScrollPane;
+import megamek.logging.MMLogger;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.IStratConFacilityEffect;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityDefinition;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.LocalModifiersEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.MonthlySupportPointsEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.PreventAerospaceEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.RevealTrackEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.ScanRangeEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.ScenarioOddsEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.SharedModifiersEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityJson;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityManifest;
-import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityProfile;
 import mekhq.gui.FileDialogs;
 
 /**
- * A developer tool for editing StratCon facility files (JSON). Exposes the persisted fields with New / Load / Save,
- * mirroring the other Developer Tools editors. Biomes are edited through a modal sub-editor.
+ * A developer tool for editing StratCon facility definition files (JSON), with New / Load / Save, mirroring the other
+ * Developer Tools editors. A definition carries one profile for when the player's side holds the facility and one for
+ * when the enemy does; each is edited on its own tab. Biomes are edited through a modal sub-editor.
+ *
+ * <p>Loading a file in the format used before 0.51.01 opens it as a one-sided definition; saving writes the current
+ * format.</p>
  */
 public class StratConFacilityEditorDialog extends JDialog {
+    private static final MMLogger LOGGER = MMLogger.create(StratConFacilityEditorDialog.class);
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DeveloperTools";
 
     private static final String FACILITY_MANIFEST_FILE_NAME = "facilitymanifest.json";
 
     private final JFrame frame;
-    private StratConFacility facility = new StratConFacility();
-    // The file the current facility was last loaded from or saved to; null until then. Registering with the manifest
-    // needs a concrete file name, so it stays disabled until this is set.
+    private StratConFacilityDefinition definition = new StratConFacilityDefinition();
+    // The file the current definition was last loaded from or saved to; null until then. Registering with the
+    // manifest needs a concrete file name, so it stays disabled until this is set.
     private File currentFile;
 
-    private final JComboBox<ForceAlignment> cboOwner = new JComboBox<>(ForceAlignment.values());
-    private final JComboBox<FacilityType> cboFacilityType = new JComboBox<>(FacilityType.values());
+    private final JTextField txtId = new JTextField(30);
     private final JTextField txtDisplayableName = new JTextField(30);
-    private final JTextArea txtUserDescription = new JTextArea(4, 40);
-    private final JCheckBox chkVisible = new JCheckBox();
-    private final JCheckBox chkIsAvailable = new JCheckBox();
-    private final JTextArea txtSharedModifiers = new JTextArea(3, 40);
-    private final JTextArea txtLocalModifiers = new JTextArea(3, 40);
-    private final JTextField txtCapturedDefinition = new JTextField(30);
-    private final JCheckBox chkRevealTrack = new JCheckBox();
-    private final JCheckBox chkIncreaseScanRange = new JCheckBox();
-    private final JSpinner spnScenarioOddsModifier = new JSpinner(new SpinnerNumberModel(0, -1000, 1000, 1));
-    private final JSpinner spnMonthlySPModifier = new JSpinner(new SpinnerNumberModel(0, -1000, 1000, 1));
-    private final JCheckBox chkPreventAerospace = new JCheckBox();
-    private final JCheckBox chkStrategicObjective = new JCheckBox();
+    private final JComboBox<FacilityType> cboFacilityType = new JComboBox<>(FacilityType.values());
     private final DefaultListModel<StratConBiome> biomeModel = new DefaultListModel<>();
     private final JList<StratConBiome> lstBiomes = new JList<>(biomeModel);
+    private final ProfilePanel alliedProfilePanel = new ProfilePanel();
+    private final ProfilePanel hostileProfilePanel = new ProfilePanel();
     private final JButton btnAddToManifest = new JButton(getTextAt(RESOURCE_BUNDLE, "button.addToManifest"));
 
     public StratConFacilityEditorDialog(JFrame parent) {
@@ -94,7 +100,7 @@ public class StratConFacilityEditorDialog extends JDialog {
         setLayout(new BorderLayout());
         add(new FastJScrollPane(buildForm()), BorderLayout.CENTER);
         add(buildButtonBar(), BorderLayout.SOUTH);
-        load(facility);
+        load(definition);
         pack();
         setLocationRelativeTo(parent);
     }
@@ -107,28 +113,12 @@ public class StratConFacilityEditorDialog extends JDialog {
         constraints.anchor = GridBagConstraints.WEST;
         constraints.insets = new Insets(3, 5, 3, 5);
 
-        txtUserDescription.setLineWrap(true);
-        txtUserDescription.setWrapStyleWord(true);
-        txtSharedModifiers.setLineWrap(false);
-        txtLocalModifiers.setLineWrap(false);
         lstBiomes.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         lstBiomes.setVisibleRowCount(4);
 
-        addRow(panel, constraints, "facilityEditor.owner", cboOwner);
+        addRow(panel, constraints, "facilityEditor.id", txtId);
         addRow(panel, constraints, "facilityEditor.displayableName", txtDisplayableName);
         addRow(panel, constraints, "facilityEditor.facilityType", cboFacilityType);
-        addRow(panel, constraints, "facilityEditor.userDescription", new FastJScrollPane(txtUserDescription));
-        addRow(panel, constraints, "facilityEditor.visible", chkVisible);
-        addRow(panel, constraints, "facilityEditor.isAvailable", chkIsAvailable);
-        addRow(panel, constraints, "facilityEditor.sharedModifiers", new FastJScrollPane(txtSharedModifiers));
-        addRow(panel, constraints, "facilityEditor.localModifiers", new FastJScrollPane(txtLocalModifiers));
-        addRow(panel, constraints, "facilityEditor.capturedDefinition", txtCapturedDefinition);
-        addRow(panel, constraints, "facilityEditor.revealTrack", chkRevealTrack);
-        addRow(panel, constraints, "facilityEditor.increaseScanRange", chkIncreaseScanRange);
-        addRow(panel, constraints, "facilityEditor.scenarioOddsModifier", spnScenarioOddsModifier);
-        addRow(panel, constraints, "facilityEditor.monthlySPModifier", spnMonthlySPModifier);
-        addRow(panel, constraints, "facilityEditor.preventAerospace", chkPreventAerospace);
-        addRow(panel, constraints, "facilityEditor.strategicObjective", chkStrategicObjective);
 
         // biomes list with add/edit/remove
         constraints.gridx = 0;
@@ -149,9 +139,9 @@ public class StratConFacilityEditorDialog extends JDialog {
         });
         JButton btnRemove = new JButton(getTextAt(RESOURCE_BUNDLE, "button.remove"));
         btnRemove.addActionListener(e -> {
-            int idx = lstBiomes.getSelectedIndex();
-            if (idx >= 0) {
-                biomeModel.remove(idx);
+            int selectedIndex = lstBiomes.getSelectedIndex();
+            if (selectedIndex >= 0) {
+                biomeModel.remove(selectedIndex);
             }
         });
         biomeButtons.add(btnAdd);
@@ -160,10 +150,20 @@ public class StratConFacilityEditorDialog extends JDialog {
         constraints.gridx = 2;
         panel.add(biomeButtons, constraints);
 
+        JTabbedPane profileTabs = new JTabbedPane();
+        profileTabs.addTab(getTextAt(RESOURCE_BUNDLE, "facilityEditor.alliedProfile"), alliedProfilePanel);
+        profileTabs.addTab(getTextAt(RESOURCE_BUNDLE, "facilityEditor.hostileProfile"), hostileProfilePanel);
+        constraints.gridx = 0;
+        constraints.gridy++;
+        constraints.gridwidth = 3;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        panel.add(profileTabs, constraints);
+
         return panel;
     }
 
-    private void addRow(JPanel panel, GridBagConstraints constraints, String labelKey, java.awt.Component control) {
+    private static void addRow(JPanel panel, GridBagConstraints constraints, String labelKey,
+          java.awt.Component control) {
         constraints.gridx = 0;
         constraints.gridy++;
         JLabel label = new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey));
@@ -177,9 +177,9 @@ public class StratConFacilityEditorDialog extends JDialog {
         JPanel bar = new JPanel();
         JButton btnNew = new JButton(getTextAt(RESOURCE_BUNDLE, "button.new"));
         btnNew.addActionListener(e -> {
-            facility = new StratConFacility();
+            definition = new StratConFacilityDefinition();
             currentFile = null;
-            load(facility);
+            load(definition);
             updateManifestButtonState();
         });
         JButton btnLoad = new JButton(getTextAt(RESOURCE_BUNDLE, "button.load"));
@@ -203,47 +203,27 @@ public class StratConFacilityEditorDialog extends JDialog {
         btnAddToManifest.setEnabled(currentFile != null);
     }
 
-    private void load(StratConFacility source) {
-        cboOwner.setSelectedItem(source.getOwner());
+    private void load(StratConFacilityDefinition source) {
+        txtId.setText(nullToEmpty(source.getId()));
         txtDisplayableName.setText(nullToEmpty(source.getDisplayableName()));
         cboFacilityType.setSelectedItem(source.getFacilityType());
-        txtUserDescription.setText(nullToEmpty(source.getUserDescription()));
-        chkVisible.setSelected(source.getVisible());
-        chkIsAvailable.setSelected(source.getIsAvailable());
-        txtSharedModifiers.setText(String.join("\n", source.getSharedModifiers()));
-        txtLocalModifiers.setText(String.join("\n", source.getLocalModifiers()));
-        txtCapturedDefinition.setText(nullToEmpty(source.getCapturedDefinition()));
-        chkRevealTrack.setSelected(source.getRevealTrack());
-        chkIncreaseScanRange.setSelected(source.getIncreaseScanRange());
-        spnScenarioOddsModifier.setValue(source.getScenarioOddsModifier());
-        spnMonthlySPModifier.setValue(source.getMonthlySPModifier());
-        chkPreventAerospace.setSelected(source.preventAerospace());
-        chkStrategicObjective.setSelected(source.isStrategicObjective());
         biomeModel.clear();
         source.getBiomes().forEach(biomeModel::addElement);
+        alliedProfilePanel.load(source.getAlliedProfile());
+        hostileProfilePanel.load(source.getHostileProfile());
     }
 
-    private void writeInto(StratConFacility target) {
-        target.setOwner((ForceAlignment) cboOwner.getSelectedItem());
+    private void writeInto(StratConFacilityDefinition target) {
+        target.setId(emptyToNull(txtId.getText()));
         target.setDisplayableName(emptyToNull(txtDisplayableName.getText()));
         target.setFacilityType((FacilityType) cboFacilityType.getSelectedItem());
-        target.setUserDescription(emptyToNull(txtUserDescription.getText()));
-        target.setVisible(chkVisible.isSelected());
-        target.setIsAvailable(chkIsAvailable.isSelected());
-        target.setSharedModifiers(parseLines(txtSharedModifiers.getText()));
-        target.setLocalModifiers(parseLines(txtLocalModifiers.getText()));
-        target.setCapturedDefinition(emptyToNull(txtCapturedDefinition.getText()));
-        target.setRevealTrack(chkRevealTrack.isSelected());
-        target.setIncreaseScanRange(chkIncreaseScanRange.isSelected());
-        target.setScenarioOddsModifier((int) spnScenarioOddsModifier.getValue());
-        target.setMonthlySPModifier((int) spnMonthlySPModifier.getValue());
-        target.setPreventAerospace(chkPreventAerospace.isSelected());
-        target.setStrategicObjective(chkStrategicObjective.isSelected());
         List<StratConBiome> biomes = new ArrayList<>();
-        for (int i = 0; i < biomeModel.size(); i++) {
-            biomes.add(biomeModel.get(i));
+        for (int index = 0; index < biomeModel.size(); index++) {
+            biomes.add(biomeModel.get(index));
         }
         target.setBiomes(biomes);
+        target.setAlliedProfile(alliedProfilePanel.toProfile());
+        target.setHostileProfile(hostileProfilePanel.toProfile());
     }
 
     private void loadFromFile() {
@@ -251,31 +231,42 @@ public class StratConFacilityEditorDialog extends JDialog {
         if (file == null) {
             return;
         }
-        StratConFacility loaded = StratConFacility.deserialize(file.getPath());
-        if (loaded == null) {
+
+        StratConFacilityDefinition loaded;
+        try {
+            loaded = StratConFacilityJson.fromFile(file).definition();
+        } catch (Exception e) {
+            LOGGER.error("Error loading facility definition {}", file.getPath(), e);
             JOptionPane.showMessageDialog(this, getTextAt(RESOURCE_BUNDLE, "loadError.message"),
                   getTextAt(RESOURCE_BUNDLE, "loadError.title"), JOptionPane.ERROR_MESSAGE);
             return;
         }
-        facility = loaded;
+
+        definition = loaded;
         currentFile = file;
-        load(facility);
+        load(definition);
         updateManifestButtonState();
     }
 
     private void saveToFile() {
-        writeInto(facility);
-        FileDialogs.saveStratConFacility(frame, facility).ifPresent(file -> {
-            facility.Serialize(file);
+        writeInto(definition);
+        FileDialogs.saveStratConFacility(frame, definition).ifPresent(file -> {
+            try {
+                StratConFacilityJson.toFile(definition, file);
+            } catch (Exception e) {
+                LOGGER.error("Error saving facility definition {}", file.getPath(), e);
+                return;
+            }
             currentFile = file;
             updateManifestButtonState();
+            StratConFacilityFactory.reloadFacilities();
         });
     }
 
     /**
-     * Registers the current facility's file name in the facility manifest that sits alongside it, so the game will load
-     * it. Reads the sibling {@code facilitymanifest.json} (creating a fresh one only if there is none; one that exists
-     * but cannot be read is left unchanged), appends the file name if it is not already listed, and writes the
+     * Registers the current definition's file name in the facility manifest that sits alongside it, so the game will
+     * load it. Reads the sibling {@code facilitymanifest.json} (creating a fresh one only if there is none; one that
+     * exists but cannot be read is left unchanged), appends the file name if it is not already listed, and writes the
      * manifest back.
      */
     private void addToManifest() {
@@ -311,6 +302,7 @@ public class StratConFacilityEditorDialog extends JDialog {
 
         manifest.facilityFileNames.add(fileName);
         if (manifest.serialize(manifestFile)) {
+            StratConFacilityFactory.reloadFacilities();
             JOptionPane.showMessageDialog(this,
                   getFormattedTextAt(RESOURCE_BUNDLE, "facilityEditor.manifest.added.message", fileName),
                   getTextAt(RESOURCE_BUNDLE, "facilityEditor.manifest.title"), JOptionPane.INFORMATION_MESSAGE);
@@ -346,5 +338,115 @@ public class StratConFacilityEditorDialog extends JDialog {
             }
         }
         return result;
+    }
+
+    /**
+     * Edits one profile of a definition: whether it exists, its description, and the effects this editor knows. An
+     * effect it does not know is kept as it was and written back after the others.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static class ProfilePanel extends JPanel {
+        private final JCheckBox chkHasProfile = new JCheckBox();
+        private final JTextArea txtDescription = new JTextArea(4, 40);
+        private final JTextArea txtLocalModifiers = new JTextArea(3, 40);
+        private final JTextArea txtSharedModifiers = new JTextArea(3, 40);
+        private final JSpinner spnScanRange = new JSpinner(new SpinnerNumberModel(0, -10, 10, 1));
+        private final JSpinner spnScenarioOddsModifier = new JSpinner(new SpinnerNumberModel(0, -1000, 1000, 1));
+        private final JSpinner spnMonthlySupportPoints = new JSpinner(new SpinnerNumberModel(0, -1000, 1000, 1));
+        private final JCheckBox chkRevealTrack = new JCheckBox();
+        private final JCheckBox chkPreventAerospace = new JCheckBox();
+        private final List<IStratConFacilityEffect> otherEffects = new ArrayList<>();
+
+        ProfilePanel() {
+            super(new GridBagLayout());
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = 0;
+            constraints.anchor = GridBagConstraints.WEST;
+            constraints.insets = new Insets(3, 5, 3, 5);
+
+            txtDescription.setLineWrap(true);
+            txtDescription.setWrapStyleWord(true);
+
+            addRow(this, constraints, "facilityEditor.hasProfile", chkHasProfile);
+            addRow(this, constraints, "facilityEditor.description", new FastJScrollPane(txtDescription));
+            addRow(this, constraints, "facilityEditor.localModifiers", new FastJScrollPane(txtLocalModifiers));
+            addRow(this, constraints, "facilityEditor.sharedModifiers", new FastJScrollPane(txtSharedModifiers));
+            addRow(this, constraints, "facilityEditor.scanRange", spnScanRange);
+            addRow(this, constraints, "facilityEditor.scenarioOddsModifier", spnScenarioOddsModifier);
+            addRow(this, constraints, "facilityEditor.monthlySPModifier", spnMonthlySupportPoints);
+            addRow(this, constraints, "facilityEditor.revealTrack", chkRevealTrack);
+            addRow(this, constraints, "facilityEditor.preventAerospace", chkPreventAerospace);
+        }
+
+        void load(StratConFacilityProfile profile) {
+            otherEffects.clear();
+            chkHasProfile.setSelected(profile != null);
+            StratConFacilityProfile source = (profile == null) ? new StratConFacilityProfile() : profile;
+
+            txtDescription.setText(nullToEmpty(source.getDescription()));
+            txtLocalModifiers.setText(String.join("\n", source.getLocalModifierIds()));
+            txtSharedModifiers.setText(String.join("\n", source.getSharedModifierIds()));
+            spnScanRange.setValue(source.getScanRangeIncrease());
+            spnScenarioOddsModifier.setValue(source.getScenarioOddsModifier());
+            spnMonthlySupportPoints.setValue(source.getMonthlySupportPoints());
+            chkRevealTrack.setSelected(source.isRevealingTrack());
+            chkPreventAerospace.setSelected(source.isPreventingAerospace());
+
+            for (IStratConFacilityEffect effect : source.getEffects()) {
+                if (!isEditedHere(effect)) {
+                    otherEffects.add(effect);
+                }
+            }
+        }
+
+        StratConFacilityProfile toProfile() {
+            if (!chkHasProfile.isSelected()) {
+                return null;
+            }
+
+            List<IStratConFacilityEffect> effects = new ArrayList<>();
+            List<String> localModifiers = parseLines(txtLocalModifiers.getText());
+            if (!localModifiers.isEmpty()) {
+                effects.add(new LocalModifiersEffect(localModifiers));
+            }
+            List<String> sharedModifiers = parseLines(txtSharedModifiers.getText());
+            if (!sharedModifiers.isEmpty()) {
+                effects.add(new SharedModifiersEffect(sharedModifiers));
+            }
+            int scanRange = (int) spnScanRange.getValue();
+            if (scanRange != 0) {
+                effects.add(new ScanRangeEffect(scanRange));
+            }
+            int scenarioOddsModifier = (int) spnScenarioOddsModifier.getValue();
+            if (scenarioOddsModifier != 0) {
+                effects.add(new ScenarioOddsEffect(scenarioOddsModifier));
+            }
+            int monthlySupportPoints = (int) spnMonthlySupportPoints.getValue();
+            if (monthlySupportPoints != 0) {
+                effects.add(new MonthlySupportPointsEffect(monthlySupportPoints));
+            }
+            if (chkRevealTrack.isSelected()) {
+                effects.add(new RevealTrackEffect());
+            }
+            if (chkPreventAerospace.isSelected()) {
+                effects.add(new PreventAerospaceEffect());
+            }
+            effects.addAll(otherEffects);
+
+            return new StratConFacilityProfile(emptyToNull(txtDescription.getText()), effects);
+        }
+
+        private static boolean isEditedHere(IStratConFacilityEffect effect) {
+            return (effect instanceof LocalModifiersEffect)
+                         || (effect instanceof SharedModifiersEffect)
+                         || (effect instanceof ScanRangeEffect)
+                         || (effect instanceof ScenarioOddsEffect)
+                         || (effect instanceof MonthlySupportPointsEffect)
+                         || (effect instanceof RevealTrackEffect)
+                         || (effect instanceof PreventAerospaceEffect);
+        }
     }
 }

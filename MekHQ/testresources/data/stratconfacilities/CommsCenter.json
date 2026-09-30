@@ -16,16 +16,29 @@
 # affiliated with Microsoft.
 
 {
-"owner": "Opposing",
-"displayableName": "Artillery Base",
-"facilityType": "ArtilleryBase",
-"userDescription": "Hostile artillery will participate in scenarios on this track and defend this facility.",
-"visible": false,
-"sharedModifiers": [
-"EnemyArty.json"
-],
-"localModifiers": [
-"EnemyArtyGarrison.json"
-],
-"capturedDefinition": "AlliedArtilleryBase.json"
+  "id": "CommsCenter",
+  "displayableName": "Comms Center",
+  "facilityType": "CommandCenter",
+  "alliedProfile": {
+    "description": "This facility will coordinate additional allied reinforcements to scenarios on this track.",
+    "effects": [
+      {
+        "effect": "sharedModifiers",
+        "modifiers": [
+          "AlliedReinforcements.json"
+        ]
+      }
+    ]
+  },
+  "hostileProfile": {
+    "description": "Coordinates additional hostile reinforcements for scenarios on this track.",
+    "effects": [
+      {
+        "effect": "sharedModifiers",
+        "modifiers": [
+          "EnemyReinforcements.json"
+        ]
+      }
+    ]
+  }
 }

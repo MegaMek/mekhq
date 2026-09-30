@@ -16,16 +16,27 @@
 # affiliated with Microsoft.
 
 {
-"owner": "Allied",
-"displayableName": "Mek Base",
-"facilityType": "MekBase",
-"userDescription": "Allied Meks will participate in scenarios on this track and defend this facility.",
-"visible": true,
-"sharedModifiers": [
-"AlliedMekReinforcements.json"
-],
-"localModifiers": [
-"AlliedMekGarrison.json"
-],
-"capturedDefinition": "HostileMekBase.json"
+  "id": "IndustrialFacility",
+  "displayableName": "Industrial Center",
+  "facilityType": "IndustrialFacility",
+  "alliedProfile": {
+    "description": "Provides 1 SP/month of allied logistical support.",
+    "effects": [
+      {
+        "effect": "monthlySupportPoints",
+        "value": 1
+      }
+    ]
+  },
+  "hostileProfile": {
+    "description": "Hostile forces on this track are larger and better equipped with factory-fresh units.",
+    "effects": [
+      {
+        "effect": "sharedModifiers",
+        "modifiers": [
+          "ArmednArmored.json"
+        ]
+      }
+    ]
+  }
 }

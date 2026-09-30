@@ -481,12 +481,31 @@ public class StratConTrackState {
      * @return Whether this track has a facility on it that reveals the track.
      */
     public boolean hasActiveTrackReveal() {
-        return getFacilities().values().stream().anyMatch(StratConFacility::getRevealTrack);
+        for (StratConFacility facility : getFacilities().values()) {
+            if (facility.isRevealingTrack()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Matches every facility loaded from a save written before 0.51.01 to its definition (see
+     * {@link StratConFacility#resolveLegacyData()}). Called once the campaign state has loaded.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void restoreFacilityDefinitions() {
+        for (StratConFacility facility : facilities.values()) {
+            facility.resolveLegacyData();
+        }
     }
 
     /**
      * Whether a facility on this track keeps air and space scenarios from being generated here, whichever side holds
-     * it (see {@link StratConFacility#preventAerospace()}).
+     * it (see {@link StratConFacility#isPreventingAerospace()}).
      *
      * @return {@code true} if no random air or space scenario may be generated on this track
      *
@@ -495,7 +514,7 @@ public class StratConTrackState {
      */
     public boolean isAerospacePrevented() {
         for (StratConFacility facility : getFacilities().values()) {
-            if (facility.preventAerospace()) {
+            if (facility.isPreventingAerospace()) {
                 return true;
             }
         }
@@ -506,7 +525,8 @@ public class StratConTrackState {
     /**
      * Determines how many hexes are added to the scan range of every force scouting this track.
      *
-     * <p>Each facility that increases scan range (see {@link StratConFacility#getIncreaseScanRange()}) adds one hex.
+     * <p>Each facility adds what its current owner's profile gives (see
+     * {@link StratConFacility#getScanRangeIncrease()}).
      * Each point of interest adds whatever its type's behavior decides (see
      * {@link IStratConPointOfInterestBehavior#getScanRangeIncrease}).</p>
      *
@@ -515,9 +535,7 @@ public class StratConTrackState {
     public int getScanRangeIncrease() {
         int scanRange = 0;
         for (StratConFacility facility : getFacilities().values()) {
-            if (facility.getIncreaseScanRange()) {
-                scanRange++;
-            }
+            scanRange += facility.getScanRangeIncrease();
         }
 
         for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {

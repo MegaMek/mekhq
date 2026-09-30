@@ -16,11 +16,29 @@
 # affiliated with Microsoft.
 
 {
-"owner": "Allied",
-"displayableName": "Orbital Defense",
-"facilityType": "OrbitalDefense",
-"userDescription": "Prevents hostile air units from operating on this track.",
-"visible": true,
-"capturedDefinition": "HostileOrbitalDefense.json",
-"preventAerospace": true
+  "id": "OrbitalDefense",
+  "displayableName": "Orbital Defense",
+  "facilityType": "OrbitalDefense",
+  "alliedProfile": {
+    "description": "Prevents hostile air units from operating on this track.",
+    "effects": [
+      {
+        "effect": "preventAerospace"
+      }
+    ]
+  },
+  "hostileProfile": {
+    "description": "Prevents allied aerospace unit operation on this track and supplies an additional hostile Mek to ground scenarios.",
+    "effects": [
+      {
+        "effect": "sharedModifiers",
+        "modifiers": [
+          "EnemyOfficerMek.json"
+        ]
+      },
+      {
+        "effect": "preventAerospace"
+      }
+    ]
+  }
 }

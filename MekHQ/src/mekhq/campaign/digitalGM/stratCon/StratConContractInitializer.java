@@ -756,7 +756,10 @@ public class StratConContractInitializer {
         }
 
         StratConFacility facility = StratConFacilityFactory.getRandomHostileFacility();
-        facility.setOwner(ForceAlignment.Opposing);
+        if (facility == null) {
+            return null;
+        }
+
         facility.setStrategicObjective(true);
         facility.setVisible(true);
         track.addFacility(coords, facility);
@@ -1963,10 +1966,13 @@ public class StratConContractInitializer {
             StratConFacility sf = owner == ForceAlignment.Allied ?
                                         StratConFacilityFactory.getRandomAlliedFacility() :
                                         StratConFacilityFactory.getRandomHostileFacility();
+            if (sf == null) {
+                break;
+            }
 
             sf.setOwner(owner);
             sf.setStrategicObjective(strategicObjective);
-            sf.getLocalModifiers().addAll(modifiers);
+            sf.addAdditionalLocalModifiers(modifiers);
 
             StratConCoords coords = getUnoccupiedCoords(trackState);
 

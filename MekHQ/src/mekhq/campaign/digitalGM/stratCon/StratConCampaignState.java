@@ -660,6 +660,7 @@ public class StratConCampaignState {
             for (StratConTrackState track : resultingCampaignState.getTracks()) {
                 track.restoreReturnDates();
                 track.restoreAssignedCoordForces();
+                track.restoreFacilityDefinitions();
             }
         }
 

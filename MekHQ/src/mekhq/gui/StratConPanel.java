@@ -86,6 +86,7 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.ImageType;
 import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityDefinition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
@@ -150,6 +151,7 @@ public class StratConPanel extends JPanel implements ActionListener {
     private static final String RIGHT_CLICK_COMMAND_REMOVE_FACILITY = "RemoveFacility";
     private static final String RIGHT_CLICK_COMMAND_CAPTURE_FACILITY = "CaptureFacility";
     private static final String RIGHT_CLICK_COMMAND_ADD_FACILITY = "AddFacility";
+    private static final String RIGHT_CLICK_PROPERTY_FACILITY_OWNER = "AddFacilityOwner";
     private static final String RIGHT_CLICK_COMMAND_REMOVE_SCENARIO = "RemoveScenario";
     private static final String RIGHT_CLICK_COMMAND_RESET_DEPLOYMENT = "ResetDeployment";
     private static final String RIGHT_CLICK_COMMAND_ADD_CITY = "AddCity";
@@ -708,11 +710,12 @@ public class StratConPanel extends JPanel implements ActionListener {
                 menuItemAddAlliedFacility.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.allied"));
                 menuItemAddFacility.add(menuItemAddAlliedFacility);
 
-                for (StratConFacility facility : StratConFacilityFactory.getAlliedFacilities()) {
+                for (StratConFacilityDefinition definition : StratConFacilityFactory.getDefinitionsFor(Allied)) {
                     JMenuItem facilityItem = new JMenuItem();
-                    facilityItem.setText(facility.getDisplayableName());
+                    facilityItem.setText(definition.getDisplayableName());
                     facilityItem.setActionCommand(RIGHT_CLICK_COMMAND_ADD_FACILITY);
-                    facilityItem.putClientProperty(RIGHT_CLICK_COMMAND_ADD_FACILITY, facility);
+                    facilityItem.putClientProperty(RIGHT_CLICK_COMMAND_ADD_FACILITY, definition);
+                    facilityItem.putClientProperty(RIGHT_CLICK_PROPERTY_FACILITY_OWNER, Allied);
                     facilityItem.addActionListener(this);
                     menuItemAddAlliedFacility.add(facilityItem);
                 }
@@ -721,11 +724,13 @@ public class StratConPanel extends JPanel implements ActionListener {
                 menuItemAddHostileFacility.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.hostile"));
                 menuItemAddFacility.add(menuItemAddHostileFacility);
 
-                for (StratConFacility facility : StratConFacilityFactory.getHostileFacilities()) {
+                for (StratConFacilityDefinition definition :
+                      StratConFacilityFactory.getDefinitionsFor(ForceAlignment.Opposing)) {
                     JMenuItem facilityItem = new JMenuItem();
-                    facilityItem.setText(facility.getDisplayableName());
+                    facilityItem.setText(definition.getDisplayableName());
                     facilityItem.setActionCommand(RIGHT_CLICK_COMMAND_ADD_FACILITY);
-                    facilityItem.putClientProperty(RIGHT_CLICK_COMMAND_ADD_FACILITY, facility);
+                    facilityItem.putClientProperty(RIGHT_CLICK_COMMAND_ADD_FACILITY, definition);
+                    facilityItem.putClientProperty(RIGHT_CLICK_PROPERTY_FACILITY_OWNER, ForceAlignment.Opposing);
                     facilityItem.addActionListener(this);
                     menuItemAddHostileFacility.add(facilityItem);
                 }
@@ -2341,9 +2346,11 @@ public class StratConPanel extends JPanel implements ActionListener {
                 break;
             case RIGHT_CLICK_COMMAND_ADD_FACILITY:
                 JMenuItem eventSource = (JMenuItem) evt.getSource();
-                StratConFacility facility = (StratConFacility) eventSource.getClientProperty(
-                      RIGHT_CLICK_COMMAND_ADD_FACILITY);
-                StratConFacility newFacility = facility.clone();
+                StratConFacilityDefinition facilityDefinition =
+                      (StratConFacilityDefinition) eventSource.getClientProperty(RIGHT_CLICK_COMMAND_ADD_FACILITY);
+                ForceAlignment owner = (ForceAlignment) eventSource.getClientProperty(
+                      RIGHT_CLICK_PROPERTY_FACILITY_OWNER);
+                StratConFacility newFacility = new StratConFacility(facilityDefinition, owner);
                 newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
                 currentTrack.addFacility(selectedCoords, newFacility);
                 recalculateRoads();

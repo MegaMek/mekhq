@@ -16,16 +16,31 @@
 # affiliated with Microsoft.
 
 {
-"owner": "Allied",
-"displayableName": "Early Warning Center",
-"facilityType": "EarlyWarningSystem",
-"userDescription": "Reduces reinforcement arrival times for allied and player forces.",
-"visible": true,
-"sharedModifiers": [
-"ReinforcementDelayReductionAllied.json"
-],
-"localModifiers": [
-"ReinforcementDelayReductionAllied.json"
-],
-"capturedDefinition": "HostileEarlyWarningSystem.json"
+  "id": "DataCenter",
+  "displayableName": "Data Center",
+  "facilityType": "DataCenter",
+  "alliedProfile": {
+    "description": "Increases the scan range of all friendly forces by 1.",
+    "effects": [
+      {
+        "effect": "scanRange",
+        "value": 1
+      }
+    ]
+  },
+  "hostileProfile": {
+    "description": "An additional hostile Mek patrol will sweep through scenarios on this track.",
+    "effects": [
+      {
+        "effect": "sharedModifiers",
+        "modifiers": [
+          "EnemyMekPatrol.json"
+        ]
+      },
+      {
+        "effect": "scenarioOdds",
+        "value": 5
+      }
+    ]
+  }
 }
