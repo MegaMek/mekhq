@@ -35,7 +35,6 @@ package mekhq.campaign.unit;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import mekhq.campaign.Campaign;
@@ -168,19 +167,18 @@ class MaintenanceCharacterizationTest {
     }
 
     @Test
-    void techWithoutEnoughTimeStillMakesTheCheckWithTheirOwnSkill() {
+    void techWithoutEnoughTimeLeavesTheUnitUnmaintained() {
         scenario.withAsTechs(FULL_ASTECH_TEAM);
         Person tech = assignTech(EXP_REGULAR);
         tech.setMinutesLeft(100);
 
         runOneMaintenanceCycle(6);
 
-        // Current behaviour, see REP-10: no time or AsTech time is spent, yet the check uses the tech's own skill
-        // (with the no-AsTech penalty) instead of the unmaintained target; changes when that is fixed
+        // REP-10: no time is spent, so the tech's skill is not used either; the check is the unmaintained one
         assertEquals(100, tech.getMinutesLeft());
         assertEquals(FULL_ASTECH_POOL_MINUTES, asTechPoolMinutes());
-        assertFalse(locust.getLastMaintenanceReport().contains("Nobody"));
-        assertEquals(PartQuality.QUALITY_E, locust.getQuality());
+        assertTrue(locust.getLastMaintenanceReport().contains("Nobody performing maintenance"));
+        assertTrue(locust.getLastMaintenanceReport().contains("Unmaintained"));
         assertEquals(0.0, locust.getDaysSinceMaintenance());
     }
 }

@@ -54,6 +54,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.options.OptionsConstants;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.AtmosphericTaint;
@@ -148,6 +149,12 @@ public class Maintenance {
                                         (asTechsUsed * minutesUsed);
                     campaign.getPlayerForce().getHumanResources().setAsTechPoolMinutes(minutes);
                 }
+                if (!maintained) {
+                    // A tech who could not do the work does not make the check: the unit is checked as unmaintained
+                    LOGGER.debug("[Maintenance] {}: {} could not maintain it today, checked as unmaintained",
+                          unit.getName(), tech.getFullName());
+                    tech = null;
+                }
             }
 
             // maybe use the money
@@ -186,7 +193,7 @@ public class Maintenance {
             for (Part part : unit.getParts()) {
                 try {
                     String partReport = doMaintenanceOnUnitPart(campaign,
-                          unit,
+                          tech,
                           part,
                           partsToDamage,
                           paidMaintenance,
@@ -290,7 +297,11 @@ public class Maintenance {
         return damageString;
     }
 
-    private static String doMaintenanceOnUnitPart(Campaign campaign, Unit unit, Part part,
+    /**
+     * @param maintenanceTech the tech who did the maintenance, or {@code null} when nobody could, in which case the
+     *                        part is checked as unmaintained
+     */
+    private static String doMaintenanceOnUnitPart(Campaign campaign, @Nullable Person maintenanceTech, Part part,
           Map<Part, Integer> partsToDamage,
           boolean paidMaintenance, int asTechsUsed) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
@@ -300,13 +311,12 @@ public class Maintenance {
             return null;
         }
         PartQuality oldQuality = part.getQuality();
-        TargetRoll target = getTargetForMaintenance(campaign, part, unit.getTech(), asTechsUsed);
+        TargetRoll target = getTargetForMaintenance(campaign, part, maintenanceTech, asTechsUsed);
         if (!paidMaintenance) {
             // TODO : Make campaign modifier user configurable
             target.addModifier(1, "did not pay for maintenance");
         }
 
-        Person maintenanceTech = unit.getTech();
         Skill maintenanceSkill = (maintenanceTech == null) ? null : maintenanceTech.getSkillForWorkingOn(part);
         int roll;
         if (maintenanceSkill == null) {
@@ -614,6 +624,10 @@ public class Maintenance {
      */
     public static void checkAndCorrectMaintenanceSchedule(Campaign campaign) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (!campaignOptions.get(CampaignOption.CHECK_MAINTENANCE)) {
+            LOGGER.debug("[Maintenance] schedule not checked: maintenance checks are off");
+            return;
+        }
         final int maintenanceCycleDuration = campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS);
         final boolean techsUseAdmin = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
 
@@ -870,6 +884,15 @@ public class Maintenance {
      * @since 0.50.10
      */
     public static void performImmediateMaintenance(Campaign campaign, Unit unit) {
+        // doMaintenance does nothing in either case, so the loop below would never end
+        if (!campaign.getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE)) {
+            LOGGER.debug("[Maintenance] {}: no immediate maintenance, maintenance checks are off", unit.getName());
+            return;
+        }
+        if (!unit.requiresMaintenance()) {
+            LOGGER.debug("[Maintenance] {}: no immediate maintenance, the unit does not need it", unit.getName());
+            return;
+        }
         Person tech = unit.getTech(); // This gets the engineer, instead, if appropriate
         if (tech == null) {
             return;
