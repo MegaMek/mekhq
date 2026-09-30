@@ -135,6 +135,9 @@ class ContractMarketPage {
 
     private JPanel pnlContractPay;
     private JCheckBox chkUseChaosSupportPointConversion;
+    private JCheckBox chkBasePayOnlyConsidersScale;
+    private JCheckBox chkCapContractScaleByHiringHall;
+    private JCheckBox chkTaperCombatPayAndSalvageByScale;
     private JCheckBox chkUseLegacyOptions;
     private JPanel pnlLegacyContractPayOptions;
     private JRadioButton btnContractEquipment;
@@ -439,6 +442,15 @@ class ContractMarketPage {
         chkUseChaosSupportPointConversion = new CampaignOptionsCheckBox("UseChaosSupportPointConversion",
               getMetadata(new Version(0, 51, 1)));
         chkUseChaosSupportPointConversion.addMouseListener(createTipPanelUpdater("UseChaosSupportPointConversion"));
+        chkBasePayOnlyConsidersScale = new CampaignOptionsCheckBox("BasePayOnlyConsidersScale",
+              getMetadata(new Version(0, 51, 1)));
+        chkBasePayOnlyConsidersScale.addMouseListener(createTipPanelUpdater("BasePayOnlyConsidersScale"));
+        chkCapContractScaleByHiringHall = new CampaignOptionsCheckBox("CapContractScaleByHiringHall",
+              getMetadata(new Version(0, 51, 1)));
+        chkCapContractScaleByHiringHall.addMouseListener(createTipPanelUpdater("CapContractScaleByHiringHall"));
+        chkTaperCombatPayAndSalvageByScale = new CampaignOptionsCheckBox("TaperCombatPayAndSalvageByScale",
+              getMetadata(new Version(0, 51, 1)));
+        chkTaperCombatPayAndSalvageByScale.addMouseListener(createTipPanelUpdater("TaperCombatPayAndSalvageByScale"));
 
         // Top-level pay scheme: the default Chaos Campaign scheme, or the legacy force-value / payroll schemes whose
         // basis and options are configured in the nested card below. Leaving the box unticked keeps Chaos pay.
@@ -570,6 +582,15 @@ class ContractMarketPage {
         layout.gridx = 0;
         layout.gridy = 0;
         panel.add(chkUseChaosSupportPointConversion, layout);
+
+        layout.gridy++;
+        panel.add(chkBasePayOnlyConsidersScale, layout);
+
+        layout.gridy++;
+        panel.add(chkCapContractScaleByHiringHall, layout);
+
+        layout.gridy++;
+        panel.add(chkTaperCombatPayAndSalvageByScale, layout);
 
         layout.gridy++;
         panel.add(chkUseLegacyOptions, layout);
@@ -709,6 +730,9 @@ class ContractMarketPage {
         spnContractSalvageMultiplier.setValue(model.contractSalvageMultiplier);
         spnScenarioTempoMultiplier.setValue(model.scenarioTempoMultiplier);
         chkUseChaosSupportPointConversion.setSelected(model.useChaosSupportPointConversion);
+        chkBasePayOnlyConsidersScale.setSelected(model.basePayOnlyConsidersScale);
+        chkCapContractScaleByHiringHall.setSelected(model.capContractScaleByHiringHall);
+        chkTaperCombatPayAndSalvageByScale.setSelected(model.taperCombatPayAndSalvageByScale);
         chkUseLegacyOptions.setSelected(model.useLegacyContractPay);
         if (model.equipmentContractBase) {
             btnContractEquipment.setSelected(true);
@@ -768,6 +792,9 @@ class ContractMarketPage {
         model.contractSalvageMultiplier = (double) spnContractSalvageMultiplier.getValue();
         model.scenarioTempoMultiplier = (double) spnScenarioTempoMultiplier.getValue();
         model.useChaosSupportPointConversion = chkUseChaosSupportPointConversion.isSelected();
+        model.basePayOnlyConsidersScale = chkBasePayOnlyConsidersScale.isSelected();
+        model.capContractScaleByHiringHall = chkCapContractScaleByHiringHall.isSelected();
+        model.taperCombatPayAndSalvageByScale = chkTaperCombatPayAndSalvageByScale.isSelected();
         model.useLegacyContractPay = chkUseLegacyOptions.isSelected();
         model.equipmentContractBase = btnContractEquipment.isSelected();
         model.equipmentContractPercent = (double) spnEquipPercent.getValue();

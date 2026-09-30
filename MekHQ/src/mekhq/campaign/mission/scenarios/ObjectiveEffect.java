@@ -76,7 +76,7 @@ public class ObjectiveEffect {
         /* changes the number of support points (not implemented yet)
          *
          */
-        SupportPointUpdate("%d Support Points", true),
+        SupportPointUpdate("%d Employer Support", true),
         /* changes the size of supply cache
          *
          */

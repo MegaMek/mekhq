@@ -35,16 +35,7 @@ package mekhq.gui.view;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveBioweapons;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
 
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
 import java.time.LocalDate;
@@ -53,17 +44,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.StringJoiner;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JEditorPane;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextPane;
-import javax.swing.JToolTip;
-import javax.swing.JViewport;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
+import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
@@ -85,7 +66,6 @@ import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.SourceableValueLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.MHQInternationalization;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * A custom panel that gets filled in with goodies from a Planet record
@@ -559,7 +539,7 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     private String getHiringHallText(Planet planet) {
-        return StringUtils.capitalize(planet.getHiringHallLevel(campaign.getLocalDate()).name().toLowerCase());
+        return planet.getHiringHallLevel(campaign.getLocalDate()).getLabel();
     }
 
     private static String getDiseaseText(Set<InjuryType> activeDiseases) {

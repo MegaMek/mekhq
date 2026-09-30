@@ -70,6 +70,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.finances.RepairCosts;
 import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
@@ -1371,7 +1372,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             details.add(hits + (hits == 1 ? " hit" : " hits"));
             if (campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS)) {
                 details.add(getFormattedTextAt(RESOURCE_BUNDLE, "Part.repairCost.details",
-                      getRepairCost().toAmountAndSymbolString()));
+                      getRepairCost()
+                                  .multipliedBy(RepairCosts.getRepairCostMultiplier(campaign, unit))
+                                  .toAmountAndSymbolString()));
             }
         }
         return details.toString();
