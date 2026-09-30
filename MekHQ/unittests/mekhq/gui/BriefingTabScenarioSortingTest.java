@@ -33,22 +33,52 @@
 package mekhq.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.TableRowSorter;
 
+import mekhq.MHQOptions;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.gui.model.ScenarioTableModel;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 class BriefingTabScenarioSortingTest {
+    private MockedStatic<MekHQ> mekHQ;
+
+    /**
+     * Supplies the locale and display date text, which would otherwise need the application's user preferences.
+     */
+    @BeforeEach
+    void setUp() {
+        MHQOptions mhqOptions = mock(MHQOptions.class);
+        when(mhqOptions.getLocale()).thenReturn(Locale.ENGLISH);
+        when(mhqOptions.getDisplayFormattedDate(any())).thenAnswer(invocation -> {
+            LocalDate date = invocation.getArgument(0);
+            return (date == null) ? "" : date.toString();
+        });
+        mekHQ = mockStatic(MekHQ.class);
+        mekHQ.when(MekHQ::getMHQOptions).thenReturn(mhqOptions);
+    }
+
+    @AfterEach
+    void tearDown() {
+        mekHQ.close();
+    }
+
     @Test
     void scenariosDefaultToNewestFirst() {
         Scenario past = scenario("Past", LocalDate.of(3078, 12, 31));

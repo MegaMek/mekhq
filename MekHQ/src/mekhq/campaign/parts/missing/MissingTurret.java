@@ -46,6 +46,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.TankLocation;
 import mekhq.campaign.parts.Turret;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.unit.VehicleLocations;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -56,17 +57,47 @@ import org.w3c.dom.NodeList;
 public class MissingTurret extends MissingPart {
     private static final MMLogger LOGGER = MMLogger.create(MissingTurret.class);
 
+    /** Stands for "not recorded": saves made before the turret's location was recorded. */
+    private static final int UNKNOWN_LOCATION = -1;
+
     double weight;
+    /** The location of the turret this part stands for. */
+    private int turretLocation = UNKNOWN_LOCATION;
 
     @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingTurret() {
-        this(0, 0, null);
+        this(0, UNKNOWN_LOCATION, 0, null);
     }
 
-    public MissingTurret(int tonnage, double weight, Campaign c) {
-        super(tonnage, c);
+    /**
+     * @param tonnage        the vehicle's tonnage
+     * @param turretLocation the location of the destroyed turret, which differs between tanks, superheavy tanks,
+     *                       large support tanks and VTOLs, and between a dual-turret tank's two turrets
+     * @param weight         the turret's weight
+     * @param campaign       the campaign, or {@code null} while the part is being loaded from a save
+     */
+    public MissingTurret(int tonnage, int turretLocation, double weight, @Nullable Campaign campaign) {
+        super(tonnage, campaign);
+        this.turretLocation = turretLocation;
         this.weight = weight;
         this.name = "Turret";
+    }
+
+    /**
+     * @return the location of the turret this part stands for. Saves made before the location was recorded fall back
+     *       to the vehicle's destroyed turret, or to the standard turret location when the part is on no vehicle.
+     */
+    public int getTurretLocation() {
+        if (turretLocation != UNKNOWN_LOCATION) {
+            return turretLocation;
+        }
+        if ((unit != null) && (unit.getEntity() instanceof Tank tank)) {
+            int destroyedTurret = VehicleLocations.destroyedTurretLocation(tank);
+            LOGGER.debug("{}: destroyed turret saved without its location, taken as location {}", unit.getName(),
+                  destroyedTurret);
+            return destroyedTurret;
+        }
+        return Tank.LOC_TURRET;
     }
 
     @Override
@@ -80,34 +111,44 @@ public class MissingTurret extends MissingPart {
     }
 
     @Override
-    public void writeToXML(final PrintWriter pw, int indent) {
-        indent = writeToXMLBegin(pw, indent);
-        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "weight", weight);
-        writeToXMLEnd(pw, indent);
+    public void writeToXML(final PrintWriter printWriter, int indent) {
+        indent = writeToXMLBegin(printWriter, indent);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "weight", weight);
+        MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "turretLocation", getTurretLocation());
+        writeToXMLEnd(printWriter, indent);
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) {
-        NodeList nl = wn.getChildNodes();
+    protected void loadFieldsFromXmlNode(Node node) {
+        NodeList childNodes = node.getChildNodes();
 
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
+        for (int index = 0; index < childNodes.getLength(); index++) {
+            Node childNode = childNodes.item(index);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("weight")) {
-                    weight = Double.parseDouble(wn2.getTextContent());
+                if (childNode.getNodeName().equalsIgnoreCase("weight")) {
+                    weight = Double.parseDouble(childNode.getTextContent());
+                } else if (childNode.getNodeName().equalsIgnoreCase("turretLocation")) {
+                    turretLocation = Integer.parseInt(childNode.getTextContent().trim());
                 }
-            } catch (Exception e) {
-                LOGGER.error("", e);
+            } catch (Exception exception) {
+                LOGGER.error("", exception);
             }
         }
     }
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
-        return part instanceof Turret
-                     && (((TankLocation) part).getLoc() == Tank.LOC_TURRET
-                               || ((TankLocation) part).getLoc() == Tank.LOC_TURRET_2);
+        // Any spare turret of the same weight fits; it is moved to this turret's location when fitted
+        return (part instanceof Turret) && (part.getTonnage() == weight);
+    }
+
+    @Override
+    protected Part prepareReplacement(Part replacement) {
+        if (replacement instanceof Turret turret) {
+            turret.setTurretLocation(getTurretLocation());
+        }
+        return replacement;
     }
 
     @Override
@@ -117,8 +158,7 @@ public class MissingTurret extends MissingPart {
 
     @Override
     public Part getNewPart() {
-        // TODO: how to get second turret location?
-        return new Turret(Tank.LOC_TURRET, getUnitTonnage(), weight, campaign);
+        return new Turret(getTurretLocation(), getUnitTonnage(), weight, campaign);
     }
 
     @Override
@@ -130,7 +170,7 @@ public class MissingTurret extends MissingPart {
     @Override
     public void updateConditionFromPart() {
         if (null != unit) {
-            unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, Tank.LOC_TURRET);
+            unit.getEntity().setInternal(IArmorState.ARMOR_DESTROYED, getTurretLocation());
         }
     }
 
