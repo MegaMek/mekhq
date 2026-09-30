@@ -71,6 +71,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.RepairLocationCheck;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.service.mrms.MRMSService.MRMSUnitAction.STATUS;
@@ -1347,10 +1348,17 @@ public class MRMSService {
             return validTechs;
         }
 
+        int techsElsewhere = 0;
         for (int i = techs.size() - 1; i >= 0; i--) {
             Person tech = techs.get(i);
 
             if (tech.getMinutesLeft() <= 0) {
+                continue;
+            }
+
+            // The repair refuses a tech who is not where the task is; picking one anyway would repeat forever
+            if (!RepairLocationCheck.isTechAtTask(tech, partWork)) {
+                techsElsewhere++;
                 continue;
             }
 
@@ -1391,6 +1399,10 @@ public class MRMSService {
             validTechs.add(tech);
         }
 
+        if (techsElsewhere > 0) {
+            LOGGER.debug("[MRMS] {}: {} techs skipped because they are at a different location", partWork.getPartName(),
+                  techsElsewhere);
+        }
         return validTechs;
     }
 
