@@ -190,7 +190,7 @@ class RankPage {
      * @param rankSystem the rank system to select
      */
     void setSelectedRankSystem(RankSystem rankSystem) {
-        rankSystemsPane.getComboRankSystems().setSelectedItem(rankSystem);
+        rankSystemsPane.selectRankSystem(rankSystem);
     }
 
     /**

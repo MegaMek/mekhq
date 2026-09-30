@@ -475,12 +475,6 @@ final class CampaignOptionCodecs {
     }
 
     private static void registerSpecials() {
-        // Strategic view theme is derived through the client preferences on both read and write.
-        register(CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME, CampaignOptionCodec.of(
-              (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),
-                    options.getStrategicViewTheme().getName()),
-              (node, text, version, option, options) -> options.setStrategicViewTheme(text)));
-
         // Personnel market name has a pre-CamOps backward-compatibility rename.
         register(CampaignOption.PERSONNEL_MARKET_NAME, CampaignOptionCodec.of(
               (pw, indent, option, options) -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, option.xmlTag(),

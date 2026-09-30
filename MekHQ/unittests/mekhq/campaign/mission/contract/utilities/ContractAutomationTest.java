@@ -33,6 +33,7 @@
 package mekhq.campaign.mission.contract.utilities;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,6 +53,7 @@ import java.util.UUID;
 import java.util.Vector;
 
 import megamek.common.units.Entity;
+import mekhq.MHQOptions;
 import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
@@ -163,6 +165,190 @@ class ContractAutomationTest {
                 assertTrue(detachment.getAutomatedMothballUnits().isEmpty());
                 verify(dropShip, never()).startMothballing(null, true);
             }
+        }
+    }
+
+    /**
+     * Tests the "Don't Mothball Units in Bays When Travelling" and "Don't Mothball Salvage When Travelling" client
+     * options.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nested
+    class TravelMothballOptions {
+        /** Wires a single-unit detachment and returns it; the unit sits in the only formation. */
+        private static Detachment detachmentFor(Campaign campaign, UUID unitId, Unit unit) {
+            PlayerForce force = mock(PlayerForce.class);
+            Formation formation = mock(Formation.class);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(unitId)));
+            when(force.getAllFormations()).thenReturn(List.of(formation));
+            when(campaign.getPlayerForce()).thenReturn(force);
+            when(campaign.getUnit(unitId)).thenReturn(unit);
+
+            Detachment detachment = spy(new Detachment());
+            LocalHangar hangar = mock(LocalHangar.class);
+            doReturn(hangar).when(detachment).getHangar();
+            when(hangar.getUnits()).thenReturn(List.of(unit));
+            return detachment;
+        }
+
+        private static MHQOptions options(boolean doNotMothballUnitsInBays, boolean doNotMothballSalvage) {
+            MHQOptions mhqOptions = mock(MHQOptions.class);
+            when(mhqOptions.getDoNotMothballUnitsInBays()).thenReturn(doNotMothballUnitsInBays);
+            when(mhqOptions.getDoNotMothballSalvage()).thenReturn(doNotMothballSalvage);
+            return mhqOptions;
+        }
+
+        /** Runs automated mothballing on a single unit and reports whether that unit was mothballed. */
+        private static boolean runAndCheckMothballed(Unit unit, MHQOptions mhqOptions) {
+            UUID unitId = UUID.randomUUID();
+            when(unit.getId()).thenReturn(unitId);
+            Campaign campaign = mock(Campaign.class);
+            Detachment detachment = detachmentFor(campaign, unitId, unit);
+
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class)) {
+                mekHQ.when(MekHQ::getMHQOptions).thenReturn(mhqOptions);
+                ContractAutomation.performAutomatedMothballing(campaign, detachment);
+            }
+
+            boolean recorded = detachment.getAutomatedMothballUnits().contains(unitId);
+            if (recorded) {
+                verify(unit).startMothballing(null, true);
+            } else {
+                verify(unit, never()).startMothballing(null, true);
+            }
+            return recorded;
+        }
+
+        @Test
+        void unitInBayIsSkippedWhenOptionEnabled() {
+            Unit unit = mothballableUnit();
+            when(unit.hasTransportShipAssignment()).thenReturn(true);
+
+            assertFalse(runAndCheckMothballed(unit, options(true, false)));
+        }
+
+        @Test
+        void unitInBayIsMothballedWhenOptionDisabled() {
+            Unit unit = mothballableUnit();
+            when(unit.hasTransportShipAssignment()).thenReturn(true);
+
+            assertTrue(runAndCheckMothballed(unit, options(false, false)));
+        }
+
+        @Test
+        void tacticallyTransportedUnitIsMothballedEvenWhenBayOptionEnabled() {
+            // Infantry in an APC is a tactical transport assignment, not a transport bay, so the option ignores it.
+            Unit unit = mothballableUnit();
+            when(unit.hasTransportShipAssignment()).thenReturn(false);
+            when(unit.hasTacticalTransportAssignment()).thenReturn(true);
+
+            assertTrue(runAndCheckMothballed(unit, options(true, false)));
+        }
+
+        @Test
+        void unitNotInBayIsMothballedWhenBayOptionEnabled() {
+            Unit unit = mothballableUnit();
+
+            assertTrue(runAndCheckMothballed(unit, options(true, false)));
+        }
+
+        @Test
+        void salvageIsSkippedWhenOptionEnabled() {
+            Unit unit = mothballableUnit();
+            when(unit.isSalvage()).thenReturn(true);
+
+            assertFalse(runAndCheckMothballed(unit, options(false, true)));
+        }
+
+        @Test
+        void salvageIsMothballedWhenOptionDisabled() {
+            Unit unit = mothballableUnit();
+            when(unit.isSalvage()).thenReturn(true);
+
+            assertTrue(runAndCheckMothballed(unit, options(false, false)));
+        }
+
+        @Test
+        void nonSalvageIsMothballedWhenSalvageOptionEnabled() {
+            Unit unit = mothballableUnit();
+
+            assertTrue(runAndCheckMothballed(unit, options(false, true)));
+        }
+
+        @Test
+        void bothOptionsSkipTheirOwnUnitsOnly() {
+            Unit unitInBay = mothballableUnit();
+            when(unitInBay.hasTransportShipAssignment()).thenReturn(true);
+            Unit salvage = mothballableUnit();
+            when(salvage.isSalvage()).thenReturn(true);
+            Unit ordinary = mothballableUnit();
+
+            MHQOptions mhqOptions = options(true, true);
+            assertFalse(runAndCheckMothballed(unitInBay, mhqOptions));
+            assertFalse(runAndCheckMothballed(salvage, mhqOptions));
+            assertTrue(runAndCheckMothballed(ordinary, mhqOptions));
+        }
+
+        @Test
+        void contractStartRespectsOptions() {
+            // Contract-market travel goes through performContractStart, which must honour the same options.
+            LocalDate today = LocalDate.of(3025, 1, 1);
+            UUID bayId = UUID.randomUUID();
+            UUID salvageId = UUID.randomUUID();
+            UUID ordinaryId = UUID.randomUUID();
+
+            Unit unitInBay = mothballableUnit();
+            when(unitInBay.getId()).thenReturn(bayId);
+            when(unitInBay.hasTransportShipAssignment()).thenReturn(true);
+            Unit salvage = mothballableUnit();
+            when(salvage.getId()).thenReturn(salvageId);
+            when(salvage.isSalvage()).thenReturn(true);
+            Unit ordinary = mothballableUnit();
+            when(ordinary.getId()).thenReturn(ordinaryId);
+
+            AbstractLocation currentLocation = mock(AbstractLocation.class);
+            when(currentLocation.getCurrentPlanetDirect()).thenReturn(mock(Planet.class));
+            when(currentLocation.isOnPlanet()).thenReturn(true);
+
+            LocalHangar hangar = mock(LocalHangar.class);
+            when(hangar.getUnits()).thenReturn(List.of(unitInBay, salvage, ordinary));
+
+            Detachment detachment = spy(new Detachment());
+            doReturn(hangar).when(detachment).getHangar();
+            doReturn(currentLocation).when(detachment).getCurrentLocation();
+
+            PlayerForce force = mock(PlayerForce.class);
+            when(force.getForceDetachment()).thenReturn(detachment);
+            Formation formation = mock(Formation.class);
+            when(formation.getUnits()).thenReturn(new Vector<>(List.of(bayId, salvageId, ordinaryId)));
+            when(force.getAllFormations()).thenReturn(List.of(formation));
+
+            Campaign campaign = mock(Campaign.class);
+            when(campaign.getPlayerForce()).thenReturn(force);
+            when(campaign.getUnit(bayId)).thenReturn(unitInBay);
+            when(campaign.getUnit(salvageId)).thenReturn(salvage);
+            when(campaign.getUnit(ordinaryId)).thenReturn(ordinary);
+            when(campaign.getLocalDate()).thenReturn(today);
+
+            AbstractContract contract = mock(AbstractContract.class);
+            when(contract.getTargetPlanet()).thenReturn(mock(Planet.class));
+
+            MHQOptions mhqOptions = options(true, true);
+            try (MockedStatic<MekHQ> mekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractUtilities> utilities = mockStatic(ContractUtilities.class)) {
+                mekHQ.when(MekHQ::getMHQOptions).thenReturn(mhqOptions);
+                utilities.when(() -> ContractUtilities.hasArrivedAtContractLocation(any(), any())).thenReturn(false);
+                utilities.when(() -> ContractUtilities.getJumpPath(any(), any(), any())).thenReturn(null);
+
+                ContractAutomation.performContractStart(campaign, contract, true, false);
+            }
+
+            verify(unitInBay, never()).startMothballing(null, true);
+            verify(salvage, never()).startMothballing(null, true);
+            verify(ordinary).startMothballing(null, true);
+            assertIterableEquals(List.of(ordinaryId), detachment.getAutomatedMothballUnits());
         }
     }
 

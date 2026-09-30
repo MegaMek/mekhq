@@ -33,6 +33,7 @@
 package mekhq.campaign.io;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -40,6 +41,8 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 
 import megamek.Version;
+import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.RandomNameGenerator;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsUnmarshaller;
@@ -95,5 +98,55 @@ class CampaignXmlParserTest {
         CampaignXmlParser.preserveLegacyReputationForExistingCampaigns(node, options);
 
         assertFalse(options.get(CampaignOption.USE_CHAOS_REPUTATION), "an explicit tag value must be honored");
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void legacySaveWithoutNameGenerationTags_takesTheValuesTheNameGenBlockSet() {
+        final int originalPercentFemale = RandomGenderGenerator.getPercentFemale();
+        final String originalChosenFaction = RandomNameGenerator.getInstance().getChosenFaction();
+        try {
+            // The <nameGen> block, parsed earlier in <info>, has already written these into the generators
+            RandomGenderGenerator.setPercentFemale(37);
+            RandomNameGenerator.getInstance().setChosenFaction("FS");
+            Node node = campaignOptionsNode("<manualUnitRatingModifier>0</manualUnitRatingModifier>");
+            CampaignOptions options = CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(node, VERSION);
+
+            CampaignXmlParser.preserveLegacyNameGenerationSettings(node, options);
+
+            assertEquals(37, options.get(CampaignOption.PERCENT_FEMALE));
+            assertEquals("FS", options.get(CampaignOption.NAME_GENERATOR_FACTION));
+        } finally {
+            RandomGenderGenerator.setPercentFemale(originalPercentFemale);
+            RandomNameGenerator.getInstance().setChosenFaction(originalChosenFaction);
+        }
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void newFormatSaveWithNameGenerationTags_keepsItsOwnValues() {
+        final int originalPercentFemale = RandomGenderGenerator.getPercentFemale();
+        final String originalChosenFaction = RandomNameGenerator.getInstance().getChosenFaction();
+        try {
+            RandomGenderGenerator.setPercentFemale(37);
+            RandomNameGenerator.getInstance().setChosenFaction("FS");
+            Node node = campaignOptionsNode("<percentFemale>64</percentFemale>"
+                                                  + "<nameGeneratorFaction>CC</nameGeneratorFaction>");
+            CampaignOptions options = CampaignOptionsUnmarshaller.generateCampaignOptionsFromXml(node, VERSION);
+
+            CampaignXmlParser.preserveLegacyNameGenerationSettings(node, options);
+
+            assertEquals(64, options.get(CampaignOption.PERCENT_FEMALE));
+            assertEquals("CC", options.get(CampaignOption.NAME_GENERATOR_FACTION));
+        } finally {
+            RandomGenderGenerator.setPercentFemale(originalPercentFemale);
+            RandomNameGenerator.getInstance().setChosenFaction(originalChosenFaction);
+        }
     }
 }
