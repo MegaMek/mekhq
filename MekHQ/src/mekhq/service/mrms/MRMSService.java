@@ -48,9 +48,12 @@ import java.util.ResourceBundle;
 
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.HandheldWeapon;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Aero;
+import megamek.common.units.Entity;
 import megamek.common.units.Mek;
+import megamek.common.units.ProtoMek;
 import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -90,16 +93,34 @@ public class MRMSService {
     }
 
     public static boolean isValidMRMSUnit(Unit unit, MRMSConfiguredOptions configuredOptions) {
-        if (unit.isSelfCrewed() ||
-                  (!unit.isSalvage() && !configuredOptions.useRepair()) ||
-                  (unit.isSalvage() && !configuredOptions.useSalvage())) {
+        boolean isRepairOff = !unit.isSalvage() && !configuredOptions.useRepair();
+        boolean isSalvageOff = unit.isSalvage() && !configuredOptions.useSalvage();
+        if (isRepairOff || isSalvageOff) {
             return false;
         }
+        return isMassRepairableUnit(unit);
+    }
 
-        return (unit.getEntity() instanceof Tank) ||
-                     (unit.getEntity() instanceof Aero) ||
-                     (unit.getEntity() instanceof Mek) ||
-                     (unit.getEntity() instanceof BattleArmor);
+    /**
+     * Whether Mass Repair can work on a unit at all. The Mass Repair dialog, Instant and New Day Mass Repair and the
+     * right-click menu all ask this, so they offer the same units. A self-crewed unit looks after itself; any other
+     * unit qualifies when it is a type a tech can be assigned to, the same types {@link Person#canTech} accepts.
+     *
+     * @param unit the unit
+     *
+     * @return {@code true} if Mass Repair can work on the unit
+     */
+    public static boolean isMassRepairableUnit(Unit unit) {
+        if (unit.isSelfCrewed()) {
+            return false;
+        }
+        Entity entity = unit.getEntity();
+        boolean isMekTechWork = (entity instanceof Mek) || (entity instanceof ProtoMek)
+                                      || (entity instanceof HandheldWeapon);
+        boolean isOtherTechWork = (entity instanceof Aero) || (entity instanceof BattleArmor)
+                                        || (entity instanceof Tank);
+        boolean isTechMaintainedInfantry = (entity != null) && entity.isConventionalInfantry();
+        return isMekTechWork || isOtherTechWork || isTechMaintainedInfantry;
     }
 
     public static MRMSPartSet performWarehouseMRMS(List<IPartWork> selectedParts,
