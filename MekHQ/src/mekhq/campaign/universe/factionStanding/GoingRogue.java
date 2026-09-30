@@ -180,11 +180,37 @@ public class GoingRogue {
      */
     public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
           @Nullable Person second, boolean isDefection, boolean isUltimatum, boolean isUsingFactionStandings) {
+        processGoingRogue(campaign, chosenFaction, commander, second, isDefection, isUltimatum,
+              isUsingFactionStandings, 0);
+    }
+
+    /**
+     * Carries out the narrative and data changes when the force goes rogue, with a modifier to how many personnel
+     * refuse to follow.
+     *
+     * <p>Changes personnel statuses, mass-loyalty, and adjusts faction standings.</p>
+     *
+     * @param campaign                the current campaign context
+     * @param chosenFaction           the new faction may be the same or a new one
+     * @param commander               the force commander
+     * @param second                  secondary command personnel
+     * @param isDefection             whether the 'going rogue' action counts as defection
+     * @param isUltimatum             whether the 'going rogue' action was the result of an ultimatum
+     * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
+     * @param divisiveness            added to the loyalty check's target number; positive values make more personnel
+     *                                refuse to follow, negative values fewer
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
+          @Nullable Person second, boolean isDefection, boolean isUltimatum, boolean isUsingFactionStandings,
+          int divisiveness) {
         Faction currentFaction = campaign.getPlayerForce().getFaction();
         String chosenFactionCode = chosenFaction.getShortName();
 
         if (isUsingFactionStandings) {
-            processPersonnel(campaign, isDefection, commander, second);
+            processPersonnel(campaign, isDefection, commander, second, divisiveness);
 
             if (currentFaction.equals(chosenFaction)) {
                 processRegardBump(campaign);
@@ -231,13 +257,14 @@ public class GoingRogue {
      * @param campaign    the current campaign context
      * @param isDefection whether this event counts as a defection to a new faction
      * @param commander   the commanding officer
-     * @param second      the second-in-command
+     * @param second       the second-in-command
+     * @param divisiveness added to the loyalty check's target number
      *
      * @author Illiani
      * @since 0.50.07
      */
     private static void processPersonnel(Campaign campaign, boolean isDefection, Person commander,
-          @Nullable Person second) {
+          @Nullable Person second, int divisiveness) {
         final LocalDate today = campaign.getLocalDate();
         Collection<Person> allPersonnel = campaign.getPlayerForce().getHumanResources().getPersonnel();
         Set<Person> preProcessedPersonnel = new HashSet<>();
@@ -276,7 +303,7 @@ public class GoingRogue {
             int modifier = loyaltyEnabled ? person.getLoyaltyModifier(loyalty) : 0;
             int roll = Compute.d6(2);
 
-            if (roll < (LOYALTY_TARGET_NUMBER + modifier)) {
+            if (failsLoyaltyCheck(roll, modifier, divisiveness)) {
                 person.changeStatus(campaign, today, isDefection ? PersonnelStatus.HOMICIDE : PersonnelStatus.DESERTED);
             } else if (isDefection) {
                 // Small chance a person still gets murdered when defecting
@@ -288,6 +315,22 @@ public class GoingRogue {
 
             processGenealogicallyLinkedPersonnel(campaign, person, today, preProcessedPersonnel);
         }
+    }
+
+    /**
+     * Determines whether a person refuses to follow the campaign when it goes rogue.
+     *
+     * @param roll            the person's 2d6 roll
+     * @param loyaltyModifier the person's loyalty modifier; positive values make them more likely to leave
+     * @param divisiveness    how divisive the event is; positive values make everyone more likely to leave
+     *
+     * @return {@code true} if the person refuses to follow
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean failsLoyaltyCheck(int roll, int loyaltyModifier, int divisiveness) {
+        return roll < (LOYALTY_TARGET_NUMBER + loyaltyModifier + divisiveness);
     }
 
     /**

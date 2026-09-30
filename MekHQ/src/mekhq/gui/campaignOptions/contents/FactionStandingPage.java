@@ -44,9 +44,10 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -71,6 +72,7 @@ class FactionStandingPage {
     private CampaignOptionsHeaderPanel factionStandingHeader;
     private JCheckBox chkTrackFactionStanding;
     private JCheckBox chkTrackClimateRegardChanges;
+    private JCheckBox chkUseFactionStandingUltimatums;
     private JSpinner spnRegardMultiplier;
 
     private JCheckBox chkUseFactionStandingNegotiation;
@@ -134,6 +136,10 @@ class FactionStandingPage {
                 getMetadata(MILESTONE_BEFORE_METADATA));
         chkTrackClimateRegardChanges.addMouseListener(createTipPanelUpdater("TrackClimateRegardChanges"));
 
+        chkUseFactionStandingUltimatums = new CampaignOptionsCheckBox("UseFactionStandingUltimatums",
+                getMetadata(new Version(0, 51, 1)));
+        chkUseFactionStandingUltimatums.addMouseListener(createTipPanelUpdater("UseFactionStandingUltimatums"));
+
         JLabel lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier",
                 getMetadata(MILESTONE_BEFORE_METADATA));
         lblRegardMultiplier.addMouseListener(createTipPanelUpdater("RegardMultiplier"));
@@ -146,7 +152,8 @@ class FactionStandingPage {
                 FORM_CONTROL_COLUMN_WIDTH);
         panel.addCheckBoxGrid(CHECKBOX_GRID_COLUMNS,
                 chkTrackFactionStanding,
-                chkTrackClimateRegardChanges);
+                chkTrackClimateRegardChanges,
+                chkUseFactionStandingUltimatums);
         panel.addRow(lblRegardMultiplier, spnRegardMultiplier);
 
         return panel;
@@ -233,6 +240,7 @@ class FactionStandingPage {
 
         chkTrackFactionStanding.setSelected(model.trackFactionStanding);
         chkTrackClimateRegardChanges.setSelected(model.trackClimateRegardChanges);
+        chkUseFactionStandingUltimatums.setSelected(model.useFactionStandingUltimatums);
         spnRegardMultiplier.setValue(model.regardMultiplier);
         chkUseFactionStandingNegotiation.setSelected(model.useFactionStandingNegotiation);
         chkUseFactionStandingResupply.setSelected(model.useFactionStandingResupply);
@@ -259,6 +267,7 @@ class FactionStandingPage {
 
         model.trackFactionStanding = chkTrackFactionStanding.isSelected();
         model.trackClimateRegardChanges = chkTrackClimateRegardChanges.isSelected();
+        model.useFactionStandingUltimatums = chkUseFactionStandingUltimatums.isSelected();
         model.regardMultiplier = (double) spnRegardMultiplier.getValue();
         model.useFactionStandingNegotiation = chkUseFactionStandingNegotiation.isSelected();
         model.useFactionStandingResupply = chkUseFactionStandingResupply.isSelected();
