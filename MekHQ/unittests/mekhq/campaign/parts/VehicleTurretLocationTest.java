@@ -37,8 +37,11 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
+import megamek.Version;
 import megamek.common.equipment.IArmorState;
 import megamek.common.units.Entity;
 import megamek.common.units.Tank;
@@ -46,7 +49,9 @@ import megamek.common.units.VTOL;
 import mekhq.campaign.parts.missing.MissingTurret;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.VehicleLocations;
+import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
 import testUtilities.parts.PartsScenario;
 import testUtilities.parts.UnitFixture;
 
@@ -120,13 +125,10 @@ class VehicleTurretLocationTest {
     @Test
     void aReplacementTurretGoesWhereTheLostOneWas() {
         Unit zephyros = scenario.withUnit(UnitFixture.ZEPHYROS_DUAL_TURRET);
-        Turret frontTurret = null;
-        for (Turret turret : PartsScenario.unitParts(zephyros, Turret.class)) {
-            if (turret.getLoc() == Tank.LOC_TURRET) {
-                frontTurret = turret;
-            }
-        }
         destroyLocation(zephyros, Tank.LOC_TURRET_2);
+        // The only turret left on the tank is the one at the first turret location
+        Turret frontTurret = PartsScenario.unitParts(zephyros, Turret.class).getFirst();
+        assertEquals(Tank.LOC_TURRET, frontTurret.getLoc());
         MissingTurret missingTurret = theMissingTurret(zephyros);
         Turret spare = assertInstanceOf(Turret.class, frontTurret.clone());
         spare.setUnit(null);
@@ -153,10 +155,16 @@ class VehicleTurretLocationTest {
     }
 
     @Test
-    void aMissingTurretSavedWithoutItsLocationTakesTheDestroyedTurret() {
+    void aMissingTurretSavedWithoutItsLocationTakesTheDestroyedTurret() throws Exception {
         Unit zephyros = scenario.withUnit(UnitFixture.ZEPHYROS_DUAL_TURRET);
         destroyLocation(zephyros, Tank.LOC_TURRET_2);
-        MissingTurret savedWithoutLocation = new MissingTurret();
+        // A save written before the turret's location was recorded
+        String olderSave = "<part id=\"1\" type=\"mekhq.campaign.parts.missing.MissingTurret\"><weight>1.0</weight>"
+              + "</part>";
+        Document document = MHQXMLUtility.newSafeDocumentBuilder()
+                                  .parse(new ByteArrayInputStream(olderSave.getBytes(StandardCharsets.UTF_8)));
+        MissingTurret savedWithoutLocation = assertInstanceOf(MissingTurret.class,
+              Part.generateInstanceFromXML(document.getDocumentElement(), new Version()));
         savedWithoutLocation.setUnit(zephyros);
 
         assertEquals(Tank.LOC_TURRET_2, savedWithoutLocation.getTurretLocation());
