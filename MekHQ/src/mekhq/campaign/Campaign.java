@@ -255,6 +255,7 @@ import mekhq.campaign.utilities.LithiumFusionBatteries;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.RepairAsTechTime;
 import mekhq.campaign.work.RepairTaskHold;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -2953,6 +2954,8 @@ public class Campaign implements ITechManager {
             report += " on " + partWork.getUnit().getName();
         }
 
+        RepairAsTechTime asTechTime = new RepairAsTechTime(getPlayerForce().getHumanResources(), isOvertimeAllowed(),
+              getCampaignOptions());
         int minutes = partWork.getTimeLeft();
         int minutesUsed = minutes;
         boolean usedOvertime = false;
@@ -2982,15 +2985,10 @@ public class Campaign implements ITechManager {
                 partWork.addTimeSpent(minutesUsed);
                 tech.setMinutesLeft(0);
                 tech.setOvertimeLeft(tech.getOvertimeLeft() - overtimeUsed);
-                int helpMod = getShorthandedMod(getPlayerForce().getHumanResources().getAvailableAsTechs(minutesUsed,
-                      usedOvertime,
-                      isOvertimeAllowed(),
-                      getCampaignOptions()), false);
-                if ((null != partWork.getUnit()) &&
-                          ((partWork.getUnit().getEntity() instanceof Dropship) ||
-                                 (partWork.getUnit().getEntity() instanceof Jumpship))) {
-                    helpMod = 0;
-                }
+                int helpers = asTechTime.chargeForMinutesWorked(partWork, minutesUsed, usedOvertime);
+                boolean isSelfCrewed = (partWork.getUnit() != null) && partWork.getUnit().isSelfCrewed();
+                // A self-crewed unit's own crew helps instead of AsTechs; getTargetFor applies their modifier
+                int helpMod = isSelfCrewed ? 0 : getShorthandedMod(helpers, false);
 
                 if (partWork.getShorthandedMod() < helpMod) {
                     partWork.setShorthandedMod(helpMod);
@@ -3021,21 +3019,7 @@ public class Campaign implements ITechManager {
         } else {
             tech.setMinutesLeft(tech.getMinutesLeft() - minutes);
         }
-        int asTechMinutesUsed = minutesUsed * getPlayerForce().getHumanResources().getAvailableAsTechs(minutesUsed,
-              usedOvertime,
-              isOvertimeAllowed(),
-              getCampaignOptions());
-        if (getPlayerForce().getHumanResources().getAsTechPoolMinutes() < asTechMinutesUsed) {
-            asTechMinutesUsed -= getPlayerForce().getHumanResources().getAsTechPoolMinutes();
-            getPlayerForce().getHumanResources().setAsTechPoolMinutes(0);
-            getPlayerForce().getHumanResources()
-                  .setAsTechPoolOvertime(getPlayerForce().getHumanResources().getAsTechPoolOvertime() -
-                                               asTechMinutesUsed);
-        } else {
-            getPlayerForce().getHumanResources()
-                  .setAsTechPoolMinutes(getPlayerForce().getHumanResources().getAsTechPoolMinutes() -
-                                              asTechMinutesUsed);
-        }
+        asTechTime.chargeForMinutesWorked(partWork, minutesUsed, usedOvertime);
         // check for the type
         int roll;
         String wrongType = "";
