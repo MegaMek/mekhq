@@ -137,7 +137,7 @@ public class MarketsPages {
         }
 
         updateModelFromCreatedControls();
-        model.applyTo(campaign, options);
+        model.applyTo(presetCampaignOptions == null ? campaign : null, options);
     }
 
     private void updateCreatedControlsFromModel() {

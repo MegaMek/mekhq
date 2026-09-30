@@ -35,6 +35,7 @@ package mekhq.gui.campaignOptions.contents;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
 
 import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -265,7 +266,7 @@ class PersonnelOptionsModel {
         techsNeedToolKit = options.get(CampaignOption.TECHS_NEED_TOOL_KIT);
     }
 
-    void applyTo(@Nonnull Campaign campaign, @Nonnull CampaignOptions options) {
+    void applyTo(@Nullable Campaign campaign, @Nonnull CampaignOptions options) {
         options.set(CampaignOption.USE_TACTICS, useTactics);
         options.set(CampaignOption.USE_INITIATIVE_BONUS, useInitiativeBonus);
         options.set(CampaignOption.USE_SENSIBLE_TACTICS, useSensibleTactics);
@@ -351,7 +352,8 @@ class PersonnelOptionsModel {
         options.set(CampaignOption.MASH_THEATRE_CAPACITY, mashTheatreCapacity);
         options.set(CampaignOption.PRISONER_CAPTURE_STYLE, prisonerCaptureStyle);
         options.set(CampaignOption.USE_FUNCTIONAL_ESCAPE_ARTIST, useFunctionalEscapeArtist);
-        if (resetTemporaryPrisonerCapacity) {
+        // No campaign when saving a preset: the reset belongs to the running campaign, so it waits for Apply
+        if (resetTemporaryPrisonerCapacity && (campaign != null)) {
             campaign.getPlayerForce().setTemporaryPrisonerCapacity(DEFAULT_TEMPORARY_CAPACITY);
         }
         options.set(CampaignOption.USE_RANDOM_DEPENDENT_ADDITION, useRandomDependentAddition);

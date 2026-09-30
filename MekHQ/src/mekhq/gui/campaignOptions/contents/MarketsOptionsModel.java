@@ -161,10 +161,11 @@ class MarketsOptionsModel {
         overageRepaymentInFinalPayment = options.get(CampaignOption.OVERAGE_REPAYMENT_IN_FINAL_PAYMENT);
     }
 
-    void applyTo(@Nonnull Campaign campaign, @Nonnull CampaignOptions options) {
+    void applyTo(@Nullable Campaign campaign, @Nonnull CampaignOptions options) {
         if (personnelMarketStyle != null) {
             PersonnelMarketStyle originalPersonnelMarketStyle = options.get(CampaignOption.PERSONNEL_MARKET_STYLE);
-            if (personnelMarketStyle != originalPersonnelMarketStyle) {
+            // No campaign when saving a preset, whose options must not swap out the running campaign's market
+            if ((campaign != null) && (personnelMarketStyle != originalPersonnelMarketStyle)) {
                 NewPersonnelMarket replacementMarket = switch (personnelMarketStyle) {
                     case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
                     case MEKHQ -> new PersonnelMarketMekHQ();

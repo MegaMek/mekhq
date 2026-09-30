@@ -34,6 +34,8 @@ package mekhq;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
@@ -41,7 +43,13 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import megamek.common.options.GameOptions;
+import megamek.common.options.OptionsConstants;
 import megamek.common.preference.PreferenceManager;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.personnel.skills.RandomSkillPreferences;
+import mekhq.campaign.personnel.skills.SkillType;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -113,5 +121,69 @@ class CampaignPresetTest {
 
         assertTrue(new CampaignPreset().writeToFile(null, presetFile.toFile()));
         assertTrue(Files.isRegularFile(presetFile));
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void createDetachedCopy_keepsTheValues() {
+        final CampaignPreset source = createPopulatedPreset();
+
+        final CampaignPreset copy = CampaignPreset.createDetachedCopy(source);
+
+        assertNotNull(copy);
+        assertEquals("Detached Copy Test", copy.getTitle());
+        assertFalse(copy.isGM());
+        assertEquals(73, copy.getCampaignOptions().get(CampaignOption.PERCENT_FEMALE));
+        assertEquals(42, copy.getRandomSkillPreferences().getOverallRecruitBonus());
+        assertEquals(source.getGameOptions().getOption(OptionsConstants.ALLOWED_TECH_LEVEL).stringValue(),
+              copy.getGameOptions().getOption(OptionsConstants.ALLOWED_TECH_LEVEL).stringValue());
+        final String skillName = SkillType.skillList[0];
+        assertEquals(source.getSkills().get(skillName).getTarget(), copy.getSkills().get(skillName).getTarget());
+    }
+
+    /**
+     * Saving a preset writes the dialog's values into the copy, so editing it must never reach the source (which, when
+     * saving, is the running campaign).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void createDetachedCopy_sharesNoObjectsWithTheSource() {
+        final CampaignPreset source = createPopulatedPreset();
+        final String skillName = SkillType.skillList[0];
+        final int sourceTarget = source.getSkills().get(skillName).getTarget();
+
+        final CampaignPreset copy = CampaignPreset.createDetachedCopy(source);
+        assertNotNull(copy);
+        copy.getCampaignOptions().set(CampaignOption.PERCENT_FEMALE, 5);
+        copy.getRandomSkillPreferences().setOverallRecruitBonus(1);
+        copy.getSkills().get(skillName).setTarget(sourceTarget + 1);
+
+        assertNotSame(source.getCampaignOptions(), copy.getCampaignOptions());
+        assertNotSame(source.getGameOptions(), copy.getGameOptions());
+        assertNotSame(source.getRandomSkillPreferences(), copy.getRandomSkillPreferences());
+        assertNotSame(source.getSkills(), copy.getSkills());
+        assertEquals(73, source.getCampaignOptions().get(CampaignOption.PERCENT_FEMALE));
+        assertEquals(42, source.getRandomSkillPreferences().getOverallRecruitBonus());
+        assertEquals(sourceTarget, source.getSkills().get(skillName).getTarget());
+    }
+
+    private static CampaignPreset createPopulatedPreset() {
+        final CampaignPreset preset = new CampaignPreset();
+        preset.setTitle("Detached Copy Test");
+        preset.setGM(false);
+        preset.setGameOptions(new GameOptions());
+        final CampaignOptions campaignOptions = new CampaignOptions();
+        campaignOptions.set(CampaignOption.PERCENT_FEMALE, 73);
+        preset.setCampaignOptions(campaignOptions);
+        final RandomSkillPreferences randomSkillPreferences = new RandomSkillPreferences();
+        randomSkillPreferences.setOverallRecruitBonus(42);
+        preset.setRandomSkillPreferences(randomSkillPreferences);
+        preset.setSkills(SkillType.createDefaultTypes());
+        return preset;
     }
 }

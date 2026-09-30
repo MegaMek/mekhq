@@ -97,7 +97,6 @@ public class RandomSkillPreferences {
         return overallRecruitBonus;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
     public void setOverallRecruitBonus(int b) {
         overallRecruitBonus = b;
     }

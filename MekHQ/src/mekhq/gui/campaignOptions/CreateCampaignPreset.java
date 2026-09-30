@@ -51,7 +51,6 @@ import jakarta.annotation.Nullable;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.dialogs.buttonDialogs.GameOptionsDialog;
 import megamek.client.ui.enums.ValidationState;
-import megamek.client.ui.preferences.JIntNumberSpinnerPreference;
 import megamek.client.ui.preferences.JToggleButtonPreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
@@ -102,7 +101,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
     private MMComboBox<Planet> comboStartingPlanet;
     private JCheckBox chkSpecifyRankSystem;
     private MMComboBox<RankSystem> comboRankSystem;
-    private JSpinner spnContractCount;
     private JCheckBox chkGM;
     //endregion Startup
 
@@ -124,17 +122,49 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         this.campaign = campaign;
         setPreset(preset);
         setDate(((preset == null) || (preset.getDate() == null)) ? campaign.getLocalDate() : preset.getDate());
+
+        // The saved preset gets the dialog's values written into these objects, so they must never be the running
+        // campaign's own: take detached copies of anything the preset does not already supply.
+        final CampaignPreset campaignCopy = createCampaignCopy(campaign);
         this.gameOptions = ((preset == null) || (preset.getGameOptions() == null))
-                                 ? campaign.getGameOptions() : preset.getGameOptions();
+                                 ? campaignCopy.getGameOptions() : preset.getGameOptions();
         this.campaignOptions = ((preset == null) || (preset.getCampaignOptions() == null))
-                                     ? campaign.getCampaignOptions() : preset.getCampaignOptions();
+                                     ? campaignCopy.getCampaignOptions() : preset.getCampaignOptions();
         this.randomSkillPreferences = ((preset == null) || (preset.getRandomSkillPreferences() == null))
-                                            ? campaign.getRandomSkillPreferences() : preset.getRandomSkillPreferences();
+                                            ? campaignCopy.getRandomSkillPreferences() : preset.getRandomSkillPreferences();
         this.skills = ((preset == null) || preset.getSkills().isEmpty())
-                            ? SkillType.getSkillHash() : preset.getSkills();
+                            ? campaignCopy.getSkills() : preset.getSkills();
         this.specialAbilities = ((preset == null) || preset.getSpecialAbilities().isEmpty())
-                                      ? SpecialAbility.getSpecialAbilities() : preset.getSpecialAbilities();
+                                      ? campaignCopy.getSpecialAbilities() : preset.getSpecialAbilities();
         initialize();
+    }
+
+    /**
+     * Snapshots the campaign's game options, campaign options, random skill preferences, skills and special abilities
+     * into a preset that shares no objects with the campaign.
+     *
+     * @param campaign the campaign to snapshot
+     *
+     * @return the detached snapshot
+     *
+     * @throws IllegalStateException if the snapshot could not be made; saving must not fall back to the live objects
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static CampaignPreset createCampaignCopy(final Campaign campaign) {
+        final CampaignPreset livePreset = new CampaignPreset();
+        livePreset.setGameOptions(campaign.getGameOptions());
+        livePreset.setCampaignOptions(campaign.getCampaignOptions());
+        livePreset.setRandomSkillPreferences(campaign.getRandomSkillPreferences());
+        livePreset.setSkills(SkillType.getSkillHash());
+        livePreset.setSpecialAbilities(SpecialAbility.getSpecialAbilities());
+
+        final CampaignPreset copy = CampaignPreset.createDetachedCopy(livePreset);
+        if ((copy == null) || (copy.getGameOptions() == null) || (copy.getCampaignOptions() == null) ||
+                  (copy.getRandomSkillPreferences() == null)) {
+            throw new IllegalStateException("Unable to copy the campaign's settings for a new campaign preset");
+        }
+        return copy;
     }
     //endregion Constructors
 
@@ -266,13 +296,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         this.comboRankSystem = comboRankSystem;
     }
 
-    public JSpinner getSpnContractCount() {
-        return spnContractCount;
-    }
-
-    public void setSpnContractCount(final JSpinner spnContractCount) {
-        this.spnContractCount = spnContractCount;
-    }
 
     public JCheckBox getChkGM() {
         return chkGM;
@@ -552,14 +575,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
             }
         });
 
-        final JLabel lblContractCount = new JLabel(resources.getString("lblContractCount.text"));
-        lblContractCount.setToolTipText(resources.getString("lblContractCount.toolTipText"));
-        lblContractCount.setName("lblContractCount");
-
-        setSpnContractCount(new JSpinner(new SpinnerNumberModel(2, 0, 100, 1)));
-        getSpnContractCount().setToolTipText(resources.getString("lblContractCount.toolTipText"));
-        getSpnContractCount().setName("spnContractCount");
-
         setChkGM(new JCheckBox(resources.getString("chkGM.text")));
         getChkGM().setToolTipText(resources.getString("chkGM.toolTipText"));
         getChkGM().setName("chkGM");
@@ -636,17 +651,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         gbc.weightx = 1.0;
         gbc.fill = GridBagConstraints.HORIZONTAL;
         panel.add(getComboRankSystem(), gbc);
-
-        // Starting Contract Count
-        gbc.gridx = 0;
-        gbc.gridy++;
-        gbc.weightx = 0.0;
-        gbc.fill = GridBagConstraints.NONE;
-        panel.add(lblContractCount, gbc);
-        gbc.gridx = 1;
-        gbc.weightx = 1.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        panel.add(getSpnContractCount(), gbc);
 
         // Start as GM
         gbc.gridx = 0;
@@ -762,9 +766,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
                                                    ?
                                                    getCampaign().getPlayerForce().getRankSystem() :
                                                    getPreset().getRankSystem());
-        if (getPreset() != null) {
-            getSpnContractCount().setValue(getPreset().getContractCount());
-        }
         getChkGM().setSelected((getPreset() == null) ? getCampaign().isGM() : getPreset().isGM());
 
         if (getPreset() != null) {
@@ -825,7 +826,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
         preferences.manage(new JToggleButtonPreference(getChkSpecifyFaction()));
         preferences.manage(new JToggleButtonPreference(getChkSpecifyPlanet()));
         preferences.manage(new JToggleButtonPreference(getChkSpecifyRankSystem()));
-        preferences.manage(new JIntNumberSpinnerPreference(getSpnContractCount()));
         preferences.manage(new JToggleButtonPreference(getChkSpecifyGameOptions()));
         preferences.manage(new JToggleButtonPreference(getChkSpecifyCampaignOptions()));
     }
@@ -885,7 +885,6 @@ public class CreateCampaignPreset extends AbstractMHQValidationButtonDialog {
             if (getChkSpecifyRankSystem().isSelected()) {
                 getPreset().setRankSystem(getComboRankSystem().getSelectedItem());
             }
-            getPreset().setContractCount((int) getSpnContractCount().getValue());
             getPreset().setGM(getChkGM().isSelected());
             if (getChkSpecifyGameOptions().isSelected()) {
                 getPreset().setGameOptions(getGameOptions());

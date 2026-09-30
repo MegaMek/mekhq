@@ -36,11 +36,12 @@ package mekhq.campaign.campaignOptions;
 import static megamek.common.TechConstants.getSimpleLevel;
 import static megamek.common.options.OptionsConstants.*;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
 
 import jakarta.annotation.Nonnull;
+import megamek.client.generator.RandomGenderGenerator;
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.TechConstants;
 import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.enums.SkillLevel;
@@ -527,16 +528,19 @@ public class CampaignOptions {
 
     // endregion File IO
 
-    public File getStrategicViewTheme() {
+    /**
+     * Pushes the options that MegaMek holds globally rather than per campaign into MegaMek: the gender generator's
+     * percent female, the name generator's faction and the strategic view minimap theme. Call this whenever these
+     * options become the active campaign's options (loading a campaign, applying the options dialog), and never for
+     * options that only belong to a preset.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void applyGlobalSettings() {
+        RandomGenderGenerator.setPercentFemale(get(CampaignOption.PERCENT_FEMALE));
+        RandomNameGenerator.getInstance().setChosenFaction(get(CampaignOption.NAME_GENERATOR_FACTION));
         CLIENT_PREFERENCES.setStrategicViewTheme(get(CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME));
-        return CLIENT_PREFERENCES.getStrategicViewTheme();
-    }
-
-    public void setStrategicViewTheme(String minimapStyle) {
-        // it is persisted here to have something in the campaign options persisted that
-        // will change the GUI preference for the theme
-        set(CampaignOption.STRATEGIC_VIEW_MINIMAP_THEME, minimapStyle);
-        CLIENT_PREFERENCES.setStrategicViewTheme(minimapStyle);
     }
 
     /**

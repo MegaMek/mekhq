@@ -88,8 +88,6 @@ import javax.swing.JOptionPane;
 import jakarta.annotation.Nonnull;
 import megamek.Version;
 import megamek.client.bot.princess.BehaviorSettings;
-import megamek.client.generator.RandomGenderGenerator;
-import megamek.client.generator.RandomNameGenerator;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.codeUtilities.ObjectUtility;
 import megamek.codeUtilities.StringUtility;
@@ -3922,13 +3920,6 @@ public class Campaign implements ITechManager {
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "lastScenarioId", lastScenarioId);
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "initiativeBonus", getPlayerForce().getInitiativeBonus());
         MHQXMLUtility.writeSimpleXMLTag(writer, indent, "initiativeMaxBonus", getPlayerForce().getInitiativeMaxBonus());
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "nameGen");
-        MHQXMLUtility.writeSimpleXMLTag(writer,
-              indent,
-              "faction",
-              RandomNameGenerator.getInstance().getChosenFaction());
-        MHQXMLUtility.writeSimpleXMLTag(writer, indent, "percentFemale", RandomGenderGenerator.getPercentFemale());
-        MHQXMLUtility.writeSimpleXMLCloseTag(writer, --indent, "nameGen");
 
         dailyReportLog.writeToXML(writer, indent);
 
