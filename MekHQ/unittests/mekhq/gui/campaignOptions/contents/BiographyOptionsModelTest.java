@@ -36,8 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import mekhq.campaign.RandomOriginOptions;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.universe.Planet;
 import org.junit.jupiter.api.Test;
@@ -46,8 +46,7 @@ import org.junit.jupiter.api.Test;
  * Exhaustive round-trip test for {@link BiographyOptionsModel}, whose fields span {@link CampaignOptions} and
  * {@link RandomOriginOptions}. Every scalar field is mutated automatically, plus the per-role portrait array and the
  * specified origin planet (a mock, so {@code applyTo} does not fall back to a {@code Systems} lookup). The random-death
- * age-group map is asserted explicitly. {@code percentFemale} is backed by a process-wide gender generator, so it is
- * left untouched to avoid leaking state into other tests.
+ * age-group map is asserted explicitly, and the name generator faction is set by hand as it is a {@link String}.
  */
 class BiographyOptionsModelTest {
     @Test
@@ -56,7 +55,8 @@ class BiographyOptionsModelTest {
         RandomOriginOptions sourceOrigin = sourceOptions.get(CampaignOption.RANDOM_ORIGIN_OPTIONS);
         BiographyOptionsModel model = new BiographyOptionsModel(sourceOptions, sourceOrigin);
 
-        OptionsModelTestSupport.mutateScalarFields(model, "percentFemale");
+        OptionsModelTestSupport.mutateScalarFields(model);
+        model.factionNames = "FS";
         model.specifiedPlanet = mock(Planet.class);
         model.usePortraitForRole[0] = !model.usePortraitForRole[0];
         AgeGroup ageGroup = AgeGroup.values()[0];
