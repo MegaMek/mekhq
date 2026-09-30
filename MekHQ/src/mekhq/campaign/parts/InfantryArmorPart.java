@@ -37,6 +37,10 @@ import java.io.PrintWriter;
 
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
+import megamek.common.equipment.enums.MiscTypeFlag;
+import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
@@ -60,6 +64,8 @@ public class InfantryArmorPart extends Part {
     private boolean sneak_camo;
     private boolean sneak_ir;
     private boolean sneak_ecm;
+    /** The armor kit this part is, or {@code null} for armor described only by its properties. */
+    private EquipmentType armorKit;
 
     @Deprecated(since = "0.51.0", forRemoval = true)
     public InfantryArmorPart() {
@@ -68,7 +74,17 @@ public class InfantryArmorPart extends Part {
 
     public InfantryArmorPart(int tonnage, Campaign c, double divisor, boolean enc, boolean dest, boolean camo,
           boolean ir, boolean ecm, boolean space) {
+        this(tonnage, c, null, divisor, enc, dest, camo, ir, ecm, space);
+    }
+
+    /**
+     * @param armorKit the armor kit this part is, or {@code null} for armor described only by its properties; a kit
+     *                 names and prices the part
+     */
+    public InfantryArmorPart(int tonnage, Campaign c, @Nullable EquipmentType armorKit, double divisor, boolean enc,
+          boolean dest, boolean camo, boolean ir, boolean ecm, boolean space) {
         super(tonnage, c);
+        this.armorKit = armorKit;
         this.damageDivisor = divisor;
         this.encumbering = enc;
         this.dest = dest;
@@ -80,6 +96,10 @@ public class InfantryArmorPart extends Part {
     }
 
     private void assignName() {
+        if (armorKit != null) {
+            this.name = armorKit.getName();
+            return;
+        }
         String heavyString = "";
         if (damageDivisor > 1) {
             heavyString = "Heavy ";
@@ -175,12 +195,13 @@ public class InfantryArmorPart extends Part {
     public MissingPart getMissingPart() {
         return new MissingInfantryArmorPart(getUnitTonnage(),
               campaign,
+              armorKit,
               damageDivisor,
               encumbering,
               dest,
               sneak_camo,
-              sneak_ecm,
               sneak_ir,
+              sneak_ecm,
               spaceSuit);
     }
 
@@ -196,6 +217,11 @@ public class InfantryArmorPart extends Part {
 
     @Override
     public Money getStickerPrice() {
+        if (armorKit != null) {
+            // Priced as MegaMek prices the kit for the platoon
+            Entity entity = (unit == null) ? null : unit.getEntity();
+            return Money.of(armorKit.getCost(entity, false, ConvInfantry.LOC_INFANTRY));
+        }
         double price = 0;
         if (damageDivisor > 1) {
             if (isEncumbering()) {
@@ -241,6 +267,7 @@ public class InfantryArmorPart extends Part {
     @Override
     public boolean isSamePartType(Part part) {
         return (getClass() == part.getClass())
+                     && isSameKit(armorKit, ((InfantryArmorPart) part).getArmorKit())
                      && damageDivisor == ((InfantryArmorPart) part).getDamageDivisor()
                      && dest == ((InfantryArmorPart) part).isDest()
                      && encumbering == ((InfantryArmorPart) part).isEncumbering()
@@ -252,6 +279,44 @@ public class InfantryArmorPart extends Part {
 
     public double getDamageDivisor() {
         return damageDivisor;
+    }
+
+    /**
+     * @return the armor kit this part is, or {@code null} for armor described only by its properties
+     */
+    public @Nullable EquipmentType getArmorKit() {
+        return armorKit;
+    }
+
+    /**
+     * Makes this part the given armor kit, taking the kit's damage divisor, special properties, name and price, the way
+     * MegaMek applies a kit to a platoon. Used for armor parts saved before parts recorded their kit, some of which also
+     * had their infrared and ECM sneak properties swapped.
+     *
+     * @param armorKit the platoon's armor kit
+     */
+    public void setArmorKit(EquipmentType armorKit) {
+        this.armorKit = armorKit;
+        if (armorKit instanceof MiscType kit) {
+            damageDivisor = kit.getDamageDivisor();
+            encumbering = kit.hasFlag(MiscTypeFlag.S_ENCUMBERING);
+            spaceSuit = kit.hasFlag(MiscTypeFlag.S_SPACE_SUIT);
+            dest = kit.hasFlag(MiscTypeFlag.S_DEST);
+            sneak_camo = kit.hasFlag(MiscTypeFlag.S_SNEAK_CAMO);
+            sneak_ir = kit.hasFlag(MiscTypeFlag.S_SNEAK_IR);
+            sneak_ecm = kit.hasFlag(MiscTypeFlag.S_SNEAK_ECM);
+        }
+        assignName();
+    }
+
+    /**
+     * @return {@code true} if both are the same armor kit, or neither is a kit
+     */
+    public static boolean isSameKit(@Nullable EquipmentType kit, @Nullable EquipmentType otherKit) {
+        if ((kit == null) || (otherKit == null)) {
+            return kit == otherKit;
+        }
+        return kit.getInternalName().equals(otherKit.getInternalName());
     }
 
     public boolean isDest() {
@@ -288,6 +353,9 @@ public class InfantryArmorPart extends Part {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sneak_ecm", sneak_ecm);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sneak_ir", sneak_ir);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaceSuit", spaceSuit);
+        if (armorKit != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "armorKit", armorKit.getInternalName());
+        }
         writeToXMLEnd(pw, indent);
     }
 
@@ -311,6 +379,8 @@ public class InfantryArmorPart extends Part {
                 sneak_ir = wn2.getTextContent().equalsIgnoreCase("true");
             } else if (wn2.getNodeName().equalsIgnoreCase("spaceSuit")) {
                 spaceSuit = wn2.getTextContent().equalsIgnoreCase("true");
+            } else if (wn2.getNodeName().equalsIgnoreCase("armorKit")) {
+                armorKit = EquipmentType.get(wn2.getTextContent().trim());
             }
         }
     }
@@ -319,12 +389,13 @@ public class InfantryArmorPart extends Part {
     public Part clone() {
         InfantryArmorPart clone = new InfantryArmorPart(getUnitTonnage(),
               campaign,
+              armorKit,
               damageDivisor,
               encumbering,
               dest,
               sneak_camo,
-              sneak_ecm,
               sneak_ir,
+              sneak_ecm,
               spaceSuit);
         clone.copyBaseData(this);
         return clone;

@@ -37,6 +37,7 @@ import java.io.PrintWriter;
 
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
@@ -60,6 +61,8 @@ public class MissingInfantryArmorPart extends MissingPart {
     private boolean sneak_camo;
     private boolean sneak_ir;
     private boolean sneak_ecm;
+    /** The armor kit the platoon needs, or {@code null} for armor described only by its properties. */
+    private EquipmentType armorKit;
 
     @Deprecated(since = "0.51.0", forRemoval = true)
     public MissingInfantryArmorPart() {
@@ -68,7 +71,16 @@ public class MissingInfantryArmorPart extends MissingPart {
 
     public MissingInfantryArmorPart(int tonnage, Campaign c, double divisor, boolean enc, boolean dest, boolean camo,
           boolean ir, boolean ecm, boolean space) {
+        this(tonnage, c, null, divisor, enc, dest, camo, ir, ecm, space);
+    }
+
+    /**
+     * @param armorKit the armor kit the platoon needs, or {@code null} for armor described only by its properties
+     */
+    public MissingInfantryArmorPart(int tonnage, Campaign c, @Nullable EquipmentType armorKit, double divisor,
+          boolean enc, boolean dest, boolean camo, boolean ir, boolean ecm, boolean space) {
         super(tonnage, c);
+        this.armorKit = armorKit;
         this.damageDivisor = divisor;
         this.encumbering = enc;
         this.dest = dest;
@@ -90,6 +102,10 @@ public class MissingInfantryArmorPart extends MissingPart {
     }
 
     private void assignName() {
+        if (armorKit != null) {
+            this.name = armorKit.getName();
+            return;
+        }
         String heavyString = "";
         if (damageDivisor > 1) {
             heavyString = "Heavy ";
@@ -118,13 +134,14 @@ public class MissingInfantryArmorPart extends MissingPart {
 
     @Override
     public Part getNewPart() {
-        return new InfantryArmorPart(getUnitTonnage(), campaign, damageDivisor, encumbering, dest, sneak_camo,
-              sneak_ecm, sneak_ir, spaceSuit);
+        return new InfantryArmorPart(getUnitTonnage(), campaign, armorKit, damageDivisor, encumbering, dest,
+              sneak_camo, sneak_ir, sneak_ecm, spaceSuit);
     }
 
     @Override
     public boolean isAcceptableReplacement(Part part, boolean refit) {
         return part instanceof InfantryArmorPart
+                     && InfantryArmorPart.isSameKit(armorKit, ((InfantryArmorPart) part).getArmorKit())
                      && damageDivisor == ((InfantryArmorPart) part).getDamageDivisor()
                      && dest == ((InfantryArmorPart) part).isDest()
                      && encumbering == ((InfantryArmorPart) part).isEncumbering()
@@ -149,6 +166,9 @@ public class MissingInfantryArmorPart extends MissingPart {
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sneak_ecm", sneak_ecm);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "sneak_ir", sneak_ir);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "spaceSuit", spaceSuit);
+        if (armorKit != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "armorKit", armorKit.getInternalName());
+        }
         writeToXMLEnd(pw, indent);
     }
 
@@ -173,6 +193,8 @@ public class MissingInfantryArmorPart extends MissingPart {
                     sneak_ir = Boolean.parseBoolean(wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("spaceSuit")) {
                     spaceSuit = Boolean.parseBoolean(wn2.getTextContent().trim());
+                } else if (wn2.getNodeName().equalsIgnoreCase("armorKit")) {
+                    armorKit = EquipmentType.get(wn2.getTextContent().trim());
                 }
             } catch (Exception e) {
                 LOGGER.error("", e);
