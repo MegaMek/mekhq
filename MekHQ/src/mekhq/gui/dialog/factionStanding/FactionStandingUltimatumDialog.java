@@ -699,7 +699,7 @@ public class FactionStandingUltimatumDialog {
     public static @Nullable Person getThirdInCommand(Campaign campaign, @Nullable Person commander,
           @Nullable Person secondInCommand) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean isClanCampaign = campaign.isClanCampaign();
+        boolean isClanCampaign = campaign.getPlayerForce().isClanForce();
         LocalDate today = campaign.getLocalDate();
         Person thirdInCommand = null;
 
