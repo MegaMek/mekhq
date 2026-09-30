@@ -87,6 +87,23 @@ public enum UnitFixture {
     HUNCHBACK_HBK_4G("Hunchback HBK-4G", false, Mek.class),
     /** Hunchback HBK-4P, the refit target of the HBK-4G. Source: {@code meks/3039u/Hunchback HBK-4P.mtf}. */
     HUNCHBACK_HBK_4P("Hunchback HBK-4P", false, Mek.class),
+    /** Griffin GRF-1A, a primitive Griffin. Source: {@code meks/XTRs/Primitives IV/Griffin GRF-1A.mtf}. */
+    GRIFFIN_GRF_1A("Griffin GRF-1A", false, Mek.class),
+    /** Griffin GRF-1N, the standard Griffin. Source: {@code meks/3039u/Griffin GRF-1N.mtf}. */
+    GRIFFIN_GRF_1N("Griffin GRF-1N", false, Mek.class),
+    /**
+     * Lumberjack LM1A, an IndustrialMek with a primitive engine rated above its walking MP times its tonnage. Source:
+     * {@code meks/3075/Lumberjack LM1A.mtf}.
+     */
+    LUMBERJACK_LM1A("Lumberjack LM1A", false, Mek.class),
+    /** Omega SHP-5R, a superheavy Mek with a superheavy gyro. Source: {@code meks/3145/NTNU RS/NTNU/Omega SHP-5R.mtf}. */
+    OMEGA_SHP_5R("Omega SHP-5R", false, Mek.class),
+    /** Omega SHP-4X, the earlier superheavy Omega. Source: {@code meks/Jihad Final Reckoning/OMEGA SHP-4X.mtf}. */
+    OMEGA_SHP_4X("OMEGA SHP-4X", false, Mek.class),
+    /**
+     * Skinwalker A, a Mek with an interface cockpit and no gyro. Source: {@code meks/Rec Guides ilClan/Vol 24/(Ryoken III) Skinwalker A.mtf}.
+     */
+    SKINWALKER_A("(Ryoken III) Skinwalker A", false, Mek.class),
     /** Hoplite C, a Clan Mek (not an OmniMek) with Clan ferro-fibrous armor. Source: {@code meks/3050U/Hoplite C.mtf}. */
     HOPLITE_C("Hoplite C", false, Mek.class),
     /** Vedette Medium Tank, a tracked combat vehicle. Source: {@code vehicles/3039u/Vedette Medium Tank.blk}. */
