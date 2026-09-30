@@ -97,6 +97,7 @@ import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.VehicleLocations;
 import mekhq.campaign.unit.actions.AdjustLargeCraftAmmoAction;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.FileDialogs;
@@ -977,10 +978,10 @@ public class ResolveScenarioTracker {
                         boolean wounded = false;
                         // tanks need to be handled specially because of the special crits and because
                         // tank destruction should "kill" the crew
-                        if (en instanceof Tank) {
+                        if (en instanceof Tank tank) {
                             boolean destroyed = false;
                             for (int loc = 0; loc < en.locations(); loc++) {
-                                if (loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
+                                if (VehicleLocations.canLoseWithoutWrecking(tank, loc)) {
                                     continue;
                                 }
                                 if (en.getInternal(loc) <= 0) {
@@ -1223,7 +1224,7 @@ public class ResolveScenarioTracker {
      * @since 0.51.01
      */
     private boolean isVehicleCrewLost(Entity entity) {
-        if (!(entity instanceof Tank)) {
+        if (!(entity instanceof Tank tank)) {
             return false;
         }
 
@@ -1232,7 +1233,7 @@ public class ResolveScenarioTracker {
         }
 
         for (int loc = 0; loc < entity.locations(); loc++) {
-            if ((loc == Tank.LOC_TURRET) || (loc == Tank.LOC_TURRET_2) || (loc == Tank.LOC_BODY)) {
+            if (VehicleLocations.canLoseWithoutWrecking(tank, loc)) {
                 continue;
             }
             if (entity.getInternal(loc) <= 0) {
@@ -1587,10 +1588,10 @@ public class ResolveScenarioTracker {
                 } else {
                     // we have a multi-crewed vee
                     boolean wounded = false;
-                    if (entity instanceof Tank) {
+                    if (entity instanceof Tank tank) {
                         boolean destroyed = false;
                         for (int loc = 0; loc < entity.locations(); loc++) {
-                            if (loc == Tank.LOC_TURRET || loc == Tank.LOC_TURRET_2 || loc == Tank.LOC_BODY) {
+                            if (VehicleLocations.canLoseWithoutWrecking(tank, loc)) {
                                 continue;
                             }
                             if (entity.getInternal(loc) <= 0) {

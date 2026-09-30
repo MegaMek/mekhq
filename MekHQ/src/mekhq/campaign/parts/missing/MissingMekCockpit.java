@@ -116,11 +116,15 @@ public class MissingMekCockpit extends MissingPart {
             Node wn2 = nl.item(x);
 
             try {
-                if (wn2.getNodeName().equalsIgnoreCase("small")) {
+                // The type is saved as "type"; it was read from "small", so a missing cockpit of any other type came
+                // back from a save as a standard one. "small" is still read in case an older save wrote it.
+                boolean isTypeNode = wn2.getNodeName().equalsIgnoreCase("type")
+                      || wn2.getNodeName().equalsIgnoreCase("small");
+                if (isTypeNode) {
                     type = Integer.parseInt(wn2.getTextContent());
                 }
-            } catch (Exception e) {
-                LOGGER.error("", e);
+            } catch (Exception exception) {
+                LOGGER.error("", exception);
             }
         }
     }

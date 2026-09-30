@@ -48,7 +48,6 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
 import java.util.Collection;
-import java.util.List;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
@@ -735,8 +734,12 @@ public class TransportCostCalculations {
      * @since 50.10
      */
     void countUnitsByType() {
-        List<Unit> relevantUnits = travelingUnits.stream().filter(unit -> !unit.isMothballed()).toList();
-        for (Unit unit : relevantUnits) {
+        for (Unit unit : travelingUnits) {
+            // Support carriers are an organisational wrapper; their occupants are counted as passengers instead
+            if (unit.isMothballed() || unit.isCarrier()) {
+                continue;
+            }
+
             Entity entity = unit.getEntity();
             if (entity == null) {
                 LOGGER.warn("Entity is null for unit: {}. Skipping", unit.getName());

@@ -144,6 +144,11 @@ public class AverageExperienceRating {
             }
 
             for (Unit unit : formation.getAllUnitsAsUnits(hangar, true)) {
+                // Support carriers are not combat units; their occupants are support personnel
+                if (unit.isCarrier()) {
+                    continue;
+                }
+
                 Entity entity = unit.getEntity();
                 if (entity == null || entity instanceof Jumpship) {
                     continue;

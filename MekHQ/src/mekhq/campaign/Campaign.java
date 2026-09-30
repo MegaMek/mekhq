@@ -255,6 +255,7 @@ import mekhq.campaign.utilities.LithiumFusionBatteries;
 import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.RepairTaskHold;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
@@ -2618,7 +2619,7 @@ public class Campaign implements ITechManager {
         }
 
         String report;
-        if (!unit.isConventionalInfantry()) {
+        if (!unit.isSelfMaintainedInfantry()) {
             Person tech = unit.getTech();
             if (null == tech) {
                 // uh-oh
@@ -2705,7 +2706,7 @@ public class Campaign implements ITechManager {
         }
 
         String report;
-        if (!unit.isConventionalInfantry()) {
+        if (!unit.isSelfMaintainedInfantry()) {
             Person tech = unit.getTech();
             if (null == tech) {
                 // uh-oh
@@ -2938,6 +2939,10 @@ public class Campaign implements ITechManager {
                 return report;
             }
         }
+        String heldReport = RepairTaskHold.holdIfItCannotGoAhead(this, partWork, tech, target);
+        if (heldReport != null) {
+            return heldReport;
+        }
         if (partWork instanceof SpacecraftCoolingSystem) {
             // Change the string since we're not working on the part itself
             report += tech.getHyperlinkedFullTitle() + " attempts to" + action + "a heat sink";
@@ -2968,6 +2973,9 @@ public class Campaign implements ITechManager {
                     // Can't use more overtime than there are minutes remaining on the part
                     overtimeUsed = Math.min(minutes, tech.getOvertimeLeft());
                     minutesUsed += overtimeUsed;
+                }
+                // Only overtime actually worked counts, for the +3 overtime modifier and the AsTech helpers
+                if (overtimeUsed > 0) {
                     partWork.setWorkedOvertime(true);
                     usedOvertime = true;
                 }
@@ -4514,7 +4522,7 @@ public class Campaign implements ITechManager {
                   getPlayerForce().getHumanResources().findUnitRefitBy(getPlayerForce().getHangar(), tech).getName()));
         } else if (skill == null) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "Assigned tech does not have the right skills");
-        } else if (getCampaignOptions().get(CampaignOption.TECHS_NEED_TOOL_KIT) &&
+        } else if (EquipmentKitCatalog.isToolKitRequired(getCampaignOptions(), partWork.getUnit()) &&
                          !EquipmentKitCatalog.hasToolKit(tech)) {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, "The tech has no tool kit");
         } else if (!getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN) && (partWork.getSkillMin() > effectiveSkillLevel)) {
@@ -4552,7 +4560,9 @@ public class Campaign implements ITechManager {
             return new TargetRoll(TargetRoll.IMPOSSIBLE, notFixable);
         }
 
-        // if this is an infantry refit, then automatic success
+        // if this is an infantry refit, then automatic success. Infantry refits take no time (they are a
+        // reorganization), so this holds even when Techs maintain conventional infantry: the Tech must still be the
+        // right profession (checked above via the refit skill), but a zero-time refit must never be failed and retried
         if ((partWork instanceof Refit) &&
                   (partWork.getUnit() != null) &&
                   partWork.getUnit().isConventionalInfantry()) {

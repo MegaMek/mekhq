@@ -78,8 +78,10 @@ import megamek.common.rolls.TargetRoll;
 import megamek.common.units.*;
 import megamek.common.util.C3Util;
 import megamek.common.verifier.EntityVerifier;
+import megamek.common.verifier.TestAdvancedAerospace;
 import megamek.common.verifier.TestAero;
 import megamek.common.verifier.TestEntity;
+import megamek.common.verifier.TestSmallCraft;
 import megamek.common.verifier.TestTank;
 import megamek.common.weapons.attacks.InfantryAttack;
 import megamek.logging.MMLogger;
@@ -402,6 +404,8 @@ public class Refit extends Part implements IAcquisitionWork {
             if (p instanceof SpacecraftCoolingSystem spacecraftCoolingSystem) {
                 oldLargeCraftHeatSinks = spacecraftCoolingSystem.getTotalSinks();
                 oldLargeCraftSinkType = spacecraftCoolingSystem.getSinkType();
+                // The ship keeps its cooling system; a refit only changes the heat sinks in it
+                continue;
             }
             if ((!isOmniRefit || p.isOmniPodded()) || (p instanceof TransportBayPart)) {
                 oldUnitParts.add(p);
@@ -422,6 +426,7 @@ public class Refit extends Part implements IAcquisitionWork {
         //      happen later.
 
         List<Part> partsRemaining = new ArrayList<>();
+        Money spacecraftSystemUpgrades = Money.zero();
         for (Part newPart : newUnit.getParts()) {
             if (isOmniRefit && !newPart.isOmniPodded()) {
                 continue;
@@ -448,12 +453,9 @@ public class Refit extends Part implements IAcquisitionWork {
 
                 boolean acceptableReplacement = (oldPart instanceof MissingPart oldMissingPart) &&
                                                       oldMissingPart.isAcceptableReplacement(newPart, true);
-                // We're not going to require replacing the life support system just because
-                // the number of bay personnel changes.
-                boolean aeroLifeSupportIssue = (oldPart instanceof AeroLifeSupport) &&
-                                                     (newPart instanceof AeroLifeSupport) &&
-                                                     !crewSizeChanged();
-                if (acceptableReplacement || oldPart.isSamePartType(newPart) || aeroLifeSupportIssue) {
+                // The ship keeps its drive, fire control and life support when only their size or value changes
+                boolean isKeptSpacecraftSystem = RefitSpacecraftSystems.isSameSystem(oldPart, newPart);
+                if (acceptableReplacement || oldPart.isSamePartType(newPart) || isKeptSpacecraftSystem) {
 
                     // need a special check for location and armor amount for armor
                     if ((oldPart instanceof Armor oldArmorPart) &&
@@ -485,6 +487,10 @@ public class Refit extends Part implements IAcquisitionWork {
                             continue;
                         }
                     }
+                    if (isKeptSpacecraftSystem) {
+                        spacecraftSystemUpgrades = spacecraftSystemUpgrades.plus(
+                              RefitSpacecraftSystems.upgradeCost(oldPart, newPart));
+                    }
                     newUnitParts.add(oldPart);
                     partFound = true;
                     break;
@@ -497,6 +503,12 @@ public class Refit extends Part implements IAcquisitionWork {
                 // Address new and moved parts next
                 partsRemaining.add(newPart);
             }
+        }
+
+        if (spacecraftSystemUpgrades.isPositive()) {
+            cost = cost.plus(spacecraftSystemUpgrades);
+            LOGGER.debug("[Refit] {}: keeps its drive, fire control and life support and pays {} to bring them up to"
+                  + " the new design", oldUnit.getName(), spacecraftSystemUpgrades.toAmountAndSymbolString());
         }
 
         // Step 2b: Find parts that moved or add them as new parts
@@ -513,12 +525,8 @@ public class Refit extends Part implements IAcquisitionWork {
 
                 boolean acceptableReplacement = (oldPart instanceof MissingPart oldMissingPart) &&
                                                       oldMissingPart.isAcceptableReplacement(newPart, true);
-                // We're not going to require replacing the life support system just because the number of bay
-                // personnel changes.
-                boolean aeroLifeSupportIssue = (oldPart instanceof AeroLifeSupport) &&
-                                                     (newPart instanceof AeroLifeSupport) &&
-                                                     !crewSizeChanged();
-                if (acceptableReplacement || oldPart.isSamePartType(newPart) || aeroLifeSupportIssue) {
+                boolean isKeptSpacecraftSystem = RefitSpacecraftSystems.isSameSystem(oldPart, newPart);
+                if (acceptableReplacement || oldPart.isSamePartType(newPart) || isKeptSpacecraftSystem) {
 
                     // need a special check for location and armor amount for armor
                     if ((oldPart instanceof Armor oldArmorPart) &&
@@ -603,6 +611,7 @@ public class Refit extends Part implements IAcquisitionWork {
         List<Part> tempOldParts = new ArrayList<>(oldUnitParts);
 
         armorNeeded = 0;
+        Map<ArmorFace, Integer> newArmorPointsByFace = new HashMap<>();
         int armorType = 0;
         boolean armorIsClan = false;
         Map<Part, Integer> partQuantity = new HashMap<>();
@@ -649,7 +658,9 @@ public class Refit extends Part implements IAcquisitionWork {
                 // NOT ANYMORE - I think this is overkill, lets just reuse existing armor parts
                 int totalAmount = newArmorPart.getTotalAmount();
                 time += totalAmount * newArmorPart.getBaseTimeFor(newEntity);
-                armorNeeded += totalAmount;
+                armorNeeded += Armor.toWarehousePoints(newEntity, totalAmount);
+                newArmorPointsByFace.merge(new ArmorFace(newArmorPart.getLocation(), newArmorPart.isRearMounted()),
+                      totalAmount, Integer::sum);
                 armorType = newArmorPart.getType();
                 armorIsClan = newPart.isClanTechBase();
 
@@ -674,20 +685,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
 
             } else if (newPart instanceof SpacecraftCoolingSystem spacecraftCoolingSystem) {
-                int sinkType = spacecraftCoolingSystem.getSinkType();
-                int sinksToReplace;
-                Part replacement = new AeroHeatSink(0, sinkType, false, campaign);
-                int newLargeCraftHeatSinks = spacecraftCoolingSystem.getTotalSinks();
-                if (sinkType != oldLargeCraftSinkType) {
-                    sinksToReplace = newLargeCraftHeatSinks;
-                } else {
-                    sinksToReplace = Math.max((newLargeCraftHeatSinks - oldLargeCraftHeatSinks), 0);
-                }
-                time += (WORK_HOUR * (sinksToReplace / 50));
-                while (sinksToReplace > 0) {
-                    shoppingList.add(replacement);
-                    sinksToReplace--;
-                }
+                planSpacecraftHeatSinks(spacecraftCoolingSystem, oldLargeCraftHeatSinks, oldLargeCraftSinkType);
             }
 
             /* CHECK REFIT CLASS */
@@ -725,8 +723,15 @@ public class Refit extends Part implements IAcquisitionWork {
                 updateRefitClass(CLASS_E);
                 locationHasNewStuff[Mek.LOC_HEAD] = true;
 
+            } else if ((newPart instanceof MissingAeroHeatSink) && newPart.isOmniPodded()) {
+                // A pod heat sink goes in the fighter's body, so an OmniPod reconfiguration has work there
+                locationHasNewStuff[Aero.LOC_FUSELAGE] = true;
+
             } else if (newPart instanceof MissingInfantryMotiveType || newPart instanceof MissingInfantryArmorPart) {
                 updateRefitClass(CLASS_A);
+
+            } else if (RefitSpacecraftSystems.isNewShipComponent(newPart)) {
+                updateRefitClass(CLASS_C);
 
             } else {
                 // determine whether this is A, B, or C
@@ -823,8 +828,8 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
-        // if oldUnitParts is not empty we are removing some stuff and so this should be at least a Class A refit
-        if (!oldUnitParts.isEmpty()) {
+        // Removing anything makes this at least a Class A refit
+        if (isRemovingPartsOtherThanBays()) {
             if (isOmniRefit) {
                 updateRefitClass(CLASS_OMNI);
             } else {
@@ -832,72 +837,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
 
-        /*
-         * Cargo and transport bays are essentially just open space and while it may take time and  materials to
-         * change the cubicles or the number of doors, the bay itself does not require  any refit work unless the
-         * size changes. First we create a list of all bays on each unit, then we attempt to match them by size and
-         * number of doors. Any remaining are matched on size, and difference in number of doors is noted as moving
-         * doors has to be accounted for in the time calculation.
-         */
-        List<Bay> oldUnitBays = new ArrayList<>(oldUnit.getEntity()
-                                                      .getTransportBays()
-                                                      .stream()
-                                                      .filter(b -> !b.isQuarters())
-                                                      .toList());
-        List<Bay> newUnitBays = new ArrayList<>(newEntity.getTransportBays()
-                                                      .stream()
-                                                      .filter(b -> !b.isQuarters())
-                                                      .toList());
-
-        // If any bays keep the same size but have any doors added or removed, we need to note that separately since
-        // removing a door from one bay and adding it to another requires time even if the number of parts hasn't
-        // changed. We track them separately so that we don't charge time for changing the overall number of doors
-        // twice.
-        int doorsRemoved = 0;
-        int doorsAdded = 0;
-        if (oldUnitBays.size() + newUnitBays.size() > 0) {
-            for (Iterator<Bay> oldBays = oldUnitBays.iterator(); oldBays.hasNext(); ) {
-                final Bay oldbay = oldBays.next();
-                for (Iterator<Bay> newBays = newUnitBays.iterator(); newBays.hasNext(); ) {
-                    final Bay newbay = newBays.next();
-                    if ((oldbay.getCapacity() == newbay.getCapacity()) && (oldbay.getDoors() == newbay.getDoors())) {
-                        oldBays.remove();
-                        newBays.remove();
-                        break;
-                    }
-                }
-            }
-            for (Iterator<Bay> oldBays = oldUnitBays.iterator(); oldBays.hasNext(); ) {
-                final Bay oldbay = oldBays.next();
-                for (Iterator<Bay> newBays = newUnitBays.iterator(); newBays.hasNext(); ) {
-                    final Bay newbay = newBays.next();
-                    if (oldbay.getCapacity() == newbay.getCapacity()) {
-                        if (oldbay.getDoors() > newbay.getDoors()) {
-                            doorsRemoved += oldbay.getDoors() - newbay.getDoors();
-                        } else {
-                            doorsAdded += newbay.getDoors() - oldbay.getDoors();
-                        }
-                        oldBays.remove();
-                        newBays.remove();
-                        break;
-                    }
-                }
-            }
-            // Use bay replacement time of 1 month (30 days) for each bay to be resized, plus another month for any
-            // bays to be added or removed. Note this only applies to large craft, CVs use 120 minutes. CO 205
-            int bayDuration = getNewEntity().isLargeCraft() ? WORK_MONTH : WORK_HOUR * 2;
-            time += Math.max(oldUnitBays.size(), newUnitBays.size()) * bayDuration;
-            int deltaDoors = oldUnitBays.stream().mapToInt(Bay::getDoors).sum() -
-                                   newUnitBays.stream().mapToInt(Bay::getDoors).sum();
-            if (deltaDoors < 0) {
-                doorsAdded = Math.max(0, doorsAdded - deltaDoors);
-            } else {
-                doorsRemoved = Math.max(0, doorsRemoved + deltaDoors);
-            }
-            // Doors for large craft take 10 hours. Doors for others take 120 minutes. CO 205
-            int doorDuration = getNewEntity().isLargeCraft() ? WORK_HOUR * 10 : WORK_HOUR * 2;
-            time += (doorsAdded + doorsRemoved) * doorDuration;
-        }
+        planBayWork();
 
         // Step 4: loop through remaining equipment on old unit parts and add time for removing.
         for (Part oldPart : oldUnitParts) {
@@ -936,9 +876,13 @@ public class Refit extends Part implements IAcquisitionWork {
                     continue;
                 }
                 case Armor oldArmor when sameArmorType -> {
-                    recycledArmorPoints += oldArmor.getAmount();
-                    // Refund the time we added above for the "new" armor that actually wasn't.
-                    time -= oldArmor.getAmount() * oldArmor.getBaseTimeFor(oldUnit.getEntity());
+                    recycledArmorPoints += Armor.toWarehousePoints(oldUnit.getEntity(), oldArmor.getAmount());
+                    // The points this location keeps were counted above as new armor, so refund their time; the
+                    // points taken off take as long to remove as to fit
+                    ArmorFace face = new ArmorFace(oldArmor.getLocation(), oldArmor.isRearMounted());
+                    int keptPoints = Math.min(oldArmor.getAmount(), newArmorPointsByFace.getOrDefault(face, 0));
+                    int removedPoints = oldArmor.getAmount() - keptPoints;
+                    time += (removedPoints - keptPoints) * oldArmor.getBaseTimeFor(oldUnit.getEntity());
                     continue;
                 }
                 default -> {
@@ -982,6 +926,8 @@ public class Refit extends Part implements IAcquisitionWork {
                                                                                   .multipliedBy(tonnageNeeded))
                                    .dividedBy(5.0));
             newArmorSupplies.setUnit(null);
+            LOGGER.debug("[Refit] {}: needs {} warehouse points ({} tons) of {} armor", oldUnit.getName(), armorNeeded,
+                  newArmorSupplies.getTonnageNeeded(), newArmorSupplies.getName());
         }
 
         // TODO : use ammo removed from the old unit in the case of changing between
@@ -1673,6 +1619,73 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * Plans the heat sinks a spacecraft refit adds to, or takes out of, the ship's cooling system. The ship keeps the
+     * cooling system itself. Heat sinks built into the engine are never removed or bought; on a change of heat sink
+     * type every other heat sink is replaced, and otherwise only the difference is.
+     *
+     * @param newCoolingSystem the new design's cooling system
+     * @param oldTotalSinks    the ship's heat sinks before the refit
+     * @param oldSinkType      the ship's heat sink type before the refit
+     */
+    private void planSpacecraftHeatSinks(SpacecraftCoolingSystem newCoolingSystem, int oldTotalSinks,
+          int oldSinkType) {
+        int newSinkType = newCoolingSystem.getSinkType();
+        int oldRemovableSinks = Math.max(0, oldTotalSinks - weightFreeSpacecraftHeatSinks(oldUnit.getEntity()));
+        int newRemovableSinks = Math.max(0,
+              newCoolingSystem.getTotalSinks() - weightFreeSpacecraftHeatSinks(newEntity));
+        boolean isTypeChanging = newSinkType != oldSinkType;
+        int sinksToBuy = isTypeChanging ? newRemovableSinks : Math.max(0, newRemovableSinks - oldRemovableSinks);
+        int sinksToReturn = isTypeChanging ? oldRemovableSinks : Math.max(0, oldRemovableSinks - newRemovableSinks);
+
+        for (int sink = 0; sink < sinksToBuy; sink++) {
+            shoppingList.add(new MissingAeroHeatSink(0, newSinkType, false, campaign));
+        }
+        cost = cost.plus(new AeroHeatSink(0, newSinkType, false, campaign).getActualValue().multipliedBy(sinksToBuy));
+        for (int sink = 0; sink < sinksToReturn; sink++) {
+            oldIntegratedHeatSinks.add(new AeroHeatSink(0, oldSinkType, false, campaign));
+        }
+        // 60 minutes for each 50 heat sinks installed, or part of 50 (SO errata)
+        time += WORK_HOUR * (int) Math.ceil(sinksToBuy / 50.0);
+        LOGGER.debug("[Refit] {}: cooling system buys {} heat sinks and returns {}", oldUnit.getName(), sinksToBuy,
+              sinksToReturn);
+    }
+
+    /**
+     * @return the heat sinks built into a spacecraft's engine, which can be neither removed nor replaced
+     */
+    private static int weightFreeSpacecraftHeatSinks(Entity entity) {
+        if (entity instanceof Jumpship jumpship) {
+            return TestAdvancedAerospace.weightFreeHeatSinks(jumpship);
+        } else if (entity instanceof SmallCraft smallCraft) {
+            return TestSmallCraft.weightFreeHeatSinks(smallCraft);
+        }
+        return 0;
+    }
+
+    /**
+     * @return the heat sink type a spacecraft's cooling system holds, the same rule the unit uses to create it
+     */
+    private static int spacecraftHeatSinkType(Entity entity) {
+        int sinkType = ((Aero) entity).getHeatType();
+        if ((sinkType == Aero.HEAT_DOUBLE) && entity.isClan()) {
+            return AeroHeatSink.CLAN_HEAT_DOUBLE;
+        }
+        return sinkType;
+    }
+
+    /**
+     * @return the unit's spacecraft cooling system, or {@code null} if it has none
+     */
+    private static @Nullable SpacecraftCoolingSystem findCoolingSystem(Unit unit) {
+        for (Part part : unit.getParts()) {
+            if (part instanceof SpacecraftCoolingSystem coolingSystem) {
+                return coolingSystem;
+            }
+        }
+        return null;
+    }
+
+    /**
      * @return {@code true} if this refits a battle armor squad into a design with more troopers
      */
     private boolean isBattleArmorSquadGrowing() {
@@ -1730,7 +1743,6 @@ public class Refit extends Part implements IAcquisitionWork {
      * Actually transform the old unit into the new one, and do all the cleanup that that entails
      */
     private void complete() {
-        boolean aClan = false;
         oldUnit.setRefit(null);
         Entity oldEntity = oldUnit.getEntity();
         List<Part> fixedPartsToKeep = getFixedPartsKeptByOmniRefit(oldEntity);
@@ -1738,6 +1750,7 @@ public class Refit extends Part implements IAcquisitionWork {
         partsTheUnitKeeps.addAll(newUnitParts);
         List<MekActuator> releasedArmActuators = releaseArmActuatorsTheNewDesignLacks(partsTheUnitKeeps);
         Map<Integer, Part> oldSuitsByTrooper = getBattleArmorSuitsByTrooper(oldUnit);
+        SpacecraftCoolingSystem keptCoolingSystem = findCoolingSystem(oldUnit);
         // add old parts to the warehouse
         for (Part part : oldUnitParts) {
             part.setUnit(null);
@@ -1771,7 +1784,7 @@ public class Refit extends Part implements IAcquisitionWork {
                 // let's just re-use this armor part
                 if (!sameArmorType) {
                     // give the amount back to the warehouse since we are switching types
-                    armor.changeAmountAvailable(armor.getAmount());
+                    armor.changeAmountAvailable(Armor.toWarehousePoints(oldEntity, armor.getAmount()));
                     if (null != newArmorSupplies) {
                         armor.changeType(newArmorSupplies.getType(), newArmorSupplies.isClanTechBase());
                     }
@@ -1785,6 +1798,11 @@ public class Refit extends Part implements IAcquisitionWork {
 
             } else if (part instanceof MissingPart) {
                 // Don't add missing or destroyed parts to warehouse
+                getWarehouse().removePart(part);
+
+            } else if (part instanceof LargeCraftAmmoBin largeCraftAmmoBin) {
+                // A spacecraft ammo bin is bay capacity, not a part that can be kept as a spare
+                largeCraftAmmoBin.unload();
                 getWarehouse().removePart(part);
 
             } else {
@@ -1803,10 +1821,10 @@ public class Refit extends Part implements IAcquisitionWork {
         // Unload any large craft ammo bins to ensure ammo isn't lost
         // when we're changing the amount but not the type of ammo
         for (Part part : largeCraftBinsToChange) {
-            if (part instanceof AmmoBin) {
-                ((AmmoBin) part).unload();
+            boolean isKeptByTheShip = newUnitParts.contains(part);
+            if ((part instanceof AmmoBin ammoBin) && !isKeptByTheShip) {
+                ammoBin.unload();
             }
-
         }
         // add leftover untracked heat sinks to the warehouse
         for (Part part : oldIntegratedHeatSinks) {
@@ -1826,14 +1844,17 @@ public class Refit extends Part implements IAcquisitionWork {
 
         // set up new parts, starting with any fixed parts an Omni reconfiguration leaves in place
         ArrayList<Part> newParts = new ArrayList<>(fixedPartsToKeep);
+        if (keptCoolingSystem != null) {
+            newParts.add(keptCoolingSystem);
+        }
         // Each trooper's suit becomes a suit of the new design, keeping its quality or staying destroyed
         if (newEntity instanceof BattleArmor newBattleArmor) {
             newParts.addAll(createSuitsForNewDesign(newBattleArmor, oldSuitsByTrooper));
         }
 
         int expectedHeatSinkParts = 0;
-        if (newEntity.getClass() == Aero.class) { // Aero but not subclasses
-            // Only Aerospace Fighters are expected to have heat sink parts (Meks handled separately) SmallCraft,
+        if (isAerospaceFighter(newEntity)) {
+            // Only aerospace fighters are expected to have heat sink parts (Meks handled separately). SmallCraft,
             // DropShip, JumpShip, WarShip, and SpaceStation use SpacecraftCoolingSystem instead
             expectedHeatSinkParts = ((Aero) newEntity).getHeatSinks() -
                                           ((Aero) newEntity).getPodHeatSinks() -
@@ -1891,7 +1912,8 @@ public class Refit extends Part implements IAcquisitionWork {
             part.setUnit(oldUnit);
             part.setRefitUnit(null);
             newParts.add(part);
-            if (part instanceof Armor) {
+            if (part instanceof Armor armor) {
+                keepDamageOnUnchangedArmor(armor);
                 // get amounts correct for armor
                 part.updateConditionFromEntity(false);
             }
@@ -1947,9 +1969,16 @@ public class Refit extends Part implements IAcquisitionWork {
 
         // FIXME: This doesn't deal properly with patchwork armor.
         if (sameArmorType && armorNeeded < 0) {
-            Armor armor = getArmor(aClan);
+            Armor armor = getSurplusArmor();
             armor.changeAmountAvailable(armor.getAmount());
         }
+
+        if (keptCoolingSystem != null) {
+            // The kept cooling system now holds the new design's heat sinks
+            keptCoolingSystem.setSinkType(spacecraftHeatSinkType(newEntity));
+            keptCoolingSystem.updateConditionFromEntity(false);
+        }
+        RefitSpacecraftSystems.refreshKeptSystems(oldUnit);
 
         for (Part part : oldUnit.getParts()) {
             part.updateConditionFromPart();
@@ -1971,6 +2000,7 @@ public class Refit extends Part implements IAcquisitionWork {
             campaign.addReport(PERSONNEL, report);
         }
         oldUnit.resetPilotAndEntity();
+        addPartsForNewLocations();
 
         if (isRefurbishing) {
             for (Part part : oldUnit.getParts()) {
@@ -1980,9 +2010,14 @@ public class Refit extends Part implements IAcquisitionWork {
         MekHQ.triggerEvent(new UnitRefitEvent(oldUnit));
     }
 
-    private Armor getArmor(boolean aClan) {
+    /**
+     * @return the armor left over when the new design carries less armor of the same type, with the new design's armor
+     *       type and tech base
+     */
+    private Armor getSurplusArmor() {
         Armor armor;
         Entity en = oldUnit.getEntity();
+        boolean isClanArmor = en.isClanArmor(en.firstArmorIndex());
         if (en.isSupportVehicle() && en.getArmorType(en.firstArmorIndex()) == EquipmentType.T_ARMOR_STANDARD) {
             armor = new SVArmor(en.getBARRating(en.firstArmorIndex()),
                   en.getArmorTechRating(),
@@ -1995,12 +2030,75 @@ public class Refit extends Part implements IAcquisitionWork {
                   -1 * armorNeeded,
                   -1,
                   false,
-                  aClan,
+                  isClanArmor,
                   getCampaign());
         }
         armor.setUnit(oldUnit);
         return armor;
     }
+
+    /**
+     * A refit kit carries the armor the refit needs. It goes straight into this refit's own armor supplies, which are
+     * reserved for the refit, so no repair can use it first, and {@link #partsInTransit()} waits for it to arrive.
+     *
+     * @param transitDays how long the kit takes to arrive
+     */
+    private void addKitArmor(int transitDays) {
+        int kitArmorPoints = armorNeeded - newArmorSupplies.getAmount();
+        if (kitArmorPoints <= 0) {
+            return;
+        }
+        newArmorSupplies.setAmount(armorNeeded);
+        newArmorSupplies.setAmountNeeded(0);
+        if (newArmorSupplies.getId() <= 0) {
+            getCampaign().getQuartermaster().addPart(newArmorSupplies, transitDays, false);
+        } else {
+            newArmorSupplies.setDaysToArrival(transitDays);
+        }
+        LOGGER.debug("[Refit] {}: the kit brings {} points of {}, reserved for the refit, arriving in {} days",
+              oldUnit.getName(), kitArmorPoints, newArmorSupplies.getName(), transitDays);
+    }
+
+    /**
+     * Armor on a location whose total the refit does not change is carried over as it is, damage included; only
+     * locations the refit changes get new armor. The unit's new design is loaded at full armor, so its value for such
+     * a location is set back to what the armor part holds before the part reads it.
+     *
+     * @param armor an armor part the refitted unit keeps
+     */
+    private void keepDamageOnUnchangedArmor(Armor armor) {
+        Entity entity = oldUnit.getEntity();
+        int location = armor.getLocation();
+        boolean isRear = armor.isRearMounted();
+        boolean isUnchangedLocation = armor.getTotalAmount() == entity.getOArmor(location, isRear);
+        if (isUnchangedLocation && (armor.getAmount() < armor.getTotalAmount())) {
+            entity.setArmor(armor.getAmount(), location, isRear);
+            LOGGER.debug("[Refit] {}: {} keeps its damage, {} of {} armor points", oldUnit.getName(),
+                  entity.getLocationAbbr(location), armor.getAmount(), armor.getTotalAmount());
+        }
+    }
+
+    /**
+     * A location the new design adds, such as a vehicle's new turret, has no armor or structure parts yet. The unit
+     * creates them the same way it does when a campaign is loaded.
+     */
+    private void addPartsForNewLocations() {
+        int partsBefore = oldUnit.getParts().size();
+        oldUnit.initializeParts(true);
+        int partsAdded = oldUnit.getParts().size() - partsBefore;
+        if (partsAdded > 0) {
+            LOGGER.debug("[Refit] {}: added {} parts for locations the new design adds", oldUnit.getName(),
+                  partsAdded);
+        }
+    }
+
+    /**
+     * One face of armor on a unit: a location, and whether it is the rear armor there.
+     *
+     * @param location the location
+     * @param isRear   {@code true} for rear armor
+     */
+    private record ArmorFace(int location, boolean isRear) {}
 
     /**
      * Deal with ammo bin changing munition type during a refit
@@ -2397,27 +2495,6 @@ public class Refit extends Part implements IAcquisitionWork {
     @Override
     public void setShorthandedMod(int i) {
 
-    }
-
-    /**
-     * Requiring the life support system to be changed just because the number of bay personnel changes is a bit much.
-     * Instead, we'll limit it to changes in crew size, measured by quarters.
-     *
-     * @return true if the crew quarters capacity changed.
-     */
-    private boolean crewSizeChanged() {
-        int oldCrew = oldUnit.getEntity()
-                            .getTransportBays()
-                            .stream()
-                            .filter(Bay::isQuarters)
-                            .mapToInt(b -> (int) b.getCapacity())
-                            .sum();
-        int newCrew = newEntity.getTransportBays()
-                            .stream()
-                            .filter(Bay::isQuarters)
-                            .mapToInt(b -> (int) b.getCapacity())
-                            .sum();
-        return oldCrew != newCrew;
     }
 
     /**
@@ -2911,13 +2988,7 @@ public class Refit extends Part implements IAcquisitionWork {
             }
         }
         if (null != newArmorSupplies) {
-            int amount = armorNeeded - newArmorSupplies.getAmount();
-            if (amount > 0) {
-                Armor armor = (Armor) newArmorSupplies.getNewPart();
-                armor.setAmount(amount);
-                getCampaign().getQuartermaster().addPart(armor, transitDays, false);
-            }
-            orderArmorSupplies();
+            addKitArmor(transitDays);
         }
         shoppingList = new ArrayList<>();
         kitFound = true;
@@ -3155,6 +3226,35 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * Bay parts are always listed among the old unit's parts because completion rebuilds them, so they alone remove
+     * nothing from the unit.
+     *
+     * @return {@code true} if the refit takes out any part other than a bay part
+     */
+    private boolean isRemovingPartsOtherThanBays() {
+        for (Part oldPart : oldUnitParts) {
+            if (!(oldPart instanceof TransportBayPart)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Adds the time and refit class of the work on cargo and transport bays that the bays' own parts do not cover.
+     *
+     * @see RefitBayWork
+     */
+    private void planBayWork() {
+        RefitBayWork bayWork = RefitBayWork.between(oldUnit.getEntity(), newEntity);
+        time += bayWork.time();
+        updateRefitClass(bayWork.refitClass());
+        LOGGER.debug("[Refit] {}: {} cargo or infantry bays change and {} bay doors move, bay work {}",
+              oldUnit.getName(), bayWork.baysWithoutCubiclesChanged(), bayWork.doorsMoved(),
+              getRefitClassName(bayWork.refitClass()));
+    }
+
+    /**
      * Assigns bay doors and cubicles as child parts of the bay part. We also need to make sure the bay number of the
      * parts match up to the Entity. The easiest way to do that is to remove all the bay parts and create new ones from
      * scratch. Then we assign doors and cubicles.
@@ -3179,9 +3279,6 @@ public class Refit extends Part implements IAcquisitionWork {
         }
         oldBays.forEach(part -> part.remove(false));
         for (Bay bay : entity.getTransportBays()) {
-            if (bay.isQuarters()) {
-                continue;
-            }
             BayType bayType = BayType.getTypeForBay(bay);
             Part bayPart = new TransportBayPart((int) oldUnit.getEntity().getWeight(),
                   bay.getBayNumber(),
@@ -3219,6 +3316,16 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
+     * Aerospace fighters carry their heat sinks as parts. A conventional fighter is also an {@link AeroSpaceFighter} in
+     * MegaMek but follows its own heat sink rule, and larger craft use a {@link SpacecraftCoolingSystem} instead.
+     *
+     * @return {@code true} if the entity is an aerospace fighter, not a conventional fighter
+     */
+    private static boolean isAerospaceFighter(Entity entity) {
+        return (entity instanceof AeroSpaceFighter) && !(entity instanceof ConvFighter);
+    }
+
+    /**
      * Refits may require adding or removing heat sinks that are not tracked as parts. For Meks and ASFs this would be
      * engine-integrated heat sinks if the heat sink type is changed. For vehicles and conventional fighters this would
      * be heat sinks required by energy weapons.
@@ -3232,7 +3339,7 @@ public class Refit extends Part implements IAcquisitionWork {
             return Math.min(((Mek) entity).heatSinks(),
                   entity.getEngine().integralHeatSinkCapacity(((Mek) entity).hasCompactHeatSinks()));
 
-        } else if (entity.getClass() == Aero.class) { // Aero but not subclasses
+        } else if (isAerospaceFighter(entity)) {
             return entity.getEngine().getWeightFreeEngineHeatSinks();
 
         } else {

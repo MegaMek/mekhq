@@ -59,21 +59,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
-import javax.swing.AbstractAction;
-import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
-import javax.swing.JComponent;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JLayeredPane;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JPopupMenu;
-import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.text.JTextComponent;
 
 import megamek.client.generator.RandomGenderGenerator;
@@ -186,6 +172,22 @@ public class OracleConsole extends JDialog {
           final boolean attribute) {
         showFor(frame, campaign);
         openConsole.showChecksFor(people, attribute);
+    }
+
+    /**
+     * Opens the console on the Journal page with a new note already started.
+     *
+     * @param frame    the MekHQ main window
+     * @param campaign the campaign
+     * @param html     the note's opening text, as HTML
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void showNewNote(final JFrame frame, final Campaign campaign, final String html) {
+        showFor(frame, campaign);
+        openConsole.showPage(ConsolePage.JOURNAL);
+        openConsole.journalPage.newNote(html);
     }
 
     private OracleConsole(final JFrame frame, final Campaign campaign) {
