@@ -161,7 +161,6 @@ import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
-import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.HistoricalLogEntry;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.ServiceLogger;
@@ -255,6 +254,7 @@ import mekhq.campaign.work.IAcquisitionWork;
 import mekhq.campaign.work.IFabricatable;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.RepairAsTechTime;
+import mekhq.campaign.work.RepairLocationCheck;
 import mekhq.campaign.work.RepairTaskHold;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
@@ -2914,9 +2914,7 @@ public class Campaign implements ITechManager {
      */
     public String fixPart(IPartWork partWork, Person tech) {
         // Enforce location constraint: tech must be at the same location as the repair target.
-        ILocation repairTarget = (partWork instanceof Part p && p.getUnit() != null)
-                                       ? p.getUnit() : (ILocation) partWork;
-        if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
+        if (!RepairLocationCheck.isTechAtTask(tech, partWork)) {
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "fixPart.locationMismatch.report",
                   tech.getFullName(), partWork.getPartName());
             addReport(TECHNICAL, report);
