@@ -590,11 +590,60 @@ public final class BriefingTab extends CampaignGuiTab {
      * so refreshing its data preserves the player's chosen sort order.
      */
     static TableRowSorter<ScenarioTableModel> createScenarioSorter(ScenarioTableModel model) {
-        TableRowSorter<ScenarioTableModel> sorter = new TableRowSorter<>(model);
+        TableRowSorter<ScenarioTableModel> sorter = new ScenarioRowSorter(model);
         sorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
         sorter.setComparator(ScenarioTableModel.COL_DATE, Comparator.<ScenarioTableModel.DisplayDate>naturalOrder());
         sorter.setSortKeys(List.of(new RowSorter.SortKey(ScenarioTableModel.COL_DATE, SortOrder.DESCENDING)));
         return sorter;
+    }
+
+    /**
+     * Sorts the date column by each scenario's {@link LocalDate} rather than re-parsing the displayed text, which
+     * depends on the user's display date format and silently mis-sorts when that format doesn't round-trip.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static class ScenarioRowSorter extends TableRowSorter<ScenarioTableModel> {
+        ScenarioRowSorter(ScenarioTableModel model) {
+            super(model);
+            ModelWrapper<ScenarioTableModel, Integer> displayWrapper = getModelWrapper();
+            setModelWrapper(new ModelWrapper<>() {
+                @Override
+                public ScenarioTableModel getModel() {
+                    return displayWrapper.getModel();
+                }
+
+                @Override
+                public int getColumnCount() {
+                    return displayWrapper.getColumnCount();
+                }
+
+                @Override
+                public int getRowCount() {
+                    return displayWrapper.getRowCount();
+                }
+
+                @Override
+                public Object getValueAt(int row, int column) {
+                    if (column == ScenarioTableModel.COL_DATE) {
+                        Scenario scenario = model.getScenario(row);
+                        return (scenario == null) ? null : scenario.getDate();
+                    }
+                    return displayWrapper.getValueAt(row, column);
+                }
+
+                @Override
+                public String getStringValueAt(int row, int column) {
+                    return displayWrapper.getStringValueAt(row, column);
+                }
+
+                @Override
+                public Integer getIdentifier(int row) {
+                    return displayWrapper.getIdentifier(row);
+                }
+            });
+        }
     }
 
     private MMComboBox<ScenarioQueueFilter> createScenarioFilterCombo(String name, ScenarioQueueFilter[] filters) {

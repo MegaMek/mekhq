@@ -116,6 +116,7 @@ import mekhq.gui.FileDialogs;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.commandGeneration.CommandGenerationDialog;
 import mekhq.gui.developerTools.ContractDefinitionEditorDialog;
+import mekhq.gui.developerTools.FactionStandingUltimatumEditorDialog;
 import mekhq.gui.developerTools.ScenarioModifierEditorDialog;
 import mekhq.gui.developerTools.StratConFacilityEditorDialog;
 import mekhq.gui.developerTools.StratConPointOfInterestEditorDialog;
@@ -641,6 +642,11 @@ public class MekHQMenuBar extends JMenuBar {
         JMenuItem miPointOfInterestEditor = createMenuItem("miPointOfInterestEditor.text", KeyEvent.VK_P,
               event -> new StratConPointOfInterestEditorDialog(getFrame()).setVisible(true));
         menuDeveloperTools.add(miPointOfInterestEditor);
+
+        JMenuItem miFactionStandingUltimatumEditor = createMenuItem("miFactionStandingUltimatumEditor.text",
+              KeyEvent.VK_U,
+              event -> new FactionStandingUltimatumEditorDialog(getFrame()).setVisible(true));
+        menuDeveloperTools.add(miFactionStandingUltimatumEditor);
 
         JMenuItem miLifePathBuilder = createMenuItem("miLifePathBuilder.text", KeyEvent.VK_L,
               event -> new LifePathBuilderDialog(getCampaign(), getFrame()));

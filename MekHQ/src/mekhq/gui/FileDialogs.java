@@ -344,6 +344,8 @@ public class FileDialogs {
     private static final String STRAT_CON_FACILITY_DIRECTORY = developerDataDirectory("stratconfacilities");
     private static final String STRAT_CON_POINT_OF_INTEREST_DIRECTORY = developerDataDirectory(
           "stratconpointsofinterest");
+    private static final String FACTION_STANDING_ULTIMATUM_DIRECTORY = developerDataDirectory(
+          "universe/factionStandingUltimatums");
 
     /**
      * Resolves a data subdirectory for the StratCon/scenario Developer Tools editors. In a source checkout the
@@ -470,6 +472,41 @@ public class FileDialogs {
               "Save StratCon Point of Interest",
               FileType.JSON,
               STRAT_CON_POINT_OF_INTEREST_DIRECTORY,
+              fileName + ".json");
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a Faction Standing ultimatum file to load.
+     *
+     * @return the file selected, if any
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Optional<File> openFactionStandingUltimatum(JFrame frame) {
+        return GUI.fileDialogOpen(frame,
+              "Load Faction Standing Ultimatum",
+              FileType.JSON,
+              FACTION_STANDING_ULTIMATUM_DIRECTORY);
+    }
+
+    /**
+     * Displays a dialog window from which the user can select a Faction Standing ultimatum file to save to. The
+     * suggested file name is the ultimatum's name, as the shipped files are named (e.g. {@code EXODUS.json}).
+     *
+     * @param ultimatumName the name of the ultimatum being saved; may be blank
+     *
+     * @return the file selected, if any
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Optional<File> saveFactionStandingUltimatum(JFrame frame, String ultimatumName) {
+        String fileName = ultimatumName.isBlank() ? "ultimatum" : ultimatumName.replaceAll("[^A-Za-z0-9_]", "");
+        return GUI.fileDialogSave(frame,
+              "Save Faction Standing Ultimatum",
+              FileType.JSON,
+              FACTION_STANDING_ULTIMATUM_DIRECTORY,
               fileName + ".json");
     }
 

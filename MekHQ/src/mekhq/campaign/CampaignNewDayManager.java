@@ -1561,19 +1561,22 @@ public class CampaignNewDayManager {
      * @since 0.50.07
      */
     private void performFactionStandingChecks(boolean isFirstOfMonth, boolean isNewYear) {
-        String campaignFactionCode = faction.getShortName();
-        if (isNewYear && campaignFactionCode.equals(MERCENARY_FACTION_CODE)) {
+        if (isNewYear && faction.getShortName().equals(MERCENARY_FACTION_CODE)) {
             campaign.checkForNewMercenaryOrganizationStartUp(false, false);
         }
 
+        // Ultimatums have their own option, so they can be used without Faction Standing
+        if (campaignOptions.get(CampaignOption.USE_FACTION_STANDING_ULTIMATUMS)
+                  && FactionStandingUltimatum.processUltimatum(today, campaign,
+              campaign.getFactionStandingUltimatumsLibrary())) {
+            // The ultimatum may have moved the campaign to another faction. Refresh the cached faction so the rest
+            // of today's checks act for the new faction, not the one the campaign just left.
+            faction = campaign.getPlayerForce().getFaction();
+        }
+        String campaignFactionCode = faction.getShortName();
+
         if (!campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
             return;
-        }
-
-        if (FactionStandingUltimatum.checkUltimatumForDate(today,
-              campaignFactionCode,
-              campaign.getFactionStandingUltimatumsLibrary())) {
-            new FactionStandingUltimatum(today, campaign, campaign.getFactionStandingUltimatumsLibrary());
         }
 
         if (isFirstOfMonth) {
