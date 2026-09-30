@@ -870,6 +870,7 @@ public class StratConContractInitializer {
         facility.setTier(getFacilityTier(contract.getScale(),
               campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
               true));
+        facility.setGarrison(facility.getGarrisonMaximum());
 
         facility.setStrategicObjective(true);
         facility.setVisible(true);

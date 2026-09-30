@@ -57,6 +57,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.Reveal
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.ScanRangeEffect;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.ScenarioOddsEffect;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.SharedModifiersEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.UnknownEffect;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityJson;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityManifest;
@@ -203,14 +204,16 @@ public class StratConFacilityEditorDialog extends JDialog {
         btnAddToManifest.setEnabled(currentFile != null);
     }
 
-    private void load(StratConFacilityDefinition source) {
+    /**
+     * @return how many effects the definition has that this version does not know, which saving will drop
+     */
+    private int load(StratConFacilityDefinition source) {
         txtId.setText(nullToEmpty(source.getId()));
         txtDisplayableName.setText(nullToEmpty(source.getDisplayableName()));
         cboFacilityType.setSelectedItem(source.getFacilityType());
         biomeModel.clear();
         source.getBiomes().forEach(biomeModel::addElement);
-        alliedProfilePanel.load(source.getAlliedProfile());
-        hostileProfilePanel.load(source.getHostileProfile());
+        return alliedProfilePanel.load(source.getAlliedProfile()) + hostileProfilePanel.load(source.getHostileProfile());
     }
 
     private void writeInto(StratConFacilityDefinition target) {
@@ -244,8 +247,15 @@ public class StratConFacilityEditorDialog extends JDialog {
 
         definition = loaded;
         currentFile = file;
-        load(definition);
+        int unknownEffectCount = load(definition);
         updateManifestButtonState();
+
+        if (unknownEffectCount > 0) {
+            JOptionPane.showMessageDialog(this,
+                  getFormattedTextAt(RESOURCE_BUNDLE, "facilityEditor.unknownEffects.message", unknownEffectCount),
+                  getTextAt(RESOURCE_BUNDLE, "facilityEditor.unknownEffects.title"),
+                  JOptionPane.WARNING_MESSAGE);
+        }
     }
 
     private void saveToFile() {
@@ -342,7 +352,7 @@ public class StratConFacilityEditorDialog extends JDialog {
 
     /**
      * Edits one profile of a definition: whether it exists, its description, and the effects this editor knows. An
-     * effect it does not know is kept as it was and written back after the others.
+     * effect this version does not know loads without its data, so it cannot be written back; saving drops it.
      *
      * @author Illiani
      * @since 0.51.01
@@ -357,7 +367,6 @@ public class StratConFacilityEditorDialog extends JDialog {
         private final JSpinner spnMonthlySupportPoints = new JSpinner(new SpinnerNumberModel(0, -1000, 1000, 1));
         private final JCheckBox chkRevealTrack = new JCheckBox();
         private final JCheckBox chkPreventAerospace = new JCheckBox();
-        private final List<IStratConFacilityEffect> otherEffects = new ArrayList<>();
 
         ProfilePanel() {
             super(new GridBagLayout());
@@ -381,8 +390,11 @@ public class StratConFacilityEditorDialog extends JDialog {
             addRow(this, constraints, "facilityEditor.preventAerospace", chkPreventAerospace);
         }
 
-        void load(StratConFacilityProfile profile) {
-            otherEffects.clear();
+        /**
+         * @return how many of the profile's effects this version does not know; they carry none of their data, so
+         *       saving drops them
+         */
+        int load(StratConFacilityProfile profile) {
             chkHasProfile.setSelected(profile != null);
             StratConFacilityProfile source = (profile == null) ? new StratConFacilityProfile() : profile;
 
@@ -395,11 +407,13 @@ public class StratConFacilityEditorDialog extends JDialog {
             chkRevealTrack.setSelected(source.isRevealingTrack());
             chkPreventAerospace.setSelected(source.isPreventingAerospace());
 
+            int unknownEffectCount = 0;
             for (IStratConFacilityEffect effect : source.getEffects()) {
-                if (!isEditedHere(effect)) {
-                    otherEffects.add(effect);
+                if (effect instanceof UnknownEffect) {
+                    unknownEffectCount++;
                 }
             }
+            return unknownEffectCount;
         }
 
         StratConFacilityProfile toProfile() {
@@ -434,19 +448,8 @@ public class StratConFacilityEditorDialog extends JDialog {
             if (chkPreventAerospace.isSelected()) {
                 effects.add(new PreventAerospaceEffect());
             }
-            effects.addAll(otherEffects);
 
             return new StratConFacilityProfile(emptyToNull(txtDescription.getText()), effects);
-        }
-
-        private static boolean isEditedHere(IStratConFacilityEffect effect) {
-            return (effect instanceof LocalModifiersEffect)
-                         || (effect instanceof SharedModifiersEffect)
-                         || (effect instanceof ScanRangeEffect)
-                         || (effect instanceof ScenarioOddsEffect)
-                         || (effect instanceof MonthlySupportPointsEffect)
-                         || (effect instanceof RevealTrackEffect)
-                         || (effect instanceof PreventAerospaceEffect);
         }
     }
 }

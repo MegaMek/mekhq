@@ -222,8 +222,7 @@ public class StratConContractFacilityProfile {
     }
 
     private static @Nullable StratConFacility createRandomFacility(ForceAlignment owner) {
-        boolean isAllied = (owner == ForceAlignment.Allied) || (owner == ForceAlignment.Player);
-        StratConFacility facility = isAllied ?
+        StratConFacility facility = StratConFacilityDefinition.isAlliedToPlayer(owner) ?
                                           StratConFacilityFactory.getRandomAlliedFacility() :
                                           StratConFacilityFactory.getRandomHostileFacility();
         if (facility != null) {

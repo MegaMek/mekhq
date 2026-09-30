@@ -232,6 +232,10 @@ public class StratConFacility {
     @XmlTransient
     private StratConFacilityDefinition detachedDefinition;
 
+    // whether detachedDefinition is a placeholder for an ID no loaded definition has
+    @XmlTransient
+    private boolean isDefinitionMissing;
+
     /**
      * A temporary variable used to track situations where changing the ownership of this facility hinges upon multiple
      * objectives
@@ -296,10 +300,23 @@ public class StratConFacility {
                   FacilityType.BaseOfOperations,
                   null,
                   null);
+            isDefinitionMissing = true;
             return detachedDefinition;
         }
 
         return definition;
+    }
+
+    /**
+     * @return {@code true} if no loaded definition has the facility's ID, so it stands on a placeholder. Its type is
+     *       only a stand-in for drawing it: it is no source of supply and no synergy partner.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isDefinitionMissing() {
+        getDefinition();
+        return isDefinitionMissing;
     }
 
     /**
@@ -317,16 +334,14 @@ public class StratConFacility {
     }
 
     public void setOwner(ForceAlignment owner) {
-        boolean isSideChanged = (this.owner != null) && (isAlliedToPlayer(this.owner) != isAlliedToPlayer(owner));
+        boolean isSideChanged = (this.owner != null)
+                                      && (StratConFacilityDefinition.isAlliedToPlayer(this.owner)
+                                                != StratConFacilityDefinition.isAlliedToPlayer(owner));
         this.owner = owner;
         // A facility changing sides joins its new holder's supply lines afresh.
         if (isSideChanged) {
             networked = false;
         }
-    }
-
-    private static boolean isAlliedToPlayer(@Nullable ForceAlignment alignment) {
-        return (alignment == ForceAlignment.Allied) || (alignment == ForceAlignment.Player);
     }
 
     /**

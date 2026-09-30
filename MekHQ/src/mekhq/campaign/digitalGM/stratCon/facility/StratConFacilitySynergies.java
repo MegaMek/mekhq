@@ -111,6 +111,7 @@ public final class StratConFacilitySynergies {
     private static boolean isAbleToPartner(StratConTrackState track, StratConCoords coords,
           StratConFacility facility) {
         return (facility.getFacilityType() != null)
+                     && !facility.isDefinitionMissing()
                      && (facility.getCondition() != FacilityCondition.CRIPPLED)
                      && !StratConFacilitySupply.isCutOff(track, coords);
     }

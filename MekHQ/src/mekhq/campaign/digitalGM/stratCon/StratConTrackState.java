@@ -46,6 +46,7 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOrder;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConRoadCut;
@@ -233,7 +234,8 @@ public class StratConTrackState {
     }
 
     /**
-     * Removes a StratConScenario from this track.
+     * Removes a StratConScenario from this track, sending home the formations assigned to it. A formation still
+     * besieging a facility stays where it is: the siege outlasts the fight.
      */
     public void removeScenario(StratConScenario scenario) {
         scenarios.remove(scenario.getCoords());
@@ -241,7 +243,10 @@ public class StratConTrackState {
 
         // any assigned forces get cleared out here as well.
         for (int forceID : scenario.getAssignedForces()) {
-            unassignFormation(forceID);
+            StratConFacilityOrder order = getFacilityOrder(forceID);
+            if ((order == null) || (order.getOperation() != FacilityOperation.SIEGE)) {
+                unassignFormation(forceID);
+            }
 
             // scenario bookkeeping
             scenario.getPrimaryForceIDs().clear();

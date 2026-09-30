@@ -40,12 +40,16 @@ import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.LocalModifiersEffect;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -106,6 +110,19 @@ class StratConEnemyEngineersBehaviorTest {
         behavior.onLinkedScenarioEnded(engineers, track, true, campaign);
 
         assertNull(track.getFacility(COORDS));
+        assertNull(track.getPointOfInterest(engineers.getId()));
+    }
+
+    @Test
+    void engineersWhoseHexIsTakenMeanwhileBuildNothingButStillLeave() {
+        StratConFacility existing = StratConTestData.facility(ForceAlignment.Allied,
+              FacilityType.MekBase,
+              new LocalModifiersEffect(List.of("MekGarrison.json")));
+        track.addFacility(COORDS, existing);
+
+        assertNull(behavior.buildOutpost(engineers, track, campaign));
+
+        assertEquals(existing, track.getFacility(COORDS));
         assertNull(track.getPointOfInterest(engineers.getId()));
     }
 }

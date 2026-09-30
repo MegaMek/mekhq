@@ -58,6 +58,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTestDice;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -143,13 +144,14 @@ class StratConFacilityOperationsTest {
     @Nested
     class OfferedOrders {
         @Test
-        void anEnemyFacilityOffersTheFourOrdersAgainstIt() {
+        void anEnemyFacilityOffersTheFiveOrdersAgainstIt() {
             placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
 
             assertEquals(List.of(FacilityOperation.RECON,
                         FacilityOperation.RAID,
                         FacilityOperation.SABOTAGE,
-                        FacilityOperation.ASSAULT),
+                        FacilityOperation.ASSAULT,
+                        FacilityOperation.SIEGE),
                   StratConFacilityOperations.getOperationsFor(track, FACILITY_COORDS));
         }
 
@@ -185,9 +187,11 @@ class StratConFacilityOperationsTest {
     @Nested
     class Reach {
         @Test
-        void aFormationOnTheHexIsInReachOfEveryOrder() {
+        void aFormationOnTheHexIsInReachOfEveryOrderButSiege() {
             for (FacilityOperation operation : FacilityOperation.values()) {
-                assertTrue(StratConFacilityOperations.isInReach(FACILITY_COORDS, FACILITY_COORDS, operation));
+                assertEquals(operation != FacilityOperation.SIEGE,
+                      StratConFacilityOperations.isInReach(FACILITY_COORDS, FACILITY_COORDS, operation),
+                      operation.name());
             }
         }
 
@@ -542,6 +546,225 @@ class StratConFacilityOperationsTest {
             when(campaign.getGUI()).thenReturn(null);
 
             assertEquals(FacilityCaptureChoice.HOLD, StratConFacilityOperations.askCaptureChoice(campaign, facility));
+        }
+    }
+
+    @Nested
+    class AwkwardCases {
+        private StratConFacilityOrder recon(LocalDate completionDate) {
+            StratConFacilityOrder order = new StratConFacilityOrder(FacilityOperation.RECON,
+                  FORMATION_ID,
+                  FACILITY_COORDS,
+                  completionDate,
+                  null);
+            track.addFacilityOrder(order);
+            track.addStickyForce(FORMATION_ID);
+            return order;
+        }
+
+        @Test
+        void aReconDueOnAFacilityThePlayerHasSinceTakenIsAbandoned() {
+            StratConFacility facility = placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+            deployFormationAt(FACILITY_COORDS);
+            recon(TODAY);
+            facility.setOwner(ForceAlignment.Player);
+
+            StratConFacilityOperations.processOrders(track, campaign);
+
+            assertTrue(track.getFacilityOrders().isEmpty());
+            assertFalse(track.getStickyForces().contains(FORMATION_ID));
+        }
+
+        @Test
+        void aReconDueOnAFacilityRazedMeanwhileIsAbandoned() {
+            placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+            deployFormationAt(FACILITY_COORDS);
+            recon(TODAY);
+            track.removeFacility(FACILITY_COORDS);
+
+            StratConFacilityOperations.processOrders(track, campaign);
+
+            assertTrue(track.getFacilityOrders().isEmpty());
+        }
+
+        @Test
+        void anOrderIsKeptUntilItsDayAndNotADayLonger() {
+            StratConFacility facility = placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+            facility.setIntel(FacilityIntel.LOCATED);
+            deployFormationAt(FACILITY_COORDS);
+            recon(TODAY.plusDays(1));
+
+            StratConFacilityOperations.processOrders(track, campaign);
+
+            assertEquals(1, track.getFacilityOrders().size());
+            assertEquals(FacilityIntel.LOCATED, facility.getIntel());
+        }
+
+        @Test
+        void aBuildOfADefinitionNoLongerLoadedBuildsNothing() {
+            deployFormationAt(FACILITY_COORDS);
+            track.addFacilityOrder(new StratConFacilityOrder(FacilityOperation.BUILD,
+                  FORMATION_ID,
+                  FACILITY_COORDS,
+                  TODAY,
+                  "NoSuchFacility"));
+            when(campaign.getActiveContracts()).thenReturn(List.of(contract));
+
+            StratConFacilityOperations.processOrders(track, campaign);
+
+            assertTrue(track.getFacilityOrders().isEmpty());
+            assertNull(track.getFacility(FACILITY_COORDS));
+        }
+
+        @Test
+        void aSecondBuildCannotBeStartedOnAHexAlreadyBeingBuiltOn() {
+            track.addFacilityOrder(new StratConFacilityOrder(FacilityOperation.BUILD,
+                  FORMATION_ID + 1,
+                  FACILITY_COORDS,
+                  TODAY.plusDays(5),
+                  "MekBase"));
+
+            assertEquals("reason.hexOccupied", StratConFacilityOperations.getUnavailableReasonKey(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FacilityOperation.BUILD));
+        }
+
+        @Test
+        void aBuildWithNothingChosenIsNotGivenAndCostsNothing() {
+            deployFormationAt(FACILITY_COORDS);
+
+            assertFalse(StratConFacilityOperations.issueOrder(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FORMATION_ID,
+                  FacilityOperation.BUILD,
+                  null));
+            assertEquals(10, campaignState.getSupportPoints());
+        }
+
+        @Test
+        void aFormationAlreadyInAFightIsNotEligible() {
+            placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+            deployFormationAt(FACILITY_COORDS);
+            when(campaign.getPlayerForce().getFormation(FORMATION_ID).isDeployed()).thenReturn(true);
+
+            assertTrue(StratConFacilityOperations.getEligibleFormationIds(campaign,
+                  track,
+                  FACILITY_COORDS,
+                  FacilityOperation.RAID).isEmpty());
+        }
+
+        @Test
+        void ordersAgainstAFacilityCannotBeGivenWhileAFightIsUnderWayThere() {
+            placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+            StratConScenario scenario = new StratConScenario();
+            scenario.setCoords(FACILITY_COORDS);
+            track.getScenarios().put(FACILITY_COORDS, scenario);
+
+            for (FacilityOperation operation : List.of(FacilityOperation.RECON,
+                  FacilityOperation.RAID,
+                  FacilityOperation.ASSAULT)) {
+                assertEquals("reason.scenarioUnderway", StratConFacilityOperations.getUnavailableReasonKey(campaign,
+                      contract,
+                      track,
+                      FACILITY_COORDS,
+                      operation), operation.name());
+            }
+        }
+
+        @Test
+        void ordersForYourOwnFacilitiesCannotBeGivenOnTheEnemys() {
+            placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+
+            assertEquals("reason.notHeld", StratConFacilityOperations.getUnavailableReasonKey(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FacilityOperation.REINFORCE));
+        }
+
+        @Test
+        void sabotageOnADamagedFacilityStopsAtCrippled() {
+            StratConFacility facility = placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+            facility.setCondition(FacilityCondition.DAMAGED);
+
+            StratConFacilityOperations.resolveSabotage(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FORMATION_ID,
+                  12);
+
+            assertEquals(FacilityCondition.CRIPPLED, facility.getCondition());
+            assertEquals(facility, track.getFacility(FACILITY_COORDS));
+        }
+
+        @Test
+        void fortifyingKeepsTheGarrisonItHad() {
+            StratConFacility facility = placeFacility(ForceAlignment.Player, FacilityType.MekBase);
+            facility.setTier(FacilityTier.OUTPOST);
+            deployFormationAt(FACILITY_COORDS);
+
+            StratConFacilityOperations.issueOrder(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FORMATION_ID,
+                  FacilityOperation.FORTIFY,
+                  null);
+
+            assertEquals(FacilityTier.BASE, facility.getTier());
+            assertEquals(FacilityTier.OUTPOST.getGarrisonMaximum(), facility.getGarrison());
+        }
+
+        @Test
+        void holdingAFacilityWithNoGarrisonLeftMansItFully() {
+            StratConFacility facility = placeFacility(ForceAlignment.Allied, FacilityType.MekBase);
+            facility.setGarrison(0);
+
+            StratConFacilityOperations.resolveCapture(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FacilityCaptureChoice.HOLD);
+
+            assertEquals(facility.getGarrisonMaximum(), facility.getGarrison());
+        }
+
+        @Test
+        void aCaptureWithNoFacilityLeftDoesNothing() {
+            StratConFacilityOperations.resolveCapture(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FacilityCaptureChoice.RAZE);
+
+            assertEquals(0, campaignState.getEscalation());
+        }
+
+        @Test
+        void razingAFacilityEndsTheSiegesOnItTheNextDay() {
+            placeFacility(ForceAlignment.Allied, FacilityType.MekBase);
+            deployFormationAt(FACILITY_COORDS.translate(0));
+            track.addFacilityOrder(new StratConFacilityOrder(FacilityOperation.SIEGE,
+                  FORMATION_ID,
+                  FACILITY_COORDS,
+                  TODAY,
+                  null));
+            track.addStickyForce(FORMATION_ID);
+
+            StratConFacilityOperations.resolveCapture(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FacilityCaptureChoice.RAZE);
+            StratConFacilityOperations.processOrders(track, campaign);
+
+            assertTrue(track.getFacilityOrders().isEmpty());
+            assertFalse(track.getStickyForces().contains(FORMATION_ID));
         }
     }
 }

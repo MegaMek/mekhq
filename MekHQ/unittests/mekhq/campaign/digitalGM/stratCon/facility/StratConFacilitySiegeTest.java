@@ -41,6 +41,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
@@ -48,12 +49,16 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
+import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.LocalModifiersEffect;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -100,6 +105,7 @@ class StratConFacilitySiegeTest {
         campaignState.setSupportPoints(5);
         contract = mock(AbstractContract.class);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
+        when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.STALEMATE);
 
         campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         options = mock(CampaignOptions.class);
@@ -126,14 +132,39 @@ class StratConFacilitySiegeTest {
         track.getCutOffFacilities().add(FACILITY_COORDS);
     }
 
+    /** Starts a siege a full week ago, so this Monday's step charges and counts it. */
     private void besiege(int formationId, int direction) {
+        besiege(formationId, direction, TODAY.minusDays(StratConFacilitySiege.SIEGE_FIRST_WEEK_DAYS));
+    }
+
+    private void besiege(int formationId, int direction, LocalDate startDate) {
         track.assignForce(formationId, FACILITY_COORDS.translate(direction), TODAY, false);
         track.addFacilityOrder(new StratConFacilityOrder(FacilityOperation.SIEGE,
               formationId,
               FACILITY_COORDS,
-              TODAY,
+              startDate,
               null));
         track.addStickyForce(formationId);
+    }
+
+    /**
+     * Puts a fight over the siege on a besieger's hex, with that formation in it, as a sortie or relief force would
+     * be.
+     */
+    private StratConScenario siegeFight(int formationId, boolean isSortie) {
+        List<Integer> forceIds = new ArrayList<>(List.of(formationId));
+        AtBDynamicScenario backingScenario = mock(AtBDynamicScenario.class);
+        when(backingScenario.getId()).thenReturn(99);
+        when(backingScenario.getForceIDs()).thenReturn(forceIds);
+
+        StratConScenario scenario = new StratConScenario();
+        scenario.setCoords(track.getAssignedForceCoords().get(formationId));
+        scenario.setBackingScenario(backingScenario);
+        scenario.setFacilityOperation(FacilityOperation.SIEGE);
+        scenario.setSiegeCoords(FACILITY_COORDS);
+        scenario.setSiegeSortie(isSortie);
+        track.addScenario(scenario);
+        return scenario;
     }
 
     @Nested
@@ -229,6 +260,19 @@ class StratConFacilitySiegeTest {
 
             assertEquals(garrison - 1, facility.getGarrison());
             assertEquals(5 - StratConFacilitySiege.SIEGE_WEEKLY_COST, campaignState.getSupportPoints());
+        }
+
+        @Test
+        void aSiegeUnderAWeekOldIsNeitherChargedNorCounted() {
+            facility.setGarrison(facility.getGarrisonMaximum());
+            int garrison = facility.getGarrison();
+            besiege(FORMATION_ID, 0, TODAY.minusDays(1));
+
+            StratConFacilitySiege.processSieges(track, campaign);
+
+            assertEquals(garrison, facility.getGarrison());
+            assertEquals(5, campaignState.getSupportPoints());
+            assertTrue(StratConFacilitySiege.isBesieged(track, FACILITY_COORDS));
         }
 
         @Test
@@ -368,6 +412,252 @@ class StratConFacilitySiegeTest {
             StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, true);
 
             assertEquals(garrison, facility.getGarrison());
+        }
+    }
+
+    @Nested
+    class AwkwardCases {
+        @Test
+        void aFormationOnTheFacilityItselfCannotBesiegeIt() {
+            track.assignForce(FORMATION_ID, FACILITY_COORDS, TODAY, false);
+
+            assertFalse(StratConFacilityOperations.issueOrder(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FORMATION_ID,
+                  FacilityOperation.SIEGE,
+                  null));
+            assertEquals(5, campaignState.getSupportPoints());
+            assertFalse(StratConFacilitySiege.isBesieged(track, FACILITY_COORDS));
+        }
+
+        @Test
+        void aSiegeCannotBeOrderedWithoutTheSupportForIt() {
+            campaignState.setSupportPoints(StratConFacilityOperations.SIEGE_COST - 1);
+
+            assertEquals("reason.supportPoints", StratConFacilityOperations.getUnavailableReasonKey(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FacilityOperation.SIEGE));
+        }
+
+        @Test
+        void aSiegeCannotBeOrderedWhileAFightIsUnderWayOnTheFacility() {
+            StratConScenario scenario = new StratConScenario();
+            scenario.setCoords(FACILITY_COORDS);
+            track.getScenarios().put(FACILITY_COORDS, scenario);
+
+            assertEquals("reason.scenarioUnderway", StratConFacilityOperations.getUnavailableReasonKey(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FacilityOperation.SIEGE));
+        }
+
+        @Test
+        void aBesiegingFormationCannotTakeAnotherOrder() {
+            besiege(FORMATION_ID, 0);
+
+            assertTrue(StratConFacilityOperations.getEligibleFormationIds(campaign,
+                  track,
+                  FACILITY_COORDS,
+                  FacilityOperation.RAID).isEmpty());
+        }
+
+        @Test
+        void liftingASiegeLeavesAnyOtherOrderAlone() {
+            track.assignForce(FORMATION_ID, FACILITY_COORDS, TODAY, false);
+            StratConFacilityOrder recon = new StratConFacilityOrder(FacilityOperation.RECON,
+                  FORMATION_ID,
+                  FACILITY_COORDS,
+                  TODAY.plusDays(3),
+                  null);
+            track.addFacilityOrder(recon);
+
+            assertFalse(StratConFacilitySiege.liftSiege(campaign, track, FORMATION_ID));
+            assertEquals(recon, track.getFacilityOrder(FORMATION_ID));
+        }
+
+        @Test
+        void aSiegeSixDaysOldIsNotYetCountedButOneAWeekOldIs() {
+            facility.setGarrison(facility.getGarrisonMaximum());
+            int garrison = facility.getGarrison();
+            besiege(FORMATION_ID, 0, TODAY.minusDays(StratConFacilitySiege.SIEGE_FIRST_WEEK_DAYS - 1));
+            besiege(SECOND_FORMATION_ID, 1, TODAY.minusDays(StratConFacilitySiege.SIEGE_FIRST_WEEK_DAYS));
+
+            StratConFacilitySiege.processSieges(track, campaign);
+
+            assertEquals(garrison - 1, facility.getGarrison());
+            assertEquals(5 - StratConFacilitySiege.SIEGE_WEEKLY_COST, campaignState.getSupportPoints());
+        }
+
+        @Test
+        void whenSupportRunsOutPartWayOnlyTheFormationsPaidForStay() {
+            facility.setGarrison(facility.getGarrisonMaximum());
+            int garrison = facility.getGarrison();
+            campaignState.setSupportPoints(StratConFacilitySiege.SIEGE_WEEKLY_COST);
+            besiege(FORMATION_ID, 0);
+            besiege(SECOND_FORMATION_ID, 1);
+
+            StratConFacilitySiege.processSieges(track, campaign);
+
+            assertEquals(0, campaignState.getSupportPoints());
+            assertEquals(1, StratConFacilitySiege.getSieges(track, FACILITY_COORDS).size());
+            assertEquals(garrison - 1, facility.getGarrison());
+            assertFalse(track.getStickyForces().contains(SECOND_FORMATION_ID));
+        }
+
+        @Test
+        void aFacilityTakenByOtherMeansIsNotChargedForAndItsSiegesEndNextDay() {
+            besiege(FORMATION_ID, 0);
+            facility.setOwner(ForceAlignment.Player);
+
+            StratConFacilitySiege.processSieges(track, campaign);
+            assertEquals(5, campaignState.getSupportPoints());
+
+            StratConFacilityOperations.processOrders(track, campaign);
+            assertFalse(StratConFacilitySiege.isBesieged(track, FACILITY_COORDS));
+            assertFalse(track.getStickyForces().contains(FORMATION_ID));
+        }
+
+        @Test
+        void aRazedFacilitysSiegesEndWithoutCharge() {
+            besiege(FORMATION_ID, 0);
+            track.removeFacility(FACILITY_COORDS);
+
+            StratConFacilitySiege.processSieges(track, campaign);
+            StratConFacilityOperations.processOrders(track, campaign);
+
+            assertEquals(5, campaignState.getSupportPoints());
+            assertFalse(StratConFacilitySiege.isBesieged(track, FACILITY_COORDS));
+        }
+
+        @Test
+        void aSurrenderedFacilityIsHeldAtFullGarrison() {
+            facility.setGarrison(1);
+            besiege(FORMATION_ID, 0);
+
+            StratConFacilitySiege.processSieges(track, campaign);
+
+            assertEquals(ForceAlignment.Player, facility.getOwner());
+            assertEquals(facility.getGarrisonMaximum(), facility.getGarrison());
+        }
+
+        @Test
+        void aGarrisonAlreadyEmptySurrendersAtTheFirstWeeklyStep() {
+            facility.setGarrison(0);
+            besiege(FORMATION_ID, 0);
+
+            StratConFacilitySiege.processSieges(track, campaign);
+
+            assertEquals(ForceAlignment.Player, facility.getOwner());
+        }
+
+        @Test
+        void aBesiegerKeepsItsPlaceAfterAWonFightIsCleared() {
+            besiege(FORMATION_ID, 0);
+            StratConCoords besiegerCoords = track.getAssignedForceCoords().get(FORMATION_ID);
+            StratConScenario fight = siegeFight(FORMATION_ID, false);
+
+            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, false, true);
+            track.removeScenario(fight);
+            StratConFacilityOperations.processOrders(track, campaign);
+
+            assertTrue(StratConFacilitySiege.isBesieged(track, FACILITY_COORDS));
+            assertEquals(besiegerCoords, track.getAssignedForceCoords().get(FORMATION_ID));
+            assertTrue(track.getStickyForces().contains(FORMATION_ID));
+        }
+
+        @Test
+        void aBesiegerThatLostIsSentHomeWhenTheFightIsCleared() {
+            besiege(FORMATION_ID, 0);
+            StratConScenario fight = siegeFight(FORMATION_ID, true);
+
+            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, false);
+            track.removeScenario(fight);
+
+            assertNull(track.getAssignedForceCoords().get(FORMATION_ID));
+        }
+
+        @Test
+        void aFightOverASiegeLeftUnplayedBreaksItAsALossWould() {
+            besiege(FORMATION_ID, 0);
+            besiege(SECOND_FORMATION_ID, 1);
+            StratConScenario fight = siegeFight(FORMATION_ID, false);
+
+            StratConRulesManager.processIgnoredStratConScenario(fight,
+                  track,
+                  campaignState);
+
+            assertFalse(StratConFacilitySiege.isBesieged(track, FACILITY_COORDS));
+            assertNull(track.getAssignedForceCoords().get(FORMATION_ID));
+            assertFalse(track.getStickyForces().contains(SECOND_FORMATION_ID));
+        }
+
+        @Test
+        void aGarrisonDoesNotSortieWhileAFightOverTheSiegeIsUnderWay() {
+            track.getCutOffFacilities().clear();
+            besiege(FORMATION_ID, 0);
+            besiege(SECOND_FORMATION_ID, 1);
+            siegeFight(FORMATION_ID, false);
+
+            assertTrue(StratConFacilitySiege.isSiegeFightUnderway(track, FACILITY_COORDS));
+            assertNull(StratConFacilitySiege.trySortie(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  List.of(SECOND_FORMATION_ID),
+                  0));
+        }
+
+        @Test
+        void aRoutedGarrisonNeverSorties() {
+            track.getCutOffFacilities().clear();
+            track.setScenarioOdds(100);
+            when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.ROUTED);
+            besiege(FORMATION_ID, 0);
+
+            assertNull(StratConFacilitySiege.trySortie(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  List.of(FORMATION_ID),
+                  0));
+        }
+
+        @Test
+        void aRollAboveTheOddsBringsNoSortie() {
+            track.getCutOffFacilities().clear();
+            track.setScenarioOdds(10);
+            besiege(FORMATION_ID, 0);
+
+            assertNull(StratConFacilitySiege.trySortie(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  List.of(FORMATION_ID),
+                  11));
+        }
+
+        @Test
+        void noReliefComesWithoutEnemyActivity() {
+            track.getCutOffFacilities().clear();
+            besiege(FORMATION_ID, 0);
+
+            assertNull(StratConFacilitySiege.tryRelief(campaign, contract, track, FACILITY_COORDS, FORMATION_ID));
+            assertNull(campaignState.getLastCounterattackDate());
+        }
+
+        @Test
+        void aReliefForceWithNoBesiegerToFallOnDoesNotCountAsACounterattack() {
+            track.getCutOffFacilities().clear();
+            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(3.0);
+            campaignState.setLastCounterattackDate(TODAY.minusDays(100));
+
+            assertNull(StratConFacilitySiege.tryRelief(campaign, contract, track, FACILITY_COORDS, FORMATION_ID));
+            assertEquals(TODAY.minusDays(100), campaignState.getLastCounterattackDate());
         }
     }
 }

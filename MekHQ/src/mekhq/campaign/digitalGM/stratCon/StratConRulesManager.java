@@ -1552,6 +1552,7 @@ public class StratConRulesManager {
                     facility.setTier(StratConContractInitializer.getFacilityTier(contract.getScale(),
                           campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
                           false));
+                    facility.setGarrison(facility.getGarrisonMaximum());
                     facility.setVisible(true);
                     track.addFacility(coords, facility);
                     setupFacilityScenario(scenario, facility);
@@ -4669,9 +4670,15 @@ public class StratConRulesManager {
             campaignState.changeVictoryPoints(-1);
         }
 
+        // A fight over a siege left unplayed breaks the siege, as losing it would.
+        if ((scenario.getFacilityOperation() == FacilityOperation.SIEGE) && (scenario.getSiegeCoords() != null)) {
+            StratConFacilitySiege.endSieges(track, scenario.getSiegeCoords());
+        }
+
         // Fail the objective if no facility is found. Only a counterattack, handled above, costs a facility: an
-        // ordinary scenario left unplayed on one no longer does.
-        if (localFacility == null) {
+        // ordinary scenario left unplayed on one no longer does. A siege fight is on the besiegers' hex, and stands
+        // for no objective there.
+        if ((localFacility == null) && (scenario.getFacilityOperation() != FacilityOperation.SIEGE)) {
             track.failObjective(scenario.getCoords());
         }
 

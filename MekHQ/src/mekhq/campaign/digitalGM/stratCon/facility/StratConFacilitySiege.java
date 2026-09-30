@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.facility;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -79,6 +80,9 @@ public final class StratConFacilitySiege {
 
     /** The most garrison steps a siege takes from a facility each week, however many formations besiege it. */
     static final int MAXIMUM_WEEKLY_GARRISON_LOSS = 2;
+
+    /** How many days the order's own support point pays for, before the weekly cost begins. */
+    static final int SIEGE_FIRST_WEEK_DAYS = 7;
 
     private StratConFacilitySiege() {
     }
@@ -248,7 +252,7 @@ public final class StratConFacilitySiege {
      * @author Illiani
      * @since 0.51.01
      */
-    static void endSieges(StratConTrackState track, StratConCoords coords) {
+    public static void endSieges(StratConTrackState track, StratConCoords coords) {
         for (StratConFacilityOrder order : getSieges(track, coords)) {
             StratConFacilityOperations.endOrder(track, order);
         }
@@ -306,15 +310,22 @@ public final class StratConFacilitySiege {
 
     /**
      * Charges this week's support points for each formation besieging a facility, and tires its crews as a Patrol
-     * does. A formation the player cannot pay for lifts its siege.
+     * does. A formation the player cannot pay for lifts its siege. A siege begun less than a week ago was paid for when
+     * it was ordered, and has not yet had time to bite, so it is neither charged nor counted.
      *
-     * @return the IDs of the formations still besieging the facility
+     * @return the IDs of the formations besieging the facility for this week
      */
     private static List<Integer> payBesiegers(Campaign campaign, StratConCampaignState campaignState,
           StratConTrackState track, StratConCoords coords) {
         List<Integer> besiegerIds = new ArrayList<>();
+        LocalDate firstWeekStart = campaign.getLocalDate().minusDays(SIEGE_FIRST_WEEK_DAYS);
         for (StratConFacilityOrder order : getSieges(track, coords)) {
             int formationId = order.getFormationId();
+            // The order's date is the day the siege began.
+            if (order.getCompletionDate().isAfter(firstWeekStart)) {
+                continue;
+            }
+
             if (campaignState.getSupportPoints() < SIEGE_WEEKLY_COST) {
                 StratConFacilityOperations.endOrder(track, order);
                 StratConFacilityOperations.report(campaign,

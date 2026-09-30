@@ -141,7 +141,8 @@ class StratConFacilityLegacyTest {
             facility.resolveLegacyData();
 
             assertEquals(List.of("FacilityHostileDestroy.json"), facility.getAdditionalLocalModifiers());
-            assertEquals(List.of("EnemyMekGarrison.json", "FacilityHostileDestroy.json"),
+            // An old save's facility is a Base at full garrison, whose second step adds the turrets.
+            assertEquals(List.of("EnemyMekGarrison.json", "EnemyTurrets.json", "FacilityHostileDestroy.json"),
                   facility.getLocalModifiers());
         }
 

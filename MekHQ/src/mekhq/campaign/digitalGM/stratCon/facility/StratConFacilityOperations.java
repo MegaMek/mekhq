@@ -678,7 +678,7 @@ public final class StratConFacilityOperations {
      * Carries out the player's choice for a facility they have just captured, which is now Allied.
      *
      * <ul>
-     *     <li>{@link FacilityCaptureChoice#HOLD}: the player holds it.</li>
+     *     <li>{@link FacilityCaptureChoice#HOLD}: the player holds it, at full garrison.</li>
      *     <li>{@link FacilityCaptureChoice#RAZE}: it is destroyed, raising Escalation by 3d6 for a civilian facility
      *     (a Spaceport, Data Center or Industrial Facility), or 1d6 otherwise.</li>
      *     <li>{@link FacilityCaptureChoice#HAND_OVER}: it stays with the employer, at full garrison, and the contract's
@@ -703,7 +703,11 @@ public final class StratConFacilityOperations {
 
         String facilityName = facility.getDisplayableName();
         switch (choice) {
-            case HOLD -> facility.setOwner(ForceAlignment.Player);
+            case HOLD -> {
+                // The player's own troops move in; the enemy's leftover garrison is not theirs to keep.
+                facility.setOwner(ForceAlignment.Player);
+                facility.setGarrison(facility.getGarrisonMaximum());
+            }
             case RAZE -> {
                 track.removeFacility(coords);
                 if (isCivilian(facility.getFacilityType())) {

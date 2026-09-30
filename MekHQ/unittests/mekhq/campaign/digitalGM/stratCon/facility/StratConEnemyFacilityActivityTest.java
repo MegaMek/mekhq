@@ -391,4 +391,102 @@ class StratConEnemyFacilityActivityTest {
             assertEquals(List.of(TODAY.plusDays(4)), loaded.getEnemyEngineerDates());
         }
     }
+
+    @Nested
+    class AwkwardCases {
+        @Test
+        void lowerActivityWaitsLongerBeforeACounterattackIsCertain() {
+            assertFalse(StratConEnemyFacilityActivity.isCounterattack(0.5, 59, 99));
+            assertTrue(StratConEnemyFacilityActivity.isCounterattack(0.5, 60, 99));
+        }
+
+        @Test
+        void aContractWithNoStartDateCountsNoDaysSinceTheLastCounterattack() {
+            when(contract.getStartDate()).thenReturn(null);
+
+            assertEquals(0, StratConEnemyFacilityActivity.getDaysSinceLastCounterattack(contract,
+                  campaignState,
+                  TODAY));
+
+            campaignState.setLastCounterattackDate(TODAY.minusDays(12));
+            assertEquals(12, StratConEnemyFacilityActivity.getDaysSinceLastCounterattack(contract,
+                  campaignState,
+                  TODAY));
+        }
+
+        @Test
+        void counterattacksCanFallOnAnySectorOfTheContract() {
+            placeFacility(ForceAlignment.Player);
+            StratConTrackState otherTrack = new StratConTrackState();
+            otherTrack.setWidth(8);
+            otherTrack.setHeight(8);
+            campaignState.addTrack(otherTrack);
+            otherTrack.addFacility(FACILITY_COORDS, StratConTestData.facility(ForceAlignment.Allied,
+                  FacilityType.TankBase,
+                  new LocalModifiersEffect(List.of("MekGarrison.json"))));
+
+            assertEquals(2, StratConEnemyFacilityActivity.getCounterattackTargets(campaignState).size());
+        }
+
+        @Test
+        void anEmployerGarrisonAlreadyEmptyNeverGoesBelowNothing() {
+            StratConFacility facility = placeFacility(ForceAlignment.Allied);
+            facility.setGarrison(0);
+            StratConScenario scenario = placeScenario(true, true);
+
+            try (MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
+                dice.when(() -> Compute.d6(anyInt())).thenReturn(12);
+                StratConRulesManager.processIgnoredStratConScenario(scenario, track, campaignState);
+            }
+
+            assertEquals(0, facility.getGarrison());
+        }
+
+        @Test
+        void anEmployerGarrisonThatFailsOffScreenLosesTheFacilityAndThePoint() {
+            StratConFacility facility = placeFacility(ForceAlignment.Allied);
+            facility.setGarrison(0);
+            StratConScenario scenario = placeScenario(true, true);
+
+            try (MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
+                dice.when(() -> Compute.d6(anyInt())).thenReturn(2);
+                StratConRulesManager.processIgnoredStratConScenario(scenario, track, campaignState);
+            }
+
+            assertEquals(ForceAlignment.Opposing, facility.getOwner());
+            assertEquals(-1, campaignState.getVictoryPoints());
+        }
+
+        @Test
+        void anIgnoredCounterattackOnAFacilityTheEnemyAlreadyRetookChangesNothing() {
+            StratConFacility facility = placeFacility(ForceAlignment.Opposing);
+
+            assertFalse(StratConEnemyFacilityActivity.resolveIgnoredCounterattack(track, facility, campaignState));
+            assertEquals(ForceAlignment.Opposing, facility.getOwner());
+        }
+
+        @Test
+        void aLostFacilityIsStillKnownInFullToThePlayer() {
+            StratConFacility facility = placeFacility(ForceAlignment.Player);
+
+            StratConEnemyFacilityActivity.resolveLostCounterattack(campaign, track, FACILITY_COORDS, facility);
+
+            assertEquals(StratConFacility.FacilityIntel.DETAILED, facility.getIntel());
+        }
+
+        @Test
+        void losingACounterattackOnAFacilityAlreadyLostDoesNotHandItBack() {
+            StratConFacility facility = placeFacility(ForceAlignment.Opposing);
+
+            StratConEnemyFacilityActivity.resolveLostCounterattack(campaign, track, FACILITY_COORDS, facility);
+
+            assertEquals(ForceAlignment.Opposing, facility.getOwner());
+        }
+
+        @Test
+        void aNegativeScaleSendsNoEngineers() {
+            assertEquals(0, StratConEnemyFacilityActivity.getMonthlyEngineerCount(-4, false, 3.0));
+            assertEquals(1, StratConEnemyFacilityActivity.getMonthlyEngineerCount(2, false, 1.5));
+        }
+    }
 }

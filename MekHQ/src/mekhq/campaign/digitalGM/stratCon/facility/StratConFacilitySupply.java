@@ -48,6 +48,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
@@ -170,6 +171,7 @@ public final class StratConFacilitySupply {
         for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
             StratConFacility facility = entry.getValue();
             if (isOnSide(facility, isPlayerSide)
+                      && !facility.isDefinitionMissing()
                       && isSupplySource(facility.getFacilityType())
                       && supplied.add(entry.getKey())) {
                 frontier.add(entry.getKey());
@@ -178,8 +180,7 @@ public final class StratConFacilitySupply {
 
         while (!frontier.isEmpty()) {
             StratConCoords current = frontier.poll();
-            for (int direction = 0; direction < 6; direction++) {
-                StratConCoords neighbor = current.translate(direction);
+            for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, current)) {
                 if (!supplied.contains(neighbor) && isPassable(track, neighbor, isPlayerSide)) {
                     supplied.add(neighbor);
                     frontier.add(neighbor);
@@ -189,8 +190,9 @@ public final class StratConFacilitySupply {
             StratConFacility facility = track.getFacility(current);
             if ((facility != null)
                       && isOnSide(facility, isPlayerSide)
+                      && !facility.isDefinitionMissing()
                       && (facility.getFacilityType() == FacilityType.SupplyDepot)) {
-                for (StratConCoords nearby : getHexesWithin(current, DEPOT_RANGE)) {
+                for (StratConCoords nearby : StratConHexGeometry.withinRadius(track, current, DEPOT_RANGE)) {
                     StratConFacility nearbyFacility = track.getFacility(nearby);
                     if ((nearbyFacility != null) && isOnSide(nearbyFacility, isPlayerSide) && supplied.add(nearby)) {
                         frontier.add(nearby);
@@ -216,33 +218,6 @@ public final class StratConFacilitySupply {
         return isPlayerSide ? facility.isOwnerAlliedToPlayer() : (facility.getOwner() == ForceAlignment.Opposing);
     }
 
-    /**
-     * @param origin a hex
-     * @param range  a number of hexes
-     *
-     * @return every hex within that many steps of the origin, the origin among them
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    static Set<StratConCoords> getHexesWithin(StratConCoords origin, int range) {
-        Set<StratConCoords> hexes = new HashSet<>();
-        hexes.add(origin);
-        Set<StratConCoords> ring = Set.of(origin);
-        for (int step = 0; step < range; step++) {
-            Set<StratConCoords> nextRing = new HashSet<>();
-            for (StratConCoords coords : ring) {
-                for (int direction = 0; direction < 6; direction++) {
-                    StratConCoords neighbor = coords.translate(direction);
-                    if (hexes.add(neighbor)) {
-                        nextRing.add(neighbor);
-                    }
-                }
-            }
-            ring = nextRing;
-        }
-        return hexes;
-    }
 
     /**
      * The daily supply step for a sector: ends road cuts whose time is up, works out which facilities are cut off,
@@ -273,7 +248,9 @@ public final class StratConFacilitySupply {
             }
         }
         for (StratConCoords coords : previouslyCutOff) {
-            if (!cutOff.contains(coords) && (track.getFacility(coords) != null)) {
+            StratConFacility facility = track.getFacility(coords);
+            // One that has changed sides since is no longer on the supply lines it was cut from, so it is not back.
+            if (!cutOff.contains(coords) && (facility != null) && facility.isNetworked()) {
                 reportFacility(campaign, track, coords, "report.reconnected");
             }
         }
