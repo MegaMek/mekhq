@@ -45,6 +45,9 @@ import java.util.List;
 import java.util.Map;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConAssassinationLeadBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -123,6 +126,100 @@ class StratConScenarioTempoTest {
     @Test
     void aContractEndingOnItsStartSchedulesNothing() {
         assertTrue(StratConScenarioTempo.rollScenarioDates(START_DATE, START_DATE, 3, 1, 1).isEmpty());
+    }
+
+    // Scheduling a contract
+
+    @Test
+    void acceptingAContractSchedulesItsScenariosAcrossItsRun() {
+        LocalDate endDate = START_DATE.plusMonths(3);
+        AbstractContract contract = contract(START_DATE, endDate, 3, 2);
+        StratConCampaignState campaignState = new StratConCampaignState();
+
+        StratConScenarioTempo.scheduleNormalScenarios(campaign(START_DATE, false, false), contract, campaignState,
+              START_DATE);
+
+        assertTrue(campaignState.isNormalTempoScheduled());
+        assertEquals(2, campaignState.getScheduledScenarioDates().size());
+        assertAllWithin(campaignState.getScheduledScenarioDates(), START_DATE, endDate);
+    }
+
+    @Test
+    void supportPointsInScaleTripleTheScenarios() {
+        LocalDate endDate = START_DATE.plusMonths(3);
+        AbstractContract contract = contract(START_DATE, endDate, 3, 2);
+        StratConCampaignState campaignState = new StratConCampaignState();
+        Campaign campaign = campaign(START_DATE, false, false);
+        when(campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION))
+              .thenReturn(true);
+
+        StratConScenarioTempo.scheduleNormalScenarios(campaign, contract, campaignState, START_DATE);
+
+        assertEquals(6, campaignState.getScheduledScenarioDates().size());
+    }
+
+    // Rolling the schedule again (contract edits, emergency extensions)
+
+    @RepeatedTest(10)
+    void anExtendedContractIsScheduledThroughItsNewEnd() {
+        LocalDate today = START_DATE.plusMonths(2);
+        LocalDate oldEndDate = START_DATE.plusMonths(3);
+        LocalDate newEndDate = START_DATE.plusMonths(6);
+        // Thirty rolls on the six-month table all but guarantee some land in the three added months.
+        AbstractContract contract = contract(START_DATE, newEndDate, 6, 30);
+        StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.addScheduledScenarioDate(START_DATE.plusMonths(2).plusDays(10));
+
+        StratConScenarioTempo.regenerateSchedules(campaign(today, false, true), contract, campaignState);
+
+        List<LocalDate> scheduledDates = campaignState.getScheduledScenarioDates();
+        assertAllWithin(scheduledDates, today, newEndDate);
+        assertTrue(scheduledDates.stream().anyMatch(date -> !date.isBefore(oldEndDate)), scheduledDates.toString());
+    }
+
+    @Test
+    void rollingAgainLeavesDatesAlreadyPastAlone() {
+        LocalDate today = START_DATE.plusMonths(1);
+        LocalDate pastDate = START_DATE.plusDays(3);
+        AbstractContract contract = contract(START_DATE, START_DATE.plusMonths(3), 3, 1);
+        StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.addScheduledScenarioDate(pastDate);
+
+        StratConScenarioTempo.regenerateSchedules(campaign(today, false, true), contract, campaignState);
+
+        assertTrue(campaignState.getScheduledScenarioDates().contains(pastDate));
+        for (LocalDate scheduledDate : campaignState.getScheduledScenarioDates()) {
+            assertTrue(scheduledDate.equals(pastDate) || !scheduledDate.isBefore(today), scheduledDate.toString());
+        }
+    }
+
+    @Test
+    void rollingAgainReplacesTheDatesStillToCome() {
+        LocalDate today = START_DATE.plusMonths(1);
+        LocalDate staleDate = START_DATE.plusMonths(2);
+        // A contract with no tracks rolls nothing, so only a stale date that survived would remain.
+        AbstractContract contract = contract(START_DATE, START_DATE.plusMonths(3), 3, 1);
+        when(contract.getTrackCount()).thenReturn(0);
+        StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.addScheduledScenarioDate(staleDate);
+
+        StratConScenarioTempo.regenerateSchedules(campaign(today, false, true), contract, campaignState);
+
+        assertTrue(campaignState.getScheduledScenarioDates().isEmpty());
+    }
+
+    @Test
+    void singleDropKeepsItsOwnScenarioDates() {
+        LocalDate today = START_DATE.plusMonths(1);
+        LocalDate singleDropDate = today.plusDays(2);
+        AbstractContract contract = contract(START_DATE, START_DATE.plusMonths(3), 3, 1);
+        StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.addScheduledScenarioDate(singleDropDate);
+
+        StratConScenarioTempo.regenerateSchedules(campaign(today, true, true), contract, campaignState);
+
+        assertEquals(List.of(singleDropDate), campaignState.getScheduledScenarioDates());
+        assertFalse(campaignState.isNormalTempoScheduled());
     }
 
     // Campaign state
@@ -209,6 +306,42 @@ class StratConScenarioTempoTest {
               Map.of(StratConAssassinationLeadBehavior.REAL_TARGET_STATE_KEY, 2));
 
         assertEquals(0, countRealTargets(scheduled));
+    }
+
+    private static AbstractContract contract(LocalDate startDate, LocalDate endDate, int lengthInMonths, int scale) {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getStartDate()).thenReturn(startDate);
+        when(contract.getEndingDate()).thenReturn(endDate);
+        when(contract.getLengthInMonths()).thenReturn(lengthInMonths);
+        when(contract.getScale()).thenReturn(scale);
+        when(contract.getTrackCount()).thenReturn(1);
+        return contract;
+    }
+
+    /**
+     * @param today              the campaign date
+     * @param isSinglesMode      whether Single Drop play is on
+     * @param isMaplessMode      whether mapless play is on, which leaves Essential scenarios and points of interest
+     *                           out of a schedule rolled again
+     */
+    private static Campaign campaign(LocalDate today, boolean isSinglesMode, boolean isMaplessMode) {
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)).thenReturn(true);
+        when(options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
+        when(options.isUseStratConSinglesMode()).thenReturn(isSinglesMode);
+        when(options.isUseStratConMaplessMode()).thenReturn(isMaplessMode);
+
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getLocalDate()).thenReturn(today);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        return campaign;
+    }
+
+    private static void assertAllWithin(List<LocalDate> dates, LocalDate firstDate, LocalDate endDate) {
+        for (LocalDate date : dates) {
+            assertFalse(date.isBefore(firstDate), date.toString());
+            assertTrue(date.isBefore(endDate), date.toString());
+        }
     }
 
     private static int countRealTargets(List<StratConScheduledPointOfInterest> scheduledPointsOfInterest) {
