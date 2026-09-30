@@ -59,6 +59,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.PointOfInter
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInterestBehavior;
@@ -244,14 +245,16 @@ public class StratConContractInitializer {
         boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
 
         // now seed the tracks with objectives and facilities
+        boolean isFactorSupportPointsIntoScale =
+              campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
+        FacilityTier objectiveTier = getFacilityTier(contract.getScale(), isFactorSupportPointsIntoScale, true);
         if (!isUseMaplessMode) {
             for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
                 int objectiveCount;
                 if (objectiveParams.objectiveCount > 0) {
                     objectiveCount = (int) objectiveParams.objectiveCount;
                 } else if (isFacilityObjective(objectiveParams.objectiveType)) {
-                    objectiveCount = getObjectiveFacilityCount(contract.getScale(),
-                          campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION));
+                    objectiveCount = getObjectiveFacilityCount(contract.getScale(), isFactorSupportPointsIntoScale);
                 } else {
                     objectiveCount = (int) max(1, -objectiveParams.objectiveCount * contract.getScale());
                 }
@@ -272,7 +275,8 @@ public class StratConContractInitializer {
                                   numObjects,
                                   ForceAlignment.Allied,
                                   StrategicObjectiveType.AlliedFacilityControl,
-                                  objectiveParams.objectiveScenarioModifiers);
+                                  objectiveParams.objectiveScenarioModifiers,
+                                  objectiveTier);
                             break;
                         case HostileFacilityControl:
                         case FacilityDestruction:
@@ -280,7 +284,8 @@ public class StratConContractInitializer {
                                   numObjects,
                                   ForceAlignment.Opposing,
                                   objectiveParams.objectiveType,
-                                  objectiveParams.objectiveScenarioModifiers);
+                                  objectiveParams.objectiveScenarioModifiers,
+                                  objectiveTier);
                             break;
                         case PointOfInterest:
                             // Point of interest objectives are not placed up front either. They appear over the
@@ -327,7 +332,7 @@ public class StratConContractInitializer {
             ForceAlignment facilityOwner = contract.isPlayerAttacker() ? ForceAlignment.Opposing : ForceAlignment.Allied;
             int objectiveFacilityCount = countFacilitiesOwnedBy(campaignState.getTracks(), facilityOwner);
             int facilityCount = getNonObjectiveFacilityCount(contract.getScale(),
-                  campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
+                  isFactorSupportPointsIntoScale,
                   objectiveFacilityCount);
 
             List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
@@ -339,7 +344,8 @@ public class StratConContractInitializer {
                       numObjects,
                       facilityOwner,
                       null,
-                      Collections.emptyList());
+                      Collections.emptyList(),
+                      getFacilityTier(contract.getScale(), isFactorSupportPointsIntoScale, false));
             }
         }
 
@@ -827,6 +833,9 @@ public class StratConContractInitializer {
         if (facility == null) {
             return null;
         }
+        facility.setTier(getFacilityTier(contract.getScale(),
+              campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
+              true));
 
         facility.setStrategicObjective(true);
         facility.setVisible(true);
@@ -866,6 +875,44 @@ public class StratConContractInitializer {
         }
 
         return count;
+    }
+
+    /** Normalized Scale (see {@link #getFacilityTier}) up to which facilities are Outposts. */
+    static final int OUTPOST_SCALE_LIMIT = 2;
+
+    /** Normalized Scale (see {@link #getFacilityTier}) up to which facilities are Bases; above it, Strongholds. */
+    static final int BASE_SCALE_LIMIT = 5;
+
+    /**
+     * Works out the tier of a facility placed for a contract. Scale is first normalized, as for the facility share:
+     * taken as it is when battlefield support points are factored into scale, and divided by three otherwise. Up to
+     * {@value #OUTPOST_SCALE_LIMIT} gives an Outpost, up to {@value #BASE_SCALE_LIMIT} a Base, and above that a
+     * Stronghold. An objective facility is one tier larger, up to a Stronghold.
+     *
+     * @param scale                          the contract's scale
+     * @param isFactorSupportPointsIntoScale whether battlefield support points are factored into scale
+     * @param isObjective                    whether the facility is a strategic objective
+     *
+     * @return the facility's tier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static FacilityTier getFacilityTier(int scale, boolean isFactorSupportPointsIntoScale, boolean isObjective) {
+        int normalizedScale = isFactorSupportPointsIntoScale ?
+                                    scale :
+                                    scale / StratConScenarioTempo.SUPPORT_POINT_SCALE_ROLL_MULTIPLIER;
+
+        FacilityTier tier;
+        if (normalizedScale <= OUTPOST_SCALE_LIMIT) {
+            tier = FacilityTier.OUTPOST;
+        } else if (normalizedScale <= BASE_SCALE_LIMIT) {
+            tier = FacilityTier.BASE;
+        } else {
+            tier = FacilityTier.STRONGHOLD;
+        }
+
+        return isObjective ? tier.next() : tier;
     }
 
     /** Objective facilities are three times as scarce as the contract's whole share of facilities. */
@@ -2020,6 +2067,20 @@ public class StratConContractInitializer {
     // initialization would mean standing up a whole contract to assert on a placement loop.
     static void initializeTrackFacilities(StratConTrackState trackState, int numFacilities, ForceAlignment owner,
           @Nullable StrategicObjectiveType objectiveType, List<String> modifiers) {
+        initializeTrackFacilities(trackState, numFacilities, owner, objectiveType, modifiers, FacilityTier.BASE);
+    }
+
+    /**
+     * As {@link #initializeTrackFacilities(StratConTrackState, int, ForceAlignment, StrategicObjectiveType, List)},
+     * placing facilities of the given tier, each with a full garrison.
+     *
+     * @param tier the tier of every facility placed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void initializeTrackFacilities(StratConTrackState trackState, int numFacilities, ForceAlignment owner,
+          @Nullable StrategicObjectiveType objectiveType, List<String> modifiers, FacilityTier tier) {
         boolean strategicObjective = objectiveType != null;
 
         int capacity = facilityCapacity(trackState);
@@ -2039,6 +2100,8 @@ public class StratConContractInitializer {
             }
 
             sf.setOwner(owner);
+            sf.setTier(tier);
+            sf.setGarrison(tier.getGarrisonMaximum());
             sf.setStrategicObjective(strategicObjective);
             sf.addAdditionalLocalModifiers(modifiers);
 

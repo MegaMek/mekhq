@@ -97,6 +97,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConScenario.ScenarioState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.PointOfInterestDeploymentOutcome;
@@ -1530,6 +1531,9 @@ public class StratConRulesManager {
                     if (facility == null) {
                         return scenario;
                     }
+                    facility.setTier(StratConContractInitializer.getFacilityTier(contract.getScale(),
+                          campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
+                          false));
                     facility.setVisible(true);
                     track.addFacility(coords, facility);
                     setupFacilityScenario(scenario, facility);
@@ -4045,8 +4049,9 @@ public class StratConRulesManager {
                                                           && dynamicScenario.getTemplate().isHostileFacility();
                 StratConEscalation.onScenarioCompleted(campaign, mission, victory, isHostileFacilityScenario);
 
-                if ((facility != null) && (facility.getOwnershipChangeScore() > 0)) {
-                    switchFacilityOwner(facility);
+                if (facility != null) {
+                    boolean isDraw = backingScenario.getStatus().isDraw();
+                    processFacilityAftermath(facility, victory, isDraw);
                 }
 
                 // Deliberately does not touch the road network. Roads are laid when the sector is generated, and
@@ -4169,12 +4174,48 @@ public class StratConRulesManager {
     }
 
     /**
+     * Settles what a finished scenario fought on a facility did to it, if the facility is still there.
+     *
+     * <ul>
+     *     <li>If the scenario's objectives earned a capture, the facility changes hands.</li>
+     *     <li>Otherwise, if the side attacking the facility won, the facility is damaged one step and loses one
+     *     garrison step. The player attacks a hostile facility and wins with an overall victory; the enemy attacks an
+     *     allied one and wins when the player loses outright.</li>
+     *     <li>Otherwise the defender held, at the cost of one garrison step.</li>
+     * </ul>
+     *
+     * <p>Either way, the player now knows everything about the facility, having fought over it.</p>
+     *
+     * @param facility the facility the scenario was fought on
+     * @param victory  whether the player won an overall victory
+     * @param isDraw   whether the scenario was a draw
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void processFacilityAftermath(StratConFacility facility, boolean victory, boolean isDraw) {
+        if (facility.getOwnershipChangeScore() > 0) {
+            switchFacilityOwner(facility);
+        } else {
+            boolean isAttackerVictory = facility.isOwnerAlliedToPlayer() ? (!victory && !isDraw) : victory;
+            if (isAttackerVictory) {
+                facility.applyAttackerVictory();
+            } else {
+                facility.applyDefenderHeld();
+            }
+        }
+
+        facility.clearOwnershipChangeScore();
+        facility.raiseIntel(FacilityIntel.DETAILED);
+    }
+
+    /**
      * Hands a facility to the other side. Its effects follow from its definition's profile for the new owner, so only
-     * the owner changes. A facility the player could see stays visible: allied facilities are always shown, so one
-     * taken by the enemy keeps being shown rather than vanishing.
+     * the owner changes. The player keeps what they knew: the player knows everything about their own side's
+     * facilities, so one taken by the enemy stays fully known rather than vanishing.
      */
     public static void switchFacilityOwner(StratConFacility facility) {
-        facility.setVisible(facility.isVisible());
+        facility.setIntel(facility.getIntel());
 
         if (facility.isOwnerAlliedToPlayer()) {
             facility.setOwner(Opposing);

@@ -65,6 +65,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
@@ -86,6 +87,9 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.ImageType;
 import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondition;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityDefinition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
@@ -152,6 +156,7 @@ public class StratConPanel extends JPanel implements ActionListener {
     private static final String RIGHT_CLICK_COMMAND_CAPTURE_FACILITY = "CaptureFacility";
     private static final String RIGHT_CLICK_COMMAND_ADD_FACILITY = "AddFacility";
     private static final String RIGHT_CLICK_PROPERTY_FACILITY_OWNER = "AddFacilityOwner";
+    private static final String RIGHT_CLICK_COMMAND_SET_FACILITY_STATE = "SetFacilityState";
     private static final String RIGHT_CLICK_COMMAND_REMOVE_SCENARIO = "RemoveScenario";
     private static final String RIGHT_CLICK_COMMAND_RESET_DEPLOYMENT = "ResetDeployment";
     private static final String RIGHT_CLICK_COMMAND_ADD_CITY = "AddCity";
@@ -702,6 +707,8 @@ public class StratConPanel extends JPanel implements ActionListener {
                 menuItemSwitchOwner.setActionCommand(RIGHT_CLICK_COMMAND_CAPTURE_FACILITY);
                 menuItemSwitchOwner.addActionListener(this);
                 rightClickMenu.add(menuItemSwitchOwner);
+
+                rightClickMenu.add(buildFacilityStateMenu(currentTrack.getFacility(coords)));
             } else {
                 JMenu menuItemAddFacility = new JMenu();
                 menuItemAddFacility.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.addFacility"));
@@ -1688,6 +1695,129 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
+     * Builds the GM submenu that sets a facility's tier, condition, garrison and the player's intel on it. The current
+     * value of each is ticked.
+     *
+     * @param facility the facility on the selected hex
+     *
+     * @return the submenu
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JMenu buildFacilityStateMenu(StratConFacility facility) {
+        JMenu stateMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.facilityState"));
+
+        JMenu tierMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.facilityState.tier"));
+        for (FacilityTier tier : FacilityTier.values()) {
+            tierMenu.add(buildFacilityStateItem(getTextAt(RESOURCE_BUNDLE, "stratConTab.facilityTier." + tier.name()),
+                  facility.getTier() == tier,
+                  target -> target.setTier(tier)));
+        }
+        stateMenu.add(tierMenu);
+
+        JMenu conditionMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.facilityState.condition"));
+        for (FacilityCondition condition : FacilityCondition.values()) {
+            conditionMenu.add(buildFacilityStateItem(getTextAt(RESOURCE_BUNDLE,
+                        "stratConTab.facilityCondition." + condition.name()),
+                  facility.getCondition() == condition,
+                  target -> target.setCondition(condition)));
+        }
+        stateMenu.add(conditionMenu);
+
+        JMenu garrisonMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.facilityState.garrison"));
+        int garrisonMaximum = facility.getGarrisonMaximum();
+        for (int garrisonSteps = 0; garrisonSteps <= garrisonMaximum; garrisonSteps++) {
+            int chosenSteps = garrisonSteps;
+            garrisonMenu.add(buildFacilityStateItem(String.valueOf(garrisonSteps),
+                  facility.getGarrison() == garrisonSteps,
+                  target -> target.setGarrison(chosenSteps)));
+        }
+        stateMenu.add(garrisonMenu);
+
+        JMenu intelMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.facilityState.intel"));
+        for (FacilityIntel intel : FacilityIntel.values()) {
+            intelMenu.add(buildFacilityStateItem(getTextAt(RESOURCE_BUNDLE,
+                        "stratConTab.facilityIntel." + intel.name()),
+                  facility.getIntel() == intel,
+                  target -> target.setIntel(intel)));
+        }
+        stateMenu.add(intelMenu);
+
+        return stateMenu;
+    }
+
+    private JMenuItem buildFacilityStateItem(String text, boolean isCurrent, Consumer<StratConFacility> stateChange) {
+        JMenuItem item = new JCheckBoxMenuItem(text, isCurrent);
+        item.setActionCommand(RIGHT_CLICK_COMMAND_SET_FACILITY_STATE);
+        item.putClientProperty(RIGHT_CLICK_COMMAND_SET_FACILITY_STATE, stateChange);
+        item.addActionListener(this);
+        return item;
+    }
+
+    /**
+     * @param facility a facility on the map
+     *
+     * @return the facility's map label: its name, then as much of its tier, condition and garrison as the player knows
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private String getFacilityLabel(StratConFacility facility) {
+        String name = facility.getFormattedDisplayableName();
+        FacilityIntel intel = facility.getIntel();
+        if (!intel.isAtLeast(FacilityIntel.SCOUTED)) {
+            return name;
+        }
+
+        String tier = getTextAt(RESOURCE_BUNDLE, "stratConTab.facilityTier." + facility.getTier().name());
+        String condition = getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.facilityCondition." + facility.getCondition().name());
+        if (!intel.isAtLeast(FacilityIntel.DETAILED)) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.scouted", name, tier, condition);
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "stratConTab.facility.label.detailed",
+              name,
+              tier,
+              condition,
+              facility.getGarrison(),
+              facility.getGarrisonMaximum());
+    }
+
+    /**
+     * Adds a facility's tier, condition and garrison to the hex information, as far as the player knows them.
+     *
+     * @param infoBuilder the hex information being built
+     * @param facility    the facility on the selected hex
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void appendFacilityStatus(StringBuilder infoBuilder, StratConFacility facility) {
+        FacilityIntel intel = facility.getIntel();
+        if (!intel.isAtLeast(FacilityIntel.SCOUTED)) {
+            infoBuilder.append(getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.facilityUnscouted"));
+            return;
+        }
+
+        infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "stratConTab.hexInfo.facilityStatus",
+              getTextAt(RESOURCE_BUNDLE, "stratConTab.facilityTier." + facility.getTier().name()),
+              getTextAt(RESOURCE_BUNDLE, "stratConTab.facilityCondition." + facility.getCondition().name())));
+
+        if (intel.isAtLeast(FacilityIntel.DETAILED)) {
+            infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "stratConTab.hexInfo.facilityGarrison",
+                  facility.getGarrison(),
+                  facility.getGarrisonMaximum()));
+        } else {
+            infoBuilder.append(getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.facilityGarrisonUnknown"));
+        }
+    }
+
+    /**
      * Worker function to render facility icons to the given surface.
      */
     private void drawFacilities(Graphics2D g2D) {
@@ -1723,7 +1853,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.drawPolygon(facilityMarker);
                     }
 
-                    drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
+                    drawTextEffect(g2D, facilityMarker, getFacilityLabel(facility), currentCoords);
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -2130,6 +2260,8 @@ public class StratConPanel extends JPanel implements ActionListener {
                     infoBuilder.append("<br/>").append(facility.getUserDescription());
                 }
 
+                appendFacilityStatus(infoBuilder, facility);
+
                 infoBuilder.append("<span>");
             }
 
@@ -2343,6 +2475,15 @@ public class StratConPanel extends JPanel implements ActionListener {
                 // neither lays new road nor tears up the old. Recalculating would also rebuild the whole network from
                 // scratch, so a single capture could redraw roads across the sector. Capturing the same facility by
                 // winning a scenario leaves the network alone for the same reason.
+                break;
+            case RIGHT_CLICK_COMMAND_SET_FACILITY_STATE:
+                @SuppressWarnings("unchecked")
+                Consumer<StratConFacility> stateChange = (Consumer<StratConFacility>) ((JMenuItem) evt.getSource())
+                      .getClientProperty(RIGHT_CLICK_COMMAND_SET_FACILITY_STATE);
+                StratConFacility selectedFacility = currentTrack.getFacility(selectedCoords);
+                if (selectedFacility != null) {
+                    stateChange.accept(selectedFacility);
+                }
                 break;
             case RIGHT_CLICK_COMMAND_ADD_FACILITY:
                 JMenuItem eventSource = (JMenuItem) evt.getSource();

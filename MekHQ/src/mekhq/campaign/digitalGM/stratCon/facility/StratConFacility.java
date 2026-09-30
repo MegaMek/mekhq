@@ -48,9 +48,9 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
  * A facility placed on a StratCon sector. It refers to its {@link StratConFacilityDefinition} by ID and keeps only its
- * own state: who holds it, whether the player has seen it, whether it has lent its modifiers this week, whether it is
- * a strategic objective, and any scenario modifiers added when it was placed. What it does comes from the definition's
- * profile for its current owner, so capturing it is just a change of owner.
+ * own state: who holds it, its tier, condition and garrison, how much the player knows about it, whether it has lent
+ * its modifiers this week, whether it is a strategic objective, and any scenario modifiers added when it was placed.
+ * What it does comes from the definition's profile for its current owner, so capturing it is just a change of owner.
  *
  * <p>Saves from before 0.51.01 held a full copy of the facility's old-format definition instead of an ID. Those
  * fields are still read, and {@link #resolveLegacyData()} turns them into a definition ID once loading is done.</p>
@@ -75,12 +75,101 @@ public class StratConFacility {
         BaseOfOperations
     }
 
+    /**
+     * How large a facility is. The tier caps the facility's garrison.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public enum FacilityTier {
+        OUTPOST(1),
+        BASE(2),
+        STRONGHOLD(3);
+
+        private final int garrisonMaximum;
+
+        FacilityTier(int garrisonMaximum) {
+            this.garrisonMaximum = garrisonMaximum;
+        }
+
+        /**
+         * @return the most garrison steps a facility of this tier can hold
+         */
+        public int getGarrisonMaximum() {
+            return garrisonMaximum;
+        }
+
+        /**
+         * @return the next tier up, or this tier if it is already the largest
+         */
+        public FacilityTier next() {
+            return (this == STRONGHOLD) ? STRONGHOLD : values()[ordinal() + 1];
+        }
+    }
+
+    /**
+     * How badly a facility is damaged. A damaged facility's numeric effects are halved and it lends no shared
+     * modifiers; a crippled one has no effects at all. A destroyed facility is removed from the map.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public enum FacilityCondition {
+        INTACT,
+        DAMAGED,
+        CRIPPLED;
+
+        /**
+         * @return the next condition down, or this condition if it is already the worst
+         */
+        public FacilityCondition worsened() {
+            return (this == CRIPPLED) ? CRIPPLED : values()[ordinal() + 1];
+        }
+    }
+
+    /**
+     * How much the player knows about a facility. Each level shows more: its position and type once
+     * {@link #LOCATED}, its tier and condition once {@link #SCOUTED}, and its garrison once {@link #DETAILED}. The
+     * player always knows everything about a facility their own side holds.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public enum FacilityIntel {
+        UNKNOWN,
+        LOCATED,
+        SCOUTED,
+        DETAILED;
+
+        /**
+         * @param level the level to compare against
+         *
+         * @return {@code true} if this level is at least the given one
+         */
+        public boolean isAtLeast(FacilityIntel level) {
+            return ordinal() >= level.ordinal();
+        }
+    }
+
+    // The garrison ladder: garrison step 1 brings the profile's own local modifiers, and each step above that adds the
+    // next modifier for the holding side, skipping any the profile already has.
+    private static final List<String> ALLIED_GARRISON_LADDER = List.of("AlliedTurrets.json",
+          "AlliedGroundSupport.json");
+    private static final List<String> HOSTILE_GARRISON_LADDER = List.of("EnemyTurrets.json",
+          "HostileBVBudgetIncrease.json");
+
     @XmlElement
     private String definitionId;
     @XmlElement
     private ForceAlignment owner;
     @XmlElement
-    private boolean visible;
+    private FacilityTier tier;
+    @XmlElement
+    private FacilityCondition condition;
+    @XmlElement
+    private Integer garrison;
+    @XmlElement
+    private FacilityIntel intel;
     @XmlElement(name = "isAvailable")
     private boolean isAvailable = true;
     @XmlElement(name = "strategicObjective")
@@ -90,6 +179,8 @@ public class StratConFacility {
 
     // Read from saves written before 0.51.01, which held a copy of the whole old-format definition. Emptied once the
     // facility is matched to a definition, so they are only written back for a facility that could not be matched.
+    @XmlElement(name = "visible")
+    private Boolean legacyVisible;
     @XmlElement(name = "displayableName")
     private String legacyDisplayableName;
     @XmlElement(name = "facilityType")
@@ -141,6 +232,10 @@ public class StratConFacility {
     public StratConFacility(StratConFacilityDefinition definition, ForceAlignment owner) {
         this.definitionId = definition.getId();
         this.owner = owner;
+        this.tier = FacilityTier.BASE;
+        this.condition = FacilityCondition.INTACT;
+        this.garrison = FacilityTier.BASE.getGarrisonMaximum();
+        this.intel = FacilityIntel.UNKNOWN;
         if (StratConFacilityFactory.getDefinition(definition.getId()) != definition) {
             detachedDefinition = definition;
         }
@@ -228,16 +323,138 @@ public class StratConFacility {
         return getProfile().getDescription();
     }
 
-    public boolean getVisible() {
-        return visible;
+    /**
+     * @return the facility's tier; {@link FacilityTier#BASE} for one saved before tiers existed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public FacilityTier getTier() {
+        return (tier == null) ? FacilityTier.BASE : tier;
     }
 
+    /**
+     * Sets the facility's tier, trimming its garrison to the new tier's maximum.
+     *
+     * @param tier the new tier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setTier(FacilityTier tier) {
+        this.tier = tier;
+        setGarrison(getGarrison());
+    }
+
+    /**
+     * @return the facility's condition; {@link FacilityCondition#INTACT} for one saved before conditions existed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public FacilityCondition getCondition() {
+        return (condition == null) ? FacilityCondition.INTACT : condition;
+    }
+
+    public void setCondition(FacilityCondition condition) {
+        this.condition = condition;
+    }
+
+    /**
+     * @return the facility's garrison, in steps from 0 to its tier's maximum; a full garrison for one saved before
+     *       garrisons existed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getGarrison() {
+        return (garrison == null) ? getGarrisonMaximum() : garrison;
+    }
+
+    /**
+     * Sets the facility's garrison, kept between 0 and its tier's maximum.
+     *
+     * @param garrison the new garrison, in steps
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setGarrison(int garrison) {
+        this.garrison = Math.max(0, Math.min(garrison, getGarrisonMaximum()));
+    }
+
+    /**
+     * @return the most garrison steps the facility's tier allows
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getGarrisonMaximum() {
+        return getTier().getGarrisonMaximum();
+    }
+
+    /**
+     * @return how much the player knows about the facility. Everything, if the player's side holds it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public FacilityIntel getIntel() {
+        if (isOwnerAlliedToPlayer()) {
+            return FacilityIntel.DETAILED;
+        }
+        return (intel == null) ? FacilityIntel.UNKNOWN : intel;
+    }
+
+    /**
+     * Sets how much the player knows about the facility, whether more or less than before.
+     *
+     * @param intel the new intel level
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setIntel(FacilityIntel intel) {
+        this.intel = intel;
+    }
+
+    /**
+     * Raises how much the player knows about the facility to at least the given level. Never lowers it.
+     *
+     * @param level the level the player now has at least
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void raiseIntel(FacilityIntel level) {
+        if (!getIntel().isAtLeast(level)) {
+            intel = level;
+        }
+    }
+
+    /**
+     * @return {@code true} if the player knows at least where the facility is
+     */
+    public boolean getVisible() {
+        return getIntel().isAtLeast(FacilityIntel.LOCATED);
+    }
+
+    /**
+     * Shorthand for the two intel changes most callers need: {@code true} raises intel to at least
+     * {@link FacilityIntel#SCOUTED}, as scouting the hex does; {@code false} hides the facility entirely.
+     *
+     * @param visible whether the player has seen the facility
+     */
     public void setVisible(boolean visible) {
-        this.visible = visible;
+        if (visible) {
+            raiseIntel(FacilityIntel.SCOUTED);
+        } else {
+            intel = FacilityIntel.UNKNOWN;
+        }
     }
 
     public boolean isVisible() {
-        return (owner == ForceAlignment.Allied) || visible;
+        return (owner == ForceAlignment.Allied) || getVisible();
     }
 
     public boolean getIsAvailable() {
@@ -253,18 +470,40 @@ public class StratConFacility {
     }
 
     /**
-     * This is a list of scenario modifier IDs that affect scenarios in the same track as this facility.
+     * This is a list of scenario modifier IDs that affect scenarios in the same track as this facility. A damaged or
+     * crippled facility lends none.
      */
     public List<String> getSharedModifiers() {
+        if (getCondition() != FacilityCondition.INTACT) {
+            return new ArrayList<>();
+        }
         return getProfile().getSharedModifierIds();
     }
 
     /**
-     * This is a list of scenario modifier IDs that affect scenarios involving this facility directly: the current
-     * profile's, then any added when the facility was placed.
+     * This is a list of scenario modifier IDs that affect scenarios involving this facility directly: its garrison's,
+     * then any added when the facility was placed.
+     *
+     * <p>The garrison follows a ladder. With none left, the facility has no defenders of its own. At one step it has
+     * the current profile's local modifiers; each step above that adds the next garrison modifier for the holding
+     * side, skipping any the profile already has.</p>
      */
     public List<String> getLocalModifiers() {
-        List<String> modifiers = getProfile().getLocalModifierIds();
+        List<String> modifiers = new ArrayList<>();
+        int garrisonSteps = getGarrison();
+        if (garrisonSteps >= 1) {
+            modifiers.addAll(getProfile().getLocalModifierIds());
+        }
+
+        List<String> ladder = isOwnerAlliedToPlayer() ? ALLIED_GARRISON_LADDER : HOSTILE_GARRISON_LADDER;
+        int ladderSteps = Math.min(garrisonSteps - 1, ladder.size());
+        for (int step = 0; step < ladderSteps; step++) {
+            String ladderModifier = ladder.get(step);
+            if (!modifiers.contains(ladderModifier)) {
+                modifiers.add(ladderModifier);
+            }
+        }
+
         modifiers.addAll(additionalLocalModifiers);
         return modifiers;
     }
@@ -324,35 +563,90 @@ public class StratConFacility {
     }
 
     /**
-     * @return whether the facility reveals its whole sector while its current owner holds it
+     * Resets the ownership change score once a scenario's outcome has been settled, so it cannot carry over into the
+     * next scenario fought on this facility.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void clearOwnershipChangeScore() {
+        ownershipChangeScore = 0;
+    }
+
+    /**
+     * @return whether the facility reveals its whole sector while its current owner holds it; never while crippled
      */
     public boolean isRevealingTrack() {
-        return getProfile().isRevealingTrack();
+        return !isCrippled() && getProfile().isRevealingTrack();
     }
 
     /**
-     * @return hexes the facility adds to the scan range of forces scouting its sector while its current owner holds it
+     * @return hexes the facility adds to the scan range of forces scouting its sector while its current owner holds
+     *       it, adjusted for its condition
      */
     public int getScanRangeIncrease() {
-        return getProfile().getScanRangeIncrease();
-    }
-
-    public int getScenarioOddsModifier() {
-        return getProfile().getScenarioOddsModifier();
+        return applyCondition(getProfile().getScanRangeIncrease());
     }
 
     /**
-     * @return the facility's monthly SP (Support Points) change while its current owner holds it
+     * @return the facility's change to its sector's scenario odds, adjusted for its condition
+     */
+    public int getScenarioOddsModifier() {
+        return applyCondition(getProfile().getScenarioOddsModifier());
+    }
+
+    /**
+     * @return the facility's monthly SP (Support Points) change while its current owner holds it, adjusted for its
+     *       condition
      */
     public int getMonthlySupportPoints() {
-        return getProfile().getMonthlySupportPoints();
+        return applyCondition(getProfile().getMonthlySupportPoints());
     }
 
     /**
-     * @return whether the facility keeps air and space scenarios out of its sector
+     * @return whether the facility keeps air and space scenarios out of its sector; never while crippled
      */
     public boolean isPreventingAerospace() {
-        return getProfile().isPreventingAerospace();
+        return !isCrippled() && getProfile().isPreventingAerospace();
+    }
+
+    private boolean isCrippled() {
+        return getCondition() == FacilityCondition.CRIPPLED;
+    }
+
+    /**
+     * @param value a numeric effect at full strength
+     *
+     * @return the value in full while intact, halved (rounding toward zero) while damaged, and nothing while crippled
+     */
+    private int applyCondition(int value) {
+        return switch (getCondition()) {
+            case INTACT -> value;
+            case DAMAGED -> value / 2;
+            case CRIPPLED -> 0;
+        };
+    }
+
+    /**
+     * Worsens the facility after a fight on it that its holder lost: its condition drops one step and its garrison
+     * loses one step.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void applyAttackerVictory() {
+        setCondition(getCondition().worsened());
+        setGarrison(getGarrison() - 1);
+    }
+
+    /**
+     * Costs the facility one garrison step after a fight on it that its holder did not lose.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void applyDefenderHeld() {
+        setGarrison(getGarrison() - 1);
     }
 
     /**
@@ -361,12 +655,23 @@ public class StratConFacility {
      * that definition's own are kept as the facility's additional ones. A facility that matches no loaded definition
      * keeps its old data as a detached definition, so it still behaves as it did.
      *
-     * <p>Does nothing for a facility that already has a definition ID.</p>
+     * <p>Saves from before 0.51.01 also held a plain visibility flag, which becomes an intel level: seen facilities
+     * count as {@link FacilityIntel#SCOUTED}. Tier, condition and garrison take their defaults for such facilities
+     * (a full {@link FacilityTier#BASE}).</p>
+     *
+     * <p>Matching does nothing for a facility that already has a definition ID.</p>
      *
      * @author Illiani
      * @since 0.51.01
      */
     public void resolveLegacyData() {
+        if (legacyVisible != null) {
+            if (intel == null) {
+                intel = legacyVisible ? FacilityIntel.SCOUTED : FacilityIntel.UNKNOWN;
+            }
+            legacyVisible = null;
+        }
+
         if ((definitionId != null) || (legacyFacilityType == null)) {
             return;
         }
