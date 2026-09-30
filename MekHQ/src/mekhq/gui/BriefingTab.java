@@ -124,7 +124,6 @@ import mekhq.gui.dialog.markets.contractMarket.ContractEditorDialog;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.model.ScenarioTableModel;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
-import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.utilities.BriefingStyle;
 import mekhq.gui.view.AtBScenarioViewPanel;
 import mekhq.gui.view.LanceAssignmentView;
@@ -593,7 +592,7 @@ public final class BriefingTab extends CampaignGuiTab {
     static TableRowSorter<ScenarioTableModel> createScenarioSorter(ScenarioTableModel model) {
         TableRowSorter<ScenarioTableModel> sorter = new TableRowSorter<>(model);
         sorter.setComparator(ScenarioTableModel.COL_NAME, new NaturalOrderComparator());
-        sorter.setComparator(ScenarioTableModel.COL_DATE, new DateStringComparator());
+        sorter.setComparator(ScenarioTableModel.COL_DATE, Comparator.<ScenarioTableModel.DisplayDate>naturalOrder());
         sorter.setSortKeys(List.of(new RowSorter.SortKey(ScenarioTableModel.COL_DATE, SortOrder.DESCENDING)));
         return sorter;
     }
