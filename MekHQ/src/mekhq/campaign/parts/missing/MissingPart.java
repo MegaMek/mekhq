@@ -158,11 +158,23 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
               wasFabricating ? " <b>fabricated</b>." : " <b>replaced</b>.");
     }
 
+    /**
+     * Gets a copy of a spare part ready to go on the unit in place of this missing part. Most parts need nothing; a
+     * part that is placed by location, such as a turret, moves the copy to this part's location.
+     *
+     * @param replacement a copy of the spare part that replaces this one
+     *
+     * @return the part to install
+     */
+    protected Part prepareReplacement(Part replacement) {
+        return replacement;
+    }
+
     @Override
     public void fix() {
         Part replacement = findReplacement(false);
         if (replacement != null) {
-            Part actualReplacement = replacement.clone();
+            Part actualReplacement = prepareReplacement(replacement.clone());
 
             // Assign the replacement part to the unit
             unit.addPart(actualReplacement);

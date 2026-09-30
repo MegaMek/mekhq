@@ -1,0 +1,152 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-e243-7aad-b8d9-5d9a23801dec
+</UUID>
+
+<UnitType>
+Tank
+</UnitType>
+
+<Name>
+Armored Personnel Carrier
+</Name>
+
+<Model>
+(Hover LRM)
+</Model>
+
+<mul id:>
+111
+</mul id:>
+
+<year>
+2500
+</year>
+
+<type>
+IS Level 1
+</type>
+
+<role>
+Missile Boat
+</role>
+
+<motion_type>
+Hover
+</motion_type>
+
+<cruiseMP>
+10
+</cruiseMP>
+
+<engine_type>
+1
+</engine_type>
+
+<armor_type>
+0
+</armor_type>
+
+<armor_tech_rating>
+0
+</armor_tech_rating>
+
+<armor_tech_level>
+1
+</armor_tech_level>
+
+<armor>
+6
+6
+6
+6
+</armor>
+
+<Body Equipment>
+IS Ammo LRM-5
+</Body Equipment>
+
+<Front Equipment>
+LRM 5
+</Front Equipment>
+
+<Right Equipment>
+</Right Equipment>
+
+<Left Equipment>
+</Left Equipment>
+
+<Rear Equipment>
+</Rear Equipment>
+
+<capabilities>
+<p>The LRM variant of the hover APC replaces the infantry compartment and turret-mounted machine guns with a forward-firing LRM-5 launcher and one ton of missile ammunition. This conversion entirely eliminates the vehicle's troop-carrying capability, transforming it from a transport into a light fire support platform capable of engaging targets at long range. Twenty-four points of standard armor distributed evenly across all facings provide slightly better protection than the base model's turret-concentrated layout.</p><p>Operating at the same maximum speed of over one hundred sixty kilometers per hour, the LRM hover variant retains the platform's characteristic mobility advantage. Militia and garrison commands frequently employ this conversion to provide indirect fire support where dedicated missile carriers are unavailable, using the hover APC's speed to reposition between salvos and avoid counterbattery fire.</p>
+</capabilities>
+
+<overview>
+<p>The Armored Personnel Carrier is a ubiquitous ten-ton combat transport found in virtually every military force across the Inner Sphere and Periphery. Produced in three standard configurations -- hover, tracked, and wheeled -- these vehicles serve as the primary means of delivering infantry squads to and from the combat zone. The basic designs date back to the Star League era around 2500, with primitive predecessors operating as early as 2390, and production has continued without interruption for centuries. Their simplicity, low cost, and ease of manufacture ensure that every House military, mercenary command, and planetary militia fields them in quantity, making them among the most commonly encountered military vehicles in the galaxy.</p>
+</overview>
+
+<deployment>
+<p>The LRM conversion sees widespread use among militia and garrison forces that lack dedicated fire support vehicles. The hover chassis's speed allows LRM-equipped APCs to operate as highly mobile skirmishers, firing missile salvos at long range before relocating to avoid return fire. Many commands field mixed formations of standard and LRM hover APCs, with the missile variants providing overwatch as the transports deliver infantry.</p>
+</deployment>
+
+<history>
+<p>The armored personnel carrier concept predates the modern Star League designs by over a century. Primitive APCs first appeared around 2390, using civilian drive train components and petrochemical-powered internal combustion engines to deliver troops under fire. Though crude by later standards, these early carriers established the fundamental template -- a lightly armed, armored box on wheels, tracks, or a hoverskirt -- that would endure for centuries. The Age of War and the technological advances it brought rendered these primitive designs obsolete for front-line service, but they never fully disappeared, remaining in use with militia and paramilitary forces well into the thirty-first century.</p><p>The modern APC entered service around 2500, when Star League-era manufacturers standardized three motive configurations optimized for different operational environments. Production spread rapidly across the Inner Sphere, with virtually every military manufacturer offering some version of the basic design. During the Succession Wars, demand far outstripped supply, and APCs became one of the few military vehicles that even the most devastated economies could continue producing. Hundreds of local manufacturers emerged to fill the gap, many working from incomplete specifications or reverse-engineered examples.</p><p>The standard APC's enduring legacy owes as much to its limitations as its capabilities. Its minimal carrying capacity of a single infantry squad pushed militaries to develop heavier alternatives, while its thin armor and light armament drove the creation of numerous weapon-platform conversions. Militia commanders, unable to afford purpose-built combat vehicles, frequently stripped the infantry compartment to mount LRM or SRM launchers, creating improvised fire support vehicles. The Taurian Concordat and Marian Hegemony independently developed sensor-equipped hover variants for border patrol duties. One notable action occurred in 3034, when Overste-Lojtnant Illya Stroncek of the Lyran Commonwealth led a column of tracked APCs through Kurita lines on Last Frontier, evacuating three companies of wounded infantry under sustained fire and earning the Order of the Griffin for her actions.</p>
+</history>
+
+<manufacturer>
+Scarborough Manufacturers|Quikscell Company|Quikscell Company|Hadrian Mechanized Industries|Hellespont Industrials|Cyclops, Incorporated|Aldis Industries|Amaris Armored Vehicles
+</manufacturer>
+
+<primaryFactory>
+Al Na'ir|Broken Wheel|Kalidasa|Pompey|Sian|Skye|Terra|Timbuktu
+</primaryFactory>
+
+<systemManufacturers>
+ENGINE:Unknown
+ARMOR:Unknown
+COMMUNICATIONS:LongCom
+TARGETING:OptiTrack Techniques
+</systemManufacturers>
+
+<systemModels>
+ENGINE:ICE
+ARMOR:Standard
+COMMUNICATIONS:Unknown
+TARGETING:Unknown
+</systemModels>
+
+<source>
+TR:3039
+</source>
+
+<published>
+RS:3039u
+</published>
+
+<tonnage>
+10.0
+</tonnage>
+
+<fuelType>
+PETROCHEMICALS
+</fuelType>
+
