@@ -1524,8 +1524,43 @@ public class ForceHumanResources {
      */
     public List<Person> getSkilledTechs(Collection<Unit> units, CampaignOptions campaignOptions,
           boolean isClanCampaign, LocalDate today, boolean noZeroMinute) {
-        return getTechs(getActivePersonnel(false, false), units, campaignOptions, isClanCampaign, today,
-              noZeroMinute, false, Person::hasTechSkill);
+        List<Person> techs = getTechs(getActivePersonnel(false, false), units, campaignOptions, isClanCampaign,
+              today, noZeroMinute, false, Person::hasTechSkill);
+        addSelfMaintainedInfantryEngineers(techs, units, noZeroMinute);
+        return techs;
+    }
+
+    /**
+     * Adds the engineer (ranking soldier) of each self-maintaining conventional infantry unit to the given list, so
+     * the Repair tab can offer them for work on their own unit. They are deliberately left out of
+     * {@link #getTechs(Collection, Collection, CampaignOptions, boolean, LocalDate, boolean, boolean, Predicate)} so
+     * they never count towards tech or maintenance capacity.
+     *
+     * @param techs        the list to add the engineers to
+     * @param units        the units to check
+     * @param noZeroMinute if {@code true}, engineers with no remaining available minutes are skipped
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void addSelfMaintainedInfantryEngineers(List<Person> techs, Collection<Unit> units,
+          boolean noZeroMinute) {
+        for (Unit unit : units) {
+            if (!unit.isSelfMaintainedInfantry()) {
+                continue;
+            }
+
+            Person engineer = unit.getEngineer();
+            if ((engineer == null) || techs.contains(engineer)) {
+                continue;
+            }
+
+            if (noZeroMinute && (engineer.getMinutesLeft() <= 0)) {
+                continue;
+            }
+
+            techs.add(engineer);
+        }
     }
 
     /**

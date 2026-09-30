@@ -7121,6 +7121,10 @@ public class Person implements ILocatable {
             return isTechBA();
         } else if (entity instanceof Tank) {
             return isTechMechanic();
+        } else if (entity.isConventionalInfantry()) {
+            // Only reachable in practice when Techs maintain conventional infantry; otherwise the infantry look after
+            // themselves and never take a Tech.
+            return isTechMechanic();
         } else {
             return false;
         }
@@ -7689,7 +7693,7 @@ public class Person implements ILocatable {
         final Unit unit = part.getUnit();
 
         // Infantry don't need techs to reload or swap out their ammo
-        boolean isForConventionalInfantry = unit != null && unit.isConventionalInfantry();
+        boolean isForConventionalInfantry = unit != null && unit.isSelfMaintainedInfantry();
         if (isForConventionalInfantry) {
             SkillType mechanicSkillType = SkillType.getType(S_TECH_VEHICLE);
             return new Skill(S_TECH_VEHICLE, mechanicSkillType.getRegularLevel(), 0);
@@ -7758,8 +7762,8 @@ public class Person implements ILocatable {
             return getSkill(S_TECH_MEK);
         } else if ((unit.getEntity() instanceof BattleArmor) && hasSkill(S_TECH_BA)) {
             return getSkill(S_TECH_BA);
-        } else if (((unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof AbstractBuildingEntity)) &&
-                         hasSkill(S_TECH_VEHICLE)) {
+        } else if (((unit.getEntity() instanceof Tank) || (unit.getEntity() instanceof AbstractBuildingEntity)
+                          || unit.isConventionalInfantry()) && hasSkill(S_TECH_VEHICLE)) {
             return getSkill(S_TECH_VEHICLE);
         } else if (((unit.getEntity() instanceof Dropship) || (unit.getEntity() instanceof Jumpship)) &&
                          hasSkill(S_TECH_VESSEL)) {
@@ -7792,7 +7796,7 @@ public class Person implements ILocatable {
             return false;
         }
 
-        if (unit.isConventionalInfantry()) {
+        if (unit.isSelfMaintainedInfantry()) {
             return true;
         }
 
@@ -7855,7 +7859,7 @@ public class Person implements ILocatable {
      * @return the global technician skill to use, or {@code null} if this person cannot maintain/refit the unit
      */
     public @Nullable Skill getMaintenanceOrRefitSkill(final @Nullable Unit unit) {
-        if ((unit != null) && unit.isConventionalInfantry()) {
+        if ((unit != null) && unit.isSelfMaintainedInfantry()) {
             // Conventional infantry are self-maintaining and refit automatically; mirror the stock mechanic skill used
             // for them elsewhere so downstream automatic-success handling still has a non-null skill to work with.
             final SkillType vehicleSkillType = SkillType.getType(S_TECH_VEHICLE);
@@ -7913,7 +7917,7 @@ public class Person implements ILocatable {
         // particular avoids penalizing that work for parts that map to a specialist skill such as
         // InfantryWeaponPart -> Technician/Weapons.
         final Unit unit = part.getUnit();
-        if (unit != null && unit.isConventionalInfantry()) {
+        if (unit != null && unit.isSelfMaintainedInfantry()) {
             return true;
         }
 
