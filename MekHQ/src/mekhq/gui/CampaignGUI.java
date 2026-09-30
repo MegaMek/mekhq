@@ -102,6 +102,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
@@ -939,7 +940,45 @@ public class CampaignGUI extends JPanel {
     }
 
     public void showContractMarket() {
+        if (isContractMarketBlockedByActiveContract()) {
+            JOptionPane.showMessageDialog(frame,
+                  getTextAt(resourceMap.getBaseBundleName(), "contractMarketBlocked.text"),
+                  getTextAt(resourceMap.getBaseBundleName(), "contractMarketBlocked.title"),
+                  JOptionPane.INFORMATION_MESSAGE);
+            return;
+        }
+
         new ChaosContractMarketDialog(getCampaign());
+    }
+
+    /**
+     * Determines whether the contract market should be inaccessible because the campaign already holds a contract.
+     *
+     * <p>Access is only permitted while a contract is held if StratCon is disabled campaign-wide and none of the held
+     * contracts (including accepted contracts that have not yet started) have StratCon enabled.</p>
+     *
+     * @return {@code true} if the contract market should be blocked
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isContractMarketBlockedByActiveContract() {
+        Campaign campaign = getCampaign();
+        List<AbstractContract> heldContracts = campaign.getActiveContracts(true);
+        if (heldContracts.isEmpty()) {
+            return false;
+        }
+
+        if (campaign.getCampaignOptions().isUseStratCon()) {
+            return true;
+        }
+
+        for (AbstractContract contract : heldContracts) {
+            if (contract.getStratConCampaignState() != null) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public void showUnitMarket() {

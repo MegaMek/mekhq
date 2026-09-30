@@ -42,6 +42,7 @@ import java.util.Objects;
 import java.util.function.Supplier;
 
 import jakarta.annotation.Nonnull;
+import megamek.client.generator.RandomNameGenerator;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.autoResolve.AutoResolveMethod;
@@ -503,6 +504,10 @@ public final class CampaignOption<T> {
           of(String.class, "", "awardSetFilterList");
     public static final CampaignOption<Integer> NON_BINARY_DICE_SIZE =
           of(Integer.class, 60, "nonBinaryDiceSize");
+    public static final CampaignOption<Integer> PERCENT_FEMALE =
+          of(Integer.class, 50, "percentFemale");
+    public static final CampaignOption<String> NAME_GENERATOR_FACTION =
+          of(String.class, RandomNameGenerator.KEY_DEFAULT_FACTION, "nameGeneratorFaction");
     public static final CampaignOption<RandomOriginOptions> RANDOM_ORIGIN_OPTIONS =
           ofMutable(RandomOriginOptions.class, () -> new RandomOriginOptions(true), "randomOriginOptions");
     public static final CampaignOption<Boolean> USE_RANDOM_PERSONALITIES =
@@ -988,6 +993,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "essentialScenariosOnly");
     public static final CampaignOption<Boolean> CONTRACTS_USE_SPECIAL_MECHANICS =
           of(Boolean.class, false, "contractsUseSpecialMechanics");
+    public static final CampaignOption<Boolean> USE_EMPLOYER_LOST_PLANET_REACTIONS =
+          of(Boolean.class, true, "useEmployerLostPlanetReactions");
     public static final CampaignOption<Boolean> RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY =
           of(Boolean.class, false, "restrictScenariosToFleetCapability");
     public static final CampaignOption<StratConSectorCountMethod> STRAT_CON_SECTOR_COUNT_METHOD =

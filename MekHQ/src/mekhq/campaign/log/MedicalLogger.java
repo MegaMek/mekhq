@@ -236,6 +236,22 @@ public class MedicalLogger {
         campaign.addReport(MEDICAL, message);
     }
 
+    /**
+     * Posts a daily report message noting that a prisoner has been released from the infirmary back into general
+     * population.
+     *
+     * @param person   the prisoner being released
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void prisonerDismissedFromInfirmary(Person person, Campaign campaign) {
+        String message = MessageFormat.format(logEntriesResourceMap.getString("prisonerDismissedFromInfirmary.text"),
+              person.getHyperlinkedName());
+        campaign.addReport(MEDICAL, message);
+    }
+
     public static void deliveredBaby(Person patient, Person baby, LocalDate date) {
         String message = logEntriesResourceMap.getString("deliveredBaby.text");
         MedicalLogEntry medicalLogEntry = new MedicalLogEntry(date,
