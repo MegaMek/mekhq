@@ -34,13 +34,13 @@ package mekhq.gui;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.RowSorter;
 import javax.swing.SortOrder;
 import javax.swing.table.TableRowSorter;
@@ -60,17 +60,16 @@ class BriefingTabScenarioSortingTest {
     private MockedStatic<MekHQ> mekHQ;
 
     /**
-     * Pins the display date format to ISO so date sorting doesn't depend on the local user's preferences.
+     * Supplies display date text, which would otherwise need the application's user preferences.
      */
     @BeforeEach
     void setUp() {
         MHQOptions mhqOptions = mock(MHQOptions.class);
+        when(mhqOptions.getLocale()).thenReturn(Locale.ENGLISH);
         when(mhqOptions.getDisplayFormattedDate(any())).thenAnswer(invocation -> {
             LocalDate date = invocation.getArgument(0);
             return (date == null) ? "" : date.toString();
         });
-        when(mhqOptions.parseDisplayFormattedDate(anyString())).thenAnswer(
-              invocation -> LocalDate.parse(invocation.getArgument(0)));
         mekHQ = mockStatic(MekHQ.class);
         mekHQ.when(MekHQ::getMHQOptions).thenReturn(mhqOptions);
     }
