@@ -34,6 +34,7 @@ package mekhq.campaign.parts.equipment;
 
 import java.io.PrintWriter;
 
+import megamek.common.annotations.Nullable;
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.utilities.MHQXMLUtility;
@@ -54,14 +55,14 @@ public class MissingInfantryWeaponPart extends MissingEquipmentPart {
 
     /**
      * @param tonnage      the platoon's tonnage
-     * @param type         the weapon
+     * @param type         the weapon, or {@code null} while the part is being loaded from a save
      * @param equipNum     the weapon's equipment number on the platoon
-     * @param campaign     the campaign
+     * @param campaign     the campaign, or {@code null} while the part is being loaded from a save
      * @param equipTonnage the weapon's weight
      * @param primary      {@code true} for the platoon's primary weapon, {@code false} for its secondary weapon
      */
-    public MissingInfantryWeaponPart(int tonnage, EquipmentType type, int equipNum, Campaign campaign,
-          double equipTonnage, boolean primary) {
+    public MissingInfantryWeaponPart(int tonnage, @Nullable EquipmentType type, int equipNum,
+          @Nullable Campaign campaign, double equipTonnage, boolean primary) {
         super(tonnage, type, equipNum, 1.0, campaign, equipTonnage);
         this.primary = primary;
     }
