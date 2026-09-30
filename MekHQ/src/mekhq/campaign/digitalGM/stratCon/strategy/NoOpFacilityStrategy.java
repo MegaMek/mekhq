@@ -64,6 +64,24 @@ public class NoOpFacilityStrategy implements IFacilityStrategy {
     }
 
     @Override
+    public void applyWeeklyUpkeep(StratConTrackState track, Campaign campaign) {
+        // Intentionally empty: Mapless and Singles play have no facilities to repair.
+    }
+
+    @Override
+    public void processEnemyActivity(Campaign campaign, AbstractContract contract,
+          StratConCampaignState campaignState) {
+        // Intentionally empty: Mapless and Singles play have no map to build on.
+    }
+
+    @Override
+    public int launchCounterattacks(Campaign campaign, AbstractContract contract,
+          StratConCampaignState campaignState, int scenarioCount) {
+        // Mapless and Singles play have no facilities to counterattack.
+        return 0;
+    }
+
+    @Override
     public void updateFacilityForScenario(AtBScenario scenario, AbstractContract contract, boolean destroy,
           boolean capture) {
         // Intentionally empty: Mapless and Singles play have no facilities to update.

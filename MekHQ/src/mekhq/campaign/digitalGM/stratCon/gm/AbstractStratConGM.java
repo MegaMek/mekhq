@@ -44,11 +44,14 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.*;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
+import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConReconnaissance;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
@@ -224,6 +227,9 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             // Points of interest likewise appear over the contract's run, on days rolled when it was accepted.
             processScheduledPointsOfInterest(campaign, contract, campaignState, today);
 
+            // The enemy's own facility activity across the contract, such as engineers sent to build outposts.
+            getFacilityStrategy().processEnemyActivity(campaign, contract, campaignState);
+
             boolean hasAssignedSingleDropScenario = false;
             for (StratConTrackState track : campaignState.getTracks()) {
                 cleanupPhantomScenarios(track);
@@ -237,6 +243,9 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 // map-based play applies facility effects here; Mapless/Singles supply a no-op strategy
                 getFacilityStrategy().applyPeriodicEffects(track, campaignState, isStartOfMonth);
                 getFacilityStrategy().processFacilityOrders(track, campaign);
+                if (isMonday) {
+                    getFacilityStrategy().applyWeeklyUpkeep(track, campaign);
+                }
 
                 processPointsOfInterest(track, campaign);
 
@@ -249,7 +258,17 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                     if ((scenario.getDeploymentDate() != null) &&
                               scenario.getDeploymentDate().isBefore(today) &&
                               scenario.getPrimaryForceIDs().isEmpty()) {
+                        StratConCoords scenarioCoords = scenario.getCoords();
+                        StratConFacility counterattackedFacility = scenario.isCounterattack() ?
+                                                                         track.getFacility(scenarioCoords) :
+                                                                         null;
                         getScenarioLifecycleStrategy().processExpiredScenario(scenario, track, campaignState);
+                        if (counterattackedFacility != null) {
+                            StratConEnemyFacilityActivity.reportIgnoredCounterattack(campaign,
+                                  track,
+                                  scenarioCoords,
+                                  counterattackedFacility);
+                        }
                     }
                 }
 
@@ -283,10 +302,17 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 // If the OpFor is routed, we want to just discard any scheduled scenarios, clearly they've been
                 // canceled due to impending defeat
                 if (!contract.getMoraleLevel().isRouted()) {
-                    getScenarioGenerationStrategy().generateDailyScenarios(campaign,
-                          campaignState,
+                    // Some may be counterattacks on facilities held by the player or their employer instead.
+                    scenarioCount -= getFacilityStrategy().launchCounterattacks(campaign,
                           contract,
+                          campaignState,
                           scenarioCount);
+                    if (scenarioCount > 0) {
+                        getScenarioGenerationStrategy().generateDailyScenarios(campaign,
+                              campaignState,
+                              contract,
+                              scenarioCount);
+                    }
                 }
             }
         }

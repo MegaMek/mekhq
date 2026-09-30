@@ -125,6 +125,16 @@ public class StratConFacility {
         public FacilityCondition worsened() {
             return (this == CRIPPLED) ? CRIPPLED : values()[ordinal() + 1];
         }
+
+        /**
+         * @return the next condition up, or this condition if it is already intact
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        public FacilityCondition improved() {
+            return (this == INTACT) ? INTACT : values()[ordinal() - 1];
+        }
     }
 
     /**

@@ -75,6 +75,46 @@ public interface IFacilityStrategy {
     void processFacilityOrders(StratConTrackState track, Campaign campaign);
 
     /**
+     * Gives the enemy facilities on a track their weekly upkeep: repairs and reinforcements.
+     *
+     * @param track    the track whose facilities are processed
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void applyWeeklyUpkeep(StratConTrackState track, Campaign campaign);
+
+    /**
+     * Runs the enemy's contract-wide facility activity for the day, such as sending engineers to build outposts.
+     *
+     * @param campaign      the current campaign
+     * @param contract      the contract
+     * @param campaignState the StratCon state for the contract
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void processEnemyActivity(Campaign campaign, AbstractContract contract, StratConCampaignState campaignState);
+
+    /**
+     * Turns some of the day's due ordinary scenarios into enemy counterattacks on facilities held by the player or
+     * their employer.
+     *
+     * @param campaign      the current campaign
+     * @param contract      the contract
+     * @param campaignState the StratCon state for the contract
+     * @param scenarioCount how many ordinary scenarios are due today
+     *
+     * @return how many became counterattacks, and so should not be generated as ordinary scenarios
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    int launchCounterattacks(Campaign campaign, AbstractContract contract, StratConCampaignState campaignState,
+          int scenarioCount);
+
+    /**
      * Updates the facility associated with a resolved scenario, destroying or capturing it as required.
      *
      * @param scenario the resolved scenario

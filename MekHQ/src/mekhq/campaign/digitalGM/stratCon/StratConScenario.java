@@ -122,6 +122,7 @@ public class StratConScenario implements IStratConDisplayable {
     private Set<Integer> failedReinforcements = new HashSet<>();
     private ArrayList<Integer> primaryForceIDs = new ArrayList<>();
     private FacilityOperation facilityOperation;
+    private boolean counterattack;
 
     /**
      * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the
@@ -386,6 +387,21 @@ public class StratConScenario implements IStratConDisplayable {
 
     public void setFacilityOperation(@Nullable FacilityOperation facilityOperation) {
         this.facilityOperation = facilityOperation;
+    }
+
+    /**
+     * @return {@code true} if this scenario is an enemy counterattack on a facility held by the player or their
+     *       employer. Ignoring one costs the facility.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isCounterattack() {
+        return counterattack;
+    }
+
+    public void setCounterattack(boolean counterattack) {
+        this.counterattack = counterattack;
     }
 
     @XmlTransient
