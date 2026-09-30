@@ -1488,19 +1488,19 @@ public class MRMSService {
 
                 targetRoll = campaign.getTargetFor(partWork, tech);
 
-                WorkTimeCalculation wtc = new WorkTimeCalculation(null);
+                WorkTimeCalculation workTimeCalculation = new WorkTimeCalculation(null);
                 int targetNumberLimit = increaseTime ? mrmsOption.getTargetNumberMax()
                       : getRushTargetNumberLimit(mrmsOption);
                 if (targetRoll.getValue() <= targetNumberLimit) {
-                    wtc.setWorkTime(previousNewWorkTime);
+                    workTimeCalculation.setWorkTime(previousNewWorkTime);
                 }
 
                 if (skill.getExperienceLevel(skillModifierData) >=
                           highestAvailableTechSkill) {
-                    wtc.setReachedMaxSkill(true);
+                    workTimeCalculation.setReachedMaxSkill(true);
                 }
 
-                return wtc;
+                return workTimeCalculation;
             }
 
             // Set our new workTime and calculate the new targetRoll
