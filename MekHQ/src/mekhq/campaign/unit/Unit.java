@@ -984,9 +984,10 @@ public class Unit implements ITechnology, ILocatable {
                 return false;
             }
         }
-        if (en instanceof Tank) {
+        if (en instanceof Tank tank) {
             for (int i = 0; i < en.locations(); i++) {
-                if (i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2) {
+                boolean isTurretOrRotor = VehicleLocations.isTurret(tank, i) || VehicleLocations.isRotor(tank, i);
+                if (isTurretOrRotor) {
                     continue;
                 }
                 if (en.isLocationBad(i)) {
@@ -1024,10 +1025,10 @@ public class Unit implements ITechnology, ILocatable {
                 return false;
             }
         }
-        if (en instanceof Tank) {
+        if (en instanceof Tank tank) {
             // can't repair a tank with a destroyed location
             for (int i = 0; i < en.locations(); i++) {
-                if (i == Tank.LOC_TURRET || i == Tank.LOC_TURRET_2 || i == Tank.LOC_BODY) {
+                if (VehicleLocations.canLoseWithoutWrecking(tank, i)) {
                     continue;
                 }
                 if (en.getInternal(i) <= 0) {
@@ -1368,6 +1369,22 @@ public class Unit implements ITechnology, ILocatable {
         if (updated > 0) {
             LOGGER.info("{}: {} armor parts now record their {}", getName(), updated, armorKit.getName());
         }
+    }
+
+    /**
+     * @return the part for one of a vehicle's locations: its rotor, one of its turrets, or plain structure. Turret and
+     *       rotor locations come from the vehicle, since superheavy tanks, large support tanks and VTOLs number them
+     *       differently from other tanks.
+     */
+    private TankLocation createVehicleLocationPart(Tank tank, int location) {
+        int tonnage = (int) tank.getWeight();
+        if (VehicleLocations.isRotor(tank, location)) {
+            return new Rotor(tonnage, getCampaign());
+        }
+        if (VehicleLocations.isTurret(tank, location)) {
+            return new Turret(location, tonnage, getCampaign());
+        }
+        return new TankLocation(location, tonnage, getCampaign());
     }
 
     public void removePart(Part part) {
@@ -3759,8 +3776,9 @@ public class Unit implements ITechnology, ILocatable {
                 }
             } else if (part instanceof MissingRotor) {
                 locations[VTOL.LOC_ROTOR] = part;
-            } else if (part instanceof MissingTurret && Tank.LOC_TURRET < locations.length) {
-                locations[Tank.LOC_TURRET] = part;
+            } else if ((part instanceof MissingTurret missingTurret)
+                             && (missingTurret.getTurretLocation() < locations.length)) {
+                locations[missingTurret.getTurretLocation()] = part;
             } else if (part instanceof ProtoMekLocation) {
                 if (((ProtoMekLocation) part).getLoc() < locations.length) {
                     locations[((ProtoMekLocation) part).getLoc()] = part;
@@ -4081,52 +4099,10 @@ public class Unit implements ITechnology, ILocatable {
                           getCampaign());
                     addPart(protoMekLocation);
                     partsToAdd.add(protoMekLocation);
-                } else if (entity instanceof Tank && i != Tank.LOC_BODY) {
-                    if (entity instanceof VTOL) {
-                        if (i == VTOL.LOC_ROTOR) {
-                            Rotor rotor = new Rotor((int) getEntity().getWeight(), getCampaign());
-                            addPart(rotor);
-                            partsToAdd.add(rotor);
-                        } else if (i == VTOL.LOC_TURRET) {
-                            if (((VTOL) entity).hasNoTurret()) {
-                                continue;
-                            }
-                            Turret turret = new Turret(i, (int) getEntity().getWeight(), getCampaign());
-                            addPart(turret);
-                            partsToAdd.add(turret);
-                        } else if (i == VTOL.LOC_TURRET_2) {
-                            if (((VTOL) entity).hasNoDualTurret()) {
-                                continue;
-                            }
-                            Turret turret = new Turret(i, (int) getEntity().getWeight(), getCampaign());
-                            addPart(turret);
-                            partsToAdd.add(turret);
-                        } else {
-                            TankLocation tankLocation = new TankLocation(i,
-                                  (int) getEntity().getWeight(),
-                                  getCampaign());
-                            addPart(tankLocation);
-                            partsToAdd.add(tankLocation);
-                        }
-                    } else if (i == Tank.LOC_TURRET) {
-                        if (((Tank) entity).hasNoTurret()) {
-                            continue;
-                        }
-                        Turret turret = new Turret(i, (int) getEntity().getWeight(), getCampaign());
-                        addPart(turret);
-                        partsToAdd.add(turret);
-                    } else if (i == Tank.LOC_TURRET_2) {
-                        if (((Tank) entity).hasNoDualTurret()) {
-                            continue;
-                        }
-                        Turret turret = new Turret(i, (int) getEntity().getWeight(), getCampaign());
-                        addPart(turret);
-                        partsToAdd.add(turret);
-                    } else {
-                        TankLocation tankLocation = new TankLocation(i, (int) getEntity().getWeight(), getCampaign());
-                        addPart(tankLocation);
-                        partsToAdd.add(tankLocation);
-                    }
+                } else if ((entity instanceof Tank tank) && (i != tank.getBodyLocation())) {
+                    Part tankLocation = createVehicleLocationPart(tank, i);
+                    addPart(tankLocation);
+                    partsToAdd.add(tankLocation);
                 } else if ((entity instanceof BattleArmor) &&
                                  (i != 0) &&
                                  (i <= ((BattleArmor) entity).getSquadSize())) {
