@@ -86,6 +86,16 @@ public class LFBattery extends Part {
         return docks;
     }
 
+    /**
+     * Sets how many docking collars this drive supports, used when a refit changes the number of collars on the
+     * ship that keeps this drive.
+     *
+     * @param docks the number of docking collars
+     */
+    public void setDocks(int docks) {
+        this.docks = docks;
+    }
+
     @Deprecated(since = "0.51.0", forRemoval = true)
     public LFBattery() {
         this(0, Jumpship.DRIVE_CORE_STANDARD, 0, null);

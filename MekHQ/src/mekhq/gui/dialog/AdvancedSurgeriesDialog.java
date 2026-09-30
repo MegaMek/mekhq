@@ -48,12 +48,14 @@ import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.Alternat
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.EI_IMPLANT_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.ELECTIVE_IMPLANT_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.FAILED_SURGERY_RECOVERY;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.FRACTURE_REPAIR_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.PAIN_SHUNT_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_LIMB_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries.REPLACEMENT_ORGAN_RECOVERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType.IMPLANT_VDNI;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.COSMETIC_SURGERY;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.ENHANCED_IMAGING;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.FRACTURE_REPAIR;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType.PAIN_SHUNT;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -141,8 +143,10 @@ public class AdvancedSurgeriesDialog extends JDialog {
      */
     private static final List<BodyLocation> VALID_BODY_LOCATIONS = List.of(
           BRAIN,
+          SKULL,
           FACE,
           MOUTH,
+          JAW,
           EYES,
           EARS,
           LEFT_ARM,
@@ -150,10 +154,12 @@ public class AdvancedSurgeriesDialog extends JDialog {
           LEFT_HAND,
           RIGHT_HAND,
           CHEST,
+          RIBS,
           HEART,
           LUNGS,
           ORGANS,
           ABDOMEN,
+          GROIN,
           RUMP,
           LEFT_LEG,
           RIGHT_LEG,
@@ -161,6 +167,21 @@ public class AdvancedSurgeriesDialog extends JDialog {
           RIGHT_FOOT,
           BONES,
           INTERNAL
+    );
+
+    /**
+     * Sub-locations that sit beneath a hand or foot in the {@link BodyLocation} hierarchy, but are part of the lower
+     * arm or leg. Replacing a hand or foot shouldn't fix injuries here; only replacing the whole arm or leg should.
+     */
+    private static final List<BodyLocation> LOCATIONS_BEYOND_HAND_AND_FOOT = List.of(
+          LEFT_FOREARM,
+          RIGHT_FOREARM,
+          LEFT_KNEE,
+          RIGHT_KNEE,
+          LEFT_SHIN,
+          RIGHT_SHIN,
+          LEFT_CALF,
+          RIGHT_CALF
     );
 
     private final Campaign campaign;
@@ -966,6 +987,8 @@ public class AdvancedSurgeriesDialog extends JDialog {
         ProstheticType type = surgery.type;
         if (type == COSMETIC_SURGERY) {
             return COSMETIC_SURGERY_RECOVERY;
+        } else if (type == FRACTURE_REPAIR) {
+            return FRACTURE_REPAIR_RECOVERY;
         } else if (surgery.location.isLimb()) {
             if (type.isElectiveImplant()) {
                 return ELECTIVE_IMPLANT_RECOVERY;
@@ -1151,8 +1174,11 @@ public class AdvancedSurgeriesDialog extends JDialog {
                     // just the localized ones
                     boolean locationIsHead = mappedLocation.equals(HEAD);
                     boolean locationIsChest = mappedLocation.equals(CHEST);
+                    boolean isHandOrFoot = mappedLocation == LEFT_HAND || mappedLocation == RIGHT_HAND
+                                                 || mappedLocation == LEFT_FOOT || mappedLocation == RIGHT_FOOT;
+                    boolean isBeyondHandOrFoot = isHandOrFoot && LOCATIONS_BEYOND_HAND_AND_FOOT.contains(location);
                     if (isSameLocation
-                              || (childOf && !(locationIsHead || locationIsChest))) {
+                              || (childOf && !(locationIsHead || locationIsChest) && !isBeyondHandOrFoot)) {
                         // If a BodyLocation is the child of multiple valid
                         // locations, we want it added to each, so we don't
                         // break after finding one match

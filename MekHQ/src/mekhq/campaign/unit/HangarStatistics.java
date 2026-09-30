@@ -106,6 +106,10 @@ public class HangarStatistics {
             if (!inTransit && !unit.isPresent()) {
                 continue;
             }
+            // Support carriers are an organisational wrapper; their occupants travel as passengers, not in bays
+            if (unit.isCarrier()) {
+                continue;
+            }
             if (unit.isMothballed()) {
                 hashMap.merge((long) Unit.ETYPE_MOTHBALLED, 1, Integer::sum);
                 continue;

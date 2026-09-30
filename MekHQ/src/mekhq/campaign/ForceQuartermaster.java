@@ -182,8 +182,9 @@ public record ForceQuartermaster(Campaign campaign) {
             return;
         }
 
-        // don't keep around spare ammo bins
-        if ((part instanceof AmmoBin) && (null == part.getUnit())) {
+        // don't keep around spare ammo bins; a bin set aside for a refit is not spare and must survive a save
+        boolean isLooseAmmoBin = (part instanceof AmmoBin) && (null == part.getUnit());
+        if (isLooseAmmoBin && !part.isReservedForRefit()) {
             return;
         }
 

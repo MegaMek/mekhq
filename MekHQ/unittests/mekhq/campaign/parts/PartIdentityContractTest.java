@@ -45,6 +45,7 @@ import java.util.Map;
 
 import megamek.common.annotations.Nullable;
 import mekhq.campaign.parts.enums.PartQuality;
+import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.parts.equipment.BattleArmorAmmoBin;
 import mekhq.campaign.parts.equipment.LargeCraftAmmoBin;
 import mekhq.campaign.parts.missing.MissingPart;
@@ -131,7 +132,11 @@ class PartIdentityContractTest {
             assertEquals(PartQuality.QUALITY_A, clone.getQuality(), "quality");
             assertEquals(1, clone.getHits(), "hits");
             assertEquals(part.isBrandNew(), clone.isBrandNew(), "brand new");
-            assertEquals(part.isOmniPodded(), clone.isOmniPodded(), "omni-podded");
+            // An ammo bin is pod-mounted only through the unit it is installed on (AmmoBin#isOmniPodded), so a
+            // clone, which has no unit, is never pod-mounted by design
+            if (!(part instanceof AmmoBin)) {
+                assertEquals(part.isOmniPodded(), clone.isOmniPodded(), "omni-podded");
+            }
         } finally {
             part.setQuality(originalQuality);
             part.setHits(originalHits);
