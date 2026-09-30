@@ -52,6 +52,7 @@ import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.SpaceStation;
+import megamek.common.units.SupportTank;
 import megamek.common.units.Tank;
 import megamek.common.units.VTOL;
 import megamek.common.units.Warship;
@@ -103,8 +104,15 @@ public enum UnitFixture {
      * Skinwalker A, a Mek with an interface cockpit and no gyro. Source: {@code meks/Rec Guides ilClan/Vol 24/(Ryoken III) Skinwalker A.mtf}.
      */
     SKINWALKER_A("(Ryoken III) Skinwalker A", false, Mek.class),
+    /** Hoplite C, a Clan Mek (not an OmniMek) with Clan ferro-fibrous armor. Source: {@code meks/3050U/Hoplite C.mtf}. */
+    HOPLITE_C("Hoplite C", false, Mek.class),
     /** Vedette Medium Tank, a tracked combat vehicle. Source: {@code vehicles/3039u/Vedette Medium Tank.blk}. */
     VEDETTE_MEDIUM_TANK("Vedette Medium Tank", true, Tank.class),
+    /**
+     * Cellco Ranger UPU-3000, a tracked support vehicle with BAR 8 armor. Source:
+     * {@code vehicles/TRO Vehicle Annex/Tracked/Cellco Ranger UPU-3000.blk}.
+     */
+    CELLCO_RANGER_UPU_3000("Cellco Ranger UPU-3000", true, SupportTank.class),
     /**
      * Epona Pursuit Tank Prime, a Clan hover OmniVehicle with its weapons in the turret. Source:
      * {@code vehicles/3060u/Epona Pursuit Tank Prime.blk}.

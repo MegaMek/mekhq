@@ -434,6 +434,19 @@ public class Armor extends Part implements IAcquisitionWork {
         updateConditionFromEntity(false);
     }
 
+    /**
+     * Capital-scale armor is counted in capital points on the ship and in standard points in the warehouse, where one
+     * capital point is ten standard points.
+     *
+     * @param entity      the unit the armor is on
+     * @param armorPoints armor points as the unit counts them
+     *
+     * @return the same armor in the standard points the warehouse counts
+     */
+    public static int toWarehousePoints(Entity entity, int armorPoints) {
+        return entity.isCapitalScale() ? (armorPoints * 10) : armorPoints;
+    }
+
     public int getBaseTimeFor(Entity entity) {
         if (entity == null) {
             return 5;

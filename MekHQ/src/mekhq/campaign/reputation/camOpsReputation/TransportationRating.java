@@ -42,9 +42,9 @@ import megamek.common.bays.*;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class TransportationRating {
     final static int BELOW_CAPACITY = 0;
@@ -369,7 +369,7 @@ public class TransportationRating {
      *
      * @return a map containing the count for each type of entity in the campaign
      */
-    private static Map<String, Integer> calculateTransportRequirements(Campaign campaign) {
+    static Map<String, Integer> calculateTransportRequirements(Campaign campaign) {
         // Initialize variables to store counts of different unit types
         int dropShipCount = 0, smallCraftCount = 0, mekCount = 0, asfCount = 0, superHeavyVehicleCount = 0,
               heavyVehicleCount = 0, lightVehicleCount = 0, protoMekCount = 0, battleArmorCount = 0,
@@ -379,6 +379,11 @@ public class TransportationRating {
         TreeMap<Integer, Formation> formationIds = campaign.getPlayerForce().getFormationIds();
         // Iterate through each unit in the campaign
         for (Unit unit : campaign.getActiveUnits()) {
+            // Support carriers are an organisational wrapper; the people inside them are counted as passengers
+            if (unit.isCarrier()) {
+                continue;
+            }
+
             Entity entity = unit.getEntity();
 
             if (excludeNonCombatUnits && isNonCombatUnit(formationIds, unit)) {
