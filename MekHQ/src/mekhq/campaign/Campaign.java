@@ -190,6 +190,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.Refit;
 import mekhq.campaign.parts.RefitWorkCheck;
+import mekhq.campaign.parts.ReservedSpares;
 import mekhq.campaign.parts.SpacecraftCoolingSystem;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -3091,7 +3092,7 @@ public class Campaign implements ITechManager {
                 UnitLogger.repaired(repairedUnit, getLocalDate(), repairedPartName, tech.getFullName());
             }
             if (getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS) && action.equals(" fix ") && !(partWork instanceof Armor)) {
-                Money cost = partWork.getUndamagedValue().multipliedBy(0.2);
+                Money cost = partWork.getRepairCost();
                 report += "<br>Repairs cost " + cost.toAmountAndSymbolString() + " worth of parts.";
                 getPlayerForce().getFinances().debit(TransactionType.REPAIRS,
                       getLocalDate(),
@@ -3373,6 +3374,9 @@ public class Campaign implements ITechManager {
             LOGGER.debug("[Refit] {} leaves the campaign mid-refit; cancelling the refit", unit.getName());
             unit.getRefit().cancel();
         }
+
+        // An overnight replacement in progress gives back the spare it set aside
+        ReservedSpares.releaseForDepartingUnit(unit);
 
         // remove all parts for this unit as well
         for (Part p : unit.getParts()) {

@@ -118,6 +118,7 @@ import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.ReservedSpares;
 import mekhq.campaign.parts.SVArmor;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -2644,6 +2645,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 }
             });
         }
+
+        // Spares reserved by tasks on units that have since left the campaign are freed
+        ReservedSpares.releaseOrphanedReservations(campaign);
 
         LOGGER.info("[Campaign Load] Units initialized in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
