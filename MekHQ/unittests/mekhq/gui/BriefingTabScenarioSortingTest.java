@@ -60,7 +60,7 @@ class BriefingTabScenarioSortingTest {
     private MockedStatic<MekHQ> mekHQ;
 
     /**
-     * Supplies display date text, which would otherwise need the application's user preferences.
+     * Supplies the locale and display date text, which would otherwise need the application's user preferences.
      */
     @BeforeEach
     void setUp() {
