@@ -172,6 +172,27 @@ class StratConStrategyDelegationTest {
     }
 
     @Test
+    void facilityLookupFallsBackToTheStratConFacilityStrategy() {
+        try (MockedStatic<DigitalGMRegistry> registry = mockStatic(DigitalGMRegistry.class)) {
+            registry.when(() -> DigitalGMRegistry.getActiveGM(org.mockito.ArgumentMatchers.any()))
+                  .thenReturn(Optional.empty());
+
+            assertInstanceOf(StratConFacilityStrategy.class, StratConGMs.facility(mock(CampaignOptions.class)));
+        }
+    }
+
+    @Test
+    void facilityLookupUsesTheActiveGmsStrategy() {
+        // Mapless play has no facility map, so routing through the lookup must reach its no-op strategy.
+        try (MockedStatic<DigitalGMRegistry> registry = mockStatic(DigitalGMRegistry.class)) {
+            registry.when(() -> DigitalGMRegistry.getActiveGM(org.mockito.ArgumentMatchers.any()))
+                  .thenReturn(Optional.of(new MaplessStratConGM()));
+
+            assertInstanceOf(NoOpFacilityStrategy.class, StratConGMs.facility(mock(CampaignOptions.class)));
+        }
+    }
+
+    @Test
     void noOpFacilityStrategyTouchesNothing() {
         StratConTrackState track = mock(StratConTrackState.class);
         StratConCampaignState campaignState = mock(StratConCampaignState.class);

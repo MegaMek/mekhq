@@ -64,6 +64,8 @@ import megamek.common.ui.EnhancedTabbedPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -100,8 +102,9 @@ import mekhq.gui.utilities.SkillLevelPickerUtility;
  *
  * <p>The generated NPC personnel attached to a contract (the employer's negotiator and liaison, and the opposing
  * commander) can have their name, rank, and portrait edited. On confirmation the contract is mutated in place; query
- * {@link #wasConfirmed()} afterward and rebuild any view showing it. The player's chosen negotiator and the StratCon
- * campaign state are preserved as-is, not edited here.</p>
+ * {@link #wasConfirmed()} afterward and rebuild any view showing it. The player's chosen negotiator is preserved
+ * as-is. The StratCon campaign state is not edited here, but when its contract's scale, track count, or dates change,
+ * its pre-rolled schedule is rolled again to match (see {@link StratConScenarioTempo#regenerateSchedules}).</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -1101,13 +1104,21 @@ public class ContractEditorDialog extends JDialog {
     }
 
     /**
-     * Writes every edited field back onto the contract, then closes. The player's chosen negotiator and the StratCon
-     * state attached to the contract are preserved untouched.
+     * Writes every edited field back onto the contract, then closes. The player's chosen negotiator is preserved
+     * untouched. If the contract's scale, track count, or dates changed, its StratCon schedule is rolled again (see
+     * {@link StratConScenarioTempo#regenerateSchedules}).
      *
      * @author Illiani
      * @since 0.51.01
      */
     private void saveAction() {
+        // What StratCon's pre-rolled schedule was rolled from, so an edit to any of it rolls the schedule again below.
+        int previousScale = contract.getScale();
+        int previousTrackCount = contract.getTrackCount();
+        LocalDate previousStartDate = contract.getStartDate();
+        LocalDate previousEndDate = contract.getEndingDate();
+        int previousLengthInMonths = contract.getLengthInMonths();
+
         // Identity
         String name = nameField.getText().trim();
         if (!name.isBlank()) {
@@ -1291,6 +1302,18 @@ public class ContractEditorDialog extends JDialog {
         // Tier the employer negotiator to match the Elite / Novice Negotiator characteristic (Veteran when neither).
         // Done last, after the negotiator has been generated (create) or edited (edit).
         ContractCharacteristics.syncNegotiatorTier(contract, campaign);
+
+        // A running contract's schedule was rolled from what was just edited, so it is rolled again to match. A market
+        // offer has no StratCon state yet, and is scheduled from its edited values when accepted.
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        boolean isScheduleChanged = (contract.getScale() != previousScale)
+                                          || (contract.getTrackCount() != previousTrackCount)
+                                          || !Objects.equals(contract.getStartDate(), previousStartDate)
+                                          || !Objects.equals(contract.getEndingDate(), previousEndDate)
+                                          || (contract.getLengthInMonths() != previousLengthInMonths);
+        if ((campaignState != null) && isScheduleChanged) {
+            StratConScenarioTempo.regenerateSchedules(campaign, contract, campaignState);
+        }
 
         LOGGER.info("GM {} contract: {}", createMode ? "created" : "edited", contract.getName());
         confirmed = true;

@@ -74,6 +74,8 @@ class MHQNewDayPage extends MHQOptionsPage {
       private SettingsCheckBox chkNewDayOptimizeMedicalAssignments;
       private SettingsCheckBox chkNewDayAutomaticallyAssignUnmaintainedUnits;
       private SettingsCheckBox chkSelfCorrectMaintenance;
+      private SettingsCheckBox chkDoNotMothballUnitsInBays;
+      private SettingsCheckBox chkDoNotMothballSalvage;
 
     // New Day - Training
       private SettingsCheckBox chkNewMonthQuickTrain;
@@ -147,11 +149,14 @@ class MHQNewDayPage extends MHQOptionsPage {
               checkBox("chkNewDayAutomaticallyAssignUnmaintainedUnits",
                     model.newDayAutomaticallyAssignUnmaintainedUnits);
         chkSelfCorrectMaintenance = checkBox("chkSelfCorrectMaintenance", model.selfCorrectMaintenance);
+        chkDoNotMothballUnitsInBays = checkBox("chkDoNotMothballUnitsInBays", model.doNotMothballUnitsInBays);
+        chkDoNotMothballSalvage = checkBox("chkDoNotMothballSalvage", model.doNotMothballSalvage);
 
       SettingsFormPanel panel = new SettingsFormPanel("MHQNewDayTasksContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addCheckBoxGrid(2, chkNewDayAutoLogistics, chkNewDayMRMS, chkNewDayOptimizeMedicalAssignments,
-              chkNewDayAutomaticallyAssignUnmaintainedUnits, chkSelfCorrectMaintenance);
+              chkNewDayAutomaticallyAssignUnmaintainedUnits, chkSelfCorrectMaintenance, chkDoNotMothballUnitsInBays,
+              chkDoNotMothballSalvage);
         return panel;
     }
 
@@ -281,6 +286,8 @@ class MHQNewDayPage extends MHQOptionsPage {
         model.newDayOptimizeMedicalAssignments = chkNewDayOptimizeMedicalAssignments.isSelected();
         model.newDayAutomaticallyAssignUnmaintainedUnits = chkNewDayAutomaticallyAssignUnmaintainedUnits.isSelected();
         model.selfCorrectMaintenance = chkSelfCorrectMaintenance.isSelected();
+        model.doNotMothballUnitsInBays = chkDoNotMothballUnitsInBays.isSelected();
+        model.doNotMothballSalvage = chkDoNotMothballSalvage.isSelected();
 
         model.newMonthQuickTrain = chkNewMonthQuickTrain.isSelected();
         model.quickTrainIgnoreTrainingFormations = chkQuickTrainIgnoreTrainingFormations.isSelected();

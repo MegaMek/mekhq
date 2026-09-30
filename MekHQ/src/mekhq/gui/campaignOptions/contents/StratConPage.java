@@ -172,6 +172,7 @@ class StratConPage {
     private JCheckBox chkUseAdvancedScouting;
     private JCheckBox chkEssentialScenariosOnly;
     private JCheckBox chkContractsUseSpecialMechanics;
+    private JCheckBox chkUseEmployerLostPlanetReactions;
     private JCheckBox chkNoSeedForces;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
@@ -326,6 +327,9 @@ class StratConPage {
         chkContractsUseSpecialMechanics = new CampaignOptionsCheckBox("ContractsUseSpecialMechanics",
               getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkContractsUseSpecialMechanics.addMouseListener(createTipPanelUpdater("ContractsUseSpecialMechanics"));
+        chkUseEmployerLostPlanetReactions = new CampaignOptionsCheckBox("UseEmployerLostPlanetReactions",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkUseEmployerLostPlanetReactions.addMouseListener(createTipPanelUpdater("UseEmployerLostPlanetReactions"));
         chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces",
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkNoSeedForces.addMouseListener(createTipPanelUpdater("NoSeedForces"));
@@ -525,6 +529,7 @@ class StratConPage {
               chkUseAdvancedScouting,
               chkEssentialScenariosOnly,
               chkContractsUseSpecialMechanics,
+              chkUseEmployerLostPlanetReactions,
               chkNoSeedForces,
               chkUseGenericBattleValue,
               chkUseVerboseBidding,
@@ -674,6 +679,7 @@ class StratConPage {
         chkUseAdvancedScouting.setSelected(model.useAdvancedScouting);
         chkEssentialScenariosOnly.setSelected(model.essentialScenariosOnly);
         chkContractsUseSpecialMechanics.setSelected(model.contractsUseSpecialMechanics);
+        chkUseEmployerLostPlanetReactions.setSelected(model.useEmployerLostPlanetReactions);
         chkNoSeedForces.setSelected(model.noSeedForces);
         chkUseGenericBattleValue.setSelected(model.useGenericBattleValue);
         chkUseVerboseBidding.setSelected(model.useVerboseBidding);
@@ -734,6 +740,7 @@ class StratConPage {
         model.useAdvancedScouting = chkUseAdvancedScouting.isSelected();
         model.essentialScenariosOnly = chkEssentialScenariosOnly.isSelected();
         model.contractsUseSpecialMechanics = chkContractsUseSpecialMechanics.isSelected();
+        model.useEmployerLostPlanetReactions = chkUseEmployerLostPlanetReactions.isSelected();
         model.noSeedForces = chkNoSeedForces.isSelected();
         model.useGenericBattleValue = chkUseGenericBattleValue.isSelected();
         model.useVerboseBidding = chkUseVerboseBidding.isSelected();

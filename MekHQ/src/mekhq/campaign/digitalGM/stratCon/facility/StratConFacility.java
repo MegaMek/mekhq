@@ -114,9 +114,16 @@ public class StratConFacility implements Cloneable {
     }
 
     /**
-     * Copies data from the source facility to here. Does cosmetic data. Reconstructs file-driven transient data.
+     * Copies data from the source facility to here, including its name and type. Reconstructs file-driven transient
+     * data.
+     *
+     * <p>Visibility is only ever gained, never lost: a facility the player has already seen stays visible after it
+     * changes hands, even when the new owner's definition would start hidden.</p>
      */
     public void copyRulesDataFrom(StratConFacility facility) {
+        setDisplayableName(facility.getDisplayableName());
+        setFacilityType(facility.getFacilityType());
+        setVisible(visible || facility.getVisible());
         setCapturedDefinition(facility.getCapturedDefinition());
         setLocalModifiers(new ArrayList<>(facility.getLocalModifiers()));
         setSharedModifiers(new ArrayList<>(facility.getSharedModifiers()));

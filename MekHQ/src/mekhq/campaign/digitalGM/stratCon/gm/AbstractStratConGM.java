@@ -47,6 +47,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConReconnaissance;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
@@ -185,7 +186,8 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
     /**
      * The shared StratCon daily lifecycle. Runs the scenario-generation routine for every track attached to an active
      * contract: cleaning up phantom scenarios, returning forces whose deployment has ended, applying facility effects,
-     * expiring ignored scenarios, scheduling the coming week's scenarios, and generating those due today.
+     * expiring ignored scenarios, scheduling ordinary scenarios (up front, or the coming week's in Single Drop play), and
+     * generating those due today.
      *
      * @param event the new-day event (already enable-gated by {@link AbstractDigitalGM#onNewDay})
      */
@@ -207,6 +209,12 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
 
             if (campaignState == null) {
                 continue;
+            }
+
+            // Ordinary scenarios are scheduled up front, as the contract is accepted. A contract begun before that, or
+            // in Single Drop play, is scheduled from today the first time it runs outside Single Drop play.
+            if (!singleDrop && !campaignState.isNormalTempoScheduled()) {
+                StratConScenarioTempo.scheduleNormalScenarios(campaign, contract, campaignState, today);
             }
 
             // Strategic-objective scenarios trickle in over the contract's months, paced by its scenario schedule,
@@ -244,8 +252,9 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                     }
                 }
 
-                // on monday, generate new scenario dates - unless Essential-only play suppresses ambient scenarios
-                if (!essentialScenariosOnly && isMonday && !hasAssignedSingleDropScenario) {
+                // Single Drop play schedules its one scenario each Monday - unless Essential-only play suppresses ambient
+                // scenarios. Other play schedules its ordinary scenarios up front (see StratConScenarioTempo).
+                if (!essentialScenariosOnly && isMonday && singleDrop && !hasAssignedSingleDropScenario) {
                     getScenarioGenerationStrategy().generateWeeklyScenarioDates(campaign,
                           campaignState,
                           contract,
@@ -259,16 +268,16 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 }
             }
 
-            List<LocalDate> weeklyScenarioDates = campaignState.getWeeklyScenarios();
+            List<LocalDate> scheduledScenarioDates = campaignState.getScheduledScenarioDates();
 
-            if (!essentialScenariosOnly && weeklyScenarioDates.contains(today)) {
+            if (!essentialScenariosOnly && scheduledScenarioDates.contains(today)) {
                 int scenarioCount = 0;
-                for (LocalDate date : weeklyScenarioDates) {
+                for (LocalDate date : scheduledScenarioDates) {
                     if (date.equals(today)) {
                         scenarioCount++;
                     }
                 }
-                weeklyScenarioDates.removeIf(date -> date.equals(today));
+                scheduledScenarioDates.removeIf(date -> date.equals(today));
 
                 // If the OpFor is routed, we want to just discard any scheduled scenarios, clearly they've been
                 // canceled due to impending defeat
@@ -336,6 +345,10 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             return;
         }
 
+        // Counted before anything is placed today, so a contract from before the ledger existed does not count today's
+        // arrivals twice.
+        campaignState.seedPointOfInterestLedger();
+
         List<StratConPointOfInterest> placedPointsOfInterest = new ArrayList<>();
         int unplacedCount = 0;
         for (StratConScheduledPointOfInterest duePointOfInterest : duePointsOfInterest) {
@@ -352,6 +365,7 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                   StratConContractInitializer.spawnScheduledPointOfInterest(campaign, contract, duePointOfInterest);
             if (placedPointOfInterest != null) {
                 scheduledPointsOfInterest.remove(duePointOfInterest);
+                campaignState.recordPlacedPointOfInterest(duePointOfInterest);
                 placedPointsOfInterest.add(placedPointOfInterest);
             } else if (duePointOfInterest.isPlacementAbandoned(today)) {
                 LOGGER.info("Dropping scheduled point of interest {} on contract {}: no sector had room for it within"
