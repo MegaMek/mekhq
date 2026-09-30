@@ -5960,7 +5960,7 @@ public class InterstellarMapPanel extends JPanel {
         List<FactionLogoCandidate> candidates = new ArrayList<>();
 
         for (TerritoryComponent component : atlas.components()) {
-            int priority = getFactionLogoPriority(component.faction());
+            int priority = getFactionLogoPriority(component.faction(), renderKey.territoryKey().date().getYear());
             if (priority < 0) {
                 continue;
             }
@@ -6072,6 +6072,14 @@ public class InterstellarMapPanel extends JPanel {
         return faction.isPirate() ? 2 : -1;
     }
 
+    static int getFactionLogoPriority(Faction faction, int gameYear) {
+        int priority = getFactionLogoPriority(faction);
+        if ((priority >= 0) || faction.isIndependent() || faction.is(FactionTag.ABANDONED)) {
+            return priority;
+        }
+        return FactionMapLogo.hasCustomLogo(gameYear, faction.getShortName()) ? 1 : -1;
+    }
+
     static int resolveLogoSize(double size, int minimumSize, int maximumSize) {
         if (size < minimumSize) {
             return 0;
@@ -6085,45 +6093,35 @@ public class InterstellarMapPanel extends JPanel {
             return cachedImage;
         }
 
-        try {
-            ImageIcon icon = Factions.getFactionLogo(logoKey.gameYear(), logoKey.factionCode());
-            Image sourceImage = icon.getImage();
-            int sourceWidth = icon.getIconWidth();
-            int sourceHeight = icon.getIconHeight();
-            if ((sourceImage == null) || (sourceWidth <= 0) || (sourceHeight <= 0)) {
-                missingFactionLogoImages.add(logoKey);
-                return null;
-            }
-
-            BufferedImage source = new BufferedImage(sourceWidth, sourceHeight, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D sourceGraphics = source.createGraphics();
-            sourceGraphics.drawImage(sourceImage, 0, 0, null);
-            sourceGraphics.dispose();
-            Color factionColor = faction.getColor();
-            int tintedRed = (factionColor.getRed() + 510) / 3;
-            int tintedGreen = (factionColor.getGreen() + 510) / 3;
-            int tintedBlue = (factionColor.getBlue() + 510) / 3;
-            BufferedImage tinted = new BufferedImage(sourceWidth, sourceHeight, BufferedImage.TYPE_INT_ARGB);
-            BufferedImage shadow = new BufferedImage(sourceWidth, sourceHeight, BufferedImage.TYPE_INT_ARGB);
-            for (int imageY = 0; imageY < sourceHeight; imageY++) {
-                for (int imageX = 0; imageX < sourceWidth; imageX++) {
-                    int alpha = source.getRGB(imageX, imageY) >>> 24;
-                    if (alpha == 0) {
-                        continue;
-                    }
-                    tinted.setRGB(imageX, imageY,
-                          (alpha << 24) | (tintedRed << 16) | (tintedGreen << 8) | tintedBlue);
-                    int shadowAlpha = (int) Math.round(alpha * 0.72);
-                    shadow.setRGB(imageX, imageY, shadowAlpha << 24);
-                }
-            }
-            FactionLogoImage image = new FactionLogoImage(tinted, shadow);
-            factionLogoImages.put(logoKey, image);
-            return image;
-        } catch (RuntimeException exception) {
+        BufferedImage source = FactionMapLogo.load(logoKey.gameYear(), logoKey.factionCode());
+        if (source == null) {
             missingFactionLogoImages.add(logoKey);
             return null;
         }
+
+        int sourceWidth = source.getWidth();
+        int sourceHeight = source.getHeight();
+        Color factionColor = faction.getColor();
+        int tintedRed = (factionColor.getRed() + 510) / 3;
+        int tintedGreen = (factionColor.getGreen() + 510) / 3;
+        int tintedBlue = (factionColor.getBlue() + 510) / 3;
+        BufferedImage tinted = new BufferedImage(sourceWidth, sourceHeight, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage shadow = new BufferedImage(sourceWidth, sourceHeight, BufferedImage.TYPE_INT_ARGB);
+        for (int imageY = 0; imageY < sourceHeight; imageY++) {
+            for (int imageX = 0; imageX < sourceWidth; imageX++) {
+                int alpha = source.getRGB(imageX, imageY) >>> 24;
+                if (alpha == 0) {
+                    continue;
+                }
+                tinted.setRGB(imageX, imageY,
+                      (alpha << 24) | (tintedRed << 16) | (tintedGreen << 8) | tintedBlue);
+                int shadowAlpha = (int) Math.round(alpha * 0.72);
+                shadow.setRGB(imageX, imageY, shadowAlpha << 24);
+            }
+        }
+        FactionLogoImage image = new FactionLogoImage(tinted, shadow);
+        factionLogoImages.put(logoKey, image);
+        return image;
     }
 
     private FactionLogoImage getScaledFactionLogoImage(FactionLogoKey logoKey, FactionLogoImage sourceImage,
