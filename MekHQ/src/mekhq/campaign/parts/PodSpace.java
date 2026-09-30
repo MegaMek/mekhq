@@ -547,7 +547,8 @@ public class PodSpace implements IPartWork {
 
     @Override
     public PartRepairType getMRMSOptionType() {
-        return PartRepairType.GENERAL_LOCATION;
+        // The Mass Repair "Replace/Salvage OmniPod Equipment" row governs pod work
+        return PartRepairType.POD_SPACE;
     }
 
     @Override
