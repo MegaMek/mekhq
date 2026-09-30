@@ -289,6 +289,11 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
         panMap.setCampaign(getCampaign());
         panMap.addActionListener(this);
+        addHierarchyListener(event -> {
+            if ((event.getChangeFlags() & java.awt.event.HierarchyEvent.SHOWING_CHANGED) != 0 && !isShowing()) {
+                panMap.closeMapUtilityWindows();
+            }
+        });
 
         panSystem = new PlanetarySystemMapPanel(getCampaign(), getCampaignGui());
         panSystem.addActionListener(this);
@@ -330,7 +335,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         suggestPlanet.addActionListener(ev -> {
             PlanetarySystem system = getCampaign().getSystemByName(suggestPlanet.getText());
             if (system != null) {
-                panMap.setSelectedSystem(system);
+                selectMapSystem(system);
                 panSystem.updatePlanetarySystem(system);
                 syncRouteDestinationToSelection();
                 refreshPlanetView();
@@ -398,7 +403,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
           int utilityButtonSize = layers.getPreferredSize().height;
           InterstellarMapPanel.setNavigationUtilityButtonSize(information,
               new Dimension(utilityButtonSize, utilityButtonSize));
-        information.addActionListener(event -> panMap.toggleMapLegendDialog());
+        information.addActionListener(event -> panMap.toggleMapLegendDialog(information));
         constraints = new GridBagConstraints();
         constraints.gridx = 6;
         constraints.gridy = 0;
@@ -409,6 +414,10 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         preferredSize.height = Math.max(preferredSize.height, HUD_MINIMUM_HEIGHT);
         navigationHud.setPreferredSize(preferredSize);
         return navigationHud;
+    }
+
+    private void selectMapSystem(PlanetarySystem system) {
+        panMap.setSelectedSystem(system);
     }
 
     private void applyLayoutState() {
@@ -670,8 +679,10 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
               MHQInternationalization.getTextAt(RESOURCE_BUNDLE, "chkAvoidAbandonedSystems.toolTipText")));
         avoidAbandonedSystems.setSelected(getCampaign().getPlayerForce().isAvoidingEmptySystems());
         avoidAbandonedSystems.setAlignmentX(Component.LEFT_ALIGNMENT);
-        avoidAbandonedSystems.addActionListener(event ->
-              getCampaign().getPlayerForce().setIsAvoidingEmptySystems(avoidAbandonedSystems.isSelected()));
+        avoidAbandonedSystems.addActionListener(event -> {
+            getCampaign().getPlayerForce().setIsAvoidingEmptySystems(avoidAbandonedSystems.isSelected());
+            updateRouteStrip();
+        });
         options.add(avoidAbandonedSystems);
 
           JCheckBox useCommandCircuits = new ImmersiveCheckBox(
@@ -1600,7 +1611,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
      */
     public void switchPlanetaryMap(Planet p) {
         PlanetarySystem s = p.getParentSystem();
-        panMap.setSelectedSystem(s);
+        selectMapSystem(s);
         panSystem.updatePlanetarySystem(p);
         mapView.setView(panSystem);
         refreshPlanetView();
@@ -1612,7 +1623,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
      * @param s The {@link PlanetarySystem} to select.
      */
     public void switchPlanetaryMap(PlanetarySystem s) {
-        panMap.setSelectedSystem(s);
+        selectMapSystem(s);
         panSystem.updatePlanetarySystem(s);
         mapView.setView(panSystem);
         refreshPlanetView();
@@ -1624,7 +1635,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
      * @param s The {@link PlanetarySystem} to select.
      */
     public void switchSystemsMap(PlanetarySystem s) {
-        panMap.setSelectedSystem(s);
+        selectMapSystem(s);
         panSystem.updatePlanetarySystem(s);
         switchSystemsMap();
     }

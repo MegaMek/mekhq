@@ -338,7 +338,7 @@ class RepairEngineCharacterizationTest {
     }
 
     @Test
-    void carriedOverJobIsMarkedOvertimeEvenWhenNoOvertimeWasWorked() {
+    void carriedOverJobIsNotMarkedOvertimeWhenNoOvertimeWasWorked() {
         campaign.setOvertime(true);
         MekActuator actuator = damagedActuator();
         tech.setMinutesLeft(30);
@@ -347,23 +347,23 @@ class RepairEngineCharacterizationTest {
         fixWithEveryDieShowing(actuator, 3);
         tech.resetMinutesLeft(false);
 
-        // Current behaviour, see REP-06: no overtime was worked, yet tomorrow's roll carries +3; changes when fixed
-        assertTrue(actuator.hasWorkedOvertime());
-        assertEquals(9, campaign.getTargetFor(actuator, tech).getValue());
+        // REP-06 (#10209): no overtime was worked, so tomorrow's roll carries no +3 overtime modifier
+        assertFalse(actuator.hasWorkedOvertime());
+        assertEquals(6, campaign.getTargetFor(actuator, tech).getValue());
     }
 
     @Test
-    void carriedOverJobLosesItsProgressWhenTheTechHasNoTimeLeft() {
+    void carriedOverJobKeepsItsProgressWhenTheTechHasNoTimeLeft() {
         MekActuator actuator = actuatorCarriedOverAfterThirtyMinutes();
         // maintenance used the tech's whole day before the overnight pass reached the job
         tech.setMinutesLeft(0);
 
         String report = fixWithEveryDieShowing(actuator, 3);
 
-        // Current behaviour, see REP-04: the 30 minutes already worked are thrown away; changes when that is fixed
-        assertTrue(report.contains("no time left after maintenance"), report);
-        assertEquals(0, actuator.getTimeSpent());
-        assertNull(actuator.getTech());
+        // REP-04 (#10209): the job waits for tomorrow with the 30 minutes already worked and its tech
+        assertTrue(report.contains("no time left"), report);
+        assertEquals(30, actuator.getTimeSpent());
+        assertSame(tech, actuator.getTech());
         assertEquals(1, actuator.getHits());
     }
 
@@ -383,19 +383,22 @@ class RepairEngineCharacterizationTest {
     }
 
     @Test
-    void carriedOverJobThatBecameImpossibleStillRollsAndFails() {
+    void carriedOverJobThatBecameImpossibleIsNotRolled() {
         MissingPart placeholder = missingMediumLaserWithSpares(2);
         tech.setMinutesLeft(30);
         fixWithEveryDieShowing(placeholder, 3);
         tech.resetMinutesLeft(false);
         campaign.getCampaignOptions().set(CampaignOption.TECHS_NEED_TOOL_KIT, true);
 
+        int skillMinBefore = placeholder.getSkillMin();
+
         String report = fixWithEveryDieShowing(placeholder, 6);
 
-        // Current behaviour, see REP-03: an impossible task is rolled anyway and fails even on a 12; changes when
-        // that is fixed
-        assertTrue(report.contains("Impossible"), report);
-        assertEquals(EXP_REGULAR + 1, placeholder.getSkillMin());
+        // REP-03 (#10209): an impossible task is not rolled, so it cannot fail; the tech stops and the reserved
+        // spare goes back to stock
+        assertTrue(report.contains("tool kit"), report);
+        assertEquals(skillMinBefore, placeholder.getSkillMin());
+        assertNull(placeholder.getTech());
         assertSame(placeholder, PartsScenario.unitParts(locust, MissingPart.class).getFirst());
         assertEquals(2, scenario.countSpareParts(EquipmentPart.class));
     }

@@ -84,6 +84,7 @@ public class AlternateInjuries {
     private static final int CLONED_LIMB_HEALING_DAYS = 21; // ATOW pg 316
     private static final int REPLACEMENT_LIMB_HEALING_DAYS = 42; // ATOW pg 316
     private static final int COSMETIC_SURGERY_RECOVERY_HEALING_DAYS = 7; // Internet says 2-3 weeks
+    private static final int FRACTURE_REPAIR_RECOVERY_HEALING_DAYS = 14; // Shorter than letting the fracture heal
     private static final int ELECTIVE_IMPLANT_RECOVERY_HEALING_DAYS = 90; // ATOW pg 317
     private static final int ENHANCED_IMAGING_IMPLANT_RECOVERY_HEALING_DAYS = 365; // ATOW pg 317
     private static final int PAIN_SHUNT_RECOVERY_HEALING_DAYS = 365; // ATOW:Companion pg 182
@@ -295,6 +296,8 @@ public class AlternateInjuries {
     public static final InjuryType BIONIC_LUNGS = new BionicLungs();
     public static final InjuryType BIONIC_ORGAN_OTHER = new BionicOrganOther();
     public static final InjuryType COSMETIC_SURGERY = new CosmeticSurgery();
+    public static final InjuryType FRACTURE_REPAIR = new FractureRepair();
+    public static final InjuryType FRACTURE_REPAIR_RECOVERY = new FractureRepairRecovery();
     public static final InjuryType CLONED_LIMB_RECOVERY = new ClonedLimbRecovery();
     public static final InjuryType REPLACEMENT_LIMB_RECOVERY = new ReplacementLimbRecovery();
     public static final InjuryType REPLACEMENT_ORGAN_RECOVERY = new ReplacementOrganRecovery();
@@ -2280,7 +2283,7 @@ public class AlternateInjuries {
             super();
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.COSMETIC_SURGERY.simpleName");
             this.allowedLocations = Set.of(FACE, ABDOMEN, CHEST, LEFT_ARM, RIGHT_ARM, LEFT_HAND,
-                  RIGHT_HAND, LEFT_LEG, RIGHT_LEG);
+                  RIGHT_HAND, LEFT_LEG, RIGHT_LEG, LEFT_FOOT, RIGHT_FOOT);
             this.injuryEffect = NONE;
         }
 
@@ -2313,6 +2316,43 @@ public class AlternateInjuries {
                   INTERNAL_BLEEDING,
                   Set.of(GENERIC));
             this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.REPLACEMENT_ORGAN_RECOVERY.simpleName");
+        }
+    }
+
+    /**
+     * Surgical fixation of fractures in locations that can't be treated by replacing a limb or organ (skull, jaw, ribs,
+     * and pelvis).
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static final class FractureRepair extends Prosthetic {
+        FractureRepair() {
+            super();
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FRACTURE_REPAIR.simpleName");
+            this.allowedLocations = Set.of(SKULL, JAW, RIBS, GROIN);
+            this.injuryEffect = NONE;
+        }
+
+        @Override
+        public String getName(BodyLocation loc, int severity) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FRACTURE_REPAIR.simpleName",
+                  Utilities.capitalize(loc.locationName()));
+        }
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static final class FractureRepairRecovery extends BaseInjury {
+        FractureRepairRecovery() {
+            super(FRACTURE_REPAIR_RECOVERY_HEALING_DAYS,
+                  false,
+                  MINOR,
+                  NONE,
+                  Set.of(GENERIC));
+            this.simpleName = getTextAt(RESOURCE_BUNDLE, "AlternateInjuries.FRACTURE_REPAIR_RECOVERY.simpleName");
         }
     }
 

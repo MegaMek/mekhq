@@ -1317,6 +1317,31 @@ public class TransportCostCalculationsTest {
         assertEquals(unitCount, countedUnits, "Expected " + unitCount + " units but was " + countedUnits);
     }
 
+    /**
+     * Support carriers are an organisational wrapper around support personnel; the people inside travel as passengers,
+     * so the carrier itself must not demand an infantry bay.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testCountUnitsByType_supportCarrierIsIgnored() {
+        Entity carrierEntity = mock(Entity.class);
+        when(carrierEntity.isInfantry()).thenReturn(true);
+        Unit carrier = unitWithEntity(carrierEntity);
+        when(carrier.isCarrier()).thenReturn(true);
+
+        Entity infantryEntity = mock(Entity.class);
+        when(infantryEntity.isInfantry()).thenReturn(true);
+        Unit infantry = unitWithEntity(infantryEntity);
+
+        TransportCostCalculations local = calculationsWithUnits(List.of(carrier, infantry));
+        local.countUnitsByType();
+
+        assertEquals(1, local.getInfantryCount(), "Only the non-carrier infantry unit should need a bay");
+        assertEquals(0, local.getOtherUnitCount());
+    }
+
     @ParameterizedTest
     @ValueSource(ints = { 0, 1, 2, 3 })
     public void testCountUnitsByType_otherUnit(int unitCount) {

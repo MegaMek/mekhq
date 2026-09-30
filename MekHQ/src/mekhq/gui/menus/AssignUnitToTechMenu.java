@@ -40,12 +40,12 @@ import javax.swing.JMenuItem;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.JScrollableMenu;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 /**
  * This is a standard menu that takes either a unit or multiple units, and allows the user to assign or remove a tech
@@ -115,6 +115,13 @@ public class AssignUnitToTechMenu extends JScrollableMenu {
                 }
 
                 if (unitPlace != null && tech.getPlace() != unitPlace) {
+                    continue;
+                }
+
+                // A tech on a refit is tied up until it ends; they keep the units they already maintain
+                if (campaign.getPlayerForce()
+                          .getHumanResources()
+                          .isWorkingOnRefit(campaign.getPlayerForce().getHangar(), tech)) {
                     continue;
                 }
 

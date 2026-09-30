@@ -86,6 +86,15 @@ public class Turret extends TankLocation {
         this.name = "Turret";
     }
 
+    /**
+     * Moves this turret to the given turret location, used when a spare turret is fitted in place of a destroyed one.
+     *
+     * @param turretLocation the location of the turret it replaces
+     */
+    public void setTurretLocation(int turretLocation) {
+        this.loc = turretLocation;
+    }
+
     @Override
     public void setUnit(Unit u) {
         super.setUnit(u);
@@ -140,7 +149,7 @@ public class Turret extends TankLocation {
 
     @Override
     public MissingPart getMissingPart() {
-        return new MissingTurret(getUnitTonnage(), weight, campaign);
+        return new MissingTurret(getUnitTonnage(), loc, weight, campaign);
     }
 
     @Override
