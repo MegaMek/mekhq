@@ -52,6 +52,7 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.chaosCampaign.ChaosScaleLimits;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
@@ -69,6 +70,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
+import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
@@ -409,6 +411,34 @@ public abstract class AbstractContractGeneration {
      */
     public static int determineScale(Campaign campaign, PlayerForce playerForce, LocalHangar detachmentHangar,
           AbstractContract contract) {
+        int scale = determineUncappedScale(campaign, playerForce, detachmentHangar, contract);
+
+        // Hiring halls only broker jobs of the size they can support; a larger force is paid for the job, not itself
+        PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        if (campaign.getCampaignOptions().get(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL)
+                  && currentSystem != null) {
+            HiringHallLevel hiringHallLevel = currentSystem.getHiringHallLevel(campaign.getLocalDate());
+            scale = Math.min(scale, ChaosScaleLimits.getMaximumContractScale(hiringHallLevel));
+        }
+
+        return scale;
+    }
+
+    /**
+     * Determines the Scale of the units the player force commits to a contract, ignoring any Hiring Hall cap.
+     *
+     * @param campaign         the campaign, for the support-point-to-Battle-Value scale conversion option
+     * @param playerForce      the player force whose committed units set the scale
+     * @param detachmentHangar the hangar whose units are weighed
+     * @param contract         the contract being sized (its objective decides whether cadre units count)
+     *
+     * @return the Scale of the committed force
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int determineUncappedScale(Campaign campaign, PlayerForce playerForce,
+          LocalHangar detachmentHangar, AbstractContract contract) {
         boolean convertSupportPointsToBattleValue = campaign.getCampaignOptions()
                                                           .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
         return ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, detachmentHangar,

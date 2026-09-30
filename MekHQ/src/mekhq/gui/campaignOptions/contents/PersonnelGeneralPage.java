@@ -87,6 +87,9 @@ class PersonnelGeneralPage {
     private JCheckBox chkUseRandomToughness;
     private JCheckBox chkUseArtillery;
     private JCheckBox chkUseAbilities;
+    private JCheckBox chkUseSpaTrainingCosts;
+    private JCheckBox chkCapTotalSpas;
+    private JCheckBox chkSkillImprovementsCostCBills;
     private JCheckBox chkOnlyCommandersMatterVehicles;
     private JCheckBox chkOnlyCommandersMatterInfantry;
     private JCheckBox chkOnlyCommandersMatterBattleArmor;
@@ -238,6 +241,12 @@ class PersonnelGeneralPage {
         chkUseArtillery.addMouseListener(createTipPanelUpdater("UseArtillery"));
         chkUseAbilities = new CampaignOptionsCheckBox("UseAbilities");
         chkUseAbilities.addMouseListener(createTipPanelUpdater("UseAbilities"));
+        chkUseSpaTrainingCosts = new CampaignOptionsCheckBox("UseSpaTrainingCosts");
+        chkUseSpaTrainingCosts.addMouseListener(createTipPanelUpdater("UseSpaTrainingCosts"));
+        chkCapTotalSpas = new CampaignOptionsCheckBox("CapTotalSpas");
+        chkCapTotalSpas.addMouseListener(createTipPanelUpdater("CapTotalSpas"));
+        chkSkillImprovementsCostCBills = new CampaignOptionsCheckBox("SkillImprovementsCostCBills");
+        chkSkillImprovementsCostCBills.addMouseListener(createTipPanelUpdater("SkillImprovementsCostCBills"));
         chkOnlyCommandersMatterVehicles = new CampaignOptionsCheckBox("OnlyCommandersMatterVehicles",
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkOnlyCommandersMatterVehicles.addMouseListener(createTipPanelUpdater("OnlyCommandersMatterVehicles"));
@@ -299,6 +308,9 @@ class PersonnelGeneralPage {
               chkUseRandomToughness,
               chkUseArtillery,
               chkUseAbilities,
+              chkUseSpaTrainingCosts,
+              chkCapTotalSpas,
+              chkSkillImprovementsCostCBills,
               chkOnlyCommandersMatterVehicles,
               chkOnlyCommandersMatterInfantry,
               chkOnlyCommandersMatterBattleArmor,
@@ -451,6 +463,9 @@ class PersonnelGeneralPage {
         chkUseRandomToughness.setSelected(model.useRandomToughness);
         chkUseArtillery.setSelected(model.useArtillery);
         chkUseAbilities.setSelected(model.useAbilities);
+        chkUseSpaTrainingCosts.setSelected(model.useSpaTrainingCosts);
+        chkCapTotalSpas.setSelected(model.capTotalSpas);
+        chkSkillImprovementsCostCBills.setSelected(model.skillImprovementsCostCBills);
         chkOnlyCommandersMatterVehicles.setSelected(model.onlyCommandersMatterVehicles);
         chkOnlyCommandersMatterInfantry.setSelected(model.onlyCommandersMatterInfantry);
         chkOnlyCommandersMatterBattleArmor.setSelected(model.onlyCommandersMatterBattleArmor);
@@ -498,6 +513,9 @@ class PersonnelGeneralPage {
         model.useRandomToughness = chkUseRandomToughness.isSelected();
         model.useArtillery = chkUseArtillery.isSelected();
         model.useAbilities = chkUseAbilities.isSelected();
+        model.useSpaTrainingCosts = chkUseSpaTrainingCosts.isSelected();
+        model.capTotalSpas = chkCapTotalSpas.isSelected();
+        model.skillImprovementsCostCBills = chkSkillImprovementsCostCBills.isSelected();
         model.onlyCommandersMatterVehicles = chkOnlyCommandersMatterVehicles.isSelected();
         model.onlyCommandersMatterInfantry = chkOnlyCommandersMatterInfantry.isSelected();
         model.onlyCommandersMatterBattleArmor = chkOnlyCommandersMatterBattleArmor.isSelected();

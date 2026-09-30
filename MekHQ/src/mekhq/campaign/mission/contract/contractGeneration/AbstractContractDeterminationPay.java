@@ -113,6 +113,23 @@ public abstract class AbstractContractDeterminationPay {
 
         ContractFinanceData contractFinanceData = new ContractFinanceData(transportPay, monthlyPay, combatPay);
         contract.setContractFinanceData(contractFinanceData);
+        // Locked in with the pay, so changing campaign options later doesn't alter terms already agreed
+        contract.setSalvageTaperMultiplier(getSalvageTaperMultiplier(campaign, contract));
+    }
+
+    /**
+     * The fraction of the contract's salvage rights the player actually receives, locked in when pay is determined.
+     *
+     * @param campaign the campaign
+     * @param contract the contract being paid
+     *
+     * @return the salvage rights multiplier; {@code 1.0} unless a scheme tapers salvage
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public double getSalvageTaperMultiplier(Campaign campaign, AbstractContract contract) {
+        return 1.0;
     }
 
     /** The monthly retainer the employer pays. */

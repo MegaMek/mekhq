@@ -107,7 +107,7 @@ class InterstellarMapPanelLegendTest {
         "No HPG is black; D dark gray; C light gray; B pink; A pale yellow.",
         "No station is gray; one station coral; two stations yellow; unavailable data black.",
         "None is black; academy counts 1 through 6 progress from blue-teal through teal and green to yellow.",
-        "None is black; Questionable magenta; Minor orange; Standard yellow; Great green.",
+        "None (F) is black; Questionable (D) magenta; Minor (C) orange; Standard (B) yellow; Great (A) green.",
         "None is black; one outbreak yellow; two orange; three magenta; four or more purple.",
         "Hexagonal badges identify included HPG stations: A cyan, B blue, C amber, and D red. Network links are drawn only for A and B stations.",
         "A faint emblem watermark identifies territory; its tint identifies the faction.",
