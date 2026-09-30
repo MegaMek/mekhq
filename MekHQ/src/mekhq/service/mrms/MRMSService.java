@@ -610,25 +610,16 @@ public class MRMSService {
                 ps.setRepairInPlace(!configuredOptions.isReplacePodParts());
             }
 
-            // If we're replacing damaged parts, we want to remove any that have an
-            // available
-            // replacement from the list since the pod space repair will cover it.
-            List<IPartWork> temp = new ArrayList<>();
-
-            for (IPartWork p : parts) {
-                if ((p instanceof Part) && ((Part) p).isOmniPodded()) {
-                    if (!(p instanceof AmmoBin) || salvaging) {
-                        MissingPart m = p.getMissingPart();
-                        if ((m != null) && m.isReplacementAvailable()) {
-                            continue;
-                        }
-                    }
-                }
-
-                temp.add(p);
+            // Damaged pod equipment with a spare in stock is left to the pod swap, but only when the swap will
+            // run; otherwise nothing would ever repair it
+            boolean willPodSpacesSwapParts = configuredOptions.isReplacePodParts()
+                                                   && mrmsOptionsByType.containsKey(PartRepairType.POD_SPACE);
+            if (willPodSpacesSwapParts) {
+                parts = withoutPodPartsTheSwapWillReplace(parts, salvaging);
+            } else {
+                LOGGER.debug("[MRMS] {}: pod equipment is repaired in place; the OmniPod swap will not run",
+                      unit.getName());
             }
-
-            parts = temp;
         }
 
         if (techs.isEmpty()) {
@@ -954,6 +945,29 @@ public class MRMSService {
         }
 
         return scrappingLimbMode;
+    }
+
+    /**
+     * @return the tasks without the damaged pod-mounted equipment that has a spare in stock, which the pod swap
+     *       replaces instead
+     */
+    private static List<IPartWork> withoutPodPartsTheSwapWillReplace(List<IPartWork> parts, boolean salvaging) {
+        List<IPartWork> remainingParts = new ArrayList<>();
+        for (IPartWork partWork : parts) {
+            boolean isPodMounted = (partWork instanceof Part part) && part.isOmniPodded();
+            // Ammunition is reloaded in place when repairing; only salvage swaps it out
+            boolean isSwappedOut = !(partWork instanceof AmmoBin) || salvaging;
+            boolean isReplacedBySwap = isPodMounted && isSwappedOut && hasSpareInStock(partWork);
+            if (!isReplacedBySwap) {
+                remainingParts.add(partWork);
+            }
+        }
+        return remainingParts;
+    }
+
+    private static boolean hasSpareInStock(IPartWork partWork) {
+        MissingPart missingPart = partWork.getMissingPart();
+        return (missingPart != null) && missingPart.isReplacementAvailable();
     }
 
     /**
