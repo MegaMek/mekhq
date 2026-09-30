@@ -890,6 +890,8 @@ public final class CampaignOption<T> {
           of(Double.class, 1.0, "contractTransportMultiplier");
     public static final CampaignOption<Double> CONTRACT_SALVAGE_MULTIPLIER =
           of(Double.class, 1.0, "contractSalvageMultiplier");
+    public static final CampaignOption<Double> SCENARIO_TEMPO_MULTIPLIER =
+          of(Double.class, 1.0, "scenarioTempoMultiplier");
     public static final CampaignOption<Boolean> USE_LEGACY_CONTRACT_PAY =
           of(Boolean.class, false, "useLegacyContractPay");
     public static final CampaignOption<Boolean> USE_ALTERNATE_PAYMENT_MODE =
@@ -1014,6 +1016,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "essentialScenariosOnly");
     public static final CampaignOption<Boolean> CONTRACTS_USE_SPECIAL_MECHANICS =
           of(Boolean.class, false, "contractsUseSpecialMechanics");
+    public static final CampaignOption<Boolean> USE_EMPLOYER_LOST_PLANET_REACTIONS =
+          of(Boolean.class, true, "useEmployerLostPlanetReactions");
     public static final CampaignOption<Boolean> RESTRICT_SCENARIOS_TO_FLEET_CAPABILITY =
           of(Boolean.class, false, "restrictScenariosToFleetCapability");
     public static final CampaignOption<StratConSectorCountMethod> STRAT_CON_SECTOR_COUNT_METHOD =

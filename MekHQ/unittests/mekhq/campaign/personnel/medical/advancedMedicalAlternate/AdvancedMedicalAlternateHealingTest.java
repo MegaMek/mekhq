@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.personnel.medical.advancedMedicalAlternate;
 
-import static org.mockito.Mockito.lenient;
-
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_FIT;
 import static mekhq.campaign.personnel.PersonnelOptions.ATOW_TOUGHNESS;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_MEDICAL;
@@ -59,6 +57,7 @@ import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -77,8 +76,8 @@ import megamek.common.TargetRollModifier;
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.log.MedicalLogger;
 import mekhq.campaign.log.PatientLogger;
 import mekhq.campaign.personnel.Injury;
@@ -366,6 +365,7 @@ class AdvancedMedicalAlternateHealingTest {
     void getMarginOfSuccessForHealing_usesEdgeReroll() throws Exception {
         Campaign campaign = mock(Campaign.class);
         Person doctor = mock(Person.class);
+        Person patient = mock(Person.class);
         SkillCheck skillCheck = mock(SkillCheck.class);
         ActionCheckRoll firstActionCheckRoll = new ActionCheckRoll(2, List.of(1, 1));
         ActionCheckResult first = new ActionCheckResult(firstActionCheckRoll, -4, false, "first");
@@ -382,9 +382,12 @@ class AdvancedMedicalAlternateHealingTest {
             i18n.when(() -> MHQInternationalization.getTextAt(anyString(), anyString())).thenAnswer(invocation ->
                                                                                                           invocation.getArgument(
                                                                                                                 1));
+            i18n.when(() -> MHQInternationalization.getFormattedTextAt(anyString(), anyString(), any()))
+                  .thenAnswer(invocation -> invocation.getArgument(1));
 
             int margin = invokePrivateStatic("getMarginOfSuccessForHealing",
                   new Class<?>[] {
+                        Person.class,
                         Person.class,
                         Campaign.class,
                         List.class,
@@ -394,6 +397,7 @@ class AdvancedMedicalAlternateHealingTest {
                         boolean.class
                   },
                   doctor,
+                  patient,
                   campaign,
                   List.of(),
                   6,

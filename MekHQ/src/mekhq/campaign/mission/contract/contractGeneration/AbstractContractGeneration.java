@@ -717,11 +717,28 @@ public abstract class AbstractContractGeneration {
         // Scale" is set (the default MekHQ behavior), we instead roll the intensity table once per point of scale and
         // sum the results, so the contract's combat volume grows with scale while each scenario keeps its rolled size -
         // letting a player deploy smaller formations (e.g. lances). Otherwise, a single roll is made.
+        contract.setScenarioSchedule(rollScenarioSchedule(campaign, contract, monthsLength));
+    }
+
+    /**
+     * Rolls a contract's Essential scenario schedule on the Track Intensity Tables: once per point of scale when
+     * "Multiply Track Intensity by Scale" is on, and once otherwise.
+     *
+     * @param campaign       the campaign, whose options decide the roll count
+     * @param contract       the contract, whose scale and track count are rolled for
+     * @param lengthInMonths the contract's length in months, choosing which table applies
+     *
+     * @return the scenario schedule as per-month scenario counts
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<Integer> rollScenarioSchedule(Campaign campaign, AbstractContract contract,
+          int lengthInMonths) {
         int rollCount = campaign.getCampaignOptions().get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)
                               ? contract.getScale()
                               : 1;
-        contract.setScenarioSchedule(TrackIntensityTable.rollSchedule(monthsLength, contract.getTrackCount(),
-              rollCount));
+        return TrackIntensityTable.rollSchedule(lengthInMonths, contract.getTrackCount(), rollCount);
     }
 
     private static @Nonnull EnemyData pickEnemy(Campaign campaign, LocalDate currentDate, ILocation currentLocation,

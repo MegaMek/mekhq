@@ -155,7 +155,10 @@ public class ContractDebriefStatistics {
         this.totalContractPay = contract.getTotalPay();
         this.salvageWonValue = contract.getSalvagedByUnitValue();
 
-        this.recommendedStatus = evaluateRecommendedStatus();
+        // A contract whose outcome was decided by events (e.g. its employer losing the planet) is recommended that
+        // outcome, whatever its performance.
+        MissionStatus mandatedStatus = contract.getMandatedCompletionStatus();
+        this.recommendedStatus = (mandatedStatus != null) ? mandatedStatus : evaluateRecommendedStatus();
     }
 
     /**

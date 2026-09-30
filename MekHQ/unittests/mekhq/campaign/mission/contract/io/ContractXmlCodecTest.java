@@ -116,6 +116,7 @@ class ContractXmlCodecTest {
         contract.setNature(ContractNature.PROVING_GROUND);
         contract.setSharesPercent(45);
         contract.setStatus(MissionStatus.ACTIVE);
+        contract.setMandatedCompletionStatus(MissionStatus.PARTIAL);
         contract.setSalvagedByUnitValue(Money.of(1_250_000));
         contract.setSalvagedByEmployerValue(Money.of(750_000));
         contract.setRequiredVictoryPoints(9);
@@ -212,6 +213,23 @@ class ContractXmlCodecTest {
         assertNotNull(reloaded, "a contract carrying almost nothing must still parse");
         assertNull(reloaded.getStartDate());
         assertEquals(ContractMoraleLevel.STALEMATE, reloaded.getMoraleLevel());
+    }
+
+    @Test
+    void mandatedCompletionStatusSurvivesARoundTrip() throws Exception {
+        AbstractContract reloaded = reparse(write(fullyPopulatedContract()));
+
+        assertEquals(MissionStatus.PARTIAL, reloaded.getMandatedCompletionStatus());
+    }
+
+    @Test
+    void anUnsetMandatedCompletionStatusStaysUnsetAcrossARoundTrip() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setMandatedCompletionStatus(null);
+
+        AbstractContract reloaded = reparse(write(contract));
+
+        assertNull(reloaded.getMandatedCompletionStatus(), "an unset outcome must stay unset");
     }
 
     @Test

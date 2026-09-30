@@ -96,7 +96,8 @@ public class ChaosContractDeterminationEnemy {
      *
      * @return the enemy data for the given faction
      */
-    static EnemyData generateEnemyForFaction(Campaign campaign, Faction enemyFaction, LocalDate currentDate) {
+    public static EnemyData generateEnemyForFaction(Campaign campaign, Faction enemyFaction,
+          LocalDate currentDate) {
         String factionCode = enemyFaction.getShortName();
 
         String sponsorFactionCode = null;
