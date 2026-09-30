@@ -437,7 +437,7 @@ public final class ContractXmlCodec {
         readers.put("description", (contract, node, campaign, version) -> contract.setDescription(text(node)));
         readers.put("scale", (contract, node, campaign, version) -> contract.setScale(parseInt(node)));
         readers.put("salvageTaperMultiplier", (contract, node, campaign, version) ->
-              contract.setSalvageTaperMultiplier(MathUtility.parseDouble(text(node))));
+              contract.setSalvageTaperMultiplier(MathUtility.parseDouble(text(node), 1.0)));
         readers.put("requiredVictoryPoints",
               (contract, node, campaign, version) -> contract.setRequiredVictoryPoints(parseInt(node)));
         readers.put("trackCount", (contract, node, campaign, version) -> contract.setTrackCount(parseInt(node)));
