@@ -75,6 +75,7 @@ class MHQOptionsModel {
           MHQConstants.NAG_COMBAT_CHALLENGE,
           MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS,
           MHQConstants.NAG_OUTSTANDING_SCENARIOS,
+          MHQConstants.NAG_EXPIRING_NAV_POINTS,
           MHQConstants.NAG_INVALID_FACTION,
           MHQConstants.NAG_UNABLE_TO_AFFORD_EXPENSES,
           MHQConstants.NAG_UNABLE_TO_AFFORD_RENT,
