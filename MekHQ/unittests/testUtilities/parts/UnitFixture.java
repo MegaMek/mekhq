@@ -91,6 +91,10 @@ public enum UnitFixture {
     HOPLITE_C("Hoplite C", false, Mek.class),
     /** Vedette Medium Tank, a tracked combat vehicle. Source: {@code vehicles/3039u/Vedette Medium Tank.blk}. */
     VEDETTE_MEDIUM_TANK("Vedette Medium Tank", true, Tank.class),
+    /** Armored Personnel Carrier (Hover LRM), a hover APC without a turret. Source: {@code vehicles/3039u/APC (Hover LRM).blk}. */
+    APC_HOVER_LRM("APC (Hover LRM)", true, Tank.class),
+    /** Armored Personnel Carrier (Hover MG), the same APC with a turret. Source: {@code vehicles/3039u/APC (Hover MG).blk}. */
+    APC_HOVER_MG("APC (Hover MG)", true, Tank.class),
     /**
      * Cellco Ranger UPU-3000, a tracked support vehicle with BAR 8 armor. Source:
      * {@code vehicles/TRO Vehicle Annex/Tracked/Cellco Ranger UPU-3000.blk}.
