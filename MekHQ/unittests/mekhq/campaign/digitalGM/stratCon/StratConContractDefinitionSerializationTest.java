@@ -60,10 +60,8 @@ class StratConContractDefinitionSerializationTest {
     void jsonRoundTripPreservesFieldsAndCarriesLicense(@TempDir Path tempDir) throws IOException {
         StratConContractDefinition original = new StratConContractDefinition();
         original.setBriefing("Destroy designated targets.");
-        original.setAlliedFacilityCount(-0.3);
-        original.setHostileFacilityCount(-0.5);
         original.setAllowEarlyVictory(true);
-        original.setScenarioOdds(List.of(22, 32, 42));
+        original.setDeploymentEncounterOdds(List.of(22, 32, 42));
         original.setDeploymentTimes(List.of(3, 4, 5));
 
         ObjectiveParameters objective = new ObjectiveParameters();
@@ -85,10 +83,8 @@ class StratConContractDefinitionSerializationTest {
         StratConContractDefinition reloaded = StratConContractDefinition.Deserialize(out);
         assertNotNull(reloaded, "a definition carrying a leading license header should still deserialize");
         assertEquals("Destroy designated targets.", reloaded.getBriefing());
-        assertEquals(-0.3, reloaded.getAlliedFacilityCount());
-        assertEquals(-0.5, reloaded.getHostileFacilityCount());
         assertTrue(reloaded.isAllowEarlyVictory());
-        assertEquals(List.of(22, 32, 42), reloaded.getScenarioOdds());
+        assertEquals(List.of(22, 32, 42), reloaded.getDeploymentEncounterOdds());
         assertEquals(List.of(3, 4, 5), reloaded.getDeploymentTimes());
         assertEquals(1, reloaded.getObjectiveParameters().size());
         assertEquals(StrategicObjectiveType.SpecificScenarioVictory,

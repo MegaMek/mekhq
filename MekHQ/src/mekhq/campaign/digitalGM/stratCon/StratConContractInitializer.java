@@ -203,7 +203,7 @@ public class StratConContractInitializer {
         int[] letterSeen = new int[greekLetters.length];
 
         for (int index = 0; index < sectorSpecs.size(); index++) {
-            int scenarioOdds = getScenarioOdds(contractDefinition);
+            int scenarioOdds = getDeploymentEncounterOdds(contractDefinition);
             int deploymentTime = isUseMaplessMode ? 0 : getDeploymentTime(contractDefinition);
 
             StratConTrackState track = initializeTrackState(sectorSpecs.get(index),
@@ -973,22 +973,23 @@ public class StratConContractInitializer {
     }
 
     /**
-     * Retrieves a random scenario odds value from the provided {@link StratConContractDefinition}.
+     * Retrieves a random deployment encounter odds value from the provided {@link StratConContractDefinition}.
      *
-     * <p>The scenario odds are selected randomly from the list of scenario odds in the
+     * <p>The odds are selected randomly from the list of deployment encounter odds in the
      * given {@code StratConContractDefinition}.</p>
      *
-     * @param contractDefinition the contract definition containing scenario odds options
+     * @param contractDefinition the contract definition containing deployment encounter odds options
      *
-     * @return a randomly selected scenario odds value
+     * @return a randomly selected deployment encounter odds value
      *
-     * @throws IllegalArgumentException if the list of scenario odds is empty
-     * @throws NullPointerException     if {@code contractDefinition} or its scenario odds list is null
+     * @throws IllegalArgumentException if the list of deployment encounter odds is empty
+     * @throws NullPointerException     if {@code contractDefinition} or its deployment encounter odds list is null
      * @author Illiani
      * @since 0.50.05
      */
-    public static int getScenarioOdds(StratConContractDefinition contractDefinition) {
-        return contractDefinition.getScenarioOdds().get(Compute.randomInt(contractDefinition.getScenarioOdds().size()));
+    public static int getDeploymentEncounterOdds(StratConContractDefinition contractDefinition) {
+        List<Integer> deploymentEncounterOdds = contractDefinition.getDeploymentEncounterOdds();
+        return deploymentEncounterOdds.get(Compute.randomInt(deploymentEncounterOdds.size()));
     }
 
 
