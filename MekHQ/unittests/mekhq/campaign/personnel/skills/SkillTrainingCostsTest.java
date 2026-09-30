@@ -283,7 +283,7 @@ class SkillTrainingCostsTest {
 
         private void holdsSkills(String... skillNamesAndLevels) {
             List<String> skillNames = new ArrayList<>();
-            for (int index = 0; index < skillNamesAndLevels.length; index += 2) {
+            for (int index = 0; index + 1 < skillNamesAndLevels.length; index += 2) {
                 String skillName = skillNamesAndLevels[index];
                 Skill skill = mock(Skill.class);
                 when(skill.getTotalSkillLevel(any())).thenReturn(MathUtility.parseInt(skillNamesAndLevels[index + 1]));
