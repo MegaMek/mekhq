@@ -73,27 +73,47 @@ class StratConScenarioTempoTest {
 
     @Test
     void rollsOncePerPointOfScale() {
-        assertEquals(4, StratConScenarioTempo.getRollCount(true, false, 4));
+        assertEquals(4, StratConScenarioTempo.getRollCount(true, false, 4, 1.0));
     }
 
     @Test
     void rollsThreeTimesPerPointOfScaleWhenSupportPointsAreFactoredIntoScale() {
-        assertEquals(12, StratConScenarioTempo.getRollCount(true, true, 4));
+        assertEquals(12, StratConScenarioTempo.getRollCount(true, true, 4, 1.0));
     }
 
     @Test
     void rollsOnceWhenTrackIntensityIsNotMultipliedByScale() {
-        assertEquals(1, StratConScenarioTempo.getRollCount(false, false, 4));
+        assertEquals(1, StratConScenarioTempo.getRollCount(false, false, 4, 1.0));
     }
 
     @Test
     void rollsThreeTimesWhenOnlySupportPointsAreFactoredIntoScale() {
-        assertEquals(3, StratConScenarioTempo.getRollCount(false, true, 4));
+        assertEquals(3, StratConScenarioTempo.getRollCount(false, true, 4, 1.0));
+    }
+
+    @Test
+    void theTempoMultiplierMultipliesTheRolls() {
+        assertEquals(8, StratConScenarioTempo.getRollCount(true, false, 4, 2.0));
+    }
+
+    @Test
+    void theTempoMultiplierAppliesAfterSupportPoints() {
+        assertEquals(24, StratConScenarioTempo.getRollCount(true, true, 4, 2.0));
+    }
+
+    @Test
+    void theTempoMultiplierRoundsToTheNearestRoll() {
+        assertEquals(5, StratConScenarioTempo.getRollCount(true, false, 3, 1.5));
+    }
+
+    @Test
+    void theTempoMultiplierNeverRollsFewerThanOnce() {
+        assertEquals(1, StratConScenarioTempo.getRollCount(true, false, 1, 0.1));
     }
 
     @Test
     void aScaleBelowOneStillRollsOnce() {
-        assertEquals(1, StratConScenarioTempo.getRollCount(true, false, 0));
+        assertEquals(1, StratConScenarioTempo.getRollCount(true, false, 0, 1.0));
     }
 
     // Scheduling
@@ -328,6 +348,7 @@ class StratConScenarioTempoTest {
         CampaignOptions options = mock(CampaignOptions.class);
         when(options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)).thenReturn(true);
         when(options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
+        when(options.get(CampaignOption.SCENARIO_TEMPO_MULTIPLIER)).thenReturn(1.0);
         when(options.isUseStratConSinglesMode()).thenReturn(isSinglesMode);
         when(options.isUseStratConMaplessMode()).thenReturn(isMaplessMode);
 

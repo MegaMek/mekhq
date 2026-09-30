@@ -85,6 +85,7 @@ class MarketsOptionsModel {
     double contractBattlefieldLossMultiplier;
     double contractTransportMultiplier;
     double contractSalvageMultiplier;
+    double scenarioTempoMultiplier;
     boolean useChaosSupportPointConversion;
     boolean useLegacyContractPay;
     boolean equipmentContractBase;
@@ -138,6 +139,7 @@ class MarketsOptionsModel {
         contractBattlefieldLossMultiplier = options.get(CampaignOption.CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER);
         contractTransportMultiplier = options.get(CampaignOption.CONTRACT_TRANSPORT_MULTIPLIER);
         contractSalvageMultiplier = options.get(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER);
+        scenarioTempoMultiplier = options.get(CampaignOption.SCENARIO_TEMPO_MULTIPLIER);
         useChaosSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION);
         useLegacyContractPay = options.get(CampaignOption.USE_LEGACY_CONTRACT_PAY);
         equipmentContractBase = options.get(CampaignOption.EQUIPMENT_CONTRACT_BASE);
@@ -206,6 +208,7 @@ class MarketsOptionsModel {
         options.set(CampaignOption.CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER, contractBattlefieldLossMultiplier);
         options.set(CampaignOption.CONTRACT_TRANSPORT_MULTIPLIER, contractTransportMultiplier);
         options.set(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER, contractSalvageMultiplier);
+        options.set(CampaignOption.SCENARIO_TEMPO_MULTIPLIER, scenarioTempoMultiplier);
         options.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, useChaosSupportPointConversion);
         options.set(CampaignOption.USE_LEGACY_CONTRACT_PAY, useLegacyContractPay);
         options.set(CampaignOption.EQUIPMENT_CONTRACT_BASE, equipmentContractBase);

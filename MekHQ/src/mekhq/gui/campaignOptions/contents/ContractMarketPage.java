@@ -128,6 +128,8 @@ class ContractMarketPage {
     private JSpinner spnContractTransportMultiplier;
     private JLabel lblContractSalvageMultiplier;
     private JSpinner spnContractSalvageMultiplier;
+    private JLabel lblScenarioTempoMultiplier;
+    private JSpinner spnScenarioTempoMultiplier;
 
     private JPanel pnlContractTermMultipliers;
 
@@ -402,6 +404,12 @@ class ContractMarketPage {
         spnContractSalvageMultiplier = new CampaignOptionsSpinner("ContractSalvageMultiplier", 1.0, 0.1, 2.0, 0.1);
         spnContractSalvageMultiplier.addMouseListener(createTipPanelUpdater("ContractSalvageMultiplier"));
 
+        lblScenarioTempoMultiplier = new CampaignOptionsLabel("ScenarioTempoMultiplier",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        lblScenarioTempoMultiplier.addMouseListener(createTipPanelUpdater("ScenarioTempoMultiplier"));
+        spnScenarioTempoMultiplier = new CampaignOptionsSpinner("ScenarioTempoMultiplier", 1.0, 0.1, 5.0, 0.1);
+        spnScenarioTempoMultiplier.addMouseListener(createTipPanelUpdater("ScenarioTempoMultiplier"));
+
         final SettingsFormPanel panel = new SettingsFormPanel("ContractTermMultipliersPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
@@ -410,6 +418,7 @@ class ContractMarketPage {
         panel.addRow(lblContractBattlefieldLossMultiplier, spnContractBattlefieldLossMultiplier);
         panel.addRow(lblContractTransportMultiplier, spnContractTransportMultiplier);
         panel.addRow(lblContractSalvageMultiplier, spnContractSalvageMultiplier);
+        panel.addRow(lblScenarioTempoMultiplier, spnScenarioTempoMultiplier);
 
         return panel;
     }
@@ -698,6 +707,7 @@ class ContractMarketPage {
         spnContractBattlefieldLossMultiplier.setValue(model.contractBattlefieldLossMultiplier);
         spnContractTransportMultiplier.setValue(model.contractTransportMultiplier);
         spnContractSalvageMultiplier.setValue(model.contractSalvageMultiplier);
+        spnScenarioTempoMultiplier.setValue(model.scenarioTempoMultiplier);
         chkUseChaosSupportPointConversion.setSelected(model.useChaosSupportPointConversion);
         chkUseLegacyOptions.setSelected(model.useLegacyContractPay);
         if (model.equipmentContractBase) {
@@ -756,6 +766,7 @@ class ContractMarketPage {
         model.contractBattlefieldLossMultiplier = (double) spnContractBattlefieldLossMultiplier.getValue();
         model.contractTransportMultiplier = (double) spnContractTransportMultiplier.getValue();
         model.contractSalvageMultiplier = (double) spnContractSalvageMultiplier.getValue();
+        model.scenarioTempoMultiplier = (double) spnScenarioTempoMultiplier.getValue();
         model.useChaosSupportPointConversion = chkUseChaosSupportPointConversion.isSelected();
         model.useLegacyContractPay = chkUseLegacyOptions.isSelected();
         model.equipmentContractBase = btnContractEquipment.isSelected();

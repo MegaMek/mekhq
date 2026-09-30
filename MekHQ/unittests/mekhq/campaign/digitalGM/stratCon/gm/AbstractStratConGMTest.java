@@ -201,6 +201,7 @@ class AbstractStratConGMTest {
         CampaignOptions options = event.getCampaign().getCampaignOptions();
         when(options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)).thenReturn(true);
         when(options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
+        when(options.get(CampaignOption.SCENARIO_TEMPO_MULTIPLIER)).thenReturn(1.0);
 
         gm.handleNewDay(event);
 

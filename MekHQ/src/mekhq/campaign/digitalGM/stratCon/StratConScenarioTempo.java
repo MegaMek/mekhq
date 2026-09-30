@@ -59,7 +59,8 @@ import mekhq.campaign.mission.contract.contractGeneration.TrackIntensityTable;
  * <p>Ordinary scenarios are scheduled the way Essential scenarios are: up front, by rolling the Track Intensity Tables
  * for the contract's track count (see {@link TrackIntensityTable#rollSchedule}). The table is rolled once per point of
  * scale when "Multiply Track Intensity by Scale" is on and once otherwise, and three times as often when battlefield
- * support points are factored into scale, since that makes for smaller scales. As for Essential scenarios, the
+ * support points are factored into scale, since that makes for smaller scales. The "Scenario Tempo Multiplier" option
+ * then multiplies the rolls. As for Essential scenarios, the
  * table's columns are read as months; unlike them, the table is rolled afresh for however many months it falls short of
  * the contract, so no month of a long contract is left without scenarios.</p>
  *
@@ -82,6 +83,8 @@ public final class StratConScenarioTempo {
      * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
      * @param isFactorSupportPointsIntoScale  whether battlefield support points are factored into scale
      * @param scale                           the contract's scale; a scale below one still rolls as one
+     * @param scenarioTempoMultiplier         the "Scenario Tempo Multiplier" option, applied last and rounded to the
+     *                                        nearest whole roll, never below one
      *
      * @return the number of rolls
      *
@@ -89,9 +92,12 @@ public final class StratConScenarioTempo {
      * @since 0.51.01
      */
     static int getRollCount(boolean isMultiplyTrackIntensityByScale, boolean isFactorSupportPointsIntoScale,
-          int scale) {
+          int scale, double scenarioTempoMultiplier) {
         int rollCount = isMultiplyTrackIntensityByScale ? max(1, scale) : 1;
-        return isFactorSupportPointsIntoScale ? rollCount * SUPPORT_POINT_SCALE_ROLL_MULTIPLIER : rollCount;
+        if (isFactorSupportPointsIntoScale) {
+            rollCount *= SUPPORT_POINT_SCALE_ROLL_MULTIPLIER;
+        }
+        return max(1, (int) Math.round(rollCount * scenarioTempoMultiplier));
     }
 
     /**
@@ -179,7 +185,8 @@ public final class StratConScenarioTempo {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         int rollCount = getRollCount(campaignOptions.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE),
               campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
-              contract.getScale());
+              contract.getScale(),
+              campaignOptions.get(CampaignOption.SCENARIO_TEMPO_MULTIPLIER));
         List<LocalDate> scenarioDates = rollScenarioDates(startDate, endDate, contract.getLengthInMonths(),
               contract.getTrackCount(), rollCount);
 

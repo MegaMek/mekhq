@@ -862,6 +862,8 @@ public final class CampaignOption<T> {
           of(Double.class, 1.0, "contractTransportMultiplier");
     public static final CampaignOption<Double> CONTRACT_SALVAGE_MULTIPLIER =
           of(Double.class, 1.0, "contractSalvageMultiplier");
+    public static final CampaignOption<Double> SCENARIO_TEMPO_MULTIPLIER =
+          of(Double.class, 1.0, "scenarioTempoMultiplier");
     public static final CampaignOption<Boolean> USE_LEGACY_CONTRACT_PAY =
           of(Boolean.class, false, "useLegacyContractPay");
     public static final CampaignOption<Boolean> USE_ALTERNATE_PAYMENT_MODE =
