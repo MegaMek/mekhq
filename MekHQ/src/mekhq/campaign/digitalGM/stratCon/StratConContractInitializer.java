@@ -58,6 +58,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectivePar
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.PointOfInterestParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.facility.FacilityTrait;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConContractFacilityProfile;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
@@ -957,7 +958,8 @@ public class StratConContractInitializer {
         }
 
         anchor.setTier(tier);
-        anchor.setGarrison(tier.getGarrisonMaximum());
+        FacilityTrait.assignRandomTraits(anchor);
+        anchor.setGarrison(anchor.getGarrisonMaximum());
         track.addFacility(coords, anchor);
         return true;
     }
@@ -2238,7 +2240,8 @@ public class StratConContractInitializer {
 
             sf.setOwner(owner);
             sf.setTier(tier);
-            sf.setGarrison(tier.getGarrisonMaximum());
+            FacilityTrait.assignRandomTraits(sf);
+            sf.setGarrison(sf.getGarrisonMaximum());
             sf.setStrategicObjective(strategicObjective);
             sf.addAdditionalLocalModifiers(modifiers);
 

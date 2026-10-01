@@ -4315,6 +4315,10 @@ public class StratConRulesManager {
                     boolean wasHostile = !facility.isOwnerAlliedToPlayer();
                     processFacilityAftermath(facility, victory, isDraw, scenario.getFacilityOperation());
 
+                    if (victory && wasHostile && (scenario.getFacilityOperation() == FacilityOperation.RAID)) {
+                        StratConFacilityOperations.resolveRaidLoot(campaign, mission, facility);
+                    }
+
                     // A counterattack lost outright costs the facility.
                     if (scenario.isCounterattack() && !victory && !isDraw) {
                         StratConEnemyFacilityActivity.resolveLostCounterattack(campaign,

@@ -298,7 +298,7 @@ public final class StratConFacilitySiege {
             }
 
             facility.setGarrison(facility.getGarrison() - getWeeklyGarrisonLoss(besiegerIds.size()));
-            if (facility.getGarrison() <= 0) {
+            if (facility.isReadyToSurrender()) {
                 surrender(campaign, contract, track, coords);
                 continue;
             }
@@ -443,7 +443,7 @@ public final class StratConFacilitySiege {
         }
 
         facility.setGarrison(facility.getGarrison() - 1);
-        if (facility.getGarrison() <= 0) {
+        if (facility.isReadyToSurrender()) {
             surrender(campaign, contract, track, facilityCoords);
         } else {
             StratConFacilityOperations.report(campaign, "report.siege.sortieBeaten", facilityName);

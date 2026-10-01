@@ -224,7 +224,9 @@ public final class StratConFacilityAdvisor {
                 hints.add(getFormattedTextAt(RESOURCE_BUNDLE,
                       "hint.besieged.detailed",
                       besiegerCount,
-                      getWeeksToSurrender(facility.getGarrison(), besiegerCount)));
+                      getWeeksToSurrender(facility.getGarrison()
+                                                - (facility.hasTrait(FacilityTrait.POOR_MORALE) ? 1 : 0),
+                            besiegerCount)));
             } else {
                 hints.add(getFormattedTextAt(RESOURCE_BUNDLE, "hint.besieged", besiegerCount));
             }
@@ -437,6 +439,38 @@ public final class StratConFacilityAdvisor {
             }
         }
         return String.join(", ", parts);
+    }
+
+    /**
+     * @return {@code true} if the player knows the facility's traits: they have detailed intel on it, which they always
+     *       have on their own side's facilities
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean areTraitsKnown(StratConFacility facility) {
+        return facility.getIntel().isAtLeast(FacilityIntel.DETAILED);
+    }
+
+    /**
+     * @return the names of the facility's traits, comma-separated, or a note that it has none or that they are not yet
+     *       known
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static String getTraitSummary(StratConFacility facility) {
+        if (!areTraitsKnown(facility)) {
+            return getTextAt(RESOURCE_BUNDLE, "traits.unknown");
+        }
+        if (facility.getTraits().isEmpty()) {
+            return getTextAt(RESOURCE_BUNDLE, "traits.none");
+        }
+        List<String> names = new ArrayList<>();
+        for (FacilityTrait trait : facility.getTraits()) {
+            names.add(getTextAt(RESOURCE_BUNDLE, "trait." + trait.name()));
+        }
+        return String.join(", ", names);
     }
 
     /**

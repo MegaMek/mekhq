@@ -1935,6 +1935,23 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
         stateMenu.add(intelMenu);
 
+        JMenu traitsMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.facilityState.traits"));
+        for (FacilityTrait trait : FacilityTrait.values()) {
+            JCheckBoxMenuItem traitItem = new JCheckBoxMenuItem(getTextAt(FACILITY_OPERATIONS_BUNDLE,
+                  "trait." + trait.name()), facility.hasTrait(trait));
+            traitItem.addActionListener(evt -> {
+                if (traitItem.isSelected()) {
+                    facility.addTrait(trait);
+                } else {
+                    facility.removeTrait(trait);
+                }
+                infoArea.setText(buildSelectedHexInfo(campaign));
+                repaint();
+            });
+            traitsMenu.add(traitItem);
+        }
+        stateMenu.add(traitsMenu);
+
         return stateMenu;
     }
 
@@ -2013,6 +2030,11 @@ public class StratConPanel extends JPanel implements ActionListener {
                   "stratConTab.hexInfo.facilityGarrison",
                   facility.getGarrison(),
                   facility.getGarrisonMaximum()));
+            if (!facility.getTraits().isEmpty()) {
+                infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "stratConTab.hexInfo.facilityTraits",
+                      StratConFacilityAdvisor.getTraitSummary(facility)));
+            }
         } else {
             infoBuilder.append(getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.facilityGarrisonUnknown"));
         }

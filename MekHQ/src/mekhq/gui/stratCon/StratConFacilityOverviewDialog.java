@@ -93,6 +93,7 @@ public class StratConFacilityOverviewDialog extends JDialog {
           "overview.column.condition",
           "overview.column.garrison",
           "overview.column.supply",
+          "overview.column.traits",
           "overview.column.activity");
     private final DefaultTableModel eventModel = createModel("overview.column.date",
           "overview.column.sector",
@@ -255,6 +256,9 @@ public class StratConFacilityOverviewDialog extends JDialog {
         return new Object[] { track.getDisplayableName(), facility.getDisplayableName(),
                               getTextAt(RESOURCE_BUNDLE, "dialog.owner." + StratConFacilityDialog.getOwnerKey(facility.getOwner())), tier,
                               condition, garrison, supply,
+                              StratConFacilityAdvisor.areTraitsKnown(facility) ?
+                                    StratConFacilityAdvisor.getTraitSummary(facility) :
+                                    getTextAt(RESOURCE_BUNDLE, "overview.unknown"),
                               StratConFacilityAdvisor.getActivitySummary(campaign, track, coords) };
     }
 }

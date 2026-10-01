@@ -225,7 +225,23 @@ public class StratConFacilityDialog extends JDialog {
                   String.join(", ", partnerNames)));
         }
 
+        appendTraits(html, facility);
         appendEffects(html, facility);
+    }
+
+    private void appendTraits(StringBuilder html, StratConFacility facility) {
+        html.append("<h3>").append(getTextAt(RESOURCE_BUNDLE, "dialog.traits")).append("</h3>");
+        if (!StratConFacilityAdvisor.areTraitsKnown(facility) || facility.getTraits().isEmpty()) {
+            html.append("<p>").append(StratConFacilityAdvisor.getTraitSummary(facility)).append("</p>");
+            return;
+        }
+        html.append("<ul>");
+        for (FacilityTrait trait : facility.getTraits()) {
+            html.append("<li><b>").append(getTextAt(RESOURCE_BUNDLE, "trait." + trait.name())).append(":</b> ")
+                  .append(getTextAt(RESOURCE_BUNDLE, "trait." + trait.name() + ".description"))
+                  .append("</li>");
+        }
+        html.append("</ul>");
     }
 
     /**

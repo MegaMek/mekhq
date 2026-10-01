@@ -28,6 +28,10 @@
     "EarlyWarningSystem.json",
     "OrbitalDefense.json",
     "BaseOfOperations.json",
-    "SupplyDepot.json"
+    "SupplyDepot.json",
+    "SensorPost.json",
+    "JammingStation.json",
+    "FieldFortifications.json",
+    "MilitiaBarracks.json"
   ]
 }

@@ -497,7 +497,12 @@ public final class StratConFacilityOperations {
           StratConCoords coords, int formationId, int roll) {
         StratConFacility facility = track.getFacility(coords);
         if (roll >= SABOTAGE_TARGET_NUMBER) {
-            facility.setCondition(facility.getCondition().worsened().worsened());
+            // A hardened facility loses one condition step rather than two.
+            FacilityCondition sabotagedCondition = facility.getCondition().worsened();
+            if (!facility.hasTrait(FacilityTrait.HARDENED)) {
+                sabotagedCondition = sabotagedCondition.worsened();
+            }
+            facility.setCondition(sabotagedCondition);
             StratConEscalation.onTargetSabotaged(campaign, contract);
             report(campaign, "report.sabotage.success", facility.getDisplayableName());
             return;
@@ -713,6 +718,18 @@ public final class StratConFacilityOperations {
         }
 
         String facilityName = facility.getDisplayableName();
+
+        // Prototype gear is traded to the employer however the facility is dealt with, and only once.
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        if (facility.hasTrait(FacilityTrait.EXPERIMENTAL_WEAPONS) && (campaignState != null)) {
+            facility.removeTrait(FacilityTrait.EXPERIMENTAL_WEAPONS);
+            campaignState.changeSupportPoints(FacilityTrait.EXPERIMENTAL_WEAPONS_CAPTURE_SUPPORT);
+            report(campaign,
+                  "report.trait.experimentalWeapons",
+                  facilityName,
+                  FacilityTrait.EXPERIMENTAL_WEAPONS_CAPTURE_SUPPORT);
+        }
+
         switch (choice) {
             case HOLD -> {
                 // The player's own troops move in; the enemy's leftover garrison is not theirs to keep.
@@ -750,12 +767,35 @@ public final class StratConFacilityOperations {
                      || (facilityType == FacilityType.IndustrialFacility);
     }
 
+    /**
+     * Settles what a won raid brings in beyond the damage it did: extra Employer Support from a well-stocked facility.
+     *
+     * @param campaign the current campaign
+     * @param contract the contract whose map holds the facility
+     * @param facility the raided facility
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void resolveRaidLoot(Campaign campaign, AbstractContract contract, StratConFacility facility) {
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        if ((campaignState == null) || facility.isOwnerAlliedToPlayer()
+                  || !facility.hasTrait(FacilityTrait.WELL_STOCKED)) {
+            return;
+        }
+        campaignState.changeSupportPoints(FacilityTrait.WELL_STOCKED_RAID_SUPPORT);
+        report(campaign,
+              "report.trait.wellStocked",
+              facility.getDisplayableName(),
+              FacilityTrait.WELL_STOCKED_RAID_SUPPORT);
+    }
+
     static String getFormationName(Campaign campaign, int formationId) {
         Formation formation = campaign.getPlayerForce().getFormation(formationId);
         return (formation == null) ? String.valueOf(formationId) : formation.getName();
     }
 
-    static void report(Campaign campaign, String key, String name) {
-        campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE, key, name));
+    static void report(Campaign campaign, String key, Object... arguments) {
+        campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE, key, arguments));
     }
 }

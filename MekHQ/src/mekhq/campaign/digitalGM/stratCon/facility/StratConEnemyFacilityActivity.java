@@ -464,6 +464,19 @@ public final class StratConEnemyFacilityActivity {
     }
 
     /**
+     * @return the off-screen defence modifier from the facility's garrison: better for veterans, worse for poor morale
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int getTraitModifier(StratConFacility facility) {
+        if (facility.hasTrait(FacilityTrait.VETERAN_GARRISON)) {
+            return FacilityTrait.OFF_SCREEN_DEFENSE_MODIFIER;
+        }
+        return facility.hasTrait(FacilityTrait.POOR_MORALE) ? -FacilityTrait.OFF_SCREEN_DEFENSE_MODIFIER : 0;
+    }
+
+    /**
      * Rolls an employer's defense of their facility against a counterattack the player left to them. The roll is 2d6,
      * plus the facility's garrison and tier (1 for an Outpost up to 3 for a Stronghold), plus the employer's skill,
      * minus the enemy's skill and morale, against {@link #OFF_SCREEN_DEFENSE_TARGET}. Skills count from Regular, and
@@ -487,7 +500,8 @@ public final class StratConEnemyFacilityActivity {
                                  + facility.getTier().ordinal() + 1
                                  + getSkillModifier(employerSkill)
                                  - getSkillModifier(enemySkill)
-                                 - ((enemyMorale == null) ? 0 : enemyMorale.getLevel());
+                                 - ((enemyMorale == null) ? 0 : enemyMorale.getLevel())
+                                 + getTraitModifier(facility);
         return modifiedRoll >= OFF_SCREEN_DEFENSE_TARGET;
     }
 

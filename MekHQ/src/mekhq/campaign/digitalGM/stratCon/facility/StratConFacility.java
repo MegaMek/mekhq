@@ -74,7 +74,15 @@ public class StratConFacility {
         OrbitalDefense,
         BaseOfOperations,
         /** Links facilities within a few hexes into its holder's supply lines without a road. */
-        SupplyDepot
+        SupplyDepot,
+        /** A small post that extends its holder's scan range. */
+        SensorPost,
+        /** Jams the other side's sensors, or hides its holder's movements. */
+        JammingStation,
+        /** Prepared positions that strengthen fights at the hex and nowhere else. */
+        FieldFortifications,
+        /** Militia that change how often fights break out in the sector. */
+        MilitiaBarracks
     }
 
     /**
@@ -177,6 +185,8 @@ public class StratConFacility {
     // next modifier for the holding side, skipping any the profile already has.
     private static final List<String> ALLIED_GARRISON_LADDER = List.of("AlliedTurrets.json",
           "AlliedGroundSupport.json");
+    static final String VETERAN_GARRISON_MODIFIER = "Veterans.json";
+    static final String EXPERIMENTAL_WEAPONS_MODIFIER = "GoodEquipment.json";
     private static final List<String> HOSTILE_GARRISON_LADDER = List.of("EnemyTurrets.json",
           "HostileBVBudgetIncrease.json");
 
@@ -201,6 +211,8 @@ public class StratConFacility {
     private boolean networked;
     @XmlElement(name = "additionalLocalModifier")
     private List<String> additionalLocalModifiers = new ArrayList<>();
+    @XmlElement(name = "trait")
+    private List<FacilityTrait> traits = new ArrayList<>();
 
     // Read from saves written before 0.51.01, which held a copy of the whole old-format definition. Emptied once the
     // facility is matched to a definition, so they are only written back for a facility that could not be matched.
@@ -338,10 +350,84 @@ public class StratConFacility {
                                       && (StratConFacilityDefinition.isAlliedToPlayer(this.owner)
                                                 != StratConFacilityDefinition.isAlliedToPlayer(owner));
         this.owner = owner;
-        // A facility changing sides joins its new holder's supply lines afresh.
+        // A facility changing sides joins its new holder's supply lines afresh, and its old garrison's traits go with
+        // its old garrison.
         if (isSideChanged) {
             networked = false;
+            getTraits().removeIf(FacilityTrait::isGarrisonTrait);
         }
+    }
+
+    /**
+     * @return the facility's traits, in the order they were given; the list itself, so callers may change it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<FacilityTrait> getTraits() {
+        if (traits == null) {
+            traits = new ArrayList<>();
+        }
+        return traits;
+    }
+
+    /**
+     * @param trait a trait
+     *
+     * @return {@code true} if the facility has it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean hasTrait(FacilityTrait trait) {
+        return getTraits().contains(trait);
+    }
+
+    /**
+     * Gives the facility a trait, unless it already has it. A conflicting trait it has is replaced.
+     *
+     * @param trait the trait to give
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addTrait(FacilityTrait trait) {
+        if (hasTrait(trait)) {
+            return;
+        }
+        FacilityTrait conflictingTrait = trait.getConflictingTrait();
+        if (conflictingTrait != null) {
+            getTraits().remove(conflictingTrait);
+        }
+        getTraits().add(trait);
+        // An undermanned facility may now hold more than it can.
+        if (garrison != null) {
+            setGarrison(garrison);
+        }
+    }
+
+    /**
+     * Takes a trait away from the facility, if it has it.
+     *
+     * @param trait the trait to remove
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void removeTrait(FacilityTrait trait) {
+        getTraits().remove(trait);
+    }
+
+    /**
+     * @return {@code true} if the facility's garrison is low enough that it surrenders to a siege: none left, or one
+     *       step left for a garrison with poor morale
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isReadyToSurrender() {
+        int surrenderThreshold = hasTrait(FacilityTrait.POOR_MORALE) ? 1 : 0;
+        return getGarrison() <= surrenderThreshold;
     }
 
     /**
@@ -448,13 +534,17 @@ public class StratConFacility {
     }
 
     /**
-     * @return the most garrison steps the facility's tier allows
+     * @return the most garrison steps the facility can hold: its tier's maximum, one fewer if it is undermanned
      *
      * @author Illiani
      * @since 0.51.01
      */
     public int getGarrisonMaximum() {
-        return getTier().getGarrisonMaximum();
+        int garrisonMaximum = getTier().getGarrisonMaximum();
+        if (hasTrait(FacilityTrait.UNDERMANNED)) {
+            garrisonMaximum = Math.max(1, garrisonMaximum - 1);
+        }
+        return garrisonMaximum;
     }
 
     /**
@@ -552,6 +642,20 @@ public class StratConFacility {
      * the current profile's local modifiers; each step above that adds the next garrison modifier for the holding
      * side, skipping any the profile already has.</p>
      */
+    // The scenario modifiers an enemy facility's traits add to fights there. These modifiers only work on the opposing
+    // side, so the same traits on a facility the player's side holds act through the rules instead.
+    private void addTraitModifiers(List<String> modifiers) {
+        if (isOwnerAlliedToPlayer()) {
+            return;
+        }
+        if (hasTrait(FacilityTrait.VETERAN_GARRISON) && !modifiers.contains(VETERAN_GARRISON_MODIFIER)) {
+            modifiers.add(VETERAN_GARRISON_MODIFIER);
+        }
+        if (hasTrait(FacilityTrait.EXPERIMENTAL_WEAPONS) && !modifiers.contains(EXPERIMENTAL_WEAPONS_MODIFIER)) {
+            modifiers.add(EXPERIMENTAL_WEAPONS_MODIFIER);
+        }
+    }
+
     public List<String> getLocalModifiers() {
         List<String> modifiers = new ArrayList<>();
         int garrisonSteps = getGarrison();
@@ -569,6 +673,7 @@ public class StratConFacility {
         }
 
         modifiers.addAll(additionalLocalModifiers);
+        addTraitModifiers(modifiers);
         return modifiers;
     }
 
@@ -660,11 +765,15 @@ public class StratConFacility {
     }
 
     /**
-     * @return the facility's monthly SP (Support Points) change while its current owner holds it, adjusted for its
-     *       condition
+     * @return the facility's monthly Employer Support change while its current owner holds it, with any extra from a
+     *       well-stocked facility your side holds, adjusted for its condition
      */
     public int getMonthlySupportPoints() {
-        return applyCondition(getProfile().getMonthlySupportPoints());
+        int supportPoints = getProfile().getMonthlySupportPoints();
+        if (isOwnerAlliedToPlayer() && hasTrait(FacilityTrait.WELL_STOCKED)) {
+            supportPoints += FacilityTrait.WELL_STOCKED_MONTHLY_SUPPORT;
+        }
+        return applyCondition(supportPoints);
     }
 
     /**
@@ -692,14 +801,17 @@ public class StratConFacility {
     }
 
     /**
-     * Worsens the facility after a fight on it that its holder lost: its condition drops one step and its garrison
-     * loses one step.
+     * Worsens the facility after a fight on it that its holder lost: its condition drops one step, unless it is
+     * hardened, and its garrison loses one step.
      *
      * @author Illiani
      * @since 0.51.01
      */
     public void applyAttackerVictory() {
-        setCondition(getCondition().worsened());
+        // A hardened facility shrugs off an attack that does not take it.
+        if (!hasTrait(FacilityTrait.HARDENED)) {
+            setCondition(getCondition().worsened());
+        }
         setGarrison(getGarrison() - 1);
     }
 
