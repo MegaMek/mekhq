@@ -302,7 +302,7 @@ class StratConPointOfInterestObjectiveTest {
         when(contract.getStartDate()).thenReturn(TODAY);
         when(contract.getLengthInMonths()).thenReturn(3);
         when(contract.getScale()).thenReturn(1);
-        when(contract.getTrackCount()).thenReturn(4);
+        when(contract.getTrackCount()).thenReturn(3);
         StratConCampaignState campaignState = new StratConCampaignState();
         StratConContractDefinition definition = contractDefinition(
               List.of(pointOfInterestObjective(1, TYPE_ID)),
@@ -311,7 +311,7 @@ class StratConPointOfInterestObjectiveTest {
         StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState, true, true);
 
         List<StratConScheduledPointOfInterest> scheduled = campaignState.getScheduledPointsOfInterest();
-        assertEquals(5, scheduled.size(), "one objective, plus one roll of the four-track column");
+        assertEquals(4, scheduled.size(), "one objective, plus one roll of the three-track column");
         assertEquals(1, countStrategicObjectives(scheduled));
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertNotNull(pointOfInterest.getSpawnDate());
