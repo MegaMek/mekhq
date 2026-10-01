@@ -313,7 +313,7 @@ class StratConFacilitySiegeTest {
             facility.setGarrison(0);
             besiege(FORMATION_ID, 0);
 
-            StratConEnemyFacilityActivity.applyWeeklyUpkeep(track, campaign);
+            StratConEnemyFacilityActivity.applyMonthlyUpkeep(track, campaign);
 
             assertEquals(0, facility.getGarrison());
         }

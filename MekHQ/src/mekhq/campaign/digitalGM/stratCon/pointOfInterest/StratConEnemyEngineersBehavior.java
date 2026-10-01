@@ -51,9 +51,10 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
  * {@code StratConEnemyFacilityActivity}).
  *
  * <p>Deploying a formation onto their hex makes the usual scenario roll. With no scenario, the engineers scatter. With
- * one, the formation is ambushed by their escort: winning drives them off, and anything else lets them finish. Engineers
- * left alone until they leave finish too. Finishing leaves an enemy Outpost of a random type on their hex, which the
- * player already knows the position of.</p>
+ * one, the formation is ambushed by their escort: winning drives them off, and anything else lets them finish.
+ * Engineers left alone until they leave finish too. Finishing leaves an enemy Outpost, of a type picked as for any
+ * facility that turns up mid-contract, on their hex, which the player already knows the position of - unless the
+ * sector has reached its facility cap by then.</p>
  *
  * <p>Driving them off pays no combat bonus.</p>
  *
@@ -138,7 +139,10 @@ public class StratConEnemyEngineersBehavior extends StratConContestedPointOfInte
         StratConCoords coords = pointOfInterest.getCoords();
         StratConPointOfInterestRules.withdrawPointOfInterest(track, pointOfInterest);
 
-        if ((coords == null) || (track.getFacility(coords) != null)) {
+        // The sector may have filled up while they worked; the cap still holds.
+        if ((coords == null)
+                  || (track.getFacility(coords) != null)
+                  || !StratConContractInitializer.hasRoomForFacility(track)) {
             return null;
         }
 

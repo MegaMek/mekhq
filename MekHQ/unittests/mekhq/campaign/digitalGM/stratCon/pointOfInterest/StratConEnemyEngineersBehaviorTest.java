@@ -125,4 +125,24 @@ class StratConEnemyEngineersBehaviorTest {
         assertEquals(existing, track.getFacility(COORDS));
         assertNull(track.getPointOfInterest(engineers.getId()));
     }
+
+    @Test
+    void engineersInASectorAtItsFacilityCapBuildNothing() {
+        // Fill the sector to its cap: half of its 36 dry hexes.
+        int placed = 0;
+        for (int x = 0; (x < track.getWidth()) && (placed < 18); x++) {
+            for (int y = 0; (y < track.getHeight()) && (placed < 18); y++) {
+                StratConCoords coords = new StratConCoords(x, y);
+                if (!coords.equals(COORDS)) {
+                    track.addFacility(coords, StratConTestData.facility(ForceAlignment.Opposing,
+                          FacilityType.MekBase,
+                          new LocalModifiersEffect(List.of("MekGarrison.json"))));
+                    placed++;
+                }
+            }
+        }
+
+        assertNull(behavior.buildOutpost(engineers, track, campaign));
+        assertNull(track.getFacility(COORDS));
+    }
 }

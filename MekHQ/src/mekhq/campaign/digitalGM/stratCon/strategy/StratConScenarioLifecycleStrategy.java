@@ -55,8 +55,8 @@ public class StratConScenarioLifecycleStrategy implements IScenarioLifecycleStra
 
     @Override
     public void processExpiredScenario(StratConScenario scenario, StratConTrackState track,
-          StratConCampaignState campaignState) {
-        StratConRulesManager.processIgnoredStratConScenario(scenario, track, campaignState);
+          StratConCampaignState campaignState, Campaign campaign) {
+        StratConRulesManager.processIgnoredStratConScenario(scenario, track, campaignState, campaign);
     }
 
     @Override

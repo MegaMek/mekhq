@@ -61,7 +61,7 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
  * enemy only.</p>
  *
  * <p>A facility its side's supply reaches is Connected, and is marked as on the supply lines. One that was on them but
- * is no longer reached is Cut: it gets no weekly upkeep, and loses a condition step at the start of each month. A
+ * is no longer reached is Cut: it gets no monthly upkeep, and loses a condition step at the start of each month. A
  * facility never on the supply lines supplies itself, so there is nothing to cut.</p>
  *
  * <p>Supply lines apply only with the improved sector generator, which lays roads, and only while the "Supply Lines"

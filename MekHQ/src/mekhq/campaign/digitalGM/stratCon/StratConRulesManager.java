@@ -169,7 +169,6 @@ public class StratConRulesManager {
     // what an enemy counterattack on a facility is fought in; see startCounterattackScenario
     private static final List<String> COUNTERATTACK_SCENARIO_TEMPLATES = List.of("Base Defense.json",
           "Hold Until Relief.json");
-    private static final String COUNTERATTACK_OBJECTIVE_MODIFIER = "FacilityAlliedDefend.json";
     // what an Interdict Supply order is fought in; see startInterdictionScenario
     private static final String INTERDICTION_SCENARIO_TEMPLATE = "Convoy Interdiction.json";
     // what an enemy relief force against besiegers is fought in; see startSiegeScenario
@@ -1797,8 +1796,10 @@ public class StratConRulesManager {
 
     /**
      * Starts an enemy counterattack on a facility held by the player or their employer: a Crisis, never a Turning
-     * Point, fought in the Base Defense or Hold Until Relief template with the facility's defend objective. Nobody is
-     * assigned to it; the player has until the deployment deadline to send a formation.
+     * Point, fought in the Base Defense or Hold Until Relief template. Formations already on the facility's hex are
+     * committed to it at once, as they would be to any scenario arising on their hex; otherwise the player has until
+     * the deployment deadline to send one. The templates' own objectives decide the fight: the facility's fate follows
+     * from the result (see {@code StratConFacilityOperations}), never from a facility-removing objective.
      *
      * @param campaign    the current campaign
      * @param contract    the contract whose map holds the sector
@@ -1828,18 +1829,33 @@ public class StratConRulesManager {
             return null;
         }
 
-        StratConScenario scenario = generateScenario(campaign, contract, track, null, coords, template, warningDays);
+        // Formations already standing on the facility meet the attack where they are.
+        Set<Integer> defenderIds = track.getAssignedCoordForces().get(coords);
+        List<Integer> defenders = (defenderIds == null) ? new ArrayList<>() : new ArrayList<>(defenderIds);
+        Collections.sort(defenders);
+        Integer firstDefenderId = defenders.isEmpty() ? null : defenders.get(0);
+
+        StratConScenario scenario = generateScenario(campaign,
+              contract,
+              track,
+              firstDefenderId,
+              coords,
+              template,
+              warningDays);
         if (scenario == null) {
             return null;
         }
 
+        for (int index = 1; index < defenders.size(); index++) {
+            scenario.incrementRequiredPlayerLances();
+            scenario.addPrimaryForce(defenders.get(index));
+        }
+        if (!defenders.isEmpty()) {
+            scenario.setOverrideForceAutoAssignment(true);
+        }
+
         scenario.setCounterattack(true);
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
-        AtBScenarioModifier objectiveModifier = AtBScenarioModifier.getScenarioModifier(
-              COUNTERATTACK_OBJECTIVE_MODIFIER);
-        if ((objectiveModifier != null) && !backingScenario.alreadyHasModifier(objectiveModifier)) {
-            backingScenario.addScenarioModifier(objectiveModifier);
-        }
         backingScenario.setName(String.format("%s - Counterattack", facility.getDisplayableName()));
 
         track.getRevealedCoords().add(coords);
@@ -4624,13 +4640,14 @@ public class StratConRulesManager {
      * @param scenarioId    The ID of the dynamic scenario to be processed.
      * @param campaignState The state of the current campaign, used to access tracks and scenarios.
      */
-    public static void processIgnoredDynamicScenario(int scenarioId, StratConCampaignState campaignState) {
+    public static void processIgnoredDynamicScenario(int scenarioId, StratConCampaignState campaignState,
+          @Nullable Campaign campaign) {
         for (StratConTrackState track : campaignState.getTracks()) {
             Map<Integer, StratConScenario> backingScenarios = track.getBackingScenariosMap();
             StratConScenario stratConScenario = backingScenarios.get(scenarioId);
 
             if (stratConScenario != null) {
-                processIgnoredStratConScenario(stratConScenario, track, campaignState);
+                processIgnoredStratConScenario(stratConScenario, track, campaignState, campaign);
                 break;
             }
         }
@@ -4671,6 +4688,25 @@ public class StratConRulesManager {
      */
     public static void processIgnoredStratConScenario(StratConScenario scenario, StratConTrackState track,
           StratConCampaignState campaignState) {
+        processIgnoredStratConScenario(scenario, track, campaignState, null);
+    }
+
+    /**
+     * As {@link #processIgnoredStratConScenario(StratConScenario, StratConTrackState, StratConCampaignState)}, with
+     * the campaign to report to and read options from. Without the enemy facility activity this PR adds (Facility
+     * Operations off, or Enemy Facility Activity at 0), an ordinary scenario left unplayed on an employer's facility
+     * still costs it, as before; with it, only counterattacks do.
+     *
+     * @param scenario      the ignored scenario
+     * @param track         its sector
+     * @param campaignState the contract's StratCon campaign state
+     * @param campaign      the current campaign, or {@code null} to neither report nor read options
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void processIgnoredStratConScenario(StratConScenario scenario, StratConTrackState track,
+          StratConCampaignState campaignState, @Nullable Campaign campaign) {
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
         boolean isCrisis = backingScenario != null && backingScenario.isCrisis();
         StratConFacility localFacility = track.getFacility(scenario.getCoords());
@@ -4682,6 +4718,20 @@ public class StratConRulesManager {
             isFacilityLost = StratConEnemyFacilityActivity.resolveIgnoredCounterattack(track,
                   localFacility,
                   campaignState);
+            // Reported here, as this is reached from the end of the day, the contract's end and a lost planet alike.
+            if (campaign != null) {
+                StratConEnemyFacilityActivity.reportIgnoredCounterattack(campaign,
+                      track,
+                      scenario.getCoords(),
+                      localFacility);
+            }
+        } else if ((localFacility != null)
+                         && (localFacility.getOwner() == Allied)
+                         && (scenario.getFacilityOperation() != FacilityOperation.SIEGE)
+                         && (campaign != null)
+                         && (StratConEnemyFacilityActivity.getActivity(campaign) <= 0)) {
+            // Without counterattacks to take them, an employer's facility falls when a fight on it goes unplayed.
+            localFacility.setOwner(Opposing);
         }
 
         // Update victory points if the scenario is marked as "special" or "turning point"

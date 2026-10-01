@@ -76,7 +76,7 @@ public interface IFacilityStrategy {
 
     /**
      * Settles the week's sieges on a track: support points, garrison losses, surrenders and sorties. Called on
-     * Mondays, before the weekly upkeep.
+     * Mondays.
      *
      * @param track    the track whose sieges are processed
      * @param campaign the current campaign
@@ -87,7 +87,7 @@ public interface IFacilityStrategy {
     void processSieges(StratConTrackState track, Campaign campaign);
 
     /**
-     * Gives the enemy facilities on a track their weekly upkeep: repairs and reinforcements.
+     * Gives the enemy facilities on a track their monthly upkeep: repairs and reinforcements.
      *
      * @param track    the track whose facilities are processed
      * @param campaign the current campaign
@@ -95,7 +95,7 @@ public interface IFacilityStrategy {
      * @author Illiani
      * @since 0.51.01
      */
-    void applyWeeklyUpkeep(StratConTrackState track, Campaign campaign);
+    void applyMonthlyUpkeep(StratConTrackState track, Campaign campaign);
 
     /**
      * Checks which facilities on a track are cut off from their supply lines, and applies what being cut off does.

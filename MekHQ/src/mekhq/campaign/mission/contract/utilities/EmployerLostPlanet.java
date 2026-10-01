@@ -261,7 +261,7 @@ public final class EmployerLostPlanet {
 
         for (Scenario scenario : activeScenarios) {
             if ((campaignState != null) && (scenario instanceof AtBDynamicScenario)) {
-                processIgnoredDynamicScenario(scenario.getId(), campaignState);
+                processIgnoredDynamicScenario(scenario.getId(), campaignState, campaign);
             }
             scenario.convertToStub(campaign, ScenarioStatus.DECISIVE_DEFEAT);
         }

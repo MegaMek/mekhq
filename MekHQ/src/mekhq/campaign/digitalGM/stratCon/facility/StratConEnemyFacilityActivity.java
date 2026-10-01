@@ -51,6 +51,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
@@ -65,12 +66,13 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
- * What the enemy does with facilities between the player's fights: weekly upkeep of its own facilities, counterattacks
- * on facilities the player or their employer holds, and enemy engineers building new outposts.
+ * What the enemy does with facilities between the player's fights: monthly upkeep of its own facilities,
+ * counterattacks on facilities the player or their employer holds, and enemy engineers building new outposts.
  *
  * <ul>
- *     <li><b>Weekly upkeep.</b> Each Monday, every enemy facility repairs one condition step and reinforces one
- *     garrison step, unless a fight is under way there, it is cut off from its supply lines, or it is under siege.</li>
+ *     <li><b>Monthly upkeep.</b> At the start of each month, every enemy facility repairs one condition step and
+ *     reinforces one garrison step, unless a fight is under way there, it is cut off from its supply lines, or it is
+ *     under siege.</li>
  *     <li><b>Counterattacks.</b> When one of the contract's ordinary scenarios comes due, it may instead become a
  *     counterattack on a facility held by the player or their employer. A counterattack is a Crisis, placed on the
  *     facility's hex with a deployment deadline of 3 to 7 days. Losing or ignoring it hands the facility to the enemy,
@@ -120,15 +122,16 @@ public final class StratConEnemyFacilityActivity {
     /**
      * @param campaign the current campaign
      *
-     * @return the "Enemy Facility Activity" option, kept between 0 and {@link #MAXIMUM_ACTIVITY}; 0 in mapless play,
-     *       where there are no facilities
+     * @return the "Enemy Facility Activity" option, kept between 0 and {@link #MAXIMUM_ACTIVITY}; 0 with Facility
+     *       Operations off, so turning that off restores play as it was before, and 0 in mapless play, where there are
+     *       no facilities
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static double getActivity(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (campaignOptions.isUseStratConMaplessMode()) {
+        if (!StratConFacilityOperations.isEnabled(campaign)) {
             return 0;
         }
 
@@ -140,7 +143,7 @@ public final class StratConEnemyFacilityActivity {
     }
 
     /**
-     * Works out how many steps of upkeep an enemy facility gets this week. The whole part of the activity is always
+     * Works out how many steps of upkeep an enemy facility gets this month. The whole part of the activity is always
      * given; its fraction is the percentage chance of one more step.
      *
      * @param activity   the Enemy Facility Activity option
@@ -158,7 +161,7 @@ public final class StratConEnemyFacilityActivity {
     }
 
     /**
-     * Gives every enemy facility in a sector its weekly upkeep: for each step (see {@link #getUpkeepSteps}), one
+     * Gives every enemy facility in a sector its monthly upkeep: for each step (see {@link #getUpkeepSteps}), one
      * condition step repaired and one garrison step reinforced. A facility being fought over gets none. Each facility
      * the player can see that changed is reported.
      *
@@ -168,7 +171,7 @@ public final class StratConEnemyFacilityActivity {
      * @author Illiani
      * @since 0.51.01
      */
-    public static void applyWeeklyUpkeep(StratConTrackState track, Campaign campaign) {
+    public static void applyMonthlyUpkeep(StratConTrackState track, Campaign campaign) {
         double activity = getActivity(campaign);
         if (activity <= 0) {
             return;
@@ -278,6 +281,13 @@ public final class StratConEnemyFacilityActivity {
         }
 
         LocalDate today = campaign.getLocalDate();
+        // The quiet spell that guarantees a counterattack counts from the first day counterattacks could come - not
+        // from the contract's start, which for a save loaded partway through would make the first one certain.
+        if (campaignState.getLastCounterattackDate() == null) {
+            campaignState.setLastCounterattackDate(today);
+        }
+
+        LocalDate contractEnd = contract.getEndingDate();
         int launchedCount = 0;
         for (int scenarioIndex = 0; scenarioIndex < scenarioCount; scenarioIndex++) {
             if (!isCounterattack(activity, getDaysSinceLastCounterattack(contract, campaignState, today),
@@ -293,6 +303,10 @@ public final class StratConEnemyFacilityActivity {
             int warningDays = COUNTERATTACK_MINIMUM_WARNING_DAYS
                                     + Compute.randomInt(COUNTERATTACK_MAXIMUM_WARNING_DAYS
                                                               - COUNTERATTACK_MINIMUM_WARNING_DAYS + 1);
+            // Like any scenario, a counterattack must fall before the contract ends.
+            if ((contractEnd != null) && !today.plusDays(warningDays).isBefore(contractEnd)) {
+                continue;
+            }
             StratConScenario scenario = StratConRulesManager.startCounterattackScenario(campaign,
                   contract,
                   target.track(),
@@ -553,6 +567,12 @@ public final class StratConEnemyFacilityActivity {
      */
     public static void processEnemyEngineers(Campaign campaign, AbstractContract contract,
           StratConCampaignState campaignState) {
+        // At no activity the enemy builds nothing, including engineers scheduled before the option was turned down.
+        if (getActivity(campaign) <= 0) {
+            campaignState.getEnemyEngineerDates().clear();
+            return;
+        }
+
         LocalDate today = campaign.getLocalDate();
         LocalDate scheduledUntil = campaignState.getEnemyEngineersScheduledUntil();
         if ((scheduledUntil == null) || !today.isBefore(scheduledUntil)) {
@@ -615,6 +635,10 @@ public final class StratConEnemyFacilityActivity {
         List<StratConTrackState> tracks = new ArrayList<>(campaignState.getTracks());
         while (!tracks.isEmpty()) {
             StratConTrackState track = tracks.remove(Compute.randomInt(tracks.size()));
+            // Engineers only go where their outpost would fit under the sector's facility cap.
+            if (!StratConContractInitializer.hasRoomForFacility(track)) {
+                continue;
+            }
             StratConPointOfInterest pointOfInterest = StratConPointOfInterestPlacer.place(track,
                   StratConEnemyEngineersBehavior.TYPE_ID,
                   null,

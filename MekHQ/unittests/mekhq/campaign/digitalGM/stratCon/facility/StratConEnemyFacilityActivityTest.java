@@ -117,6 +117,7 @@ class StratConEnemyFacilityActivityTest {
         campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         options = mock(CampaignOptions.class);
         when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(1.0);
+        when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(true);
         when(options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
         when(options.isUseStratConMaplessMode()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(options);
@@ -168,7 +169,7 @@ class StratConEnemyFacilityActivityTest {
     }
 
     @Nested
-    class WeeklyUpkeep {
+    class MonthlyUpkeep {
         @Test
         void theWholeActivityIsAlwaysGivenAndItsFractionIsAChance() {
             assertEquals(1, StratConEnemyFacilityActivity.getUpkeepSteps(1.0, 99));
@@ -201,7 +202,7 @@ class StratConEnemyFacilityActivityTest {
             StratConFacility allied = placeFacility(ForceAlignment.Allied);
             allied.setGarrison(0);
 
-            StratConEnemyFacilityActivity.applyWeeklyUpkeep(track, campaign);
+            StratConEnemyFacilityActivity.applyMonthlyUpkeep(track, campaign);
             assertEquals(0, allied.getGarrison());
 
             track.removeFacility(FACILITY_COORDS);
@@ -209,11 +210,11 @@ class StratConEnemyFacilityActivityTest {
             enemy.setGarrison(0);
             placeScenario(false, false);
 
-            StratConEnemyFacilityActivity.applyWeeklyUpkeep(track, campaign);
+            StratConEnemyFacilityActivity.applyMonthlyUpkeep(track, campaign);
             assertEquals(0, enemy.getGarrison());
 
             track.removeScenario(track.getScenario(FACILITY_COORDS));
-            StratConEnemyFacilityActivity.applyWeeklyUpkeep(track, campaign);
+            StratConEnemyFacilityActivity.applyMonthlyUpkeep(track, campaign);
             assertEquals(1, enemy.getGarrison());
         }
 
@@ -223,7 +224,7 @@ class StratConEnemyFacilityActivityTest {
             StratConFacility enemy = placeFacility(ForceAlignment.Opposing);
             enemy.setGarrison(0);
 
-            StratConEnemyFacilityActivity.applyWeeklyUpkeep(track, campaign);
+            StratConEnemyFacilityActivity.applyMonthlyUpkeep(track, campaign);
 
             assertEquals(0, enemy.getGarrison());
         }
@@ -496,5 +497,13 @@ class StratConEnemyFacilityActivityTest {
         assertTrue(StratConEnemyFacilityActivity.isReliefSent(1.0, 24));
         assertFalse(StratConEnemyFacilityActivity.isReliefSent(1.0, 25));
         assertFalse(StratConEnemyFacilityActivity.isReliefSent(0, 0));
+    }
+
+    @Test
+    void theQuietSpellCountsFromTheFirstDayCounterattacksCouldCome() {
+        // A contract loaded partway through must not owe a counterattack for the days before.
+        StratConEnemyFacilityActivity.launchCounterattacks(campaign, contract, campaignState, 0);
+
+        assertEquals(TODAY, campaignState.getLastCounterattackDate());
     }
 }

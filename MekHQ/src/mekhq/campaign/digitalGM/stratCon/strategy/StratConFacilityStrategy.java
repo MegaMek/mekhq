@@ -71,8 +71,8 @@ public class StratConFacilityStrategy implements IFacilityStrategy {
     }
 
     @Override
-    public void applyWeeklyUpkeep(StratConTrackState track, Campaign campaign) {
-        StratConEnemyFacilityActivity.applyWeeklyUpkeep(track, campaign);
+    public void applyMonthlyUpkeep(StratConTrackState track, Campaign campaign) {
+        StratConEnemyFacilityActivity.applyMonthlyUpkeep(track, campaign);
     }
 
     @Override

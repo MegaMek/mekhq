@@ -44,14 +44,11 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.*;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
-import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConReconnaissance;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
@@ -246,7 +243,9 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 getFacilityStrategy().processSupply(track, campaign, isStartOfMonth);
                 if (isMonday) {
                     getFacilityStrategy().processSieges(track, campaign);
-                    getFacilityStrategy().applyWeeklyUpkeep(track, campaign);
+                }
+                if (isStartOfMonth) {
+                    getFacilityStrategy().applyMonthlyUpkeep(track, campaign);
                 }
 
                 processPointsOfInterest(track, campaign);
@@ -260,17 +259,10 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                     if ((scenario.getDeploymentDate() != null) &&
                               scenario.getDeploymentDate().isBefore(today) &&
                               scenario.getPrimaryForceIDs().isEmpty()) {
-                        StratConCoords scenarioCoords = scenario.getCoords();
-                        StratConFacility counterattackedFacility = scenario.isCounterattack() ?
-                                                                         track.getFacility(scenarioCoords) :
-                                                                         null;
-                        getScenarioLifecycleStrategy().processExpiredScenario(scenario, track, campaignState);
-                        if (counterattackedFacility != null) {
-                            StratConEnemyFacilityActivity.reportIgnoredCounterattack(campaign,
-                                  track,
-                                  scenarioCoords,
-                                  counterattackedFacility);
-                        }
+                        getScenarioLifecycleStrategy().processExpiredScenario(scenario,
+                              track,
+                              campaignState,
+                              campaign);
                     }
                 }
 

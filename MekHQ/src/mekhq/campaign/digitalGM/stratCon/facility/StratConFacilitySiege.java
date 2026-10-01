@@ -61,9 +61,9 @@ import mekhq.campaign.mission.contract.AbstractContract;
  *     against it, on the same odds as any counterattack.</li>
  *     <li><b>Each Monday.</b> Every besieging formation costs {@link #SIEGE_WEEKLY_COST} support point, and gains
  *     fatigue as a Patrol does; a formation the player cannot pay for lifts its siege. The facility loses a garrison
- *     step per besieging formation, at most {@link #MAXIMUM_WEEKLY_GARRISON_LOSS}, and gets no weekly upkeep. Then,
- *     unless it is cut off, the garrison may sortie on the sector's usual scenario odds, against one besieging
- *     formation.</li>
+ *     step per besieging formation, at most {@link #MAXIMUM_WEEKLY_GARRISON_LOSS}, and gets no upkeep while
+ *     besieged. Then, unless it is cut off, the garrison may sortie on the sector's usual scenario odds, against one
+ *     besieging formation.</li>
  *     <li><b>Fights.</b> Winning a sortie costs the facility another garrison step; beating a relief force changes
  *     nothing. A draw leaves the siege as it was. Losing either breaks the siege.</li>
  *     <li><b>End.</b> At no garrison, the facility surrenders: the player takes it without a fight and chooses its
@@ -168,10 +168,10 @@ public final class StratConFacilitySiege {
     }
 
     /**
-     * Rolls whether the enemy brings a counterattack forward as a relief force against a new siege, on a counterattack's
-     * daily chance (see {@link StratConEnemyFacilityActivity#isReliefSent}). Unlike a counterattack, a relief force is
-     * never guaranteed by a long quiet spell. A relief force counts as the enemy's latest counterattack. A cut-off
-     * facility cannot be relieved.
+     * Rolls whether the enemy brings a counterattack forward as a relief force against a new siege, on a
+     * counterattack's daily chance (see {@link StratConEnemyFacilityActivity#isReliefSent}). Unlike a counterattack, a
+     * relief force is never guaranteed by a long quiet spell. A relief force counts as the enemy's latest
+     * counterattack. A cut-off facility cannot be relieved.
      *
      * @param campaign    the current campaign
      * @param contract    the contract whose map holds the sector
@@ -260,7 +260,7 @@ public final class StratConFacilitySiege {
     }
 
     /**
-     * The Monday step for every siege in a sector, before the enemy's weekly upkeep (see the class description).
+     * The Monday step for every siege in a sector, (see the class description).
      *
      * @param track    the sector
      * @param campaign the current campaign
