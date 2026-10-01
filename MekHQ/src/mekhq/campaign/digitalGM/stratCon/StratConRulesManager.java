@@ -143,6 +143,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
@@ -1022,6 +1023,25 @@ public class StratConRulesManager {
      */
     static boolean isValidUnitForScenario(Unit unit, ScenarioForceTemplate scenarioForceTemplate,
           Campaign campaign, MapLocation mapLocation) {
+        return isValidUnitForScenario(unit, scenarioForceTemplate.getAllowedUnitType(), campaign, mapLocation);
+    }
+
+    /**
+     * Validates if a given unit can be included in a scenario that allows the given unit type. See
+     * {@link #isValidUnitForScenario(Unit, ScenarioForceTemplate, Campaign, MapLocation)}.
+     *
+     * @param unit            The unit to validate.
+     * @param allowedUnitType The unit type (or special unit type) the scenario allows.
+     * @param campaign        The current campaign, used to check campaign options and planetary conditions.
+     * @param mapLocation     The map location type of the scenario, used to check if the unit can operate there.
+     *
+     * @return {@code true} if the unit can be included in the scenario, {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isValidUnitForScenario(Unit unit, int allowedUnitType, Campaign campaign,
+          MapLocation mapLocation) {
         // Check if the unit is a DropShip and player DropShips are disabled
         Entity entity = unit.getEntity();
         if (entity == null) {
@@ -1051,8 +1071,8 @@ public class StratConRulesManager {
         }
 
         // Validate the unit type, availability, and functionality
-        return forceCompositionMatchesDeclaredUnitType(entity.getUnitType(),
-              scenarioForceTemplate.getAllowedUnitType()) && unit.isAvailable() && unit.isFunctional();
+        return forceCompositionMatchesDeclaredUnitType(entity.getUnitType(), allowedUnitType)
+                     && unit.isAvailable() && unit.isFunctional();
     }
 
     /**
@@ -3739,10 +3759,23 @@ public class StratConRulesManager {
                                                              campaignState) != ReinforcementEligibilityType.NONE);
 
             List<Unit> allUnits = force.getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(), false);
+
+            // In low altitude and space scenarios we need to verify that any units that can't deploy are carried by
+            // a unit that can.
+            MapLocation mapLocation = (currentScenario == null) ?
+                                            null :
+                                            currentScenario.getScenarioTemplate().mapParameters.getMapLocation();
+            boolean compositionMatches;
+            if (mapLocation == LowAtmosphere || mapLocation == Space) {
+                compositionMatches = isFormationDeployableToAirOrSpace(allUnits, unitType, campaign, mapLocation);
+            } else {
+                compositionMatches = forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType);
+            }
+
             if ((force.getScenarioId() <= 0) &&
                       !allUnits.isEmpty() &&
                       !forcesInTracks.contains(force.getId()) &&
-                      forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType) &&
+                      compositionMatches &&
                       noReinforcementRestriction &&
                       !subElementsOrSelfDeployed(force, campaign)) {
                 if (isCombatChallenge) {
@@ -3771,6 +3804,75 @@ public class StratConRulesManager {
         }
 
         return retVal;
+    }
+
+    /**
+     * Checks whether an entire formation can take part in a low altitude or space scenario. Every unit must either be
+     * able to deploy there itself (an aerospace unit that passes the normal scenario unit vetting), or be loaded aboard
+     * - via ship or tactical transport - a unit in the same formation that can.
+     *
+     * @param units       the formation's units
+     * @param unitType    the template's allowed unit type
+     * @param campaign    the current campaign
+     * @param mapLocation the scenario's map location; expected to be {@link MapLocation#LowAtmosphere} or
+     *                    {@link MapLocation#Space}
+     *
+     * @return {@code true} if every unit in the formation can reach the scenario
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isFormationDeployableToAirOrSpace(List<Unit> units, int unitType, Campaign campaign,
+          MapLocation mapLocation) {
+        if (units.isEmpty()) {
+            return false;
+        }
+
+        Set<UUID> deployableUnitIds = new HashSet<>();
+        for (Unit unit : units) {
+            if (isUnitDeployableToAirOrSpace(unit, unitType, campaign, mapLocation)) {
+                deployableUnitIds.add(unit.getId());
+            }
+        }
+
+        for (Unit unit : units) {
+            if (deployableUnitIds.contains(unit.getId())) {
+                continue;
+            }
+
+            if (!isCarriedByDeployableUnit(unit.getTransportShipAssignment(), deployableUnitIds)
+                      && !isCarriedByDeployableUnit(unit.getTacticalTransportAssignment(), deployableUnitIds)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static boolean isCarriedByDeployableUnit(@Nullable ITransportAssignment transportAssignment,
+          Set<UUID> deployableUnitIds) {
+        if (transportAssignment == null) {
+            return false;
+        }
+
+        Unit transport = transportAssignment.getTransport();
+        return (transport != null) && deployableUnitIds.contains(transport.getId());
+    }
+
+    private static boolean isUnitDeployableToAirOrSpace(@Nullable Unit unit, int unitType, Campaign campaign,
+          MapLocation mapLocation) {
+        if (unit == null) {
+            return false;
+        }
+
+        Entity entity = unit.getEntity();
+        if (entity == null || !entity.isAerospace()) {
+            return false;
+        }
+
+        // Use the same vetting as actual scenario deployment, so we never count a transport here that would later be
+        // rejected (DropShips disabled, unstreamlined in atmosphere, unavailable, non-functional, etc.)
+        return isValidUnitForScenario(unit, unitType, campaign, mapLocation);
     }
 
     /**
