@@ -407,6 +407,47 @@ public class TransportCostCalculationsTest {
               "Expected " + expectedCost + " cargo bay cost but was " + actualCost);
     }
 
+    @Test
+    public void calculateAdditionalBayRequirementsFromUnits_unusedBaysProvideCargoCapacity() {
+        // 2 small craft bays, 1 used by an overflow ASF; 3 Mek bays, 1 used; 2 super heavy bays, both cascading down
+        // to light vehicles with 1 used; 5 ProtoMek slots, 2 used
+        TransportCostCalculations local = calculationsWithUnits(List.of(unitWithSmallCraftCapacity(2),
+              unitWithMekCapacity(3), unitWithSuperHeavyVehicleCapacity(2), unitWithProtoMekCapacity(5)));
+
+        local.setASFCount(1);
+        local.setMekCount(1);
+        local.setLightVehicleCount(1);
+        local.setProtoMekCount(2);
+        local.calculateAdditionalBayRequirementsFromUnits();
+
+        double expectedCapacity = SMALL_CRAFT_BAY_CARGO_TONNAGE +
+                                        2 * MEK_BAY_CARGO_TONNAGE +
+                                        SUPER_HEAVY_VEHICLE_BAY_CARGO_TONNAGE +
+                                        3 * PROTOMEK_BAY_CARGO_TONNAGE;
+        double actualCapacity = local.getSpareBayCargoCapacity();
+        assertEquals(expectedCapacity, actualCapacity,
+              "Expected " + expectedCapacity + " spare bay cargo capacity but was " + actualCapacity);
+    }
+
+    @Test
+    public void calculateCargoRequirements_unusedBaysOffsetCargoShortfall() {
+        TransportCostCalculations local = calculationsWithUnits(List.of(unitWithMekCapacity(2)));
+        local.calculateAdditionalBayRequirementsFromUnits();
+
+        try (MockedStatic<CargoStatistics> mockedCargo = mockStatic(CargoStatistics.class)) {
+            mockedCargo.when(() -> CargoStatistics.getTotalCargoCapacity(ArgumentMatchers.any())).thenReturn(0.0);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(false))).thenReturn(150.0);
+            mockedCargo.when(() -> CargoStatistics.getCargoTonnage(anyCollection(), anyCollection(), eq(false),
+                  eq(true))).thenReturn(0.0);
+
+            local.calculateCargoRequirements();
+        }
+
+        assertEquals(0.0, local.getAdditionalCargoSpaceRequired());
+        assertEquals(0, local.getAdditionalDropShipsRequired());
+    }
+
     @ParameterizedTest
     @ValueSource(ints = { 0, 3, 5, 10 })
     public void calculateAdditionalBayRequirementsFromUnits_smallCraft_noSpareBays(int bayRequirementCount) {
