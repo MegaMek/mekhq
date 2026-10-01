@@ -53,6 +53,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.missing.MissingFireControlSystem;
 import mekhq.campaign.unit.Unit;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import testUtilities.MHQTestUtilities;
@@ -72,8 +73,12 @@ class RefitSmallCraftEmptyArcTest {
     @TempDir
     Path temporaryFolder;
 
-    private static Entity parse(File file) throws Exception {
+    @BeforeAll
+    static void initializeEquipment() {
         EquipmentType.initializeTypes();
+    }
+
+    private static Entity parse(File file) throws Exception {
         return new MekFileParser(file).getEntity();
     }
 
@@ -81,7 +86,7 @@ class RefitSmallCraftEmptyArcTest {
         String design = Files.readString(Path.of(AQUARIUS_FILE), StandardCharsets.UTF_8);
         String emptyNose = design.replaceAll("(?s)<Nose Equipment>.*?</Nose Equipment>",
               "<Nose Equipment>\n</Nose Equipment>");
-        assertNotEquals(design, emptyNose, "The nose weapons were taken out");
+        assertNotEquals(design, emptyNose, "The design copy should have no nose weapons");
         Path emptyNoseFile = temporaryFolder.resolve("Aquarius Escort Empty Nose.blk");
         Files.writeString(emptyNoseFile, emptyNose, StandardCharsets.UTF_8);
         return emptyNoseFile.toFile();
