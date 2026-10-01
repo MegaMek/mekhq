@@ -665,7 +665,7 @@ public class TransportCostCalculations {
         double totalCargoUsage = CargoStatistics.getCargoTonnage(travelingUnits, travelingSpareParts, false, false);
         totalCargoUsage += CargoStatistics.getCargoTonnage(travelingUnits, travelingSpareParts, false, true);
 
-        additionalCargoSpaceRequired = -min(0, totalCargoCapacity - totalCargoUsage);
+        additionalCargoSpaceRequired = max(0, totalCargoUsage - totalCargoCapacity);
         cargoBayCost = round(additionalCargoSpaceRequired * CARGO_PER_TON_COST);
 
         requiredCargoDropShips = (int) ceil(additionalCargoSpaceRequired / CARGO_PER_DROPSHIP);

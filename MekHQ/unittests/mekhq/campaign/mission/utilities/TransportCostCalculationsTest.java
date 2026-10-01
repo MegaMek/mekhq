@@ -62,6 +62,7 @@ import java.util.UUID;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.units.Entity;
+import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Jumpship;
 import megamek.common.units.SpaceStation;
 import mekhq.campaign.JumpPath;
@@ -1344,6 +1345,7 @@ public class TransportCostCalculationsTest {
         when(mockEntity.isProtoMek()).thenReturn(false);
         when(mockEntity.isBattleArmor()).thenReturn(false);
         when(mockEntity.isInfantry()).thenReturn(true);
+        when(mockEntity.getMovementMode()).thenReturn(EntityMovementMode.INF_LEG);
 
         Collection<Unit> units = new ArrayList<>();
         for (int i = 0; i < unitCount; i++) {
@@ -1374,6 +1376,7 @@ public class TransportCostCalculationsTest {
 
         Entity infantryEntity = mock(Entity.class);
         when(infantryEntity.isInfantry()).thenReturn(true);
+        when(infantryEntity.getMovementMode()).thenReturn(EntityMovementMode.INF_LEG);
         Unit infantry = unitWithEntity(infantryEntity);
 
         TransportCostCalculations local = calculationsWithUnits(List.of(carrier, infantry));
