@@ -92,7 +92,7 @@ public class SVEnginePart extends Part {
     public SVEnginePart(int unitTonnage, double engineTonnage, int etype, TechRating techRating,
           FuelType fuelType, Campaign campaign) {
         super(unitTonnage, campaign);
-        this.engineTonnage = unitTonnage;
+        this.engineTonnage = engineTonnage;
         this.etype = etype;
         this.techRating = techRating;
         this.fuelType = fuelType;
@@ -250,6 +250,7 @@ public class SVEnginePart extends Part {
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         if (null != unit) {
+            refreshEngineTonnageFromUnit();
             int engineHits = 0;
             int engineCrits = 0;
             if (unit.getEntity() instanceof Tank) {
@@ -296,6 +297,24 @@ public class SVEnginePart extends Part {
     @Override
     public boolean needsFixing() {
         return hits > 0;
+    }
+
+    /**
+     * Takes the engine's weight from its vehicle, the way MegaMek weighs it. Saves made before the weight was stored
+     * correctly carry the whole vehicle's weight for the engine, and this puts it right once the engine is on its
+     * vehicle again.
+     */
+    private void refreshEngineTonnageFromUnit() {
+        Entity entity = unit.getEntity();
+        if ((entity == null) || (entity.getEngine() == null)) {
+            return;
+        }
+        double weightFromUnit = entity.getEngine().getWeightEngine(entity);
+        if (weightFromUnit != engineTonnage) {
+            LOGGER.debug("[SVEngine] {}: engine weight corrected from {} to {} tons", unit.getName(), engineTonnage,
+                  weightFromUnit);
+            engineTonnage = weightFromUnit;
+        }
     }
 
     @Override
