@@ -1,0 +1,225 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-e161-78e2-9e11-447bb285adaf
+</UUID>
+
+<UnitType>
+SmallCraft
+</UnitType>
+
+<Name>
+Aquarius Escort
+</Name>
+
+<Model>
+
+</Model>
+
+<mul id:>
+3709
+</mul id:>
+
+<year>
+2515
+</year>
+
+<type>
+IS Level 2
+</type>
+
+<role>
+None
+</role>
+
+<motion_type>
+Aerodyne
+</motion_type>
+
+<transporters>
+2ndclassquarters:0.0:0:-1::-1:0
+crewquarters:0.0:0:-1::-1:0
+1stclassquarters:0.0:0:-1::-1:0
+steeragequarters:30.0:0:-1::-1:0
+</transporters>
+
+<SafeThrust>
+4
+</SafeThrust>
+
+<heatsinks>
+32
+</heatsinks>
+
+<sink_type>
+0
+</sink_type>
+
+<fuel>
+480
+</fuel>
+
+<engine_type>
+1
+</engine_type>
+
+<armor_type>
+41
+</armor_type>
+
+<armor_tech_rating>
+0
+</armor_tech_rating>
+
+<armor_tech_level>
+1
+</armor_tech_level>
+
+<armor>
+183
+162
+162
+101
+</armor>
+
+<Nose Equipment>
+Large Laser
+Large Laser
+</Nose Equipment>
+
+<Left Side Equipment>
+LRM 10
+IS Ammo LRM-10
+SRM 6
+IS Ammo SRM-6
+(R) Medium Laser
+</Left Side Equipment>
+
+<Right Side Equipment>
+LRM 10
+IS Ammo LRM-10
+SRM 6
+IS Ammo SRM-6
+(R) Medium Laser
+</Right Side Equipment>
+
+<Aft Equipment>
+Medium Laser
+Medium Laser
+</Aft Equipment>
+
+<Hull Equipment>
+</Hull Equipment>
+
+<structural_integrity>
+8
+</structural_integrity>
+
+<capabilities>
+<p>The Aquarius is a 200-ton military aerodyne built around a layered weapons loadout covering multiple engagement ranges. Its primary long-range punch comes from two Long Range Missile launchers, one nose-mounted and one in the left wing, fed by two tons of shared ammunition. For closer work, the nose also mounts a pair of Large Lasers, providing reliable energy firepower without ammunition dependency. Each wing section carries a Six-tube Short-Range Missile launcher and a medium laser, while the aft arc is covered by two additional medium lasers. This arrangement lets the Aquarius engage threats across all arcs without leaving exposed flanks.</p><p>With a safe thrust of 4g and maximum thrust of 6g, the Aquarius is considerably faster than the DropShips it is designed to escort, giving it the speed to intercept most threats before they close to effective range. Its thirty-two heat sinks provide adequate dissipation for the energy loadout, though sustained use of both Large Lasers alongside the missile batteries can stress the thermal system. The craft's primary weakness is its modest fuel supply of six tons, which limits operational radius and requires disciplined mission planning on extended patrols.</p>
+</capabilities>
+
+<overview>
+<p>Developed by Andurien AeroTech and introduced in 2515, the Aquarius Escort was designed to complement the smaller Lyonesse introduced two years earlier. Built to protect DropShips and WarShips operating in contested space, the Aquarius filled the niche between heavyweight aerospace fighters and full combat DropShips, offering the range and firepower to escort capital ships across a system while remaining small enough to dock in standard craft bays. The design quickly became one of Andurien AeroTech's most profitable products, outselling the Lyonesse and earning a reputation as a reliable, versatile escort platform throughout the Star League era. Production eventually ceased following the merger of Andurien AeroTech into Free Worlds Defense Industries and the subsequent decline in demand for dedicated escort craft. The design was resurrected during the Jihad by both the Free Worlds League and the Word of Blake, who produced updated variants for the renewed era of space warfare.</p>
+</overview>
+
+<deployment>
+<p>The standard Aquarius served with Free Worlds League naval forces through the Star League era, assigned to escort DropShip convoys and patrol contested jump points in the Andurien and rimward border regions. Production was discontinued following the formation of Free Worlds Defense Industries in 2562, and surviving examples gradually scattered to Periphery hands and mercenary operators as the design aged. By the Late Succession Wars, remaining Aquarius craft were valued as much for their salvageable components as for combat capability.</p>
+</deployment>
+
+<history>
+<p>Andurien AeroTech released the Aquarius in 2515 to meet demand the Lyonesse had created but could not fully satisfy. Where the Lyonesse was designed for close-in defensive fighting, the Aquarius extended the escort concept outward, using superior speed and a heavier long-range missile loadout to intercept threats before they closed with the vessels it protected. The two designs were complementary by intention, and together they defined the surface-to-orbit escort doctrine of the Star League era. The Aquarius quickly outsold the Lyonesse, becoming Andurien AeroTech's most profitable product and the backbone of Free Worlds League escort operations through the mid-Star League period.</p><p>The decline came swiftly after the 2562 merger that created Free Worlds Defense Industries. With heavier aerospace fighters and newer DropShip designs absorbing the escort role, demand for dedicated small craft like the Aquarius collapsed. Production wound down, lines were dismantled or shifted, and both the Aquarius and the Lyonesse passed from active service. The escort small craft role they had built together effectively ceased to exist as a distinct military category in the major powers. In the Periphery, however, Vandenberg Mechanized Industries had watched this decline and drew a different conclusion. When they designed the Tigress in 2790, they explicitly described it as filling the role that the Aquarius and Lyonesse had once held, adapting the concept for the defensive realities of the Taurian Concordat.</p><p>The Aquarius returned during the Jihad, when renewed space warfare made the escort role suddenly relevant again. The Free Worlds League produced the M1 variant at Gibson, replacing the standard laser batteries with extended-range models. The Word of Blake's W1 took a different direction, trading most of the weapons suite for an Arrow IV artillery battery, converting the escort craft into a ground-support platform. Both lines served through the Jihad's closing years and both closed when it ended. The escort concept the Aquarius had helped define would not be permanently revived until the Condottiere appeared in 3093, with Nimakachi explicitly citing the Aquarius and Lyonesse as its direct historical predecessors.</p>
+</history>
+
+<manufacturer>
+Andurien AeroTech (A Division of Free Worlds Defense Industries)
+</manufacturer>
+
+<primaryFactory>
+Andurien
+</primaryFactory>
+
+<systemManufacturers>
+CHASSIS:Unknown
+ENGINE:Unknown
+ARMOR:Unknown
+COMMUNICATIONS:Unknown
+TARGETING:Unknown
+</systemManufacturers>
+
+<systemModels>
+CHASSIS:Unknown
+ENGINE:Unknown
+ARMOR:Unknown
+COMMUNICATIONS:Unknown
+TARGETING:Unknown
+</systemModels>
+
+<source>
+TR:3075
+</source>
+
+<published>
+RS:3075u-AW
+</published>
+
+<tonnage>
+200.0
+</tonnage>
+
+<designtype>
+1
+</designtype>
+
+<crew>
+6
+</crew>
+
+<officers>
+2
+</officers>
+
+<gunners>
+2
+</gunners>
+
+<passengers>
+0
+</passengers>
+
+<marines>
+0
+</marines>
+
+<battlearmor>
+0
+</battlearmor>
+
+<otherpassenger>
+0
+</otherpassenger>
+
+<life_boat>
+0
+</life_boat>
+
+<escape_pod>
+0
+</escape_pod>
+
