@@ -33,6 +33,8 @@
  */
 package mekhq.campaign.report;
 
+import static mekhq.campaign.mission.utilities.TransportCostCalculations.calculateSpareBayCargoCapacity;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.unit.CargoStatistics;
 import mekhq.campaign.unit.HangarStatistics;
@@ -52,8 +54,12 @@ public class CargoReport extends AbstractReport {
         final CargoStatistics cargoStats = getCampaign().getCargoStatistics();
         final HangarStatistics hangarStats = getCampaign().getHangarStatistics();
 
-        final double ccc = cargoStats.getTotalCombinedCargoCapacity();
-        final double gcc = cargoStats.getTotalCargoCapacity();
+        // Unit bays not needed for our units can carry general cargo instead
+        final double spareBayCapacity = calculateSpareBayCargoCapacity(getCampaign().getPlayerForce()
+                                                                             .getHangar()
+                                                                             .getUnits());
+        final double ccc = cargoStats.getTotalCombinedCargoCapacity() + spareBayCapacity;
+        final double gcc = cargoStats.getTotalCargoCapacity() + spareBayCapacity;
         final double icc = cargoStats.getTotalInsulatedCargoCapacity();
         final double lcc = cargoStats.getTotalLiquidCargoCapacity();
         final double scc = cargoStats.getTotalLivestockCargoCapacity();
@@ -70,6 +76,8 @@ public class CargoReport extends AbstractReport {
                      String.format(resources.getString("CargoReport.TotalCapacity.text"), ccc)
                      +
                      String.format(resources.getString("CargoReport.GeneralCapacity.text"), gcc)
+                     +
+                     String.format(resources.getString("CargoReport.SpareBayCapacity.text"), spareBayCapacity)
                      +
                      String.format(resources.getString("CargoReport.InsulatedCapacity.text"), icc)
                      +

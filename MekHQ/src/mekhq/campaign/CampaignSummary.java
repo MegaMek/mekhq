@@ -32,6 +32,7 @@
  */
 package mekhq.campaign;
 
+import static mekhq.campaign.mission.utilities.TransportCostCalculations.calculateSpareBayCargoCapacity;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_TETRIS_MASTER;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.areFieldKitchensWithinCapacity;
 import static mekhq.campaign.personnel.turnoverAndRetention.Fatigue.checkFieldKitchenCapacity;
@@ -262,6 +263,8 @@ public class CampaignSummary {
         }
 
         cargoCapacity = cargoCapacity * tetrisMasterMultiplier;
+        // Unit bays not needed for our units can carry cargo instead
+        cargoCapacity += calculateSpareBayCargoCapacity(campaign.getPlayerForce().getHangar().getUnits());
 
         cargoTons = cargoStats.getCargoTonnage(false);
         double mothballedTonnage = cargoStats.getCargoTonnage(false, true);
