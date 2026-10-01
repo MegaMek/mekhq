@@ -4370,7 +4370,11 @@ public class StratConRulesManager {
                 if ((facility != null) && !isSiegeScenario) {
                     boolean isDraw = backingScenario.getStatus().isDraw();
                     boolean wasHostile = !facility.isOwnerAlliedToPlayer();
-                    processFacilityAftermath(facility, victory, isDraw, scenario.getFacilityOperation());
+                    if (StratConFacilityOperations.isEnabled(campaign)) {
+                        processFacilityAftermath(facility, victory, isDraw, scenario.getFacilityOperation());
+                    } else {
+                        processLegacyFacilityAftermath(facility);
+                    }
 
                     if (victory && wasHostile && (scenario.getFacilityOperation() == FacilityOperation.RAID)) {
                         StratConFacilityOperations.resolveRaidLoot(campaign, mission, facility);
@@ -4584,6 +4588,23 @@ public class StratConRulesManager {
 
         facility.clearOwnershipChangeScore();
         facility.raiseIntel(FacilityIntel.DETAILED);
+    }
+
+    /**
+     * What a fight on a facility does to it with Facility Operations off, as before they were added: the facility
+     * changes hands if its objectives say so, and nothing else - no condition or garrison loss, and no intel gained.
+     *
+     * @param facility the facility the scenario was fought on
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void processLegacyFacilityAftermath(StratConFacility facility) {
+        if (facility.getOwnershipChangeScore() > 0) {
+            switchFacilityOwner(facility);
+        }
+        // Cleared so one fight's result can't carry into the next fight on the same facility.
+        facility.clearOwnershipChangeScore();
     }
 
     /**

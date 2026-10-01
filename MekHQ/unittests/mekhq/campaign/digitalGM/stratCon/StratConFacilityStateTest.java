@@ -340,6 +340,31 @@ class StratConFacilityStateTest {
     @Nested
     class Aftermath {
         @Test
+        void withFacilityOperationsOffAFightLeavesTheFacilityAsItWas() {
+            StratConFacility facility = mekBase(ForceAlignment.Opposing);
+            FacilityIntel intel = facility.getIntel();
+
+            StratConRulesManager.processLegacyFacilityAftermath(facility);
+
+            assertEquals(FacilityCondition.INTACT, facility.getCondition());
+            assertEquals(facility.getGarrisonMaximum(), facility.getGarrison());
+            assertEquals(intel, facility.getIntel());
+            assertEquals(ForceAlignment.Opposing, facility.getOwner());
+        }
+
+        @Test
+        void withFacilityOperationsOffAnEarnedCaptureStillChangesHandsOnce() {
+            StratConFacility facility = mekBase(ForceAlignment.Opposing);
+            facility.incrementOwnershipChangeScore();
+
+            StratConRulesManager.processLegacyFacilityAftermath(facility);
+            assertEquals(ForceAlignment.Allied, facility.getOwner());
+
+            StratConRulesManager.processLegacyFacilityAftermath(facility);
+            assertEquals(ForceAlignment.Allied, facility.getOwner(), "the next fight must not flip it back");
+        }
+
+        @Test
         void winningAtAHostileFacilityDamagesItAndCostsItsGarrison() {
             StratConFacility facility = mekBase(ForceAlignment.Opposing);
 
