@@ -107,6 +107,8 @@ class ContractMarketPage {
     private JCheckBox chkUseBolsterContractSkill;
     private JCheckBox chkUseChaosScaleSupportPointConversion;
     private JCheckBox chkMultiplyTrackIntensityByScale;
+    private JCheckBox chkMinimumOneTrackPerRoll;
+    private JCheckBox chkRollTracksWeekly;
     private JCheckBox chkUseContractFactionModifiers;
     private JCheckBox chkUseIntelObfuscation;
     private JCheckBox chkUseNonNegotiableTerms;
@@ -289,6 +291,14 @@ class ContractMarketPage {
         chkMultiplyTrackIntensityByScale.addMouseListener(
               createTipPanelUpdater("MultiplyTrackIntensityByScale"));
 
+        chkMinimumOneTrackPerRoll = new CampaignOptionsCheckBox("MinimumOneTrackPerRoll",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkMinimumOneTrackPerRoll.addMouseListener(createTipPanelUpdater("MinimumOneTrackPerRoll"));
+
+        chkRollTracksWeekly = new CampaignOptionsCheckBox("RollTracksWeekly",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkRollTracksWeekly.addMouseListener(createTipPanelUpdater("RollTracksWeekly"));
+
         chkUseContractFactionModifiers = new CampaignOptionsCheckBox("UseContractFactionModifiers",
               getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
         chkUseContractFactionModifiers.addMouseListener(createTipPanelUpdater("UseContractFactionModifiers"));
@@ -349,6 +359,8 @@ class ContractMarketPage {
                 chkUseBolsterContractSkill,
               chkUseChaosScaleSupportPointConversion,
               chkMultiplyTrackIntensityByScale,
+              chkMinimumOneTrackPerRoll,
+              chkRollTracksWeekly,
               chkUseContractFactionModifiers,
               chkUseIntelObfuscation,
               chkUseNonNegotiableTerms,
@@ -714,6 +726,8 @@ class ContractMarketPage {
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
         chkUseChaosScaleSupportPointConversion.setSelected(model.useChaosScaleSupportPointConversion);
         chkMultiplyTrackIntensityByScale.setSelected(model.multiplyTrackIntensityByScale);
+        chkMinimumOneTrackPerRoll.setSelected(model.minimumOneTrackPerRoll);
+        chkRollTracksWeekly.setSelected(model.rollTracksWeekly);
         chkUseContractFactionModifiers.setSelected(model.useContractFactionModifiers);
         chkUseIntelObfuscation.setSelected(model.useIntelObfuscation);
         chkUseNonNegotiableTerms.setSelected(model.useNonNegotiableTerms);
@@ -776,6 +790,8 @@ class ContractMarketPage {
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
         model.useChaosScaleSupportPointConversion = chkUseChaosScaleSupportPointConversion.isSelected();
         model.multiplyTrackIntensityByScale = chkMultiplyTrackIntensityByScale.isSelected();
+        model.minimumOneTrackPerRoll = chkMinimumOneTrackPerRoll.isSelected();
+        model.rollTracksWeekly = chkRollTracksWeekly.isSelected();
         model.useContractFactionModifiers = chkUseContractFactionModifiers.isSelected();
         model.useIntelObfuscation = chkUseIntelObfuscation.isSelected();
         model.useNonNegotiableTerms = chkUseNonNegotiableTerms.isSelected();

@@ -69,6 +69,8 @@ class MarketsOptionsModel {
     boolean useBolsterContractSkill;
     boolean useChaosScaleSupportPointConversion;
     boolean multiplyTrackIntensityByScale;
+    boolean minimumOneTrackPerRoll;
+    boolean rollTracksWeekly;
     boolean useContractFactionModifiers;
     boolean useIntelObfuscation;
     boolean useNonNegotiableTerms;
@@ -126,6 +128,8 @@ class MarketsOptionsModel {
         useBolsterContractSkill = options.get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL);
         useChaosScaleSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
         multiplyTrackIntensityByScale = options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE);
+        minimumOneTrackPerRoll = options.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL);
+        rollTracksWeekly = options.get(CampaignOption.ROLL_TRACKS_WEEKLY);
         useContractFactionModifiers = options.get(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS);
         useIntelObfuscation = options.get(CampaignOption.USE_INTEL_OBFUSCATION);
         useNonNegotiableTerms = options.get(CampaignOption.USE_NON_NEGOTIABLE_TERMS);
@@ -199,6 +203,8 @@ class MarketsOptionsModel {
         options.set(CampaignOption.USE_BOLSTER_CONTRACT_SKILL, useBolsterContractSkill);
         options.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, useChaosScaleSupportPointConversion);
         options.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, multiplyTrackIntensityByScale);
+        options.set(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL, minimumOneTrackPerRoll);
+        options.set(CampaignOption.ROLL_TRACKS_WEEKLY, rollTracksWeekly);
         options.set(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS, useContractFactionModifiers);
         options.set(CampaignOption.USE_INTEL_OBFUSCATION, useIntelObfuscation);
         options.set(CampaignOption.USE_NON_NEGOTIABLE_TERMS, useNonNegotiableTerms);

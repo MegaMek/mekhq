@@ -193,7 +193,7 @@ class StratConDataCacheSchedulingTest {
               true,
               false);
 
-        assertEquals(3, scheduled.size(), "two objectives and one ordinary point of interest, as the definition asks");
+        assertEquals(2 + SCALE, scheduled.size(), "two objectives, and one ordinary point of interest per roll");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertFalse(isDataCache(pointOfInterest));
         }
@@ -205,7 +205,7 @@ class StratConDataCacheSchedulingTest {
               true,
               true);
 
-        assertEquals(3, scheduled.size());
+        assertEquals(2 + SCALE, scheduled.size(), "two objectives, and one ordinary point of interest per roll");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertFalse(isDataCache(pointOfInterest));
         }
@@ -230,7 +230,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.GUERRILLA_WARFARE, 1), true, false);
 
-        assertEquals(3, scheduled.size());
+        assertEquals(2 + SCALE, scheduled.size(), "two objectives, and one ordinary point of interest per roll");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(DEFINITION_TYPE_ID, pointOfInterest.getTypeId());
         }
@@ -255,7 +255,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.MOLE_HUNTING, 1), true, false);
 
-        assertEquals(3, scheduled.size());
+        assertEquals(2 + SCALE, scheduled.size(), "two objectives, and one ordinary point of interest per roll");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(DEFINITION_TYPE_ID, pointOfInterest.getTypeId());
         }
@@ -280,7 +280,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.OBSERVATION_RAID, 1), true, false);
 
-        assertEquals(3, scheduled.size());
+        assertEquals(2 + SCALE, scheduled.size(), "two objectives, and one ordinary point of interest per roll");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(DEFINITION_TYPE_ID, pointOfInterest.getTypeId());
         }
