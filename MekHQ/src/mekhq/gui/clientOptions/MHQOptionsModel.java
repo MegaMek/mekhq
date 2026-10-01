@@ -74,6 +74,7 @@ class MHQOptionsModel {
           MHQConstants.NAG_INSUFFICIENT_MEDICS,
           MHQConstants.NAG_COMBAT_CHALLENGE,
           MHQConstants.NAG_UNRESOLVED_STRAT_CON_CONTACTS,
+          MHQConstants.NAG_STRATCON_FACILITY_BRIEFING,
           MHQConstants.NAG_OUTSTANDING_SCENARIOS,
           MHQConstants.NAG_EXPIRING_NAV_POINTS,
           MHQConstants.NAG_INVALID_FACTION,

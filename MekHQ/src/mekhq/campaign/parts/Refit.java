@@ -1343,7 +1343,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     newPart.changeQuantity(-1);
                     newPart = newPart.clone();
                     newPart.setRefitUnit(oldUnit);
-                    getCampaign().getQuartermaster().addPart(newPart, 0, false);
+                    getCampaign().getQuartermaster().addPart(newPart, 0, newPart.isBrandNew());
                     newNewUnitParts.add(newPart);
                 } else {
                     newPart.setRefitUnit(oldUnit);
@@ -1398,7 +1398,8 @@ public class Refit extends Part implements IAcquisitionWork {
                     if (replacement.getQuantity() > 1) {
                         Part actualReplacement = replacement.clone();
                         actualReplacement.setRefitUnit(oldUnit);
-                        getCampaign().getQuartermaster().addPart(actualReplacement, 0, false);
+                        getCampaign().getQuartermaster().addPart(actualReplacement, 0,
+                              actualReplacement.isBrandNew());
                         newUnitParts.add(actualReplacement);
                         replacement.changeQuantity(-1);
                     } else {
@@ -1806,12 +1807,14 @@ public class Refit extends Part implements IAcquisitionWork {
                 largeCraftAmmoBin.unload();
                 getWarehouse().removePart(part);
 
-            } else {
-                if (part instanceof AmmoBin) {
-                    ((AmmoBin) part).unload();
-                }
+            } else if (part instanceof AmmoBin ammoBin) {
+                // An empty bin is not kept as a spare, the same as when a bin is removed by hand
+                ammoBin.unload();
+                getWarehouse().removePart(part);
 
-                Part spare = getWarehouse().checkForExistingSparePart(part);
+            } else {
+                // Stacks only with a spare that matches it, used or brand new
+                Part spare = getWarehouse().checkForExistingSparePart(part, true);
                 if (spare != null) {
                     spare.changeQuantity(1);
                     getWarehouse().removePart(part);
@@ -2977,15 +2980,16 @@ public class Refit extends Part implements IAcquisitionWork {
                 }
 
             } else if (part instanceof MissingPart) {
+                // Everything in a refit kit is bought new
                 Part newPart = (Part) ((IAcquisitionWork) part).getNewEquipment();
                 newPart.setRefitUnit(oldUnit);
-                getCampaign().getQuartermaster().addPart(newPart, transitDays, false);
+                getCampaign().getQuartermaster().addPart(newPart, transitDays, true);
                 newUnitParts.add(newPart);
 
             } else if (part instanceof AmmoStorage) {
                 part.setUnit(null);
                 part.setRefitUnit(oldUnit);
-                campaign.getQuartermaster().addPart(part, transitDays, false);
+                campaign.getQuartermaster().addPart(part, transitDays, true);
             }
         }
         if (null != newArmorSupplies) {

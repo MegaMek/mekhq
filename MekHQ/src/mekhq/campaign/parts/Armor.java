@@ -297,7 +297,9 @@ public class Armor extends Part implements IAcquisitionWork {
 
     @Override
     public boolean isSameStatus(Part part) {
-        return this.getDaysToArrival() == part.getDaysToArrival();
+        boolean isArrivingTogether = getDaysToArrival() == part.getDaysToArrival();
+        boolean isSameQuality = getQuality() == part.getQuality();
+        return isArrivingTogether && isSameQuality;
     }
 
     @Override
