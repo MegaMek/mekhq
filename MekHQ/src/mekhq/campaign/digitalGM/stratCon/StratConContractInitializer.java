@@ -397,7 +397,7 @@ public class StratConContractInitializer {
         // A new contract has placed nothing yet, so its point of interest ledger starts empty rather than from the map.
         campaignState.setPointOfInterestLedgerSeeded(true);
 
-        // Fixed for the contract's life, so every schedule below, and any rolled again later, uses the same rules.
+        // Snapshot the options so every schedule below uses the same rules. Only editing the contract refreshes them.
         campaignState.setMinimumOneTrackPerRoll(campaignOptions.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL));
         campaignState.setRollTracksWeekly(campaignOptions.get(CampaignOption.ROLL_TRACKS_WEEKLY));
 
