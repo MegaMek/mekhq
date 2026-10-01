@@ -62,8 +62,8 @@ import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.enums.PartRepairType;
@@ -952,12 +952,17 @@ public class MRMSDialog extends JDialog {
         return pnlButtons;
     }
 
-    private void btnUnselectPartsActionPerformed(ActionEvent evt) {
-        partsTable.removeRowSelectionInterval(0, partsTable.getRowCount() - 1);
+    private void btnUnselectPartsActionPerformed(ActionEvent event) {
+        // An empty table has no rows to select, and asking for rows 0 to -1 throws
+        if (partsTable.getRowCount() > 0) {
+            partsTable.removeRowSelectionInterval(0, partsTable.getRowCount() - 1);
+        }
     }
 
-    private void btnSelectAllPartsActionPerformed(ActionEvent evt) {
-        partsTable.addRowSelectionInterval(0, partsTable.getRowCount() - 1);
+    private void btnSelectAllPartsActionPerformed(ActionEvent event) {
+        if (partsTable.getRowCount() > 0) {
+            partsTable.addRowSelectionInterval(0, partsTable.getRowCount() - 1);
+        }
     }
 
     private JPanel createActionButtons() {
@@ -1049,6 +1054,7 @@ public class MRMSDialog extends JDialog {
                       resources.getString("MRMSDisabled.error"),
                       resources.getString("MRMSDisabled.errorTitle"),
                       JOptionPane.ERROR_MESSAGE);
+                return;
             } else if (!configuredOptions.isHActiveMRMSOption()) {
                 JOptionPane.showMessageDialog(this,
                       resources.getString("NoEnabledRepairOptions.error"),
@@ -1121,8 +1127,8 @@ public class MRMSDialog extends JDialog {
         updateOptions();
     }
 
-    private void btnCancelActionPerformed(ActionEvent evt) {
-        this.setVisible(false);
+    private void btnCancelActionPerformed(ActionEvent event) {
+        dispose();
     }
 
     // region Campaign Options
