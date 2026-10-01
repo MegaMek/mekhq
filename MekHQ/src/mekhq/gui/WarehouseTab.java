@@ -56,6 +56,7 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
@@ -74,6 +75,7 @@ import mekhq.campaign.events.parts.PartRemovedEvent;
 import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.events.units.UnitNewEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.market.PartsInUseManager;
@@ -778,14 +780,28 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private final ActionScheduler partsFilterScheduler = new ActionScheduler(this::filterParts);
     private final ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
 
+    /**
+     * A unit arriving, leaving or changing (stripped, repaired, refitted) changes how many of each part are in use, so
+     * the In Use column is recounted, not just re-filtered. The scheduler runs one refresh for a burst of events.
+     */
     @Subscribe
-    public void handle(UnitRemovedEvent ev) {
-        filterParts();
+    public void handleUnitAdded(UnitNewEvent unitNewEvent) {
+        scheduleInUseRecount(unitNewEvent.getUnit(), "added");
     }
 
     @Subscribe
-    public void handle(UnitChangedEvent ev) {
-        filterParts();
+    public void handleUnitRemoved(UnitRemovedEvent unitRemovedEvent) {
+        scheduleInUseRecount(unitRemovedEvent.getUnit(), "removed");
+    }
+
+    @Subscribe
+    public void handleUnitChanged(UnitChangedEvent unitChangedEvent) {
+        scheduleInUseRecount(unitChangedEvent.getUnit(), "changed");
+    }
+
+    private void scheduleInUseRecount(@Nullable Unit unit, String change) {
+        LOGGER.debug("[Warehouse] {} {}; In Use will be recounted", (unit == null) ? "a unit" : unit.getName(), change);
+        partsScheduler.schedule();
     }
 
     @Subscribe
