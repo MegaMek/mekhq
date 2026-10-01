@@ -40,6 +40,7 @@ import java.util.Set;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondition;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 
 /**
@@ -90,6 +91,41 @@ public final class StratConFacilitySynergies {
      * @since 0.51.01
      */
     public static List<StratConFacility> getPartners(StratConTrackState track, StratConCoords coords) {
+        return findPartners(track, coords);
+    }
+
+    /**
+     * The partners the player may be told about: for an enemy facility, only once it has been scouted, since whether
+     * it has partners at all gives away its condition and supply; and only partners the player knows are there (see
+     * {@link StratConFacilityOperations#isKnownToPlayer}).
+     *
+     * @param track  the sector
+     * @param coords a facility's hex
+     *
+     * @return the known partners, in no particular order; empty if the player may not be told
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<StratConFacility> getKnownPartners(StratConTrackState track, StratConCoords coords) {
+        List<StratConFacility> knownPartners = new ArrayList<>();
+        StratConFacility facility = track.getFacility(coords);
+        boolean isScouted = (facility != null)
+                                  && (facility.isOwnerAlliedToPlayer()
+                                            || facility.getIntel().isAtLeast(FacilityIntel.SCOUTED));
+        if (!isScouted) {
+            return knownPartners;
+        }
+
+        for (StratConFacility partner : findPartners(track, coords)) {
+            if (StratConFacilityOperations.isKnownToPlayer(track, partner)) {
+                knownPartners.add(partner);
+            }
+        }
+        return knownPartners;
+    }
+
+    private static List<StratConFacility> findPartners(StratConTrackState track, StratConCoords coords) {
         List<StratConFacility> partners = new ArrayList<>();
         StratConFacility facility = track.getFacility(coords);
         if ((facility == null) || !isAbleToPartner(track, coords, facility)) {

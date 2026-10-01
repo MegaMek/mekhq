@@ -132,6 +132,9 @@ public class StratConTab extends CampaignGuiTab {
     private boolean objectivesCollapsed = false;
 
     private AbstractContract currentContract;
+    // The Facilities overview, if one is open, and the contract it shows
+    private StratConFacilityOverviewDialog facilityOverview;
+    private AbstractContract facilityOverviewContract;
     private StratConTrackState currentSectorTrack;
 
     private boolean adjustingSelectors = false;
@@ -508,7 +511,17 @@ public class StratConTab extends CampaignGuiTab {
         if ((currentContract == null) || (currentContract.getStratConCampaignState() == null)) {
             return;
         }
-        new StratConFacilityOverviewDialog(JOptionPane.getFrameForComponent(this),
+
+        // One overview at a time: bring back the open one if it shows this contract, rather than stack another.
+        if (facilityOverview != null) {
+            if (facilityOverview.isVisible() && (facilityOverviewContract == currentContract)) {
+                facilityOverview.toFront();
+                return;
+            }
+            facilityOverview.dispose();
+        }
+        facilityOverviewContract = currentContract;
+        facilityOverview = new StratConFacilityOverviewDialog(JOptionPane.getFrameForComponent(this),
               getCampaign(),
               currentContract,
               this);

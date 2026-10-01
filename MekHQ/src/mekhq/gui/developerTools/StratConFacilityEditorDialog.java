@@ -213,7 +213,8 @@ public class StratConFacilityEditorDialog extends JDialog {
         cboFacilityType.setSelectedItem(source.getFacilityType());
         biomeModel.clear();
         source.getBiomes().forEach(biomeModel::addElement);
-        return alliedProfilePanel.load(source.getAlliedProfile()) + hostileProfilePanel.load(source.getHostileProfile());
+        return alliedProfilePanel.load(source.getAlliedProfile())
+                     + hostileProfilePanel.load(source.getHostileProfile());
     }
 
     private void writeInto(StratConFacilityDefinition target) {
@@ -238,8 +239,8 @@ public class StratConFacilityEditorDialog extends JDialog {
         StratConFacilityDefinition loaded;
         try {
             loaded = StratConFacilityJson.fromFile(file).definition();
-        } catch (Exception e) {
-            LOGGER.error("Error loading facility definition {}", file.getPath(), e);
+        } catch (Exception exception) {
+            LOGGER.error("Error loading facility definition {}", file.getPath(), exception);
             JOptionPane.showMessageDialog(this, getTextAt(RESOURCE_BUNDLE, "loadError.message"),
                   getTextAt(RESOURCE_BUNDLE, "loadError.title"), JOptionPane.ERROR_MESSAGE);
             return;
@@ -263,8 +264,10 @@ public class StratConFacilityEditorDialog extends JDialog {
         FileDialogs.saveStratConFacility(frame, definition).ifPresent(file -> {
             try {
                 StratConFacilityJson.toFile(definition, file);
-            } catch (Exception e) {
-                LOGGER.error("Error saving facility definition {}", file.getPath(), e);
+            } catch (Exception exception) {
+                LOGGER.error("Error saving facility definition {}", file.getPath(), exception);
+                JOptionPane.showMessageDialog(this, getTextAt(RESOURCE_BUNDLE, "facilityEditor.saveError.message"),
+                      getTextAt(RESOURCE_BUNDLE, "facilityEditor.saveError.title"), JOptionPane.ERROR_MESSAGE);
                 return;
             }
             currentFile = file;

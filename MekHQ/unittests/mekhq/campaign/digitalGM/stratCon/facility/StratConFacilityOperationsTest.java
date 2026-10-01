@@ -809,11 +809,20 @@ class StratConFacilityOperationsTest {
         }
 
         @Test
-        void aLocatedFacilityOnAnUnrevealedHexStaysHidden() {
-            placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+        void aLocatedFacilityIsKnownAsTheMapShowsIt() {
+            StratConFacility facility = placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
             track.getRevealedCoords().clear();
 
-            assertNull(StratConFacilityOperations.getKnownFacility(track, FACILITY_COORDS));
+            assertEquals(facility, StratConFacilityOperations.getKnownFacility(track, FACILITY_COORDS));
+        }
+
+        @Test
+        void aRevealedSectorShowsEveryFacility() {
+            StratConFacility facility = placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+            facility.setIntel(FacilityIntel.UNKNOWN);
+            track.setGmRevealed(true);
+
+            assertEquals(facility, StratConFacilityOperations.getKnownFacility(track, FACILITY_COORDS));
         }
     }
 

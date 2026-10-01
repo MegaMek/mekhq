@@ -89,7 +89,8 @@ public class StratConFacilityBriefingNagDialog extends ImmersiveDialogNag {
      * @since 0.51.01
      */
     public static boolean isBriefingDue(Campaign campaign, AbstractContract contract) {
-        if (!StratConFacilityOperations.isEnabled(campaign) || campaign.getCampaignOptions().isUseStratConMaplessMode()) {
+        // Facility Operations are never on in mapless play.
+        if (!StratConFacilityOperations.isEnabled(campaign)) {
             return false;
         }
 

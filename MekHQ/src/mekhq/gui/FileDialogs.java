@@ -427,7 +427,11 @@ public class FileDialogs {
      */
     public static Optional<File> saveStratConFacility(JFrame frame, StratConFacilityDefinition definition) {
         String id = definition.getId();
-        String fileName = ((id == null) || id.isBlank()) ? "facility" : id.replaceAll("[^A-Za-z0-9_-]", "");
+        // Strip first, so an ID made only of stripped characters still falls back to the default name.
+        String fileName = (id == null) ? "" : id.replaceAll("[^A-Za-z0-9_-]", "");
+        if (fileName.isBlank()) {
+            fileName = "facility";
+        }
         return GUI.fileDialogSave(frame, "Save StratCon Facility", FileType.JSON, STRAT_CON_FACILITY_DIRECTORY,
               fileName + ".json");
     }

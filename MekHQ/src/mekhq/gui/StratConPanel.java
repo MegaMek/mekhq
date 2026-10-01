@@ -345,12 +345,21 @@ public class StratConPanel extends JPanel implements ActionListener {
         // The palette paints wherever you drag, so it must not outlive the sector it was opened for.
         closeTerrainPaintDialog();
 
+        // Re-selecting the sector already shown - as happens after every order, when the tab refreshes - keeps the
+        // hex the player just acted on selected, as long as it is still on the map.
+        boolean isSameTrack = (track != null) && (track == currentTrack);
         this.campaignState = campaignState;
         currentTrack = track;
 
-        // clear hex selection
-        boardState.selectedX = null;
-        boardState.selectedY = null;
+        boolean isSelectionOnMap = isSameTrack
+                                         && (boardState.selectedX != null)
+                                         && (boardState.selectedY != null)
+                                         && !track.isOutOfBounds(new StratConCoords(boardState.selectedX,
+                                               boardState.selectedY));
+        if (!isSelectionOnMap) {
+            boardState.selectedX = null;
+            boardState.selectedY = null;
+        }
         infoArea.setText(buildSelectedHexInfo(campaign));
 
         repaint();
@@ -1883,8 +1892,8 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Builds the GM submenu that sets a facility's tier, condition, garrison and the player's intel on it. The current
-     * value of each is ticked.
+     * Builds the GM submenu that sets a facility's tier, condition, garrison, traits and the player's intel on it. The
+     * current value of each is ticked.
      *
      * @param facility the facility on the selected hex
      *
@@ -1965,8 +1974,7 @@ public class StratConPanel extends JPanel implements ActionListener {
      * @param coords   the facility's hex
      *
      * @return the facility's map label: its name, marked if it is cut off from its supply lines or besieged, then as
-     *       much of its
-     *       tier, condition and garrison as the player knows
+     *       much of its tier, condition and garrison as the player knows
      *
      * @author Illiani
      * @since 0.51.01
@@ -2060,7 +2068,7 @@ public class StratConPanel extends JPanel implements ActionListener {
             infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.besieged", besiegerCount));
         }
 
-        List<StratConFacility> partners = StratConFacilitySynergies.getPartners(currentTrack, coords);
+        List<StratConFacility> partners = StratConFacilitySynergies.getKnownPartners(currentTrack, coords);
         if (!partners.isEmpty()) {
             StringBuilder partnerNames = new StringBuilder();
             for (StratConFacility partner : partners) {
@@ -2088,14 +2096,12 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         Polygon graphHex = generateGraphHex();
 
-        boolean trackRevealed = currentTrack.hasActiveTrackReveal();
-
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratConCoords currentCoords = new StratConCoords(x, y);
                 StratConFacility facility = currentTrack.getFacility(currentCoords);
 
-                if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
+                if ((facility != null) && StratConFacilityOperations.isKnownToPlayer(currentTrack, facility)) {
                     g2D.setColor(facility.isOwnerAlliedToPlayer() ? Color.CYAN : Color.RED);
 
                     BufferedImage facilityImage = getFacilityImage(facility);
@@ -2787,6 +2793,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                 StratConFacility selectedFacility = currentTrack.getFacility(selectedCoords);
                 if (selectedFacility != null) {
                     stateChange.accept(selectedFacility);
+                    infoArea.setText(buildSelectedHexInfo(campaign));
                 }
                 break;
             case RIGHT_CLICK_COMMAND_ADD_FACILITY:

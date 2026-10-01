@@ -64,6 +64,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityAdvisor;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityAdvisor.UpcomingEvent;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.gui.StratConTab;
@@ -206,7 +207,7 @@ public class StratConFacilityOverviewDialog extends JDialog {
         for (StratConTrackState track : campaignState.getTracks()) {
             for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
                 StratConFacility facility = entry.getValue();
-                if (!isKnown(track, entry.getKey(), facility)) {
+                if (!StratConFacilityOperations.isKnownToPlayer(track, facility)) {
                     continue;
                 }
                 facilityModel.addRow(createFacilityRow(track, entry.getKey(), facility, isSupplyLinesActive));
@@ -225,14 +226,6 @@ public class StratConFacilityOverviewDialog extends JDialog {
      * @return {@code true} if the player can see the facility on the map: their side holds it, or they have located
      *       it on a hex they have scouted
      */
-    private static boolean isKnown(StratConTrackState track, StratConCoords coords, StratConFacility facility) {
-        if (facility.isOwnerAlliedToPlayer() || track.isGmRevealed()) {
-            return true;
-        }
-        boolean isRevealed = track.hasActiveTrackReveal() || track.getRevealedCoords().contains(coords);
-        return isRevealed && facility.isVisible();
-    }
-
     private Object[] createFacilityRow(StratConTrackState track, StratConCoords coords, StratConFacility facility,
           boolean isSupplyLinesActive) {
         FacilityIntel intel = facility.getIntel();
@@ -253,12 +246,13 @@ public class StratConFacilityOverviewDialog extends JDialog {
                   StratConFacilitySupply.isCutOff(track, coords) ? "overview.supply.cut" : "overview.supply.ok");
         }
 
-        return new Object[] { track.getDisplayableName(), facility.getDisplayableName(),
-                              getTextAt(RESOURCE_BUNDLE, "dialog.owner." + StratConFacilityDialog.getOwnerKey(facility.getOwner())), tier,
-                              condition, garrison, supply,
-                              StratConFacilityAdvisor.areTraitsKnown(facility) ?
-                                    StratConFacilityAdvisor.getTraitSummary(facility) :
-                                    getTextAt(RESOURCE_BUNDLE, "overview.unknown"),
+        String owner = getTextAt(RESOURCE_BUNDLE,
+              "dialog.owner." + StratConFacilityDialog.getOwnerKey(facility.getOwner()));
+        String traits = StratConFacilityAdvisor.areTraitsKnown(facility) ?
+                              StratConFacilityAdvisor.getTraitSummary(facility) :
+                              unknown;
+        return new Object[] { track.getDisplayableName(), facility.getDisplayableName(), owner, tier,
+                              condition, garrison, supply, traits,
                               StratConFacilityAdvisor.getActivitySummary(track, coords) };
     }
 }

@@ -214,7 +214,7 @@ public class StratConFacilityDialog extends JDialog {
         if (besiegerCount > 0) {
             html.append(getFormattedTextAt(STRATCON_BUNDLE, "stratConTab.hexInfo.besieged", besiegerCount));
         }
-        List<StratConFacility> partners = StratConFacilitySynergies.getPartners(track, coords);
+        List<StratConFacility> partners = StratConFacilitySynergies.getKnownPartners(track, coords);
         if (!partners.isEmpty()) {
             List<String> partnerNames = new ArrayList<>();
             for (StratConFacility partner : partners) {

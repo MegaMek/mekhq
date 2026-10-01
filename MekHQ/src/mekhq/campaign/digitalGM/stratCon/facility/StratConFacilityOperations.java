@@ -209,23 +209,33 @@ public final class StratConFacilityOperations {
      * @param track  a sector
      * @param coords a hex in it
      *
-     * @return the facility on the hex if the player knows it is there - one their side holds, or an enemy facility
-     *       they have located on a revealed hex - or {@code null} if there is none or the player can't see it. An enemy
-     *       facility the player hasn't found is treated as absent, so orders can't be used to find it.
+     * @return the facility on the hex if the player knows it is there (see {@link #isKnownToPlayer}), or
+     *       {@code null} if there is none or the player can't see it. An enemy facility the player hasn't found is
+     *       treated as absent, so orders can't be used to find it.
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static @Nullable StratConFacility getKnownFacility(StratConTrackState track, StratConCoords coords) {
         StratConFacility facility = track.getFacility(coords);
-        if ((facility == null) || facility.isOwnerAlliedToPlayer()) {
-            return facility;
-        }
+        return ((facility != null) && isKnownToPlayer(track, facility)) ? facility : null;
+    }
 
-        boolean isRevealed = track.hasActiveTrackReveal()
-                                   || track.getRevealedCoords().contains(coords)
-                                   || track.isGmRevealed();
-        return (isRevealed && facility.isVisible()) ? facility : null;
+    /**
+     * The one test of whether the player knows a facility is there, used alike by the map, the facility window, the
+     * Facilities overview and the orders: their side holds it, they have located it, or the whole sector is revealed
+     * (by a facility that reveals it, or by the GM).
+     *
+     * @param track    the facility's sector
+     * @param facility the facility
+     *
+     * @return {@code true} if the player knows the facility is there
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isKnownToPlayer(StratConTrackState track, StratConFacility facility) {
+        return facility.isVisible() || track.hasActiveTrackReveal() || track.isGmRevealed();
     }
 
     /**
@@ -509,6 +519,10 @@ public final class StratConFacilityOperations {
 
         if (!isGiven) {
             campaignState.changeSupportPoints(cost);
+            // Say so, rather than leave the click looking as if it did nothing.
+            report(campaign,
+                  "report.orderFailed",
+                  getTextAt(RESOURCE_BUNDLE, "operation." + operation.name()));
         }
         return isGiven;
     }

@@ -112,4 +112,23 @@ class StratConFacilitySynergiesTest {
         track.getCutOffFacilities().add(SECOND);
         assertTrue(StratConFacilitySynergies.getPartners(track, FIRST).isEmpty());
     }
+
+    @Test
+    void thePlayerIsOnlyToldOfPartnersTheyCanSee() {
+        StratConFacility artilleryBase = place(FIRST, ForceAlignment.Opposing, FacilityType.ArtilleryBase);
+        StratConFacility commandCenter = place(SECOND, ForceAlignment.Opposing, FacilityType.CommandCenter);
+
+        // Not yet scouted: whether it has partners would give away its condition and supply.
+        artilleryBase.setIntel(StratConFacility.FacilityIntel.LOCATED);
+        commandCenter.setIntel(StratConFacility.FacilityIntel.LOCATED);
+        assertTrue(StratConFacilitySynergies.getKnownPartners(track, FIRST).isEmpty());
+
+        // Scouted, but its partner not yet found.
+        artilleryBase.setIntel(StratConFacility.FacilityIntel.SCOUTED);
+        commandCenter.setIntel(StratConFacility.FacilityIntel.UNKNOWN);
+        assertTrue(StratConFacilitySynergies.getKnownPartners(track, FIRST).isEmpty());
+
+        commandCenter.setIntel(StratConFacility.FacilityIntel.LOCATED);
+        assertEquals(List.of(commandCenter), StratConFacilitySynergies.getKnownPartners(track, FIRST));
+    }
 }
