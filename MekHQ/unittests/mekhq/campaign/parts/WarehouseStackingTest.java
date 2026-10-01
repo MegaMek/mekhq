@@ -166,4 +166,18 @@ class WarehouseStackingTest {
         assertEquals(balanceBefore, campaign.getPlayerForce().getFinances().getBalance(), "Nothing is paid");
         assertSame(wolverine, installedAutocannon.getUnit(), "The autocannon stays on the Wolverine");
     }
+
+    @Test
+    void armorOnAUnitCannotBeSold() {
+        Unit wolverine = scenario.withUnit(UnitFixture.WOLVERINE_WVR_6R);
+        Armor installedArmor = PartsScenario.unitParts(wolverine, Armor.class).getFirst();
+        int pointsBefore = installedArmor.getAmount();
+        Money balanceBefore = campaign.getPlayerForce().getFinances().getBalance();
+
+        campaign.getQuartermaster().sellArmor(installedArmor, pointsBefore);
+
+        assertEquals(balanceBefore, campaign.getPlayerForce().getFinances().getBalance(), "Nothing is paid");
+        assertSame(wolverine, installedArmor.getUnit(), "The armor stays on the Wolverine");
+        assertEquals(pointsBefore, installedArmor.getAmount());
+    }
 }

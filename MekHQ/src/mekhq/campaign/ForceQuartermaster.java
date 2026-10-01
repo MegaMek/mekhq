@@ -755,9 +755,7 @@ public record ForceQuartermaster(Campaign campaign) {
             return;
         }
 
-        // A part on a unit, reserved or being worked on is not for sale; paying for it would keep the part as well
-        if (!part.isSpare()) {
-            LOGGER.warn("[Quartermaster] {} was not sold: it is not a spare", part.getName());
+        if (!isForSale(part)) {
             return;
         }
 
@@ -780,6 +778,20 @@ public record ForceQuartermaster(Campaign campaign) {
     }
 
     /**
+     * Only a spare can be sold. A part on a unit, reserved or being worked on is not for sale: paying for it would
+     * leave the part where it is as well.
+     *
+     * @return {@code true} if the part is a spare
+     */
+    private boolean isForSale(Part part) {
+        if (!part.isSpare()) {
+            LOGGER.warn("[Quartermaster] {} was not sold: it is not a spare", part.getName());
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Sell all the ammo on hand.
      *
      * @param ammo The ammo to sell.
@@ -798,6 +810,9 @@ public record ForceQuartermaster(Campaign campaign) {
      */
     public void sellAmmo(AmmoStorage ammo, int shots) {
         Objects.requireNonNull(ammo);
+        if (!isForSale(ammo)) {
+            return;
+        }
 
         // Do not sell more than we have
         shots = Math.min(shots, ammo.getShots());
@@ -839,6 +854,9 @@ public record ForceQuartermaster(Campaign campaign) {
      */
     public void sellArmor(Armor armor, int points) {
         Objects.requireNonNull(armor);
+        if (!isForSale(armor)) {
+            return;
+        }
 
         // Do not sell more than we have
         points = Math.min(points, armor.getAmount());
