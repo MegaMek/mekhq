@@ -114,8 +114,7 @@ public class AutosaveService implements IAutosaveService {
                     writer.flush();
                 }
             } else {
-                LOGGER.error("Unable to perform an autosave: could not read the saved campaigns directory {}",
-                      MekHQ.getCampaignsDirectory().getValue());
+                LOGGER.error("Unable to perform an autosave because the autosave file name could not be determined");
             }
         } catch (Exception ex) {
             LOGGER.error("", ex);
@@ -198,6 +197,7 @@ public class AutosaveService implements IAutosaveService {
             return Paths.get(savesDirectoryPath, fileName).toString();
         }
 
+        LOGGER.error("Unable to read the autosave directory {}", folder.getAbsolutePath());
         return null;
     }
 }
