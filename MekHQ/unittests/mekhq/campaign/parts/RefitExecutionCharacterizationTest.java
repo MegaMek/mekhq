@@ -202,9 +202,8 @@ class RefitExecutionCharacterizationTest {
         assertEquals("LCT-1E", locust.getEntity().getModel());
         Unit freshLct1e = scenario.withUnit(UnitFixture.LOCUST_LCT_1E);
         assertEquals(PartsCensus.ofUnit(freshLct1e), PartsCensus.ofUnit(locust));
-        // The Machine Gun bin is unloaded into 200 loose rounds and the empty bin is kept as a spare as well
-        assertEquals(Map.of("Machine Gun", 2, "Machine Gun Ammo [Full]", 200, "Machine Gun Ammo [Full] Bin", 1),
-              warehouseStock());
+        // The Machine Gun bin is unloaded into 200 loose rounds; the empty bin is not kept (PW-23)
+        assertEquals(Map.of("Machine Gun", 2, "Machine Gun Ammo [Full]", 200), warehouseStock());
         for (Part sparePart : scenario.getSpareParts()) {
             assertFalse(sparePart.isBrandNew(), sparePart.getName() + " came off the unit and is not brand new");
         }
