@@ -447,28 +447,30 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     }
 
     public String getStatus() {
-        String toReturn = "Functional";
-        if (needsFixing()) {
-            toReturn = "Damaged";
-        }
+        String toReturn = getConditionStatus();
         if (isReservedForRefit()) {
-            toReturn = "Reserved for Refit";
+            toReturn = getTextAt(RESOURCE_BUNDLE, "Part.status.reservedForRefit");
         }
         if (isReservedForReplacement()) {
-            toReturn = "Reserved for Repair";
+            toReturn = getTextAt(RESOURCE_BUNDLE, "Part.status.reservedForRepair");
         }
         if (isBeingWorkedOn()) {
-            toReturn = "Being worked on";
+            toReturn = getTextAt(RESOURCE_BUNDLE, "Part.status.beingWorkedOn");
         }
         if (!isPresent()) {
-            // toReturn = "" + getDaysToArrival() + " days to arrival";
-            String dayName = "day";
-            if (getDaysToArrival() > 1) {
-                dayName += "s";
-            }
-            toReturn = "In transit (" + getDaysToArrival() + ' ' + dayName + ')';
+            // The warehouse sorts statuses by the number in "(N days)", so the text keeps that shape
+            toReturn = getFormattedTextAt(RESOURCE_BUNDLE, "Part.status.inTransit",
+                  String.valueOf(getDaysToArrival()), getDaysToArrival());
         }
         return toReturn;
+    }
+
+    /**
+     * @return the part's status when it is not reserved, being worked on or in transit: whether it works or is
+     *       damaged
+     */
+    protected String getConditionStatus() {
+        return getTextAt(RESOURCE_BUNDLE, needsFixing() ? "Part.status.damaged" : "Part.status.functional");
     }
 
     /**
