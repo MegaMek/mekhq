@@ -46,6 +46,7 @@ import java.util.UUID;
 
 import megamek.common.units.Entity;
 import megamek.common.units.UnitType;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.TransportShipAssignment;
@@ -53,14 +54,16 @@ import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests {@link StratConRulesManager#isFormationDeployableToAirOrSpace(List, int, MapLocation)}: every unit in a
- * formation must either deploy to a low altitude or space scenario itself, or be carried by a unit in the same
- * formation that can.
+ * Tests {@link StratConRulesManager#isFormationDeployableToAirOrSpace(List, int, Campaign, MapLocation)}: every unit
+ * in a formation must either deploy to a low altitude or space scenario itself, or be carried by a unit in the
+ * same formation that can.
  *
  * @author Illiani
  * @since 0.51.01
  */
 class StratConAirOrSpaceDeploymentTest {
+    private static final Campaign CAMPAIGN = mock(Campaign.class);
+
 
     private static Unit createUnit(int unitType, boolean isAerospace, boolean doomedInAtmosphere,
           boolean doomedInSpace) {
@@ -73,6 +76,8 @@ class StratConAirOrSpaceDeploymentTest {
         Unit unit = mock(Unit.class);
         when(unit.getEntity()).thenReturn(entity);
         when(unit.getId()).thenReturn(UUID.randomUUID());
+        when(unit.isAvailable()).thenReturn(true);
+        when(unit.isFunctional()).thenReturn(true);
         return unit;
     }
 
@@ -100,12 +105,13 @@ class StratConAirOrSpaceDeploymentTest {
     void allAerospaceFormationIsDeployable() {
         List<Unit> units = List.of(createSmallCraft(), createUnit(UnitType.AEROSPACE_FIGHTER, true, false, false));
 
-        assertTrue(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_AERO_MIX, MapLocation.Space));
+        assertTrue(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_AERO_MIX, CAMPAIGN,
+              MapLocation.Space));
     }
 
     @Test
     void emptyFormationIsNotDeployable() {
-        assertFalse(isFormationDeployableToAirOrSpace(new ArrayList<>(), SPECIAL_UNIT_TYPE_ATB_AERO_MIX,
+        assertFalse(isFormationDeployableToAirOrSpace(new ArrayList<>(), SPECIAL_UNIT_TYPE_ATB_AERO_MIX, CAMPAIGN,
               MapLocation.Space));
     }
 
@@ -113,7 +119,8 @@ class StratConAirOrSpaceDeploymentTest {
     void groundOnlyFormationIsNotDeployable() {
         List<Unit> units = List.of(createInfantry(), createInfantry());
 
-        assertFalse(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_MIX, MapLocation.LowAtmosphere));
+        assertFalse(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_MIX, CAMPAIGN,
+              MapLocation.LowAtmosphere));
     }
 
     @Test
@@ -126,7 +133,8 @@ class StratConAirOrSpaceDeploymentTest {
 
         List<Unit> units = List.of(smallCraft, infantryOne, infantryTwo);
 
-        assertTrue(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_AERO_MIX, MapLocation.Space));
+        assertTrue(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_AERO_MIX, CAMPAIGN,
+              MapLocation.Space));
     }
 
     @Test
@@ -137,7 +145,7 @@ class StratConAirOrSpaceDeploymentTest {
 
         List<Unit> units = List.of(smallCraft, infantry);
 
-        assertTrue(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_AERO_MIX,
+        assertTrue(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_AERO_MIX, CAMPAIGN,
               MapLocation.LowAtmosphere));
     }
 
@@ -150,7 +158,8 @@ class StratConAirOrSpaceDeploymentTest {
 
         List<Unit> units = List.of(smallCraft, loadedInfantry, strandedInfantry);
 
-        assertFalse(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_AERO_MIX, MapLocation.Space));
+        assertFalse(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_AERO_MIX, CAMPAIGN,
+              MapLocation.Space));
     }
 
     @Test
@@ -161,7 +170,8 @@ class StratConAirOrSpaceDeploymentTest {
 
         List<Unit> units = List.of(createSmallCraft(), infantry);
 
-        assertFalse(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_AERO_MIX, MapLocation.Space));
+        assertFalse(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_AERO_MIX, CAMPAIGN,
+              MapLocation.Space));
     }
 
     @Test
@@ -173,7 +183,7 @@ class StratConAirOrSpaceDeploymentTest {
 
         List<Unit> units = List.of(unstreamlinedCraft, infantry);
 
-        assertFalse(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_AERO_MIX,
+        assertFalse(isFormationDeployableToAirOrSpace(units, SPECIAL_UNIT_TYPE_ATB_AERO_MIX, CAMPAIGN,
               MapLocation.LowAtmosphere));
     }
 
@@ -182,15 +192,15 @@ class StratConAirOrSpaceDeploymentTest {
         Unit conventionalFighter = createUnit(UnitType.CONV_FIGHTER, true, false, true);
 
         assertFalse(isFormationDeployableToAirOrSpace(List.of(conventionalFighter), SPECIAL_UNIT_TYPE_ATB_AERO_MIX,
-              MapLocation.Space));
+              CAMPAIGN, MapLocation.Space));
         assertTrue(isFormationDeployableToAirOrSpace(List.of(conventionalFighter), SPECIAL_UNIT_TYPE_ATB_AERO_MIX,
-              MapLocation.LowAtmosphere));
+              CAMPAIGN, MapLocation.LowAtmosphere));
     }
 
     @Test
     void aerospaceUnitNotMatchingTemplateTypeIsNotDeployable() {
         List<Unit> units = List.of(createSmallCraft());
 
-        assertFalse(isFormationDeployableToAirOrSpace(units, UnitType.AEROSPACE_FIGHTER, MapLocation.Space));
+        assertFalse(isFormationDeployableToAirOrSpace(units, UnitType.AEROSPACE_FIGHTER, CAMPAIGN, MapLocation.Space));
     }
 }
