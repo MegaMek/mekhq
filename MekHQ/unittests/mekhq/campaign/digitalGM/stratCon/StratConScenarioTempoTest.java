@@ -427,6 +427,8 @@ class StratConScenarioTempoTest {
         when(options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)).thenReturn(true);
         when(options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
         when(options.get(CampaignOption.SCENARIO_TEMPO_MULTIPLIER)).thenReturn(1.0);
+        when(options.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL)).thenReturn(false);
+        when(options.get(CampaignOption.ROLL_TRACKS_WEEKLY)).thenReturn(false);
         when(options.isUseStratConSinglesMode()).thenReturn(isSinglesMode);
         when(options.isUseStratConMaplessMode()).thenReturn(isMaplessMode);
 
