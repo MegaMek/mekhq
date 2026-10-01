@@ -63,6 +63,7 @@ public final class BombUnloader {
 
     /**
      * Returns every bomb the unit carries, internal and external, to the warehouse and leaves the unit carrying none.
+     * A bomb type with no matching ammunition in the warehouse stays on the unit instead of being lost.
      *
      * @param campaign the campaign whose warehouse takes the bombs
      * @param unit     the unit to unload
@@ -75,6 +76,8 @@ public final class BombUnloader {
             return 0;
         }
         BombLoadout loadout = bomber.getBombChoices();
+        // Bombs that cannot go back to the warehouse stay on the aircraft, so nothing is lost
+        BombLoadout bombsKeptOnBoard = new BombLoadout();
         int bombsReturned = 0;
         for (BombTypeEnum bombType : BombTypeEnum.values()) {
             int count = loadout.getCount(bombType);
@@ -87,9 +90,13 @@ public final class BombUnloader {
             } else {
                 LOGGER.error("[BombUnloader] no ammunition type for bomb {}; {} left on {}",
                       bombType.getInternalName(), count, unit.getName());
+                bombsKeptOnBoard.put(bombType, count);
             }
         }
         bomber.clearBombChoices();
+        if (!bombsKeptOnBoard.isEmpty()) {
+            bomber.setBombChoices(bombsKeptOnBoard);
+        }
         LOGGER.debug("[BombUnloader] {}: {} bombs returned to the warehouse", unit.getName(), bombsReturned);
         return bombsReturned;
     }

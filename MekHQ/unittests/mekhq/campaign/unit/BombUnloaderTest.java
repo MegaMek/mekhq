@@ -83,7 +83,7 @@ class BombUnloaderTest {
             if (!(part instanceof AmmoStorage storage)) {
                 continue;
             }
-            if (storage.getType() == highExplosiveAmmo) {
+            if (storage.getType().getInternalName().equals(highExplosiveAmmo.getInternalName())) {
                 bombs += storage.getShots();
             }
         }
