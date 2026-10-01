@@ -47,6 +47,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
@@ -305,8 +306,10 @@ public final class StratConScenarioTempo {
 
         campaignState.seedPointOfInterestLedger();
 
-        // Those overdue - due, but still waiting for room in a sector - are kept, and count as already placed.
-        int committedCount = campaignState.getPlacedPointOfInterestCount();
+        // Only objectives are a fixed number, so only they count against the definition's share; ordinary points of
+        // interest are rolled again. Those overdue - due, but still waiting for room in a sector - are kept, and count
+        // as already placed.
+        int committedObjectiveCount = countPlacedPointOfInterestObjectives(campaignState);
         Map<String, Integer> alreadyMarkedCounts = new HashMap<>(campaignState.getMarkedPointOfInterestCounts());
         List<StratConScheduledPointOfInterest> futurePointsOfInterest = new ArrayList<>();
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : campaignState.getScheduledPointsOfInterest()) {
@@ -316,7 +319,9 @@ public final class StratConScenarioTempo {
                 continue;
             }
 
-            committedCount++;
+            if (scheduledPointOfInterest.isStrategicObjective()) {
+                committedObjectiveCount++;
+            }
             for (Map.Entry<String, String> entry : scheduledPointOfInterest.getInitialState().entrySet()) {
                 if (Boolean.parseBoolean(entry.getValue())) {
                     alreadyMarkedCounts.merge(entry.getKey(), 1, Integer::sum);
@@ -331,7 +336,26 @@ public final class StratConScenarioTempo {
               campaign.getCampaignOptions().get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE),
               campaignState.isContractsUseSpecialMechanics(),
               today,
-              committedCount,
+              committedObjectiveCount,
               alreadyMarkedCounts);
+    }
+
+    /**
+     * Counts the point of interest objectives on the contract's map, met or not. One that was withdrawn has lost its
+     * objective too, so it is not counted.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static int countPlacedPointOfInterestObjectives(StratConCampaignState campaignState) {
+        int count = 0;
+        for (StratConTrackState track : campaignState.getTracks()) {
+            for (StratConStrategicObjective objective : track.getStrategicObjectives()) {
+                if (objective.getObjectiveType() == StrategicObjectiveType.PointOfInterest) {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 }
