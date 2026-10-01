@@ -118,6 +118,7 @@ class MHQRemindersPage extends MHQOptionsPage {
               { "optionSomeoneRandomlyDiedCampFollowerNag", MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_CAMP_FOLLOWER },
               { "optionSomeoneRandomlyDiedRetiredNag", MHQConstants.NAG_SOMEONE_RANDOMLY_DIED_RETIREE },
               { "optionContractJournalPromptNag", MHQConstants.NAG_CONTRACT_JOURNAL_PROMPT },
+              { "optionStratConFacilityBriefingNag", MHQConstants.NAG_STRATCON_FACILITY_BRIEFING },
         };
         return nagCheckBoxGrid("MHQNagContent", nagOptions);
     }
