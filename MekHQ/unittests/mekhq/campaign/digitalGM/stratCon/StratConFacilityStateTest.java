@@ -49,6 +49,7 @@ import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
 import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
+import mekhq.campaign.digitalGM.stratCon.facility.FacilityTrait;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
@@ -462,7 +463,10 @@ class StratConFacilityStateTest {
             assertEquals(2, track.getFacilities().size());
             for (StratConFacility facility : track.getFacilities().values()) {
                 assertEquals(FacilityTier.STRONGHOLD, facility.getTier());
-                assertEquals(3, facility.getGarrison());
+                // A placed facility may roll Undermanned, which holds one step fewer.
+                int expectedMaximum = facility.hasTrait(FacilityTrait.UNDERMANNED) ? 2 : 3;
+                assertEquals(expectedMaximum, facility.getGarrisonMaximum());
+                assertEquals(expectedMaximum, facility.getGarrison());
             }
         }
     }
