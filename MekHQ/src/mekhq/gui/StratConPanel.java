@@ -104,6 +104,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.dialog.StratConTerrainPaintDialog;
+import mekhq.gui.stratCon.StratConFacilityDialog;
 import mekhq.gui.stratCon.deployment.StratConDeploymentWizard;
 import mekhq.utilities.ReportingUtilities;
 
@@ -806,6 +807,13 @@ public class StratConPanel extends JPanel implements ActionListener {
             return;
         }
 
+        if (hasFacilityDetails(coords)) {
+            JMenuItem detailsItem = new JMenuItem(getTextAt(FACILITY_OPERATIONS_BUNDLE,
+                  (currentTrack.getFacility(coords) == null) ? "contextMenu.hexDetails" : "contextMenu.details"));
+            detailsItem.addActionListener(evt -> openFacilityDialog(coords));
+            rightClickMenu.add(detailsItem);
+        }
+
         JMenu ordersMenu = new JMenu(getTextAt(FACILITY_OPERATIONS_BUNDLE, "contextMenu.orders"));
         for (FacilityOperation operation : operations) {
             ordersMenu.add(buildFacilityOrderMenu(coords, contract, operation));
@@ -824,6 +832,77 @@ public class StratConPanel extends JPanel implements ActionListener {
             ordersMenu.add(liftSiegeMenu);
         }
         rightClickMenu.add(ordersMenu);
+    }
+
+    /**
+     * @param coords a hex
+     *
+     * @return {@code true} if the hex has a facility the player can see, or is an empty hex a formation stands on that
+     *       has orders, so it has a facility dialog worth opening
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean hasFacilityDetails(StratConCoords coords) {
+        if ((currentTrack == null) || (campaignState == null) || (campaignState.getContract() == null)) {
+            return false;
+        }
+
+        StratConFacility facility = currentTrack.getFacility(coords);
+        if (facility != null) {
+            boolean isRevealed = currentTrack.hasActiveTrackReveal()
+                                       || currentTrack.getRevealedCoords().contains(coords)
+                                       || currentTrack.isGmRevealed();
+            return isRevealed && facility.isVisible();
+        }
+        return StratConFacilityOperations.isEnabled(campaign)
+                     && currentTrack.areAnyForceDeployedTo(coords)
+                     && !StratConFacilityOperations.getOperationsFor(currentTrack, coords).isEmpty();
+    }
+
+    /**
+     * Opens the facility dialog for a hex, refreshing the map and contract view after each order given from it.
+     *
+     * @param coords the hex
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void openFacilityDialog(StratConCoords coords) {
+        if ((currentTrack == null) || (campaignState == null) || (campaignState.getContract() == null)) {
+            return;
+        }
+
+        new StratConFacilityDialog(JOptionPane.getFrameForComponent(this),
+              campaign,
+              campaignState.getContract(),
+              currentTrack,
+              coords,
+              () -> {
+                  MekHQ.triggerEvent(new MissionChangedEvent(campaignState.getContract()));
+                  infoArea.setText(buildSelectedHexInfo(campaign));
+                  repaint();
+              });
+    }
+
+    /**
+     * Adds the next steps worth pointing out for a hex (see {@link StratConFacilityAdvisor#getHints}) to the hex
+     * information.
+     *
+     * @param infoBuilder the hex information being built
+     * @param coords      the hex
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void appendFacilityHints(StringBuilder infoBuilder, StratConCoords coords) {
+        if ((campaignState == null) || (campaignState.getContract() == null)) {
+            return;
+        }
+        for (String hint : StratConFacilityAdvisor.getHints(campaign, campaignState.getContract(), currentTrack,
+              coords)) {
+            infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.hint", hint));
+        }
     }
 
     private JMenu buildFacilityOrderMenu(StratConCoords coords, AbstractContract contract,
@@ -2206,6 +2285,35 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
+     * Selects a hex, shows its information and scrolls the map so the hex sits roughly in the middle of the view.
+     *
+     * @param coords the hex to focus on
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void focusOnHex(StratConCoords coords) {
+        if (currentTrack == null) {
+            return;
+        }
+        boardState.setSelectedCoords(coords);
+        infoArea.setText(buildSelectedHexInfo(campaign));
+
+        JViewport viewport = getViewport();
+        if (viewport != null) {
+            // The same offsets the map is drawn with (see performInitialTransform and drawHexes); close enough to
+            // centre the hex, which is all this needs.
+            Point center = hexCenter(coords.getX(), coords.getY());
+            int pixelX = (int) ((center.x + HEX_X_RADIUS) * scale);
+            int pixelY = (int) ((center.y + (HEX_Y_RADIUS * 2)) * scale) + HEX_Y_RADIUS;
+            Dimension extent = viewport.getExtentSize();
+            Point proposed = new Point(pixelX - (extent.width / 2), pixelY - (extent.height / 2));
+            viewport.setViewPosition(clampViewPosition(proposed, viewport));
+        }
+        repaint();
+    }
+
+    /**
      * Pans the map by the given screen-pixel delta, clamped to the map edges. Dragging the mouse right/down moves the
      * content the same way, which corresponds to decreasing the view position.
      */
@@ -2306,6 +2414,13 @@ public class StratConPanel extends JPanel implements ActionListener {
             }
 
             repaint();
+
+            // a double-click on a facility, or on a hex a formation could give orders on, opens its details
+            StratConCoords clickedCoords = boardState.getSelectedCoords();
+            if (pointFoundOnBoard && (e.getClickCount() == 2) && (clickedCoords != null)
+                      && hasFacilityDetails(clickedCoords)) {
+                openFacilityDialog(clickedCoords);
+            }
             // right button pops up a context menu
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             clickedPoint = e.getPoint();
@@ -2424,6 +2539,9 @@ public class StratConPanel extends JPanel implements ActionListener {
                 appendFacilityNetworkInfo(infoBuilder, boardState.getSelectedCoords(), facility);
 
                 infoBuilder.append("<span>");
+                appendFacilityHints(infoBuilder, boardState.getSelectedCoords());
+            } else if (facility == null) {
+                appendFacilityHints(infoBuilder, boardState.getSelectedCoords());
             }
 
             for (StratConRoadCut roadCut : currentTrack.getRoadCuts()) {

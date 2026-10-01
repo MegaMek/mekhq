@@ -72,6 +72,7 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.dialog.nagDialogs.ContractSpecialMechanicsNagDialog;
+import mekhq.gui.dialog.nagDialogs.StratConFacilityBriefingNagDialog;
 
 /**
  * Handles a defensive StratCon contract whose employer loses control of the planet the contract is fought on.
@@ -390,6 +391,7 @@ public final class EmployerLostPlanet {
 
         // The contract is now a type the player may not have been briefed on
         ContractSpecialMechanicsNagDialog.showIfDue(campaign, contract);
+        StratConFacilityBriefingNagDialog.showIfDue(campaign, contract);
     }
 
     /**
