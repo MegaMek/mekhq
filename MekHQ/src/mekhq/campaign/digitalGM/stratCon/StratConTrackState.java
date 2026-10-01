@@ -46,7 +46,10 @@ import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
 import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.annotations.Nullable;
+import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOrder;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConRoadCut;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInterestBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.utilities.MHQXMLUtility;
@@ -98,6 +101,12 @@ public class StratConTrackState {
     // points of interest: map objects that are neither scenarios nor facilities; each records its own coordinates
     private List<StratConPointOfInterest> pointsOfInterest;
 
+    // orders that take time, each held by a formation until it completes
+    private List<StratConFacilityOrder> facilityOrders;
+    // supply lines; see StratConFacilitySupply
+    private List<StratConRoadCut> roadCuts;
+    private Set<StratConCoords> cutOffFacilities;
+
     // don't serialize this
     private transient Map<Integer, StratConScenario> backingScenarioMap;
     private transient Map<StratConCoords, StratConStrategicObjective> specificStrategicObjectives;
@@ -136,6 +145,9 @@ public class StratConTrackState {
         roads = new HashSet<>();
         roadExits = new HashSet<>();
         pointsOfInterest = new ArrayList<>();
+        facilityOrders = new ArrayList<>();
+        roadCuts = new ArrayList<>();
+        cutOffFacilities = new HashSet<>();
     }
 
     public String getDisplayableName() {
@@ -222,7 +234,8 @@ public class StratConTrackState {
     }
 
     /**
-     * Removes a StratConScenario from this track.
+     * Removes a StratConScenario from this track, sending home the formations assigned to it. A formation still
+     * besieging a facility stays where it is: the siege outlasts the fight.
      */
     public void removeScenario(StratConScenario scenario) {
         scenarios.remove(scenario.getCoords());
@@ -230,7 +243,10 @@ public class StratConTrackState {
 
         // any assigned forces get cleared out here as well.
         for (int forceID : scenario.getAssignedForces()) {
-            unassignFormation(forceID);
+            StratConFacilityOrder order = getFacilityOrder(forceID);
+            if ((order == null) || (order.getOperation() != FacilityOperation.SIEGE)) {
+                unassignFormation(forceID);
+            }
 
             // scenario bookkeeping
             scenario.getPrimaryForceIDs().clear();
@@ -316,7 +332,11 @@ public class StratConTrackState {
             assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
             assignedForceCoords.remove(forceID);
             assignedForceReturnDates.remove(forceID);
-            removeStickyForce(forceID);
+            // A formation carrying out a facility order - holding a siege through a sortie, say - keeps holding its
+            // position when a fight re-deploys it; the order itself decides when it may leave.
+            if (getFacilityOrder(forceID) == null) {
+                removeStickyForce(forceID);
+            }
             getAssignedForceReturnDatesForStorage().remove(forceID);
         }
     }
@@ -481,12 +501,31 @@ public class StratConTrackState {
      * @return Whether this track has a facility on it that reveals the track.
      */
     public boolean hasActiveTrackReveal() {
-        return getFacilities().values().stream().anyMatch(StratConFacility::getRevealTrack);
+        for (StratConFacility facility : getFacilities().values()) {
+            if (facility.isRevealingTrack()) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Matches every facility loaded from a save written before 0.51.01 to its definition (see
+     * {@link StratConFacility#resolveLegacyData()}). Called once the campaign state has loaded.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void restoreFacilityDefinitions() {
+        for (StratConFacility facility : facilities.values()) {
+            facility.resolveLegacyData();
+        }
     }
 
     /**
      * Whether a facility on this track keeps air and space scenarios from being generated here, whichever side holds
-     * it (see {@link StratConFacility#preventAerospace()}).
+     * it (see {@link StratConFacility#isPreventingAerospace()}).
      *
      * @return {@code true} if no random air or space scenario may be generated on this track
      *
@@ -495,7 +534,7 @@ public class StratConTrackState {
      */
     public boolean isAerospacePrevented() {
         for (StratConFacility facility : getFacilities().values()) {
-            if (facility.preventAerospace()) {
+            if (facility.isPreventingAerospace()) {
                 return true;
             }
         }
@@ -506,7 +545,8 @@ public class StratConTrackState {
     /**
      * Determines how many hexes are added to the scan range of every force scouting this track.
      *
-     * <p>Each facility that increases scan range (see {@link StratConFacility#getIncreaseScanRange()}) adds one hex.
+     * <p>Each facility adds what its current owner's profile gives (see
+     * {@link StratConFacility#getScanRangeIncrease()}).
      * Each point of interest adds whatever its type's behavior decides (see
      * {@link IStratConPointOfInterestBehavior#getScanRangeIncrease}).</p>
      *
@@ -515,9 +555,7 @@ public class StratConTrackState {
     public int getScanRangeIncrease() {
         int scanRange = 0;
         for (StratConFacility facility : getFacilities().values()) {
-            if (facility.getIncreaseScanRange()) {
-                scanRange++;
-            }
+            scanRange += facility.getScanRangeIncrease();
         }
 
         for (StratConPointOfInterest pointOfInterest : pointsOfInterest) {
@@ -759,7 +797,8 @@ public class StratConTrackState {
 
     /**
      * Clears all generated terrain, cities, roads, and hex reveals so the sector can be regenerated from scratch.
-     * Scenarios, facilities, points of interest, and assigned forces are left untouched.
+     * Scenarios, facilities, points of interest, and assigned forces are left untouched; road cuts and the cut-off
+     * record are cleared, since they belong to the old road network.
      */
     public void clearForRegeneration() {
         terrainTypes.clear();
@@ -767,6 +806,9 @@ public class StratConTrackState {
         roads.clear();
         roadExits.clear();
         revealedCoords.clear();
+        // Both are keyed to the old road network and supply picture, which no longer exist
+        roadCuts.clear();
+        cutOffFacilities.clear();
     }
 
     /**
@@ -783,6 +825,8 @@ public class StratConTrackState {
         roads.removeIf(this::isOutOfBounds);
         roadExits.removeIf(this::isOutOfBounds);
         revealedCoords.removeIf(this::isOutOfBounds);
+        roadCuts.removeIf(roadCut -> isOutOfBounds(roadCut.getCoords()));
+        cutOffFacilities.removeIf(this::isOutOfBounds);
     }
 
     /**
@@ -816,6 +860,112 @@ public class StratConTrackState {
         return (pointsOfInterestOnHex == null) ?
                      Collections.emptyList() :
                      Collections.unmodifiableList(pointsOfInterestOnHex);
+    }
+
+    /**
+     * Used for serialization/deserialization. To change the orders, use {@link #addFacilityOrder} and
+     * {@link #removeFacilityOrder}.
+     *
+     * @return the orders under way in this sector that take time to complete
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElementWrapper(name = "facilityOrders")
+    @XmlElement(name = "facilityOrder")
+    public List<StratConFacilityOrder> getFacilityOrders() {
+        return facilityOrders;
+    }
+
+    public void setFacilityOrders(List<StratConFacilityOrder> facilityOrders) {
+        this.facilityOrders = (facilityOrders == null) ? new ArrayList<>() : facilityOrders;
+    }
+
+    /**
+     * @return the road hexes where the player has cut the enemy's supply line, and until when (mutable)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElementWrapper(name = "roadCuts")
+    @XmlElement(name = "roadCut")
+    public List<StratConRoadCut> getRoadCuts() {
+        return roadCuts;
+    }
+
+    public void setRoadCuts(List<StratConRoadCut> roadCuts) {
+        this.roadCuts = (roadCuts == null) ? new ArrayList<>() : roadCuts;
+    }
+
+    /**
+     * @param coords a hex
+     *
+     * @return {@code true} if the enemy's supply line through the hex is cut
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isRoadCut(StratConCoords coords) {
+        for (StratConRoadCut roadCut : roadCuts) {
+            if (coords.equals(roadCut.getCoords())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return the hexes of the facilities that were cut off from their supply lines when last checked (mutable); used
+     *       to report the facilities that are newly cut off or reconnected
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElementWrapper(name = "cutOffFacilities")
+    @XmlElement(name = "cutOffFacility")
+    public Set<StratConCoords> getCutOffFacilities() {
+        return cutOffFacilities;
+    }
+
+    public void setCutOffFacilities(Set<StratConCoords> cutOffFacilities) {
+        this.cutOffFacilities = (cutOffFacilities == null) ? new HashSet<>() : cutOffFacilities;
+    }
+
+    /**
+     * @param order an order that has just been given
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addFacilityOrder(StratConFacilityOrder order) {
+        facilityOrders.add(order);
+    }
+
+    /**
+     * @param order an order that has completed or been abandoned
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void removeFacilityOrder(StratConFacilityOrder order) {
+        facilityOrders.remove(order);
+    }
+
+    /**
+     * @param formationId a formation's ID
+     *
+     * @return the order that formation is carrying out, or {@code null} if it has none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConFacilityOrder getFacilityOrder(int formationId) {
+        for (StratConFacilityOrder order : facilityOrders) {
+            if (order.getFormationId() == formationId) {
+                return order;
+            }
+        }
+        return null;
     }
 
     /**

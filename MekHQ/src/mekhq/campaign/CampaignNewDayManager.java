@@ -2267,7 +2267,7 @@ public class CampaignNewDayManager {
                             continue;
                         }
 
-                        processIgnoredDynamicScenario(scenario.getId(), campaignState);
+                        processIgnoredDynamicScenario(scenario.getId(), campaignState, campaign);
 
                         ScenarioType scenarioType = scenario.getStratConScenarioType();
                         if (scenarioType.isResupply()) {

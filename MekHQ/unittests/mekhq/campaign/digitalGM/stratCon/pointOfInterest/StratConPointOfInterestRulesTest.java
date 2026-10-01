@@ -59,8 +59,11 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.ScanRangeEffect;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest.PointOfInterestStatus;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -290,8 +293,9 @@ class StratConPointOfInterestRulesTest {
 
     @Test
     void scanRangeAddsPointsOfInterestToFacilities() {
-        StratConFacility facility = new StratConFacility();
-        facility.setIncreaseScanRange(true);
+        StratConFacility facility = StratConTestData.facility(ForceAlignment.Allied,
+              FacilityType.DataCenter,
+              new ScanRangeEffect(1));
         track.addFacility(new StratConCoords(0, 0), facility);
         StratConPointOfInterest sensor = place(SENSOR_TYPE_ID, 1, 1);
         sensor.setOwner(ForceAlignment.Player);

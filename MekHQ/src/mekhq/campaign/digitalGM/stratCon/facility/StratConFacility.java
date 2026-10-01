@@ -32,21 +32,33 @@
  */
 package mekhq.campaign.digitalGM.stratCon.facility;
 
-import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.TreeMap;
 
+import jakarta.xml.bind.annotation.XmlAccessType;
+import jakarta.xml.bind.annotation.XmlAccessorType;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlTransient;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiome;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
- * This represents a facility in the StratCon context
+ * A facility placed on a StratCon sector. It refers to its {@link StratConFacilityDefinition} by ID and keeps only its
+ * own state: who holds it, its tier, condition and garrison, how much the player knows about it, whether it has lent
+ * its modifiers this week, whether it is a strategic objective, and any scenario modifiers added when it was placed.
+ * What it does comes from the definition's profile for its current owner, so capturing it is just a change of owner.
+ *
+ * <p>Saves from before 0.51.01 held a full copy of the facility's old-format definition instead of an ID. Those
+ * fields are still read, and {@link #resolveLegacyData()} turns them into a definition ID once loading is done.</p>
  *
  * @author NickAragua
  */
-public class StratConFacility implements Cloneable {
+@XmlAccessorType(XmlAccessType.FIELD)
+public class StratConFacility {
     private static final MMLogger LOGGER = MMLogger.create(StratConFacility.class);
 
     public enum FacilityType {
@@ -60,82 +72,274 @@ public class StratConFacility implements Cloneable {
         CommandCenter,
         EarlyWarningSystem,
         OrbitalDefense,
-        BaseOfOperations
+        BaseOfOperations,
+        /** Links facilities within a few hexes into its holder's supply lines without a road. */
+        SupplyDepot,
+        /** A small post that extends its holder's scan range. */
+        SensorPost,
+        /** Jams the other side's sensors, or hides its holder's movements. */
+        JammingStation,
+        /** Prepared positions that strengthen fights at the hex and nowhere else. */
+        FieldFortifications,
+        /** Militia that change how often fights break out in the sector. */
+        MilitiaBarracks
     }
 
-    private ForceAlignment owner;
-    private String displayableName;
-    private FacilityType facilityType;
-    private String userDescription;
-    private boolean visible;
-    private boolean isAvailable = true;
-    private int aggroRating;
-    private List<String> sharedModifiers = new ArrayList<>();
-    private List<String> localModifiers = new ArrayList<>();
-    private String capturedDefinition;
-    private boolean revealTrack;
-    private boolean increaseScanRange;
-    private int scenarioOddsModifier;
-    private int monthlySPModifier;
-    private boolean preventAerospace;
-    // TODO: post-MVP
-    // private Map<String, Integer> fixedGarrisonUnitStates = new HashMap<>();
-    private boolean isStrategicObjective;
-    private List<StratConBiome> biomes = new ArrayList<>();
+    /**
+     * How large a facility is. The tier caps the facility's garrison.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public enum FacilityTier {
+        OUTPOST(1),
+        BASE(2),
+        STRONGHOLD(3);
 
-    private final transient TreeMap<Integer, StratConBiome> biomeTempMap = new TreeMap<>();
+        private final int garrisonMaximum;
+
+        FacilityTier(int garrisonMaximum) {
+            this.garrisonMaximum = garrisonMaximum;
+        }
+
+        /**
+         * @return the most garrison steps a facility of this tier can hold
+         */
+        public int getGarrisonMaximum() {
+            return garrisonMaximum;
+        }
+
+        /**
+         * @return the next tier up, or this tier if it is already the largest
+         */
+        public FacilityTier next() {
+            return (this == STRONGHOLD) ? STRONGHOLD : values()[ordinal() + 1];
+        }
+    }
+
+    /**
+     * How badly a facility is damaged. A damaged facility's numeric effects are halved and it lends no shared
+     * modifiers; a crippled one has no effects at all. A destroyed facility is removed from the map.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public enum FacilityCondition {
+        INTACT,
+        DAMAGED,
+        CRIPPLED;
+
+        /**
+         * @return the next condition down, or this condition if it is already the worst
+         */
+        public FacilityCondition worsened() {
+            return (this == CRIPPLED) ? CRIPPLED : values()[ordinal() + 1];
+        }
+
+        /**
+         * @return the next condition up, or this condition if it is already intact
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        public FacilityCondition improved() {
+            return (this == INTACT) ? INTACT : values()[ordinal() - 1];
+        }
+    }
+
+    /**
+     * How much the player knows about a facility. Each level shows more: its position and type once
+     * {@link #LOCATED}, its tier and condition once {@link #SCOUTED}, and its garrison once {@link #DETAILED}. The
+     * player always knows everything about a facility their own side holds.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public enum FacilityIntel {
+        UNKNOWN,
+        LOCATED,
+        SCOUTED,
+        DETAILED;
+
+        /**
+         * @param level the level to compare against
+         *
+         * @return {@code true} if this level is at least the given one
+         */
+        public boolean isAtLeast(FacilityIntel level) {
+            return ordinal() >= level.ordinal();
+        }
+
+        /**
+         * @return the next level up, or {@link #DETAILED} if this is already the highest
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        public FacilityIntel next() {
+            return (this == DETAILED) ? DETAILED : values()[ordinal() + 1];
+        }
+    }
+
+    // The garrison ladder: garrison step 1 brings the profile's own local modifiers, and each step above that adds the
+    // next modifier for the holding side, skipping any the profile already has.
+    private static final List<String> ALLIED_GARRISON_LADDER = List.of("AlliedTurrets.json",
+          "AlliedGroundSupport.json");
+    static final String VETERAN_GARRISON_MODIFIER = "Veterans.json";
+    static final String EXPERIMENTAL_WEAPONS_MODIFIER = "GoodEquipment.json";
+    static final String ROOKIES_MODIFIER = "Rookies.json";
+    private static final List<String> HOSTILE_GARRISON_LADDER = List.of("EnemyTurrets.json",
+          "HostileBVBudgetIncrease.json");
+
+    @XmlElement
+    private String definitionId;
+    @XmlElement
+    private ForceAlignment owner;
+    @XmlElement
+    private FacilityTier tier;
+    @XmlElement
+    private FacilityCondition condition;
+    @XmlElement
+    private Integer garrison;
+    @XmlElement
+    private FacilityIntel intel;
+    @XmlElement(name = "isAvailable")
+    private boolean isAvailable = true;
+    @XmlElement(name = "strategicObjective")
+    private boolean isStrategicObjective;
+    // whether the facility has been on its holder's supply lines; see StratConFacilitySupply
+    @XmlElement
+    private boolean networked;
+    @XmlElement(name = "additionalLocalModifier")
+    private List<String> additionalLocalModifiers = new ArrayList<>();
+    @XmlElement(name = "trait")
+    private List<FacilityTrait> traits = new ArrayList<>();
+
+    // Read from saves written before 0.51.01, which held a copy of the whole old-format definition. Emptied once the
+    // facility is matched to a definition, so they are only written back for a facility that could not be matched.
+    @XmlElement(name = "visible")
+    private Boolean legacyVisible;
+    @XmlElement(name = "displayableName")
+    private String legacyDisplayableName;
+    @XmlElement(name = "facilityType")
+    private FacilityType legacyFacilityType;
+    @XmlElement(name = "userDescription")
+    private String legacyUserDescription;
+    @XmlElement(name = "sharedModifiers")
+    private List<String> legacySharedModifiers;
+    @XmlElement(name = "localModifiers")
+    private List<String> legacyLocalModifiers;
+    @XmlElement(name = "revealTrack")
+    private Boolean legacyRevealTrack;
+    @XmlElement(name = "increaseScanRange")
+    private Boolean legacyIncreaseScanRange;
+    @XmlElement(name = "scenarioOddsModifier")
+    private Integer legacyScenarioOddsModifier;
+    @XmlElement(name = "monthlySPModifier")
+    private Integer legacyMonthlySPModifier;
+
+    /**
+     * A definition held by this facility alone rather than looked up by ID: one built in code (tests, tools), one
+     * made from an unmatched old save, or a placeholder for an ID that no loaded definition has.
+     */
+    @XmlTransient
+    private StratConFacilityDefinition detachedDefinition;
+
+    // whether detachedDefinition is a placeholder for an ID no loaded definition has
+    @XmlTransient
+    private boolean isDefinitionMissing;
 
     /**
      * A temporary variable used to track situations where changing the ownership of this facility hinges upon multiple
      * objectives
      */
-    private transient int ownershipChangeScore;
+    @XmlTransient
+    private int ownershipChangeScore;
 
-    @Override
-    public StratConFacility clone() {
-        StratConFacility clone = new StratConFacility();
-        clone.owner = owner;
-        clone.displayableName = displayableName;
-        clone.facilityType = facilityType;
-        clone.visible = visible;
-        clone.isAvailable = isAvailable;
-        clone.sharedModifiers = new ArrayList<>(sharedModifiers);
-        clone.localModifiers = new ArrayList<>(localModifiers);
-        clone.setCapturedDefinition(capturedDefinition);
-        clone.revealTrack = revealTrack;
-        clone.increaseScanRange = increaseScanRange;
-        clone.scenarioOddsModifier = scenarioOddsModifier;
-        clone.monthlySPModifier = monthlySPModifier;
-        clone.preventAerospace = preventAerospace;
-        clone.userDescription = userDescription;
-        clone.biomes = new ArrayList<>(biomes);
-        ReconstructTransientData(clone);
-        return clone;
+    /**
+     * For loading from saves only.
+     */
+    public StratConFacility() {
     }
 
     /**
-     * Copies data from the source facility to here, including its name and type. Reconstructs file-driven transient
-     * data.
+     * Creates a facility of the given type, held by the given side.
      *
-     * <p>Visibility is only ever gained, never lost: a facility the player has already seen stays visible after it
-     * changes hands, even when the new owner's definition would start hidden.</p>
+     * @param definition the facility's type
+     * @param owner      the side that holds it
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    public void copyRulesDataFrom(StratConFacility facility) {
-        setDisplayableName(facility.getDisplayableName());
-        setFacilityType(facility.getFacilityType());
-        setVisible(visible || facility.getVisible());
-        setCapturedDefinition(facility.getCapturedDefinition());
-        setLocalModifiers(new ArrayList<>(facility.getLocalModifiers()));
-        setSharedModifiers(new ArrayList<>(facility.getSharedModifiers()));
-        setOwner(facility.getOwner());
-        setRevealTrack(facility.getRevealTrack());
-        setIncreaseScanRange(facility.getIncreaseScanRange());
-        setScenarioOddsModifier(facility.getScenarioOddsModifier());
-        setMonthlySPModifier(facility.getMonthlySPModifier());
-        setPreventAerospace(facility.preventAerospace());
-        setBiomes(new ArrayList<>(facility.getBiomes()));
-        setUserDescription(facility.getUserDescription());
-        ReconstructTransientData(this);
+    public StratConFacility(StratConFacilityDefinition definition, ForceAlignment owner) {
+        this.definitionId = definition.getId();
+        this.owner = owner;
+        this.tier = FacilityTier.BASE;
+        this.condition = FacilityCondition.INTACT;
+        this.garrison = FacilityTier.BASE.getGarrisonMaximum();
+        this.intel = FacilityIntel.UNKNOWN;
+        if (StratConFacilityFactory.getDefinition(definition.getId()) != definition) {
+            detachedDefinition = definition;
+        }
+    }
+
+    /**
+     * @return the ID of the facility's definition
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String getDefinitionId() {
+        return definitionId;
+    }
+
+    /**
+     * @return the facility's definition. If no loaded definition has its ID, an empty placeholder named after the ID,
+     *       so a facility whose data has gone missing does nothing rather than breaking the sector.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConFacilityDefinition getDefinition() {
+        if (detachedDefinition != null) {
+            return detachedDefinition;
+        }
+
+        StratConFacilityDefinition definition = StratConFacilityFactory.getDefinition(definitionId);
+        if (definition == null) {
+            LOGGER.warn("No facility definition {} is loaded; the facility will have no effects", definitionId);
+            detachedDefinition = new StratConFacilityDefinition(definitionId,
+                  String.valueOf(definitionId),
+                  FacilityType.BaseOfOperations,
+                  null,
+                  null);
+            isDefinitionMissing = true;
+            return detachedDefinition;
+        }
+
+        return definition;
+    }
+
+    /**
+     * @return {@code true} if no loaded definition has the facility's ID, so it stands on a placeholder. Its type is
+     *       only a stand-in for drawing it: it is no source of supply and no synergy partner.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isDefinitionMissing() {
+        getDefinition();
+        return isDefinitionMissing;
+    }
+
+    /**
+     * @return the profile that applies while the facility's current owner holds it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StratConFacilityProfile getProfile() {
+        return getDefinition().getProfileFor(owner);
     }
 
     public ForceAlignment getOwner() {
@@ -143,7 +347,105 @@ public class StratConFacility implements Cloneable {
     }
 
     public void setOwner(ForceAlignment owner) {
+        boolean isSideChanged = (this.owner != null)
+                                      && (StratConFacilityDefinition.isAlliedToPlayer(this.owner)
+                                                != StratConFacilityDefinition.isAlliedToPlayer(owner));
         this.owner = owner;
+        // A facility changing sides joins its new holder's supply lines afresh, its old garrison's traits go with its
+        // old garrison, and the modifiers it was given at placement - such as those of the objective it served - were
+        // its old holder's, not the new one's.
+        if (isSideChanged) {
+            networked = false;
+            getTraits().removeIf(FacilityTrait::isGarrisonTrait);
+            additionalLocalModifiers.clear();
+        }
+    }
+
+    /**
+     * @return the facility's traits, in the order they were given; the list itself, so callers may change it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<FacilityTrait> getTraits() {
+        if (traits == null) {
+            traits = new ArrayList<>();
+        }
+        return traits;
+    }
+
+    /**
+     * @param trait a trait
+     *
+     * @return {@code true} if the facility has it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean hasTrait(FacilityTrait trait) {
+        return getTraits().contains(trait);
+    }
+
+    /**
+     * Gives the facility a trait, unless it already has it. A conflicting trait it has is replaced.
+     *
+     * @param trait the trait to give
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addTrait(FacilityTrait trait) {
+        if (hasTrait(trait)) {
+            return;
+        }
+        FacilityTrait conflictingTrait = trait.getConflictingTrait();
+        if (conflictingTrait != null) {
+            getTraits().remove(conflictingTrait);
+        }
+        getTraits().add(trait);
+        // An undermanned facility may now hold more than it can.
+        if (garrison != null) {
+            setGarrison(garrison);
+        }
+    }
+
+    /**
+     * Takes a trait away from the facility, if it has it.
+     *
+     * @param trait the trait to remove
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void removeTrait(FacilityTrait trait) {
+        getTraits().remove(trait);
+    }
+
+    /**
+     * @return {@code true} if the facility's garrison is low enough that it surrenders to a siege: none left, or one
+     *       step left for a garrison with poor morale
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isReadyToSurrender() {
+        int surrenderThreshold = hasTrait(FacilityTrait.POOR_MORALE) ? 1 : 0;
+        return getGarrison() <= surrenderThreshold;
+    }
+
+    /**
+     * @return {@code true} if the facility has been linked to its holder's supply lines since it last changed sides.
+     *       Only such a facility can be cut off; one that was never on them supplies itself.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isNetworked() {
+        return networked;
+    }
+
+    public void setNetworked(boolean networked) {
+        this.networked = networked;
     }
 
     /**
@@ -151,39 +453,165 @@ public class StratConFacility implements Cloneable {
      *       {@code false} otherwise.
      */
     public boolean isOwnerAlliedToPlayer() {
-        return owner == ForceAlignment.Allied || owner == ForceAlignment.Player;
+        return StratConFacilityDefinition.isAlliedToPlayer(owner);
     }
 
     public String getFormattedDisplayableName() {
-        return String.format("%s %s", getOwner() == ForceAlignment.Allied ? "Allied" : "Hostile", getDisplayableName());
+        return String.format("%s %s", isOwnerAlliedToPlayer() ? "Allied" : "Hostile", getDisplayableName());
     }
 
     public String getDisplayableName() {
-        return displayableName;
-    }
-
-    public void setDisplayableName(String displayableName) {
-        this.displayableName = displayableName;
+        return getDefinition().getDisplayableName();
     }
 
     public FacilityType getFacilityType() {
-        return facilityType;
+        return getDefinition().getFacilityType();
     }
 
-    public void setFacilityType(FacilityType facilityType) {
-        this.facilityType = facilityType;
+    /**
+     * @return what the facility does while its current owner holds it, or {@code null} if the profile has no
+     *       description
+     */
+    public @Nullable String getUserDescription() {
+        return getProfile().getDescription();
     }
 
+    /**
+     * @return the facility's tier; {@link FacilityTier#BASE} for one saved before tiers existed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public FacilityTier getTier() {
+        return (tier == null) ? FacilityTier.BASE : tier;
+    }
+
+    /**
+     * Sets the facility's tier, trimming its garrison to the new tier's maximum.
+     *
+     * @param tier the new tier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setTier(FacilityTier tier) {
+        this.tier = tier;
+        setGarrison(getGarrison());
+    }
+
+    /**
+     * @return the facility's condition; {@link FacilityCondition#INTACT} for one saved before conditions existed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public FacilityCondition getCondition() {
+        return (condition == null) ? FacilityCondition.INTACT : condition;
+    }
+
+    public void setCondition(FacilityCondition condition) {
+        this.condition = condition;
+    }
+
+    /**
+     * @return the facility's garrison, in steps from 0 to its tier's maximum; a full garrison for one saved before
+     *       garrisons existed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getGarrison() {
+        return (garrison == null) ? getGarrisonMaximum() : garrison;
+    }
+
+    /**
+     * Sets the facility's garrison, kept between 0 and its tier's maximum.
+     *
+     * @param garrison the new garrison, in steps
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setGarrison(int garrison) {
+        this.garrison = Math.max(0, Math.min(garrison, getGarrisonMaximum()));
+    }
+
+    /**
+     * @return the most garrison steps the facility can hold: its tier's maximum, one fewer if it is undermanned
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getGarrisonMaximum() {
+        int garrisonMaximum = getTier().getGarrisonMaximum();
+        if (hasTrait(FacilityTrait.UNDERMANNED)) {
+            garrisonMaximum = Math.max(1, garrisonMaximum - 1);
+        }
+        return garrisonMaximum;
+    }
+
+    /**
+     * @return how much the player knows about the facility. Everything, if the player's side holds it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public FacilityIntel getIntel() {
+        if (isOwnerAlliedToPlayer()) {
+            return FacilityIntel.DETAILED;
+        }
+        return (intel == null) ? FacilityIntel.UNKNOWN : intel;
+    }
+
+    /**
+     * Sets how much the player knows about the facility, whether more or less than before.
+     *
+     * @param intel the new intel level
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setIntel(FacilityIntel intel) {
+        this.intel = intel;
+    }
+
+    /**
+     * Raises how much the player knows about the facility to at least the given level. Never lowers it.
+     *
+     * @param level the level the player now has at least
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void raiseIntel(FacilityIntel level) {
+        if (!getIntel().isAtLeast(level)) {
+            intel = level;
+        }
+    }
+
+    /**
+     * @return {@code true} if the player knows at least where the facility is
+     */
     public boolean getVisible() {
-        return visible;
+        return getIntel().isAtLeast(FacilityIntel.LOCATED);
     }
 
+    /**
+     * Shorthand for the two intel changes most callers need: {@code true} raises intel to at least
+     * {@link FacilityIntel#SCOUTED}, as scouting the hex does; {@code false} hides the facility entirely.
+     *
+     * @param visible whether the player has seen the facility
+     */
     public void setVisible(boolean visible) {
-        this.visible = visible;
+        if (visible) {
+            raiseIntel(FacilityIntel.SCOUTED);
+        } else {
+            intel = FacilityIntel.UNKNOWN;
+        }
     }
 
     public boolean isVisible() {
-        return (owner == ForceAlignment.Allied) || visible;
+        return (owner == ForceAlignment.Allied) || getVisible();
     }
 
     public boolean getIsAvailable() {
@@ -199,35 +627,92 @@ public class StratConFacility implements Cloneable {
     }
 
     /**
-     * This is a list of scenario modifier IDs that affect scenarios in the same track as this facility.
+     * This is a list of scenario modifier IDs that affect scenarios in the same track as this facility. A damaged or
+     * crippled facility lends none.
      */
     public List<String> getSharedModifiers() {
-        return sharedModifiers;
-    }
-
-    public void setSharedModifiers(List<String> sharedModifiers) {
-        this.sharedModifiers = sharedModifiers;
+        if (getCondition() != FacilityCondition.INTACT) {
+            return new ArrayList<>();
+        }
+        return getProfile().getSharedModifierIds();
     }
 
     /**
-     * This is a list of scenario modifier IDs that affect scenarios involving this facility directly.
+     * This is a list of scenario modifier IDs that affect scenarios involving this facility directly: its garrison's,
+     * then any added when the facility was placed.
+     *
+     * <p>The garrison follows a ladder. With none left, the facility has no defenders of its own. At one step it has
+     * the current profile's local modifiers; each step above that adds the next garrison modifier for the holding
+     * side that the profile doesn't already have.</p>
      */
     public List<String> getLocalModifiers() {
-        return localModifiers;
+        List<String> modifiers = new ArrayList<>();
+        int garrisonSteps = getGarrison();
+        if (garrisonSteps >= 1) {
+            modifiers.addAll(getProfile().getLocalModifierIds());
+        }
+
+        List<String> ladder = isOwnerAlliedToPlayer() ? ALLIED_GARRISON_LADDER : HOSTILE_GARRISON_LADDER;
+        // Each step above the first adds the next ladder modifier the facility doesn't already have, so every step
+        // lost weakens the fight even where the profile shares a modifier with the ladder.
+        int stepsToAdd = garrisonSteps - 1;
+        for (int index = 0; (index < ladder.size()) && (stepsToAdd > 0); index++) {
+            String ladderModifier = ladder.get(index);
+            if (!modifiers.contains(ladderModifier)) {
+                modifiers.add(ladderModifier);
+                stepsToAdd--;
+            }
+        }
+
+        modifiers.addAll(additionalLocalModifiers);
+        // The traits belong to the garrison and the kit it fights with; with no garrison left, there is no one to
+        // carry them into the fight.
+        if (garrisonSteps >= 1) {
+            addTraitModifiers(modifiers);
+        }
+        return modifiers;
     }
 
-    public void setLocalModifiers(List<String> localModifiers) {
-        this.localModifiers = localModifiers;
+    // The scenario modifiers an enemy facility's traits add to fights there. These modifiers only work on the opposing
+    // side, so the same traits on a facility the player's side holds act through the rules instead.
+    private void addTraitModifiers(List<String> modifiers) {
+        if (isOwnerAlliedToPlayer()) {
+            return;
+        }
+        if (hasTrait(FacilityTrait.VETERAN_GARRISON)) {
+            // A veteran garrison replaces a green one (such as a Militia Barracks' training cadre) rather than
+            // cancelling it out.
+            modifiers.remove(ROOKIES_MODIFIER);
+            if (!modifiers.contains(VETERAN_GARRISON_MODIFIER)) {
+                modifiers.add(VETERAN_GARRISON_MODIFIER);
+            }
+        }
+        if (hasTrait(FacilityTrait.EXPERIMENTAL_WEAPONS) && !modifiers.contains(EXPERIMENTAL_WEAPONS_MODIFIER)) {
+            modifiers.add(EXPERIMENTAL_WEAPONS_MODIFIER);
+        }
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public int getAggroRating() {
-        return aggroRating;
+    /**
+     * @return the scenario modifier IDs added to this facility alone when it was placed, such as those of the
+     *       objective it serves
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public List<String> getAdditionalLocalModifiers() {
+        return Collections.unmodifiableList(additionalLocalModifiers);
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public void setAggroRating(int rating) {
-        aggroRating = rating;
+    /**
+     * Adds scenario modifiers to this facility alone, on top of its profile's local modifiers.
+     *
+     * @param modifiers the scenario modifier IDs to add
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addAdditionalLocalModifiers(List<String> modifiers) {
+        additionalLocalModifiers.addAll(modifiers);
     }
 
     public boolean isStrategicObjective() {
@@ -239,11 +724,14 @@ public class StratConFacility implements Cloneable {
     }
 
     public List<StratConBiome> getBiomes() {
-        return biomes;
+        return getDefinition().getBiomes();
     }
 
-    public void setBiomes(List<StratConBiome> biomes) {
-        this.biomes = biomes;
+    /**
+     * Returns the biome temperature map (note: temperature mapping is in kelvins but stored in Celsius)
+     */
+    public TreeMap<Integer, StratConBiome> getBiomeTempMap() {
+        return getDefinition().getBiomeTempMap();
     }
 
     public void incrementOwnershipChangeScore() {
@@ -254,134 +742,178 @@ public class StratConFacility implements Cloneable {
         ownershipChangeScore--;
     }
 
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public void clearOwnershipChangeScore() {
-        ownershipChangeScore = 0;
-    }
-
     public int getOwnershipChangeScore() {
         return ownershipChangeScore;
     }
 
     /**
-     * If present, this is the name of the definition file to draw from when switching facility ownership.
+     * Resets the ownership change score once a scenario's outcome has been settled, so it cannot carry over into the
+     * next scenario fought on this facility.
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    public String getCapturedDefinition() {
-        return capturedDefinition;
+    public void clearOwnershipChangeScore() {
+        ownershipChangeScore = 0;
     }
 
-    public void setCapturedDefinition(String capturedDefinition) {
-        this.capturedDefinition = capturedDefinition;
+    /**
+     * @return whether the facility reveals its whole sector while its current owner holds it; never while crippled
+     */
+    public boolean isRevealingTrack() {
+        return !isCrippled() && getProfile().isRevealingTrack();
     }
 
-    public boolean getRevealTrack() {
-        return revealTrack;
+    /**
+     * @return hexes the facility adds to the scan range of forces scouting its sector while its current owner holds
+     *       it, adjusted for its condition
+     */
+    public int getScanRangeIncrease() {
+        return applyCondition(getProfile().getScanRangeIncrease());
     }
 
-    public void setRevealTrack(boolean revealTrack) {
-        this.revealTrack = revealTrack;
-    }
-
-    public boolean getIncreaseScanRange() {
-        return increaseScanRange;
-    }
-
-    public void setIncreaseScanRange(boolean increaseScanRange) {
-        this.increaseScanRange = increaseScanRange;
-    }
-
+    /**
+     * @return the facility's change to its sector's scenario odds, adjusted for its condition
+     */
     public int getScenarioOddsModifier() {
-        return scenarioOddsModifier;
-    }
-
-    public void setScenarioOddsModifier(int scenarioOddsModifier) {
-        this.scenarioOddsModifier = scenarioOddsModifier;
+        return applyCondition(getProfile().getScenarioOddsModifier());
     }
 
     /**
-     * @return The facility's monthly SP (Support Points) modifier as an integer.
+     * @return the facility's monthly Employer Support change while its current owner holds it, with any extra from a
+     *       well-stocked facility your side holds, adjusted for its condition
      */
-    public int getMonthlySPModifier() {
-        return monthlySPModifier;
+    public int getMonthlySupportPoints() {
+        int supportPoints = getProfile().getMonthlySupportPoints();
+        if (isOwnerAlliedToPlayer() && hasTrait(FacilityTrait.WELL_STOCKED)) {
+            supportPoints += FacilityTrait.WELL_STOCKED_MONTHLY_SUPPORT;
+        }
+        return applyCondition(supportPoints);
     }
 
     /**
-     * Sets a new value for the monthly SP (Support Points) modifier.
+     * @return whether the facility keeps air and space scenarios out of its sector; never while crippled
+     */
+    public boolean isPreventingAerospace() {
+        return !isCrippled() && getProfile().isPreventingAerospace();
+    }
+
+    private boolean isCrippled() {
+        return getCondition() == FacilityCondition.CRIPPLED;
+    }
+
+    /**
+     * @param value a numeric effect at full strength
      *
-     * @param monthlySPModifier The new monthly SP modifier value.
+     * @return the value in full while intact, halved (rounding toward zero) while damaged, and nothing while crippled
      */
-    public void setMonthlySPModifier(int monthlySPModifier) {
-        this.monthlySPModifier = monthlySPModifier;
+    private int applyCondition(int value) {
+        return switch (getCondition()) {
+            case INTACT -> value;
+            case DAMAGED -> value / 2;
+            case CRIPPLED -> 0;
+        };
     }
 
     /**
-     * Returns the biome temperature map (note: temperature mapping is in kelvins but stored in Celsius)
-     */
-    public TreeMap<Integer, StratConBiome> getBiomeTempMap() {
-        return biomeTempMap;
-    }
-
-    /**
-     * Attempt to deserialize an instance of a StratConFacility from the passed-in file name
+     * Worsens the facility after a fight on it that its holder lost: its condition drops one step, unless it is
+     * hardened, and its garrison loses one step.
      *
-     * @return Possibly an instance of a StratConFacility
+     * @author Illiani
+     * @since 0.51.01
      */
-    public static StratConFacility deserialize(String fileName) {
-        File inputFile = new File(fileName);
-        if (!inputFile.exists()) {
-            LOGGER.warn("Specified file {} does not exist", fileName);
-            return null;
+    public void applyAttackerVictory() {
+        // A hardened facility shrugs off an attack that does not take it.
+        if (!hasTrait(FacilityTrait.HARDENED)) {
+            setCondition(getCondition().worsened());
         }
-
-        StratConFacility resultingFacility;
-        try {
-            resultingFacility = StratConFacilityJson.fromFile(inputFile);
-        } catch (Exception e) {
-            LOGGER.error("Error Deserializing Facility {}", fileName, e);
-            return null;
-        }
-
-        if (resultingFacility == null) {
-            return null;
-        }
-
-        ReconstructTransientData(resultingFacility);
-
-        return resultingFacility;
+        setGarrison(getGarrison() - 1);
     }
 
     /**
-     * Serialize this facility to a JSON file, led by the MegaMek Data license header. Please pass in a non-null file.
+     * Costs the facility one garrison step after a fight on it that its holder did not lose.
      *
-     * @param outputFile The destination file.
+     * @author Illiani
+     * @since 0.51.01
      */
-    public void Serialize(File outputFile) {
-        try {
-            StratConFacilityJson.toFile(this, outputFile);
-        } catch (Exception e) {
-            LOGGER.error("Error serializing {}", outputFile.getPath(), e);
+    public void applyDefenderHeld() {
+        setGarrison(getGarrison() - 1);
+    }
+
+    /**
+     * Turns the old-format definition copy held by a facility from a save written before 0.51.01 into a definition ID.
+     * The facility is matched to the loaded definition of the same {@link FacilityType}; any local modifiers beyond
+     * that definition's own are kept as the facility's additional ones. A facility that matches no loaded definition
+     * keeps its old data as a detached definition, so it still behaves as it did.
+     *
+     * <p>Saves from before 0.51.01 also held a plain visibility flag, which becomes an intel level: seen facilities
+     * count as {@link FacilityIntel#SCOUTED}. Tier, condition and garrison take their defaults for such facilities
+     * (a full {@link FacilityTier#BASE}).</p>
+     *
+     * <p>Matching does nothing for a facility that already has a definition ID.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void resolveLegacyData() {
+        if (legacyVisible != null) {
+            if (intel == null) {
+                intel = legacyVisible ? FacilityIntel.SCOUTED : FacilityIntel.UNKNOWN;
+            }
+            legacyVisible = null;
         }
-    }
 
-    private static void ReconstructTransientData(StratConFacility facility) {
-        for (StratConBiome biome : facility.getBiomes()) {
-            facility.getBiomeTempMap().put(biome.allowedTemperatureLowerBound, biome);
+        if ((definitionId != null) || (legacyFacilityType == null)) {
+            return;
         }
+
+        StratConFacilityDefinition definition = StratConFacilityFactory.getDefinitionForType(legacyFacilityType);
+        if (definition == null) {
+            detachedDefinition = buildLegacyDefinition();
+            definitionId = detachedDefinition.getId();
+            LOGGER.warn("No facility definition of type {} is loaded; keeping the saved data for {}",
+                  legacyFacilityType,
+                  legacyDisplayableName);
+            return;
+        }
+
+        definitionId = definition.getId();
+
+        List<String> remainingModifiers = new ArrayList<>();
+        if (legacyLocalModifiers != null) {
+            remainingModifiers.addAll(legacyLocalModifiers);
+        }
+        for (String profileModifier : definition.getProfileFor(owner).getLocalModifierIds()) {
+            remainingModifiers.remove(profileModifier);
+        }
+        additionalLocalModifiers.addAll(remainingModifiers);
+
+        legacyDisplayableName = null;
+        legacyFacilityType = null;
+        legacyUserDescription = null;
+        legacySharedModifiers = null;
+        legacyLocalModifiers = null;
+        legacyRevealTrack = null;
+        legacyIncreaseScanRange = null;
+        legacyScenarioOddsModifier = null;
+        legacyMonthlySPModifier = null;
     }
 
-    public boolean preventAerospace() {
-        return preventAerospace;
-    }
-
-    public void setPreventAerospace(boolean preventAerospace) {
-        this.preventAerospace = preventAerospace;
-    }
-
-    public String getUserDescription() {
-        return userDescription;
-    }
-
-    public void setUserDescription(String userDescription) {
-        this.userDescription = userDescription;
+    /**
+     * @return a one-sided definition built from the old-format data a save held for this facility
+     */
+    private StratConFacilityDefinition buildLegacyDefinition() {
+        LegacyStratConFacilityData legacyData = new LegacyStratConFacilityData();
+        legacyData.owner = owner;
+        legacyData.displayableName = legacyDisplayableName;
+        legacyData.facilityType = legacyFacilityType;
+        legacyData.userDescription = legacyUserDescription;
+        legacyData.sharedModifiers = legacySharedModifiers;
+        legacyData.localModifiers = legacyLocalModifiers;
+        legacyData.revealTrack = Boolean.TRUE.equals(legacyRevealTrack);
+        legacyData.increaseScanRange = Boolean.TRUE.equals(legacyIncreaseScanRange);
+        legacyData.scenarioOddsModifier = (legacyScenarioOddsModifier == null) ? 0 : legacyScenarioOddsModifier;
+        legacyData.monthlySPModifier = (legacyMonthlySPModifier == null) ? 0 : legacyMonthlySPModifier;
+        return legacyData.toDefinition("legacy-" + legacyFacilityType.name());
     }
 }

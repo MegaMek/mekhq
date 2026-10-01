@@ -32,11 +32,16 @@
  */
 package mekhq.campaign.digitalGM.stratCon.strategy;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.IFacilityStrategy;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySiege;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 
@@ -53,6 +58,38 @@ public class StratConFacilityStrategy implements IFacilityStrategy {
     public void applyPeriodicEffects(StratConTrackState track, StratConCampaignState campaignState,
           boolean isStartOfMonth) {
         StratConRulesManager.processFacilityEffects(track, campaignState, isStartOfMonth);
+    }
+
+    @Override
+    public void processFacilityOrders(StratConTrackState track, Campaign campaign) {
+        StratConFacilityOperations.processOrders(track, campaign);
+    }
+
+    @Override
+    public void processSieges(StratConTrackState track, Campaign campaign) {
+        StratConFacilitySiege.processSieges(track, campaign);
+    }
+
+    @Override
+    public void applyMonthlyUpkeep(StratConTrackState track, Campaign campaign) {
+        StratConEnemyFacilityActivity.applyMonthlyUpkeep(track, campaign);
+    }
+
+    @Override
+    public void processSupply(StratConTrackState track, Campaign campaign, boolean isStartOfMonth) {
+        StratConFacilitySupply.processSupply(track, campaign, isStartOfMonth);
+    }
+
+    @Override
+    public void processEnemyActivity(Campaign campaign, AbstractContract contract,
+          StratConCampaignState campaignState) {
+        StratConEnemyFacilityActivity.processEnemyEngineers(campaign, contract, campaignState);
+    }
+
+    @Override
+    public int launchCounterattacks(Campaign campaign, AbstractContract contract,
+          StratConCampaignState campaignState, int scenarioCount) {
+        return StratConEnemyFacilityActivity.launchCounterattacks(campaign, contract, campaignState, scenarioCount);
     }
 
     @Override

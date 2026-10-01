@@ -55,6 +55,11 @@ import java.util.Set;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityDefinition;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.PreventAerospaceEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.ScanRangeEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.ScenarioOddsEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityProfile;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
 import org.junit.jupiter.api.BeforeAll;
@@ -64,7 +69,7 @@ import org.mockito.MockedStatic;
 
 /**
  * Tests the StratCon facility rules: facilities that prevent aerospace, the objective type given to placed objective
- * facilities, what a captured facility takes from its new owner's definition, and which facilities count against the
+ * facilities, what a captured facility does for its new owner, and which facilities count against the
  * non-objective share.
  *
  * @author Illiani
@@ -95,10 +100,9 @@ class StratConFacilityRulesTest {
     }
 
     private static StratConFacility facility(ForceAlignment owner, boolean preventAerospace) {
-        StratConFacility facility = new StratConFacility();
-        facility.setOwner(owner);
-        facility.setPreventAerospace(preventAerospace);
-        return facility;
+        return preventAerospace ?
+                     StratConTestData.facility(owner, FacilityType.OrbitalDefense, new PreventAerospaceEffect()) :
+                     StratConTestData.facility(owner, FacilityType.MekBase);
     }
 
     @Nested
@@ -262,57 +266,60 @@ class StratConFacilityRulesTest {
     }
 
     @Nested
-    class CaptureCopy {
-        private StratConFacility capturedDefinition(boolean visible) {
-            StratConFacility definition = new StratConFacility();
-            definition.setOwner(ForceAlignment.Allied);
-            definition.setDisplayableName("Allied Data Center");
-            definition.setFacilityType(FacilityType.DataCenter);
-            definition.setVisible(visible);
-            return definition;
-        }
-
-        private StratConFacility hostileFacility(boolean visible) {
-            StratConFacility facility = new StratConFacility();
-            facility.setOwner(ForceAlignment.Opposing);
-            facility.setDisplayableName("Hostile Comms Center");
-            facility.setFacilityType(FacilityType.CommandCenter);
-            facility.setVisible(visible);
-            return facility;
-        }
+    class OwnerSwitch {
+        private final StratConFacilityDefinition dataCenter = new StratConFacilityDefinition("TestDataCenter",
+              "Data Center",
+              FacilityType.DataCenter,
+              new StratConFacilityProfile("Allied scan", List.of(new ScanRangeEffect(1))),
+              new StratConFacilityProfile("Hostile odds", List.of(new ScenarioOddsEffect(5))));
 
         @Test
-        void theNameTypeAndOwnerAreCopied() {
-            StratConFacility facility = hostileFacility(true);
-            facility.copyRulesDataFrom(capturedDefinition(true));
+        void aCapturedFacilityTakesTheProfileOfItsNewOwner() {
+            StratConFacility facility = new StratConFacility(dataCenter, ForceAlignment.Opposing);
+            assertEquals(5, facility.getScenarioOddsModifier());
+            assertEquals(0, facility.getScanRangeIncrease());
 
-            assertEquals("Allied Data Center", facility.getDisplayableName());
-            assertEquals(FacilityType.DataCenter, facility.getFacilityType());
+            StratConRulesManager.switchFacilityOwner(facility);
+
             assertEquals(ForceAlignment.Allied, facility.getOwner());
+            assertEquals("TestDataCenter", facility.getDefinitionId(), "capture changes the owner, not the type");
+            assertEquals("Data Center", facility.getDisplayableName());
+            assertEquals("Allied scan", facility.getUserDescription());
+            assertEquals(1, facility.getScanRangeIncrease());
+            assertEquals(0, facility.getScenarioOddsModifier());
         }
 
         @Test
-        void aSeenFacilityStaysVisibleWhenTheDefinitionStartsHidden() {
-            StratConFacility facility = hostileFacility(true);
-            facility.copyRulesDataFrom(capturedDefinition(false));
+        void anAlliedFacilityTakenByTheEnemyStaysVisible() {
+            // Allied facilities are always shown, even if never scouted; losing one must not hide it again.
+            StratConFacility facility = new StratConFacility(dataCenter, ForceAlignment.Allied);
+            assertTrue(facility.isVisible());
 
-            assertTrue(facility.getVisible());
+            StratConRulesManager.switchFacilityOwner(facility);
+
+            assertEquals(ForceAlignment.Opposing, facility.getOwner());
+            assertTrue(facility.isVisible());
         }
 
         @Test
-        void aHiddenFacilityBecomesVisibleWhenTheDefinitionStartsVisible() {
-            StratConFacility facility = hostileFacility(false);
-            facility.copyRulesDataFrom(capturedDefinition(true));
+        void aFacilityThatWasAlliedStaysVisibleAfterTheEnemyRetakesIt() {
+            StratConFacility facility = new StratConFacility(dataCenter, ForceAlignment.Opposing);
+            StratConRulesManager.switchFacilityOwner(facility);
+            StratConRulesManager.switchFacilityOwner(facility);
 
-            assertTrue(facility.getVisible());
+            assertEquals(ForceAlignment.Opposing, facility.getOwner());
+            assertTrue(facility.getVisible(), "it was allied, and so shown, in between");
         }
 
         @Test
-        void aHiddenFacilityStaysHiddenWhenTheDefinitionStartsHidden() {
-            StratConFacility facility = hostileFacility(false);
-            facility.copyRulesDataFrom(capturedDefinition(false));
+        void aPlayerHeldFacilityCountsAsAllied() {
+            StratConFacility facility = new StratConFacility(dataCenter, ForceAlignment.Player);
 
-            assertFalse(facility.getVisible());
+            assertEquals(1, facility.getScanRangeIncrease());
+
+            StratConRulesManager.switchFacilityOwner(facility);
+
+            assertEquals(ForceAlignment.Opposing, facility.getOwner());
         }
     }
 

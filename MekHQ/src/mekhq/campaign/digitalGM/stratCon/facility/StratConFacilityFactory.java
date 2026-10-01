@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.facility;
 
+import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -43,29 +44,29 @@ import megamek.codeUtilities.ObjectUtility;
 import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityJson.LoadedFacilityDefinition;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
- * This class handles functionality related to loading and StratCon facility definitions.
+ * This class handles loading StratCon facility definitions and creating facilities from them.
+ *
+ * <p>Definitions are looked up by ID. Old-format files (one side of a type each, as shipped before 0.51.01) are
+ * merged in pairs through their captured definitions, and can also be looked up by either file's name.</p>
  *
  * @author NickAragua
  */
 public class StratConFacilityFactory {
     private static final MMLogger logger = MMLogger.create(StratConFacilityFactory.class);
 
-    // loaded facility definitions
+    // definition ID -> definition, in load order
+    private static final Map<String, StratConFacilityDefinition> definitionsById = new HashMap<>();
 
-    // map of filename -> facility definition, for specific facility retrieval
-    private static final Map<String, StratConFacility> stratconFacilityMap = new HashMap<>();
+    // every loaded definition, in load order
+    private static final List<StratConFacilityDefinition> definitions = new ArrayList<>();
 
-    // list of all loaded facility definitions
-    private static final List<StratConFacility> stratConFacilityList = new ArrayList<>();
-
-    // list of all hostile facility defs for convenience
-    private static final List<StratConFacility> hostileFacilities = new ArrayList<>();
-
-    // list of all allied facility defs for convenience
-    private static final List<StratConFacility> alliedFacilities = new ArrayList<>();
+    // old-format file name (with and without extension) -> the definition it was merged into
+    private static final Map<String, StratConFacilityDefinition> legacyAliases = new HashMap<>();
 
     static {
         reloadFacilities();
@@ -95,99 +96,233 @@ public class StratConFacilityFactory {
     }
 
     private static void reloadFacilities(String manifestPath, @Nullable String userManifestPath, String facilityPath) {
-        stratConFacilityList.clear();
-        hostileFacilities.clear();
-        alliedFacilities.clear();
-        stratconFacilityMap.clear();
+        definitionsById.clear();
+        definitions.clear();
+        legacyAliases.clear();
 
-        // load dynamic scenarios
         StratConFacilityManifest facilityManifest = StratConFacilityManifest.deserialize(manifestPath);
-
-        // load user-specified scenario list
         StratConFacilityManifest userManifest = (userManifestPath == null) ?
                                                       null :
                                                       StratConFacilityManifest.deserialize(userManifestPath);
 
+        Map<String, LoadedFacilityDefinition> legacyFiles = new HashMap<>();
+        List<String> legacyFileOrder = new ArrayList<>();
         if (facilityManifest != null) {
-            loadFacilitiesFromManifest(facilityManifest, facilityPath);
+            loadFacilitiesFromManifest(facilityManifest, facilityPath, legacyFiles, legacyFileOrder);
         }
 
         if (userManifest != null) {
-            loadFacilitiesFromManifest(userManifest, facilityPath);
+            loadFacilitiesFromManifest(userManifest, facilityPath, legacyFiles, legacyFileOrder);
         }
+
+        mergeLegacyFiles(legacyFiles, legacyFileOrder);
     }
 
     /**
-     * Helper function that loads scenario templates from the given manifest.
+     * Loads the definitions a manifest names. Current-format definitions are registered at once; old-format ones are
+     * collected so the two sides of each type can be merged once every file is read.
      *
-     * @param manifest     The manifest to process
-     * @param facilityPath the directory holding the facility files the manifest names
+     * @param manifest        The manifest to process
+     * @param facilityPath    the directory holding the facility files the manifest names
+     * @param legacyFiles     collects old-format files by file name
+     * @param legacyFileOrder collects old-format file names in load order
      */
-    private static void loadFacilitiesFromManifest(StratConFacilityManifest manifest, String facilityPath) {
-        if (manifest == null) {
-            return;
-        }
+    private static void loadFacilitiesFromManifest(StratConFacilityManifest manifest, String facilityPath,
+          Map<String, LoadedFacilityDefinition> legacyFiles, List<String> legacyFileOrder) {
+        for (String listedName : manifest.facilityFileNames) {
+            if ((listedName == null) || listedName.isBlank()) {
+                continue;
+            }
 
-        for (String fileName : manifest.facilityFileNames) {
-            String filePath = Paths.get(facilityPath, fileName.trim()).toString();
+            String fileName = listedName.trim();
+            File inputFile = Paths.get(facilityPath, fileName).toFile();
+            if (!inputFile.exists()) {
+                logger.warn("Specified file {} does not exist", inputFile.getPath());
+                continue;
+            }
 
             try {
-                StratConFacility facility = StratConFacility.deserialize(filePath);
-
-                if (facility != null) {
-                    stratConFacilityList.add(facility);
-                    stratconFacilityMap.put(fileName.trim(), facility);
-
-                    if (facility.getOwner() == ForceAlignment.Allied) {
-                        alliedFacilities.add(facility);
-                    } else {
-                        hostileFacilities.add(facility);
-                    }
+                LoadedFacilityDefinition loaded = StratConFacilityJson.fromFile(inputFile);
+                if (loaded.isLegacyFormat()) {
+                    legacyFiles.put(fileName, loaded);
+                    legacyFileOrder.add(fileName);
+                } else {
+                    register(loaded.definition());
                 }
             } catch (Exception e) {
-                logger.error("Error loading file: {}", filePath, e);
+                logger.error("Error loading file: {}", inputFile.getPath(), e);
             }
         }
     }
 
     /**
-     * Gets a specific facility given an "ID" (the file name). This method does not clone the facility and should not be
-     * used to put one on the board
+     * Merges old-format files in pairs: an allied file and the hostile file it names as its captured definition (or
+     * the other way round) become one definition carrying both profiles, under the allied file's ID. A file with no
+     * such partner is registered on its own, with its one profile.
+     *
+     * @param legacyFiles     old-format files by file name
+     * @param legacyFileOrder old-format file names in load order
      */
-    public static StratConFacility getFacilityByName(String name) {
-        return stratconFacilityMap.get(name);
+    private static void mergeLegacyFiles(Map<String, LoadedFacilityDefinition> legacyFiles,
+          List<String> legacyFileOrder) {
+        List<String> consumedFiles = new ArrayList<>();
+
+        for (String fileName : legacyFileOrder) {
+            if (consumedFiles.contains(fileName)) {
+                continue;
+            }
+            consumedFiles.add(fileName);
+
+            LoadedFacilityDefinition loaded = legacyFiles.get(fileName);
+            StratConFacilityDefinition definition = loaded.definition();
+
+            String partnerName = (loaded.capturedDefinition() == null) ? null : loaded.capturedDefinition().trim();
+            LoadedFacilityDefinition partner = (partnerName == null) ? null : legacyFiles.get(partnerName);
+            boolean isPartnerUsable = (partner != null)
+                                            && !consumedFiles.contains(partnerName)
+                                            && (definition.getAlliedProfile() != null)
+                                                     != (partner.definition().getAlliedProfile() != null);
+
+            if (isPartnerUsable) {
+                consumedFiles.add(partnerName);
+                definition = mergeSides(definition, partner.definition());
+                addLegacyAlias(partnerName, definition);
+            }
+
+            addLegacyAlias(fileName, definition);
+            register(definition);
+        }
     }
 
     /**
-     * Gets a clone of a specific facility given the "ID" (file name), null if it doesn't exist.
+     * @return one definition holding the allied profile of one side and the hostile profile of the other, named and
+     *       identified after the allied side
      */
-    @Nullable
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public static StratConFacility getFacilityCloneByName(String name) {
-        return stratconFacilityMap.containsKey(name) ? stratconFacilityMap.get(name).clone() : null;
+    private static StratConFacilityDefinition mergeSides(StratConFacilityDefinition first,
+          StratConFacilityDefinition second) {
+        StratConFacilityDefinition allied = (first.getAlliedProfile() != null) ? first : second;
+        StratConFacilityDefinition hostile = (allied == first) ? second : first;
+
+        StratConFacilityDefinition merged = new StratConFacilityDefinition(allied.getId(),
+              allied.getDisplayableName(),
+              allied.getFacilityType(),
+              allied.getAlliedProfile(),
+              hostile.getHostileProfile());
+        merged.setBiomes(allied.getBiomes().isEmpty() ? hostile.getBiomes() : allied.getBiomes());
+        return merged;
+    }
+
+    private static void addLegacyAlias(String fileName, StratConFacilityDefinition definition) {
+        legacyAliases.put(fileName, definition);
+        legacyAliases.put(StratConFacilityJson.idFromFileName(fileName), definition);
+    }
+
+    private static void register(StratConFacilityDefinition definition) {
+        StratConFacilityDefinition replaced = definitionsById.put(definition.getId(), definition);
+        if (replaced != null) {
+            logger.warn("Facility definition {} is defined more than once; the last one loaded is used",
+                  definition.getId());
+            definitions.remove(replaced);
+        }
+        definitions.add(definition);
     }
 
     /**
-     * Retrieves a random facility
+     * Gets a definition by its ID, or by the file name of an old-format file merged into it.
+     *
+     * @param id the definition ID or old-format file name
+     *
+     * @return the definition, or {@code null} if none is loaded
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    @Deprecated(since = "0.51.0", forRemoval = true)
-    public static StratConFacility getRandomFacility() {
-        return ObjectUtility.getRandomItem(stratConFacilityList).clone();
+    public static @Nullable StratConFacilityDefinition getDefinition(@Nullable String id) {
+        if (id == null) {
+            return null;
+        }
+
+        StratConFacilityDefinition definition = definitionsById.get(id);
+        return (definition != null) ? definition : legacyAliases.get(id);
     }
 
-    public static StratConFacility getRandomHostileFacility() {
-        return ObjectUtility.getRandomItem(hostileFacilities).clone();
+    /**
+     * Finds the definition to use for a facility known only by its type, as in saves from before 0.51.01. A definition
+     * with both profiles is preferred over a one-sided one.
+     *
+     * @param facilityType the facility type
+     *
+     * @return the definition, or {@code null} if none of that type is loaded
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConFacilityDefinition getDefinitionForType(FacilityType facilityType) {
+        StratConFacilityDefinition oneSidedMatch = null;
+        for (StratConFacilityDefinition definition : definitions) {
+            if (definition.getFacilityType() != facilityType) {
+                continue;
+            }
+
+            if ((definition.getAlliedProfile() != null) && (definition.getHostileProfile() != null)) {
+                return definition;
+            }
+
+            if (oneSidedMatch == null) {
+                oneSidedMatch = definition;
+            }
+        }
+        return oneSidedMatch;
     }
 
-    public static StratConFacility getRandomAlliedFacility() {
-        return ObjectUtility.getRandomItem(alliedFacilities).clone();
+    /**
+     * @return every loaded definition, in load order
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<StratConFacilityDefinition> getDefinitions() {
+        return Collections.unmodifiableList(definitions);
     }
 
-    public static List<StratConFacility> getHostileFacilities() {
-        return Collections.unmodifiableList(hostileFacilities);
+    /**
+     * @param owner the side that would hold the facility
+     *
+     * @return the loaded definitions with a profile for that side, in load order
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<StratConFacilityDefinition> getDefinitionsFor(ForceAlignment owner) {
+        List<StratConFacilityDefinition> matchingDefinitions = new ArrayList<>();
+        for (StratConFacilityDefinition definition : definitions) {
+            if (definition.hasProfileFor(owner)) {
+                matchingDefinitions.add(definition);
+            }
+        }
+        return matchingDefinitions;
     }
 
-    public static List<StratConFacility> getAlliedFacilities() {
-        return Collections.unmodifiableList(alliedFacilities);
+    /**
+     * @return a new facility of a random type, held by the enemy, or {@code null} if no type has a hostile profile
+     */
+    public static @Nullable StratConFacility getRandomHostileFacility() {
+        return createRandomFacility(ForceAlignment.Opposing);
+    }
+
+    /**
+     * @return a new facility of a random type, held by an ally, or {@code null} if no type has an allied profile
+     */
+    public static @Nullable StratConFacility getRandomAlliedFacility() {
+        return createRandomFacility(ForceAlignment.Allied);
+    }
+
+    private static @Nullable StratConFacility createRandomFacility(ForceAlignment owner) {
+        StratConFacilityDefinition definition = ObjectUtility.getRandomItem(getDefinitionsFor(owner));
+        if (definition == null) {
+            logger.error("No facility definition has a profile for {}; is the facility data loaded?", owner);
+            return null;
+        }
+        return new StratConFacility(definition, owner);
     }
 }

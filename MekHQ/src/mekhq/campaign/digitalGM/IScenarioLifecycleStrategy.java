@@ -67,9 +67,10 @@ public interface IScenarioLifecycleStrategy {
      * @param scenario      the expired scenario
      * @param track         the track the scenario belongs to
      * @param campaignState the StratCon state for the contract
+     * @param campaign      the active campaign
      */
     void processExpiredScenario(StratConScenario scenario, StratConTrackState track,
-          StratConCampaignState campaignState);
+          StratConCampaignState campaignState, Campaign campaign);
 
     /**
      * Applies the results of a resolved scenario (rewards, casualties, facility changes, and so on).

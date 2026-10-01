@@ -48,6 +48,7 @@ import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogConfirmation;
 import mekhq.gui.dialog.nagDialogs.ContractSpecialMechanicsNagDialog;
+import mekhq.gui.dialog.nagDialogs.StratConFacilityBriefingNagDialog;
 
 /**
  * Commits a {@link AbstractContract} offer from the market into an active campaign mission.
@@ -132,6 +133,7 @@ public final class ContractAcceptance {
 
         // Brief the player on any special mechanics the contract brings to StratCon, now that they are set up.
         ContractSpecialMechanicsNagDialog.showIfDue(campaign, contract);
+        StratConFacilityBriefingNagDialog.showIfDue(campaign, contract);
 
         return true;
     }

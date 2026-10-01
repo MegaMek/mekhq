@@ -58,8 +58,13 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.ObjectivePar
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.PointOfInterestParameters;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.facility.FacilityTrait;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConContractFacilityProfile;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOrder;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInterestBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
@@ -235,7 +240,12 @@ public class StratConContractInitializer {
      */
     private static void seedCampaignState(AbstractContract contract, Campaign campaign,
           StratConContractDefinition contractDefinition, StratConCampaignState campaignState) {
+        StratConContractFacilityProfile facilityProfile = contractDefinition.getFacilityProfile();
+        String facilityBriefing = ((facilityProfile == null) || (facilityProfile.getBriefing() == null)) ?
+                                        "" :
+                                        "<br/>" + facilityProfile.getBriefing();
         campaignState.setBriefingText(contractDefinition.getBriefing() +
+                                            facilityBriefing +
                                             "<br/>" +
                                             contract.getCommandRights().getStratConText());
         campaignState.setAllowEarlyVictory(contractDefinition.isAllowEarlyVictory());
@@ -244,14 +254,17 @@ public class StratConContractInitializer {
         boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
 
         // now seed the tracks with objectives and facilities
+        boolean isFactorSupportPointsIntoScale =
+              campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
+        FacilityTier objectiveTier = adjustTier(facilityProfile,
+              getFacilityTier(contract.getScale(), isFactorSupportPointsIntoScale, true));
         if (!isUseMaplessMode) {
             for (ObjectiveParameters objectiveParams : contractDefinition.getObjectiveParameters()) {
                 int objectiveCount;
                 if (objectiveParams.objectiveCount > 0) {
                     objectiveCount = (int) objectiveParams.objectiveCount;
                 } else if (isFacilityObjective(objectiveParams.objectiveType)) {
-                    objectiveCount = getObjectiveFacilityCount(contract.getScale(),
-                          campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION));
+                    objectiveCount = getObjectiveFacilityCount(contract.getScale(), isFactorSupportPointsIntoScale);
                 } else {
                     objectiveCount = (int) max(1, -objectiveParams.objectiveCount * contract.getScale());
                 }
@@ -272,7 +285,9 @@ public class StratConContractInitializer {
                                   numObjects,
                                   ForceAlignment.Allied,
                                   StrategicObjectiveType.AlliedFacilityControl,
-                                  objectiveParams.objectiveScenarioModifiers);
+                                  objectiveParams.objectiveScenarioModifiers,
+                                  objectiveTier,
+                                  facilityProfile);
                             break;
                         case HostileFacilityControl:
                         case FacilityDestruction:
@@ -280,7 +295,9 @@ public class StratConContractInitializer {
                                   numObjects,
                                   ForceAlignment.Opposing,
                                   objectiveParams.objectiveType,
-                                  objectiveParams.objectiveScenarioModifiers);
+                                  objectiveParams.objectiveScenarioModifiers,
+                                  objectiveTier,
+                                  facilityProfile);
                             break;
                         case PointOfInterest:
                             // Point of interest objectives are not placed up front either. They appear over the
@@ -320,26 +337,51 @@ public class StratConContractInitializer {
             }
         }
 
-        // Non-objective facilities: the defender's, so allied on a defensive contract and hostile on an offensive one.
-        // The objective facilities placed above are the only facilities so far. Those the defender owns count against
-        // the scale's share; the other side's objective facilities do not, or they would crowd out the defender's own.
+        // Non-objective facilities. Without a facility profile, they are the defender's: allied on a defensive contract
+        // and hostile on an offensive one. The objective facilities placed above are the only facilities so far. Those
+        // the defender owns count against the scale's share; the other side's objective facilities do not, or they
+        // would crowd out the defender's own. With a profile, the profile splits them between the sides, all objective
+        // facilities count against the share, and an anchor facility may be placed first.
         if (!isUseMaplessMode) {
-            ForceAlignment facilityOwner = contract.isPlayerAttacker() ? ForceAlignment.Opposing : ForceAlignment.Allied;
-            int objectiveFacilityCount = countFacilitiesOwnedBy(campaignState.getTracks(), facilityOwner);
-            int facilityCount = getNonObjectiveFacilityCount(contract.getScale(),
-                  campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
-                  objectiveFacilityCount);
+            FacilityTier facilityTier = adjustTier(facilityProfile,
+                  getFacilityTier(contract.getScale(), isFactorSupportPointsIntoScale, false));
+            double density = getFacilityDensity(campaignOptions, facilityProfile);
 
-            List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
+            if ((facilityProfile == null) || (facilityProfile.getAlliedShare() == null)) {
+                ForceAlignment facilityOwner = contract.isPlayerAttacker() ?
+                                                     ForceAlignment.Opposing :
+                                                     ForceAlignment.Allied;
+                int objectiveFacilityCount = countFacilitiesOwnedBy(campaignState.getTracks(), facilityOwner);
+                int facilityCount = getNonObjectiveFacilityCount(contract.getScale(),
+                      isFactorSupportPointsIntoScale,
+                      objectiveFacilityCount,
+                      density);
+                placeNonObjectiveFacilities(campaignState, facilityCount, facilityOwner, facilityTier,
+                      facilityProfile);
+            } else {
+                int objectiveFacilityCount = countFacilitiesOwnedBy(campaignState.getTracks(), ForceAlignment.Allied)
+                                                   + countFacilitiesOwnedBy(campaignState.getTracks(),
+                      ForceAlignment.Opposing);
+                int facilityCount = getNonObjectiveFacilityCount(contract.getScale(),
+                      isFactorSupportPointsIntoScale,
+                      objectiveFacilityCount,
+                      density);
+                int alliedCount = (int) Math.round(facilityCount * facilityProfile.getAlliedShare());
+                int hostileCount = facilityCount - alliedCount;
 
-            for (int x = 0; x < trackObjects.size(); x++) {
-                int numObjects = trackObjects.get(x);
+                FacilityType anchorType = facilityProfile.getAnchorType();
+                if ((anchorType != null) && placeAnchorFacility(campaignState, facilityProfile, facilityTier)) {
+                    if (facilityProfile.getAnchorOwner() == ForceAlignment.Opposing) {
+                        hostileCount = max(0, hostileCount - 1);
+                    } else {
+                        alliedCount = max(0, alliedCount - 1);
+                    }
+                }
 
-                initializeTrackFacilities(campaignState.getTrack(x),
-                      numObjects,
-                      facilityOwner,
-                      null,
-                      Collections.emptyList());
+                placeNonObjectiveFacilities(campaignState, alliedCount, ForceAlignment.Allied, facilityTier,
+                      facilityProfile);
+                placeNonObjectiveFacilities(campaignState, hostileCount, ForceAlignment.Opposing, facilityTier,
+                      facilityProfile);
             }
         }
 
@@ -823,8 +865,11 @@ public class StratConContractInitializer {
             return null;
         }
 
-        StratConFacility facility = StratConFacilityFactory.getRandomHostileFacility();
-        facility.setOwner(ForceAlignment.Opposing);
+        StratConFacility facility = createMidContractFacility(campaign, contract, ForceAlignment.Opposing, true);
+        if (facility == null) {
+            return null;
+        }
+
         facility.setStrategicObjective(true);
         facility.setVisible(true);
         track.addFacility(coords, facility);
@@ -863,6 +908,190 @@ public class StratConContractInitializer {
         }
 
         return count;
+    }
+
+    /**
+     * Spreads non-objective facilities for one side across the contract's sectors.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void placeNonObjectiveFacilities(StratConCampaignState campaignState, int facilityCount,
+          ForceAlignment owner, FacilityTier tier, @Nullable StratConContractFacilityProfile facilityProfile) {
+        List<Integer> trackObjects = trackObjectDistribution(facilityCount, campaignState.getTrackCount());
+        for (int x = 0; x < trackObjects.size(); x++) {
+            initializeTrackFacilities(campaignState.getTrack(x),
+                  trackObjects.get(x),
+                  owner,
+                  null,
+                  Collections.emptyList(),
+                  tier,
+                  facilityProfile);
+        }
+    }
+
+    /**
+     * Places a contract profile's anchor facility - a single facility of its anchor type for its anchor owner - in a
+     * random sector with room for it.
+     *
+     * @return {@code true} if it was placed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean placeAnchorFacility(StratConCampaignState campaignState,
+          StratConContractFacilityProfile facilityProfile, FacilityTier tier) {
+        FacilityType anchorType = facilityProfile.getAnchorType();
+        if ((anchorType == null) || (campaignState.getTrackCount() == 0)) {
+            return false;
+        }
+
+        StratConFacility anchor = StratConContractFacilityProfile.createFacility(anchorType,
+              facilityProfile.getAnchorOwner());
+        if (anchor == null) {
+            return false;
+        }
+
+        // Start in a random sector, then try the others in turn, so one full sector doesn't cost the contract its
+        // anchor.
+        int trackCount = campaignState.getTrackCount();
+        int firstTrackIndex = Compute.randomInt(trackCount);
+        StratConTrackState track = null;
+        StratConCoords coords = null;
+        for (int offset = 0; (offset < trackCount) && (coords == null); offset++) {
+            track = campaignState.getTrack((firstTrackIndex + offset) % trackCount);
+            if (track.getOccupiedHexCount() < facilityCapacity(track)) {
+                coords = getUnoccupiedCoords(track);
+            }
+        }
+        if (coords == null) {
+            return false;
+        }
+
+        anchor.setTier(tier);
+        FacilityTrait.assignRandomTraits(anchor);
+        anchor.setGarrison(anchor.getGarrisonMaximum());
+        track.addFacility(coords, anchor);
+        return true;
+    }
+
+    /**
+     * Creates a facility for a scenario that brings one onto the map partway through a contract, made the same way as
+     * those placed when the contract began: its type is picked by the contract's facility profile, if it has one, its
+     * tier follows the contract's scale and profile, it rolls traits, and it starts with a full garrison.
+     *
+     * @param campaign the current campaign
+     * @param contract the contract whose map gets the facility
+     * @param owner    the side that holds it
+     *
+     * @return the facility, not yet placed, or {@code null} if no facility definition suits that side
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConFacility createMidContractFacility(Campaign campaign, AbstractContract contract,
+          ForceAlignment owner) {
+        return createMidContractFacility(campaign, contract, owner, false);
+    }
+
+    /**
+     * As {@link #createMidContractFacility(Campaign, AbstractContract, ForceAlignment)}, but for a facility that may be
+     * a strategic objective, which starts one tier larger.
+     *
+     * @param campaign    the current campaign
+     * @param contract    the contract whose map gets the facility
+     * @param owner       the side that holds it
+     * @param isObjective whether the facility is a strategic objective
+     *
+     * @return the facility, not yet placed, or {@code null} if no facility definition suits that side
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConFacility createMidContractFacility(Campaign campaign, AbstractContract contract,
+          ForceAlignment owner, boolean isObjective) {
+        StratConContractDefinition contractDefinition =
+              StratConContractDefinition.getContractDefinition(contract.getObjectiveType());
+        StratConContractFacilityProfile facilityProfile = (contractDefinition == null) ?
+                                                                null :
+                                                                contractDefinition.getFacilityProfile();
+
+        StratConFacility facility;
+        if (facilityProfile != null) {
+            facility = facilityProfile.createFacility(owner);
+        } else {
+            facility = (owner == ForceAlignment.Opposing) ?
+                             StratConFacilityFactory.getRandomHostileFacility() :
+                             StratConFacilityFactory.getRandomAlliedFacility();
+        }
+        if (facility == null) {
+            return null;
+        }
+
+        facility.setOwner(owner);
+        boolean isFactorSupportPointsIntoScale = campaign.getCampaignOptions()
+                                                       .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
+        facility.setTier(adjustTier(facilityProfile,
+              getFacilityTier(contract.getScale(), isFactorSupportPointsIntoScale, isObjective)));
+        FacilityTrait.assignRandomTraits(facility);
+        facility.setGarrison(facility.getGarrisonMaximum());
+        return facility;
+    }
+
+    /**
+     * @return the "Facility Density" option multiplied by the contract profile's own density, if there is a profile
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static double getFacilityDensity(CampaignOptions campaignOptions,
+          @Nullable StratConContractFacilityProfile facilityProfile) {
+        Double optionDensity = campaignOptions.get(CampaignOption.FACILITY_DENSITY);
+        double density = (optionDensity == null) ? 1.0 : optionDensity;
+        return (facilityProfile == null) ? density : density * facilityProfile.getDensityMultiplier();
+    }
+
+    private static FacilityTier adjustTier(@Nullable StratConContractFacilityProfile facilityProfile,
+          FacilityTier tier) {
+        return (facilityProfile == null) ? tier : facilityProfile.adjustTier(tier);
+    }
+
+    /** Normalized Scale (see {@link #getFacilityTier}) up to which facilities are Outposts. */
+    static final int OUTPOST_SCALE_LIMIT = 2;
+
+    /** Normalized Scale (see {@link #getFacilityTier}) up to which facilities are Bases; above it, Strongholds. */
+    static final int BASE_SCALE_LIMIT = 5;
+
+    /**
+     * Works out the tier of a facility placed for a contract. Scale is first normalized, as for the facility share:
+     * taken as it is when battlefield support points are factored into scale, and divided by three otherwise. Up to
+     * {@value #OUTPOST_SCALE_LIMIT} gives an Outpost, up to {@value #BASE_SCALE_LIMIT} a Base, and above that a
+     * Stronghold. An objective facility is one tier larger, up to a Stronghold.
+     *
+     * @param scale                          the contract's scale
+     * @param isFactorSupportPointsIntoScale whether battlefield support points are factored into scale
+     * @param isObjective                    whether the facility is a strategic objective
+     *
+     * @return the facility's tier
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static FacilityTier getFacilityTier(int scale, boolean isFactorSupportPointsIntoScale, boolean isObjective) {
+        int normalizedScale = isFactorSupportPointsIntoScale ?
+                                    scale :
+                                    scale / StratConScenarioTempo.SUPPORT_POINT_SCALE_ROLL_MULTIPLIER;
+
+        FacilityTier tier;
+        if (normalizedScale <= OUTPOST_SCALE_LIMIT) {
+            tier = FacilityTier.OUTPOST;
+        } else if (normalizedScale <= BASE_SCALE_LIMIT) {
+            tier = FacilityTier.BASE;
+        } else {
+            tier = FacilityTier.STRONGHOLD;
+        }
+
+        return isObjective ? tier.next() : tier;
     }
 
     /** Objective facilities are three times as scarce as the contract's whole share of facilities. */
@@ -922,10 +1151,24 @@ public class StratConContractInitializer {
     // Package-private rather than private so the counting rule can be tested directly.
     static int getNonObjectiveFacilityCount(int scale, boolean isFactorSupportPointsIntoScale,
           int objectiveFacilityCount) {
+        return getNonObjectiveFacilityCount(scale, isFactorSupportPointsIntoScale, objectiveFacilityCount, 1.0);
+    }
+
+    /**
+     * As {@link #getNonObjectiveFacilityCount(int, boolean, int)}, with the contract's share of facilities multiplied
+     * by the given density and rounded to the nearest whole facility before the objective facilities are taken off.
+     *
+     * @param density how much to multiply the share by
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int getNonObjectiveFacilityCount(int scale, boolean isFactorSupportPointsIntoScale,
+          int objectiveFacilityCount, double density) {
         int facilityShare = isFactorSupportPointsIntoScale ?
                                   scale :
                                   scale / StratConScenarioTempo.SUPPORT_POINT_SCALE_ROLL_MULTIPLIER;
-        return max(0, facilityShare - objectiveFacilityCount);
+        return max(0, (int) Math.round(facilityShare * density) - objectiveFacilityCount);
     }
 
     /**
@@ -1559,6 +1802,55 @@ public class StratConContractInitializer {
 
         track.moveObjective(source, destination);
         moveAssignedForces(track, source, destination);
+        moveFacilityState(track, source, destination);
+    }
+
+    /**
+     * Points the hex-keyed facility state - orders under way, siege targets, and the cut-off record - that referred to
+     * {@code source} at {@code destination} instead, so a moved facility keeps its running orders and sieges.
+     */
+    private static void moveFacilityState(StratConTrackState track, StratConCoords source,
+          StratConCoords destination) {
+        for (StratConFacilityOrder order : track.getFacilityOrders()) {
+            if (source.equals(order.getTargetCoords())) {
+                order.setTargetCoords(destination);
+            }
+        }
+
+        for (StratConScenario scenario : track.getScenarios().values()) {
+            if (source.equals(scenario.getSiegeCoords())) {
+                scenario.setSiegeCoords(destination);
+            }
+        }
+
+        if (track.getCutOffFacilities().remove(source)) {
+            track.getCutOffFacilities().add(destination);
+        }
+    }
+
+    /**
+     * Drops the hex-keyed facility state - orders under way, siege targets, and the cut-off record - that referred to
+     * an occupant that could not be saved.
+     */
+    private static void dropFacilityState(StratConTrackState track, StratConCoords source) {
+        track.getFacilityOrders().removeIf(order -> {
+            boolean targetsSource = source.equals(order.getTargetCoords());
+            if (targetsSource) {
+                LOGGER.warn("Abandoned {} order on {} on track {}: its target could not be relocated.",
+                      order.getOperation(),
+                      source,
+                      track.getDisplayableName());
+            }
+            return targetsSource;
+        });
+
+        for (StratConScenario scenario : track.getScenarios().values()) {
+            if (source.equals(scenario.getSiegeCoords())) {
+                scenario.setSiegeCoords(null);
+            }
+        }
+
+        track.getCutOffFacilities().remove(source);
     }
 
     /**
@@ -1575,6 +1867,7 @@ public class StratConContractInitializer {
         }
 
         removeObjectiveAt(track, source);
+        dropFacilityState(track, source);
     }
 
     /** Drops any strategic objective tied to a hex whose occupant could not be saved, so nothing points at dead ground. */
@@ -2017,6 +2310,35 @@ public class StratConContractInitializer {
     // initialization would mean standing up a whole contract to assert on a placement loop.
     static void initializeTrackFacilities(StratConTrackState trackState, int numFacilities, ForceAlignment owner,
           @Nullable StrategicObjectiveType objectiveType, List<String> modifiers) {
+        initializeTrackFacilities(trackState, numFacilities, owner, objectiveType, modifiers, FacilityTier.BASE);
+    }
+
+    /**
+     * As {@link #initializeTrackFacilities(StratConTrackState, int, ForceAlignment, StrategicObjectiveType, List)},
+     * placing facilities of the given tier, each with a full garrison.
+     *
+     * @param tier the tier of every facility placed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void initializeTrackFacilities(StratConTrackState trackState, int numFacilities, ForceAlignment owner,
+          @Nullable StrategicObjectiveType objectiveType, List<String> modifiers, FacilityTier tier) {
+        initializeTrackFacilities(trackState, numFacilities, owner, objectiveType, modifiers, tier, null);
+    }
+
+    /**
+     * As {@link #initializeTrackFacilities(StratConTrackState, int, ForceAlignment, StrategicObjectiveType, List,
+     * FacilityTier)}, picking each facility's type from a contract's facility profile.
+     *
+     * @param facilityProfile the contract's facility profile, or {@code null} for random types
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void initializeTrackFacilities(StratConTrackState trackState, int numFacilities, ForceAlignment owner,
+          @Nullable StrategicObjectiveType objectiveType, List<String> modifiers, FacilityTier tier,
+          @Nullable StratConContractFacilityProfile facilityProfile) {
         boolean strategicObjective = objectiveType != null;
 
         int capacity = facilityCapacity(trackState);
@@ -2028,13 +2350,24 @@ public class StratConContractInitializer {
                 break;
             }
 
-            StratConFacility sf = owner == ForceAlignment.Allied ?
-                                        StratConFacilityFactory.getRandomAlliedFacility() :
-                                        StratConFacilityFactory.getRandomHostileFacility();
+            StratConFacility sf;
+            if (facilityProfile != null) {
+                sf = facilityProfile.createFacility(owner);
+            } else {
+                sf = owner == ForceAlignment.Allied ?
+                           StratConFacilityFactory.getRandomAlliedFacility() :
+                           StratConFacilityFactory.getRandomHostileFacility();
+            }
+            if (sf == null) {
+                break;
+            }
 
             sf.setOwner(owner);
+            sf.setTier(tier);
+            FacilityTrait.assignRandomTraits(sf);
+            sf.setGarrison(sf.getGarrisonMaximum());
             sf.setStrategicObjective(strategicObjective);
-            sf.getLocalModifiers().addAll(modifiers);
+            sf.addAdditionalLocalModifiers(modifiers);
 
             StratConCoords coords = getUnoccupiedCoords(trackState);
 
@@ -2081,6 +2414,19 @@ public class StratConContractInitializer {
      *       suggest. And only part of that land is offered, because scenarios need somewhere to spawn for the life of
      *       the contract; a sector paved with facilities has nowhere left to fight.</p>
      */
+    /**
+     * @param track a sector
+     *
+     * @return {@code true} if the sector has room for another facility under its cap (see
+     *       {@link #facilityCapacity})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean hasRoomForFacility(StratConTrackState track) {
+        return track.getOccupiedHexCount() < facilityCapacity(track);
+    }
+
     private static int facilityCapacity(StratConTrackState trackState) {
         int placeable = 0;
         for (int x = 0; x < trackState.getWidth(); x++) {
@@ -2225,11 +2571,14 @@ public class StratConContractInitializer {
             // facility
             boolean addedFacility = false;
             if (template.isFacilityScenario()) {
-                StratConFacility facility = template.isHostileFacility() ?
-                                                  StratConFacilityFactory.getRandomHostileFacility() :
-                                                  StratConFacilityFactory.getRandomAlliedFacility();
-                trackState.addFacility(coords, facility);
-                addedFacility = true;
+                StratConFacility facility = createMidContractFacility(campaign,
+                      contract,
+                      template.isHostileFacility() ? ForceAlignment.Opposing : ForceAlignment.Allied,
+                      true);
+                if (facility != null) {
+                    trackState.addFacility(coords, facility);
+                    addedFacility = true;
+                }
             }
 
             // create scenario - don't assign a force yet
