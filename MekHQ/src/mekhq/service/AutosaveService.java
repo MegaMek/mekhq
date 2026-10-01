@@ -58,6 +58,9 @@ import mekhq.campaign.Campaign;
 public class AutosaveService implements IAutosaveService {
     private static final MMLogger LOGGER = MMLogger.create(AutosaveService.class);
 
+    /** Where autosaves go when the saved campaigns directory no longer exists; MekHQ's own default for it. */
+    private static final String DEFAULT_CAMPAIGNS_DIRECTORY = "./campaigns";
+
     // region Constructors
     public AutosaveService() {
 
@@ -111,16 +114,44 @@ public class AutosaveService implements IAutosaveService {
                     writer.flush();
                 }
             } else {
-                LOGGER.error("Unable to perform an autosave because of a null or empty file name");
+                LOGGER.error("Unable to perform an autosave because the autosave file name could not be determined");
             }
         } catch (Exception ex) {
             LOGGER.error("", ex);
         }
     }
 
+    /**
+     * Finds the directory to autosave into: the saved campaigns directory, unless it no longer exists - such as after
+     * loading a campaign from a folder that has since been deleted or moved - in which case the default campaigns
+     * directory is used instead, created if need be, so autosaves are not silently lost.
+     *
+     * @return the path of the directory to autosave into
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private String getAutosaveDirectoryPath() {
+        final String savesDirectoryPath = MekHQ.getCampaignsDirectory().getValue();
+        if (!StringUtility.isNullOrBlank(savesDirectoryPath) && new File(savesDirectoryPath).isDirectory()) {
+            return savesDirectoryPath;
+        }
+
+        final File defaultDirectory = new File(DEFAULT_CAMPAIGNS_DIRECTORY);
+        if (!defaultDirectory.isDirectory() && !defaultDirectory.mkdirs()) {
+            LOGGER.error("Unable to create the default campaigns directory {}", defaultDirectory.getAbsolutePath());
+        }
+
+        LOGGER.warn("The saved campaigns directory {} does not exist; autosaving to {} instead. Saving the campaign "
+                          + "to an existing folder with Save As will set a new saved campaigns directory.",
+              savesDirectoryPath,
+              defaultDirectory.getAbsolutePath());
+        return DEFAULT_CAMPAIGNS_DIRECTORY;
+    }
+
     private @Nullable String getAutosaveFilename(final Campaign campaign) {
         // Get all autosave files in ascending order of date creation
-        final String savesDirectoryPath = MekHQ.getCampaignsDirectory().getValue();
+        final String savesDirectoryPath = getAutosaveDirectoryPath();
         final File folder = new File(savesDirectoryPath);
         final File[] files = folder.listFiles();
         if (files != null) {
@@ -166,6 +197,7 @@ public class AutosaveService implements IAutosaveService {
             return Paths.get(savesDirectoryPath, fileName).toString();
         }
 
+        LOGGER.error("Unable to read the autosave directory {}", folder.getAbsolutePath());
         return null;
     }
 }

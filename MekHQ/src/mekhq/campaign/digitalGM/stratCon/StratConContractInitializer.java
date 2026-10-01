@@ -42,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -396,6 +397,10 @@ public class StratConContractInitializer {
         // A new contract has placed nothing yet, so its point of interest ledger starts empty rather than from the map.
         campaignState.setPointOfInterestLedgerSeeded(true);
 
+        // Snapshot the options so every schedule below uses the same rules. Only editing the contract refreshes them.
+        campaignState.setMinimumOneTrackPerRoll(campaignOptions.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL));
+        campaignState.setRollTracksWeekly(campaignOptions.get(CampaignOption.ROLL_TRACKS_WEEKLY));
+
         // Pre-roll the days on which the contract's ordinary scenarios appear. Mapless play has them too; Single Drop
         // play keeps its own weekly pace instead.
         if (!campaignOptions.isUseStratConSinglesMode()) {
@@ -578,8 +583,10 @@ public class StratConContractInitializer {
      * Schedules every point of interest the contract definition asks for, both strategic objectives and ordinary ones,
      * to appear over the contract's run instead of all at once - the way strategic-objective scenarios do.
      *
-     * <p>The points of interest are spread across the contract's months by the Track Intensity Tables (see
-     * {@link TrackIntensityTable#rollScheduleForCount}). Each month's points of interest then get random days within
+     * <p>Point of interest objectives are a fixed number, spread across the contract's months by the Track Intensity
+     * Tables (see {@link TrackIntensityTable#rollScheduleForCount}). Ordinary points of interest have no fixed number:
+     * it is rolled on the tables like the contract's scenarios (see {@link #scheduleOrdinaryPointsOfInterest}). Each
+     * month's points of interest then get random days within
      * it (see {@link #rollSpawnDates}), and are stored on the campaign state for the daily StratCon lifecycle to
      * place as their days come (see {@link #spawnScheduledPointOfInterest}). Which point of interest lands on which day
      * is shuffled, so types are not bunched together.</p>
@@ -614,9 +621,10 @@ public class StratConContractInitializer {
      * or fallen due (see {@link StratConScenarioTempo#regenerateSchedules}).
      *
      * <p>Special points of interest are rolled for the whole contract as usual, and only the days from
-     * {@code fromDate} on are kept; the marks already made count against what is marked now. A definition's points of
-     * interest are a fixed number, so those already placed or due are taken off it, and the rest are spread across the
-     * contract's remaining months instead.</p>
+     * {@code fromDate} on are kept; the marks already made count against what is marked now. Ordinary points of
+     * interest are rolled for the whole contract the same way. A definition's point of interest objectives are a fixed
+     * number, so those already placed or due are taken off it, and the rest are spread across the contract's remaining
+     * months instead.</p>
      *
      * @param contract                        the contract
      * @param contractDefinition              its StratCon contract definition
@@ -625,7 +633,8 @@ public class StratConContractInitializer {
      * @param isContractsUseSpecialMechanics  whether the contract uses its type's special mechanics
      * @param fromDate                        the first day to schedule on; the contract's start date when it is
      *                                        accepted
-     * @param committedCount                  how many points of interest have already been placed or fallen due
+     * @param committedCount                  how many point of interest objectives have already been placed or fallen
+     *                                        due
      * @param alreadyMarkedCounts             how many of those were marked under each initial state key
      *
      * @author Illiani
@@ -647,8 +656,11 @@ public class StratConContractInitializer {
             return;
         }
 
+        scheduleOrdinaryPointsOfInterest(contract, contractDefinition, campaignState, isMultiplyTrackIntensityByScale,
+              fromDate);
+
         List<StratConScheduledPointOfInterest> requestedPointsOfInterest =
-              getRequestedPointsOfInterest(contractDefinition, contract.getScale());
+              getRequestedObjectivePointsOfInterest(contractDefinition, contract.getScale());
         // Those already placed or due are taken off at random, since which type each was drawn as is not remembered.
         int removedCount = min(committedCount, requestedPointsOfInterest.size());
         for (int index = 0; index < removedCount; index++) {
@@ -686,6 +698,76 @@ public class StratConContractInitializer {
             scheduledPointOfInterest.setSpawnDate(spawnDates.get(index));
             campaignState.addScheduledPointOfInterest(scheduledPointOfInterest);
         }
+    }
+
+    /**
+     * Schedules a contract definition's ordinary (non-objective) points of interest. Their number is not fixed: it is
+     * rolled on the Track Intensity Tables the way special points of interest are (see
+     * {@link #scheduleSpecialPointsOfInterest}), once per point of scale when "Multiply Track Intensity by Scale" is on
+     * and once otherwise, honoring the contract's Track Intensity Table options. Each one's type is drawn from the
+     * definition's {@code pointsOfInterest}, weighted by the size of each entry's count (see
+     * {@link #getOrdinaryPointOfInterestWeights}).
+     *
+     * <p>The schedule is rolled for the whole contract and only the days from {@code fromDate} on are kept, so a
+     * schedule rolled again partway through leaves the days already past alone.</p>
+     *
+     * @param contract                        the contract
+     * @param contractDefinition              its StratCon contract definition
+     * @param campaignState                   the campaign state to store the scheduled points of interest on
+     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
+     * @param fromDate                        the first day to keep; the contract's start date when it is accepted
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void scheduleOrdinaryPointsOfInterest(AbstractContract contract,
+          StratConContractDefinition contractDefinition, StratConCampaignState campaignState,
+          boolean isMultiplyTrackIntensityByScale, @Nullable LocalDate fromDate) {
+        Map<String, Double> weights = getOrdinaryPointOfInterestWeights(contractDefinition);
+        LocalDate startDate = contract.getStartDate();
+        if (weights.isEmpty() || (startDate == null)) {
+            return;
+        }
+
+        double totalWeight = 0;
+        for (double weight : weights.values()) {
+            totalWeight += weight;
+        }
+
+        // A scale-0 contract (auto-scaled from an empty hangar) still rolls once, as special points of interest do.
+        int rollCount = isMultiplyTrackIntensityByScale ? max(1, contract.getScale()) : 1;
+        List<Integer> schedule = TrackIntensityTable.rollSchedule(contract.getLengthInMonths(),
+              contract.getTrackCount(),
+              rollCount,
+              campaignState.isMinimumOneTrackPerRoll(),
+              campaignState.isRollTracksWeekly());
+
+        LocalDate endDate = contract.getEndingDate();
+        for (LocalDate spawnDate : rollSpawnDates(startDate, schedule, contract.getLengthInMonths())) {
+            if ((fromDate != null) && spawnDate.isBefore(fromDate)) {
+                continue;
+            }
+            if ((endDate != null) && endDate.isAfter(startDate) && !spawnDate.isBefore(endDate)) {
+                spawnDate = endDate.minusDays(1);
+            }
+
+            String typeId = drawWeightedTypeId(weights, totalWeight);
+            campaignState.addScheduledPointOfInterest(new StratConScheduledPointOfInterest(spawnDate, typeId, false));
+        }
+    }
+
+    private static String drawWeightedTypeId(Map<String, Double> weights, double totalWeight) {
+        double roll = Compute.randomFloat() * totalWeight;
+        String lastTypeId = null;
+        for (Map.Entry<String, Double> entry : weights.entrySet()) {
+            lastTypeId = entry.getKey();
+            roll -= entry.getValue();
+            if (roll < 0) {
+                return lastTypeId;
+            }
+        }
+        // Only reached through rounding at the very top of the range.
+        return lastTypeId;
     }
 
     /**
@@ -813,7 +895,9 @@ public class StratConContractInitializer {
         int rollCount = isMultiplyTrackIntensityByScale ? max(1, contract.getScale()) : 1;
         List<Integer> schedule = TrackIntensityTable.rollSchedule(contract.getLengthInMonths(),
               contract.getTrackCount(),
-              rollCount);
+              rollCount,
+              campaignState.isMinimumOneTrackPerRoll(),
+              campaignState.isRollTracksWeekly());
 
         boolean isStrategicObjective = isSpecialPointOfInterestObjective(typeId);
         List<StratConScheduledPointOfInterest> scheduledPointsOfInterest = new ArrayList<>();
@@ -1172,23 +1256,23 @@ public class StratConContractInitializer {
     }
 
     /**
-     * Lists every point of interest a contract definition asks for, without spawn dates: one per point of interest
-     * objective (its type drawn at random from that objective's {@code objectivePointsOfInterest}), and one per
-     * ordinary point of interest in its {@code pointsOfInterest}. Counts are worked out as the facility and objective
-     * counts are - a negative count is scaled by the contract's size.
+     * Lists every point of interest objective a contract definition asks for, without spawn dates: one per objective,
+     * its type drawn at random from that objective's {@code objectivePointsOfInterest}. Counts are worked out as for
+     * other objectives - a negative count is scaled by the contract's size, never below one. Ordinary points of
+     * interest are rolled instead (see {@link #scheduleOrdinaryPointsOfInterest}).
      *
-     * <p>An objective with no types to choose from, or an ordinary entry with no type, is skipped and logged.</p>
+     * <p>An objective with no types to choose from is skipped and logged.</p>
      *
      * @param contractDefinition the contract definition
      * @param scale              the contract's scale
      *
-     * @return the requested points of interest, in definition order
+     * @return the requested point of interest objectives, in definition order
      *
      * @author Illiani
      * @since 0.51.01
      */
     // Package-private rather than private so the counting rules can be tested directly.
-    static List<StratConScheduledPointOfInterest> getRequestedPointsOfInterest(
+    static List<StratConScheduledPointOfInterest> getRequestedObjectivePointsOfInterest(
           StratConContractDefinition contractDefinition, int scale) {
         List<StratConScheduledPointOfInterest> requestedPointsOfInterest = new ArrayList<>();
 
@@ -1218,6 +1302,25 @@ public class StratConContractInitializer {
             }
         }
 
+        return requestedPointsOfInterest;
+    }
+
+    /**
+     * Works out how likely each of a contract definition's ordinary points of interest is to be drawn (see
+     * {@link #scheduleOrdinaryPointsOfInterest}). An entry's weight is the size of its count, so a negative (scaled)
+     * count weighs the same as the positive one; the count no longer sets how many appear. Entries of the same type
+     * add together. An entry with no type, or a count of zero, is skipped; one with no type is logged.
+     *
+     * @param contractDefinition the contract definition
+     *
+     * @return each ordinary point of interest type ID with its weight, in definition order; empty if there are none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    // Package-private rather than private so the weighting rules can be tested directly.
+    static Map<String, Double> getOrdinaryPointOfInterestWeights(StratConContractDefinition contractDefinition) {
+        Map<String, Double> weights = new LinkedHashMap<>();
         for (PointOfInterestParameters pointOfInterestParameters : contractDefinition.getPointsOfInterest()) {
             String typeId = pointOfInterestParameters.getTypeId();
             if ((typeId == null) || typeId.isBlank()) {
@@ -1226,17 +1329,12 @@ public class StratConContractInitializer {
                 continue;
             }
 
-            // As for non-objective facilities, a scaled count may round down to none.
-            int pointOfInterestCount = (pointOfInterestParameters.getCount() > 0) ?
-                                             (int) pointOfInterestParameters.getCount() :
-                                             (int) (-pointOfInterestParameters.getCount() * scale);
-
-            for (int pointOfInterestIndex = 0; pointOfInterestIndex < pointOfInterestCount; pointOfInterestIndex++) {
-                requestedPointsOfInterest.add(new StratConScheduledPointOfInterest(null, typeId, false));
+            double weight = Math.abs(pointOfInterestParameters.getCount());
+            if (weight > 0) {
+                weights.merge(typeId, weight, Double::sum);
             }
         }
-
-        return requestedPointsOfInterest;
+        return weights;
     }
 
     /**

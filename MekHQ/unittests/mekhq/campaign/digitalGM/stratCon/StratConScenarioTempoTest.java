@@ -193,6 +193,35 @@ class StratConScenarioTempoTest {
     }
 
     @Test
+    void aContractWithNoTracksSchedulesNothingWithoutTheMinimumTrack() {
+        LocalDate endDate = START_DATE.plusMonths(3);
+
+        assertTrue(StratConScenarioTempo.rollScenarioDates(START_DATE, endDate, 3, 0, 3, false, false).isEmpty());
+    }
+
+    @Test
+    void theMinimumTrackGivesAContractWithNoTracksScenarios() {
+        LocalDate endDate = START_DATE.plusMonths(3);
+
+        assertEquals(3, StratConScenarioTempo.rollScenarioDates(START_DATE, endDate, 3, 0, 3, true, false).size());
+    }
+
+    @RepeatedTest(20)
+    void theColumnsAreReadAsWeeksWhenRollingWeekly() {
+        LocalDate endDate = START_DATE.plusMonths(3);
+
+        // Ninety days is thirteen weeks: four whole rolls of the three-week table and the first week of a fifth.
+        List<LocalDate> scenarioDates = StratConScenarioTempo.rollScenarioDates(START_DATE, endDate,
+              3, 1, 1, false, true);
+
+        assertTrue((scenarioDates.size() >= 4) && (scenarioDates.size() <= 5), "count " + scenarioDates.size());
+        for (LocalDate scenarioDate : scenarioDates) {
+            assertFalse(scenarioDate.isBefore(START_DATE), scenarioDate.toString());
+            assertTrue(scenarioDate.isBefore(endDate), scenarioDate.toString());
+        }
+    }
+
+    @Test
     void aContractEndingOnItsStartSchedulesNothing() {
         assertTrue(StratConScenarioTempo.rollScenarioDates(START_DATE, START_DATE, 3, 1, 1).isEmpty());
     }
@@ -398,6 +427,8 @@ class StratConScenarioTempoTest {
         when(options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)).thenReturn(true);
         when(options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
         when(options.get(CampaignOption.SCENARIO_TEMPO_MULTIPLIER)).thenReturn(1.0);
+        when(options.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL)).thenReturn(false);
+        when(options.get(CampaignOption.ROLL_TRACKS_WEEKLY)).thenReturn(false);
         when(options.isUseStratConSinglesMode()).thenReturn(isSinglesMode);
         when(options.isUseStratConMaplessMode()).thenReturn(isMaplessMode);
 

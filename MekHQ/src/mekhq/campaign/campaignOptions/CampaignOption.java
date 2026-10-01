@@ -871,6 +871,10 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useChaosScaleSupportPointConversion");
     public static final CampaignOption<Boolean> MULTIPLY_TRACK_INTENSITY_BY_SCALE =
           of(Boolean.class, true, "multiplyTrackIntensityByScale");
+    public static final CampaignOption<Boolean> MINIMUM_ONE_TRACK_PER_ROLL =
+          of(Boolean.class, false, "minimumOneTrackPerRoll");
+    public static final CampaignOption<Boolean> ROLL_TRACKS_WEEKLY =
+          of(Boolean.class, false, "rollTracksWeekly");
     public static final CampaignOption<Boolean> USE_CONTRACT_FACTION_MODIFIERS =
           of(Boolean.class, true, "useContractFactionModifiers");
     public static final CampaignOption<Boolean> USE_INTEL_OBFUSCATION =

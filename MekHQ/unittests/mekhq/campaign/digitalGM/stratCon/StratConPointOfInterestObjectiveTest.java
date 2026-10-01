@@ -44,6 +44,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -240,7 +241,7 @@ class StratConPointOfInterestObjectiveTest {
     }
 
     @Test
-    void requestedPointsOfInterestIncludeObjectivesAndOrdinaryOnes() {
+    void requestedObjectivesIgnoreOtherObjectiveTypesAndOrdinaryEntries() {
         ObjectiveParameters otherObjective = new ObjectiveParameters();
         otherObjective.setObjectiveType(StrategicObjectiveType.AnyScenarioVictory);
         otherObjective.setObjectiveCount(4);
@@ -249,28 +250,40 @@ class StratConPointOfInterestObjectiveTest {
               List.of(ordinaryPointOfInterest(OTHER_TYPE_ID, 3)));
 
         List<StratConScheduledPointOfInterest> requested =
-              StratConContractInitializer.getRequestedPointsOfInterest(definition, 1);
+              StratConContractInitializer.getRequestedObjectivePointsOfInterest(definition, 1);
 
-        assertEquals(5, requested.size(), "other objective types ask for no points of interest");
+        assertEquals(2, requested.size(), "other objective types ask for no points of interest");
         assertEquals(2, countStrategicObjectives(requested));
         for (StratConScheduledPointOfInterest pointOfInterest : requested) {
-            String expectedType = pointOfInterest.isStrategicObjective() ? TYPE_ID : OTHER_TYPE_ID;
-            assertEquals(expectedType, pointOfInterest.getTypeId());
+            assertEquals(TYPE_ID, pointOfInterest.getTypeId());
         }
     }
 
     @Test
-    void negativeCountsScaleWithTheContract() {
-        // An objective never scales below one; an ordinary entry may round down to none.
+    void negativeObjectiveCountsScaleWithTheContract() {
+        // An objective never scales below one.
         StratConContractDefinition definition = contractDefinition(
-              List.of(pointOfInterestObjective(-0.1, TYPE_ID)),
-              List.of(ordinaryPointOfInterest(OTHER_TYPE_ID, -0.5), ordinaryPointOfInterest(TYPE_ID, -0.1)));
+              List.of(pointOfInterestObjective(-0.1, TYPE_ID)), List.of());
 
         List<StratConScheduledPointOfInterest> requested =
-              StratConContractInitializer.getRequestedPointsOfInterest(definition, 3);
+              StratConContractInitializer.getRequestedObjectivePointsOfInterest(definition, 3);
 
-        assertEquals(1, countStrategicObjectives(requested), "max(1, 0.3) objectives");
-        assertEquals(2, requested.size(), "plus (int) 1.5 ordinary, plus (int) 0.3 of the other type");
+        assertEquals(1, requested.size(), "max(1, 0.3) objectives");
+    }
+
+    @Test
+    void ordinaryEntriesAreWeightedByTheSizeOfTheirCount() {
+        StratConContractDefinition definition = contractDefinition(List.of(),
+              List.of(ordinaryPointOfInterest(OTHER_TYPE_ID, -0.5),
+                    ordinaryPointOfInterest(TYPE_ID, 2),
+                    ordinaryPointOfInterest(OTHER_TYPE_ID, 1),
+                    ordinaryPointOfInterest("UnitTestZeroType", 0)));
+
+        Map<String, Double> weights = StratConContractInitializer.getOrdinaryPointOfInterestWeights(definition);
+
+        assertEquals(2, weights.size(), "a zero count is skipped");
+        assertEquals(1.5, weights.get(OTHER_TYPE_ID), "entries of one type add together, sign ignored");
+        assertEquals(2.0, weights.get(TYPE_ID));
     }
 
     @Test
@@ -279,7 +292,8 @@ class StratConPointOfInterestObjectiveTest {
               List.of(pointOfInterestObjective(2)),
               List.of(ordinaryPointOfInterest(" ", 2), ordinaryPointOfInterest(null, 2)));
 
-        assertTrue(StratConContractInitializer.getRequestedPointsOfInterest(definition, 1).isEmpty());
+        assertTrue(StratConContractInitializer.getRequestedObjectivePointsOfInterest(definition, 1).isEmpty());
+        assertTrue(StratConContractInitializer.getOrdinaryPointOfInterestWeights(definition).isEmpty());
     }
 
     @Test
@@ -288,15 +302,16 @@ class StratConPointOfInterestObjectiveTest {
         when(contract.getStartDate()).thenReturn(TODAY);
         when(contract.getLengthInMonths()).thenReturn(3);
         when(contract.getScale()).thenReturn(1);
+        when(contract.getTrackCount()).thenReturn(3);
         StratConCampaignState campaignState = new StratConCampaignState();
         StratConContractDefinition definition = contractDefinition(
               List.of(pointOfInterestObjective(1, TYPE_ID)),
-              List.of(ordinaryPointOfInterest(OTHER_TYPE_ID, 4)));
+              List.of(ordinaryPointOfInterest(OTHER_TYPE_ID, 1)));
 
         StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState, true, true);
 
         List<StratConScheduledPointOfInterest> scheduled = campaignState.getScheduledPointsOfInterest();
-        assertEquals(5, scheduled.size());
+        assertEquals(4, scheduled.size(), "one objective, plus one roll of the three-track column");
         assertEquals(1, countStrategicObjectives(scheduled));
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertNotNull(pointOfInterest.getSpawnDate());

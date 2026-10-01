@@ -40,6 +40,7 @@ import static megamek.common.units.Jumpship.DRIVE_CORE_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ELITE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_HEROIC;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_LEGENDARY;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -48,12 +49,21 @@ import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.time.LocalDate;
 import java.util.Collection;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 import megamek.codeUtilities.MathUtility;
 import megamek.common.annotations.Nullable;
+import megamek.common.battleArmor.BattleArmor;
+import megamek.common.bays.BattleArmorBay;
+import megamek.common.bays.Bay;
+import megamek.common.bays.InfantryBay;
 import megamek.common.units.Entity;
+import megamek.common.units.Infantry;
 import megamek.common.units.Jumpship;
 import megamek.common.units.LandAirMek;
+import megamek.common.units.PlatoonType;
 import megamek.common.units.SpaceStation;
 import megamek.logging.MMLogger;
 import mekhq.campaign.JumpPath;
@@ -148,12 +158,33 @@ public class TransportCostCalculations {
     // Hiring a Princess for dependents proved to be insanely expensive. So we're instead assuming
     static final double PASSENGERS_COST = INFANTRY_COST;
 
+    // An unused unit bay can be filled with cargo instead. The cargo it holds is based on the bay's capacity, not its
+    // weight: the maximum tonnage of the unit, or troopers, it could have held (TechManual Transport Bays table).
+    static final double SMALL_CRAFT_BAY_CARGO_TONNAGE = 200.0;
+    static final double ASF_BAY_CARGO_TONNAGE = 100.0;
+    static final double MEK_BAY_CARGO_TONNAGE = 100.0;
+    static final double SUPER_HEAVY_VEHICLE_BAY_CARGO_TONNAGE = 200.0;
+    static final double HEAVY_VEHICLE_BAY_CARGO_TONNAGE = 100.0;
+    static final double LIGHT_VEHICLE_BAY_CARGO_TONNAGE = 50.0;
+    static final double PROTOMEK_BAY_CARGO_TONNAGE = 15.0; // Per ProtoMek
+    // Battle Armor bays hold 2 tons of bay per trooper (BattleArmorBay#getWeight), and the heaviest suits weigh 2 tons,
+    // so bay tonnage and capacity tonnage are the same
+    static final double BATTLE_ARMOR_BAY_TONNAGE_PER_TROOPER = 2.0;
+    static final int CONVENTIONAL_INFANTRY_TROOPERS_PER_PLATOON_SLOT = 30;
+    static final int MECHANIZED_INFANTRY_TROOPERS_PER_SQUAD_SLOT = 7;
+    // The heaviest base trooper weight for each platoon type, from the conventional infantry construction rules
+    static final double FOOT_TROOPER_TONNAGE = 0.085;
+    static final double JUMP_TROOPER_TONNAGE = 0.165;
+    static final double MOTORIZED_TROOPER_TONNAGE = 0.195;
+    static final double MECHANIZED_TROOPER_TONNAGE = 1.9; // VTOL
+
     private final Collection<Unit> travelingUnits;
     private final Collection<Person> travelingPersonnel;
     private final Collection<Part> travelingSpareParts;
     private final int jumpShipCrewExperienceLevel;
 
     private double additionalCargoSpaceRequired;
+    private double spareBayCargoCapacity;
     private double cargoBayCost;
     private double tetrisMasterMultiplier = 1.0;
     private boolean hasTransportNegotiatorSPA;
@@ -198,6 +229,8 @@ public class TransportCostCalculations {
     private int protoMekCount;
     private int battleArmorCount;
     private int infantryCount;
+    private final Map<PlatoonType, Double> infantryBayTonnageRequired = new EnumMap<>(PlatoonType.class);
+    private double battleArmorBayTonnageRequired;
     private int otherUnitCount;
 
     private Money totalCost = null;
@@ -212,6 +245,16 @@ public class TransportCostCalculations {
 
     public double getAdditionalCargoSpaceRequired() {
         return additionalCargoSpaceRequired;
+    }
+
+    /**
+     * @return the cargo tonnage provided by unit bays that are not needed to transport units
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public double getSpareBayCargoCapacity() {
+        return spareBayCargoCapacity;
     }
 
     public double getCargoBayCost() {
@@ -449,6 +492,26 @@ public class TransportCostCalculations {
     }
 
     /**
+     * Calculates the cargo tonnage provided by unit bays that are not needed to carry the supplied units. Each unused
+     * bay contributes the maximum tonnage of the unit it could have held.
+     *
+     * @param units the units whose bays, and transport needs, are being considered
+     *
+     * @return the cargo tonnage available in unused unit bays
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double calculateSpareBayCargoCapacity(final Collection<Unit> units) {
+        TransportCostCalculations calculations = new TransportCostCalculations(units, List.of(), List.of(),
+              EXP_REGULAR);
+        calculations.totalCost = Money.zero();
+        calculations.countUnitsByType();
+        calculations.calculateAdditionalBayRequirementsFromUnits();
+        return calculations.getSpareBayCargoCapacity();
+    }
+
+    /**
      * Calculates and sets the Tetris Master multiplier based on active personnel.
      *
      * <p>This method examines all active personnel in the provided collection and increments the
@@ -516,10 +579,10 @@ public class TransportCostCalculations {
         // Initialize totalCost
         totalCost = Money.zero();
 
-        calculateCargoRequirements();
-
         countUnitsByType();
         calculateAdditionalBayRequirementsFromUnits();
+        // Must follow the bay calculations, as unused unit bays are made available for cargo
+        calculateCargoRequirements();
         calculateAdditionalBayRequirementsFromPassengers(getTotalLargeCraftPassengerCapacity());
         additionalDropShipsRequired += (int) ceil(totalAdditionalBaysRequired / BAYS_PER_DROPSHIP);
 
@@ -602,7 +665,7 @@ public class TransportCostCalculations {
         double totalCargoUsage = CargoStatistics.getCargoTonnage(travelingUnits, travelingSpareParts, false, false);
         totalCargoUsage += CargoStatistics.getCargoTonnage(travelingUnits, travelingSpareParts, false, true);
 
-        additionalCargoSpaceRequired = -min(0, totalCargoCapacity - totalCargoUsage);
+        additionalCargoSpaceRequired = max(0, totalCargoUsage - totalCargoCapacity);
         cargoBayCost = round(additionalCargoSpaceRequired * CARGO_PER_TON_COST);
 
         requiredCargoDropShips = (int) ceil(additionalCargoSpaceRequired / CARGO_PER_DROPSHIP);
@@ -615,6 +678,7 @@ public class TransportCostCalculations {
     private double getTotalCargoCapacity() {
         double totalCargoCapacity = CargoStatistics.getTotalCargoCapacity(travelingUnits);
         totalCargoCapacity *= tetrisMasterMultiplier;
+        totalCargoCapacity += spareBayCargoCapacity;
         return totalCargoCapacity;
     }
 
@@ -708,6 +772,29 @@ public class TransportCostCalculations {
         additionalInfantryBaysCost = round(additionalInfantryBaysRequired * INFANTRY_COST);
         totalCost = totalCost.plus(additionalInfantryBaysCost);
 
+        // Spare bays left over after all units have been allocated can carry cargo. Surplus larger bays cascade down
+        // into smaller bay categories, and are only used once the smaller category's own bays are full. So whatever
+        // remains unused is drawn first from the larger bays.
+        int unusedASFLevelBays = max(0, asfBays - asfCount);
+        int unusedSmallCraftBays = min(smallCraftSpareCapacity, unusedASFLevelBays);
+        int unusedASFBays = unusedASFLevelBays - unusedSmallCraftBays;
+
+        int unusedLightVehicleLevelBays = max(0, lightVehicleBayUsage);
+        int unusedHeavyVehicleLevelBays = min(heavyVehicleSpareCapacity, unusedLightVehicleLevelBays);
+        int unusedSuperHeavyVehicleBays = min(superHeavyVehicleSpareCapacity, unusedHeavyVehicleLevelBays);
+        int unusedHeavyVehicleBays = unusedHeavyVehicleLevelBays - unusedSuperHeavyVehicleBays;
+        int unusedLightVehicleBays = unusedLightVehicleLevelBays - unusedHeavyVehicleLevelBays;
+
+        spareBayCargoCapacity = unusedSmallCraftBays * SMALL_CRAFT_BAY_CARGO_TONNAGE +
+                                      unusedASFBays * ASF_BAY_CARGO_TONNAGE +
+                                      max(0, mekBayUsage) * MEK_BAY_CARGO_TONNAGE +
+                                      unusedSuperHeavyVehicleBays * SUPER_HEAVY_VEHICLE_BAY_CARGO_TONNAGE +
+                                      unusedHeavyVehicleBays * HEAVY_VEHICLE_BAY_CARGO_TONNAGE +
+                                      unusedLightVehicleBays * LIGHT_VEHICLE_BAY_CARGO_TONNAGE +
+                                      max(0, protoMekBays - protoMekCount) * PROTOMEK_BAY_CARGO_TONNAGE +
+                                      max(0, getTotalBattleArmorBayTonnage() - battleArmorBayTonnageRequired) +
+                                      getSpareInfantryBayCargoCapacity();
+
         // Other Units
         additionalOtherUnitBaysCost = round(otherUnitCount * OTHER_UNIT_COST);
         totalCost = totalCost.plus(additionalOtherUnitBaysCost);
@@ -776,8 +863,14 @@ public class TransportCostCalculations {
                     protoMekCount++;
                 } else if (entity.isBattleArmor()) {
                     battleArmorCount++;
+                    if (entity instanceof BattleArmor battleArmor) {
+                        battleArmorBayTonnageRequired += battleArmor.getOriginalTrooperCount() *
+                                                               BATTLE_ARMOR_BAY_TONNAGE_PER_TROOPER;
+                    }
                 } else if (entity.isInfantry()) {
                     infantryCount++;
+                    infantryBayTonnageRequired.merge(PlatoonType.getPlatoonType(entity),
+                          getInfantryBayTonnageRequired(entity), Double::sum);
                 } else if (!(entity instanceof Jumpship) && !entity.isHandheldWeapon()) {
                     // Includes WarShips
                     otherUnitCount++;
@@ -1001,6 +1094,134 @@ public class TransportCostCalculations {
         }
 
         return (int) Math.round(total);
+    }
+
+    /**
+     * Calculates the bay tonnage needed to carry a conventional infantry unit. This mirrors
+     * {@link InfantryBay#spaceForUnit(Entity)}: each platoon type takes up a different amount of space, and mechanized
+     * infantry take up space for each squad.
+     *
+     * @param entity the conventional infantry unit
+     *
+     * @return the infantry bay tonnage required to carry it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static double getInfantryBayTonnageRequired(Entity entity) {
+        PlatoonType platoonType = PlatoonType.getPlatoonType(entity);
+        if ((platoonType == PlatoonType.MECHANIZED) && (entity instanceof Infantry infantry)) {
+            return platoonType.getWeight() * infantry.getSquadCount();
+        }
+        return platoonType.getWeight();
+    }
+
+    /**
+     * Calculates the cargo that unused conventional infantry bays could carry. Each bay's spare space is converted
+     * into the number of troopers it could have held, multiplied by the heaviest trooper weight for that bay's platoon
+     * type.
+     *
+     * <p>Infantry are first placed in bays of their own platoon type. Any that don't fit there take up spare space in
+     * other infantry bays.</p>
+     *
+     * @return the cargo tonnage available in unused infantry bays
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    double getSpareInfantryBayCargoCapacity() {
+        Map<PlatoonType, Double> spareBayTonnage = new EnumMap<>(PlatoonType.class);
+        double overflowTonnage = 0.0;
+
+        for (PlatoonType platoonType : PlatoonType.values()) {
+            double bayTonnage = getTotalInfantryBayTonnage(platoonType);
+            double requiredTonnage = infantryBayTonnageRequired.getOrDefault(platoonType, 0.0);
+            spareBayTonnage.put(platoonType, max(0, bayTonnage - requiredTonnage));
+            overflowTonnage += max(0, requiredTonnage - bayTonnage);
+        }
+
+        double spareCargoCapacity = 0.0;
+        for (PlatoonType platoonType : PlatoonType.values()) {
+            double spareTonnage = spareBayTonnage.get(platoonType);
+            double absorbedOverflow = min(spareTonnage, overflowTonnage);
+            spareTonnage -= absorbedOverflow;
+            overflowTonnage -= absorbedOverflow;
+
+            double spareSlots = spareTonnage / platoonType.getWeight();
+            spareCargoCapacity += spareSlots * getInfantryBayCargoTonnagePerSlot(platoonType);
+        }
+
+        return spareCargoCapacity;
+    }
+
+    /**
+     * @param platoonType the infantry bay's platoon type
+     *
+     * @return the cargo tonnage one slot of that bay could hold: its trooper capacity multiplied by the heaviest base
+     *       trooper weight for that platoon type
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static double getInfantryBayCargoTonnagePerSlot(PlatoonType platoonType) {
+        return switch (platoonType) {
+            case FOOT -> CONVENTIONAL_INFANTRY_TROOPERS_PER_PLATOON_SLOT * FOOT_TROOPER_TONNAGE;
+            case JUMP -> CONVENTIONAL_INFANTRY_TROOPERS_PER_PLATOON_SLOT * JUMP_TROOPER_TONNAGE;
+            case MOTORIZED -> CONVENTIONAL_INFANTRY_TROOPERS_PER_PLATOON_SLOT * MOTORIZED_TROOPER_TONNAGE;
+            case MECHANIZED -> MECHANIZED_INFANTRY_TROOPERS_PER_SQUAD_SLOT * MECHANIZED_TROOPER_TONNAGE;
+        };
+    }
+
+    /**
+     * @param platoonType the platoon type of the bays to total
+     *
+     * @return the total bay tonnage of conventional infantry bays of the given platoon type across all traveling units
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    double getTotalInfantryBayTonnage(PlatoonType platoonType) {
+        double total = 0.0;
+
+        for (Unit unit : travelingUnits) {
+            for (Bay bay : getTransportBays(unit)) {
+                if (bay instanceof InfantryBay infantryBay && infantryBay.getPlatoonType() == platoonType) {
+                    // Infantry bay capacity is already tracked in bay tons
+                    total += infantryBay.getCapacity();
+                }
+            }
+        }
+
+        return total;
+    }
+
+    /**
+     * @return the total tonnage of Battle Armor bays across all traveling units
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    double getTotalBattleArmorBayTonnage() {
+        double total = 0.0;
+
+        for (Unit unit : travelingUnits) {
+            for (Bay bay : getTransportBays(unit)) {
+                if (bay instanceof BattleArmorBay) {
+                    // The bay's tonnage already accounts for IS, Clan, or ComStar squad sizes
+                    total += bay.getWeight();
+                }
+            }
+        }
+
+        return total;
+    }
+
+    private static List<Bay> getTransportBays(Unit unit) {
+        Entity entity = unit.getEntity();
+        if ((entity == null) || (entity.getTransportBays() == null)) {
+            return List.of();
+        }
+        return entity.getTransportBays();
     }
 
     public int getTotalDockingCollars() {
