@@ -489,4 +489,12 @@ class StratConEnemyFacilityActivityTest {
             assertEquals(1, StratConEnemyFacilityActivity.getMonthlyEngineerCount(2, false, 1.5));
         }
     }
+
+    @Test
+    void aReliefForceIsNeverGuaranteed() {
+        // A counterattack's chance is 25% at normal activity; a long quiet spell doesn't change that for relief.
+        assertTrue(StratConEnemyFacilityActivity.isReliefSent(1.0, 24));
+        assertFalse(StratConEnemyFacilityActivity.isReliefSent(1.0, 25));
+        assertFalse(StratConEnemyFacilityActivity.isReliefSent(0, 0));
+    }
 }

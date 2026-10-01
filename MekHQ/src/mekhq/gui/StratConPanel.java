@@ -801,15 +801,16 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         AbstractContract contract = campaignState.getContract();
         List<FacilityOperation> operations = StratConFacilityOperations.getOperationsFor(currentTrack, coords);
-        boolean isEmptyHexWithoutFormation = (currentTrack.getFacility(coords) == null)
-                                                   && !currentTrack.areAnyForceDeployedTo(coords);
+        // An enemy facility the player hasn't found counts as an empty hex, so right-clicks can't be used to find it.
+        StratConFacility knownFacility = StratConFacilityOperations.getKnownFacility(currentTrack, coords);
+        boolean isEmptyHexWithoutFormation = (knownFacility == null) && !currentTrack.areAnyForceDeployedTo(coords);
         if ((contract == null) || operations.isEmpty() || isEmptyHexWithoutFormation) {
             return;
         }
 
         if (hasFacilityDetails(coords)) {
             JMenuItem detailsItem = new JMenuItem(getTextAt(FACILITY_OPERATIONS_BUNDLE,
-                  (currentTrack.getFacility(coords) == null) ? "contextMenu.hexDetails" : "contextMenu.details"));
+                  (knownFacility == null) ? "contextMenu.hexDetails" : "contextMenu.details"));
             detailsItem.addActionListener(evt -> openFacilityDialog(coords));
             rightClickMenu.add(detailsItem);
         }
@@ -848,12 +849,8 @@ public class StratConPanel extends JPanel implements ActionListener {
             return false;
         }
 
-        StratConFacility facility = currentTrack.getFacility(coords);
-        if (facility != null) {
-            boolean isRevealed = currentTrack.hasActiveTrackReveal()
-                                       || currentTrack.getRevealedCoords().contains(coords)
-                                       || currentTrack.isGmRevealed();
-            return isRevealed && facility.isVisible();
+        if (StratConFacilityOperations.getKnownFacility(currentTrack, coords) != null) {
+            return true;
         }
         return StratConFacilityOperations.isEnabled(campaign)
                      && currentTrack.areAnyForceDeployedTo(coords)

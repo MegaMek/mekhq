@@ -332,7 +332,11 @@ public class StratConTrackState {
             assignedCoordForces.get(assignedForceCoords.get(forceID)).remove(forceID);
             assignedForceCoords.remove(forceID);
             assignedForceReturnDates.remove(forceID);
-            removeStickyForce(forceID);
+            // A formation carrying out a facility order - holding a siege through a sortie, say - keeps holding its
+            // position when a fight re-deploys it; the order itself decides when it may leave.
+            if (getFacilityOrder(forceID) == null) {
+                removeStickyForce(forceID);
+            }
             getAssignedForceReturnDatesForStorage().remove(forceID);
         }
     }

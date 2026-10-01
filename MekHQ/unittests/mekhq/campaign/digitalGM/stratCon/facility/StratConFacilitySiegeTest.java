@@ -53,6 +53,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTestData;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.LocalModifiersEffect;
@@ -128,6 +129,9 @@ class StratConFacilitySiegeTest {
         // A Stronghold's garrison is large enough to take two steps without surrendering.
         facility.setTier(FacilityTier.STRONGHOLD);
         track.addFacility(FACILITY_COORDS, facility);
+        // Found by the player, as orders are only given on facilities they can see.
+        facility.raiseIntel(FacilityIntel.LOCATED);
+        track.getRevealedCoords().add(FACILITY_COORDS);
         // Cut off, so the garrison can neither sortie nor be relieved.
         track.getCutOffFacilities().add(FACILITY_COORDS);
     }
@@ -355,7 +359,7 @@ class StratConFacilitySiegeTest {
             besiege(FORMATION_ID, 0);
             besiege(SECOND_FORMATION_ID, 1);
 
-            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, false);
+            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, false, false);
 
             assertFalse(StratConFacilitySiege.isBesieged(track, FACILITY_COORDS));
         }
@@ -364,7 +368,7 @@ class StratConFacilitySiegeTest {
         void losingToAReliefForceBreaksTheSiege() {
             besiege(FORMATION_ID, 0);
 
-            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, false, false);
+            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, false, false, false);
 
             assertFalse(StratConFacilitySiege.isBesieged(track, FACILITY_COORDS));
         }
@@ -375,7 +379,7 @@ class StratConFacilitySiegeTest {
             int garrison = facility.getGarrison();
             besiege(FORMATION_ID, 0);
 
-            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, true);
+            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, true, false);
 
             assertEquals(garrison - 1, facility.getGarrison());
             assertTrue(StratConFacilitySiege.isBesieged(track, FACILITY_COORDS));
@@ -387,7 +391,19 @@ class StratConFacilitySiegeTest {
             int garrison = facility.getGarrison();
             besiege(FORMATION_ID, 0);
 
-            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, false, true);
+            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, false, true, false);
+
+            assertEquals(garrison, facility.getGarrison());
+            assertTrue(StratConFacilitySiege.isBesieged(track, FACILITY_COORDS));
+        }
+
+        @Test
+        void aDrawnFightKeepsTheSiegeAndChangesNothingElse() {
+            facility.setGarrison(facility.getGarrisonMaximum());
+            int garrison = facility.getGarrison();
+            besiege(FORMATION_ID, 0);
+
+            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, false, true);
 
             assertEquals(garrison, facility.getGarrison());
             assertTrue(StratConFacilitySiege.isBesieged(track, FACILITY_COORDS));
@@ -398,7 +414,7 @@ class StratConFacilitySiegeTest {
             facility.setGarrison(1);
             besiege(FORMATION_ID, 0);
 
-            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, true);
+            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, true, false);
 
             assertEquals(ForceAlignment.Player, facility.getOwner());
             assertFalse(StratConFacilitySiege.isBesieged(track, FACILITY_COORDS));
@@ -409,7 +425,7 @@ class StratConFacilitySiegeTest {
             facility.setGarrison(facility.getGarrisonMaximum());
             int garrison = facility.getGarrison();
 
-            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, true);
+            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, true, false);
 
             assertEquals(garrison, facility.getGarrison());
         }
@@ -561,7 +577,7 @@ class StratConFacilitySiegeTest {
             StratConCoords besiegerCoords = track.getAssignedForceCoords().get(FORMATION_ID);
             StratConScenario fight = siegeFight(FORMATION_ID, false);
 
-            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, false, true);
+            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, false, true, false);
             track.removeScenario(fight);
             StratConFacilityOperations.processOrders(track, campaign);
 
@@ -575,7 +591,7 @@ class StratConFacilitySiegeTest {
             besiege(FORMATION_ID, 0);
             StratConScenario fight = siegeFight(FORMATION_ID, true);
 
-            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, false);
+            StratConFacilitySiege.resolveSiegeScenario(campaign, contract, track, FACILITY_COORDS, true, false, false);
             track.removeScenario(fight);
 
             assertNull(track.getAssignedForceCoords().get(FORMATION_ID));

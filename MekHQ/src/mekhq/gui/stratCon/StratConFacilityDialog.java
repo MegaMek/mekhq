@@ -132,7 +132,7 @@ public class StratConFacilityDialog extends JDialog {
     private void rebuild() {
         content.removeAll();
 
-        StratConFacility facility = track.getFacility(coords);
+        StratConFacility facility = StratConFacilityOperations.getKnownFacility(track, coords);
         setTitle((facility == null) ?
                        getTextAt(RESOURCE_BUNDLE, "dialog.title.hex") :
                        getFormattedTextAt(RESOURCE_BUNDLE, "dialog.title", facility.getDisplayableName()));

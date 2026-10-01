@@ -240,6 +240,22 @@ public final class StratConEnemyFacilityActivity {
     }
 
     /**
+     * Rolls whether the enemy sends a relief force against a new siege: a counterattack's daily chance, scaled by
+     * activity, without the guarantee a long quiet spell gives a counterattack.
+     *
+     * @param activity   the "Enemy Facility Activity" option (see {@link #getActivity})
+     * @param percentile a roll from 0 to 99
+     *
+     * @return {@code true} if a relief force comes
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isReliefSent(double activity, int percentile) {
+        return (activity > 0) && (percentile < Math.round(COUNTERATTACK_CHANCE_PERCENT * activity));
+    }
+
+    /**
      * Turns as many of the day's due ordinary scenarios into counterattacks as the rules call for (see
      * {@link #isCounterattack}), each on a different facility held by the player or their employer. Each counterattack
      * takes the place of one ordinary scenario, so the contract's pace is unchanged.

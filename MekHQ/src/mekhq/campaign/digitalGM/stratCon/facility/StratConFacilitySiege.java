@@ -32,7 +32,9 @@
  */
 package mekhq.campaign.digitalGM.stratCon.facility;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -63,7 +65,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
  *     unless it is cut off, the garrison may sortie on the sector's usual scenario odds, against one besieging
  *     formation.</li>
  *     <li><b>Fights.</b> Winning a sortie costs the facility another garrison step; beating a relief force changes
- *     nothing. Losing either breaks the siege.</li>
+ *     nothing. A draw leaves the siege as it was. Losing either breaks the siege.</li>
  *     <li><b>End.</b> At no garrison, the facility surrenders: the player takes it without a fight and chooses its
  *     fate, as after a capture. The player can lift a siege at any time.</li>
  * </ul>
@@ -148,11 +150,13 @@ public final class StratConFacilitySiege {
           StratConCoords coords, int formationId) {
         boolean isFirstBesieger = !isBesieged(track, coords);
         // A siege has no set end; the order's date records the day it began.
-        track.addFacilityOrder(new StratConFacilityOrder(FacilityOperation.SIEGE,
+        StratConFacilityOrder order = new StratConFacilityOrder(FacilityOperation.SIEGE,
               formationId,
               coords,
               campaign.getLocalDate(),
-              null));
+              null);
+        order.setWasAlreadySticky(track.getStickyForces().contains(formationId));
+        track.addFacilityOrder(order);
         track.addStickyForce(formationId);
 
         StratConFacility facility = track.getFacility(coords);
@@ -164,9 +168,10 @@ public final class StratConFacilitySiege {
     }
 
     /**
-     * Rolls whether the enemy brings a counterattack forward as a relief force against a new siege, on the same odds
-     * as any counterattack (see {@link StratConEnemyFacilityActivity#isCounterattack}). A relief force counts as the
-     * enemy's latest counterattack. A cut-off facility cannot be relieved.
+     * Rolls whether the enemy brings a counterattack forward as a relief force against a new siege, on a counterattack's
+     * daily chance (see {@link StratConEnemyFacilityActivity#isReliefSent}). Unlike a counterattack, a relief force is
+     * never guaranteed by a long quiet spell. A relief force counts as the enemy's latest counterattack. A cut-off
+     * facility cannot be relieved.
      *
      * @param campaign    the current campaign
      * @param contract    the contract whose map holds the sector
@@ -186,12 +191,8 @@ public final class StratConFacilitySiege {
             return null;
         }
 
-        long daysSinceLastAttack = StratConEnemyFacilityActivity.getDaysSinceLastCounterattack(contract,
-              campaignState,
-              campaign.getLocalDate());
-        boolean isRelieved = StratConEnemyFacilityActivity.isCounterattack(
+        boolean isRelieved = StratConEnemyFacilityActivity.isReliefSent(
               StratConEnemyFacilityActivity.getActivity(campaign),
-              daysSinceLastAttack,
               Compute.randomInt(100));
         if (!isRelieved) {
             return null;
@@ -318,11 +319,9 @@ public final class StratConFacilitySiege {
     private static List<Integer> payBesiegers(Campaign campaign, StratConCampaignState campaignState,
           StratConTrackState track, StratConCoords coords) {
         List<Integer> besiegerIds = new ArrayList<>();
-        LocalDate firstWeekStart = campaign.getLocalDate().minusDays(SIEGE_FIRST_WEEK_DAYS);
         for (StratConFacilityOrder order : getSieges(track, coords)) {
             int formationId = order.getFormationId();
-            // The order's date is the day the siege began.
-            if (order.getCompletionDate().isAfter(firstWeekStart)) {
+            if (!isBiting(order, campaign.getLocalDate())) {
                 continue;
             }
 
@@ -341,6 +340,33 @@ public final class StratConFacilitySiege {
             besiegerIds.add(formationId);
         }
         return besiegerIds;
+    }
+
+    /**
+     * @param siege a siege order
+     * @param day   a Monday the sieges are settled on
+     *
+     * @return {@code true} if the siege has had its free first week by that day, and so bites and is charged for
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isBiting(StratConFacilityOrder siege, LocalDate day) {
+        // The order's date is the day the siege began.
+        return !siege.getCompletionDate().isAfter(day.minusDays(SIEGE_FIRST_WEEK_DAYS));
+    }
+
+    /**
+     * @param today the current date
+     *
+     * @return the next day sieges are settled on: the coming Monday, or a week from today if today is Monday, as
+     *       today's have already been settled
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static LocalDate getNextSiegeDay(LocalDate today) {
+        return today.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
     }
 
     /**
@@ -408,8 +434,8 @@ public final class StratConFacilitySiege {
     }
 
     /**
-     * Settles a fight over a siege. A loss breaks the siege; a won sortie costs the facility a garrison step, which
-     * may make it surrender.
+     * Settles a fight over a siege. A loss breaks the siege, a draw leaves it as it was, and a won sortie costs the
+     * facility a garrison step, which may make it surrender.
      *
      * @param campaign       the current campaign
      * @param contract       the contract whose map holds the sector
@@ -417,18 +443,24 @@ public final class StratConFacilitySiege {
      * @param facilityCoords the besieged facility's hex
      * @param isSortie       {@code true} for a sortie, {@code false} for a relief force
      * @param isVictory      {@code true} if the player won
+     * @param isDraw         {@code true} if the fight was drawn
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static void resolveSiegeScenario(Campaign campaign, AbstractContract contract, StratConTrackState track,
-          StratConCoords facilityCoords, boolean isSortie, boolean isVictory) {
+          StratConCoords facilityCoords, boolean isSortie, boolean isVictory, boolean isDraw) {
         StratConFacility facility = track.getFacility(facilityCoords);
         if ((facility == null) || facility.isOwnerAlliedToPlayer() || !isBesieged(track, facilityCoords)) {
             return;
         }
 
         String facilityName = facility.getDisplayableName();
+        if (isDraw) {
+            StratConFacilityOperations.report(campaign, "report.siege.drawn", facilityName);
+            return;
+        }
+
         if (!isVictory) {
             endSieges(track, facilityCoords);
             StratConFacilityOperations.report(campaign,
@@ -476,6 +508,8 @@ public final class StratConFacilitySiege {
               contract,
               track,
               coords,
-              StratConFacilityOperations.askCaptureChoice(campaign, facility));
+              StratConFacilityOperations.askCaptureChoice(campaign,
+                    facility,
+                    StratConFacilityOperations.canRaze(track, coords)));
     }
 }

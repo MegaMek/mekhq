@@ -79,7 +79,8 @@ public final class StratConFacilitySupply {
     /** How many days a won convoy interdiction cuts the enemy's supply through its hex. */
     static final int ROAD_CUT_DAYS = 28;
 
-    private StratConFacilitySupply() {}
+    private StratConFacilitySupply() {
+    }
 
     /**
      * @param campaign the current campaign
@@ -217,7 +218,6 @@ public final class StratConFacilitySupply {
     private static boolean isOnSide(StratConFacility facility, boolean isPlayerSide) {
         return isPlayerSide ? facility.isOwnerAlliedToPlayer() : (facility.getOwner() == ForceAlignment.Opposing);
     }
-
 
     /**
      * The daily supply step for a sector: ends road cuts whose time is up, works out which facilities are cut off,

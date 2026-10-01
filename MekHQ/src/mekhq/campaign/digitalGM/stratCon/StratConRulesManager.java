@@ -4347,7 +4347,9 @@ public class StratConRulesManager {
                               mission,
                               track,
                               scenario.getCoords(),
-                              StratConFacilityOperations.askCaptureChoice(campaign, facility));
+                              StratConFacilityOperations.askCaptureChoice(campaign,
+                                    facility,
+                                    StratConFacilityOperations.canRaze(track, scenario.getCoords())));
                     }
                 }
 
@@ -4363,7 +4365,8 @@ public class StratConRulesManager {
                           track,
                           scenario.getSiegeCoords(),
                           scenario.isSiegeSortie(),
-                          victory);
+                          victory,
+                          backingScenario.getStatus().isDraw());
                 }
 
                 // Deliberately does not touch the road network. Roads are laid when the sector is generated, and

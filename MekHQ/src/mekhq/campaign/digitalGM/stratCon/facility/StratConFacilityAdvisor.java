@@ -167,6 +167,7 @@ public final class StratConFacilityAdvisor {
             case "reason.supportPoints" -> "guidance.supportPoints";
             case "reason.needsDetailedIntel" -> "guidance.needsDetailedIntel";
             case "reason.scenarioUnderway" -> "guidance.scenarioUnderway";
+            case "reason.cutOff" -> "guidance.cutOff";
             default -> null;
         };
     }
@@ -192,7 +193,8 @@ public final class StratConFacilityAdvisor {
             return hints;
         }
 
-        StratConFacility facility = track.getFacility(coords);
+        // An enemy facility the player hasn't found gets no hints, so they can't give it away.
+        StratConFacility facility = StratConFacilityOperations.getKnownFacility(track, coords);
         LocalDate today = campaign.getLocalDate();
 
         StratConScenario counterattack = getCounterattack(track, coords);
@@ -218,7 +220,8 @@ public final class StratConFacilityAdvisor {
             return hints;
         }
 
-        int besiegerCount = StratConFacilitySiege.getSieges(track, coords).size();
+        List<StratConFacilityOrder> sieges = StratConFacilitySiege.getSieges(track, coords);
+        int besiegerCount = sieges.size();
         if (besiegerCount > 0) {
             if (facility.getIntel().isAtLeast(FacilityIntel.DETAILED)) {
                 hints.add(getFormattedTextAt(RESOURCE_BUNDLE,
@@ -226,7 +229,7 @@ public final class StratConFacilityAdvisor {
                       besiegerCount,
                       getWeeksToSurrender(facility.getGarrison()
                                                 - (facility.hasTrait(FacilityTrait.POOR_MORALE) ? 1 : 0),
-                            besiegerCount)));
+                            getBesiegerCountsByWeek(sieges, StratConFacilitySiege.getNextSiegeDay(today)))));
             } else {
                 hints.add(getFormattedTextAt(RESOURCE_BUNDLE, "hint.besieged", besiegerCount));
             }
@@ -238,18 +241,39 @@ public final class StratConFacilityAdvisor {
         }
 
         if (facility.isOwnerAlliedToPlayer()) {
-            if (facility.getGarrison() < facility.getGarrisonMaximum()) {
+            if ((facility.getGarrison() < facility.getGarrisonMaximum())
+                      && !StratConFacilitySupply.isCutOff(track, coords)) {
                 hints.add(getTextAt(RESOURCE_BUNDLE, "hint.understrength"));
             }
             return hints;
         }
 
         if ((besiegerCount == 0) && (counterattack == null)) {
-            hints.add(getTextAt(RESOURCE_BUNDLE,
-                  hasAnyOrderAvailable(campaign, contract, track, coords) ? "hint.ordersAvailable" :
-                        "hint.deployToAct"));
+            hints.add(getEnemyFacilityOrderHint(campaign, contract, track, coords));
         }
         return hints;
+    }
+
+    /**
+     * @return the hint for an enemy facility that is neither besieged nor counterattacking: that orders are available;
+     *       that a formation is needed, if that is all that stands in the way; or else what does stand in the way
+     */
+    private static String getEnemyFacilityOrderHint(Campaign campaign, AbstractContract contract,
+          StratConTrackState track, StratConCoords coords) {
+        List<OrderOption> options = getOrderOptions(campaign, contract, track, coords);
+        for (OrderOption option : options) {
+            if (option.isAvailable()) {
+                return getTextAt(RESOURCE_BUNDLE, "hint.ordersAvailable");
+            }
+        }
+
+        for (OrderOption option : options) {
+            if (!"contextMenu.noFormation".equals(option.reasonKey())) {
+                String key = (option.guidanceKey() == null) ? option.reasonKey() : option.guidanceKey();
+                return getTextAt(RESOURCE_BUNDLE, key);
+            }
+        }
+        return getTextAt(RESOURCE_BUNDLE, "hint.deployToAct");
     }
 
     private static void addEmptyHexHints(Campaign campaign, AbstractContract contract, StratConTrackState track,
@@ -282,8 +306,52 @@ public final class StratConFacilityAdvisor {
      * @since 0.51.01
      */
     static int getWeeksToSurrender(int garrison, int besiegerCount) {
-        int stepsPerWeek = Math.max(1, Math.min(besiegerCount, 2));
-        return Math.max(1, (garrison + stepsPerWeek - 1) / stepsPerWeek);
+        return getWeeksToSurrender(garrison, new int[] { besiegerCount });
+    }
+
+    /**
+     * @param garrison              the besieged facility's garrison
+     * @param besiegerCountsByWeek  how many formations bite on each coming Monday, the first entry being next Monday;
+     *                              the last entry holds for every week after
+     *
+     * @return how many weeks from now it takes to empty the garrison, counting any week in which no besieger bites
+     *       yet, at least one
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int getWeeksToSurrender(int garrison, int[] besiegerCountsByWeek) {
+        int lastWeeklyLoss = StratConFacilitySiege.getWeeklyGarrisonLoss(
+              besiegerCountsByWeek[besiegerCountsByWeek.length - 1]);
+        if (lastWeeklyLoss <= 0) {
+            return 1;
+        }
+
+        int remaining = garrison;
+        int weeks = 0;
+        while (remaining > 0) {
+            int week = Math.min(weeks, besiegerCountsByWeek.length - 1);
+            remaining -= StratConFacilitySiege.getWeeklyGarrisonLoss(besiegerCountsByWeek[week]);
+            weeks++;
+        }
+        return Math.max(1, weeks);
+    }
+
+    /**
+     * @param sieges      the sieges on a facility
+     * @param nextSiegeDay the next Monday, when sieges bite
+     *
+     * @return how many besiegers bite on next Monday and on the one after, which every siege reaches: a siege bites
+     *       only once its free first week is over
+     */
+    private static int[] getBesiegerCountsByWeek(List<StratConFacilityOrder> sieges, LocalDate nextSiegeDay) {
+        int bitingNextWeek = 0;
+        for (StratConFacilityOrder siege : sieges) {
+            if (StratConFacilitySiege.isBiting(siege, nextSiegeDay)) {
+                bitingNextWeek++;
+            }
+        }
+        return new int[] { bitingNextWeek, sieges.size() };
     }
 
     /**

@@ -49,10 +49,12 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConEscalation;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
+import mekhq.campaign.digitalGM.stratCon.StratConStrategicObjective;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
@@ -184,7 +186,7 @@ public final class StratConFacilityOperations {
      */
     public static List<FacilityOperation> getOperationsFor(StratConTrackState track, StratConCoords coords) {
         List<FacilityOperation> operations = new ArrayList<>();
-        StratConFacility facility = track.getFacility(coords);
+        StratConFacility facility = getKnownFacility(track, coords);
         for (FacilityOperation operation : FacilityOperation.values()) {
             boolean isSuitable;
             if (facility == null) {
@@ -201,6 +203,29 @@ public final class StratConFacilityOperations {
             }
         }
         return operations;
+    }
+
+    /**
+     * @param track  a sector
+     * @param coords a hex in it
+     *
+     * @return the facility on the hex if the player knows it is there - one their side holds, or an enemy facility
+     *       they have located on a revealed hex - or {@code null} if there is none or the player can't see it. An enemy
+     *       facility the player hasn't found is treated as absent, so orders can't be used to find it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConFacility getKnownFacility(StratConTrackState track, StratConCoords coords) {
+        StratConFacility facility = track.getFacility(coords);
+        if ((facility == null) || facility.isOwnerAlliedToPlayer()) {
+            return facility;
+        }
+
+        boolean isRevealed = track.hasActiveTrackReveal()
+                                   || track.getRevealedCoords().contains(coords)
+                                   || track.isGmRevealed();
+        return (isRevealed && facility.isVisible()) ? facility : null;
     }
 
     /**
@@ -224,9 +249,10 @@ public final class StratConFacilityOperations {
             return "reason.supportPoints";
         }
 
-        StratConFacility facility = track.getFacility(coords);
+        StratConFacility facility = getKnownFacility(track, coords);
         if (operation == FacilityOperation.BUILD) {
-            boolean isHexOccupied = (facility != null)
+            // A hidden enemy facility still takes up the hex; the player just isn't told what is there.
+            boolean isHexOccupied = (track.getFacility(coords) != null)
                                           || (track.getScenario(coords) != null)
                                           || track.isCity(coords)
                                           || StratConPointOfInterestRules.hasActivePointOfInterest(track, coords)
@@ -248,6 +274,10 @@ public final class StratConFacilityOperations {
         if (operation.isOnOwnFacility()) {
             if (!facility.isOwnerAlliedToPlayer()) {
                 return "reason.notHeld";
+            }
+            // Building up a facility, or bringing in fresh troops, needs the supplies a cut-off one can't get.
+            if (StratConFacilitySupply.isCutOff(track, coords)) {
+                return "reason.cutOff";
             }
             if ((operation == FacilityOperation.FORTIFY) && (facility.getTier() == FacilityTier.STRONGHOLD)) {
                 return "reason.maximumTier";
@@ -464,11 +494,13 @@ public final class StratConFacilityOperations {
             case RECON, BUILD -> {
                 int days = (operation == FacilityOperation.RECON) ? RECON_DAYS : BUILD_DAYS;
                 String definitionId = (buildDefinition == null) ? null : buildDefinition.getId();
-                track.addFacilityOrder(new StratConFacilityOrder(operation,
+                StratConFacilityOrder order = new StratConFacilityOrder(operation,
                       formationId,
                       coords,
                       campaign.getLocalDate().plusDays(days),
-                      definitionId));
+                      definitionId);
+                order.setWasAlreadySticky(track.getStickyForces().contains(formationId));
+                track.addFacilityOrder(order);
                 // The formation holds its position until the order completes.
                 track.addStickyForce(formationId);
                 yield true;
@@ -591,7 +623,10 @@ public final class StratConFacilityOperations {
 
     static void endOrder(StratConTrackState track, StratConFacilityOrder order) {
         track.removeFacilityOrder(order);
-        track.removeStickyForce(order.getFormationId());
+        // A formation the player had already told to remain deployed stays that way.
+        if (!order.isWasAlreadySticky()) {
+            track.removeStickyForce(order.getFormationId());
+        }
     }
 
     /**
@@ -613,6 +648,11 @@ public final class StratConFacilityOperations {
         int formationId = order.getFormationId();
         int total = roll + (isOnPatrol(campaign, formationId) ? RECON_PATROL_BONUS : 0);
         if (total >= RECON_TARGET_NUMBER) {
+            // Another recon may have finished first and already learned everything.
+            if (facility.getIntel().isAtLeast(FacilityIntel.DETAILED)) {
+                report(campaign, "report.recon.nothingMore", facility.getDisplayableName());
+                return;
+            }
             facility.raiseIntel(facility.getIntel().next());
             report(campaign, "report.recon.success", facility.getDisplayableName());
             return;
@@ -683,24 +723,74 @@ public final class StratConFacilityOperations {
      * @since 0.51.01
      */
     public static FacilityCaptureChoice askCaptureChoice(Campaign campaign, StratConFacility facility) {
+        return askCaptureChoice(campaign, facility, true);
+    }
+
+    /**
+     * As {@link #askCaptureChoice(Campaign, StratConFacility)}, but leaving out Raze when the facility must not be
+     * destroyed (see {@link #canRaze}).
+     *
+     * @param campaign the current campaign
+     * @param facility the captured facility
+     * @param canRaze  whether Raze may be offered
+     *
+     * @return the player's choice
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static FacilityCaptureChoice askCaptureChoice(Campaign campaign, StratConFacility facility,
+          boolean canRaze) {
         if (campaign.getGUI() == null) {
             return FacilityCaptureChoice.HOLD;
         }
 
+        List<FacilityCaptureChoice> choices = new ArrayList<>();
         List<String> buttonLabels = new ArrayList<>();
         for (FacilityCaptureChoice choice : FacilityCaptureChoice.values()) {
+            if ((choice == FacilityCaptureChoice.RAZE) && !canRaze) {
+                continue;
+            }
+            choices.add(choice);
             buttonLabels.add(getTextAt(RESOURCE_BUNDLE, "capture.button." + choice.name()));
         }
 
+        String message = getFormattedTextAt(RESOURCE_BUNDLE, "capture.message", facility.getDisplayableName());
+        if (!canRaze) {
+            message += getTextAt(RESOURCE_BUNDLE, "capture.message.objective");
+        }
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               null,
-              getFormattedTextAt(RESOURCE_BUNDLE, "capture.message", facility.getDisplayableName()),
+              message,
               buttonLabels,
               getTextAt(RESOURCE_BUNDLE, "capture.ooc"));
         int choiceIndex = dialog.getDialogChoice();
-        FacilityCaptureChoice[] choices = FacilityCaptureChoice.values();
-        boolean isValidChoice = (choiceIndex >= 0) && (choiceIndex < choices.length);
-        return isValidChoice ? choices[choiceIndex] : FacilityCaptureChoice.HOLD;
+        boolean isValidChoice = (choiceIndex >= 0) && (choiceIndex < choices.size());
+        return isValidChoice ? choices.get(choiceIndex) : FacilityCaptureChoice.HOLD;
+    }
+
+    /**
+     * @param track  a sector
+     * @param coords a facility's hex
+     *
+     * @return {@code false} if a strategic objective on the hex needs the facility to still stand - one the player must
+     *       control - so razing it would fail the objective for good
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean canRaze(StratConTrackState track, StratConCoords coords) {
+        for (StratConStrategicObjective objective : track.getStrategicObjectives()) {
+            if (!coords.equals(objective.getObjectiveCoords())) {
+                continue;
+            }
+            StrategicObjectiveType objectiveType = objective.getObjectiveType();
+            if ((objectiveType == StrategicObjectiveType.AlliedFacilityControl)
+                      || (objectiveType == StrategicObjectiveType.HostileFacilityControl)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -732,6 +822,17 @@ public final class StratConFacilityOperations {
 
         String facilityName = facility.getDisplayableName();
 
+        // Recon and sieges on the facility are over now it is taken; say so, rather than have them read as abandoned.
+        for (StratConFacilityOrder order : new ArrayList<>(track.getFacilityOrders())) {
+            if (coords.equals(order.getTargetCoords())) {
+                endOrder(track, order);
+                report(campaign,
+                      "report.targetTaken." + order.getOperation().name(),
+                      getFormationName(campaign, order.getFormationId()),
+                      facilityName);
+            }
+        }
+
         // Prototype gear is traded to the employer however the facility is dealt with, and only once.
         StratConCampaignState campaignState = contract.getStratConCampaignState();
         if (facility.hasTrait(FacilityTrait.EXPERIMENTAL_WEAPONS) && (campaignState != null)) {
@@ -741,6 +842,11 @@ public final class StratConFacilityOperations {
                   "report.trait.experimentalWeapons",
                   facilityName,
                   FacilityTrait.EXPERIMENTAL_WEAPONS_CAPTURE_SUPPORT);
+        }
+
+        // Never destroy a facility an objective needs standing, whatever was asked for.
+        if ((choice == FacilityCaptureChoice.RAZE) && !canRaze(track, coords)) {
+            choice = FacilityCaptureChoice.HOLD;
         }
 
         switch (choice) {

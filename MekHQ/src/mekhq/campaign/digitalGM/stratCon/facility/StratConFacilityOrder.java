@@ -53,6 +53,8 @@ public class StratConFacilityOrder {
     private StratConCoords targetCoords;
     private LocalDate completionDate;
     private String definitionId;
+    /** Whether the formation was already set to remain deployed before the order, and so should stay that way after. */
+    private boolean wasAlreadySticky;
 
     public StratConFacilityOrder() {
     }
@@ -116,5 +118,20 @@ public class StratConFacilityOrder {
 
     public void setDefinitionId(@Nullable String definitionId) {
         this.definitionId = definitionId;
+    }
+
+    /**
+     * @return {@code true} if the formation was already set to remain deployed before the order was given, so ending
+     *       the order should leave it so
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isWasAlreadySticky() {
+        return wasAlreadySticky;
+    }
+
+    public void setWasAlreadySticky(boolean wasAlreadySticky) {
+        this.wasAlreadySticky = wasAlreadySticky;
     }
 }

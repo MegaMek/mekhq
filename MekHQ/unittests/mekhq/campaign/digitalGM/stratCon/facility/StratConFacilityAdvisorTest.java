@@ -125,6 +125,9 @@ class StratConFacilityAdvisorTest {
               FacilityType.MekBase,
               new LocalModifiersEffect(List.of("MekGarrison.json")));
         track.addFacility(FACILITY_COORDS, facility);
+        // Found by the player, as orders are only given on facilities they can see.
+        facility.raiseIntel(FacilityIntel.LOCATED);
+        track.getRevealedCoords().add(FACILITY_COORDS);
         return facility;
     }
 
@@ -352,6 +355,12 @@ class StratConFacilityAdvisorTest {
         @Test
         void anEmptyGarrisonStillTakesOneWeeklyStep() {
             assertEquals(1, StratConFacilityAdvisor.getWeeksToSurrender(0, 1));
+        }
+
+        @Test
+        void aSiegeStillInItsFreeFirstWeekAddsAWeek() {
+            // Nobody bites next Monday; one besieger bites every Monday after.
+            assertEquals(3, StratConFacilityAdvisor.getWeeksToSurrender(2, new int[] { 0, 1 }));
         }
     }
 
