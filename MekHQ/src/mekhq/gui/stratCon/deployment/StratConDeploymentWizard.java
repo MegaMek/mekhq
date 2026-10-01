@@ -488,7 +488,7 @@ public class StratConDeploymentWizard extends JDialog {
               campaign,
               currentTrack,
               false,
-              null,
+              scenario,
               campaignState,
               restrictToSingleForce);
 
