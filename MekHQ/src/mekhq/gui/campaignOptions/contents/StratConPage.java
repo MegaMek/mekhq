@@ -173,6 +173,8 @@ class StratConPage {
     private JCheckBox chkEssentialScenariosOnly;
     private JCheckBox chkContractsUseSpecialMechanics;
     private JCheckBox chkUseEmployerLostPlanetReactions;
+    private JCheckBox chkUseFacilityOperations;
+    private JCheckBox chkUseSupplyLines;
     private JCheckBox chkNoSeedForces;
     private JCheckBox chkUseGenericBattleValue;
     private JCheckBox chkUseVerboseBidding;
@@ -181,6 +183,10 @@ class StratConPage {
     private JCheckBox chkUseStratConAlternateSectorTerrain;
     private JLabel lblStratConSectorSizeMultiplier;
     private JSpinner spnStratConSectorSizeMultiplier;
+    private JLabel lblEnemyFacilityActivity;
+    private JSpinner spnEnemyFacilityActivity;
+    private JLabel lblFacilityDensity;
+    private JSpinner spnFacilityDensity;
     // end StratCon
 
     private boolean created;
@@ -330,6 +336,12 @@ class StratConPage {
         chkUseEmployerLostPlanetReactions = new CampaignOptionsCheckBox("UseEmployerLostPlanetReactions",
               getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseEmployerLostPlanetReactions.addMouseListener(createTipPanelUpdater("UseEmployerLostPlanetReactions"));
+        chkUseFacilityOperations = new CampaignOptionsCheckBox("UseFacilityOperations",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkUseFacilityOperations.addMouseListener(createTipPanelUpdater("UseFacilityOperations"));
+        chkUseSupplyLines = new CampaignOptionsCheckBox("UseSupplyLines",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        chkUseSupplyLines.addMouseListener(createTipPanelUpdater("UseSupplyLines"));
         chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces",
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkNoSeedForces.addMouseListener(createTipPanelUpdater("NoSeedForces"));
@@ -348,6 +360,16 @@ class StratConPage {
               getMetadata(new Version(0, 51, 1)));
         spnStratConSectorSizeMultiplier = new CampaignOptionsSpinner("StratConSectorSizeMultiplier", 1.0, 0.25, 2.0,
               0.1);
+        lblEnemyFacilityActivity = new CampaignOptionsLabel("EnemyFacilityActivity",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        lblEnemyFacilityActivity.addMouseListener(createTipPanelUpdater("EnemyFacilityActivity"));
+        spnEnemyFacilityActivity = new CampaignOptionsSpinner("EnemyFacilityActivity", 1.0, 0.0, 3.0, 0.1);
+        spnEnemyFacilityActivity.addMouseListener(createTipPanelUpdater("EnemyFacilityActivity"));
+        lblFacilityDensity = new CampaignOptionsLabel("FacilityDensity",
+              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+        lblFacilityDensity.addMouseListener(createTipPanelUpdater("FacilityDensity"));
+        spnFacilityDensity = new CampaignOptionsSpinner("FacilityDensity", 1.0, 0.5, 2.0, 0.1);
+        spnFacilityDensity.addMouseListener(createTipPanelUpdater("FacilityDensity"));
 
         JPanel generalOptionsPanel = createStratConGeneralOptionsPanel();
         JPanel scenarioGenerationPanel = createStratConScenarioGenerationPanel();
@@ -530,12 +552,16 @@ class StratConPage {
               chkEssentialScenariosOnly,
               chkContractsUseSpecialMechanics,
               chkUseEmployerLostPlanetReactions,
+              chkUseFacilityOperations,
+              chkUseSupplyLines,
               chkNoSeedForces,
               chkUseGenericBattleValue,
               chkUseVerboseBidding,
               chkUseStratConAlternateSectorTerrain);
         panel.addRow(lblStratConSectorCountMethod, comboStratConSectorCountMethod);
         panel.addRow(lblStratConSectorSizeMultiplier, spnStratConSectorSizeMultiplier);
+        panel.addRow(lblEnemyFacilityActivity, spnEnemyFacilityActivity);
+        panel.addRow(lblFacilityDensity, spnFacilityDensity);
 
         return panel;
     }
@@ -680,12 +706,16 @@ class StratConPage {
         chkEssentialScenariosOnly.setSelected(model.essentialScenariosOnly);
         chkContractsUseSpecialMechanics.setSelected(model.contractsUseSpecialMechanics);
         chkUseEmployerLostPlanetReactions.setSelected(model.useEmployerLostPlanetReactions);
+        chkUseFacilityOperations.setSelected(model.useFacilityOperations);
+        chkUseSupplyLines.setSelected(model.useSupplyLines);
         chkNoSeedForces.setSelected(model.noSeedForces);
         chkUseGenericBattleValue.setSelected(model.useGenericBattleValue);
         chkUseVerboseBidding.setSelected(model.useVerboseBidding);
         comboStratConSectorCountMethod.setSelectedItem(model.stratConSectorCountMethod);
         chkUseStratConAlternateSectorTerrain.setSelected(model.useStratConAlternateSectorTerrain);
         spnStratConSectorSizeMultiplier.setValue(model.stratConSectorSizeMultiplier);
+        spnEnemyFacilityActivity.setValue(model.enemyFacilityActivity);
+        spnFacilityDensity.setValue(model.facilityDensity);
     }
 
     /**
@@ -741,11 +771,15 @@ class StratConPage {
         model.essentialScenariosOnly = chkEssentialScenariosOnly.isSelected();
         model.contractsUseSpecialMechanics = chkContractsUseSpecialMechanics.isSelected();
         model.useEmployerLostPlanetReactions = chkUseEmployerLostPlanetReactions.isSelected();
+        model.useFacilityOperations = chkUseFacilityOperations.isSelected();
+        model.useSupplyLines = chkUseSupplyLines.isSelected();
         model.noSeedForces = chkNoSeedForces.isSelected();
         model.useGenericBattleValue = chkUseGenericBattleValue.isSelected();
         model.useVerboseBidding = chkUseVerboseBidding.isSelected();
         model.stratConSectorCountMethod = comboStratConSectorCountMethod.getSelectedItem();
         model.useStratConAlternateSectorTerrain = chkUseStratConAlternateSectorTerrain.isSelected();
         model.stratConSectorSizeMultiplier = (double) spnStratConSectorSizeMultiplier.getValue();
+        model.enemyFacilityActivity = (double) spnEnemyFacilityActivity.getValue();
+        model.facilityDensity = (double) spnFacilityDensity.getValue();
     }
 }

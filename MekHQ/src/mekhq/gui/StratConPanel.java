@@ -63,8 +63,10 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
@@ -85,8 +87,10 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.ImageType;
 import mekhq.campaign.digitalGM.stratCon.deployment.DeploymentMode;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.facility.*;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondition;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
@@ -96,9 +100,11 @@ import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.dialog.StratConTerrainPaintDialog;
+import mekhq.gui.stratCon.StratConFacilityDialog;
 import mekhq.gui.stratCon.deployment.StratConDeploymentWizard;
 import mekhq.utilities.ReportingUtilities;
 
@@ -150,6 +156,10 @@ public class StratConPanel extends JPanel implements ActionListener {
     private static final String RIGHT_CLICK_COMMAND_REMOVE_FACILITY = "RemoveFacility";
     private static final String RIGHT_CLICK_COMMAND_CAPTURE_FACILITY = "CaptureFacility";
     private static final String RIGHT_CLICK_COMMAND_ADD_FACILITY = "AddFacility";
+    private static final String RIGHT_CLICK_PROPERTY_FACILITY_OWNER = "AddFacilityOwner";
+    private static final String RIGHT_CLICK_COMMAND_SET_FACILITY_STATE = "SetFacilityState";
+    private static final String RIGHT_CLICK_COMMAND_FACILITY_ORDER = "FacilityOrder";
+    private static final String FACILITY_OPERATIONS_BUNDLE = "mekhq.resources.StratConFacilityOperations";
     private static final String RIGHT_CLICK_COMMAND_REMOVE_SCENARIO = "RemoveScenario";
     private static final String RIGHT_CLICK_COMMAND_RESET_DEPLOYMENT = "ResetDeployment";
     private static final String RIGHT_CLICK_COMMAND_ADD_CITY = "AddCity";
@@ -335,12 +345,21 @@ public class StratConPanel extends JPanel implements ActionListener {
         // The palette paints wherever you drag, so it must not outlive the sector it was opened for.
         closeTerrainPaintDialog();
 
+        // Re-selecting the sector already shown - as happens after every order, when the tab refreshes - keeps the
+        // hex the player just acted on selected, as long as it is still on the map.
+        boolean isSameTrack = (track != null) && (track == currentTrack);
         this.campaignState = campaignState;
         currentTrack = track;
 
-        // clear hex selection
-        boardState.selectedX = null;
-        boardState.selectedY = null;
+        boolean isSelectionOnMap = isSameTrack
+                                         && (boardState.selectedX != null)
+                                         && (boardState.selectedY != null)
+                                         && !track.isOutOfBounds(new StratConCoords(boardState.selectedX,
+                                               boardState.selectedY));
+        if (!isSelectionOnMap) {
+            boardState.selectedX = null;
+            boardState.selectedY = null;
+        }
         infoArea.setText(buildSelectedHexInfo(campaign));
 
         repaint();
@@ -683,6 +702,8 @@ public class StratConPanel extends JPanel implements ActionListener {
             }
         }
 
+        addFacilityOrdersMenu(coords);
+
         if ((currentTrack != null) && campaign.isGM()) {
             rightClickMenu.addSeparator();
 
@@ -700,6 +721,8 @@ public class StratConPanel extends JPanel implements ActionListener {
                 menuItemSwitchOwner.setActionCommand(RIGHT_CLICK_COMMAND_CAPTURE_FACILITY);
                 menuItemSwitchOwner.addActionListener(this);
                 rightClickMenu.add(menuItemSwitchOwner);
+
+                rightClickMenu.add(buildFacilityStateMenu(currentTrack.getFacility(coords)));
             } else {
                 JMenu menuItemAddFacility = new JMenu();
                 menuItemAddFacility.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.addFacility"));
@@ -708,11 +731,12 @@ public class StratConPanel extends JPanel implements ActionListener {
                 menuItemAddAlliedFacility.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.allied"));
                 menuItemAddFacility.add(menuItemAddAlliedFacility);
 
-                for (StratConFacility facility : StratConFacilityFactory.getAlliedFacilities()) {
+                for (StratConFacilityDefinition definition : StratConFacilityFactory.getDefinitionsFor(Allied)) {
                     JMenuItem facilityItem = new JMenuItem();
-                    facilityItem.setText(facility.getDisplayableName());
+                    facilityItem.setText(definition.getDisplayableName());
                     facilityItem.setActionCommand(RIGHT_CLICK_COMMAND_ADD_FACILITY);
-                    facilityItem.putClientProperty(RIGHT_CLICK_COMMAND_ADD_FACILITY, facility);
+                    facilityItem.putClientProperty(RIGHT_CLICK_COMMAND_ADD_FACILITY, definition);
+                    facilityItem.putClientProperty(RIGHT_CLICK_PROPERTY_FACILITY_OWNER, Allied);
                     facilityItem.addActionListener(this);
                     menuItemAddAlliedFacility.add(facilityItem);
                 }
@@ -721,11 +745,13 @@ public class StratConPanel extends JPanel implements ActionListener {
                 menuItemAddHostileFacility.setText(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.hostile"));
                 menuItemAddFacility.add(menuItemAddHostileFacility);
 
-                for (StratConFacility facility : StratConFacilityFactory.getHostileFacilities()) {
+                for (StratConFacilityDefinition definition :
+                      StratConFacilityFactory.getDefinitionsFor(ForceAlignment.Opposing)) {
                     JMenuItem facilityItem = new JMenuItem();
-                    facilityItem.setText(facility.getDisplayableName());
+                    facilityItem.setText(definition.getDisplayableName());
                     facilityItem.setActionCommand(RIGHT_CLICK_COMMAND_ADD_FACILITY);
-                    facilityItem.putClientProperty(RIGHT_CLICK_COMMAND_ADD_FACILITY, facility);
+                    facilityItem.putClientProperty(RIGHT_CLICK_COMMAND_ADD_FACILITY, definition);
+                    facilityItem.putClientProperty(RIGHT_CLICK_PROPERTY_FACILITY_OWNER, ForceAlignment.Opposing);
                     facilityItem.addActionListener(this);
                     menuItemAddHostileFacility.add(facilityItem);
                 }
@@ -764,6 +790,186 @@ public class StratConPanel extends JPanel implements ActionListener {
                 rightClickMenu.add(resetDeploymentItem);
             }
         }
+    }
+
+    /**
+     * Adds the "Facility Orders" submenu for the given hex, when Facility Operations are on and the hex has orders
+     * that make sense there. Build is offered on an empty hex only once a formation stands on it, so every empty hex
+     * does not carry the menu. Each order lists the formations that could carry it out; an order that cannot be given
+     * is shown disabled, with a tooltip saying why.
+     *
+     * @param coords the hex the menu was opened on
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void addFacilityOrdersMenu(StratConCoords coords) {
+        if ((currentTrack == null) || (campaignState == null) || !StratConFacilityOperations.isEnabled(campaign)) {
+            return;
+        }
+
+        AbstractContract contract = campaignState.getContract();
+        List<FacilityOperation> operations = StratConFacilityOperations.getOperationsFor(currentTrack, coords);
+        // An enemy facility the player hasn't found counts as an empty hex, so right-clicks can't be used to find it.
+        StratConFacility knownFacility = StratConFacilityOperations.getKnownFacility(currentTrack, coords);
+        boolean isEmptyHexWithoutFormation = (knownFacility == null) && !currentTrack.areAnyForceDeployedTo(coords);
+        if ((contract == null) || operations.isEmpty() || isEmptyHexWithoutFormation) {
+            return;
+        }
+
+        if (hasFacilityDetails(coords)) {
+            JMenuItem detailsItem = new JMenuItem(getTextAt(FACILITY_OPERATIONS_BUNDLE,
+                  (knownFacility == null) ? "contextMenu.hexDetails" : "contextMenu.details"));
+            detailsItem.addActionListener(evt -> openFacilityDialog(coords));
+            rightClickMenu.add(detailsItem);
+        }
+
+        JMenu ordersMenu = new JMenu(getTextAt(FACILITY_OPERATIONS_BUNDLE, "contextMenu.orders"));
+        for (FacilityOperation operation : operations) {
+            ordersMenu.add(buildFacilityOrderMenu(coords, contract, operation));
+        }
+
+        List<StratConFacilityOrder> sieges = StratConFacilitySiege.getSieges(currentTrack, coords);
+        if (!sieges.isEmpty()) {
+            JMenu liftSiegeMenu = new JMenu(getTextAt(FACILITY_OPERATIONS_BUNDLE, "contextMenu.liftSiege"));
+            for (StratConFacilityOrder siege : sieges) {
+                int formationId = siege.getFormationId();
+                Formation formation = campaign.getPlayerForce().getFormation(formationId);
+                String formationName = (formation == null) ? String.valueOf(formationId) : formation.getName();
+                liftSiegeMenu.add(buildFacilityOrderItem(formationName,
+                      () -> StratConFacilitySiege.liftSiege(campaign, currentTrack, formationId)));
+            }
+            ordersMenu.add(liftSiegeMenu);
+        }
+        rightClickMenu.add(ordersMenu);
+    }
+
+    /**
+     * @param coords a hex
+     *
+     * @return {@code true} if the hex has a facility the player can see, or is an empty hex a formation stands on that
+     *       has orders, so it has a facility dialog worth opening
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean hasFacilityDetails(StratConCoords coords) {
+        if ((currentTrack == null) || (campaignState == null) || (campaignState.getContract() == null)) {
+            return false;
+        }
+
+        if (StratConFacilityOperations.getKnownFacility(currentTrack, coords) != null) {
+            return true;
+        }
+        return StratConFacilityOperations.isEnabled(campaign)
+                     && currentTrack.areAnyForceDeployedTo(coords)
+                     && !StratConFacilityOperations.getOperationsFor(currentTrack, coords).isEmpty();
+    }
+
+    /**
+     * Opens the facility dialog for a hex, refreshing the map and contract view after each order given from it.
+     *
+     * @param coords the hex
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void openFacilityDialog(StratConCoords coords) {
+        if ((currentTrack == null) || (campaignState == null) || (campaignState.getContract() == null)) {
+            return;
+        }
+
+        new StratConFacilityDialog(JOptionPane.getFrameForComponent(this),
+              campaign,
+              campaignState.getContract(),
+              currentTrack,
+              coords,
+              () -> {
+                  MekHQ.triggerEvent(new MissionChangedEvent(campaignState.getContract()));
+                  infoArea.setText(buildSelectedHexInfo(campaign));
+                  repaint();
+              });
+    }
+
+    /**
+     * Adds the next steps worth pointing out for a hex (see {@link StratConFacilityAdvisor#getHints}) to the hex
+     * information.
+     *
+     * @param infoBuilder the hex information being built
+     * @param coords      the hex
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void appendFacilityHints(StringBuilder infoBuilder, StratConCoords coords) {
+        if ((campaignState == null) || (campaignState.getContract() == null)) {
+            return;
+        }
+        for (String hint : StratConFacilityAdvisor.getHints(campaign, campaignState.getContract(), currentTrack,
+              coords)) {
+            infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.hint", hint));
+        }
+    }
+
+    private JMenu buildFacilityOrderMenu(StratConCoords coords, AbstractContract contract,
+          FacilityOperation operation) {
+        JMenu operationMenu = new JMenu(StratConFacilityAdvisor.getOperationLabel(operation));
+
+        String reasonKey = StratConFacilityOperations.getUnavailableReasonKey(campaign,
+              contract,
+              currentTrack,
+              coords,
+              operation);
+        List<Integer> formationIds = StratConFacilityOperations.getEligibleFormationIds(campaign,
+              currentTrack,
+              coords,
+              operation);
+        if ((reasonKey == null) && formationIds.isEmpty()) {
+            reasonKey = "contextMenu.noFormation";
+        }
+
+        if (reasonKey != null) {
+            operationMenu.setEnabled(false);
+            operationMenu.setToolTipText(getTextAt(FACILITY_OPERATIONS_BUNDLE, reasonKey));
+            return operationMenu;
+        }
+
+        operationMenu.setToolTipText(getTextAt(FACILITY_OPERATIONS_BUNDLE, "operation.tooltip." + operation.name()));
+        for (int formationId : formationIds) {
+            String formationName = campaign.getPlayerForce().getFormation(formationId).getName();
+            if (operation == FacilityOperation.BUILD) {
+                JMenu formationMenu = new JMenu(formationName);
+                for (StratConFacilityDefinition definition : StratConFacilityOperations.getBuildableDefinitions()) {
+                    formationMenu.add(buildFacilityOrderItem(definition.getDisplayableName(),
+                          () -> StratConFacilityOperations.issueOrder(campaign,
+                                contract,
+                                currentTrack,
+                                coords,
+                                formationId,
+                                operation,
+                                definition)));
+                }
+                operationMenu.add(formationMenu);
+            } else {
+                operationMenu.add(buildFacilityOrderItem(formationName,
+                      () -> StratConFacilityOperations.issueOrder(campaign,
+                            contract,
+                            currentTrack,
+                            coords,
+                            formationId,
+                            operation,
+                            null)));
+            }
+        }
+        return operationMenu;
+    }
+
+    private JMenuItem buildFacilityOrderItem(String text, Runnable order) {
+        JMenuItem item = new JMenuItem(text);
+        item.setActionCommand(RIGHT_CLICK_COMMAND_FACILITY_ORDER);
+        item.putClientProperty(RIGHT_CLICK_COMMAND_FACILITY_ORDER, order);
+        item.addActionListener(this);
+        return item;
     }
 
     /**
@@ -1270,7 +1476,7 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     private BufferedImage getFacilityImage(StratConFacility facility) {
-        String imageKeyPrefix = facility.getOwner() == Allied ?
+        String imageKeyPrefix = facility.isOwnerAlliedToPlayer() ?
                                       StratConBiomeManifest.FACILITY_ALLIED :
                                       StratConBiomeManifest.FACILITY_HOSTILE;
         String imageKey = imageKeyPrefix + facility.getFacilityType().name();
@@ -1381,7 +1587,7 @@ public class StratConPanel extends JPanel implements ActionListener {
 
                     if (currentTrack.getFacility(currentCoords) == null) {
                         drawTextEffect(g2D, scenarioMarker, scenario.getName(), currentCoords);
-                    } else if (currentTrack.getFacility(currentCoords).getOwner() == Allied) {
+                    } else if (currentTrack.getFacility(currentCoords).isOwnerAlliedToPlayer()) {
                         drawTextEffect(g2D, scenarioMarker, "Under Attack!", currentCoords);
                     }
                 }
@@ -1683,6 +1889,196 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
+     * Builds the GM submenu that sets a facility's tier, condition, garrison, traits and the player's intel on it. The
+     * current value of each is ticked.
+     *
+     * @param facility the facility on the selected hex
+     *
+     * @return the submenu
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JMenu buildFacilityStateMenu(StratConFacility facility) {
+        JMenu stateMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.facilityState"));
+
+        JMenu tierMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.facilityState.tier"));
+        for (FacilityTier tier : FacilityTier.values()) {
+            tierMenu.add(buildFacilityStateItem(getTextAt(RESOURCE_BUNDLE, "stratConTab.facilityTier." + tier.name()),
+                  facility.getTier() == tier,
+                  target -> target.setTier(tier)));
+        }
+        stateMenu.add(tierMenu);
+
+        JMenu conditionMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.facilityState.condition"));
+        for (FacilityCondition condition : FacilityCondition.values()) {
+            conditionMenu.add(buildFacilityStateItem(getTextAt(RESOURCE_BUNDLE,
+                        "stratConTab.facilityCondition." + condition.name()),
+                  facility.getCondition() == condition,
+                  target -> target.setCondition(condition)));
+        }
+        stateMenu.add(conditionMenu);
+
+        JMenu garrisonMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.facilityState.garrison"));
+        int garrisonMaximum = facility.getGarrisonMaximum();
+        for (int garrisonSteps = 0; garrisonSteps <= garrisonMaximum; garrisonSteps++) {
+            int chosenSteps = garrisonSteps;
+            garrisonMenu.add(buildFacilityStateItem(String.valueOf(garrisonSteps),
+                  facility.getGarrison() == garrisonSteps,
+                  target -> target.setGarrison(chosenSteps)));
+        }
+        stateMenu.add(garrisonMenu);
+
+        JMenu intelMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.facilityState.intel"));
+        for (FacilityIntel intel : FacilityIntel.values()) {
+            intelMenu.add(buildFacilityStateItem(getTextAt(RESOURCE_BUNDLE,
+                        "stratConTab.facilityIntel." + intel.name()),
+                  facility.getIntel() == intel,
+                  target -> target.setIntel(intel)));
+        }
+        stateMenu.add(intelMenu);
+
+        JMenu traitsMenu = new JMenu(getTextAt(RESOURCE_BUNDLE, "stratConTab.contextMenu.facilityState.traits"));
+        for (FacilityTrait trait : FacilityTrait.values()) {
+            JCheckBoxMenuItem traitItem = new JCheckBoxMenuItem(getTextAt(FACILITY_OPERATIONS_BUNDLE,
+                  "trait." + trait.name()), facility.hasTrait(trait));
+            traitItem.addActionListener(evt -> {
+                if (traitItem.isSelected()) {
+                    facility.addTrait(trait);
+                } else {
+                    facility.removeTrait(trait);
+                }
+                infoArea.setText(buildSelectedHexInfo(campaign));
+                repaint();
+            });
+            traitsMenu.add(traitItem);
+        }
+        stateMenu.add(traitsMenu);
+
+        return stateMenu;
+    }
+
+    private JMenuItem buildFacilityStateItem(String text, boolean isCurrent, Consumer<StratConFacility> stateChange) {
+        JMenuItem item = new JCheckBoxMenuItem(text, isCurrent);
+        item.setActionCommand(RIGHT_CLICK_COMMAND_SET_FACILITY_STATE);
+        item.putClientProperty(RIGHT_CLICK_COMMAND_SET_FACILITY_STATE, stateChange);
+        item.addActionListener(this);
+        return item;
+    }
+
+    /**
+     * @param facility a facility on the map
+     * @param coords   the facility's hex
+     *
+     * @return the facility's map label: its name, marked if it is cut off from its supply lines or besieged, then as
+     *       much of its tier, condition and garrison as the player knows
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private String getFacilityLabel(StratConFacility facility, StratConCoords coords) {
+        String name = facility.getFormattedDisplayableName();
+        // The broken-link mark shows as soon as the player can see the facility.
+        if (StratConFacilitySupply.isCutOff(currentTrack, coords)) {
+            name = getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.cutOff", name);
+        }
+        if (StratConFacilitySiege.isBesieged(currentTrack, coords)) {
+            name = getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.besieged", name);
+        }
+        FacilityIntel intel = facility.getIntel();
+        if (!intel.isAtLeast(FacilityIntel.SCOUTED)) {
+            return name;
+        }
+
+        String tier = getTextAt(RESOURCE_BUNDLE, "stratConTab.facilityTier." + facility.getTier().name());
+        String condition = getTextAt(RESOURCE_BUNDLE,
+              "stratConTab.facilityCondition." + facility.getCondition().name());
+        if (!intel.isAtLeast(FacilityIntel.DETAILED)) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.scouted", name, tier, condition);
+        }
+
+        return getFormattedTextAt(RESOURCE_BUNDLE,
+              "stratConTab.facility.label.detailed",
+              name,
+              tier,
+              condition,
+              facility.getGarrison(),
+              facility.getGarrisonMaximum());
+    }
+
+    /**
+     * Adds a facility's tier, condition and garrison to the hex information, as far as the player knows them.
+     *
+     * @param infoBuilder the hex information being built
+     * @param facility    the facility on the selected hex
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void appendFacilityStatus(StringBuilder infoBuilder, StratConFacility facility) {
+        FacilityIntel intel = facility.getIntel();
+        if (!intel.isAtLeast(FacilityIntel.SCOUTED)) {
+            infoBuilder.append(getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.facilityUnscouted"));
+            return;
+        }
+
+        infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE,
+              "stratConTab.hexInfo.facilityStatus",
+              getTextAt(RESOURCE_BUNDLE, "stratConTab.facilityTier." + facility.getTier().name()),
+              getTextAt(RESOURCE_BUNDLE, "stratConTab.facilityCondition." + facility.getCondition().name())));
+
+        if (intel.isAtLeast(FacilityIntel.DETAILED)) {
+            infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "stratConTab.hexInfo.facilityGarrison",
+                  facility.getGarrison(),
+                  facility.getGarrisonMaximum()));
+            if (!facility.getTraits().isEmpty()) {
+                infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                      "stratConTab.hexInfo.facilityTraits",
+                      StratConFacilityAdvisor.getTraitSummary(facility)));
+            }
+        } else {
+            infoBuilder.append(getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.facilityGarrisonUnknown"));
+        }
+    }
+
+    /**
+     * Adds whether a facility is cut off from its supply lines, how many formations besiege it, and which facilities it
+     * has a synergy with, to the hex information.
+     *
+     * @param infoBuilder the hex information being built
+     * @param coords      the facility's hex
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void appendFacilityNetworkInfo(StringBuilder infoBuilder, StratConCoords coords) {
+        if (StratConFacilitySupply.isSupplyLinesActive(campaign)) {
+            infoBuilder.append(getTextAt(RESOURCE_BUNDLE,
+                  StratConFacilitySupply.isCutOff(currentTrack, coords) ?
+                        "stratConTab.hexInfo.supplyCut" :
+                        "stratConTab.hexInfo.supplyConnected"));
+        }
+
+        int besiegerCount = StratConFacilitySiege.getSieges(currentTrack, coords).size();
+        if (besiegerCount > 0) {
+            infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.besieged", besiegerCount));
+        }
+
+        List<StratConFacility> partners = StratConFacilitySynergies.getKnownPartners(currentTrack, coords);
+        if (!partners.isEmpty()) {
+            StringBuilder partnerNames = new StringBuilder();
+            for (StratConFacility partner : partners) {
+                if (!partnerNames.isEmpty()) {
+                    partnerNames.append(", ");
+                }
+                partnerNames.append(partner.getDisplayableName());
+            }
+            infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.synergy", partnerNames));
+        }
+    }
+
+    /**
      * Worker function to render facility icons to the given surface.
      */
     private void drawFacilities(Graphics2D g2D) {
@@ -1697,15 +2093,13 @@ public class StratConPanel extends JPanel implements ActionListener {
 
         Polygon graphHex = generateGraphHex();
 
-        boolean trackRevealed = currentTrack.hasActiveTrackReveal();
-
         for (int x = 0; x < currentTrack.getWidth(); x++) {
             for (int y = 0; y < currentTrack.getHeight(); y++) {
                 StratConCoords currentCoords = new StratConCoords(x, y);
                 StratConFacility facility = currentTrack.getFacility(currentCoords);
 
-                if ((facility != null) && (facility.isVisible() || trackRevealed || currentTrack.isGmRevealed())) {
-                    g2D.setColor(facility.getOwner() == Allied ? Color.CYAN : Color.RED);
+                if ((facility != null) && StratConFacilityOperations.isKnownToPlayer(currentTrack, facility)) {
+                    g2D.setColor(facility.isOwnerAlliedToPlayer() ? Color.CYAN : Color.RED);
 
                     BufferedImage facilityImage = getFacilityImage(facility);
 
@@ -1718,7 +2112,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.drawPolygon(facilityMarker);
                     }
 
-                    drawTextEffect(g2D, facilityMarker, facility.getFormattedDisplayableName(), currentCoords);
+                    drawTextEffect(g2D, facilityMarker, getFacilityLabel(facility, currentCoords), currentCoords);
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -1911,6 +2305,35 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
+     * Selects a hex, shows its information and scrolls the map so the hex sits roughly in the middle of the view.
+     *
+     * @param coords the hex to focus on
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void focusOnHex(StratConCoords coords) {
+        if (currentTrack == null) {
+            return;
+        }
+        boardState.setSelectedCoords(coords);
+        infoArea.setText(buildSelectedHexInfo(campaign));
+
+        JViewport viewport = getViewport();
+        if (viewport != null) {
+            // The same offsets the map is drawn with (see performInitialTransform and drawHexes); close enough to
+            // centre the hex, which is all this needs.
+            Point center = hexCenter(coords.getX(), coords.getY());
+            int pixelX = (int) ((center.x + HEX_X_RADIUS) * scale);
+            int pixelY = (int) ((center.y + (HEX_Y_RADIUS * 2)) * scale) + HEX_Y_RADIUS;
+            Dimension extent = viewport.getExtentSize();
+            Point proposed = new Point(pixelX - (extent.width / 2), pixelY - (extent.height / 2));
+            viewport.setViewPosition(clampViewPosition(proposed, viewport));
+        }
+        repaint();
+    }
+
+    /**
      * Pans the map by the given screen-pixel delta, clamped to the map edges. Dragging the mouse right/down moves the
      * content the same way, which corresponds to decreasing the view position.
      */
@@ -2011,6 +2434,13 @@ public class StratConPanel extends JPanel implements ActionListener {
             }
 
             repaint();
+
+            // a double-click on a facility, or on a hex a formation could give orders on, opens its details
+            StratConCoords clickedCoords = boardState.getSelectedCoords();
+            if (pointFoundOnBoard && (e.getClickCount() == 2) && (clickedCoords != null)
+                      && hasFacilityDetails(clickedCoords)) {
+                openFacilityDialog(clickedCoords);
+            }
             // right button pops up a context menu
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             clickedPoint = e.getPoint();
@@ -2114,7 +2544,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                           spanOpeningWithCustomColor(getAmazingColor()), CLOSING_SPAN_TAG));
                 }
                 infoBuilder.append("<span color='")
-                      .append(facility.getOwner() == Allied ?
+                      .append(facility.isOwnerAlliedToPlayer() ?
                                     getPositiveColor() :
                                     ReportingUtilities.getNegativeColor())
                       .append("'>")
@@ -2125,7 +2555,21 @@ public class StratConPanel extends JPanel implements ActionListener {
                     infoBuilder.append("<br/>").append(facility.getUserDescription());
                 }
 
+                appendFacilityStatus(infoBuilder, facility);
+                appendFacilityNetworkInfo(infoBuilder, boardState.getSelectedCoords());
+
                 infoBuilder.append("<span>");
+                appendFacilityHints(infoBuilder, boardState.getSelectedCoords());
+            } else if (facility == null) {
+                appendFacilityHints(infoBuilder, boardState.getSelectedCoords());
+            }
+
+            for (StratConRoadCut roadCut : currentTrack.getRoadCuts()) {
+                if (roadCut.getCoords().equals(boardState.getSelectedCoords())) {
+                    infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                          "stratConTab.hexInfo.roadCut",
+                          StratConFacilityAdvisor.formatDate(roadCut.getEndDate())));
+                }
             }
 
         } else {
@@ -2306,7 +2750,7 @@ public class StratConPanel extends JPanel implements ActionListener {
             return;
         }
 
-        boolean isPointOfInterestEdited = false;
+        boolean isContractViewStale = false;
 
         StratConScenario selectedScenario = currentTrack.getScenario(selectedCoords);
         switch (evt.getActionCommand()) {
@@ -2339,11 +2783,23 @@ public class StratConPanel extends JPanel implements ActionListener {
                 // scratch, so a single capture could redraw roads across the sector. Capturing the same facility by
                 // winning a scenario leaves the network alone for the same reason.
                 break;
+            case RIGHT_CLICK_COMMAND_SET_FACILITY_STATE:
+                @SuppressWarnings("unchecked")
+                Consumer<StratConFacility> stateChange = (Consumer<StratConFacility>) ((JMenuItem) evt.getSource())
+                      .getClientProperty(RIGHT_CLICK_COMMAND_SET_FACILITY_STATE);
+                StratConFacility selectedFacility = currentTrack.getFacility(selectedCoords);
+                if (selectedFacility != null) {
+                    stateChange.accept(selectedFacility);
+                    infoArea.setText(buildSelectedHexInfo(campaign));
+                }
+                break;
             case RIGHT_CLICK_COMMAND_ADD_FACILITY:
                 JMenuItem eventSource = (JMenuItem) evt.getSource();
-                StratConFacility facility = (StratConFacility) eventSource.getClientProperty(
-                      RIGHT_CLICK_COMMAND_ADD_FACILITY);
-                StratConFacility newFacility = facility.clone();
+                StratConFacilityDefinition facilityDefinition =
+                      (StratConFacilityDefinition) eventSource.getClientProperty(RIGHT_CLICK_COMMAND_ADD_FACILITY);
+                ForceAlignment owner = (ForceAlignment) eventSource.getClientProperty(
+                      RIGHT_CLICK_PROPERTY_FACILITY_OWNER);
+                StratConFacility newFacility = new StratConFacility(facilityDefinition, owner);
                 newFacility.setVisible(currentTrack.getRevealedCoords().contains(selectedCoords));
                 currentTrack.addFacility(selectedCoords, newFacility);
                 recalculateRoads();
@@ -2371,7 +2827,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                           selectedCoords,
                           currentTrack.getDisplayableName());
                 }
-                isPointOfInterestEdited = true;
+                isContractViewStale = true;
                 break;
             case RIGHT_CLICK_COMMAND_REMOVE_POINT_OF_INTEREST:
                 // Withdrawn rather than simply removed, so any objective tied to it goes too, rather than reading as
@@ -2380,7 +2836,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                       evt));
                 if (pointOfInterestToRemove != null) {
                     StratConPointOfInterestRules.withdrawPointOfInterest(currentTrack, pointOfInterestToRemove);
-                    isPointOfInterestEdited = true;
+                    isContractViewStale = true;
                 }
                 break;
             case RIGHT_CLICK_COMMAND_RESOLVE_POINT_OF_INTEREST:
@@ -2388,7 +2844,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                       getPointOfInterestId(evt));
                 if (pointOfInterestToResolve != null) {
                     StratConPointOfInterestRules.resolvePointOfInterest(currentTrack, pointOfInterestToResolve);
-                    isPointOfInterestEdited = true;
+                    isContractViewStale = true;
                 }
                 break;
             case RIGHT_CLICK_COMMAND_TOGGLE_POINT_OF_INTEREST_REVEALED:
@@ -2403,7 +2859,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                     } else {
                         pointOfInterestToReveal.setRevealed(false);
                     }
-                    isPointOfInterestEdited = true;
+                    isContractViewStale = true;
                 }
                 break;
             case RIGHT_CLICK_COMMAND_SET_POINT_OF_INTEREST_OWNER:
@@ -2413,8 +2869,14 @@ public class StratConPanel extends JPanel implements ActionListener {
                     JMenuItem ownerSource = (JMenuItem) evt.getSource();
                     pointOfInterestToChange.setOwner((ForceAlignment) ownerSource.getClientProperty(
                           RIGHT_CLICK_PROPERTY_POINT_OF_INTEREST_OWNER));
-                    isPointOfInterestEdited = true;
+                    isContractViewStale = true;
                 }
+                break;
+            case RIGHT_CLICK_COMMAND_FACILITY_ORDER:
+                Runnable order = (Runnable) ((JMenuItem) evt.getSource())
+                      .getClientProperty(RIGHT_CLICK_COMMAND_FACILITY_ORDER);
+                order.run();
+                isContractViewStale = true;
                 break;
             case RIGHT_CLICK_COMMAND_REMOVE_SCENARIO:
                 StratConScenario scenario = getSelectedScenario();
@@ -2432,9 +2894,10 @@ public class StratConPanel extends JPanel implements ActionListener {
                 break;
         }
 
-        // A point of interest edit can meet, fail or withdraw an objective, so the objective list, sector tabs and
-        // meter bars need refreshing, not just the map.
-        if (isPointOfInterestEdited && (campaignState != null)) {
+        // A point of interest edit can meet, fail or withdraw an objective, and a facility order spends support
+        // points and may start a scenario, so the objective list, sector tabs and meter bars need refreshing, not just
+        // the map.
+        if (isContractViewStale && (campaignState != null)) {
             MekHQ.triggerEvent(new MissionChangedEvent(campaignState.getContract()));
         }
 

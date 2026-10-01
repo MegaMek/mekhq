@@ -48,6 +48,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -320,8 +321,7 @@ class StratConRoadPlacerTest {
         track.addCity(new StratConCoords(14, 10));
 
         StratConCoords facilityCoords = new StratConCoords(8, 6);
-        StratConFacility facility = new StratConFacility();
-        facility.setFacilityType(facilityType);
+        StratConFacility facility = StratConTestData.facility(ForceAlignment.Allied, facilityType);
         track.addFacility(facilityCoords, facility);
 
         StratConRoadPlacer.recalculateRoads(track, List.of(facilityCoords));
