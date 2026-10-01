@@ -38,8 +38,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.gui.dialog.MRMSDialog;
 import mekhq.gui.dialog.MRMSDialog.MRMSOptionControl;
@@ -211,7 +211,8 @@ public class MRMSConfiguredOptions {
     }
 
     public void setMRMSOptions(final List<MRMSOption> mrmsOptions) {
-        this.mrmsOptions = mrmsOptions;
+        // A copy, so these settings stay as they were when taken even if the campaign's list changes
+        this.mrmsOptions = new ArrayList<>(mrmsOptions);
     }
 
     public boolean isHActiveMRMSOption() {
