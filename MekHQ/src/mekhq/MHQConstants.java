@@ -274,6 +274,7 @@ public final class MHQConstants extends SuiteConstants {
     /** The prefix of the per-contract-type special mechanics briefing keys; the contract type's name follows it. */
     public static final String NAG_CONTRACT_SPECIAL_MECHANICS_PREFIX = "nagContractSpecialMechanics.";
     public static final String NAG_UNRESOLVED_STRAT_CON_CONTACTS = "nagUnresolvedStratConContacts";
+    public static final String NAG_STRATCON_FACILITY_BRIEFING = "nagStratConFacilityBriefing";
     public static final String NAG_OUTSTANDING_SCENARIOS = "nagOutstandingScenarios";
     public static final String NAG_EXPIRING_NAV_POINTS = "nagExpiringNavPoints";
     public static final String NAG_INVALID_FACTION = "nagInvalidFaction";

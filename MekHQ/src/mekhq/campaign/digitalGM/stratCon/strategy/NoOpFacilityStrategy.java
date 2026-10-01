@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.strategy;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.IFacilityStrategy;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
@@ -55,6 +56,39 @@ public class NoOpFacilityStrategy implements IFacilityStrategy {
     public void applyPeriodicEffects(StratConTrackState track, StratConCampaignState campaignState,
           boolean isStartOfMonth) {
         // Intentionally empty: Mapless and Singles play have no facility map.
+    }
+
+    @Override
+    public void processFacilityOrders(StratConTrackState track, Campaign campaign) {
+        // Intentionally empty: Mapless and Singles play have no facilities to give orders at.
+    }
+
+    @Override
+    public void processSieges(StratConTrackState track, Campaign campaign) {
+        // Intentionally empty: Mapless and Singles play have no facilities to besiege.
+    }
+
+    @Override
+    public void applyMonthlyUpkeep(StratConTrackState track, Campaign campaign) {
+        // Intentionally empty: Mapless and Singles play have no facilities to repair.
+    }
+
+    @Override
+    public void processSupply(StratConTrackState track, Campaign campaign, boolean isStartOfMonth) {
+        // Intentionally empty: Mapless and Singles play have no supply lines.
+    }
+
+    @Override
+    public void processEnemyActivity(Campaign campaign, AbstractContract contract,
+          StratConCampaignState campaignState) {
+        // Intentionally empty: Mapless and Singles play have no map to build on.
+    }
+
+    @Override
+    public int launchCounterattacks(Campaign campaign, AbstractContract contract,
+          StratConCampaignState campaignState, int scenarioCount) {
+        // Mapless and Singles play have no facilities to counterattack.
+        return 0;
     }
 
     @Override

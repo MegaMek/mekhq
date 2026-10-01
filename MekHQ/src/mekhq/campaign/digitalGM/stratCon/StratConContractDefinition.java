@@ -50,8 +50,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import megamek.common.annotations.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConContractFacilityProfile;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.utilities.MMDataLicenseHeader;
 
@@ -213,6 +215,9 @@ public class StratConContractDefinition {
 
     private List<Integer> deploymentTimes;
 
+    /** How the contract type lays out its facilities; {@code null} to place them as before. */
+    private StratConContractFacilityProfile facilityProfile;
+
     /**
      * @return the contract type name
      */
@@ -301,6 +306,20 @@ public class StratConContractDefinition {
 
     public void setDeploymentTimes(List<Integer> deploymentTimes) {
         this.deploymentTimes = deploymentTimes;
+    }
+
+    /**
+     * @return how the contract type lays out its facilities, or {@code null} to place them as before
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConContractFacilityProfile getFacilityProfile() {
+        return facilityProfile;
+    }
+
+    public void setFacilityProfile(@Nullable StratConContractFacilityProfile facilityProfile) {
+        this.facilityProfile = facilityProfile;
     }
 
     public List<String> getGlobalScenarioModifiers() {

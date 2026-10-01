@@ -50,8 +50,10 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer.ResizeImpact;
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorCountMethod;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -261,8 +263,7 @@ class StratConSectorResizeTest {
     @Test
     void shrink_movesFacilitiesBackInsideRatherThanDestroyingThem() {
         StratConTrackState track = track(8, 8);
-        StratConFacility facility = new StratConFacility();
-        facility.setDisplayableName("Test Base");
+        StratConFacility facility = StratConTestData.facility(ForceAlignment.Opposing, FacilityType.MekBase);
         track.addFacility(new StratConCoords(7, 7), facility);
 
         resize(track, 4, 4);
