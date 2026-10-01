@@ -62,7 +62,7 @@ public final class RepairTechEligibility {
         TASK_NOT_NEEDED,
         /** The tech is not where the task is. */
         AT_ANOTHER_LOCATION,
-        /** The tech is crew on a large craft and only works on that craft. */
+        /** The tech is vessel crew on a large craft but not its engineer, and only the engineer repairs. */
         CREW_OF_ANOTHER_CRAFT,
         /** The tech's profession does not suit the unit, and the list shows only suitable techs. */
         WRONG_PROFESSION,

@@ -79,7 +79,12 @@ public class TechSorter implements Comparator<Person> {
             }
         }
         // More time left first, so the job is most likely to be finished today
-        return Integer.compare(secondTech.getMinutesLeft(), firstTech.getMinutesLeft());
+        int timeCompare = Integer.compare(secondTech.getMinutesLeft(), firstTech.getMinutesLeft());
+        if (timeCompare != 0) {
+            return timeCompare;
+        }
+        // A fixed last resort, so two techs alike in every way keep the same order after a refresh
+        return firstTech.getId().compareTo(secondTech.getId());
     }
 
     private boolean isAssignedToTheTasksUnit(Person tech) {

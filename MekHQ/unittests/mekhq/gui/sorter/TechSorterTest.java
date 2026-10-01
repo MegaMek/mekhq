@@ -128,4 +128,15 @@ class TechSorterTest {
 
         assertEquals(List.of(eliteAssignedTech, regularTech), techs);
     }
+    @Test
+    void techsAlikeInEveryWayAreAlwaysInTheSameOrder() {
+        Person firstTech = scenario.withTech(EXP_REGULAR);
+        Person secondTech = scenario.withTech(EXP_REGULAR);
+        TechSorter sorter = new TechSorter(damagedPart);
+
+        int forwards = sorter.compare(firstTech, secondTech);
+
+        assertTrue(forwards != 0, "Two different techs never compare as equal");
+        assertEquals(-Integer.signum(forwards), Integer.signum(sorter.compare(secondTech, firstTech)));
+    }
 }
