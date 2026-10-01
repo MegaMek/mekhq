@@ -275,9 +275,9 @@ class AbstractStratConGMTest {
 
         gm.handleNewDay(newDay(TUESDAY, contract));
 
-        verify(gm.lifecycle).processExpiredScenario(eq(expired), eq(track), eq(campaignState));
-        verify(gm.lifecycle, never()).processExpiredScenario(eq(expiredButCommitted), any(), any());
-        verify(gm.lifecycle, never()).processExpiredScenario(eq(future), any(), any());
+        verify(gm.lifecycle).processExpiredScenario(eq(expired), eq(track), eq(campaignState), any());
+        verify(gm.lifecycle, never()).processExpiredScenario(eq(expiredButCommitted), any(), any(), any());
+        verify(gm.lifecycle, never()).processExpiredScenario(eq(future), any(), any(), any());
     }
 
     @Test

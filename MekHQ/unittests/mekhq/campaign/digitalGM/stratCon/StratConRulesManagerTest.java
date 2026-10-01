@@ -61,6 +61,8 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.LocalModifiersEffect;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.force.CombatTeam;
@@ -70,6 +72,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioType;
@@ -168,12 +171,17 @@ class StratConRulesManagerTest {
     @Test
     void initializeObjectiveScenarios_doesNotAddObjectiveWhenScenarioGenerationFails() throws Exception {
         Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        when(campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
         AbstractContract contract = mock(AbstractContract.class);
         StratConTrackState track = new StratConTrackState();
         track.setWidth(1);
         track.setHeight(1);
         ScenarioTemplate template = mock(ScenarioTemplate.class);
-        StratConFacility facility = new StratConFacility();
+        StratConFacility facility = StratConTestData.facility(ForceAlignment.Opposing,
+              FacilityType.MekBase,
+              new LocalModifiersEffect(List.of("MekGarrison.json")));
 
         try (MockedStatic<StratConScenarioFactory> scenarioFactory = mockStatic(StratConScenarioFactory.class);
               MockedStatic<StratConFacilityFactory> facilityFactory = mockStatic(StratConFacilityFactory.class);

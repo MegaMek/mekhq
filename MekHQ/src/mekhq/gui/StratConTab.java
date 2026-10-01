@@ -89,6 +89,7 @@ import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.panels.TutorialHyperlinkPanel;
+import mekhq.gui.stratCon.StratConFacilityOverviewDialog;
 import mekhq.gui.view.ContractMeterBar;
 import mekhq.utilities.ReportingUtilities;
 
@@ -119,6 +120,7 @@ public class StratConTab extends CampaignGuiTab {
     private RoundedJButton btnEditSupportPoints;
     private RoundedJButton btnEditVictoryPoints;
     private RoundedJButton btnToggleHiddenObjects;
+    private RoundedJButton btnFacilities;
     private JLabel objectiveStatusText;
     private JPanel threatLevelPanel;
     private JPanel deploymentTimePanel;
@@ -130,6 +132,9 @@ public class StratConTab extends CampaignGuiTab {
     private boolean objectivesCollapsed = false;
 
     private AbstractContract currentContract;
+    // The Facilities overview, if one is open, and the contract it shows
+    private StratConFacilityOverviewDialog facilityOverview;
+    private AbstractContract facilityOverviewContract;
     private StratConTrackState currentSectorTrack;
 
     private boolean adjustingSelectors = false;
@@ -258,6 +263,17 @@ public class StratConTab extends CampaignGuiTab {
         victoryPointsPanel = addBarPanel(constraints, gridY++);
         escalationPanel = addBarPanel(constraints, gridY++);
         reconnaissancePanel = addBarPanel(constraints, gridY++);
+
+        // The facilities overview: every known facility and what is about to happen to them, in one list.
+        btnFacilities = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "stratConTab.facilities.text"));
+        btnFacilities.setToolTipText(getTextAt(RESOURCE_BUNDLE, "stratConTab.facilities.tooltip"));
+        btnFacilities.addActionListener(evt -> openFacilityOverview());
+        constraints.gridy = gridY++;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
+        infoPanel.add(btnFacilities, constraints);
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.weightx = 0.0;
 
         // Add the objectives panel below the bars. Its height tracks the objective content (see applyObjectiveText) so
         // it is only as tall as it needs to be; the scroll pane remains as a safety net for unusually long lists.
@@ -486,6 +502,58 @@ public class StratConTab extends CampaignGuiTab {
     }
 
     /**
+     * Opens the facilities overview for the contract being viewed.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void openFacilityOverview() {
+        if ((currentContract == null) || (currentContract.getStratConCampaignState() == null)) {
+            return;
+        }
+
+        // One overview at a time: bring back the open one if it shows this contract, rather than stack another.
+        if (facilityOverview != null) {
+            if (facilityOverview.isVisible() && (facilityOverviewContract == currentContract)) {
+                facilityOverview.toFront();
+                return;
+            }
+            facilityOverview.dispose();
+        }
+        facilityOverviewContract = currentContract;
+        facilityOverview = new StratConFacilityOverviewDialog(JOptionPane.getFrameForComponent(this),
+              getCampaign(),
+              currentContract,
+              this);
+    }
+
+    /**
+     * Shows a hex of one of a contract's sectors: switches to the contract and sector, then selects the hex and
+     * centres the map on it.
+     *
+     * @param contract the contract whose map holds the sector
+     * @param track    the sector
+     * @param coords   the hex
+     *
+     * @return {@code true} if the hex is now shown
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean focusOnHex(AbstractContract contract, StratConTrackState track, StratConCoords coords) {
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        if (campaignState == null) {
+            return false;
+        }
+        int trackIndex = campaignState.getTracks().indexOf(track);
+        if ((trackIndex < 0) || !focusOnSector(contract.getId(), trackIndex)) {
+            return false;
+        }
+        stratconPanel.focusOnHex(coords);
+        return true;
+    }
+
+    /**
      * Handles selection of a contract from the dropdown: rebuilds the sector tabs for that contract's tracks.
      */
     private void contractSelectionHandler() {
@@ -581,6 +649,10 @@ public class StratConTab extends CampaignGuiTab {
         }
         if (btnEditVictoryPoints != null) {
             btnEditVictoryPoints.setEnabled(isGM);
+        }
+
+        if (btnFacilities != null) {
+            btnFacilities.setVisible((currentContract != null) && (currentContract.getStratConCampaignState() != null));
         }
 
         // No active/started contract selected: nothing to chart.

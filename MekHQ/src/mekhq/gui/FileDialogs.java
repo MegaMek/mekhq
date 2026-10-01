@@ -42,7 +42,7 @@ import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityDefinition;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
@@ -420,19 +420,17 @@ public class FileDialogs {
     }
 
     /**
-     * Displays a dialog window from which the user can select a StratCon facility file to save to. The suggested file
-     * name follows the shipped convention of an owner prefix plus the display name (e.g. {@code AlliedAirBase.json}).
+     * Displays a dialog window from which the user can select a StratCon facility definition file to save to. The
+     * suggested file name is the definition's ID (e.g. {@code AirBase.json}).
      *
      * @return the file selected, if any
      */
-    public static Optional<File> saveStratConFacility(JFrame frame, StratConFacility facility) {
-        String display = facility.getDisplayableName();
-        String fileName;
-        if ((display == null) || display.isBlank()) {
+    public static Optional<File> saveStratConFacility(JFrame frame, StratConFacilityDefinition definition) {
+        String id = definition.getId();
+        // Strip first, so an ID made only of stripped characters still falls back to the default name.
+        String fileName = (id == null) ? "" : id.replaceAll("[^A-Za-z0-9_-]", "");
+        if (fileName.isBlank()) {
             fileName = "facility";
-        } else {
-            String prefix = facility.isOwnerAlliedToPlayer() ? "Allied" : "Hostile";
-            fileName = prefix + display.replaceAll("[^A-Za-z0-9]", "");
         }
         return GUI.fileDialogSave(frame, "Save StratCon Facility", FileType.JSON, STRAT_CON_FACILITY_DIRECTORY,
               fileName + ".json");

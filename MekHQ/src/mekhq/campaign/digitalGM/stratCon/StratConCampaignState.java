@@ -109,6 +109,10 @@ public class StratConCampaignState {
     private List<LocalDate> scheduledScenarioDates;
     private final List<LocalDate> strategicScenarioSpawnDates;
     private final List<StratConScheduledPointOfInterest> scheduledPointsOfInterest;
+    // enemy facility activity; see StratConEnemyFacilityActivity
+    private LocalDate lastCounterattackDate;
+    private LocalDate enemyEngineersScheduledUntil;
+    private final List<LocalDate> enemyEngineerDates;
 
     @XmlTransient
     public AbstractContract getContract() {
@@ -124,6 +128,7 @@ public class StratConCampaignState {
         scheduledScenarioDates = new ArrayList<>();
         strategicScenarioSpawnDates = new ArrayList<>();
         scheduledPointsOfInterest = new ArrayList<>();
+        enemyEngineerDates = new ArrayList<>();
     }
 
     public StratConCampaignState(AbstractContract contract) {
@@ -131,6 +136,7 @@ public class StratConCampaignState {
         scheduledScenarioDates = new ArrayList<>();
         strategicScenarioSpawnDates = new ArrayList<>();
         scheduledPointsOfInterest = new ArrayList<>();
+        enemyEngineerDates = new ArrayList<>();
         setContract(contract);
     }
 
@@ -205,6 +211,49 @@ public class StratConCampaignState {
     }
 
     /**
+     * @return the day of the contract's most recent enemy counterattack, or {@code null} if there has been none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
+    public @Nullable LocalDate getLastCounterattackDate() {
+        return lastCounterattackDate;
+    }
+
+    public void setLastCounterattackDate(@Nullable LocalDate lastCounterattackDate) {
+        this.lastCounterattackDate = lastCounterattackDate;
+    }
+
+    /**
+     * @return the day up to which enemy engineers have been scheduled, exclusive, or {@code null} if none have been
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
+    public @Nullable LocalDate getEnemyEngineersScheduledUntil() {
+        return enemyEngineersScheduledUntil;
+    }
+
+    public void setEnemyEngineersScheduledUntil(@Nullable LocalDate enemyEngineersScheduledUntil) {
+        this.enemyEngineersScheduledUntil = enemyEngineersScheduledUntil;
+    }
+
+    /**
+     * @return the still-to-come days on which enemy engineers appear, one entry each (mutable; drained as they appear)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
+    @XmlElementWrapper(name = "enemyEngineerDates")
+    @XmlElement(name = "enemyEngineerDate")
+    public List<LocalDate> getEnemyEngineerDates() {
+        return enemyEngineerDates;
+    }
+
+    /**
      * Moves every date still to come in the contract's pre-rolled schedule - its ordinary scenarios, its
      * strategic-objective scenarios, and its points of interest - by the given number of days. Used when the contract's start date moves, so the schedule
      * keeps its place within the contract.
@@ -221,6 +270,7 @@ public class StratConCampaignState {
 
         scheduledScenarioDates.replaceAll(scenarioDate -> scenarioDate.plusDays(days));
         strategicScenarioSpawnDates.replaceAll(spawnDate -> spawnDate.plusDays(days));
+        enemyEngineerDates.replaceAll(engineerDate -> engineerDate.plusDays(days));
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
             LocalDate spawnDate = scheduledPointOfInterest.getSpawnDate();
             if (spawnDate != null) {
@@ -660,6 +710,7 @@ public class StratConCampaignState {
             for (StratConTrackState track : resultingCampaignState.getTracks()) {
                 track.restoreReturnDates();
                 track.restoreAssignedCoordForces();
+                track.restoreFacilityDefinitions();
             }
         }
 
