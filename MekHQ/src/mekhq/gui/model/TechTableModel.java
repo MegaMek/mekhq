@@ -32,11 +32,15 @@
  */
 package mekhq.gui.model;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.Component;
 import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.personnel.Person;
@@ -45,6 +49,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.TechTaskEstimate;
 import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
@@ -63,6 +68,8 @@ public class TechTableModel extends DataTableModel<Person> {
           SkillType.S_TECH_AERO,
           SkillType.S_TECH_VESSEL,
           };
+
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.GUI";
 
     private final CampaignGUI tab;
     private final ITechWorkPanel panel;
@@ -186,6 +193,9 @@ public class TechTableModel extends DataTableModel<Person> {
         if (overtimeAllowed) {
             toReturn.append(String.format(" + (%d overtime)", tech.getOvertimeLeft()));
         }
+        if (null != part) {
+            toReturn.append("<br/>").append(describeEstimate(TechTaskEstimate.estimate(getCampaign(), part, tech)));
+        }
 
         if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ENGINEER)) {
             toReturn.append(", <i>Engineer</i>");
@@ -214,6 +224,27 @@ public class TechTableModel extends DataTableModel<Person> {
 
         toReturn.append("</font></html>");
         return toReturn.toString();
+    }
+
+    /**
+     * @return one line with what the tech can expect from the selected task: target number, chance of success,
+     *       minutes needed and when it would be done, or why the tech cannot do it
+     */
+    private static String describeEstimate(TechTaskEstimate estimate) {
+        if (estimate.isImpossible()) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.impossible", estimate.targetDetails());
+        }
+        String targetNumber = (estimate.targetNumber() == TargetRoll.AUTOMATIC_SUCCESS)
+                                    ? getTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.automatic")
+                                    : String.valueOf(estimate.targetNumber());
+        String successPercent = String.valueOf(estimate.successPercent());
+        String minutesNeeded = String.valueOf(estimate.minutesNeeded());
+        if (estimate.daysToFinish() == 0) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.today", targetNumber, successPercent,
+                  minutesNeeded);
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.days", targetNumber, successPercent,
+              minutesNeeded, String.valueOf(estimate.daysToFinish()));
     }
 
     /**
