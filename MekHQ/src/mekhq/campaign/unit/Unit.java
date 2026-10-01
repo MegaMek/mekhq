@@ -8854,6 +8854,16 @@ public class Unit implements ITechnology, ILocatable {
         for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
             if (hasTransportedUnits(campaignTransportType)) {
                 getTransportedUnitsSummary(campaignTransportType).fixReferences(campaign, this);
+
+                if (campaignTransportType == CampaignTransportType.SHIP_TRANSPORT) {
+                    for (Unit transportedUnit : getTransportedUnitsSummary(campaignTransportType)
+                                                      .getTransportedUnits()) {
+                        if (transportedUnit.hasTransportShipAssignment()) {
+                            transportedUnit.getTransportShipAssignment().fixReferences(campaign, transportedUnit);
+                        }
+                    }
+                }
+
                 initializeTransportSpace(campaignTransportType);
             }
         }
