@@ -89,6 +89,10 @@ public class StratConCampaignState {
     // whether "Contracts Use Special Mechanics" was on when the contract was accepted; see
     // isContractsUseSpecialMechanics
     private boolean contractsUseSpecialMechanics;
+    // whether the Track Intensity Table options were on when the contract was accepted; see isMinimumOneTrackPerRoll
+    // and isRollTracksWeekly
+    private boolean minimumOneTrackPerRoll;
+    private boolean rollTracksWeekly;
     // whether the contract's ordinary scenarios have been scheduled up front; see isNormalTempoScheduled
     private boolean normalTempoScheduled;
     // what has been placed from the point of interest schedule; see recordPlacedPointOfInterest
@@ -493,6 +497,36 @@ public class StratConCampaignState {
      */
     public void setContractsUseSpecialMechanics(boolean contractsUseSpecialMechanics) {
         this.contractsUseSpecialMechanics = contractsUseSpecialMechanics;
+    }
+
+    /**
+     * @return {@code true} if "Minimum of 1 Hot Spots Track per Roll" was on when the contract was accepted. Fixed for
+     *       the contract's life, so its schedules are rolled the same way even if the option changes mid-contract.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isMinimumOneTrackPerRoll() {
+        return minimumOneTrackPerRoll;
+    }
+
+    public void setMinimumOneTrackPerRoll(boolean minimumOneTrackPerRoll) {
+        this.minimumOneTrackPerRoll = minimumOneTrackPerRoll;
+    }
+
+    /**
+     * @return {@code true} if "Roll Hot Spots Tracks Weekly, Not Monthly" was on when the contract was accepted. Fixed
+     *       for the contract's life, so its schedules are rolled the same way even if the option changes mid-contract.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isRollTracksWeekly() {
+        return rollTracksWeekly;
+    }
+
+    public void setRollTracksWeekly(boolean rollTracksWeekly) {
+        this.rollTracksWeekly = rollTracksWeekly;
     }
 
     public String getBriefingText() {

@@ -120,35 +120,55 @@ public final class StratConScenarioTempo {
      */
     static List<LocalDate> rollScenarioDates(LocalDate startDate, LocalDate endDate, int lengthInMonths,
           int trackCount, int rollCount) {
+        return rollScenarioDates(startDate, endDate, lengthInMonths, trackCount, rollCount, false, false);
+    }
+
+    /**
+     * As {@link #rollScenarioDates(LocalDate, LocalDate, int, int, int)}, honoring the two Track Intensity Table
+     * options. With "Minimum of 1 Hot Spots Track per Roll", a contract with no tracks is rolled as if it had one. With
+     * "Roll Hot Spots Tracks Weekly, Not Monthly", the table's columns are read as weeks rather than months, and the
+     * table is rolled afresh for every block of weeks it falls short of the contract.
+     *
+     * @param isMinimumOneTrack whether a contract with no tracks is rolled as if it had one
+     * @param isWeekly          whether the table's columns are read as weeks
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static List<LocalDate> rollScenarioDates(LocalDate startDate, LocalDate endDate, int lengthInMonths,
+          int trackCount, int rollCount, boolean isMinimumOneTrack, boolean isWeekly) {
         List<LocalDate> scenarioDates = new ArrayList<>();
         if (!endDate.isAfter(startDate)) {
             return scenarioDates;
         }
 
-        int monthCount = max(1, lengthInMonths);
-        int month = 0;
-        while (month < monthCount) {
-            List<Integer> schedule = TrackIntensityTable.rollSchedule(lengthInMonths, trackCount, rollCount);
+        int effectiveTrackCount = TrackIntensityTable.getEffectiveTrackCount(trackCount, isMinimumOneTrack);
+        int periodCount = isWeekly ?
+                                max(1, (int) ChronoUnit.WEEKS.between(startDate, endDate.minusDays(1)) + 1) :
+                                max(1, lengthInMonths);
+        int period = 0;
+        while (period < periodCount) {
+            List<Integer> schedule = TrackIntensityTable.rollSchedule(lengthInMonths, effectiveTrackCount, rollCount);
             if (schedule.isEmpty()) {
                 break;
             }
 
             for (int scenarioCount : schedule) {
-                if (month >= monthCount) {
+                if (period >= periodCount) {
                     break;
                 }
 
-                LocalDate monthStart = startDate.plusMonths(month);
-                LocalDate monthEnd = startDate.plusMonths(month + 1L);
-                if (monthEnd.isAfter(endDate)) {
-                    monthEnd = endDate;
+                LocalDate periodStart = isWeekly ? startDate.plusWeeks(period) : startDate.plusMonths(period);
+                LocalDate periodEnd = isWeekly ? startDate.plusWeeks(period + 1L) : startDate.plusMonths(period + 1L);
+                if (periodEnd.isAfter(endDate)) {
+                    periodEnd = endDate;
                 }
-                int monthDays = max(1, (int) ChronoUnit.DAYS.between(monthStart, monthEnd));
+                int periodDays = max(1, (int) ChronoUnit.DAYS.between(periodStart, periodEnd));
 
                 for (int scenario = 0; scenario < scenarioCount; scenario++) {
-                    scenarioDates.add(monthStart.plusDays(Compute.randomInt(monthDays)));
+                    scenarioDates.add(periodStart.plusDays(Compute.randomInt(periodDays)));
                 }
-                month++;
+                period++;
             }
         }
 
@@ -188,7 +208,8 @@ public final class StratConScenarioTempo {
               contract.getScale(),
               campaignOptions.get(CampaignOption.SCENARIO_TEMPO_MULTIPLIER));
         List<LocalDate> scenarioDates = rollScenarioDates(startDate, endDate, contract.getLengthInMonths(),
-              contract.getTrackCount(), rollCount);
+              contract.getTrackCount(), rollCount, campaignState.isMinimumOneTrackPerRoll(),
+              campaignState.isRollTracksWeekly());
 
         List<LocalDate> scheduledDates = campaignState.getScheduledScenarioDates();
         scheduledDates.removeIf(scenarioDate -> !scenarioDate.isBefore(firstDate));
@@ -211,7 +232,8 @@ public final class StratConScenarioTempo {
     /**
      * Rolls a contract's pre-rolled schedule again from today, after an edit to something it was rolled from - the
      * contract's scale, track count, or dates. Everything scheduled from today on is replaced; what has already
-     * happened, and anything already overdue, is left alone.
+     * happened, and anything already overdue, is left alone. The Track Intensity Table options are taken as they stand
+     * now, so an edit also brings a running contract in line with them.
      *
      * <ul>
      *     <li>Ordinary scenarios are scheduled again (see {@link #scheduleNormalScenarios}), except in Single Drop
@@ -240,6 +262,10 @@ public final class StratConScenarioTempo {
           StratConCampaignState campaignState) {
         LocalDate today = campaign.getLocalDate();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        // An edit rolls the schedules again under the options as they stand now.
+        campaignState.setMinimumOneTrackPerRoll(campaignOptions.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL));
+        campaignState.setRollTracksWeekly(campaignOptions.get(CampaignOption.ROLL_TRACKS_WEEKLY));
 
         if (!campaignOptions.isUseStratConSinglesMode()) {
             scheduleNormalScenarios(campaign, contract, campaignState, today);

@@ -71,6 +71,11 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
         if ((scale > 0) && campaign.getCampaignOptions().get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)) {
             combatPayInSupportPoints /= scale;
         }
+        // Likewise for the extra scenarios the minimum track and weekly rolling options bring.
+        double trackRollingMultiplier = TrackIntensityTable.getCombatPayMultiplier(contract.getTrackCount(),
+              campaign.getCampaignOptions().get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL),
+              campaign.getCampaignOptions().get(CampaignOption.ROLL_TRACKS_WEEKLY));
+        combatPayInSupportPoints = (int) round(combatPayInSupportPoints * trackRollingMultiplier);
         return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(combatPayInSupportPoints,
               shouldConvertSupportPoints(campaign));
     }

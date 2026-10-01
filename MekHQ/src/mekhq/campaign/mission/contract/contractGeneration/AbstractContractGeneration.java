@@ -722,7 +722,9 @@ public abstract class AbstractContractGeneration {
 
     /**
      * Rolls a contract's Essential scenario schedule on the Track Intensity Tables: once per point of scale when
-     * "Multiply Track Intensity by Scale" is on, and once otherwise.
+     * "Multiply Track Intensity by Scale" is on, and once otherwise. The "Minimum of 1 Hot Spots Track per Roll" and
+     * "Roll Hot Spots Tracks Weekly, Not Monthly" options are honored (see
+     * {@link TrackIntensityTable#rollSchedule(int, int, int, boolean, boolean)}).
      *
      * @param campaign       the campaign, whose options decide the roll count
      * @param contract       the contract, whose scale and track count are rolled for
@@ -735,10 +737,15 @@ public abstract class AbstractContractGeneration {
      */
     public static List<Integer> rollScenarioSchedule(Campaign campaign, AbstractContract contract,
           int lengthInMonths) {
-        int rollCount = campaign.getCampaignOptions().get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        int rollCount = campaignOptions.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)
                               ? contract.getScale()
                               : 1;
-        return TrackIntensityTable.rollSchedule(lengthInMonths, contract.getTrackCount(), rollCount);
+        return TrackIntensityTable.rollSchedule(lengthInMonths,
+              contract.getTrackCount(),
+              rollCount,
+              campaignOptions.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL),
+              campaignOptions.get(CampaignOption.ROLL_TRACKS_WEEKLY));
     }
 
     private static @Nonnull EnemyData pickEnemy(Campaign campaign, LocalDate currentDate, ILocation currentLocation,

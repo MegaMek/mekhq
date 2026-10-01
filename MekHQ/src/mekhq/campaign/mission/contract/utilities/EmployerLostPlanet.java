@@ -61,7 +61,6 @@ import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGenera
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationEnemy;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationTerms;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
-import mekhq.campaign.mission.contract.contractGeneration.TrackIntensityTable;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
@@ -343,9 +342,8 @@ public final class EmployerLostPlanet {
         int lengthInMonths = AbstractContractGeneration.determineLength(campaign, contract);
         contract.setScheduleData(new ContractScheduleData(today, today.plusMonths(lengthInMonths), lengthInMonths));
         contract.setTrackCount(AbstractContractGeneration.determineTrackCount(contract));
-        int rollCount = campaignOptions.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE) ? contract.getScale() : 1;
-        contract.setScenarioSchedule(TrackIntensityTable.rollSchedule(lengthInMonths, contract.getTrackCount(),
-              rollCount));
+        contract.setScenarioSchedule(AbstractContractGeneration.rollScenarioSchedule(campaign, contract,
+              lengthInMonths));
 
         // Pay (after the terms and schedule, which it depends on)
         contract.setContractFinanceData(new ContractFinanceData(Money.zero(),

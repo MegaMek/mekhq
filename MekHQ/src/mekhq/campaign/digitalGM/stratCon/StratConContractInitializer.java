@@ -396,6 +396,10 @@ public class StratConContractInitializer {
         // A new contract has placed nothing yet, so its point of interest ledger starts empty rather than from the map.
         campaignState.setPointOfInterestLedgerSeeded(true);
 
+        // Fixed for the contract's life, so every schedule below, and any rolled again later, uses the same rules.
+        campaignState.setMinimumOneTrackPerRoll(campaignOptions.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL));
+        campaignState.setRollTracksWeekly(campaignOptions.get(CampaignOption.ROLL_TRACKS_WEEKLY));
+
         // Pre-roll the days on which the contract's ordinary scenarios appear. Mapless play has them too; Single Drop
         // play keeps its own weekly pace instead.
         if (!campaignOptions.isUseStratConSinglesMode()) {
@@ -813,7 +817,9 @@ public class StratConContractInitializer {
         int rollCount = isMultiplyTrackIntensityByScale ? max(1, contract.getScale()) : 1;
         List<Integer> schedule = TrackIntensityTable.rollSchedule(contract.getLengthInMonths(),
               contract.getTrackCount(),
-              rollCount);
+              rollCount,
+              campaignState.isMinimumOneTrackPerRoll(),
+              campaignState.isRollTracksWeekly());
 
         boolean isStrategicObjective = isSpecialPointOfInterestObjective(typeId);
         List<StratConScheduledPointOfInterest> scheduledPointsOfInterest = new ArrayList<>();
