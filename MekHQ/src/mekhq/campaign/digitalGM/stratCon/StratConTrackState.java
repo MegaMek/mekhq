@@ -793,7 +793,8 @@ public class StratConTrackState {
 
     /**
      * Clears all generated terrain, cities, roads, and hex reveals so the sector can be regenerated from scratch.
-     * Scenarios, facilities, points of interest, and assigned forces are left untouched.
+     * Scenarios, facilities, points of interest, and assigned forces are left untouched; road cuts and the cut-off
+     * record are cleared, since they belong to the old road network.
      */
     public void clearForRegeneration() {
         terrainTypes.clear();
@@ -801,6 +802,9 @@ public class StratConTrackState {
         roads.clear();
         roadExits.clear();
         revealedCoords.clear();
+        // Both are keyed to the old road network and supply picture, which no longer exist
+        roadCuts.clear();
+        cutOffFacilities.clear();
     }
 
     /**
@@ -817,6 +821,8 @@ public class StratConTrackState {
         roads.removeIf(this::isOutOfBounds);
         roadExits.removeIf(this::isOutOfBounds);
         revealedCoords.removeIf(this::isOutOfBounds);
+        roadCuts.removeIf(roadCut -> isOutOfBounds(roadCut.getCoords()));
+        cutOffFacilities.removeIf(this::isOutOfBounds);
     }
 
     /**

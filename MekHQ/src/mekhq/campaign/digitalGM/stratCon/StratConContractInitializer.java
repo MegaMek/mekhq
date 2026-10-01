@@ -64,6 +64,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOrder;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.IStratConPointOfInterestBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
@@ -949,11 +950,25 @@ public class StratConContractInitializer {
             return false;
         }
 
-        StratConTrackState track = campaignState.getTrack(Compute.randomInt(campaignState.getTrackCount()));
         StratConFacility anchor = StratConContractFacilityProfile.createFacility(anchorType,
               facilityProfile.getAnchorOwner());
-        StratConCoords coords = getUnoccupiedCoords(track);
-        if ((anchor == null) || (coords == null)) {
+        if (anchor == null) {
+            return false;
+        }
+
+        // Start in a random sector, then try the others in turn, so one full sector doesn't cost the contract its
+        // anchor.
+        int trackCount = campaignState.getTrackCount();
+        int firstTrackIndex = Compute.randomInt(trackCount);
+        StratConTrackState track = null;
+        StratConCoords coords = null;
+        for (int offset = 0; (offset < trackCount) && (coords == null); offset++) {
+            track = campaignState.getTrack((firstTrackIndex + offset) % trackCount);
+            if (track.getOccupiedHexCount() < facilityCapacity(track)) {
+                coords = getUnoccupiedCoords(track);
+            }
+        }
+        if (coords == null) {
             return false;
         }
 
@@ -1772,6 +1787,55 @@ public class StratConContractInitializer {
 
         track.moveObjective(source, destination);
         moveAssignedForces(track, source, destination);
+        moveFacilityState(track, source, destination);
+    }
+
+    /**
+     * Points the hex-keyed facility state - orders under way, siege targets, and the cut-off record - that referred to
+     * {@code source} at {@code destination} instead, so a moved facility keeps its running orders and sieges.
+     */
+    private static void moveFacilityState(StratConTrackState track, StratConCoords source,
+          StratConCoords destination) {
+        for (StratConFacilityOrder order : track.getFacilityOrders()) {
+            if (source.equals(order.getTargetCoords())) {
+                order.setTargetCoords(destination);
+            }
+        }
+
+        for (StratConScenario scenario : track.getScenarios().values()) {
+            if (source.equals(scenario.getSiegeCoords())) {
+                scenario.setSiegeCoords(destination);
+            }
+        }
+
+        if (track.getCutOffFacilities().remove(source)) {
+            track.getCutOffFacilities().add(destination);
+        }
+    }
+
+    /**
+     * Drops the hex-keyed facility state - orders under way, siege targets, and the cut-off record - that referred to
+     * an occupant that could not be saved.
+     */
+    private static void dropFacilityState(StratConTrackState track, StratConCoords source) {
+        track.getFacilityOrders().removeIf(order -> {
+            boolean targetsSource = source.equals(order.getTargetCoords());
+            if (targetsSource) {
+                LOGGER.warn("Abandoned {} order on {} on track {}: its target could not be relocated.",
+                      order.getOperation(),
+                      source,
+                      track.getDisplayableName());
+            }
+            return targetsSource;
+        });
+
+        for (StratConScenario scenario : track.getScenarios().values()) {
+            if (source.equals(scenario.getSiegeCoords())) {
+                scenario.setSiegeCoords(null);
+            }
+        }
+
+        track.getCutOffFacilities().remove(source);
     }
 
     /**
@@ -1788,6 +1852,7 @@ public class StratConContractInitializer {
         }
 
         removeObjectiveAt(track, source);
+        dropFacilityState(track, source);
     }
 
     /** Drops any strategic objective tied to a hex whose occupant could not be saved, so nothing points at dead ground. */

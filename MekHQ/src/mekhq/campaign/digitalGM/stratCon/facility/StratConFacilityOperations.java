@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Map;
 
 import megamek.common.annotations.Nullable;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -81,6 +82,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  */
 public final class StratConFacilityOperations {
     static final String RESOURCE_BUNDLE = "mekhq.resources.StratConFacilityOperations";
+    private static final MMLogger LOGGER = MMLogger.create(StratConFacilityOperations.class);
 
     static final int RECON_COST = 0;
     static final int RAID_COST = 1;
@@ -123,7 +125,8 @@ public final class StratConFacilityOperations {
      */
     public static boolean isEnabled(Campaign campaign) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        // Compared rather than unboxed, so an options object without the value set reads as off.
+        // Compared rather than unboxed only so a mocked options object (which returns null) reads as off; real options
+        // always return the registered default.
         return Boolean.TRUE.equals(campaignOptions.get(CampaignOption.USE_FACILITY_OPERATIONS))
                      && !campaignOptions.isUseStratConMaplessMode();
     }
@@ -644,6 +647,16 @@ public final class StratConFacilityOperations {
           StratConFacilityOrder order) {
         StratConFacilityDefinition definition = StratConFacilityFactory.getDefinition(order.getDefinitionId());
         if (definition == null) {
+            // The facility data changed since the order was given; hand back what the order cost rather than let the
+            // formation's week of work vanish without a word.
+            LOGGER.warn("Build order on {} names unknown facility definition {}; refunding its cost.",
+                  order.getTargetCoords(),
+                  order.getDefinitionId());
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
+            if (campaignState != null) {
+                campaignState.changeSupportPoints(getSupportPointCost(FacilityOperation.BUILD));
+            }
+            report(campaign, "report.buildFailed");
             return;
         }
 

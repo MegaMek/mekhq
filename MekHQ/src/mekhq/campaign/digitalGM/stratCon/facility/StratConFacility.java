@@ -350,11 +350,13 @@ public class StratConFacility {
                                       && (StratConFacilityDefinition.isAlliedToPlayer(this.owner)
                                                 != StratConFacilityDefinition.isAlliedToPlayer(owner));
         this.owner = owner;
-        // A facility changing sides joins its new holder's supply lines afresh, and its old garrison's traits go with
-        // its old garrison.
+        // A facility changing sides joins its new holder's supply lines afresh, its old garrison's traits go with its
+        // old garrison, and the modifiers it was given at placement - such as those of the objective it served - were
+        // its old holder's, not the new one's.
         if (isSideChanged) {
             networked = false;
             getTraits().removeIf(FacilityTrait::isGarrisonTrait);
+            additionalLocalModifiers.clear();
         }
     }
 

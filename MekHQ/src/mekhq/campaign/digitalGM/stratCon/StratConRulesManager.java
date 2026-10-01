@@ -1552,7 +1552,14 @@ public class StratConRulesManager {
                           contract,
                           owner);
                     if (facility == null) {
-                        return scenario;
+                        // Without a facility to sit on, a facility scenario has nothing to fight over; discard it
+                        // rather than leave an orphan on the map.
+                        LOGGER.warn("No facility for facility scenario {} at {} on track {}; discarding it.",
+                              scenario.getName(),
+                              coords,
+                              track.getDisplayableName());
+                        campaign.removeScenario(scenario.getBackingScenario());
+                        return null;
                     }
                     facility.setVisible(true);
                     track.addFacility(coords, facility);
