@@ -56,6 +56,7 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
@@ -811,17 +812,22 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
      * the In Use column is recounted, not just re-filtered. The scheduler runs one refresh for a burst of events.
      */
     @Subscribe
-    public void handle(UnitNewEvent event) {
-        partsScheduler.schedule();
+    public void handleUnitAdded(UnitNewEvent unitNewEvent) {
+        scheduleInUseRecount(unitNewEvent.getUnit(), "added");
     }
 
     @Subscribe
-    public void handle(UnitRemovedEvent event) {
-        partsScheduler.schedule();
+    public void handleUnitRemoved(UnitRemovedEvent unitRemovedEvent) {
+        scheduleInUseRecount(unitRemovedEvent.getUnit(), "removed");
     }
 
     @Subscribe
-    public void handle(UnitChangedEvent event) {
+    public void handleUnitChanged(UnitChangedEvent unitChangedEvent) {
+        scheduleInUseRecount(unitChangedEvent.getUnit(), "changed");
+    }
+
+    private void scheduleInUseRecount(@Nullable Unit unit, String change) {
+        LOGGER.debug("[Warehouse] {} {}; In Use will be recounted", (unit == null) ? "a unit" : unit.getName(), change);
         partsScheduler.schedule();
     }
 
