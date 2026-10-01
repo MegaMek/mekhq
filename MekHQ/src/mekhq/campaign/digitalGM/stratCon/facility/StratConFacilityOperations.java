@@ -813,7 +813,7 @@ public final class StratConFacilityOperations {
      * <ul>
      *     <li>{@link FacilityCaptureChoice#HOLD}: the player holds it, at full garrison.</li>
      *     <li>{@link FacilityCaptureChoice#RAZE}: it is destroyed, raising Escalation by 3d6 for a civilian facility
-     *     (a Spaceport, Data Center or Industrial Facility), or 1d6 otherwise.</li>
+     *     (a Space Port, Data Center or Industrial Center), or 1d6 otherwise.</li>
      *     <li>{@link FacilityCaptureChoice#HAND_OVER}: it stays with the employer, at full garrison, and the contract's
      *     combat bonus is paid.</li>
      * </ul>

@@ -20,7 +20,7 @@
   "displayableName": "Tank Base",
   "facilityType": "TankBase",
   "alliedProfile": {
-    "description": "Allied vehicles will participate in scenarios on this track and defend this facility.",
+    "description": "Allied vehicles will participate in scenarios in this sector and defend this facility.",
     "effects": [
       {
         "effect": "localModifiers",
@@ -37,7 +37,7 @@
     ]
   },
   "hostileProfile": {
-    "description": "Hostile vehicles will participate in scenarios on this track and defend this facility.",
+    "description": "Hostile vehicles will participate in scenarios in this sector and defend this facility.",
     "effects": [
       {
         "effect": "localModifiers",

@@ -20,7 +20,7 @@
   "displayableName": "Industrial Center",
   "facilityType": "IndustrialFacility",
   "alliedProfile": {
-    "description": "Provides 1 SP/month of allied logistical support.",
+    "description": "Provides 1 Employer Support each month.",
     "effects": [
       {
         "effect": "monthlySupportPoints",
@@ -29,7 +29,7 @@
     ]
   },
   "hostileProfile": {
-    "description": "Hostile forces on this track are larger and better equipped with factory-fresh units.",
+    "description": "Hostile forces in this sector are larger and better equipped with factory-fresh units.",
     "effects": [
       {
         "effect": "sharedModifiers",

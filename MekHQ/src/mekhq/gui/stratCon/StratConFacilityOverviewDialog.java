@@ -216,7 +216,8 @@ public class StratConFacilityOverviewDialog extends JDialog {
         }
 
         for (UpcomingEvent event : StratConFacilityAdvisor.getUpcomingEvents(campaign, campaignState)) {
-            eventModel.addRow(new Object[] { event.date(), event.track().getDisplayableName(),
+            eventModel.addRow(new Object[] { StratConFacilityAdvisor.formatDate(event.date()),
+                                             event.track().getDisplayableName(),
                                              event.description() });
             eventLocations.add(new Location(event.track(), event.coords()));
         }

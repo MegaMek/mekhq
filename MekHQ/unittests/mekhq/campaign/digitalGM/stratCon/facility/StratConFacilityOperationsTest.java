@@ -46,6 +46,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 
@@ -60,6 +61,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConStrategicObjective;
 import mekhq.campaign.digitalGM.stratCon.StratConTestData;
@@ -98,6 +100,7 @@ class StratConFacilityOperationsTest {
     private StratConTrackState track;
     private Campaign campaign;
     private AbstractContract contract;
+    private CampaignOptions options;
 
     @BeforeAll
     static void loadStratConData() {
@@ -114,7 +117,7 @@ class StratConFacilityOperationsTest {
         campaignState.setSupportPoints(10);
 
         campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
-        CampaignOptions options = mock(CampaignOptions.class);
+        options = mock(CampaignOptions.class);
         when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(true);
         when(options.isUseStratConMaplessMode()).thenReturn(false);
         when(campaign.getCampaignOptions()).thenReturn(options);
@@ -179,9 +182,20 @@ class StratConFacilityOperationsTest {
         }
 
         @Test
-        void everyOrderHasASupportPointCost() {
+        void everyOrderCostsWhatTheRulesSay() {
+            Map<FacilityOperation, Integer> expectedCosts = Map.of(FacilityOperation.RECON, 0,
+                  FacilityOperation.RAID, 1,
+                  FacilityOperation.SABOTAGE, 2,
+                  FacilityOperation.ASSAULT, 0,
+                  FacilityOperation.FORTIFY, 3,
+                  FacilityOperation.REINFORCE, 1,
+                  FacilityOperation.BUILD, 3,
+                  FacilityOperation.INTERDICT, 1,
+                  FacilityOperation.SIEGE, 1);
             for (FacilityOperation operation : FacilityOperation.values()) {
-                assertTrue(StratConFacilityOperations.getSupportPointCost(operation) >= 0, operation.name());
+                assertEquals(expectedCosts.get(operation),
+                      StratConFacilityOperations.getSupportPointCost(operation),
+                      operation.name());
             }
         }
 
@@ -408,7 +422,7 @@ class StratConFacilityOperationsTest {
     @Nested
     class TimedOrders {
         @Test
-        void reconAndBuildAreKeptAndHoldTheFormation() {
+        void aReconIsKeptAndHoldsTheFormation() {
             placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
             deployFormationAt(FACILITY_COORDS.translate(2));
 
@@ -613,11 +627,22 @@ class StratConFacilityOperationsTest {
             facility.setIntel(FacilityIntel.LOCATED);
             deployFormationAt(FACILITY_COORDS);
             recon(TODAY.plusDays(1));
+            // Without the contract, processOrders would complete nothing whatever the date.
+            when(campaign.getActiveContracts()).thenReturn(List.of(contract));
 
-            StratConFacilityOperations.processOrders(track, campaign);
+            try (MockedStatic<Compute> ignored = StratConTestDice.loadDice()) {
+                StratConFacilityOperations.processOrders(track, campaign);
 
-            assertEquals(1, track.getFacilityOrders().size());
-            assertEquals(FacilityIntel.LOCATED, facility.getIntel());
+                assertEquals(1, track.getFacilityOrders().size());
+                assertEquals(FacilityIntel.LOCATED, facility.getIntel());
+
+                // On its day, it completes: the loaded dice beat the recon's target number.
+                when(campaign.getLocalDate()).thenReturn(TODAY.plusDays(1));
+                StratConFacilityOperations.processOrders(track, campaign);
+
+                assertTrue(track.getFacilityOrders().isEmpty());
+                assertEquals(FacilityIntel.SCOUTED, facility.getIntel());
+            }
         }
 
         @Test
@@ -949,6 +974,44 @@ class StratConFacilityOperationsTest {
                   StratConFacilityOperations.RECON_TARGET_NUMBER);
 
             assertEquals(FacilityIntel.DETAILED, facility.getIntel());
+        }
+    }
+
+    @Nested
+    class OptionOff {
+        @Test
+        void withFacilityOperationsOffDeployingOntoAnEnemyFacilityAssaultsIt() {
+            StratConFacility facility = placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+            when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(false);
+
+            assertTrue(StratConRulesManager.isDeploymentAnAssault(campaign, facility));
+        }
+
+        @Test
+        void withFacilityOperationsOnDeployingOntoAnEnemyFacilityStartsNothing() {
+            StratConFacility facility = placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
+
+            assertFalse(StratConRulesManager.isDeploymentAnAssault(campaign, facility));
+        }
+
+        @Test
+        void deployingOntoYourSidesFacilityNeverAssaultsIt() {
+            StratConFacility facility = placeFacility(ForceAlignment.Allied, FacilityType.MekBase);
+            when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(false);
+
+            assertFalse(StratConRulesManager.isDeploymentAnAssault(campaign, facility));
+            assertFalse(StratConRulesManager.isDeploymentAnAssault(campaign, null));
+        }
+
+        @Test
+        void theCaptureChoiceIsOnlyOfferedWithFacilityOperations() {
+            StratConFacility facility = placeFacility(ForceAlignment.Allied, FacilityType.MekBase);
+
+            assertTrue(StratConRulesManager.isCaptureChoiceOffered(campaign, true, facility));
+            assertFalse(StratConRulesManager.isCaptureChoiceOffered(campaign, false, facility));
+
+            when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(false);
+            assertFalse(StratConRulesManager.isCaptureChoiceOffered(campaign, true, facility));
         }
     }
 }

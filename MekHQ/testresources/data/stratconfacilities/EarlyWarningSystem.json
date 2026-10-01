@@ -37,7 +37,7 @@
     ]
   },
   "hostileProfile": {
-    "description": "Reduces hostile reinforcement arrival time for scenarios on this track.",
+    "description": "Reduces hostile reinforcement arrival time for scenarios in this sector.",
     "effects": [
       {
         "effect": "localModifiers",

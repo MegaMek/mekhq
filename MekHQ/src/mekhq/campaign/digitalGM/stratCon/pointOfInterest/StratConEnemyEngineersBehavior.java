@@ -140,9 +140,11 @@ public class StratConEnemyEngineersBehavior extends StratConContestedPointOfInte
         StratConPointOfInterestRules.withdrawPointOfInterest(track, pointOfInterest);
 
         // The sector may have filled up while they worked; the cap still holds.
-        if ((coords == null)
-                  || (track.getFacility(coords) != null)
-                  || !StratConContractInitializer.hasRoomForFacility(track)) {
+        if (coords == null) {
+            return null;
+        }
+        if ((track.getFacility(coords) != null) || !StratConContractInitializer.hasRoomForFacility(track)) {
+            addReport(BATTLE, "noRoom.report", pointOfInterest, track, campaign);
             return null;
         }
 

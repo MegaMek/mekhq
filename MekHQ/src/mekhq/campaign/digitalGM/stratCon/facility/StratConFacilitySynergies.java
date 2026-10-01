@@ -46,7 +46,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 /**
  * Facility pairings that do more together. When a facility has a partner held by the same side in the same sector, a
  * fight at the facility draws on the partner's shared modifiers too, whether or not the partner would have lent them
- * anyway. The pairings are an Artillery Base with a Command Center, an Air Base with an Early Warning System, and a
+ * anyway. The pairings are an Artillery Base with a Comms Center, an Air Base with an Early Warning Center, and a
  * Data Center with any Mek, Tank or Air Base, or a Base of Operations. A crippled facility, or one cut off from its
  * supply lines, is no partner.
  *

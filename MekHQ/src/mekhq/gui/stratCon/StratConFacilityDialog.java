@@ -311,10 +311,7 @@ public class StratConFacilityDialog extends JDialog {
         row.setBorder(BorderFactory.createEmptyBorder(UIUtil.scaleForGUI(4), 0, UIUtil.scaleForGUI(4), 0));
 
         StringBuilder html = new StringBuilder("<html><body><b>")
-                                   .append(getFormattedTextAt(RESOURCE_BUNDLE,
-                                         "operation.label",
-                                         getTextAt(RESOURCE_BUNDLE, "operation." + operation.name()),
-                                         option.supportPointCost()))
+                                   .append(StratConFacilityAdvisor.getOperationLabel(operation))
                                    .append("</b><br>")
                                    .append(getTextAt(RESOURCE_BUNDLE, "operation.tooltip." + operation.name()));
         if (!option.isAvailable()) {
@@ -408,7 +405,7 @@ public class StratConFacilityDialog extends JDialog {
                 row.add(new JLabel(getFormattedTextAt(RESOURCE_BUNDLE,
                       "dialog.underway.siege",
                       formationName,
-                      order.getCompletionDate())));
+                      StratConFacilityAdvisor.formatDate(order.getCompletionDate()))));
                 RoundedJButton liftButton = new RoundedJButton(getTextAt(RESOURCE_BUNDLE, "contextMenu.liftSiege"));
                 int formationId = order.getFormationId();
                 liftButton.addActionListener(evt -> {
@@ -421,7 +418,7 @@ public class StratConFacilityDialog extends JDialog {
                       "dialog.underway.order",
                       formationName,
                       operationName,
-                      order.getCompletionDate())));
+                      StratConFacilityAdvisor.formatDate(order.getCompletionDate()))));
             }
             underwayPanel.add(row);
         }

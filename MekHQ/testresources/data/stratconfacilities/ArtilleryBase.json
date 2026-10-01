@@ -20,7 +20,7 @@
   "displayableName": "Artillery Base",
   "facilityType": "ArtilleryBase",
   "alliedProfile": {
-    "description": "A force of allied artillery will participate in scenarios on this track and defend this facility.",
+    "description": "A force of allied artillery will participate in scenarios in this sector and defend this facility.",
     "effects": [
       {
         "effect": "localModifiers",
@@ -37,7 +37,7 @@
     ]
   },
   "hostileProfile": {
-    "description": "Hostile artillery will participate in scenarios on this track and defend this facility.",
+    "description": "Hostile artillery will participate in scenarios in this sector and defend this facility.",
     "effects": [
       {
         "effect": "localModifiers",

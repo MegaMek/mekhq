@@ -20,7 +20,7 @@
   "displayableName": "Space Port",
   "facilityType": "SpacePort",
   "alliedProfile": {
-    "description": "Provides 2 SP/month of allied logistical support.",
+    "description": "Provides 2 Employer Support each month.",
     "effects": [
       {
         "effect": "monthlySupportPoints",
@@ -29,7 +29,7 @@
     ]
   },
   "hostileProfile": {
-    "description": "Hostile forces on this track are significantly larger due to improved logistics.",
+    "description": "Hostile forces in this sector are significantly larger due to improved logistics.",
     "effects": [
       {
         "effect": "localModifiers",

@@ -32,12 +32,13 @@
  */
 package mekhq.campaign.digitalGM.stratCon.facility;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
@@ -324,6 +325,15 @@ class StratConFacilitySupplyTest {
         }
     }
 
+    /** @return the report for a facility back on its supply lines, read from the resource bundle as the game does */
+    private String reconnectedReport(StratConFacility facility, StratConCoords coords) {
+        return getFormattedTextAt("mekhq.resources.StratConEnemyFacilityActivity",
+              "report.reconnected",
+              facility.getDisplayableName(),
+              track.getDisplayableName(),
+              coords.toBTString());
+    }
+
     @Nested
     class AwkwardCases {
         @Test
@@ -340,13 +350,13 @@ class StratConFacilitySupplyTest {
             StratConFacilitySupply.processSupply(track, campaign, false);
 
             assertFalse(StratConFacilitySupply.isCutOff(track, offRoad));
-            verify(campaign, never()).addReport(any(), contains("back on its supply lines"));
+            verify(campaign, never()).addReport(any(), eq(reconnectedReport(facility, offRoad)));
         }
 
         @Test
         void aFacilityGenuinelyReconnectedIsReported() {
-            place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase).setIntel(
-                  StratConFacility.FacilityIntel.LOCATED);
+            StratConFacility facility = place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            facility.setIntel(StratConFacility.FacilityIntel.LOCATED);
             StratConFacilitySupply.processSupply(track, campaign, false);
             track.getRoadCuts().add(new StratConRoadCut(road[1], TODAY.plusDays(1)));
             StratConFacilitySupply.processSupply(track, campaign, false);
@@ -357,7 +367,7 @@ class StratConFacilitySupplyTest {
             StratConFacilitySupply.processSupply(track, campaign, false);
 
             assertFalse(StratConFacilitySupply.isCutOff(track, roadEnd));
-            verify(campaign).addReport(any(), contains("back on its supply lines"));
+            verify(campaign).addReport(any(), eq(reconnectedReport(facility, roadEnd)));
         }
 
         @Test

@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 
 import megamek.common.annotations.Nullable;
+import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
@@ -200,7 +201,7 @@ public final class StratConFacilityAdvisor {
         StratConScenario counterattack = getCounterattack(track, coords);
         if (counterattack != null) {
             hints.add((counterattack.getCurrentState() == ScenarioState.UNRESOLVED) ?
-                            getFormattedTextAt(RESOURCE_BUNDLE, "hint.counterattack", getDeadline(counterattack)) :
+                            getFormattedTextAt(RESOURCE_BUNDLE, "hint.counterattack", formatDate(getDeadline(counterattack))) :
                             getTextAt(RESOURCE_BUNDLE, "hint.counterattack.committed"));
         }
 
@@ -256,7 +257,7 @@ public final class StratConFacilityAdvisor {
 
     /**
      * @return the hint for an enemy facility that is neither besieged nor counterattacking: that orders are available;
-     *       that a formation is needed, if that is all that stands in the way; or else what does stand in the way
+     *       that a formation is needed, if a formation would make any order possible; or else what stands in the way
      */
     private static String getEnemyFacilityOrderHint(Campaign campaign, AbstractContract contract,
           StratConTrackState track, StratConCoords coords) {
@@ -268,12 +269,18 @@ public final class StratConFacilityAdvisor {
         }
 
         for (OrderOption option : options) {
-            if (!"contextMenu.noFormation".equals(option.reasonKey())) {
-                String key = (option.guidanceKey() == null) ? option.reasonKey() : option.guidanceKey();
-                return getTextAt(RESOURCE_BUNDLE, key);
+            if ("contextMenu.noFormation".equals(option.reasonKey())) {
+                return getTextAt(RESOURCE_BUNDLE, "hint.deployToAct");
             }
         }
-        return getTextAt(RESOURCE_BUNDLE, "hint.deployToAct");
+
+        // No formation would help; say what does stand in the way.
+        if (options.isEmpty()) {
+            return getTextAt(RESOURCE_BUNDLE, "hint.deployToAct");
+        }
+        OrderOption firstOption = options.get(0);
+        String key = (firstOption.guidanceKey() == null) ? firstOption.reasonKey() : firstOption.guidanceKey();
+        return getTextAt(RESOURCE_BUNDLE, key);
     }
 
     private static void addEmptyHexHints(Campaign campaign, AbstractContract contract, StratConTrackState track,
@@ -375,6 +382,34 @@ public final class StratConFacilityAdvisor {
      * @author Illiani
      * @since 0.51.01
      */
+    /**
+     * @param operation an order
+     *
+     * @return the order's name, followed by what it costs unless it is free
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static String getOperationLabel(FacilityOperation operation) {
+        String name = getTextAt(RESOURCE_BUNDLE, "operation." + operation.name());
+        int cost = StratConFacilityOperations.getSupportPointCost(operation);
+        return (cost == 0) ? name : getFormattedTextAt(RESOURCE_BUNDLE, "operation.label", name, cost);
+    }
+
+    /**
+     * @param date a date, or {@code null}
+     *
+     * @return the date as the player has chosen to see dates, or a note that it is unknown
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static String formatDate(@Nullable LocalDate date) {
+        return (date == null) ?
+                     getTextAt(RESOURCE_BUNDLE, "date.unknown") :
+                     MekHQ.getMHQOptions().getDisplayFormattedDate(date);
+    }
+
     public static @Nullable LocalDate getDeadline(StratConScenario scenario) {
         return (scenario.getDeploymentDate() != null) ? scenario.getDeploymentDate() : scenario.getActionDate();
     }
@@ -490,7 +525,7 @@ public final class StratConFacilityAdvisor {
         List<String> parts = new ArrayList<>();
         StratConScenario counterattack = getCounterattack(track, coords);
         if (counterattack != null) {
-            parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "activity.counterattack", getDeadline(counterattack)));
+            parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "activity.counterattack", formatDate(getDeadline(counterattack))));
         }
 
         int besiegerCount = StratConFacilitySiege.getSieges(track, coords).size();
@@ -503,7 +538,7 @@ public final class StratConFacilityAdvisor {
                 parts.add(getFormattedTextAt(RESOURCE_BUNDLE,
                       "activity.order",
                       getTextAt(RESOURCE_BUNDLE, "operation." + order.getOperation().name()),
-                      order.getCompletionDate()));
+                      formatDate(order.getCompletionDate())));
             }
         }
         return String.join(", ", parts);

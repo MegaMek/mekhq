@@ -381,9 +381,7 @@ public final class StratConEnemyFacilityActivity {
           StratConScenario scenario) {
         StratConFacility facility = target.track().getFacility(target.coords());
         String facilityName = (facility == null) ? "" : facility.getDisplayableName();
-        String deadline = (scenario.getDeploymentDate() == null) ?
-                                "" :
-                                scenario.getDeploymentDate().toString();
+        String deadline = StratConFacilityAdvisor.formatDate(scenario.getDeploymentDate());
         boolean isEmployerHeld = (facility != null) && (facility.getOwner() == ForceAlignment.Allied);
 
         campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE,

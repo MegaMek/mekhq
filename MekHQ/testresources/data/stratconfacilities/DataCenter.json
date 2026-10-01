@@ -29,7 +29,7 @@
     ]
   },
   "hostileProfile": {
-    "description": "An additional hostile Mek patrol will sweep through scenarios on this track.",
+    "description": "An additional hostile Mek patrol will sweep through scenarios in this sector.",
     "effects": [
       {
         "effect": "sharedModifiers",

@@ -54,7 +54,7 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 /**
  * Supply lines: the road network, read as the routes that keep each side's facilities supplied.
  *
- * <p>Each side's supply starts from its sources: its Command Centers, Bases of Operations and Spaceports, and every
+ * <p>Each side's supply starts from its sources: its Comms Centers, Bases of Operations and Space Ports, and every
  * road that leaves the sector. It runs along road hexes and through that side's own facilities, and jumps from each of
  * that side's Supply Depots to that side's facilities within {@value #DEPOT_RANGE} hexes. The other side's facilities
  * block it, and so does a road hex where the player has cut the enemy's supply (see {@link StratConRoadCut}), for the

@@ -54,7 +54,7 @@
     }
   ],
   "alliedProfile": {
-    "description": "Allied Meks will participate in scenarios on this track and defend this facility.",
+    "description": "Allied Meks will participate in scenarios in this sector and defend this facility.",
     "effects": [
       {
         "effect": "localModifiers",
@@ -71,7 +71,7 @@
     ]
   },
   "hostileProfile": {
-    "description": "Hostile Meks will participate in scenarios on this track and defend this facility.",
+    "description": "Hostile Meks will participate in scenarios in this sector and defend this facility.",
     "effects": [
       {
         "effect": "localModifiers",

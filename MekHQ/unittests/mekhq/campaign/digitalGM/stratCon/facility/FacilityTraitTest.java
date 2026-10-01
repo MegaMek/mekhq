@@ -67,6 +67,8 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 
 /**
  * Tests facility traits: how many a facility gets and which, what each does, which survive a change of hands, and
@@ -309,21 +311,24 @@ class FacilityTraitTest {
             assertEquals(0, campaignState.getSupportPoints());
         }
 
-        @Test
-        void capturedPrototypeGearPaysOnceHoweverTheFacilityIsDealtWith() {
+        @ParameterizedTest
+        @EnumSource(FacilityCaptureChoice.class)
+        void capturedPrototypeGearPaysOnceHoweverTheFacilityIsDealtWith(FacilityCaptureChoice choice) {
             StratConFacility facility = place(ForceAlignment.Allied, FacilityTrait.EXPERIMENTAL_WEAPONS);
 
-            StratConFacilityOperations.resolveCapture(campaign, contract, track, FACILITY_COORDS,
-                  FacilityCaptureChoice.HOLD);
+            StratConFacilityOperations.resolveCapture(campaign, contract, track, FACILITY_COORDS, choice);
 
             assertEquals(FacilityTrait.EXPERIMENTAL_WEAPONS_CAPTURE_SUPPORT, campaignState.getSupportPoints());
             assertFalse(facility.hasTrait(FacilityTrait.EXPERIMENTAL_WEAPONS));
+            if (track.getFacility(FACILITY_COORDS) == null) {
+                // Razed: there is nothing left to capture again.
+                return;
+            }
 
             // Taken back by the enemy and captured again, it pays nothing more.
             facility.setOwner(ForceAlignment.Opposing);
             facility.setOwner(ForceAlignment.Allied);
-            StratConFacilityOperations.resolveCapture(campaign, contract, track, FACILITY_COORDS,
-                  FacilityCaptureChoice.HOLD);
+            StratConFacilityOperations.resolveCapture(campaign, contract, track, FACILITY_COORDS, choice);
             assertEquals(FacilityTrait.EXPERIMENTAL_WEAPONS_CAPTURE_SUPPORT, campaignState.getSupportPoints());
         }
     }

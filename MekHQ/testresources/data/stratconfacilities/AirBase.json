@@ -20,7 +20,7 @@
   "displayableName": "Air Base",
   "facilityType": "AirBase",
   "alliedProfile": {
-    "description": "Allied aircraft will participate in scenarios on this track and defend this facility.",
+    "description": "Allied aircraft will participate in scenarios in this sector and defend this facility.",
     "effects": [
       {
         "effect": "localModifiers",
@@ -37,7 +37,7 @@
     ]
   },
   "hostileProfile": {
-    "description": "Hostile aircraft will participate in scenarios on this track and defend this facility.",
+    "description": "Hostile aircraft will participate in scenarios in this sector and defend this facility.",
     "effects": [
       {
         "effect": "localModifiers",

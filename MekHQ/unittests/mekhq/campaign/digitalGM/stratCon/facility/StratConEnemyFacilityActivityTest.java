@@ -325,6 +325,11 @@ class StratConEnemyFacilityActivityTest {
             assertFalse(StratConEnemyFacilityActivity.isOffScreenDefenseHeld(facility,
                   SkillLevel.REGULAR,
                   SkillLevel.REGULAR,
+                  ContractMoraleLevel.STALEMATE,
+                  4));
+            assertFalse(StratConEnemyFacilityActivity.isOffScreenDefenseHeld(facility,
+                  SkillLevel.REGULAR,
+                  SkillLevel.REGULAR,
                   ContractMoraleLevel.ADVANCING,
                   5));
             assertFalse(StratConEnemyFacilityActivity.isOffScreenDefenseHeld(facility,

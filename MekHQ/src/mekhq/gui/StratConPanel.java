@@ -913,10 +913,7 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     private JMenu buildFacilityOrderMenu(StratConCoords coords, AbstractContract contract,
           FacilityOperation operation) {
-        JMenu operationMenu = new JMenu(getFormattedTextAt(FACILITY_OPERATIONS_BUNDLE,
-              "operation.label",
-              getTextAt(FACILITY_OPERATIONS_BUNDLE, "operation." + operation.name()),
-              StratConFacilityOperations.getSupportPointCost(operation)));
+        JMenu operationMenu = new JMenu(StratConFacilityAdvisor.getOperationLabel(operation));
 
         String reasonKey = StratConFacilityOperations.getUnavailableReasonKey(campaign,
               contract,
@@ -2571,7 +2568,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                 if (roadCut.getCoords().equals(boardState.getSelectedCoords())) {
                     infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE,
                           "stratConTab.hexInfo.roadCut",
-                          roadCut.getEndDate()));
+                          StratConFacilityAdvisor.formatDate(roadCut.getEndDate())));
                 }
             }
 

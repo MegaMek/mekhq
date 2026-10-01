@@ -20,7 +20,7 @@
   "displayableName": "Comms Center",
   "facilityType": "CommandCenter",
   "alliedProfile": {
-    "description": "This facility will coordinate additional allied reinforcements to scenarios on this track.",
+    "description": "This facility will coordinate additional allied reinforcements to scenarios in this sector.",
     "effects": [
       {
         "effect": "sharedModifiers",
@@ -31,7 +31,7 @@
     ]
   },
   "hostileProfile": {
-    "description": "Coordinates additional hostile reinforcements for scenarios on this track.",
+    "description": "Coordinates additional hostile reinforcements for scenarios in this sector.",
     "effects": [
       {
         "effect": "sharedModifiers",

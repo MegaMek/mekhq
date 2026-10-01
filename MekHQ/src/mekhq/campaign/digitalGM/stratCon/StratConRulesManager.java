@@ -1236,11 +1236,7 @@ public class StratConRulesManager {
         }
 
         StratConFacility facility = track.getFacility(coords);
-        // With Facility Operations, arriving at an enemy facility starts nothing on its own: the player orders what
-        // the formation does there. Without it, deploying onto one starts an assault, as it always has.
-        boolean isNonAlliedFacility = (facility != null)
-                                            && !facility.isOwnerAlliedToPlayer()
-                                            && !StratConFacilityOperations.isEnabled(campaign);
+        boolean isNonAlliedFacility = isDeploymentAnAssault(campaign, facility);
 
         int targetNum = calculateScenarioOdds(track, contract, true);
         // Under "Essential Scenarios Only", deploying into an empty hex never rolls a random encounter - only the
@@ -1863,6 +1859,39 @@ public class StratConRulesManager {
         backingScenario.setIsCrisis(true);
         scenario.setTurningPoint(false);
         return scenario;
+    }
+
+    /**
+     * With Facility Operations, arriving at an enemy facility starts nothing on its own: the player orders what the
+     * formation does there. Without it, deploying onto one starts an assault, as it always has.
+     *
+     * @param campaign the current campaign
+     * @param facility the facility on the hex a formation is deploying to, or {@code null} if there is none
+     *
+     * @return {@code true} if the deployment starts an assault on the facility
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isDeploymentAnAssault(Campaign campaign, @Nullable StratConFacility facility) {
+        return (facility != null)
+                     && !facility.isOwnerAlliedToPlayer()
+                     && !StratConFacilityOperations.isEnabled(campaign);
+    }
+
+    /**
+     * @param campaign   the current campaign
+     * @param wasHostile whether the facility was the enemy's before the fight
+     * @param facility   the facility after the fight
+     *
+     * @return {@code true} if the player has just taken an enemy facility and, with Facility Operations, chooses its
+     *       fate; without them, a captured facility is simply held, as it always was
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isCaptureChoiceOffered(Campaign campaign, boolean wasHostile, StratConFacility facility) {
+        return wasHostile && facility.isOwnerAlliedToPlayer() && StratConFacilityOperations.isEnabled(campaign);
     }
 
     /**
@@ -4356,9 +4385,7 @@ public class StratConRulesManager {
                     }
 
                     // The player has just taken an enemy facility: with Facility Operations, they decide its fate.
-                    if (wasHostile
-                              && facility.isOwnerAlliedToPlayer()
-                              && StratConFacilityOperations.isEnabled(campaign)) {
+                    if (isCaptureChoiceOffered(campaign, wasHostile, facility)) {
                         StratConFacilityOperations.resolveCapture(campaign,
                               mission,
                               track,

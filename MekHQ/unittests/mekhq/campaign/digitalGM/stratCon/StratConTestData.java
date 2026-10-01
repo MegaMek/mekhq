@@ -59,9 +59,9 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
  * shape, one hydrology profile, an empty biome manifest - and any test that asserts something about the authored data
  * fails for want of a build step rather than for a real defect.</p>
  *
- * <p>The fixtures under {@code testresources/data/stratconbiomedefinitions/} are verbatim copies of the mm-data
- * originals, so tests keep asserting against the data the game actually ships. Re-copy them when the originals
- * change.</p>
+ * <p>The fixtures under {@code testresources/data/stratconbiomedefinitions/} and
+ * {@code testresources/data/stratconfacilities/} are verbatim copies of the mm-data originals, so tests keep asserting
+ * against the data the game actually ships. Re-copy them when the originals change.</p>
  *
  * @author Illiani
  * @since 0.51.01

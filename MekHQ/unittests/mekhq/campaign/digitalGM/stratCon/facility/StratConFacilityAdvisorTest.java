@@ -267,8 +267,10 @@ class StratConFacilityAdvisorTest {
 
             assertEquals(List.of(getFormattedTextAt(RESOURCE_BUNDLE, "hint.besieged", 1)), hints());
 
+            // Begun today, the siege has its free first week before it bites: one week of nothing, then one step a
+            // week for a garrison of two.
             facility.setIntel(FacilityIntel.DETAILED);
-            assertEquals(List.of(getFormattedTextAt(RESOURCE_BUNDLE, "hint.besieged.detailed", 1, 2)), hints());
+            assertEquals(List.of(getFormattedTextAt(RESOURCE_BUNDLE, "hint.besieged.detailed", 1, 3)), hints());
         }
 
         @Test
@@ -308,7 +310,9 @@ class StratConFacilityAdvisorTest {
             counterattack.setDeploymentDate(TODAY.plusDays(3));
             track.getScenarios().put(FACILITY_COORDS, counterattack);
 
-            assertEquals(getFormattedTextAt(RESOURCE_BUNDLE, "hint.counterattack", TODAY.plusDays(3)),
+            assertEquals(getFormattedTextAt(RESOURCE_BUNDLE,
+                        "hint.counterattack",
+                        StratConFacilityAdvisor.formatDate(TODAY.plusDays(3))),
                   hints().get(0));
         }
 
@@ -438,7 +442,8 @@ class StratConFacilityAdvisorTest {
             String summary = StratConFacilityAdvisor.getActivitySummary(track, FACILITY_COORDS);
             assertEquals(getFormattedTextAt(RESOURCE_BUNDLE, "activity.besieged", 1) + ", "
                                + getFormattedTextAt(RESOURCE_BUNDLE, "activity.order",
-                  getTextAt(RESOURCE_BUNDLE, "operation.RECON"), TODAY.plusDays(7)), summary);
+                  getTextAt(RESOURCE_BUNDLE, "operation.RECON"),
+                  StratConFacilityAdvisor.formatDate(TODAY.plusDays(7))), summary);
         }
     }
 }

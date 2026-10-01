@@ -20,7 +20,7 @@
   "displayableName": "Orbital Defense",
   "facilityType": "OrbitalDefense",
   "alliedProfile": {
-    "description": "Prevents hostile air units from operating on this track.",
+    "description": "No air or space battles take place in this sector.",
     "effects": [
       {
         "effect": "preventAerospace"
@@ -28,7 +28,7 @@
     ]
   },
   "hostileProfile": {
-    "description": "Prevents allied aerospace unit operation on this track and supplies an additional hostile Mek to ground scenarios.",
+    "description": "No air or space battles take place in this sector, and an additional hostile Mek joins ground scenarios.",
     "effects": [
       {
         "effect": "sharedModifiers",
