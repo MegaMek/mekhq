@@ -74,6 +74,7 @@ import mekhq.campaign.events.parts.PartRemovedEvent;
 import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.events.units.UnitNewEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
 import mekhq.campaign.location.ILocation;
@@ -805,14 +806,23 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private final ActionScheduler partsFilterScheduler = new ActionScheduler(this::filterParts);
     private final ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
 
+    /**
+     * A unit arriving, leaving or changing (stripped, repaired, refitted) changes how many of each part are in use, so
+     * the In Use column is recounted, not just re-filtered. The scheduler runs one refresh for a burst of events.
+     */
     @Subscribe
-    public void handle(UnitRemovedEvent ev) {
-        filterParts();
+    public void handle(UnitNewEvent event) {
+        partsScheduler.schedule();
     }
 
     @Subscribe
-    public void handle(UnitChangedEvent ev) {
-        filterParts();
+    public void handle(UnitRemovedEvent event) {
+        partsScheduler.schedule();
+    }
+
+    @Subscribe
+    public void handle(UnitChangedEvent event) {
+        partsScheduler.schedule();
     }
 
     @Subscribe
