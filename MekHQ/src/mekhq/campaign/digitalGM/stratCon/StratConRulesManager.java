@@ -136,6 +136,7 @@ import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
+import mekhq.campaign.unit.ITransportAssignment;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
@@ -3416,10 +3417,23 @@ public class StratConRulesManager {
                                                              campaignState) != ReinforcementEligibilityType.NONE);
 
             List<Unit> allUnits = force.getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(), false);
+
+            // In low altitude and space scenarios we need to verify that any units that can't deploy are carried by
+            // a unit that can.
+            MapLocation mapLocation = (currentScenario == null) ?
+                                            null :
+                                            currentScenario.getScenarioTemplate().mapParameters.getMapLocation();
+            boolean compositionMatches;
+            if (mapLocation == LowAtmosphere || mapLocation == Space) {
+                compositionMatches = isFormationDeployableToAirOrSpace(allUnits, unitType, mapLocation);
+            } else {
+                compositionMatches = forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType);
+            }
+
             if ((force.getScenarioId() <= 0) &&
                       !allUnits.isEmpty() &&
                       !forcesInTracks.contains(force.getId()) &&
-                      forceCompositionMatchesDeclaredUnitType(primaryUnitType, unitType) &&
+                      compositionMatches &&
                       noReinforcementRestriction &&
                       !subElementsOrSelfDeployed(force, campaign)) {
                 if (isCombatChallenge) {
@@ -3448,6 +3462,76 @@ public class StratConRulesManager {
         }
 
         return retVal;
+    }
+
+    /**
+     * Checks whether an entire formation can take part in a low altitude or space scenario. Every unit must either be
+     * able to deploy there itself (an aerospace unit matching the template's unit type that survives in that
+     * environment), or be loaded aboard - via ship or tactical transport - a unit in the same formation that can.
+     *
+     * @param units       the formation's units
+     * @param unitType    the template's allowed unit type
+     * @param mapLocation the scenario's map location; expected to be {@link MapLocation#LowAtmosphere} or
+     *                    {@link MapLocation#Space}
+     *
+     * @return {@code true} if every unit in the formation can reach the scenario
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isFormationDeployableToAirOrSpace(List<Unit> units, int unitType, MapLocation mapLocation) {
+        if (units.isEmpty()) {
+            return false;
+        }
+
+        Set<UUID> deployableUnitIds = new HashSet<>();
+        for (Unit unit : units) {
+            if (isUnitDeployableToAirOrSpace(unit, unitType, mapLocation)) {
+                deployableUnitIds.add(unit.getId());
+            }
+        }
+
+        for (Unit unit : units) {
+            if (deployableUnitIds.contains(unit.getId())) {
+                continue;
+            }
+
+            if (!isCarriedByDeployableUnit(unit.getTransportShipAssignment(), deployableUnitIds)
+                      && !isCarriedByDeployableUnit(unit.getTacticalTransportAssignment(), deployableUnitIds)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static boolean isCarriedByDeployableUnit(@Nullable ITransportAssignment transportAssignment,
+          Set<UUID> deployableUnitIds) {
+        if (transportAssignment == null) {
+            return false;
+        }
+
+        Unit transport = transportAssignment.getTransport();
+        return (transport != null) && deployableUnitIds.contains(transport.getId());
+    }
+
+    private static boolean isUnitDeployableToAirOrSpace(@Nullable Unit unit, int unitType,
+          MapLocation mapLocation) {
+        if (unit == null) {
+            return false;
+        }
+
+        Entity entity = unit.getEntity();
+        if (entity == null || !entity.isAerospace()) {
+            return false;
+        }
+
+        if ((mapLocation == LowAtmosphere && entity.doomedInAtmosphere())
+                  || (mapLocation == Space && entity.doomedInSpace())) {
+            return false;
+        }
+
+        return forceCompositionMatchesDeclaredUnitType(entity.getUnitType(), unitType);
     }
 
     /**
