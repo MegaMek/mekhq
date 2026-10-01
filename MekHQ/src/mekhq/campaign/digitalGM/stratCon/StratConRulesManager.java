@@ -100,7 +100,6 @@ import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
-import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySiege;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
@@ -126,6 +125,7 @@ import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.BotForce;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
@@ -1543,16 +1543,17 @@ public class StratConRulesManager {
             // stuff and add a new facility to the track
             if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
                 if (scenario.getBackingScenario().getTemplate().isFacilityScenario()) {
-                    StratConFacility facility = scenario.getBackingScenario().getTemplate().isHostileFacility() ?
-                                                      StratConFacilityFactory.getRandomHostileFacility() :
-                                                      StratConFacilityFactory.getRandomAlliedFacility();
+                    // Made like the facilities placed at contract start: the contract's profile picks the type
+                    // and tier, and it rolls traits.
+                    ForceAlignment owner = scenario.getBackingScenario().getTemplate().isHostileFacility() ?
+                                                 ForceAlignment.Opposing :
+                                                 ForceAlignment.Allied;
+                    StratConFacility facility = StratConContractInitializer.createMidContractFacility(campaign,
+                          contract,
+                          owner);
                     if (facility == null) {
                         return scenario;
                     }
-                    facility.setTier(StratConContractInitializer.getFacilityTier(contract.getScale(),
-                          campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
-                          false));
-                    facility.setGarrison(facility.getGarrisonMaximum());
                     facility.setVisible(true);
                     track.addFacility(coords, facility);
                     setupFacilityScenario(scenario, facility);

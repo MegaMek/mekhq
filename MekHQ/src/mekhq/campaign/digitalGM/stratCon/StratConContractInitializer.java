@@ -965,6 +965,50 @@ public class StratConContractInitializer {
     }
 
     /**
+     * Creates a facility for a scenario that brings one onto the map partway through a contract, made the same way as
+     * those placed when the contract began: its type is picked by the contract's facility profile, if it has one, its
+     * tier follows the contract's scale and profile, it rolls traits, and it starts with a full garrison.
+     *
+     * @param campaign the current campaign
+     * @param contract the contract whose map gets the facility
+     * @param owner    the side that holds it
+     *
+     * @return the facility, not yet placed, or {@code null} if no facility definition suits that side
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConFacility createMidContractFacility(Campaign campaign, AbstractContract contract,
+          ForceAlignment owner) {
+        StratConContractDefinition contractDefinition =
+              StratConContractDefinition.getContractDefinition(contract.getObjectiveType());
+        StratConContractFacilityProfile facilityProfile = (contractDefinition == null) ?
+                                                                null :
+                                                                contractDefinition.getFacilityProfile();
+
+        StratConFacility facility;
+        if (facilityProfile != null) {
+            facility = facilityProfile.createFacility(owner);
+        } else {
+            facility = (owner == ForceAlignment.Opposing) ?
+                             StratConFacilityFactory.getRandomHostileFacility() :
+                             StratConFacilityFactory.getRandomAlliedFacility();
+        }
+        if (facility == null) {
+            return null;
+        }
+
+        facility.setOwner(owner);
+        boolean isFactorSupportPointsIntoScale = campaign.getCampaignOptions()
+                                                       .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
+        facility.setTier(adjustTier(facilityProfile,
+              getFacilityTier(contract.getScale(), isFactorSupportPointsIntoScale, false)));
+        FacilityTrait.assignRandomTraits(facility);
+        facility.setGarrison(facility.getGarrisonMaximum());
+        return facility;
+    }
+
+    /**
      * @return the "Facility Density" option multiplied by the contract profile's own density, if there is a profile
      *
      * @author Illiani
