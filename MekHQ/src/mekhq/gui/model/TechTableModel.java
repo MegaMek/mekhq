@@ -228,10 +228,12 @@ public class TechTableModel extends DataTableModel<Person> {
     }
 
     /**
-     * @return one line with what the tech can expect from the selected task: target number, chance of success,
-     *       minutes needed and when it would be done, or why the tech cannot do it
+     * @param estimate the tech's estimate for a task
+     *
+     * @return one line with what the tech can expect from the task: target number, chance of success, minutes needed
+     *       and when it would be done, or why the tech cannot do it
      */
-    private static String describeEstimate(TechTaskEstimate estimate) {
+    public static String describeEstimate(TechTaskEstimate estimate) {
         if (estimate.isImpossible()) {
             // The reason can name a unit, so it is escaped before it goes into the row's HTML
             return getFormattedTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.impossible",
