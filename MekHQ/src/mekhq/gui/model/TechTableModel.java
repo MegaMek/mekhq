@@ -54,6 +54,7 @@ import mekhq.gui.BasicInfo;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.ITechWorkPanel;
 import mekhq.utilities.ReportingUtilities;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * A table model for displaying work items
@@ -232,7 +233,9 @@ public class TechTableModel extends DataTableModel<Person> {
      */
     private static String describeEstimate(TechTaskEstimate estimate) {
         if (estimate.isImpossible()) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.impossible", estimate.targetDetails());
+            // The reason can name a unit, so it is escaped before it goes into the row's HTML
+            return getFormattedTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.impossible",
+                  StringEscapeUtils.escapeHtml4(estimate.targetDetails()));
         }
         String targetNumber = (estimate.targetNumber() == TargetRoll.AUTOMATIC_SUCCESS)
                                     ? getTextAt(RESOURCE_BUNDLE, "TechTableModel.estimate.automatic")

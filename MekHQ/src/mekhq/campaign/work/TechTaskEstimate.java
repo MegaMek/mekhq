@@ -97,7 +97,7 @@ public record TechTaskEstimate(int targetNumber, String targetDetails, boolean i
 
     /**
      * @return {@code 0} if the work fits in the tech's time today (overtime included when allowed), otherwise how many
-     *       more full working days it runs into
+     *       more working days it runs into, counting a part day as a day
      */
     private static int findDaysToFinish(Campaign campaign, Person tech, int minutesNeeded) {
         int overtimeToday = campaign.isOvertimeAllowed() ? tech.getOvertimeLeft() : 0;
