@@ -42,6 +42,7 @@ import megamek.common.annotations.Nullable;
 import megamek.common.equipment.AmmoType;
 import megamek.common.units.Entity;
 import megamek.common.weapons.infantry.InfantryWeapon;
+import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -67,6 +68,8 @@ import mekhq.campaign.unit.UnitAcquisitionType;
  * Manages machines and material for a campaign.
  */
 public record ForceQuartermaster(Campaign campaign) {
+    private static final MMLogger LOGGER = MMLogger.create(ForceQuartermaster.class);
+
     public enum PartAcquisitionResult {
         PartInherentFailure,
         PlanetSpecificFailure,
@@ -752,6 +755,10 @@ public record ForceQuartermaster(Campaign campaign) {
             return;
         }
 
+        if (!isForSale(part)) {
+            return;
+        }
+
         // Do not sell more than we have
         quantity = Math.min(quantity, part.getQuantity());
         if (quantity <= 0) {
@@ -768,6 +775,20 @@ public record ForceQuartermaster(Campaign campaign) {
               cost, "Sale of " + quantity + " " + part.getName() + plural);
 
         warehouseFor(part).removePart(part, quantity);
+    }
+
+    /**
+     * Only a spare can be sold. A part on a unit, reserved or being worked on is not for sale: paying for it would
+     * leave the part where it is as well.
+     *
+     * @return {@code true} if the part is a spare
+     */
+    private boolean isForSale(Part part) {
+        if (!part.isSpare()) {
+            LOGGER.warn("[Quartermaster] {} was not sold: it is not a spare", part.getName());
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -789,6 +810,9 @@ public record ForceQuartermaster(Campaign campaign) {
      */
     public void sellAmmo(AmmoStorage ammo, int shots) {
         Objects.requireNonNull(ammo);
+        if (!isForSale(ammo)) {
+            return;
+        }
 
         // Do not sell more than we have
         shots = Math.min(shots, ammo.getShots());
@@ -830,6 +854,9 @@ public record ForceQuartermaster(Campaign campaign) {
      */
     public void sellArmor(Armor armor, int points) {
         Objects.requireNonNull(armor);
+        if (!isForSale(armor)) {
+            return;
+        }
 
         // Do not sell more than we have
         points = Math.min(points, armor.getAmount());

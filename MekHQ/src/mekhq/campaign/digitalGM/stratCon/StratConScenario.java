@@ -52,6 +52,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.adapter.DateAdapter;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Formation;
@@ -120,6 +121,10 @@ public class StratConScenario implements IStratConDisplayable {
     private int leadershipPointsUsed;
     private Set<Integer> failedReinforcements = new HashSet<>();
     private ArrayList<Integer> primaryForceIDs = new ArrayList<>();
+    private FacilityOperation facilityOperation;
+    private boolean counterattack;
+    private StratConCoords siegeCoords;
+    private boolean siegeSortie;
 
     /**
      * Add a force to the backing scenario. Do our best to add the force as a "primary" force, as defined in the
@@ -370,6 +375,65 @@ public class StratConScenario implements IStratConDisplayable {
 
     public void setTurningPoint(boolean turningPoint) {
         this.turningPoint = turningPoint;
+    }
+
+    /**
+     * @return the order that started this scenario on a facility, or {@code null} if no order did
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable FacilityOperation getFacilityOperation() {
+        return facilityOperation;
+    }
+
+    public void setFacilityOperation(@Nullable FacilityOperation facilityOperation) {
+        this.facilityOperation = facilityOperation;
+    }
+
+    /**
+     * @return {@code true} if this scenario is an enemy counterattack on a facility held by the player or their
+     *       employer. Ignoring one costs the facility.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isCounterattack() {
+        return counterattack;
+    }
+
+    public void setCounterattack(boolean counterattack) {
+        this.counterattack = counterattack;
+    }
+
+    /**
+     * @return for a fight over a siege (a {@link FacilityOperation#SIEGE} scenario), the besieged facility's hex;
+     *       otherwise {@code null}. The fight itself is on the besieging formation's hex.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable StratConCoords getSiegeCoords() {
+        return siegeCoords;
+    }
+
+    public void setSiegeCoords(@Nullable StratConCoords siegeCoords) {
+        this.siegeCoords = siegeCoords;
+    }
+
+    /**
+     * @return {@code true} if this fight over a siege is the garrison's sortie; {@code false} if it is an enemy relief
+     *       force, or not a siege fight at all
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isSiegeSortie() {
+        return siegeSortie;
+    }
+
+    public void setSiegeSortie(boolean siegeSortie) {
+        this.siegeSortie = siegeSortie;
     }
 
     @XmlTransient

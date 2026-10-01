@@ -334,7 +334,7 @@ public class PartsInUseManager {
         // real available warehouse stock, not parts committed to refits.
         if (incomingPart.isReservedForRefit()) {
             if (incomingPart.isPresent()) {
-                partInUse.setUseCount(partInUse.getUseCount() + incomingPart.getBaseQuantityForPartsInUse());
+                partInUse.setUseCount(partInUse.getUseCount() + findReservedUseCount(partInUse, incomingPart));
             } else {
                 partInUse.setTransferCount(
                       partInUse.getTransferCount() + incomingPart.getBaseQuantityForPartsInUse());
@@ -355,6 +355,24 @@ public class PartsInUseManager {
         partInUse.setTransferCount(partInUse.getTransferCount() + incomingPart.getQuantityForPartsInUse());
     }
 
+
+    /**
+     * How much a part set aside for a refit adds to the in-use count. Ammunition in use is counted by the bin, about
+     * a ton each, while a warehouse holds it as shots; reserved ammunition is turned into tons so that a ton of
+     * machine gun rounds counts as one, not two hundred.
+     *
+     * @param partInUse    the record being counted, which knows the weight of one shot
+     * @param reservedPart the part the refit has set aside
+     *
+     * @return the amount to add to the in-use count
+     */
+    private static int findReservedUseCount(PartInUse partInUse, Part reservedPart) {
+        int baseQuantity = reservedPart.getBaseQuantityForPartsInUse();
+        if (!(reservedPart instanceof AmmoStorage)) {
+            return baseQuantity;
+        }
+        return (int) Math.ceil(baseQuantity * partInUse.getTonnagePerItem());
+    }
 
     /**
      * Find all the parts that match this PartInUse and update their data

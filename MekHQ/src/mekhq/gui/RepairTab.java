@@ -82,17 +82,13 @@ import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
 import mekhq.campaign.events.units.UnitEvent;
-import mekhq.campaign.location.ILocation;
-import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillModifierData;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.RepairTechEligibility;
+import mekhq.campaign.work.RepairTechEligibility.TechListToggles;
 import mekhq.gui.adapter.ServicedUnitsTableMouseAdapter;
 import mekhq.gui.adapter.TaskTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -576,7 +572,6 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
                 }
             }
         }
-        ((TechSorter) techSorter.getComparator(0)).clearPart();
 
         if (null != target) {
             btnDoTask.setEnabled(target.getValue() != TargetRoll.IMPOSSIBLE);
@@ -805,87 +800,22 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     public void filterTechs() {
         final IPartWork part = getSelectedTask();
         final Unit unit = getSelectedServicedUnit();
+        final TechListToggles toggles = new TechListToggles(btnShowOnlyUnitTechs.isSelected(),
+              btnShowAllTechs.isSelected());
         RowFilter<TechTableModel, Integer> techTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends TechTableModel, ? extends Integer> entry) {
                 if (part == null) {
                     return false;
-                } else if (!part.needsFixing() && !part.isSalvaging()) {
-                    return false;
                 }
-                TechTableModel techModel = entry.getModel();
-                Person tech = techModel.getTechAt(entry.getIdentifier());
-                // Tech must be at the same location as the unit being repaired
-                ILocation repairTarget = (unit != null) ?
-                                               unit
-                                               :
-                                               (part instanceof Part partWithUnit && partWithUnit.getUnit() != null) ?
-                                                     partWithUnit.getUnit() :
-                                               (ILocation) part;
-                if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
-                    return false;
-                }
-
-                // Vessel crew assigned to a large craft can only perform repairs as that unit's engineer.
-                Unit assignedUnit = tech.getUnit();
-                if (tech.getPrimaryRole().isVesselCrew() &&
-                          assignedUnit != null &&
-                          assignedUnit.getEntity() != null &&
-                          assignedUnit.getEntity().isLargeCraft() &&
-                          !tech.equals(assignedUnit.getEngineer())) {
-                    return false;
-                }
-                if (btnShowOnlyUnitTechs.isSelected() && (unit != null) && !tech.isRightTechProfessionFor(unit)) {
-                    return false;
-                }
-                // Every tech, including a self-crewed unit's engineer, must hold the skill the task requires and,
-                // where the campaign demands one, a tool kit - regardless of the filter toggles
-                if (!tech.isRightTechTypeFor(part)) {
-                    return false;
-                }
-                if (EquipmentKitCatalog.isToolKitRequired(getCampaignOptions(), unit) &&
-                          !EquipmentKitCatalog.hasToolKit(tech)) {
-                    return false;
-                }
-                if ((unit != null) && unit.isSelfMaintainedInfantry()) {
-                    // Self-maintaining infantry repair their own gear, led by the unit's engineer (its ranking
-                    // soldier), who is the only person the repair is actually attributed to
-                    if (!tech.equals(unit.getEngineer())) {
-                        return false;
-                    }
-                } else if ((unit != null) && unit.isSelfCrewed()) {
-                    // Only the vessel crew assigned to this unit may work on it; they then face the same skill-level
-                    // and time checks as any other tech below
-                    if (!tech.getPrimaryRole().isVesselCrew() || !unit.equals(tech.getUnit())) {
-                        return false;
-                    }
-                } else if (tech.getPrimaryRole().isVesselCrew() && (unit != null) && !unit.isSelfCrewed()) {
-                    return false;
-                } else if (!btnShowAllTechs.isSelected() && !tech.isTechExpanded()) {
-                    // Otherwise only personnel in a technician role are offered
-                    return false;
-                }
-                Skill skill = tech.getSkillForWorkingOn(part);
-                int modePenalty = part.getMode().expReduction;
-                if (skill == null) {
-                    return false;
-                } else if (part.getSkillMin() > SkillType.EXP_LEGENDARY) {
-                    return false;
-                } else if (tech.getMinutesLeft() <= 0) {
-                    return false;
-                } else {
-                    SkillModifierData skillModifierData = tech.getSkillModifierData();
-                    return getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN) ||
-                                 (part.getSkillMin() <=
-                                        (skill.getExperienceLevel(skillModifierData) -
-                                               modePenalty));
-                }
+                Person tech = entry.getModel().getTechAt(entry.getIdentifier());
+                return RepairTechEligibility.findRefusal(getCampaign(), part, unit, tech, toggles) == null;
             }
         };
 
-        if (getCampaignOptions().get(CampaignOption.ASSIGNED_TECH_FIRST)) {
-            ((TechSorter) techSorter.getComparator(0)).setPart(part);
-        }
+        TechSorter sorter = (TechSorter) techSorter.getComparator(0);
+        sorter.setPart(part);
+        sorter.setAssignedFirst(getCampaignOptions().get(CampaignOption.ASSIGNED_TECH_FIRST));
         techSorter.setRowFilter(techTypeFilter);
     }
 

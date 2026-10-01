@@ -36,13 +36,20 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.util.List;
 
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
+import mekhq.campaign.digitalGM.stratCon.facility.IStratConFacilityEffect;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityDefinition;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityProfile;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHydrology;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConOrogeny;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConSectorShape;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConUrban;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
  * Points the StratCon data singletons at the test copies of their definition files.
@@ -52,9 +59,9 @@ import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConUrban;
  * shape, one hydrology profile, an empty biome manifest - and any test that asserts something about the authored data
  * fails for want of a build step rather than for a real defect.</p>
  *
- * <p>The fixtures under {@code testresources/data/stratconbiomedefinitions/} are verbatim copies of the mm-data
- * originals, so tests keep asserting against the data the game actually ships. Re-copy them when the originals
- * change.</p>
+ * <p>The fixtures under {@code testresources/data/stratconbiomedefinitions/} and
+ * {@code testresources/data/stratconfacilities/} are verbatim copies of the mm-data originals, so tests keep asserting
+ * against the data the game actually ships. Re-copy them when the originals change.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -85,14 +92,38 @@ public final class StratConTestData {
         // Facilities are a directory rather than a single file: the manifest names the files, which sit beside it.
         StratConFacilityFactory.loadForTest(new File(FACILITY_DIRECTORY, "facilitymanifest.json").getPath(),
               FACILITY_DIRECTORY);
-        assertFalse(StratConFacilityFactory.getHostileFacilities().isEmpty(),
+        assertFalse(StratConFacilityFactory.getDefinitionsFor(ForceAlignment.Opposing).isEmpty(),
               "No hostile facilities loaded from " + FACILITY_DIRECTORY +
                     " - copy them from mm-data/data/stratconfacilities/");
-        assertFalse(StratConFacilityFactory.getAlliedFacilities().isEmpty(),
+        assertFalse(StratConFacilityFactory.getDefinitionsFor(ForceAlignment.Allied).isEmpty(),
               "No allied facilities loaded from " + FACILITY_DIRECTORY +
                     " - copy them from mm-data/data/stratconfacilities/");
 
         loaded = true;
+    }
+
+    /**
+     * Builds a facility from a definition written in code rather than loaded from data. The same effects apply
+     * whichever side holds it, so a test can set the owner without changing what the facility does.
+     *
+     * @param owner        the side holding the facility
+     * @param facilityType the facility type
+     * @param effects      the facility's effects
+     *
+     * @return the facility
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static StratConFacility facility(ForceAlignment owner, FacilityType facilityType,
+          IStratConFacilityEffect... effects) {
+        List<IStratConFacilityEffect> effectList = List.of(effects);
+        StratConFacilityDefinition definition = new StratConFacilityDefinition("Test" + facilityType.name(),
+              "Test " + facilityType.name(),
+              facilityType,
+              new StratConFacilityProfile("Allied test facility", effectList),
+              new StratConFacilityProfile("Hostile test facility", effectList));
+        return new StratConFacility(definition, owner);
     }
 
     /**

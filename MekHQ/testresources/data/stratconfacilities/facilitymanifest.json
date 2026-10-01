@@ -16,28 +16,22 @@
 # affiliated with Microsoft.
 
 {
-"facilityFileNames": [
-"AlliedMekBase.json",
-"AlliedTankBase.json",
-"AlliedAirBase.json",
-"AlliedArtilleryBase.json",
-"AlliedSpacePort.json",
-"AlliedDataCenter.json",
-"AlliedIndustrialFacility.json",
-"AlliedCommsCenter.json",
-"AlliedEarlyWarningSystem.json",
-"AlliedOrbitalDefense.json",
-"AlliedBaseOfOperations.json",
-"HostileMekBase.json",
-"HostileTankBase.json",
-"HostileAirBase.json",
-"HostileArtilleryBase.json",
-"HostileSpacePort.json",
-"HostileDataCenter.json",
-"HostileIndustrialFacility.json",
-"HostileCommsCenter.json",
-"HostileEarlyWarningSystem.json",
-"HostileOrbitalDefense.json",
-"HostileBaseOfOperations.json"
-]
+  "facilityFileNames": [
+    "MekBase.json",
+    "TankBase.json",
+    "AirBase.json",
+    "ArtilleryBase.json",
+    "SpacePort.json",
+    "DataCenter.json",
+    "IndustrialFacility.json",
+    "CommsCenter.json",
+    "EarlyWarningSystem.json",
+    "OrbitalDefense.json",
+    "BaseOfOperations.json",
+    "SupplyDepot.json",
+    "SensorPost.json",
+    "JammingStation.json",
+    "FieldFortifications.json",
+    "MilitiaBarracks.json"
+  ]
 }
