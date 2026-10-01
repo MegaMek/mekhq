@@ -40,6 +40,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.IAcquisitionWork;
 import org.junit.jupiter.api.Test;
 import testUtilities.parts.PartsScenario;
 import testUtilities.parts.UnitFixture;
@@ -116,9 +117,10 @@ class RefitWarehouseSparesTest {
         Refit refit = new Refit(wolverine, UnitFixture.WOLVERINE_WVR_6R.loadEntity(), false, false, false);
         refit.begin();
 
-        // What the procurement list's GM "add one item" does with the refit kit
-        campaign.getQuartermaster().addPart((Part) refit.getNewEquipment(), 0, true);
-        refit.decrementQuantity();
+        // What the procurement list's GM "add one item" does with the refit kit, through the same interface
+        IAcquisitionWork kitOrder = refit;
+        campaign.getQuartermaster().addPart((Part) kitOrder.getNewEquipment(), 0, true);
+        kitOrder.decrementQuantity();
 
         assertTrue(refit.kitFound());
         assertTrue(refit.getShoppingList().isEmpty(), "Nothing is left to buy");
