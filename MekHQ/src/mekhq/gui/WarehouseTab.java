@@ -56,6 +56,7 @@ import megamek.client.ui.preferences.JComboBoxPreference;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.annotations.Nullable;
 import megamek.common.event.Subscribe;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.FastJScrollPane;
@@ -74,18 +75,16 @@ import mekhq.campaign.events.parts.PartRemovedEvent;
 import mekhq.campaign.events.parts.PartWorkEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
+import mekhq.campaign.events.units.UnitNewEvent;
 import mekhq.campaign.events.units.UnitRefitEvent;
 import mekhq.campaign.events.units.UnitRemovedEvent;
-import mekhq.campaign.location.ILocation;
-import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInUse;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillModifierData;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.work.RepairTechEligibility;
+import mekhq.campaign.work.RepairTechEligibility.TechListToggles;
 import mekhq.gui.adapter.PartsTableMouseAdapter;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
@@ -573,42 +572,19 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     public void filterTechs() {
         final Part part = getSelectedTask();
+        // The bench works on spares, so there is no unit to suit; the switch widens the list beyond technicians
+        final TechListToggles toggles = new TechListToggles(false, btnShowAllTechsWarehouse.isSelected());
         RowFilter<TechTableModel, Integer> techTypeFilter = new RowFilter<>() {
             @Override
             public boolean include(Entry<? extends TechTableModel, ? extends Integer> entry) {
                 if (null == part) {
                     return false;
                 }
-                if (!part.needsFixing() && !part.isSalvaging()) {
-                    return false;
-                }
-                TechTableModel techModel = entry.getModel();
-                Person tech = techModel.getTechAt(entry.getIdentifier());
-                // Tech must be at the same location as the repair target
-                ILocation repairTarget = (part.getUnit() != null) ? part.getUnit() : part;
-                if (!LocationUtils.areSameEffectiveLocation(tech, repairTarget)) {
-                    return false;
-                }
-                if (!tech.isRightTechTypeFor(part) && !btnShowAllTechsWarehouse.isSelected()) {
-                    return false;
-                }
-                Skill skill = tech.getSkillForWorkingOn(part);
-                int modePenalty = part.getMode().expReduction;
-                if (skill == null) {
-                    return false;
-                } else if (part.getSkillMin() > SkillType.EXP_LEGENDARY) {
-                    return false;
-                } else if (tech.getMinutesLeft() <= 0) {
-                    return false;
-                } else {
-                    SkillModifierData skillModifierData = tech.getSkillModifierData();
-                    return getCampaign().getCampaignOptions().get(CampaignOption.DESTROY_BY_MARGIN) ||
-                                 (part.getSkillMin() <=
-                                        (skill.getExperienceLevel(skillModifierData) -
-                                               modePenalty));
-                }
+                Person tech = entry.getModel().getTechAt(entry.getIdentifier());
+                return RepairTechEligibility.findRefusal(getCampaign(), part, part.getUnit(), tech, toggles) == null;
             }
         };
+        ((TechSorter) techSorter.getComparator(0)).setPart(part);
         techSorter.setRowFilter(techTypeFilter);
     }
 
@@ -641,7 +617,6 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
                     part.setTech(null);
                 }
             }
-            ((TechSorter) techSorter.getComparator(0)).clearPart();
         }
 
         if (null != target) {
@@ -805,14 +780,28 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
     private final ActionScheduler partsFilterScheduler = new ActionScheduler(this::filterParts);
     private final ActionScheduler techsScheduler = new ActionScheduler(this::refreshTechsList);
 
+    /**
+     * A unit arriving, leaving or changing (stripped, repaired, refitted) changes how many of each part are in use, so
+     * the In Use column is recounted, not just re-filtered. The scheduler runs one refresh for a burst of events.
+     */
     @Subscribe
-    public void handle(UnitRemovedEvent ev) {
-        filterParts();
+    public void handleUnitAdded(UnitNewEvent unitNewEvent) {
+        scheduleInUseRecount(unitNewEvent.getUnit(), "added");
     }
 
     @Subscribe
-    public void handle(UnitChangedEvent ev) {
-        filterParts();
+    public void handleUnitRemoved(UnitRemovedEvent unitRemovedEvent) {
+        scheduleInUseRecount(unitRemovedEvent.getUnit(), "removed");
+    }
+
+    @Subscribe
+    public void handleUnitChanged(UnitChangedEvent unitChangedEvent) {
+        scheduleInUseRecount(unitChangedEvent.getUnit(), "changed");
+    }
+
+    private void scheduleInUseRecount(@Nullable Unit unit, String change) {
+        LOGGER.debug("[Warehouse] {} {}; In Use will be recounted", (unit == null) ? "a unit" : unit.getName(), change);
+        partsScheduler.schedule();
     }
 
     @Subscribe
