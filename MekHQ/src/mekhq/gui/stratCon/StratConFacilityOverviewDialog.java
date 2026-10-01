@@ -259,6 +259,6 @@ public class StratConFacilityOverviewDialog extends JDialog {
                               StratConFacilityAdvisor.areTraitsKnown(facility) ?
                                     StratConFacilityAdvisor.getTraitSummary(facility) :
                                     getTextAt(RESOURCE_BUNDLE, "overview.unknown"),
-                              StratConFacilityAdvisor.getActivitySummary(campaign, track, coords) };
+                              StratConFacilityAdvisor.getActivitySummary(track, coords) };
     }
 }

@@ -418,7 +418,7 @@ public final class StratConFacilityAdvisor {
      * @author Illiani
      * @since 0.51.01
      */
-    public static String getActivitySummary(Campaign campaign, StratConTrackState track, StratConCoords coords) {
+    public static String getActivitySummary(StratConTrackState track, StratConCoords coords) {
         List<String> parts = new ArrayList<>();
         StratConScenario counterattack = getCounterattack(track, coords);
         if (counterattack != null) {

@@ -74,7 +74,7 @@ public final class StratConFacilityJson {
         mapper.setVisibility(PropertyAccessor.FIELD, JsonAutoDetect.Visibility.ANY);
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         // Leave out absent profiles and descriptions rather than writing nulls.
-        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        mapper.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         // Tolerate fields absent from older files rather than failing the whole load.
         mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         // Skip the leading '#' license-header comment lines that lead every saved file.

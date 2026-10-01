@@ -415,7 +415,7 @@ class StratConFacilityAdvisorTest {
         void aQuietFacilityHasNoActivity() {
             placeFacility(ForceAlignment.Opposing);
 
-            assertEquals("", StratConFacilityAdvisor.getActivitySummary(campaign, track, FACILITY_COORDS));
+            assertEquals("", StratConFacilityAdvisor.getActivitySummary(track, FACILITY_COORDS));
         }
 
         @Test
@@ -426,7 +426,7 @@ class StratConFacilityAdvisorTest {
             track.addFacilityOrder(new StratConFacilityOrder(FacilityOperation.RECON, FORMATION_ID + 1,
                   FACILITY_COORDS, TODAY.plusDays(7), null));
 
-            String summary = StratConFacilityAdvisor.getActivitySummary(campaign, track, FACILITY_COORDS);
+            String summary = StratConFacilityAdvisor.getActivitySummary(track, FACILITY_COORDS);
             assertEquals(getFormattedTextAt(RESOURCE_BUNDLE, "activity.besieged", 1) + ", "
                                + getFormattedTextAt(RESOURCE_BUNDLE, "activity.order",
                   getTextAt(RESOURCE_BUNDLE, "operation.RECON"), TODAY.plusDays(7)), summary);

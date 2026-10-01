@@ -2046,13 +2046,11 @@ public class StratConPanel extends JPanel implements ActionListener {
      *
      * @param infoBuilder the hex information being built
      * @param coords      the facility's hex
-     * @param facility    the facility
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private void appendFacilityNetworkInfo(StringBuilder infoBuilder, StratConCoords coords,
-          StratConFacility facility) {
+    private void appendFacilityNetworkInfo(StringBuilder infoBuilder, StratConCoords coords) {
         if (StratConFacilitySupply.isSupplyLinesActive(campaign)) {
             infoBuilder.append(getTextAt(RESOURCE_BUNDLE,
                   StratConFacilitySupply.isCutOff(currentTrack, coords) ?
@@ -2558,7 +2556,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                 }
 
                 appendFacilityStatus(infoBuilder, facility);
-                appendFacilityNetworkInfo(infoBuilder, boardState.getSelectedCoords(), facility);
+                appendFacilityNetworkInfo(infoBuilder, boardState.getSelectedCoords());
 
                 infoBuilder.append("<span>");
                 appendFacilityHints(infoBuilder, boardState.getSelectedCoords());
