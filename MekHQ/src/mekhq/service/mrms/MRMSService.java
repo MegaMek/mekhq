@@ -71,6 +71,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IPartWork;
+import mekhq.campaign.work.RepairLocationCheck;
 import mekhq.campaign.work.WorkTime;
 import mekhq.gui.sorter.UnitStatusSorter;
 import mekhq.service.mrms.MRMSService.MRMSUnitAction.STATUS;
@@ -138,11 +139,13 @@ public class MRMSService {
             if (!parts.isEmpty()) {
                 for (IPartWork partWork : parts) {
                     Part part = (Part) partWork;
+                    WorkTime playerChosenMode = part.getMode();
                     part.resetModeToNormal();
 
                     List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, campaign);
 
                     if (validTechs.isEmpty()) {
+                        restorePlayerChosenMode(part, playerChosenMode);
                         continue;
                     }
 
@@ -572,6 +575,33 @@ public class MRMSService {
     private static MRMSUnitAction performUnitMassTechAction(Campaign campaign, Unit unit, List<Person> techs,
           Map<PartRepairType, MRMSOption> mrmsOptionsByType, boolean salvaging,
           MRMSConfiguredOptions configuredOptions) {
+        boolean wasSalvaging = unit.isSalvage();
+        boolean allowedCarryover = configuredOptions.isAllowCarryover();
+        try {
+            return performUnitMassTechActionOnce(campaign, unit, techs, mrmsOptionsByType, salvaging,
+                  configuredOptions);
+        } finally {
+            restoreAfterLimbStripping(unit, wasSalvaging, configuredOptions, allowedCarryover);
+        }
+    }
+
+    /**
+     * Stripping a limb with a broken hip or shoulder switches the unit to salvage mode and turns carryover off for a
+     * while. Both go back to how they were whatever happens, so an early return or an error cannot leave the unit in
+     * salvage mode or carryover off for every later unit in the batch.
+     */
+    private static void restoreAfterLimbStripping(Unit unit, boolean wasSalvaging,
+          MRMSConfiguredOptions configuredOptions, boolean allowedCarryover) {
+        if (unit.isSalvage() != wasSalvaging) {
+            LOGGER.debug("[MRMS] {}: salvage mode put back to {}", unit.getName(), wasSalvaging);
+            unit.setSalvage(wasSalvaging);
+        }
+        configuredOptions.setAllowCarryover(allowedCarryover);
+    }
+
+    private static MRMSUnitAction performUnitMassTechActionOnce(Campaign campaign, Unit unit, List<Person> techs,
+          Map<PartRepairType, MRMSOption> mrmsOptionsByType, boolean salvaging,
+          MRMSConfiguredOptions configuredOptions) {
         List<IPartWork> parts = unit.getPartsNeedingService(true);
 
         if (parts.isEmpty()) {
@@ -583,8 +613,6 @@ public class MRMSService {
 
             return new MRMSUnitAction(unit, salvaging, MRMSUnitAction.STATUS.NO_PARTS);
         }
-
-        resetPartsModeToNormal(parts);
 
         // If we're performing an action on a unit, and we allow auto-scrapping of parts
         // that can't be fixed by an elite tech, let's first get rid of those parts and start with
@@ -609,25 +637,16 @@ public class MRMSService {
                 ps.setRepairInPlace(!configuredOptions.isReplacePodParts());
             }
 
-            // If we're replacing damaged parts, we want to remove any that have an
-            // available
-            // replacement from the list since the pod space repair will cover it.
-            List<IPartWork> temp = new ArrayList<>();
-
-            for (IPartWork p : parts) {
-                if ((p instanceof Part) && ((Part) p).isOmniPodded()) {
-                    if (!(p instanceof AmmoBin) || salvaging) {
-                        MissingPart m = p.getMissingPart();
-                        if ((m != null) && m.isReplacementAvailable()) {
-                            continue;
-                        }
-                    }
-                }
-
-                temp.add(p);
+            // Damaged pod equipment with a spare in stock is left to the pod swap, but only when the swap will
+            // run; otherwise nothing would ever repair it
+            boolean willPodSpacesSwapParts = configuredOptions.isReplacePodParts()
+                                                   && mrmsOptionsByType.containsKey(PartRepairType.POD_SPACE);
+            if (willPodSpacesSwapParts) {
+                parts = withoutPodPartsTheSwapWillReplace(parts, salvaging);
+            } else {
+                LOGGER.debug("[MRMS] {}: pod equipment is repaired in place; the OmniPod swap will not run",
+                      unit.getName());
             }
-
-            parts = temp;
         }
 
         if (techs.isEmpty()) {
@@ -761,6 +780,19 @@ public class MRMSService {
     private static MRMSUnitAction scrapLocationAndRemoveEquipment(Campaign campaign, Unit unit,
           List<Person> techs, Map<PartRepairType, MRMSOption> mrmsOptionsByType,
           MRMSConfiguredOptions configuredOptions, List<IPartWork> parts) {
+        boolean wasSalvaging = unit.isSalvage();
+        boolean allowedCarryover = configuredOptions.isAllowCarryover();
+        try {
+            return scrapLocationAndRemoveEquipmentOnce(campaign, unit, techs, mrmsOptionsByType, configuredOptions,
+                  parts);
+        } finally {
+            restoreAfterLimbStripping(unit, wasSalvaging, configuredOptions, allowedCarryover);
+        }
+    }
+
+    private static MRMSUnitAction scrapLocationAndRemoveEquipmentOnce(Campaign campaign, Unit unit,
+          List<Person> techs, Map<PartRepairType, MRMSOption> mrmsOptionsByType,
+          MRMSConfiguredOptions configuredOptions, List<IPartWork> parts) {
 
         if (parts.isEmpty()) {
             return new MRMSUnitAction(unit, false, MRMSUnitAction.STATUS.ALL_PARTS_IN_PROCESS);
@@ -769,8 +801,6 @@ public class MRMSService {
         if (techs.isEmpty()) {
             return new MRMSUnitAction(unit, false, MRMSUnitAction.STATUS.NO_TECHS);
         }
-
-        resetPartsModeToNormal(parts);
 
         // If we're a mek and we have a limb with a bad shoulder/hip, we're going to try to flip it to salvageable
         // and remove all the parts so that we can nuke the limb. If we do this, when we're finally done we need to
@@ -821,11 +851,10 @@ public class MRMSService {
                 }
 
                 if (partsToBeRemoved.isEmpty()) {
-                    scrappingLimbMode = scrapEmptyLimb(locationMap,
-                          campaign,
-                          scrappingLimbMode,
-                          isSalvaging,
-                          unit);
+                    scrapEmptyLimb(locationMap, campaign, scrappingLimbMode, isSalvaging, unit);
+                    // The limb is gone, so there is nothing left to strip; carrying on would work on the scrapped limb
+                    LOGGER.debug("[MRMS] {}: Quick Strip finished, the empty limb was scrapped", unit.getName());
+                    return new MRMSUnitAction(unit, isSalvaging, MRMSUnitAction.STATUS.ACTIONS_PERFORMED);
                 } else {
                     processPartsInLocation(campaign, unit, countOfPartsPerLocation, locationMap);
 
@@ -878,6 +907,7 @@ public class MRMSService {
     private static void performPartWork(Campaign campaign, Unit unit, List<Person> techs,
           Map<PartRepairType, MRMSOption> mrmsOptionsByType, MRMSConfiguredOptions configuredOptions,
           IPartWork partWork, MRMSUnitAction unitAction) {
+        WorkTime playerChosenMode = partWork.getMode();
         if (partWork instanceof Part) {
             ((Part) partWork).resetModeToNormal();
         }
@@ -885,17 +915,23 @@ public class MRMSService {
         List<Person> validTechs = filterTechs(partWork, techs, mrmsOptionsByType, campaign);
 
         if (validTechs.isEmpty()) {
+            restorePlayerChosenMode(partWork, playerChosenMode);
             unitAction.addPartAction(MRMSPartAction.createNoTechs(partWork));
             return;
         }
 
-        unitAction.addPartAction(repairPart(campaign,
+        MRMSPartAction partAction = repairPart(campaign,
               partWork,
               unit,
               validTechs,
               mrmsOptionsByType,
               configuredOptions,
-              false));
+              false);
+        boolean isAssigned = partAction.getStatus() == MRMSPartAction.STATUS.REPAIRED;
+        if (!isAssigned) {
+            restorePlayerChosenMode(partWork, playerChosenMode);
+        }
+        unitAction.addPartAction(partAction);
     }
 
     private static void processPartsInLocation(Campaign campaign, Unit unit,
@@ -950,11 +986,36 @@ public class MRMSService {
         return scrappingLimbMode;
     }
 
-    private static void resetPartsModeToNormal(List<IPartWork> parts) {
+    /**
+     * @return the tasks without the damaged pod-mounted equipment that has a spare in stock, which the pod swap
+     *       replaces instead
+     */
+    private static List<IPartWork> withoutPodPartsTheSwapWillReplace(List<IPartWork> parts, boolean salvaging) {
+        List<IPartWork> remainingParts = new ArrayList<>();
         for (IPartWork partWork : parts) {
-            if (partWork instanceof Part) {
-                ((Part) partWork).resetModeToNormal();
+            boolean isPodMounted = (partWork instanceof Part part) && part.isOmniPodded();
+            // Ammunition is reloaded in place when repairing; only salvage swaps it out
+            boolean isSwappedOut = !(partWork instanceof AmmoBin) || salvaging;
+            boolean isReplacedBySwap = isPodMounted && isSwappedOut && hasSpareInStock(partWork);
+            if (!isReplacedBySwap) {
+                remainingParts.add(partWork);
             }
+        }
+        return remainingParts;
+    }
+
+    private static boolean hasSpareInStock(IPartWork partWork) {
+        MissingPart missingPart = partWork.getMissingPart();
+        return (missingPart != null) && missingPart.isReplacementAvailable();
+    }
+
+    /**
+     * Mass Repair tries out work times on a task while it looks for a tech. A task it does not end up assigning gets
+     * back the work time the player chose for it.
+     */
+    private static void restorePlayerChosenMode(IPartWork partWork, WorkTime playerChosenMode) {
+        if (partWork instanceof Part part) {
+            part.setMode(playerChosenMode);
         }
     }
 
@@ -1347,10 +1408,17 @@ public class MRMSService {
             return validTechs;
         }
 
+        int techsElsewhere = 0;
         for (int i = techs.size() - 1; i >= 0; i--) {
             Person tech = techs.get(i);
 
             if (tech.getMinutesLeft() <= 0) {
+                continue;
+            }
+
+            // The repair refuses a tech who is not where the task is; picking one anyway would repeat forever
+            if (!RepairLocationCheck.isTechAtTask(tech, partWork)) {
+                techsElsewhere++;
                 continue;
             }
 
@@ -1391,6 +1459,10 @@ public class MRMSService {
             validTechs.add(tech);
         }
 
+        if (techsElsewhere > 0) {
+            LOGGER.debug("[MRMS] {}: {} techs skipped because they are at a different location", partWork.getPartName(),
+                  techsElsewhere);
+        }
         return validTechs;
     }
 
@@ -1481,17 +1553,19 @@ public class MRMSService {
 
                 targetRoll = campaign.getTargetFor(partWork, tech);
 
-                WorkTimeCalculation wtc = new WorkTimeCalculation(null);
-                if (targetRoll.getValue() <= mrmsOption.getTargetNumberMax()) {
-                    wtc.setWorkTime(previousNewWorkTime);
+                WorkTimeCalculation workTimeCalculation = new WorkTimeCalculation(null);
+                int targetNumberLimit = increaseTime ? mrmsOption.getTargetNumberMax()
+                      : getRushTargetNumberLimit(mrmsOption);
+                if (targetRoll.getValue() <= targetNumberLimit) {
+                    workTimeCalculation.setWorkTime(previousNewWorkTime);
                 }
 
                 if (skill.getExperienceLevel(skillModifierData) >=
                           highestAvailableTechSkill) {
-                    wtc.setReachedMaxSkill(true);
+                    workTimeCalculation.setReachedMaxSkill(true);
                 }
 
-                return wtc;
+                return workTimeCalculation;
             }
 
             // Set our new workTime and calculate the new targetRoll
@@ -1524,7 +1598,8 @@ public class MRMSService {
                     return new WorkTimeCalculation(newWorkTime);
                 }
             } else {
-                if (targetRoll.getValue() > mrmsOption.getTargetNumberMax()) {
+                // Rushing trades a harder roll for time, but never past the preferred target number
+                if (targetRoll.getValue() > getRushTargetNumberLimit(mrmsOption)) {
                     debugLog(
                           "...... ending calculateNewMRMSWorktime because we have reached our TN goal - %s ns",
                           "calculateNewMRMSWorktime",
@@ -1536,6 +1611,14 @@ public class MRMSService {
         }
 
         return new WorkTimeCalculation();
+    }
+
+    /**
+     * @return the highest target number a Rush Job may push a task to: the preferred target number, or the maximum if
+     *       that is lower
+     */
+    private static int getRushTargetNumberLimit(MRMSOption mrmsOption) {
+        return Math.min(mrmsOption.getTargetNumberPreferred(), mrmsOption.getTargetNumberMax());
     }
 
     private static void debugLog(String msg, String methodName, Object... replacements) {
@@ -1588,7 +1671,7 @@ public class MRMSService {
 
             // Nulls at the end
             if (skill1 == null && skill2 == null) {
-                return Integer.compare(tech1.getMinutesLeft(), tech2.getMinutesLeft());
+                return compareMostTimeFirst(tech1, tech2);
             }
             if (skill1 == null) {
                 return 1;
@@ -1606,7 +1689,12 @@ public class MRMSService {
                 return experienceCompare;
             }
 
-            return Integer.compare(tech1.getMinutesLeft(), tech2.getMinutesLeft());
+            return compareMostTimeFirst(tech1, tech2);
+        }
+
+        /** Puts the tech with more minutes left first, so the job is most likely to be finished today. */
+        private static int compareMostTimeFirst(Person tech1, Person tech2) {
+            return Integer.compare(tech2.getMinutesLeft(), tech1.getMinutesLeft());
         }
     }
 

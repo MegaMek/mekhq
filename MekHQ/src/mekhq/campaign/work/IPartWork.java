@@ -165,17 +165,27 @@ public interface IPartWork extends IWork {
     double REPAIR_COST_SHARE_OF_VALUE = 0.2;
 
     static PartRepairType findCorrectMRMSType(IPartWork part) {
-        if ((part instanceof EquipmentPart equipmentPart) && (equipmentPart.getType() instanceof WeaponType)) {
+        if (isWeaponWork(part)) {
             return PartRepairType.WEAPON;
         } else {
             return part.getMRMSOptionType();
         }
     }
 
+    /**
+     * @return {@code true} if the task is on a weapon, whether the weapon is damaged or destroyed. Mass Repair and the
+     *       repair categories both use this, so a weapon falls under Weapons in every case.
+     */
+    private static boolean isWeaponWork(IPartWork part) {
+        boolean isDamagedWeapon = (part instanceof EquipmentPart equipmentPart)
+                                        && (equipmentPart.getType() instanceof WeaponType);
+        boolean isDestroyedWeapon = (part instanceof MissingEquipmentPart missingEquipmentPart)
+                                          && (missingEquipmentPart.getType() instanceof WeaponType);
+        return isDamagedWeapon || isDestroyedWeapon;
+    }
+
     static PartRepairType findCorrectRepairType(IPartWork part) {
-        if (((part instanceof EquipmentPart equipmentPart) && (equipmentPart.getType() instanceof WeaponType)) ||
-                  ((part instanceof MissingEquipmentPart missingEquipmentPart) &&
-                         (missingEquipmentPart.getType() instanceof WeaponType))) {
+        if (isWeaponWork(part)) {
             return PartRepairType.WEAPON;
         } else if ((part instanceof EquipmentPart equipmentPart) &&
                          (equipmentPart.getType() instanceof MiscType miscType) &&
