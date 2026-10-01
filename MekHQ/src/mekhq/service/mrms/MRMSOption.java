@@ -209,7 +209,9 @@ public class MRMSOption {
 
                 if ((mrmsOption.getType() == PartRepairType.UNKNOWN_LOCATION) ||
                           !partRepairTypes.contains(mrmsOption.getType())) {
-                    LOGGER.error("Attempted to load MRMSOption with illegal type id of {}", mrmsOption.getType());
+                    // Older saves carry rows for categories Mass Repair does not offer; they are dropped
+                    LOGGER.debug("[MRMS] dropped a saved option row for {}, which Mass Repair does not offer",
+                          mrmsOption.getType());
                 } else {
                     mrmsOptions.add(mrmsOption);
                 }
@@ -218,7 +220,28 @@ public class MRMSOption {
             }
         }
 
+        addMissingRows(mrmsOptions, partRepairTypes);
         return mrmsOptions;
+    }
+
+    /**
+     * Gives every category Mass Repair offers a row, with the same default a new campaign gets. Without this the
+     * dialog would show a missing row as switched on while Mass Repair itself skipped that category.
+     */
+    private static void addMissingRows(List<MRMSOption> mrmsOptions, List<PartRepairType> partRepairTypes) {
+        for (PartRepairType partRepairType : partRepairTypes) {
+            boolean hasRow = false;
+            for (MRMSOption mrmsOption : mrmsOptions) {
+                if (mrmsOption.getType() == partRepairType) {
+                    hasRow = true;
+                    break;
+                }
+            }
+            if (!hasRow) {
+                LOGGER.debug("[MRMS] added the default option row for {}, missing from the save", partRepairType);
+                mrmsOptions.add(new MRMSOption(partRepairType));
+            }
+        }
     }
 
     private static MRMSOption parseFromXML(Node wn) {

@@ -48,6 +48,7 @@ import megamek.common.equipment.AmmoType;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.RepairStatusChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.mission.rentals.FacilityRentals;
@@ -61,7 +62,6 @@ import mekhq.gui.model.UnitTableModel;
 import mekhq.gui.utilities.JMenuHelpers;
 import mekhq.gui.utilities.StaticChecks;
 import mekhq.service.mrms.MRMSService;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
 
@@ -238,7 +238,7 @@ public class ServicedUnitsTableMouseAdapter extends JPopupMenuAdapter {
                 popup.add(menuItem);
             }
 
-            if (!unit.isSelfCrewed() && unit.isAvailable() && !unit.isDeployed()) {
+            if (MRMSService.isMassRepairableUnit(unit) && unit.isAvailable() && !unit.isDeployed()) {
                 String title = String.format("Mass %s", unit.isSalvage() ? "Salvage" : "Repair");
 
                 menuItem = new JMenuItem(title);

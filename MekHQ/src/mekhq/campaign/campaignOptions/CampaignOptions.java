@@ -114,7 +114,7 @@ public class CampaignOptions {
         // Initialize any reused variables
         final PersonnelRole[] personnelRoles = PersonnelRole.values();
 
-        for (final PartRepairType type : PartRepairType.values()) {
+        for (final PartRepairType type : PartRepairType.getMRMSValidTypes()) {
             get(CampaignOption.MRMS_OPTIONS).add(new MRMSOption(type));
         }
         get(CampaignOption.PLANET_TECH_ACQUISITION_BONUS).put(PlanetarySophistication.ADVANCED, -2); // TODO: needs to be verified
