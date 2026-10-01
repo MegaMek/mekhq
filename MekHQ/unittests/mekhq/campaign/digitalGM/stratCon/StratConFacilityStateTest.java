@@ -183,6 +183,48 @@ class StratConFacilityStateTest {
 
             assertEquals(List.of("FacilityHostileDestroy.json"), facility.getLocalModifiers());
         }
+
+        @Test
+        void aLadderStepTheProfileAlreadyHasMovesOnToTheNextEntry() {
+            StratConFacility facility = StratConTestData.facility(ForceAlignment.Opposing,
+                  FacilityType.FieldFortifications,
+                  new LocalModifiersEffect(List.of("EnemyTurrets.json")));
+            facility.setTier(FacilityTier.STRONGHOLD);
+
+            facility.setGarrison(2);
+            assertEquals(List.of("EnemyTurrets.json", "HostileBVBudgetIncrease.json"), facility.getLocalModifiers());
+        }
+
+        @Test
+        void anEmptyGarrisonCarriesNoTraitModifiers() {
+            StratConFacility facility = mekBase(ForceAlignment.Opposing);
+            facility.addTrait(FacilityTrait.VETERAN_GARRISON);
+            facility.addTrait(FacilityTrait.EXPERIMENTAL_WEAPONS);
+            facility.setGarrison(0);
+
+            assertTrue(facility.getLocalModifiers().isEmpty());
+        }
+
+        @Test
+        void aVeteranGarrisonReplacesRookies() {
+            StratConFacility facility = StratConTestData.facility(ForceAlignment.Opposing,
+                  FacilityType.MilitiaBarracks,
+                  new LocalModifiersEffect(List.of("Rookies.json")));
+            facility.setGarrison(1);
+            facility.addTrait(FacilityTrait.VETERAN_GARRISON);
+
+            assertEquals(List.of("Veterans.json"), facility.getLocalModifiers());
+        }
+
+        @Test
+        void changingSidesDropsTheModifiersAddedAtPlacement() {
+            StratConFacility facility = mekBase(ForceAlignment.Allied);
+            facility.addAdditionalLocalModifiers(List.of("LocalGarrisonTurrets.json"));
+
+            facility.setOwner(ForceAlignment.Opposing);
+
+            assertTrue(facility.getAdditionalLocalModifiers().isEmpty());
+        }
     }
 
     @Nested

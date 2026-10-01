@@ -43,6 +43,7 @@ import static org.mockito.Mockito.when;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Set;
 import javax.xml.namespace.QName;
 import javax.xml.transform.stream.StreamSource;
 
@@ -382,5 +383,30 @@ class FacilityTraitTest {
             assertNotNull(loaded.getTraits());
             assertTrue(loaded.getTraits().isEmpty());
         }
+    }
+
+    @Test
+    void aTraitTheEnemyProfileAlreadyProvidesIsNeverRolled() {
+        StratConFacility facility = StratConTestData.facility(ForceAlignment.Opposing,
+              FacilityType.BaseOfOperations,
+              new LocalModifiersEffect(List.of("Veterans.json", "GoodEquipment.json")));
+
+        assertEquals(Set.of(FacilityTrait.VETERAN_GARRISON, FacilityTrait.EXPERIMENTAL_WEAPONS),
+              FacilityTrait.getRedundantTraits(facility));
+        List<FacilityTrait> picked = FacilityTrait.pickTraits(FacilityTier.STRONGHOLD,
+              FacilityTrait.MAXIMUM_TRAITS,
+              bound -> 0,
+              FacilityTrait.getRedundantTraits(facility));
+        assertFalse(picked.contains(FacilityTrait.VETERAN_GARRISON));
+        assertFalse(picked.contains(FacilityTrait.EXPERIMENTAL_WEAPONS));
+    }
+
+    @Test
+    void theAlliedSideHasNoRedundantTraits() {
+        StratConFacility facility = StratConTestData.facility(ForceAlignment.Allied,
+              FacilityType.BaseOfOperations,
+              new LocalModifiersEffect(List.of("Veterans.json")));
+
+        assertTrue(FacilityTrait.getRedundantTraits(facility).isEmpty());
     }
 }

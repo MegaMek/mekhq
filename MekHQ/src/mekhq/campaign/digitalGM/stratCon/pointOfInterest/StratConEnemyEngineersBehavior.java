@@ -44,6 +44,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 
 /**
  * The behavior of enemy engineers: an enemy work party, sent to build a new outpost (see
@@ -141,7 +142,14 @@ public class StratConEnemyEngineersBehavior extends StratConContestedPointOfInte
             return null;
         }
 
-        StratConFacility facility = StratConFacilityFactory.getRandomHostileFacility();
+        // Made like any other facility that turns up mid-contract, so the contract's profile picks the type and it
+        // rolls traits; only the tier differs, as engineers raise no more than an Outpost.
+        AbstractContract contract = StratConPointOfInterestRules.getContract(track, campaign);
+        StratConFacility facility = (contract == null) ?
+                                          StratConFacilityFactory.getRandomHostileFacility() :
+                                          StratConContractInitializer.createMidContractFacility(campaign,
+                                                contract,
+                                                ForceAlignment.Opposing);
         if (facility == null) {
             return null;
         }
@@ -151,7 +159,6 @@ public class StratConEnemyEngineersBehavior extends StratConContestedPointOfInte
         facility.raiseIntel(FacilityIntel.LOCATED);
         track.addFacility(coords, facility);
 
-        AbstractContract contract = StratConPointOfInterestRules.getContract(track, campaign);
         if (contract != null) {
             StratConContractInitializer.connectFacilitiesToRoads(track, contract, campaign);
         }

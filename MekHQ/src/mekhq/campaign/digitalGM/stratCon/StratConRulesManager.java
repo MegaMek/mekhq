@@ -3271,6 +3271,10 @@ public class StratConRulesManager {
 
             // A facility's synergy partners lend their shared modifiers to fights at it.
             for (StratConFacility partner : StratConFacilitySynergies.getPartners(track, coords)) {
+                // A partner with nothing to lend, such as a damaged one, keeps its weekly lend for elsewhere.
+                if (partner.getSharedModifiers().isEmpty()) {
+                    continue;
+                }
                 getFacilityModifiers(scenario, partner, false, restrictAlliedModifiers, restrictEnemyModifiers);
             }
 

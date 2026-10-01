@@ -187,6 +187,7 @@ public class StratConFacility {
           "AlliedGroundSupport.json");
     static final String VETERAN_GARRISON_MODIFIER = "Veterans.json";
     static final String EXPERIMENTAL_WEAPONS_MODIFIER = "GoodEquipment.json";
+    static final String ROOKIES_MODIFIER = "Rookies.json";
     private static final List<String> HOSTILE_GARRISON_LADDER = List.of("EnemyTurrets.json",
           "HostileBVBudgetIncrease.json");
 
@@ -433,8 +434,8 @@ public class StratConFacility {
     }
 
     /**
-     * @return {@code true} if the facility has been linked to its holder's supply lines since it last changed sides. Only
-     *       such a facility can be cut off; one that was never on them supplies itself.
+     * @return {@code true} if the facility has been linked to its holder's supply lines since it last changed sides.
+     *       Only such a facility can be cut off; one that was never on them supplies itself.
      *
      * @author Illiani
      * @since 0.51.01
@@ -642,22 +643,8 @@ public class StratConFacility {
      *
      * <p>The garrison follows a ladder. With none left, the facility has no defenders of its own. At one step it has
      * the current profile's local modifiers; each step above that adds the next garrison modifier for the holding
-     * side, skipping any the profile already has.</p>
+     * side that the profile doesn't already have.</p>
      */
-    // The scenario modifiers an enemy facility's traits add to fights there. These modifiers only work on the opposing
-    // side, so the same traits on a facility the player's side holds act through the rules instead.
-    private void addTraitModifiers(List<String> modifiers) {
-        if (isOwnerAlliedToPlayer()) {
-            return;
-        }
-        if (hasTrait(FacilityTrait.VETERAN_GARRISON) && !modifiers.contains(VETERAN_GARRISON_MODIFIER)) {
-            modifiers.add(VETERAN_GARRISON_MODIFIER);
-        }
-        if (hasTrait(FacilityTrait.EXPERIMENTAL_WEAPONS) && !modifiers.contains(EXPERIMENTAL_WEAPONS_MODIFIER)) {
-            modifiers.add(EXPERIMENTAL_WEAPONS_MODIFIER);
-        }
-    }
-
     public List<String> getLocalModifiers() {
         List<String> modifiers = new ArrayList<>();
         int garrisonSteps = getGarrison();
@@ -666,17 +653,43 @@ public class StratConFacility {
         }
 
         List<String> ladder = isOwnerAlliedToPlayer() ? ALLIED_GARRISON_LADDER : HOSTILE_GARRISON_LADDER;
-        int ladderSteps = Math.min(garrisonSteps - 1, ladder.size());
-        for (int step = 0; step < ladderSteps; step++) {
-            String ladderModifier = ladder.get(step);
+        // Each step above the first adds the next ladder modifier the facility doesn't already have, so every step
+        // lost weakens the fight even where the profile shares a modifier with the ladder.
+        int stepsToAdd = garrisonSteps - 1;
+        for (int index = 0; (index < ladder.size()) && (stepsToAdd > 0); index++) {
+            String ladderModifier = ladder.get(index);
             if (!modifiers.contains(ladderModifier)) {
                 modifiers.add(ladderModifier);
+                stepsToAdd--;
             }
         }
 
         modifiers.addAll(additionalLocalModifiers);
-        addTraitModifiers(modifiers);
+        // The traits belong to the garrison and the kit it fights with; with no garrison left, there is no one to
+        // carry them into the fight.
+        if (garrisonSteps >= 1) {
+            addTraitModifiers(modifiers);
+        }
         return modifiers;
+    }
+
+    // The scenario modifiers an enemy facility's traits add to fights there. These modifiers only work on the opposing
+    // side, so the same traits on a facility the player's side holds act through the rules instead.
+    private void addTraitModifiers(List<String> modifiers) {
+        if (isOwnerAlliedToPlayer()) {
+            return;
+        }
+        if (hasTrait(FacilityTrait.VETERAN_GARRISON)) {
+            // A veteran garrison replaces a green one (such as a Militia Barracks' training cadre) rather than
+            // cancelling it out.
+            modifiers.remove(ROOKIES_MODIFIER);
+            if (!modifiers.contains(VETERAN_GARRISON_MODIFIER)) {
+                modifiers.add(VETERAN_GARRISON_MODIFIER);
+            }
+        }
+        if (hasTrait(FacilityTrait.EXPERIMENTAL_WEAPONS) && !modifiers.contains(EXPERIMENTAL_WEAPONS_MODIFIER)) {
+            modifiers.add(EXPERIMENTAL_WEAPONS_MODIFIER);
+        }
     }
 
     /**

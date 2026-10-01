@@ -865,14 +865,10 @@ public class StratConContractInitializer {
             return null;
         }
 
-        StratConFacility facility = StratConFacilityFactory.getRandomHostileFacility();
+        StratConFacility facility = createMidContractFacility(campaign, contract, ForceAlignment.Opposing, true);
         if (facility == null) {
             return null;
         }
-        facility.setTier(getFacilityTier(contract.getScale(),
-              campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
-              true));
-        facility.setGarrison(facility.getGarrisonMaximum());
 
         facility.setStrategicObjective(true);
         facility.setVisible(true);
@@ -995,6 +991,25 @@ public class StratConContractInitializer {
      */
     public static @Nullable StratConFacility createMidContractFacility(Campaign campaign, AbstractContract contract,
           ForceAlignment owner) {
+        return createMidContractFacility(campaign, contract, owner, false);
+    }
+
+    /**
+     * As {@link #createMidContractFacility(Campaign, AbstractContract, ForceAlignment)}, but for a facility that may be
+     * a strategic objective, which starts one tier larger.
+     *
+     * @param campaign    the current campaign
+     * @param contract    the contract whose map gets the facility
+     * @param owner       the side that holds it
+     * @param isObjective whether the facility is a strategic objective
+     *
+     * @return the facility, not yet placed, or {@code null} if no facility definition suits that side
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static @Nullable StratConFacility createMidContractFacility(Campaign campaign, AbstractContract contract,
+          ForceAlignment owner, boolean isObjective) {
         StratConContractDefinition contractDefinition =
               StratConContractDefinition.getContractDefinition(contract.getObjectiveType());
         StratConContractFacilityProfile facilityProfile = (contractDefinition == null) ?
@@ -1017,7 +1032,7 @@ public class StratConContractInitializer {
         boolean isFactorSupportPointsIntoScale = campaign.getCampaignOptions()
                                                        .get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
         facility.setTier(adjustTier(facilityProfile,
-              getFacilityTier(contract.getScale(), isFactorSupportPointsIntoScale, false)));
+              getFacilityTier(contract.getScale(), isFactorSupportPointsIntoScale, isObjective)));
         FacilityTrait.assignRandomTraits(facility);
         facility.setGarrison(facility.getGarrisonMaximum());
         return facility;
@@ -2543,11 +2558,14 @@ public class StratConContractInitializer {
             // facility
             boolean addedFacility = false;
             if (template.isFacilityScenario()) {
-                StratConFacility facility = template.isHostileFacility() ?
-                                                  StratConFacilityFactory.getRandomHostileFacility() :
-                                                  StratConFacilityFactory.getRandomAlliedFacility();
-                trackState.addFacility(coords, facility);
-                addedFacility = true;
+                StratConFacility facility = createMidContractFacility(campaign,
+                      contract,
+                      template.isHostileFacility() ? ForceAlignment.Opposing : ForceAlignment.Allied,
+                      true);
+                if (facility != null) {
+                    trackState.addFacility(coords, facility);
+                    addedFacility = true;
+                }
             }
 
             // create scenario - don't assign a force yet

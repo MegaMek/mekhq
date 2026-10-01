@@ -36,9 +36,12 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntUnaryOperator;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
 import megamek.common.annotations.Nullable;
 import megamek.common.compute.Compute;
+import megamek.logging.MMLogger;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
@@ -55,6 +58,8 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
  * @since 0.51.01
  */
 public class StratConContractFacilityProfile {
+    private static final MMLogger LOGGER = MMLogger.create(StratConContractFacilityProfile.class);
+
     /** A paragraph for the contract's StratCon briefing, about what its facilities mean for the player. */
     private String briefing;
 
@@ -80,6 +85,36 @@ public class StratConContractFacilityProfile {
     private ForceAlignment anchorOwner = ForceAlignment.Opposing;
 
     public StratConContractFacilityProfile() {
+    }
+
+    // Read by name rather than as enums, so a facility type this version doesn't know - a typo, a user's own type, or
+    // newer data - is skipped with a warning instead of failing the whole contract definition.
+    @JsonSetter("typeWeights")
+    private void readTypeWeights(@Nullable Map<String, Integer> typeWeightsByName) {
+        typeWeights = new LinkedHashMap<>();
+        if (typeWeightsByName == null) {
+            return;
+        }
+        for (Map.Entry<String, Integer> entry : typeWeightsByName.entrySet()) {
+            FacilityType facilityType = parseFacilityType(entry.getKey());
+            if (facilityType != null) {
+                typeWeights.put(facilityType, entry.getValue());
+            }
+        }
+    }
+
+    @JsonSetter("anchorType")
+    private void readAnchorType(@Nullable String anchorTypeName) {
+        anchorType = (anchorTypeName == null) ? null : parseFacilityType(anchorTypeName);
+    }
+
+    private static @Nullable FacilityType parseFacilityType(String name) {
+        try {
+            return FacilityType.valueOf(name);
+        } catch (IllegalArgumentException e) {
+            LOGGER.warn("Unknown facility type {} in a contract facility profile; ignoring it.", name);
+            return null;
+        }
     }
 
     public @Nullable String getBriefing() {
@@ -158,14 +193,14 @@ public class StratConContractFacilityProfile {
      * Picks a facility type for the given side, weighted by this profile, among the types that side can hold.
      *
      * @param owner      the side the facility is for
-     * @param percentile a roll from 0 to 99, used as a fraction of the total weight
+     * @param randomizer gives a random number below its argument, here the total weight of the candidate types
      *
      * @return the type, or {@code null} if this profile weights no type that side can hold
      *
      * @author Illiani
      * @since 0.51.01
      */
-    @Nullable FacilityType pickType(ForceAlignment owner, int percentile) {
+    @Nullable FacilityType pickType(ForceAlignment owner, IntUnaryOperator randomizer) {
         List<FacilityType> candidates = new ArrayList<>();
         List<Integer> weights = new ArrayList<>();
         int totalWeight = 0;
@@ -181,7 +216,7 @@ public class StratConContractFacilityProfile {
             return null;
         }
 
-        int roll = (percentile * totalWeight) / 100;
+        int roll = randomizer.applyAsInt(totalWeight);
         for (int index = 0; index < candidates.size(); index++) {
             roll -= weights.get(index);
             if (roll < 0) {
@@ -203,7 +238,7 @@ public class StratConContractFacilityProfile {
      * @since 0.51.01
      */
     public @Nullable StratConFacility createFacility(ForceAlignment owner) {
-        FacilityType facilityType = pickType(owner, Compute.randomInt(100));
+        FacilityType facilityType = pickType(owner, Compute::randomInt);
         return (facilityType == null) ? createRandomFacility(owner) : createFacility(facilityType, owner);
     }
 

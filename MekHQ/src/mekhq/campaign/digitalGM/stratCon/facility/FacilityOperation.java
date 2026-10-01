@@ -42,7 +42,8 @@ package mekhq.campaign.digitalGM.stratCon.facility;
  *     garrison, both from its hex.</li>
  *     <li>{@link #BUILD} raises a new player-held Outpost on an empty hex.</li>
  *     <li>{@link #INTERDICT} ambushes the enemy's supply convoys on a road hex.</li>
- *     <li>{@link #SIEGE} surrounds an enemy facility from a hex next to it, wearing its garrison down week by week.</li>
+ *     <li>{@link #SIEGE} surrounds an enemy facility from a hex next to it, wearing its garrison down week by
+ *     week.</li>
  * </ul>
  *
  * @author Illiani

@@ -20,13 +20,11 @@
   "displayableName": "Base of Operations",
   "facilityType": "BaseOfOperations",
   "alliedProfile": {
-    "description": "This base is defended by well-equipped veteran troops, turrets and a commander in a Mek.\n\nThe commander will participate in scenarios on this track.",
+    "description": "This base is defended by turrets and a commander in a Mek.\n\nThe commander will participate in scenarios in this sector.",
     "effects": [
       {
         "effect": "localModifiers",
         "modifiers": [
-          "Veterans.json",
-          "GoodEquipment.json",
           "AlliedTurrets.json",
           "AlliedOfficerMek.json"
         ]
@@ -40,7 +38,7 @@
     ]
   },
   "hostileProfile": {
-    "description": "This base is defended by well-equipped veteran troops, turrets and a commander in a Mek.\n\nThe commander will participate in scenarios on this track.",
+    "description": "This base is defended by well-equipped veteran troops, turrets and a commander in a Mek.\n\nThe commander will participate in scenarios in this sector.",
     "effects": [
       {
         "effect": "localModifiers",

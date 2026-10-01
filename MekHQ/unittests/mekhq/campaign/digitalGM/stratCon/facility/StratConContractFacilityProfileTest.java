@@ -77,16 +77,16 @@ class StratConContractFacilityProfileTest {
         weights.put(FacilityType.TankBase, 1);
         StratConContractFacilityProfile profile = profile(weights);
 
-        assertEquals(FacilityType.MekBase, profile.pickType(ForceAlignment.Opposing, 0));
-        assertEquals(FacilityType.MekBase, profile.pickType(ForceAlignment.Opposing, 74));
-        assertEquals(FacilityType.TankBase, profile.pickType(ForceAlignment.Opposing, 75));
-        assertEquals(FacilityType.TankBase, profile.pickType(ForceAlignment.Opposing, 99));
+        assertEquals(FacilityType.MekBase, profile.pickType(ForceAlignment.Opposing, bound -> 0));
+        assertEquals(FacilityType.MekBase, profile.pickType(ForceAlignment.Opposing, bound -> 2));
+        assertEquals(FacilityType.TankBase, profile.pickType(ForceAlignment.Opposing, bound -> 3));
+        assertEquals(FacilityType.TankBase, profile.pickType(ForceAlignment.Opposing, bound -> bound - 1));
     }
 
     @Test
     void aProfileWeightingNothingPicksNothing() {
-        assertNull(profile(Map.of()).pickType(ForceAlignment.Opposing, 50));
-        assertNull(profile(Map.of(FacilityType.MekBase, 0)).pickType(ForceAlignment.Opposing, 50));
+        assertNull(profile(Map.of()).pickType(ForceAlignment.Opposing, bound -> 0));
+        assertNull(profile(Map.of(FacilityType.MekBase, 0)).pickType(ForceAlignment.Opposing, bound -> 0));
     }
 
     @Test

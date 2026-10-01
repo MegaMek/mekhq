@@ -33,7 +33,10 @@
 package mekhq.campaign.digitalGM.stratCon.facility;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.IntUnaryOperator;
 
 import megamek.common.annotations.Nullable;
@@ -63,7 +66,9 @@ public enum FacilityTrait {
      * employer's facility defends itself worse when you stay away from a counterattack.
      */
     POOR_MORALE(true, FacilityTier.OUTPOST),
-    /** Built to take punishment: an attacker who wins short of capturing it does no damage, and sabotage only one step. */
+    /**
+     * Built to take punishment: an attacker who wins short of capturing it does no damage, and sabotage only one step.
+     */
     HARDENED(false, FacilityTier.OUTPOST),
     /**
      * Full stores: a won raid on an enemy one brings in extra Employer Support, and one your side holds provides extra
@@ -178,7 +183,8 @@ public enum FacilityTrait {
      */
     public static void assignRandomTraits(StratConFacility facility) {
         int count = getTraitCount(Compute.d6(2));
-        for (FacilityTrait trait : pickTraits(facility.getTier(), count, Compute::randomInt)) {
+        for (FacilityTrait trait : pickTraits(facility.getTier(), count, Compute::randomInt,
+              getRedundantTraits(facility))) {
             facility.addTrait(trait);
         }
     }
@@ -198,6 +204,24 @@ public enum FacilityTrait {
      */
     public static List<FacilityTrait> pickTraits(FacilityTier tier, int count,
           IntUnaryOperator randomizer) {
+        return pickTraits(tier, count, randomizer, Collections.emptySet());
+    }
+
+    /**
+     * As {@link #pickTraits(FacilityTier, int, IntUnaryOperator)}, but never picking any of the excluded traits.
+     *
+     * @param tier       the facility's tier
+     * @param count      how many traits to pick (see {@link #getTraitCount})
+     * @param randomizer gives a random index below its argument
+     * @param excluded   traits that may not be picked
+     *
+     * @return the traits, in the order picked
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<FacilityTrait> pickTraits(FacilityTier tier, int count,
+          IntUnaryOperator randomizer, Set<FacilityTrait> excluded) {
         List<FacilityTrait> picked = new ArrayList<>();
         for (int attempt = 0; attempt < count; attempt++) {
             List<FacilityTrait> candidates = new ArrayList<>();
@@ -209,7 +233,7 @@ public enum FacilityTrait {
                         break;
                     }
                 }
-                if (!isConflicting && trait.isAllowedFor(tier)) {
+                if (!isConflicting && trait.isAllowedFor(tier) && !excluded.contains(trait)) {
                     candidates.add(trait);
                 }
             }
@@ -219,5 +243,31 @@ public enum FacilityTrait {
             picked.add(candidates.get(randomizer.applyAsInt(candidates.size())));
         }
         return picked;
+    }
+
+    /**
+     * @param facility a facility
+     *
+     * @return the traits that would change nothing on that facility, because the scenario modifier they add to fights
+     *       there is one its profile already has
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static Set<FacilityTrait> getRedundantTraits(StratConFacility facility) {
+        // Only an enemy facility's traits work through scenario modifiers; the player's side's act through the rules.
+        if (facility.isOwnerAlliedToPlayer()) {
+            return Collections.emptySet();
+        }
+
+        List<String> profileModifiers = facility.getProfile().getLocalModifierIds();
+        Set<FacilityTrait> redundantTraits = EnumSet.noneOf(FacilityTrait.class);
+        if (profileModifiers.contains(StratConFacility.VETERAN_GARRISON_MODIFIER)) {
+            redundantTraits.add(VETERAN_GARRISON);
+        }
+        if (profileModifiers.contains(StratConFacility.EXPERIMENTAL_WEAPONS_MODIFIER)) {
+            redundantTraits.add(EXPERIMENTAL_WEAPONS);
+        }
+        return redundantTraits;
     }
 }

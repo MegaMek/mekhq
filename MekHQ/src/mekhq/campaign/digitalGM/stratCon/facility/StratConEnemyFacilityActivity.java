@@ -69,8 +69,8 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * on facilities the player or their employer holds, and enemy engineers building new outposts.
  *
  * <ul>
- *     <li><b>Weekly upkeep.</b> Each Monday, every enemy facility repairs one condition step and reinforces one garrison
- *     step, unless a fight is under way there, it is cut off from its supply lines, or it is under siege.</li>
+ *     <li><b>Weekly upkeep.</b> Each Monday, every enemy facility repairs one condition step and reinforces one
+ *     garrison step, unless a fight is under way there, it is cut off from its supply lines, or it is under siege.</li>
  *     <li><b>Counterattacks.</b> When one of the contract's ordinary scenarios comes due, it may instead become a
  *     counterattack on a facility held by the player or their employer. A counterattack is a Crisis, placed on the
  *     facility's hex with a deployment deadline of 3 to 7 days. Losing or ignoring it hands the facility to the enemy,
