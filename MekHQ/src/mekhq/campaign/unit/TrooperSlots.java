@@ -89,7 +89,7 @@ public class TrooperSlots {
      * @param personId the person
      */
     public void release(UUID personId) {
-        occupantBySlot.values().remove(personId);
+        occupantBySlot.values().removeIf(personId::equals);
     }
 
     /**
@@ -166,6 +166,7 @@ public class TrooperSlots {
      * @param trooperSlotsNode the {@code trooperSlots} node
      */
     public void readFromXML(Node trooperSlotsNode) {
+        occupantBySlot.clear();
         NodeList trooperSlotNodes = trooperSlotsNode.getChildNodes();
         for (int index = 0; index < trooperSlotNodes.getLength(); index++) {
             Node trooperSlotNode = trooperSlotNodes.item(index);
@@ -191,7 +192,13 @@ public class TrooperSlots {
             return;
         }
         try {
-            occupantBySlot.put(Integer.parseInt(slotText), UUID.fromString(personIdText));
+            int slot = Integer.parseInt(slotText);
+            UUID personId = UUID.fromString(personIdText);
+            if (occupantBySlot.containsValue(personId)) {
+                LOGGER.warn("[TrooperSlots] Skipping a second saved suit, slot {}, for person {}", slot, personId);
+                return;
+            }
+            occupantBySlot.put(slot, personId);
         } catch (IllegalArgumentException exception) {
             LOGGER.warn("[TrooperSlots] Skipping an unreadable saved suit assignment: slot {}, person {}",
                   slotText, personIdText);
