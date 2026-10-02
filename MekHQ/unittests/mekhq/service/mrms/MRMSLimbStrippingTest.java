@@ -135,6 +135,7 @@ class MRMSLimbStrippingTest {
         assertEquals(FULL_SHIFT_MINUTES, tech.getMinutesLeft(), "Nobody works on the arm that was just scrapped");
         assertFalse(locust.isSalvage(), "The Locust is back in repair mode");
     }
+
     @Test
     void quickStripRunsWithMassRepairAndSalvageSwitchedOff() {
         campaign.getCampaignOptions().set(CampaignOption.MRMS_USE_REPAIR, false);
