@@ -106,6 +106,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitPurchaseCheck;
 import mekhq.campaign.parts.RefitWorkCheck;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -1235,7 +1236,7 @@ public class CampaignGUI extends JPanel {
         // will be done
         // TODO: better information
         int response = JOptionPane.showConfirmDialog(null,
-              getRefitConfirmation(refit),
+              getRefitConfirmation(campaign, refit),
               getTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.title"),
               JOptionPane.YES_NO_OPTION);
         if (response != JOptionPane.YES_OPTION) {
@@ -1262,11 +1263,20 @@ public class CampaignGUI extends JPanel {
     }
 
     /**
-     * @return the question asked before a refit or refurbishment starts, naming its refit class and the unit
+     * @return the question asked before a refit or refurbishment starts, naming its refit class and the unit, and
+     *       warning about parts the refit needs but the campaign may not buy
      */
-    private static String getRefitConfirmation(Refit refit) {
+    private static String getRefitConfirmation(Campaign campaign, Refit refit) {
         String key = refit.isBeingRefurbished() ? "refitConfirm.refurbish.text" : "refitConfirm.refit.text";
-        return getFormattedTextAt(REFIT_RESOURCE_BUNDLE, key, refit.getRefitClassName(), refit.getUnit().getName());
+        String question = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, key, refit.getRefitClassName(),
+              refit.getUnit().getName());
+        List<String> partsThatCannotBeBought = RefitPurchaseCheck.findPartsThatCannotBeBought(campaign, refit);
+        if (partsThatCannotBeBought.isEmpty()) {
+            return question;
+        }
+        String warning = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitConfirm.cannotBuy.text",
+              String.join(", ", partsThatCannotBeBought));
+        return warning + "\n\n" + question;
     }
 
     /**
