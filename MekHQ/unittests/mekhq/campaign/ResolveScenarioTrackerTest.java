@@ -34,6 +34,7 @@ package mekhq.campaign;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -56,8 +57,10 @@ import java.util.Vector;
 
 import megamek.client.IClient;
 import megamek.common.Player;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.common.compute.Compute;
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.IArmorState;
 import megamek.common.event.PostGameResolution;
 import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.IEntityRemovalConditions;
@@ -66,12 +69,14 @@ import megamek.common.units.EjectedCrew;
 import megamek.common.units.Entity;
 import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
+import mekhq.campaign.ResolveScenarioTracker.PersonStatus;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.TestUnit;
+import mekhq.campaign.unit.TrooperSlots;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -583,4 +588,112 @@ class ResolveScenarioTrackerTest {
     }
 
     // endregion Blob (temporary) crew casualties
+
+    // region Battle armor casualties by suit
+
+    /**
+     * Sets up a four-trooper battle armor squad with one named person in each suit, registered with the tracker.
+     * The suits listed in {@code lostSuits} come back from the battle with no living trooper.
+     */
+    private List<Person> squadThatLostSuits(ResolveScenarioTracker tracker, boolean isTotalLoss, int... lostSuits) {
+        BattleArmor battleArmor = (BattleArmor) createPlayerBlkEntity("IS Standard BA [Laser] (Sqd4)");
+        List<Person> troopers = new ArrayList<>();
+        List<UUID> trooperIds = new ArrayList<>();
+        List<Integer> suits = new ArrayList<>();
+        for (int slot = BattleArmor.LOC_TROOPER_1; slot <= battleArmor.getSquadSize(); slot++) {
+            Person trooper = mockCrewMember("Trooper " + slot);
+            troopers.add(trooper);
+            trooperIds.add(trooper.getId());
+            suits.add(slot);
+            battleArmor.setInternal(1, slot);
+        }
+        TrooperSlots trooperSlots = new TrooperSlots();
+        trooperSlots.seat(trooperIds, suits);
+        for (int lostSuit : lostSuits) {
+            battleArmor.setInternal(IArmorState.ARMOR_DESTROYED, lostSuit);
+        }
+
+        Unit squad = mock(Unit.class);
+        UUID squadId = UUID.fromString(battleArmor.getExternalIdAsString());
+        when(squad.getId()).thenReturn(squadId);
+        when(squad.getEntity()).thenReturn(battleArmor);
+        when(squad.getName()).thenReturn("Battle Armor Test Squad");
+        when(squad.getActiveCrew()).thenAnswer(invocation -> new ArrayList<>(troopers));
+        when(squad.getCrew()).thenReturn(troopers);
+        when(squad.getTotalCrewSize()).thenReturn(troopers.size());
+        when(squad.getCommander()).thenReturn(troopers.getFirst());
+        when(squad.getTrooperSlots()).thenReturn(trooperSlots);
+        tracker.pilots.put(troopers.getFirst().getId(), battleArmor.getCrew());
+        registerUnit(tracker, squad, battleArmor, isTotalLoss);
+        return troopers;
+    }
+
+    private static boolean isCasualty(ResolveScenarioTracker tracker, Person trooper) {
+        PersonStatus status = tracker.getPeopleStatus().get(trooper.getId());
+        assertNotNull(status, trooper.getFullName() + " has a status");
+        return status.isDead() || (status.getHits() > 0);
+    }
+
+    /**
+     * The person in the lost suit is the casualty, not someone picked at random from the squad (issue #10257).
+     */
+    @Test
+    void checkStatusOfPersonnelHurtsTheTrooperWhoseSuitWasLost() {
+        ResolveScenarioTracker tracker = createTracker();
+        List<Person> troopers = squadThatLostSuits(tracker, false, 3);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.d6(2)).thenReturn(2); // < 7: killed
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+
+        assertTrue(tracker.getPeopleStatus().get(troopers.get(2).getId()).isDead(), "The trooper in suit 3 died");
+        for (Person survivor : List.of(troopers.get(0), troopers.get(1), troopers.get(3))) {
+            assertFalse(isCasualty(tracker, survivor), survivor.getFullName() + " is unhurt");
+        }
+    }
+
+    /**
+     * A squad that comes back with every suit intact has no casualties.
+     */
+    @Test
+    void checkStatusOfPersonnelHurtsNobodyWhenNoSuitWasLost() {
+        ResolveScenarioTracker tracker = createTracker();
+        List<Person> troopers = squadThatLostSuits(tracker, false);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.d6(2)).thenReturn(2);
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+
+        for (Person trooper : troopers) {
+            assertFalse(isCasualty(tracker, trooper), trooper.getFullName() + " is unhurt");
+        }
+    }
+
+    /**
+     * When the whole squad is lost, everyone in it is a casualty.
+     */
+    @Test
+    void checkStatusOfPersonnelHurtsEveryTrooperWhenTheSquadIsLost() {
+        ResolveScenarioTracker tracker = createTracker();
+        List<Person> troopers = squadThatLostSuits(tracker, true, 1, 2, 3, 4);
+
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.d6(2)).thenReturn(2);
+            compute.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
+
+            tracker.checkStatusOfPersonnel();
+        }
+
+        for (Person trooper : troopers) {
+            assertTrue(tracker.getPeopleStatus().get(trooper.getId()).isDead(), trooper.getFullName() + " died");
+        }
+    }
+
+    // endregion Battle armor casualties by suit
 }
