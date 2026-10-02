@@ -33,7 +33,9 @@
 package mekhq.campaign.parts;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import megamek.common.annotations.Nullable;
 import megamek.common.enums.TechBase;
@@ -80,16 +82,16 @@ public final class RefitPurchaseCheck {
      *       get everything it needs
      */
     public static List<String> findPartsThatCannotBeBought(Campaign campaign, Refit refit) {
-        List<String> partNames = new ArrayList<>();
+        // Each name once, in the order the shopping list gives them
+        Set<String> partNames = new LinkedHashSet<>();
         for (Part part : refit.getShoppingList()) {
-            boolean canBuy = canBuyTechBase(campaign.getCampaignOptions(), part.getTechBase());
-            if (!canBuy && !partNames.contains(part.getName())) {
+            if (!canBuyTechBase(campaign.getCampaignOptions(), part.getTechBase())) {
                 partNames.add(part.getName());
             }
         }
         if (!partNames.isEmpty()) {
             LOGGER.debug("[RefitPurchase] {}: cannot buy {}", refit.getUnit().getName(), partNames);
         }
-        return partNames;
+        return new ArrayList<>(partNames);
     }
 }
