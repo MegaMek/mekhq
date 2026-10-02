@@ -8320,17 +8320,10 @@ public class Unit implements ITechnology, ILocatable {
             }
         }
 
-        // Handle cost for quirks if used
-        if (entity.hasQuirk(OptionsConstants.QUIRK_POS_EASY_MAINTAIN)) {
-            partsCost = partsCost.multipliedBy(0.8);
-        } else if (entity.hasQuirk(OptionsConstants.QUIRK_NEG_DIFFICULT_MAINTAIN)) {
-            partsCost = partsCost.multipliedBy(1.25);
-        } else if (entity.hasQuirk(OptionsConstants.QUIRK_NEG_NON_STANDARD)) {
-            partsCost = partsCost.multipliedBy(2.0);
-        } else if (entity.hasQuirk(OptionsConstants.QUIRK_POS_UBIQUITOUS_IS)) {
-            partsCost = partsCost.multipliedBy(0.75);
+        // Quirks multiply the spare parts cost in turn (CO p.24), when the campaign uses quirks
+        if (getCampaign().getCampaignOptions().get(CampaignOption.USE_QUIRKS)) {
+            partsCost = partsCost.multipliedBy(SparePartsQuirkMultiplier.find(entity, getCampaign().getGameYear()));
         }
-        // TODO Obsolete quirk
 
         // Now for extended parts cost modifiers
         if (getCampaign().getCampaignOptions().get(CampaignOption.USE_EXTENDED_PARTS_MODIFIER)) {
