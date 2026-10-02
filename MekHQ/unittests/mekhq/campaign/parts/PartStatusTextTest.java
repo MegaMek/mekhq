@@ -102,4 +102,15 @@ class PartStatusTextTest {
         assertEquals(List.of("Functional", "In transit (1 day)", "In transit (5 days)", "In transit (1000 days)"),
               statuses);
     }
+
+    @Test
+    void aTranslatedTransitStatusStillSortsByItsDays() {
+        List<String> statuses = new ArrayList<>(List.of("Unterwegs (12 Tage)", "Funktionsfaehig", "Unterwegs (3 Tage)",
+              "Unterwegs (1 Tag)"));
+
+        statuses.sort(new WarehouseStatusSorter());
+
+        assertEquals(List.of("Funktionsfaehig", "Unterwegs (1 Tag)", "Unterwegs (3 Tage)", "Unterwegs (12 Tage)"),
+              statuses, "12 days sorts after 3 days, not before it as text would");
+    }
 }
