@@ -1,0 +1,321 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-eca6-7efa-ae69-1671267e7521
+</UUID>
+
+<UnitType>
+Warship
+</UnitType>
+
+<Name>
+Potemkin Troop Cruiser
+</Name>
+
+<Model>
+(2875)
+</Model>
+
+<mul id:>
+4847
+</mul id:>
+
+<year>
+2875
+</year>
+
+<type>
+Clan Level 3
+</type>
+
+<role>
+None
+</role>
+
+<motion_type>
+Aerodyne
+</motion_type>
+
+<transporters>
+smallcraftbay:5.0:1:1::-1:0
+smallcraftbay:5.0:1:2::-1:0
+cargobay:371293.5:1:3::-1:0
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+1stclassquarters:680.0:0:-1::-1:0
+crewquarters:2359.0:0:-1::-1:0
+</transporters>
+
+<SafeThrust>
+2
+</SafeThrust>
+
+<heatsinks>
+3325
+</heatsinks>
+
+<sink_type>
+1
+</sink_type>
+
+<fuel>
+25000
+</fuel>
+
+<engine_type>
+1
+</engine_type>
+
+<clan_engine>
+false
+</clan_engine>
+
+<armor_type>
+11
+</armor_type>
+
+<armor_tech_rating>
+0
+</armor_tech_rating>
+
+<armor_tech_level>
+6
+</armor_tech_level>
+
+<armor>
+179
+201
+201
+156
+201
+201
+</armor>
+
+<Nose Equipment>
+(B) Naval Laser 45
+Naval Laser 45
+</Nose Equipment>
+
+<Left Front Side Equipment>
+(B) Naval Laser 45
+Naval Laser 45
+Naval Laser 45
+(B) Capital Missile Launcher (Barracuda)
+Capital Missile Launcher (Barracuda)
+Ammo Barracuda:20
+</Left Front Side Equipment>
+
+<Right Front Side Equipment>
+(B) Naval Laser 45
+Naval Laser 45
+Naval Laser 45
+(B) Capital Missile Launcher (Barracuda)
+Capital Missile Launcher (Barracuda)
+Ammo Barracuda:20
+</Right Front Side Equipment>
+
+<Aft Equipment>
+(B) Capital Missile Launcher (Barracuda)
+Capital Missile Launcher (Barracuda)
+Capital Missile Launcher (Barracuda)
+Capital Missile Launcher (Barracuda)
+Ammo Barracuda:40
+</Aft Equipment>
+
+<Aft Left Side Equipment>
+(B) Naval PPC (Heavy)
+Naval PPC (Heavy)
+Naval PPC (Heavy)
+(B) Naval PPC (Heavy)
+Naval PPC (Heavy)
+Naval PPC (Heavy)
+(B) Naval Laser 45
+Naval Laser 45
+Naval Laser 45
+Naval Laser 45
+</Aft Left Side Equipment>
+
+<Aft Right Side Equipment>
+(B) Naval PPC (Heavy)
+Naval PPC (Heavy)
+Naval PPC (Heavy)
+(B) Naval PPC (Heavy)
+Naval PPC (Heavy)
+Naval PPC (Heavy)
+(B) Naval Laser 45
+Naval Laser 45
+Naval Laser 45
+Naval Laser 45
+</Aft Right Side Equipment>
+
+<Hull Equipment>
+ISMobileHPG
+</Hull Equipment>
+
+<Left Broadsides Equipment>
+(B) Naval PPC (Heavy)
+Naval PPC (Heavy)
+Naval PPC (Heavy)
+(B) Naval PPC (Heavy)
+Naval PPC (Heavy)
+Naval PPC (Heavy)
+</Left Broadsides Equipment>
+
+<Right Broadsides Equipment>
+(B) Naval PPC (Heavy)
+Naval PPC (Heavy)
+Naval PPC (Heavy)
+(B) Naval PPC (Heavy)
+Naval PPC (Heavy)
+Naval PPC (Heavy)
+</Right Broadsides Equipment>
+
+<structural_integrity>
+80
+</structural_integrity>
+
+<capabilities>
+<p>Displacing 1,510,000 tons across 1,508 meters of Cortex DuoStress hull, the Potemkin dwarfs most battleships in sheer mass and volume while carrying enough firepower to defend its precious cargo against capital-class threats. Twenty-five docking collars arranged in five rings of five around the cylindrical hull provide unmatched transport capacity, supplemented by over 370,000 tons of internal cargo space and bays for ten small craft. The defensive armament centers on twenty-four Heavy Naval PPCs distributed in batteries of six across the broadside and aft quarter arcs, delivering devastating energy firepower that can punish any hostile vessel attacking a laden Potemkin. Sixteen NL45 naval lasers cover the forward and aft quarter arcs with overlapping fields of fire, while eight Barracuda capital missile launchers provide long-range coverage from the aft and forward quarter positions. The 3,325 double heat sinks manage the thermal output from sustained defensive fire. Over 1,300 tons of Grumman TR8 ferro-carbide armor protect the hull, supported by a structural integrity rating of eighty, exceptional resilience for a transport vessel. Chatham 7500 engines drive the vessel at a safe thrust of two, modest but sufficient for a ship whose role demands endurance over speed. A single 95-meter gravity deck serves the crew of approximately 450 personnel.</p><p>The Clan refit added a lithium-fusion battery for rapid successive jumps and a mobile HPG for independent fleet communications, while incorporating HarJel hull sealant systems for improved battle damage repair. These enhancements came at the cost of approximately 150 tons of armor protection and some cargo capacity, a trade-off Clan naval planners considered acceptable given the strategic advantages of rapid redeployment and autonomous communications.</p>
+</capabilities>
+
+<overview>
+<p>The Potemkin-class troop cruiser is the largest dedicated military transport ever constructed, a vessel so massive that the Star League Defense Force created an entirely new classification to describe it. Commissioned in 2611 by Riga Interstellar Shipyards on Dyev, the Potemkin was designed to carry an unprecedented number of DropShips arranged in distinctive rings around its cylindrical hull, a silhouette that earned it the affectionate nickname "Corncob Cruiser" among the generations of crew who served aboard these vessels. The class filled a critical gap in SLDF logistics capability, replacing the vulnerable convoy systems that had plagued earlier military operations with a single protected platform capable of moving an entire regiment's transport assets in one jump. Heavily armed for a transport, the Potemkin proved equally capable as fleet tender, mobile supply depot, and spaceborne habitat, earning a reputation as the workhorse of interstellar military logistics.</p>
+</overview>
+
+<deployment>
+<p>Following the 2875 upgrade program, twenty-nine Potemkins served across virtually every Clan touman, forming the logistical foundation upon which every major Clan deployment rested. No significant offensive could be mounted without at least one Potemkin providing primary transport lift, and the class's famous docking capacity could carry sufficient DropShips for an entire Galaxy's deployment requirements. Clan Hell's Horses fielded three Potemkins, the Steel Shield, Armageddon, and Blood Horse, the largest concentration of the class in any single Clan's navy. This reflected the Horses' emphasis on heavy mechanized formations requiring massive transport capability.</p><p>The CSJ Renown served as a key logistics vessel for Clan Smoke Jaguar throughout the Clan Invasion era before being mothballed at Sheridan following the Clan's destruction during Operation BULLDOG. The CDS Titanic served with the Diamond Shark Spectral Diamond Naval Star until destroyed at York in 3073 by Clan Star Adder forces during the Wars of Reaving. The CW Full Moon served Clan Wolf-in-Exile, while the CSR Snowflake operated with Clan Snow Raven's substantial naval touman.</p><p>Perhaps the most remarkable Potemkin legacy emerged in the Dark Age when Clan Sea Fox extensively modified several hulls into ArcShips, mobile manufacturing and habitat platforms that grew to 2.5 million tons. The CDS Kraken became the Fox ArcShip for the Fox Khanate, while other conversions including the Poseidon, Atlantean, and Tsunami served other Khanates. These massively expanded vessels represent an entirely separate classification from the standard troop cruiser.</p>
+</deployment>
+
+<history>
+<p>The Potemkin-class troop cruiser originated from a Star League Defense Force requirement for a protected military transport to replace the vulnerable convoy systems used during the Reunification War, when unescorted DropShip convoys had proven catastrophically susceptible to ambush. The losses suffered during those campaigns convinced SLDF planners that future operations demanded a single vessel capable of carrying an entire regiment's transport assets under the protection of capital-grade armament. Riga Interstellar Shipyards initially submitted a 750,000-ton design capable of carrying ten DropShips, but over eight years and eleven successive redesigns the approved vessel grew to 1,510,000 tons with its signature five-ring docking arrangement. So unprecedented in scale, the SLDF created an entirely new ship classification for it: troop cruiser.</p><p>The first Potemkin launched from the Riga shipyards at Dyev in 2611 and quickly proved its worth as the backbone of SLDF logistics operations. The class earned the affectionate nickname "Corncob Cruiser" for the distinctive rings of DropShips clustered along its cylindrical hull, a silhouette that became one of the most recognizable in known space. Production continued for 170 years, with one hundred six vessels completed before the final keel launched in 2748 and production officially ceased in 2781. The combination of heavy defensive armament, enormous cargo capacity, and unmatched docking capability made the class indispensable for every major SLDF deployment, and no corps-level operation could be mounted without Potemkin support.</p><p>The Potemkin played a critical role during the Amaris Crisis and its aftermath. Several were lost during the Liberation of Terra, and when General Kerensky called for the Exodus in 2784, approximately thirty Potemkins accompanied the fleet into the Deep Periphery. These vessels served as mobile cities for the evacuated military families and civilians during the eighteen-month transit to the Kerensky Cluster, their cavernous cargo holds converted into improvised habitation decks for thousands of refugees. The first children born after the Exodus entered the world aboard Potemkin-class vessels, forever linking the class to the founding mythology of the Clans. The transit was not without turmoil, as at least one Potemkin became caught up in the Prinz Eugen revolt that tested the fleet's cohesion during those desperate months.</p><p>Beginning in 2875, Clan technicians upgraded surviving Potemkins with enhanced jump capability, improved communications systems, and advanced damage control measures, increasing their operational flexibility at the cost of some armor protection and cargo volume. Twenty-nine Potemkins remained in Clan service following the upgrade program, distributed across virtually every Clan touman. The class formed the logistical core of Clan military operations, and every major Clan deployment from the Invasion Corridors to the Wars of Reaving depended on Potemkin transport lift. With forty-six individual vessels documented across all eras and factions, the Potemkin holds the distinction of being one of the most prolific WarShip classes ever constructed.</p><p>The Wars of Reaving and Jihad claimed several Potemkins on both sides of the Exodus boundary. In the Clan Homeworlds, internecine conflict destroyed vessels that had served for centuries. In the Inner Sphere, the few Potemkins remaining in Successor State or ComStar service were lost to the upheaval of the Jihad era. Despite these losses, the Potemkin remained the most numerous capital-class vessel in Clan service well into the Dark Age. The class's final evolution came when Clan Sea Fox modified several hulls into ArcShips, massive mobile habitats and trading platforms that expanded well beyond the original displacement. Though these rebuilt vessels constitute a separate classification, the enduring hull design has carried humanity's ambitions across the stars for over five centuries.</p>
+</history>
+
+<manufacturer>
+Riga Interstellar Shipyards
+</manufacturer>
+
+<primaryFactory>
+Dyev
+</primaryFactory>
+
+<systemManufacturers>
+CHASSIS:Riga Interstellar Shipyards
+ENGINE:Chatham
+ARMOR:Grumman
+JUMP_JET:Unknown
+COMMUNICATIONS:TelStar
+TARGETING:KTI
+</systemManufacturers>
+
+<systemModels>
+CHASSIS:Cortex DuoStress
+ENGINE:7500
+ARMOR:TR8
+JUMP_JET:KF Mark LC
+COMMUNICATIONS:HN
+TARGETING:6001
+</systemModels>
+
+<use>
+Troop Cruiser
+</use>
+
+<source>
+TR:3057r
+</source>
+
+<tonnage>
+1510000.0
+</tonnage>
+
+<kf_core>
+1
+</kf_core>
+
+<lithium-fusion>
+1
+</lithium-fusion>
+
+<sail>
+1
+</sail>
+
+<grav_decks>
+95
+</grav_decks>
+
+<designtype>
+1
+</designtype>
+
+<crew>
+455
+</crew>
+
+<officers>
+68
+</officers>
+
+<gunners>
+48
+</gunners>
+
+<passengers>
+0
+</passengers>
+
+<marines>
+0
+</marines>
+
+<battlearmor>
+0
+</battlearmor>
+
+<life_boat>
+50
+</life_boat>
+
+<escape_pod>
+50
+</escape_pod>
+
