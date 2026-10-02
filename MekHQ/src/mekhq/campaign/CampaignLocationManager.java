@@ -396,7 +396,7 @@ public class CampaignLocationManager {
         return switch (traveler) {
             case Person person -> {yield campaign.getPlayerForce().getHumanResources().getPerson(person.getId()) != null;}
             case Unit unit -> campaign.getUnit(unit.getId()) != null;
-            case Part part -> findPartAnywhere(campaign, part.getId()) != null;
+            case Part part -> findPartAnywhere(campaign, part.getUniqueId()) != null;
             default -> true;
         };
     }
@@ -459,6 +459,31 @@ public class CampaignLocationManager {
             }
         }
         return null;
+    }
+
+    /**
+     * Finds a part named by its number in an older save, which did not say which warehouse the number belongs to.
+     * The campaign warehouse is searched first, then each base's; when more than one warehouse has a part with that
+     * number the choice is logged, because it may be the wrong part.
+     *
+     * @param campaign     the campaign
+     * @param legacyNumber the part number from the older save
+     *
+     * @return the first part with that number, or {@code null} if none has it
+     */
+    public @Nullable Part findPartByLegacyNumber(Campaign campaign, int legacyNumber) {
+        Part part = findPartAnywhere(campaign, legacyNumber);
+        int warehousesWithThatNumber = (campaign.getPlayerForce().getWarehouse().getPart(legacyNumber) == null) ? 0 : 1;
+        for (PlayerBase base : playerBases) {
+            if (base.getBaseWarehouse().getPart(legacyNumber) != null) {
+                warehousesWithThatNumber++;
+            }
+        }
+        if (warehousesWithThatNumber > 1) {
+            LOGGER.warn("[PartIdentity] Part number {} from an older save is used in {} warehouses; took {}",
+                  legacyNumber, warehousesWithThatNumber, (part == null) ? "none" : part.getName());
+        }
+        return part;
     }
 
     /**
@@ -707,7 +732,8 @@ public class CampaignLocationManager {
                               MHQXMLUtility.writeSimpleXMLTag(pw, indent, "personId", person.getId().toString());
                         case Unit unit ->
                               MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", unit.getId().toString());
-                        case Part part -> MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partId", part.getId());
+                        case Part part ->
+                              MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partUniqueId", part.getUniqueId());
                         default -> LOGGER.error(
                               "writePendingTravel: cannot serialize queued traveler of type {} bound for {} — skipping",
                               traveler.getClass().getSimpleName(), destination.getClass().getSimpleName());

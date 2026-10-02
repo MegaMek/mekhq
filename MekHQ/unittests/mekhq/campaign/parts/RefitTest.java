@@ -330,18 +330,18 @@ public class RefitTest {
         assertEquals(refit.getTech(), deserialized.getTech());
 
         // Check that we got all the correct old parts in the XML
-        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream().map(Part::getId).collect(Collectors.toSet());
-        Set<Integer> serializedOldParts = deserialized.getOldUnitParts()
+        Set<UUID> oldUnitParts = refit.getOldUnitParts().stream().map(Part::getUniqueId).collect(Collectors.toSet());
+        Set<UUID> serializedOldParts = deserialized.getOldUnitParts()
                                                 .stream()
-                                                .map(Part::getId)
+                                                .map(Part::getUniqueId)
                                                 .collect(Collectors.toSet());
         assertEquals(oldUnitParts, serializedOldParts);
 
         // Check that we got all the correct new parts in the XML
-        Set<Integer> newUnitParts = refit.getNewUnitParts().stream().map(Part::getId).collect(Collectors.toSet());
-        Set<Integer> serializedNewParts = deserialized.getNewUnitParts()
+        Set<UUID> newUnitParts = refit.getNewUnitParts().stream().map(Part::getUniqueId).collect(Collectors.toSet());
+        Set<UUID> serializedNewParts = deserialized.getNewUnitParts()
                                                 .stream()
-                                                .map(Part::getId)
+                                                .map(Part::getUniqueId)
                                                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
@@ -524,18 +524,18 @@ public class RefitTest {
         assertEquals(refit.getTech().getId(), deserialized.getTech().getId());
 
         // Check that we got all the correct old parts in the XML
-        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream().map(Part::getId).collect(Collectors.toSet());
-        Set<Integer> serializedOldParts = deserialized.getOldUnitParts()
+        Set<UUID> oldUnitParts = refit.getOldUnitParts().stream().map(Part::getUniqueId).collect(Collectors.toSet());
+        Set<UUID> serializedOldParts = deserialized.getOldUnitParts()
                                                 .stream()
-                                                .map(Part::getId)
+                                                .map(Part::getUniqueId)
                                                 .collect(Collectors.toSet());
         assertEquals(oldUnitParts, serializedOldParts);
 
         // Check that we got all the correct new parts in the XML
-        Set<Integer> newUnitParts = refit.getNewUnitParts().stream().map(Part::getId).collect(Collectors.toSet());
-        Set<Integer> serializedNewParts = deserialized.getNewUnitParts()
+        Set<UUID> newUnitParts = refit.getNewUnitParts().stream().map(Part::getUniqueId).collect(Collectors.toSet());
+        Set<UUID> serializedNewParts = deserialized.getNewUnitParts()
                                                 .stream()
-                                                .map(Part::getId)
+                                                .map(Part::getUniqueId)
                                                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 
@@ -743,18 +743,18 @@ public class RefitTest {
         assertEquals(refit.getTech().getId(), deserialized.getTech().getId());
 
         // Check that we got all the correct old parts in the XML
-        Set<Integer> oldUnitParts = refit.getOldUnitParts().stream().map(Part::getId).collect(Collectors.toSet());
-        Set<Integer> serializedOldParts = deserialized.getOldUnitParts()
+        Set<UUID> oldUnitParts = refit.getOldUnitParts().stream().map(Part::getUniqueId).collect(Collectors.toSet());
+        Set<UUID> serializedOldParts = deserialized.getOldUnitParts()
                                                 .stream()
-                                                .map(Part::getId)
+                                                .map(Part::getUniqueId)
                                                 .collect(Collectors.toSet());
         assertEquals(oldUnitParts, serializedOldParts);
 
         // Check that we got all the correct new parts in the XML
-        Set<Integer> newUnitParts = refit.getNewUnitParts().stream().map(Part::getId).collect(Collectors.toSet());
-        Set<Integer> serializedNewParts = deserialized.getNewUnitParts()
+        Set<UUID> newUnitParts = refit.getNewUnitParts().stream().map(Part::getUniqueId).collect(Collectors.toSet());
+        Set<UUID> serializedNewParts = deserialized.getNewUnitParts()
                                                 .stream()
-                                                .map(Part::getId)
+                                                .map(Part::getUniqueId)
                                                 .collect(Collectors.toSet());
         assertEquals(newUnitParts, serializedNewParts);
 

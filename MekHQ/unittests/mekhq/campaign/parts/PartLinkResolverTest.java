@@ -127,7 +127,7 @@ class PartLinkResolverTest {
      */
     private Part olderSavePart(Part template, int number, UUID unitId, String numberLinks) {
         String partXml = saved(template)
-                               .replaceAll("<(unitId|replacementUniqueId|parentPartUniqueId|childPartUniqueId|"
+                               .replaceAll("<(uniqueId|unitId|replacementUniqueId|parentPartUniqueId|childPartUniqueId|"
                                                  + "reserveId|techId)>[^<]*</\\1>\\s*", "")
                                .replaceFirst("id=\"-?\\d+\"", "id=\"" + number + "\"")
                                .replaceFirst("<id>-?\\d+</id>", "<id>" + number + "</id>");
