@@ -57,11 +57,12 @@ public class WarehouseStatusSorter implements Comparator<String> {
     private static final MMLogger LOGGER = MMLogger.create(WarehouseStatusSorter.class);
 
     /**
-     * Regular expression pattern to locate the number of "days" in a string.
+     * Regular expression pattern to locate the number of days in a status.
      *
-     * <p>Matches strings like "(5 days)" or "(1 day)" and captures the numeric part.</p>
+     * <p>Matches a number at the start of a bracket, such as "(5 days)" or "(1 day)", and captures it. The word after
+     * the number is not checked, so a translated status such as "(5 Tage)" sorts the same way.</p>
      */
-    private static final Pattern DAYS_PATTERN = Pattern.compile("\\((\\d+)\\s*day(s)?\\)");
+    private static final Pattern DAYS_PATTERN = Pattern.compile("\\((\\d+)\\b[^)]*\\)");
 
     /**
      * Compares two strings and determines their sorting order.
@@ -110,7 +111,7 @@ public class WarehouseStatusSorter implements Comparator<String> {
     /**
      * Extracts the numeric value representing "days" from a string.
      *
-     * <p>The method searches for a pattern matching a number followed by "day(s)" (e.g., "(5 days)"). If found, it
+     * <p>The method searches for a number at the start of a bracket (e.g., "(5 days)"). If found, it
      * parses and returns the numeric value.</p>
      *
      * <p>If no numeric value is found, or parsing fails, it defaults to {@link Integer#MAX_VALUE}.</p>

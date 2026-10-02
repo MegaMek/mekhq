@@ -117,6 +117,7 @@ import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.NewsItem;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.utilities.AutomatedTechAssignments;
+import mekhq.campaign.work.TechTaskEstimate;
 import mekhq.gui.baseComponents.ScalingWidthConstrainedPanel;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.roundedComponents.AccentRoundedJButton;
@@ -140,6 +141,7 @@ import mekhq.gui.enums.MHQTabType;
 import mekhq.gui.menus.MekHQMenuBar;
 import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.model.PartsTableModel;
+import mekhq.gui.model.TechTableModel;
 import mekhq.gui.roleplay.OracleConsole;
 import mekhq.gui.view.AdvanceTimePanel;
 import mekhq.gui.view.CommandSummaryPanel;
@@ -1106,7 +1108,6 @@ public class CampaignGUI extends JPanel {
 
         ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
         LocalHangar hangar = campaign.getPlayerForce().getHangar();
-        boolean isUsingAdministration = campaign.getCampaignOptions().get(CampaignOption.TECHS_USE_ADMINISTRATION);
         List<Person> techs = humanResources.getTechs(hangar.getUnits(),
               campaign.getCampaignOptions(),
               campaign.getPlayerForce().isClanForce(),
@@ -1126,13 +1127,12 @@ public class CampaignGUI extends JPanel {
                 continue;
             }
 
+            // The same estimate the Repair tab shows: target number, odds, minutes needed and finish day
             String techLabel = getFormattedTextAt(REFIT_RESOURCE_BUNDLE, "refitSelectTech.techLabel",
                   tech.getFullName(),
                   SkillType.getColoredExperienceLevelName(tech.getSkillLevel(campaign, false, true)),
                   tech.getPrimaryRoleDesc(),
-                  campaign.getTargetFor(refit, tech).getValueAsString(),
-                  String.valueOf(tech.getMinutesLeft()),
-                  String.valueOf(tech.getDailyAvailableTechTime(isUsingAdministration)));
+                  TechTableModel.describeEstimate(TechTaskEstimate.estimate(campaign, refit, tech)));
             techsByLabel.put(techLabel, tech);
             if (tech.isRightTechTypeFor(refit)) {
                 techLabels.add(lastRightTechIndex++, techLabel);
