@@ -95,6 +95,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.scenarios.IPlayerSettings;
+import mekhq.campaign.parts.RefitTechManager;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
@@ -269,6 +270,8 @@ public class Utilities {
 
     public static ArrayList<String> getAllVariants(Entity en, Campaign campaign) {
         ArrayList<String> variants = new ArrayList<>();
+        // Refits may fit Clan and Inner Sphere parts already owned, so the variant list allows mixed tech
+        RefitTechManager refitTechManager = new RefitTechManager(campaign);
 
         for (MekSummary summary : MekSummaryCache.getInstance().getAllMeks()) {
             // If this isn't the same chassis, is our current unit, we continue
@@ -300,7 +303,7 @@ public class Utilities {
                       "Could not determine tech progression for %s, including among available refits.",
                       summary.getName());
                 LOGGER.warn(message);
-            } else if (!campaign.isLegal(techProg)) {
+            } else if (!refitTechManager.isLegal(techProg)) {
                 continue;
             }
 

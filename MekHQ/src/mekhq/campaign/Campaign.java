@@ -4760,12 +4760,11 @@ public class Campaign implements ITechManager {
         if (getCampaignOptions().get(CampaignOption.ACQUISITIONS_TYPE) == AcquisitionsType.AUTOMATIC) {
             decisiveModifier = new TargetRollModifier(TargetRoll.AUTOMATIC_SUCCESS,
                   getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.automaticSuccess"));
-        } else if (acquisition.getTechBase() == TechBase.CLAN && !getCampaignOptions().get(CampaignOption.ALLOW_CLAN_PURCHASES)) {
+        } else if (!RefitPurchaseCheck.canBuyTechBase(getCampaignOptions(), acquisition.getTechBase())) {
+            String reasonKey = (acquisition.getTechBase() == TechBase.CLAN) ? "acquisition.modifier.clanTech"
+                                     : "acquisition.modifier.ISTech";
             decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
-                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.clanTech"));
-        } else if (acquisition.getTechBase() == TechBase.IS && !getCampaignOptions().get(CampaignOption.ALLOW_IS_PURCHASES)) {
-            decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
-                  getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.ISTech"));
+                  getTextAt(ACTION_CHECK_BUNDLE, reasonKey));
         } else if (getCampaignOptions().get(CampaignOption.TECH_LEVEL) < Utilities.getSimpleTechLevel(acquisition.getTechLevel())) {
             decisiveModifier = new TargetRollModifier(TargetRoll.IMPOSSIBLE,
                   getTextAt(ACTION_CHECK_BUNDLE, "acquisition.modifier.techLevel"));
