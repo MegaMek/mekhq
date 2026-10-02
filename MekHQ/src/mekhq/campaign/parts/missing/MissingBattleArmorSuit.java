@@ -50,6 +50,7 @@ import mekhq.campaign.parts.equipment.BattleArmorEquipmentPart;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingBattleArmorEquipmentPart;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.unit.Unit;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -287,8 +288,11 @@ public class MissingBattleArmorSuit extends MissingPart {
                 }
             }
             replacement.changeQuantity(1);
-            unit.getEntity().setInternal(1, trooper);
+            // the new suit starts empty; putting the crew back in suits mans it only if someone is free to wear it
+            Unit squad = unit;
+            squad.getEntity().setInternal(0, trooper);
             remove(false);
+            squad.resetPilotAndEntity();
         }
     }
 
