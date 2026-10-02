@@ -52,6 +52,7 @@ import megamek.Version;
 import megamek.common.battleArmor.BattleArmor;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.BattleArmorSuit;
+import mekhq.campaign.parts.missing.MissingBattleArmorSuit;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -176,6 +177,65 @@ class BattleArmorTrooperSlotTest {
         for (Person trooper : troopers) {
             UUID loadedWearer = loadedSquad.getTrooperSlots().getOccupant(suitOf(trooper));
             assertEquals(trooper.getId(), loadedWearer, trooper.getFullName() + " is still in the same suit");
+        }
+    }
+
+    private MissingBattleArmorSuit missingSuit(int slot) {
+        for (MissingBattleArmorSuit missingSuit : PartsScenario.unitParts(squad, MissingBattleArmorSuit.class)) {
+            if (missingSuit.getTrooper() == slot) {
+                return missingSuit;
+            }
+        }
+        throw new IllegalStateException("No missing suit in trooper slot " + slot);
+    }
+
+    @Test
+    void aReplacementSuitStaysEmptyWhenNobodyIsFreeToWearIt() {
+        Person leaving = troopers.get(1);
+        int emptySlot = suitOf(leaving);
+        squad.remove(leaving, false);
+        suit(emptySlot).remove(true);
+
+        missingSuit(emptySlot).fix();
+
+        assertEquals(0, battleArmor.getInternal(emptySlot), "Nobody is in the new suit");
+        assertNull(squad.getTrooperSlots().getOccupant(emptySlot));
+    }
+
+    @Test
+    void aReplacementSuitIsWornByATrooperWhoHadNoSuit() {
+        Person wearer = troopers.getFirst();
+        int salvagedSlot = suitOf(wearer);
+        suit(salvagedSlot).remove(true);
+        squad.addPilotOrSoldier(wearer);
+        assertNull(suitOf(wearer), "Every remaining suit is taken");
+
+        missingSuit(salvagedSlot).fix();
+
+        assertEquals(salvagedSlot, suitOf(wearer), "The trooper without a suit wears the new one");
+        assertEquals(1, battleArmor.getInternal(salvagedSlot));
+    }
+
+    @Test
+    void aWoundedTrooperLeavesTheirSuitEmptyAndTheOthersKeepTheirs() {
+        Person wounded = troopers.get(2);
+        int woundedSlot = suitOf(wounded);
+        List<Integer> otherSuits = new ArrayList<>();
+        for (Person trooper : troopers) {
+            if (trooper != wounded) {
+                otherSuits.add(suitOf(trooper));
+            }
+        }
+        wounded.setHits(2);
+
+        squad.resetPilotAndEntity();
+
+        assertEquals(0, battleArmor.getInternal(woundedSlot), "Nobody fights in the wounded trooper's suit");
+        int index = 0;
+        for (Person trooper : troopers) {
+            if (trooper != wounded) {
+                assertEquals(otherSuits.get(index++), suitOf(trooper), trooper.getFullName() + " keeps their suit");
+            }
         }
     }
 }
