@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import megamek.common.units.Entity;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.missing.MissingAeroLifeSupport;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 import testUtilities.parts.PartsScenario;
@@ -74,11 +75,32 @@ class AeroLifeSupportPriceTest {
         assertEquals(Money.of(5000.0 * (leopard.getNCrew() + leopard.getNPassenger())),
               lifeSupport.getStickerPrice());
     }
+
     @Test
     void aFightersLifeSupportSavedAtTheOldPriceIsPricedRight() {
         AeroLifeSupport savedAtTheOldPrice = new AeroLifeSupport(50, Money.of(5000), true,
               lifeSupportOf(UnitFixture.BATU_PRIME).getCampaign());
 
         assertEquals(Money.of(50000), savedAtTheOldPrice.getStickerPrice());
+    }
+
+    @Test
+    void aFightersMissingLifeSupportSavedAtTheOldPriceTakesANewOne() {
+        AeroLifeSupport newLifeSupport = lifeSupportOf(UnitFixture.BATU_PRIME);
+        newLifeSupport.calculateCost();
+        MissingAeroLifeSupport missingAtTheOldPrice = new MissingAeroLifeSupport(50, Money.of(5000), true,
+              newLifeSupport.getCampaign());
+
+        assertTrue(missingAtTheOldPrice.isAcceptableReplacement(newLifeSupport, false));
+    }
+
+    @Test
+    void aDropShipsMissingLifeSupportStillNeedsOneSizedForItsCrew() {
+        AeroLifeSupport leopardLifeSupport = lifeSupportOf(UnitFixture.LEOPARD_DROPSHIP);
+        leopardLifeSupport.calculateCost();
+        MissingAeroLifeSupport missingForALargerCrew = new MissingAeroLifeSupport(1900,
+              leopardLifeSupport.getStickerPrice().plus(5000), false, leopardLifeSupport.getCampaign());
+
+        assertFalse(missingForALargerCrew.isAcceptableReplacement(leopardLifeSupport, false));
     }
 }
