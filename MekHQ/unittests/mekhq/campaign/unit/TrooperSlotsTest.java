@@ -146,4 +146,24 @@ class TrooperSlotsTest {
 
         assertEquals("", savedXml.toString());
     }
+
+    @Test
+    void aPersonSavedInTwoSuitsIsLoadedIntoOnlyTheFirst() throws Exception {
+        String savedXml = "<trooperSlots>"
+                                + "<trooperSlot><slot>1</slot><personId>" + alice + "</personId></trooperSlot>"
+                                + "<trooperSlot><slot>2</slot><personId>" + alice + "</personId></trooperSlot>"
+                                + "</trooperSlots>";
+        Element trooperSlotsElement = MHQXMLUtility.newSafeDocumentBuilder()
+                                            .parse(new ByteArrayInputStream(
+                                                  savedXml.getBytes(StandardCharsets.UTF_8)))
+                                            .getDocumentElement();
+        TrooperSlots loadedSlots = new TrooperSlots();
+        loadedSlots.seat(List.of(bruno), List.of(3));
+
+        loadedSlots.readFromXML(trooperSlotsElement);
+
+        assertEquals(alice, loadedSlots.getOccupant(1));
+        assertNull(loadedSlots.getOccupant(2), "Alice is not also in suit 2");
+        assertNull(loadedSlots.getOccupant(3), "Loading replaces what was there before");
+    }
 }
