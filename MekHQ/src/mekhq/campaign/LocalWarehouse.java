@@ -199,6 +199,34 @@ public class LocalWarehouse implements ILocation {
     }
 
     /**
+     * Moves a part, as it is, to another warehouse. It keeps its identity, its place on its unit and its links to
+     * other parts, and takes the next free number in the destination, where numbers are counted separately.
+     *
+     * @param part        a part this warehouse keeps
+     * @param destination the warehouse to move it to
+     *
+     * @return {@code true} if the part was moved
+     */
+    public boolean transferPart(Part part, LocalWarehouse destination) {
+        Objects.requireNonNull(part);
+        Objects.requireNonNull(destination);
+        if (destination == this) {
+            return false;
+        }
+        if (parts.get(part.getId()) != part) {
+            LOGGER.warn("[PartIdentity] Not moving {} (number {}): this warehouse does not keep it", part.getName(),
+                  part.getId());
+            return false;
+        }
+        parts.remove(part.getId());
+        partsByUniqueId.remove(part.getUniqueId());
+        MekHQ.triggerEvent(new PartRemovedEvent(part));
+        part.setId(0);
+        destination.addPart(part, false);
+        return true;
+    }
+
+    /**
      * Removes a part from the warehouse.
      *
      * @param part The part to remove.

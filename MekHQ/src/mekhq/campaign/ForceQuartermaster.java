@@ -131,7 +131,10 @@ public record ForceQuartermaster(Campaign campaign) {
      * the location tree), falling back to the campaign warehouse.
      */
     private LocalWarehouse warehouseFor(Part part) {
-        LocalWarehouse partWarehouse = part.getWarehouse();
+        // a spare bought or set aside for a refit is kept with the unit being refitted, which may be at a base
+        Unit refitUnit = part.getRefitUnit();
+        boolean isForARefit = (part.getUnit() == null) && (refitUnit != null);
+        LocalWarehouse partWarehouse = isForARefit ? refitUnit.getWarehouse() : part.getWarehouse();
         return (partWarehouse != null) ? partWarehouse : getWarehouse();
     }
 
