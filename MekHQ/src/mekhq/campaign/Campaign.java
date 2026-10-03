@@ -4082,9 +4082,9 @@ public class Campaign implements ITechManager {
      *
      * <p>This method can operate in two modes:</p>
      * <ul>
-     *     <li>If {@code shouldSaveAllUnits} is {@code true}, it scans all units currently present in the campaign
-     *     and collects each unit's raw short name (via {@code entity.getShortNameRaw()}) as a candidate custom
-     *     definition.</li>
+     *     <li>If {@code shouldSaveAllUnits} is {@code true}, it collects the raw short name (via
+     *     {@code entity.getShortNameRaw()}) of every unit in the main force's hangar and at each base, and of the design
+     *     each refit in progress is turning a unit into, as candidate custom definitions.</li>
      *     <li>Else, if {@code shouldSaveAllCustoms} is {@code true}, it writes all names already present in the
      *     campaign's {@code customs} collection.</li>
      * </ul>
