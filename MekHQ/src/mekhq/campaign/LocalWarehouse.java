@@ -36,7 +36,10 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -74,6 +77,8 @@ public class LocalWarehouse implements ILocation {
     // race is reachable in normal play. Same NavigableMap API; the snapshot helpers stay in
     // place for deterministic per-call views but no longer trip during construction.
     private final ConcurrentSkipListMap<Integer, Part> parts = new ConcurrentSkipListMap<>();
+    // the same parts by their campaign-wide identity
+    private final Map<UUID, Part> partsByUniqueId = new ConcurrentHashMap<>();
 
     @Override
     public @Nonnull LocationNode getLocationNode() {
@@ -133,6 +138,9 @@ public class LocalWarehouse implements ILocation {
         boolean isNewPart = !parts.containsKey(part.getId());
 
         parts.put(part.getId(), part);
+        if (part.getUniqueId() != null) {
+            partsByUniqueId.put(part.getUniqueId(), part);
+        }
         part.setParent(this);
 
         if (isNewPart) {
@@ -164,6 +172,17 @@ public class LocalWarehouse implements ILocation {
     }
 
     /**
+     * Gets a part from the warehouse by its campaign-wide identity.
+     *
+     * @param uniqueId the part's identity
+     *
+     * @return the part, or {@code null} if this warehouse does not hold it
+     */
+    public @Nullable Part getPart(UUID uniqueId) {
+        return partsByUniqueId.get(uniqueId);
+    }
+
+    /**
      * Executes a function for each part in the warehouse.
      *
      * <p>Iterates over a snapshot of the parts collection so callers from a non-EDT thread are
@@ -189,9 +208,28 @@ public class LocalWarehouse implements ILocation {
     public boolean removePart(Part part) {
         Objects.requireNonNull(part);
 
+        // Numbers repeat between warehouses: never remove a different part that happens to share this one's number
+        Part partWithThisNumber = parts.get(part.getId());
+        if ((partWithThisNumber != null) && (partWithThisNumber != part)) {
+            LOGGER.warn("[PartIdentity] Not removing {} (number {}): that number here belongs to {}", part.getName(),
+                  part.getId(), partWithThisNumber.getName());
+            return false;
+        }
+        // A part another warehouse keeps, such as a base's, keeps its number there; clearing it would orphan the part
+        boolean isKeptByAnotherWarehouse = (part.getParentLocation() instanceof LocalWarehouse holdingWarehouse)
+                                                 && (holdingWarehouse != this);
+        if ((partWithThisNumber == null) && isKeptByAnotherWarehouse) {
+            LOGGER.warn("[PartIdentity] Not removing {} (number {}): another warehouse keeps it", part.getName(),
+                  part.getId());
+            return false;
+        }
+
         boolean didRemove = (parts.remove(part.getId()) != null);
 
         if (didRemove) {
+            if (part.getUniqueId() != null) {
+                partsByUniqueId.remove(part.getUniqueId());
+            }
             part.setParent(null);
             MekHQ.triggerEvent(new PartRemovedEvent(part));
         }
