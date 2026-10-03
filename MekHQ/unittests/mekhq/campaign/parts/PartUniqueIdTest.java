@@ -39,15 +39,20 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 import java.io.ByteArrayInputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import megamek.Version;
+import mekhq.campaign.FixedLocation;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.parts.equipment.EquipmentPart;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,10 +66,11 @@ import testUtilities.parts.UnitFixture;
  */
 class PartUniqueIdTest {
     private Part mediumLaser;
+    private PartsScenario scenario;
 
     @BeforeEach
     void setUp() {
-        PartsScenario scenario = PartsScenario.create();
+        scenario = PartsScenario.create();
         mediumLaser = PartsScenario.unitParts(scenario.withUnit(UnitFixture.WOLVERINE_WVR_6R), EquipmentPart.class)
                             .getFirst();
     }
@@ -149,5 +155,24 @@ class PartUniqueIdTest {
         assertSame(mainPart, mainWarehouse.getPart(mainPart.getId()), "The main warehouse's part is still there");
         assertSame(basePart, baseWarehouse.getPart(basePart.getId()), "The base's part keeps its number");
         assertTrue(baseWarehouse.removePart(basePart), "Its own warehouse can still remove it");
+    }
+
+    @Test
+    void askingTheWrongWarehouseToRemoveAPartLeavesItsNumberAlone() {
+        LocalWarehouse mainWarehouse = scenario.getCampaign().getPlayerForce().getWarehouse();
+        PlayerBase base = new PlayerBase(new FixedLocation(mock(PlanetarySystem.class)));
+        scenario.getCampaign().getCampaignLocationManager().addPlayerBase(base);
+        LocalWarehouse baseWarehouse = base.getBaseWarehouse();
+        for (Part part : List.copyOf(mainWarehouse.getParts())) {
+            mainWarehouse.removePart(part);
+        }
+        Part basePart = mediumLaser.clone();
+        baseWarehouse.addPart(basePart);
+        int number = basePart.getId();
+
+        assertFalse(mainWarehouse.removePart(basePart), "The main warehouse has no part with this number");
+
+        assertEquals(number, basePart.getId(), "The base's part keeps its number");
+        assertSame(basePart, baseWarehouse.getPart(number));
     }
 }
