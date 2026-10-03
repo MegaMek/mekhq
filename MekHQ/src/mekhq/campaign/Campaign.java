@@ -4046,6 +4046,38 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * The design of every unit in the campaign, in the main force's hangar and at each base, and the design each refit
+     * is turning a unit into, so that a save carries everything needed to load it on another machine.
+     */
+    private Set<String> collectDesignNamesOfAllUnits() {
+        List<Unit> units = new ArrayList<>(getPlayerForce().getHangar().getUnits());
+        for (PlayerBase base : getCampaignLocationManager().getPlayerBases()) {
+            units.addAll(base.getBaseHangar().getUnits());
+        }
+        Set<String> designNames = new HashSet<>();
+        for (Unit unit : units) {
+            addDesignName(unit.getEntity(), unit.getName(), designNames);
+            Refit refit = unit.getRefit();
+            if (refit != null) {
+                addDesignName(refit.getNewEntity(), unit.getName() + " refit", designNames);
+            }
+        }
+        return designNames;
+    }
+
+    private static void addDesignName(@Nullable Entity entity, String description, Set<String> designNames) {
+        if (entity == null) {
+            return;
+        }
+        String shortName = entity.getShortNameRaw();
+        if (StringUtility.isNullOrBlank(shortName)) {
+            LOGGER.warn("shortName was null or blank for {}. Skipping", description);
+            return;
+        }
+        designNames.add(shortName);
+    }
+
+    /**
      * Writes custom unit definitions to the campaign XML output.
      *
      * <p>This method can operate in two modes:</p>
@@ -4081,17 +4113,7 @@ public class Campaign implements ITechManager {
           boolean shouldSaveAllCustoms) {
         Set<String> customUnits = new HashSet<>();
         if (shouldSaveAllUnits) {
-            for (Unit unit : getPlayerForce().getHangar().getUnits()) {
-                Entity entity = unit.getEntity();
-                if (entity != null) {
-                    String shortName = entity.getShortNameRaw();
-                    if (!StringUtility.isNullOrBlank(shortName)) {
-                        customUnits.add(shortName);
-                    } else {
-                        LOGGER.warn("shortName was null or blank for {}. Skipping", unit.getName());
-                    }
-                }
-            }
+            customUnits = collectDesignNamesOfAllUnits();
         } else if (shouldSaveAllCustoms) {
             customUnits = new HashSet<>(customs);
         }
