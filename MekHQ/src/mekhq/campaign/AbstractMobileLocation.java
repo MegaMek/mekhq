@@ -57,6 +57,7 @@ public abstract class AbstractMobileLocation extends AbstractLocation {
     protected transient List<UUID>    pendingPersonIds = new ArrayList<>();
     protected transient List<UUID>    pendingUnitIds   = new ArrayList<>();
     protected transient List<Integer> pendingPartIds   = new ArrayList<>();
+    protected transient List<UUID>    pendingPartUniqueIds = new ArrayList<>();
 
     protected AbstractMobileLocation(PlanetarySystem system, double transitTime) {
         super(system);
@@ -82,10 +83,17 @@ public abstract class AbstractMobileLocation extends AbstractLocation {
         return ids;
     }
 
-    /** Returns and clears the part IDs read from XML, for use during post-load reconnection. */
+    /** Returns and clears the part numbers read from an older save, for use during post-load reconnection. */
     public List<Integer> drainPendingPartIds() {
         List<Integer> ids = new ArrayList<>(pendingPartIds);
         pendingPartIds.clear();
+        return ids;
+    }
+
+    /** Returns and clears the part identities read from XML, for use during post-load reconnection. */
+    public List<UUID> drainPendingPartUniqueIds() {
+        List<UUID> ids = new ArrayList<>(pendingPartUniqueIds);
+        pendingPartUniqueIds.clear();
         return ids;
     }
 
