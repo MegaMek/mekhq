@@ -420,7 +420,51 @@ public class CampaignLocationManager {
         campaign.getPlayerForce().getDetachmentLocationManager().processArrivals(campaign);
     }
 
-    /** Searches the campaign warehouse then all base warehouses for a part by ID. */
+    /**
+     * Finds a part in the campaign warehouse or any base warehouse by its campaign-wide identity.
+     *
+     * @param campaign the campaign
+     * @param uniqueId the part's identity
+     *
+     * @return the part, or {@code null} if no warehouse holds it
+     */
+    public @Nullable Part findPartAnywhere(Campaign campaign, UUID uniqueId) {
+        LocalWarehouse holdingWarehouse = warehouseContaining(campaign, uniqueId);
+        return (holdingWarehouse == null) ? null : holdingWarehouse.getPart(uniqueId);
+    }
+
+    /**
+     * Finds the warehouse whose stock holds this exact part: the campaign warehouse or a base's. This is where the
+     * part is kept, which can differ from where its unit is.
+     *
+     * @param campaign the campaign
+     * @param part     the part
+     *
+     * @return the warehouse holding the part, or {@code null} if none does
+     */
+    public @Nullable LocalWarehouse findHoldingWarehouse(Campaign campaign, Part part) {
+        LocalWarehouse holdingWarehouse = warehouseContaining(campaign, part.getUniqueId());
+        boolean isThisPart = (holdingWarehouse != null) && (holdingWarehouse.getPart(part.getUniqueId()) == part);
+        return isThisPart ? holdingWarehouse : null;
+    }
+
+    private @Nullable LocalWarehouse warehouseContaining(Campaign campaign, UUID uniqueId) {
+        LocalWarehouse mainWarehouse = campaign.getPlayerForce().getWarehouse();
+        if (mainWarehouse.getPart(uniqueId) != null) {
+            return mainWarehouse;
+        }
+        for (PlayerBase base : playerBases) {
+            if (base.getBaseWarehouse().getPart(uniqueId) != null) {
+                return base.getBaseWarehouse();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Searches the campaign warehouse then all base warehouses for a part by number. Numbers repeat between
+     * warehouses, so this can find the wrong part; prefer {@link #findPartAnywhere(Campaign, UUID)}.
+     */
     public @Nullable Part findPartAnywhere(Campaign campaign, int partId) {
         Part part = campaign.getPlayerForce().getWarehouse().getPart(partId);
         if (part != null) {
