@@ -429,7 +429,7 @@ public class CampaignLocationManager {
      * @return the part, or {@code null} if no warehouse holds it
      */
     public @Nullable Part findPartAnywhere(Campaign campaign, UUID uniqueId) {
-        LocalWarehouse holdingWarehouse = findWarehouseHolding(campaign, uniqueId);
+        LocalWarehouse holdingWarehouse = warehouseContaining(campaign, uniqueId);
         return (holdingWarehouse == null) ? null : holdingWarehouse.getPart(uniqueId);
     }
 
@@ -443,12 +443,12 @@ public class CampaignLocationManager {
      * @return the warehouse holding the part, or {@code null} if none does
      */
     public @Nullable LocalWarehouse findHoldingWarehouse(Campaign campaign, Part part) {
-        LocalWarehouse holdingWarehouse = findWarehouseHolding(campaign, part.getUniqueId());
+        LocalWarehouse holdingWarehouse = warehouseContaining(campaign, part.getUniqueId());
         boolean isThisPart = (holdingWarehouse != null) && (holdingWarehouse.getPart(part.getUniqueId()) == part);
         return isThisPart ? holdingWarehouse : null;
     }
 
-    private @Nullable LocalWarehouse findWarehouseHolding(Campaign campaign, UUID uniqueId) {
+    private @Nullable LocalWarehouse warehouseContaining(Campaign campaign, UUID uniqueId) {
         LocalWarehouse mainWarehouse = campaign.getPlayerForce().getWarehouse();
         if (mainWarehouse.getPart(uniqueId) != null) {
             return mainWarehouse;
