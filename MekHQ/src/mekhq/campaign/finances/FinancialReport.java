@@ -69,6 +69,7 @@ public class FinancialReport {
     private Money hotSpotsUpkeep = Money.zero();
     private Money contracts = Money.zero();
     private Money rentals = Money.zero();
+    private Money foodAndHousing = Money.zero();
 
     public Money getNetWorth() {
         return getTotalAssets().minus(getTotalLiabilities());
@@ -94,7 +95,8 @@ public class FinancialReport {
                      .plus(coSpareParts)
                      .plus(coAmmo)
                      .plus(coFuel)
-                     .plus(rentals);
+                     .plus(rentals)
+                     .plus(foodAndHousing);
     }
 
     public Money getCash() {
@@ -179,6 +181,8 @@ public class FinancialReport {
         return rentals;
     }
 
+    public Money getFoodAndHousing() {return foodAndHousing;}
+
     public static FinancialReport calculate(Campaign campaign) {
         FinancialReport financialReport = new FinancialReport();
 
@@ -238,6 +242,8 @@ public class FinancialReport {
               campaign.getActiveContracts()
                     .stream().map(AbstractContract::getMonthlyPayOut)
                     .collect(Collectors.toList()));
+
+        financialReport.foodAndHousing = accountant.getMonthlyFoodAndHousingExpenses();
 
         return financialReport;
     }

@@ -685,6 +685,12 @@ public final class FinancesTab extends CampaignGuiTab {
                   String.format(formatted, report.getMonthlyFuelCosts().toAmountAndSymbolString())));
         }
 
+        Money foodAndHousing = report.getFoodAndHousing();
+        if (!foodAndHousing.isZero()) {
+            financialLine.append(formattingFinancialReport(resourceMap.getString("foodAndHousing.text"), 2,
+                  String.format(formatted, foodAndHousing.toAmountAndSymbolString())));
+        }
+
         return financialLine.toString();
     }
 
