@@ -135,7 +135,10 @@ final class PartLinkResolver {
         if (holdingWarehouse != null) {
             searchOrder.add(holdingWarehouse);
         }
-        searchOrder.add(linkingPart.getWarehouse());
+        LocalWarehouse unitWarehouse = linkingPart.getWarehouse();
+        if (unitWarehouse != null) {
+            searchOrder.add(unitWarehouse);
+        }
         searchOrder.add(campaign.getPlayerForce().getWarehouse());
         for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
             searchOrder.add(base.getBaseWarehouse());
