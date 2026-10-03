@@ -713,10 +713,11 @@ public record ForceQuartermaster(Campaign campaign) {
 
         Money sellValue = unit.getSellValue();
 
-        campaign().getPlayerForce().getFinances().credit(TransactionType.UNIT_SALE, campaign().getLocalDate(),
-              sellValue, "Sale of " + unit.getName());
-
-        campaign().removeUnit(unit.getId());
+        // a unit the campaign cannot find is not sold, so nothing is paid for it
+        if (campaign().removeUnit(unit.getId())) {
+            campaign().getPlayerForce().getFinances().credit(TransactionType.UNIT_SALE, campaign().getLocalDate(),
+                  sellValue, "Sale of " + unit.getName());
+        }
     }
 
     /**
