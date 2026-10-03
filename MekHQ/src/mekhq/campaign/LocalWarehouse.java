@@ -251,6 +251,14 @@ public class LocalWarehouse implements ILocation {
                 return false;
             }
         }
+        // A part another warehouse keeps, such as a base's, keeps its number there; clearing it would orphan the part
+        boolean isKeptByAnotherWarehouse = (part.getParentLocation() instanceof LocalWarehouse holdingWarehouse)
+                                                 && (holdingWarehouse != this);
+        if ((partWithThisNumber == null) && isKeptByAnotherWarehouse) {
+            LOGGER.warn("[PartIdentity] Not removing {} (number {}): another warehouse keeps it", part.getName(),
+                  part.getId());
+            return false;
+        }
 
         boolean didRemove = (parts.remove(part.getId()) != null);
 
