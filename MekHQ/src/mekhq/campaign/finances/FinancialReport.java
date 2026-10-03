@@ -243,7 +243,9 @@ public class FinancialReport {
                     .stream().map(AbstractContract::getMonthlyPayOut)
                     .collect(Collectors.toList()));
 
-        financialReport.foodAndHousing = accountant.getMonthlyFoodAndHousingExpenses();
+        if (campaignOptions.get(CampaignOption.PAY_FOR_FOOD) || campaignOptions.get(CampaignOption.PAY_FOR_HOUSING)) {
+            financialReport.foodAndHousing = accountant.getMonthlyFoodAndHousingExpenses();
+        }
 
         return financialReport;
     }
