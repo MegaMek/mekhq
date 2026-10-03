@@ -208,22 +208,21 @@ public class LocalWarehouse implements ILocation {
     public boolean removePart(Part part) {
         Objects.requireNonNull(part);
 
-        // Numbers repeat between warehouses: never remove a different part that happens to share this one's number
         Part partWithThisNumber = parts.get(part.getId());
-        if ((partWithThisNumber != null) && (partWithThisNumber != part)) {
-            LOGGER.warn("[PartIdentity] Not removing {} (number {}): that number here belongs to {}", part.getName(),
-                  part.getId(), partWithThisNumber.getName());
-            return false;
+        if (partWithThisNumber != part) {
+            // A part kept by another warehouse, such as a base's, is removed from that warehouse
+            if ((part.getParentLocation() instanceof LocalWarehouse holdingWarehouse) && (holdingWarehouse != this)) {
+                LOGGER.debug("[PartIdentity] {} (number {}) is kept by another warehouse; removing it there",
+                      part.getName(), part.getId());
+                return holdingWarehouse.removePart(part);
+            }
+            // Numbers repeat between warehouses: never remove a different part that happens to share this one's number
+            if (partWithThisNumber != null) {
+                LOGGER.warn("[PartIdentity] Not removing {} (number {}): that number here belongs to {}",
+                      part.getName(), part.getId(), partWithThisNumber.getName());
+                return false;
+            }
         }
-        // A part another warehouse keeps, such as a base's, keeps its number there; clearing it would orphan the part
-        boolean isKeptByAnotherWarehouse = (part.getParentLocation() instanceof LocalWarehouse holdingWarehouse)
-                                                 && (holdingWarehouse != this);
-        if ((partWithThisNumber == null) && isKeptByAnotherWarehouse) {
-            LOGGER.warn("[PartIdentity] Not removing {} (number {}): another warehouse keeps it", part.getName(),
-                  part.getId());
-            return false;
-        }
-
         boolean didRemove = (parts.remove(part.getId()) != null);
 
         if (didRemove) {
