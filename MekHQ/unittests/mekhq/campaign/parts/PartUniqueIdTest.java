@@ -158,7 +158,7 @@ class PartUniqueIdTest {
     }
 
     @Test
-    void askingTheWrongWarehouseToRemoveAPartLeavesItsNumberAlone() {
+    void askingTheWrongWarehouseToRemoveAPartRemovesItFromTheWarehouseThatKeepsIt() {
         LocalWarehouse mainWarehouse = scenario.getCampaign().getPlayerForce().getWarehouse();
         PlayerBase base = new PlayerBase(new FixedLocation(mock(PlanetarySystem.class)));
         scenario.getCampaign().getCampaignLocationManager().addPlayerBase(base);
@@ -170,9 +170,8 @@ class PartUniqueIdTest {
         baseWarehouse.addPart(basePart);
         int number = basePart.getId();
 
-        assertFalse(mainWarehouse.removePart(basePart), "The main warehouse has no part with this number");
+        assertTrue(mainWarehouse.removePart(basePart), "The removal is handed to the base");
 
-        assertEquals(number, basePart.getId(), "The base's part keeps its number");
-        assertSame(basePart, baseWarehouse.getPart(number));
+        assertNull(baseWarehouse.getPart(number), "The part left the base rather than being orphaned there");
     }
 }
