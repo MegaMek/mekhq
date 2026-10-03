@@ -754,7 +754,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     }
 
     /**
-     * @return the spare shots of this bin's ammunition in the warehouse it loads from, which may be a base's
+     * @return the spare shots of this bin's ammunition in the warehouse it loads from, which may be a base's warehouse
      */
     public int getAmountAvailable() {
         return campaign.getQuartermaster().getAmmoAvailable(getWarehouse(), getType());
