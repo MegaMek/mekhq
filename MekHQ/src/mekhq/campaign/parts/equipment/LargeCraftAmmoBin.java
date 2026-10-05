@@ -197,6 +197,8 @@ public class LargeCraftAmmoBin extends AmmoBin {
         if (designShots <= 0) {
             return 0;
         }
+        // whole lots of the ammunition's own tonnage (a ton, a half ton, one 50 ton capital missile), the same way
+        // MegaMek sizes the bin when it loads the unit
         double designCapacity = Math.ceil((double) designShots / getType().getShots()) * ammoTonnage;
         boolean hasDesignCapacity = Math.abs(getCapacity() - designCapacity) < CAPACITY_TOLERANCE;
         return hasDesignCapacity ? designShots : 0;

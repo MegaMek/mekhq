@@ -34,13 +34,13 @@ package mekhq.campaign.parts.equipment;
 
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.AmmoType;
-import megamek.common.equipment.Mounted;
 import megamek.common.units.Entity;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -52,19 +52,25 @@ import org.junit.jupiter.api.Test;
 class LargeCraftAmmoBinDesignRoundsTest {
     private static final int EQUIPMENT_NUMBER = 7;
     private static final AmmoType GAUSS_AMMO = getAmmoType("IS Gauss Ammo");
+    private static final AmmoType HALF_TON_MACHINE_GUN_AMMO = getAmmoType("IS Machine Gun Ammo - Half");
 
     private static LargeCraftAmmoBin binOnAUnit(double capacity, int designRounds, int roundsLoaded) {
+        return binOnAUnit(GAUSS_AMMO, capacity, designRounds, roundsLoaded);
+    }
+
+    private static LargeCraftAmmoBin binOnAUnit(AmmoType ammoType, double capacity, int designRounds,
+          int roundsLoaded) {
         AmmoMounted mounted = mock(AmmoMounted.class);
-        when(mounted.getType()).thenReturn(GAUSS_AMMO);
+        when(mounted.getType()).thenReturn(ammoType);
         when(mounted.getSize()).thenReturn(capacity);
         when(mounted.getOriginalShots()).thenReturn(designRounds);
         when(mounted.getBaseShotsLeft()).thenReturn(roundsLoaded);
         Entity entity = mock(Entity.class);
-        when(entity.getEquipment(EQUIPMENT_NUMBER)).thenReturn((Mounted) mounted);
+        doReturn(mounted).when(entity).getEquipment(EQUIPMENT_NUMBER);
         Unit unit = mock(Unit.class);
         when(unit.getEntity()).thenReturn(entity);
 
-        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, GAUSS_AMMO, EQUIPMENT_NUMBER, 0, capacity,
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, EQUIPMENT_NUMBER, 0, capacity,
               mockCampaign());
         ammoBin.setUnit(unit);
         ammoBin.updateConditionFromEntity(false);
@@ -85,6 +91,15 @@ class LargeCraftAmmoBinDesignRoundsTest {
         LargeCraftAmmoBin ammoBin = binOnAUnit(8.0, 60, 50);
 
         assertEquals(10, ammoBin.getShotsNeeded());
+    }
+
+    @Test
+    void ammunitionSoldByTheHalfTonIsRoundedUpTheSameWay() {
+        // 150 machine gun rounds at 100 a half ton is two half tons; that ton of space would hold 200
+        LargeCraftAmmoBin ammoBin = binOnAUnit(HALF_TON_MACHINE_GUN_AMMO, 1.0, 150, 150);
+
+        assertEquals(150, ammoBin.getFullShots());
+        assertEquals(0, ammoBin.getShotsNeeded());
     }
 
     @Test
