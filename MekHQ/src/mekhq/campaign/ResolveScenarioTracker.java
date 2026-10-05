@@ -55,7 +55,6 @@ import megamek.common.battleArmor.BattleArmor;
 import megamek.common.compute.Compute;
 import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.MiscType;
-import megamek.common.equipment.Mounted;
 import megamek.common.event.PostGameResolution;
 import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.IEntityRemovalConditions;
@@ -95,6 +94,7 @@ import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
+import mekhq.campaign.unit.SlotMounts;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.VehicleLocations;
@@ -785,18 +785,12 @@ public class ResolveScenarioTracker {
                 if (null == cs || !cs.isEverHittable()) {
                     continue;
                 }
-                Mounted<?> m = cs.getMount();
                 if (cs.isMissing()) {
                     if (controlsField) {
                         cs.setMissing(false);
-                        if (null != m) {
-                            m.setMissing(false);
-                        }
-                    } else {
-                        if (null != m) {
-                            m.setMissing(true);
-                        }
                     }
+                    // Both items in a superheavy's shared slot are found, or lost, with it
+                    SlotMounts.forEach(cs, mount -> mount.setMissing(!controlsField));
                 }
             }
         }
@@ -948,6 +942,8 @@ public class ResolveScenarioTracker {
                     pilot = mia.get(UUID.fromString(en.getCrew().getExternalIdAsString()));
                     missingCrew = true;
                 }
+                boolean isBattleArmor = en instanceof BattleArmor;
+                Set<UUID> lostTrooperIds = findLostBattleArmorTroopers(u, en, crew, unitStatus.isTotalLoss());
                 for (Person p : crew) {
                     PersonStatus status = new PersonStatus(p.getFullName(),
                           u.getEntity().getDisplayName(),
@@ -1023,7 +1019,15 @@ public class ResolveScenarioTracker {
                                 }
                             }
                         }
-                        if (casualtiesAssigned < casualties) {
+                        if (isBattleArmor) {
+                            // a battle armor casualty is the person whose suit was lost, not someone picked at random
+                            if (lostTrooperIds.contains(p.getId())) {
+                                casualtiesAssigned++;
+                                if (rollPersonCasualty(status) == CasualtyAssignment.PERSON_WOUNDED) {
+                                    wounded = true;
+                                }
+                            }
+                        } else if (casualtiesAssigned < casualties) {
                             CasualtyAssignment assignment = assignTempCrewCasualty(u, status);
                             casualtiesAssigned++;
                             if (assignment == CasualtyAssignment.PERSON_WOUNDED) {
@@ -1116,7 +1120,17 @@ public class ResolveScenarioTracker {
             return CasualtyAssignment.BLOB_CREW;
         }
 
-        // Casualty goes to a Person - determine if wounded or dead
+        return rollPersonCasualty(status);
+    }
+
+    /**
+     * Rolls whether a person who became a casualty is wounded or killed.
+     *
+     * @param status the person's status, marked dead if they are killed
+     *
+     * @return {@link CasualtyAssignment#PERSON_WOUNDED} or {@link CasualtyAssignment#PERSON_DEAD}
+     */
+    private CasualtyAssignment rollPersonCasualty(PersonStatus status) {
         if (Compute.d6(2) >= 7) {
             return CasualtyAssignment.PERSON_WOUNDED;
         } else {
@@ -1124,6 +1138,36 @@ public class ResolveScenarioTracker {
             status.setDead(true);
             return CasualtyAssignment.PERSON_DEAD;
         }
+    }
+
+    /**
+     * Finds the people in a battle armor squad who lost their suit in the battle. They, and only they, are the squad's
+     * named casualties; any further casualties fall on the squad's temporary troopers. When the whole squad is lost,
+     * everyone in it is a casualty.
+     *
+     * @param unit         the squad
+     * @param battleEntity the squad as it came back from the battle
+     * @param crew         the people who fought in it
+     * @param isTotalLoss  whether the whole squad was lost
+     *
+     * @return the ids of the people who lost their suit, empty if the unit is not battle armor
+     */
+    private Set<UUID> findLostBattleArmorTroopers(Unit unit, Entity battleEntity, List<Person> crew,
+          boolean isTotalLoss) {
+        if (!(battleEntity instanceof BattleArmor battleArmor)) {
+            return Set.of();
+        }
+        Set<UUID> lostTrooperIds = new HashSet<>();
+        if (isTotalLoss) {
+            for (Person person : crew) {
+                lostTrooperIds.add(person.getId());
+            }
+        } else {
+            lostTrooperIds.addAll(unit.getTrooperSlots().findWearersOfLostSuits(battleArmor));
+        }
+        logger.debug("[TrooperSlots] {}: {} of {} people lost their suit (total loss: {})", unit.getName(),
+              lostTrooperIds.size(), crew.size(), isTotalLoss);
+        return lostTrooperIds;
     }
 
     /**

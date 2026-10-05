@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2020-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -97,6 +97,14 @@ public class InfantryAmmoBin extends AmmoBin {
      */
     public InfantryWeapon getWeaponType() {
         return weaponType;
+    }
+
+    /**
+     * @return the shots loaded in this bin as it was saved, without checking the unit's equipment. Used when the bin
+     *       no longer has a valid mount, such as an Inferno bin for a launcher that lost its Inferno ammo.
+     */
+    public int getLoadedShots() {
+        return getCurrentShots();
     }
 
     /**
