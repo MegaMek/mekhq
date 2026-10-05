@@ -35,6 +35,7 @@ package mekhq.campaign.parts;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.UUID;
 
 import megamek.common.TechAdvancement;
 import megamek.common.annotations.Nullable;
@@ -447,15 +448,9 @@ public class BattleArmorSuit extends Part {
     public void remove(boolean salvage) {
         ArrayList<Part> trooperParts = new ArrayList<>();
         if (null != unit) {
-            Person trooperToRemove = null;
-            if (unit.getEntity().getInternal(trooper) > 0) {
-                // then there is a trooper here, so remove a crewmember
-                if (!unit.getCrew().isEmpty()) {
-                    trooperToRemove = unit.getCrew().getLast();
-                    // don't remove yet - we need to first set the internal to
-                    // destroyed so, this slot gets skipped over when we reset the pilot
-                }
-            }
+            // don't remove the wearer yet - the suit must first be marked destroyed, so it is skipped over when
+            // the crew are put back in suits
+            Person trooperToRemove = findWearer();
 
             for (Part part : unit.getParts()) {
                 if ((part instanceof BattleArmorEquipmentPart)
@@ -497,6 +492,28 @@ public class BattleArmorSuit extends Part {
         }
         setUnit(null);
         updateConditionFromEntity(false);
+    }
+
+    /**
+     * @return the person wearing this suit, or {@code null} if it is empty or worn by a temporary trooper
+     */
+    private @Nullable Person findWearer() {
+        if (unit.getEntity().getInternal(trooper) <= 0) {
+            return null;
+        }
+        UUID wearerId = unit.getTrooperSlots().getOccupant(trooper);
+        if (wearerId == null) {
+            LOGGER.debug("[TrooperSlots] Suit {} on {} is worn by a temporary trooper", trooper, unit.getName());
+            return null;
+        }
+        for (Person person : unit.getCrew()) {
+            if (person.getId().equals(wearerId)) {
+                return person;
+            }
+        }
+        LOGGER.warn("[TrooperSlots] Suit {} on {} is recorded as worn by {}, who is not in the crew", trooper,
+              unit.getName(), wearerId);
+        return null;
     }
 
     @Override
