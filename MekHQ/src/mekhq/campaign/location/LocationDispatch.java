@@ -51,6 +51,7 @@ import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.UnitPartsTransfer;
 import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -322,22 +323,10 @@ public final class LocationDispatch {
         dispatch(units, destination, campaign, LOG_DISPATCH_UNITS, arrivalHangar, group -> {
             for (Unit unit : group) {
                 LocalHangar sourceHangar = unit.getHangar();
-                // Capture the unit's current warehouse BEFORE moving it: Hangar.addUnit reparents the unit's node, after
-                // which each installed part's getWarehouse() (resolved through the unit) would already read the arrival
-                // warehouse and the move below would be skipped.
-                LocalWarehouse sourceWarehouse = unit.getWarehouse();
-                if (sourceWarehouse == null) {
-                    sourceWarehouse = campaign.getPlayerForce().getWarehouse();
-                }
                 (sourceHangar != null ? sourceHangar : campaign.getPlayerForce().getHangar()).removeUnit(unit.getId());
                 arrivalHangar.addUnit(unit);
-                // Installed parts live in the warehouse local to their unit; move them along.
-                if (sourceWarehouse != arrivalWarehouse) {
-                    for (Part part : unit.getParts()) {
-                        sourceWarehouse.removePart(part);
-                        arrivalWarehouse.addPart(part);
-                    }
-                }
+                // Its parts go with it, each from the warehouse that keeps it, with their links intact
+                UnitPartsTransfer.moveUnitParts(campaign, unit, arrivalWarehouse);
             }
         });
     }
@@ -365,11 +354,8 @@ public final class LocationDispatch {
 
         // Move the data structure immediately so warehouse filters stay correct.
         dispatch(parts, destination, campaign, LOG_DISPATCH_PARTS, arrivalWarehouse, group -> {
-            for (Part part : group) {
-                LocalWarehouse sourceWarehouse = part.getWarehouse();
-                (sourceWarehouse != null ? sourceWarehouse : campaign.getPlayerForce().getWarehouse()).removePart(part);
-                arrivalWarehouse.addPart(part);
-            }
+            // each spare goes with the parts that belong to it, such as a removed suit's equipment
+            UnitPartsTransfer.moveSpareParts(campaign, group, arrivalWarehouse);
         });
     }
 

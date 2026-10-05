@@ -3361,10 +3361,18 @@ public class Campaign implements ITechManager {
                      .stream().filter(Person::isSecondInCommand).findFirst().orElse(null);
     }
 
-    public void removeUnit(UUID id) {
-        Unit unit = getPlayerForce().getHangar().getUnit(id);
+    /**
+     * Removes a unit, with its parts, from the campaign, wherever it is kept: the main force's hangar or a base's.
+     *
+     * @param id the unit's id
+     *
+     * @return {@code true} if the unit was removed, {@code false} if no hangar holds it
+     */
+    public boolean removeUnit(UUID id) {
+        Unit unit = getUnit(id);
         if (unit == null) {
-            return;
+            LOGGER.debug("[PartIdentity] No hangar holds unit {}, so nothing was removed", id);
+            return false;
         }
 
         // A refit in progress gives back its reserved parts and removes its orders before the unit goes
@@ -3423,12 +3431,22 @@ public class Campaign implements ITechManager {
             detachment.getAutomatedMothballUnits().remove(unit.getId());
         }
 
-        // finally, remove the unit
-        getPlayerForce().getHangar().removeUnit(unit.getId());
+        // finally, remove the unit from the hangar that holds it, which may be a base's
+        holdingHangar(unit).removeUnit(unit.getId());
 
         checkDuplicateNamesDuringDelete(unit.getEntity());
         addReport(ACQUISITIONS, unit.getName() + " has been removed from the unit roster.");
         MekHQ.triggerEvent(new UnitRemovedEvent(unit));
+        return true;
+    }
+
+    private LocalHangar holdingHangar(Unit unit) {
+        for (PlayerBase base : getCampaignLocationManager().getPlayerBases()) {
+            if (base.getBaseHangar().getUnit(unit.getId()) == unit) {
+                return base.getBaseHangar();
+            }
+        }
+        return getPlayerForce().getHangar();
     }
 
     public void removeScenario(final Scenario scenario) {

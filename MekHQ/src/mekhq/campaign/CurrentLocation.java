@@ -494,7 +494,7 @@ public class CurrentLocation extends AbstractMobileLocation {
             } else if (child instanceof Unit unit) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", unit.getId().toString());
             } else if (child instanceof Part part) {
-                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partId", String.valueOf(part.getId()));
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "partUniqueId", part.getUniqueId().toString());
             }
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "location");
@@ -541,6 +541,8 @@ public class CurrentLocation extends AbstractMobileLocation {
                     retVal.pendingPersonIds.add(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitId")) {
                     retVal.pendingUnitIds.add(UUID.fromString(wn2.getTextContent().trim()));
+                } else if (wn2.getNodeName().equalsIgnoreCase("partUniqueId")) {
+                    retVal.pendingPartUniqueIds.add(UUID.fromString(wn2.getTextContent().trim()));
                 } else if (wn2.getNodeName().equalsIgnoreCase("partId")) {
                     retVal.pendingPartIds.add(Integer.parseInt(wn2.getTextContent().trim()));
                 }
