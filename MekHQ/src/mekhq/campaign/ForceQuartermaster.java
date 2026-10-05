@@ -507,14 +507,27 @@ public record ForceQuartermaster(Campaign campaign) {
      * @return The number of shots available of the given ammo type.
      */
     public int getAmmoAvailable(AmmoType ammoType) {
+        return getAmmoAvailable(getWarehouse(), ammoType);
+    }
+
+    /**
+     * Gets the amount of ammo of a given type available in a warehouse, such as a base's.
+     *
+     * @param warehouse The warehouse to count in; the main force's when {@code null}.
+     * @param ammoType  The type of ammo.
+     *
+     * @return The number of shots available of the given ammo type.
+     */
+    public int getAmmoAvailable(@Nullable LocalWarehouse warehouse, AmmoType ammoType) {
         Objects.requireNonNull(ammoType);
+        LocalWarehouse stock = (warehouse != null) ? warehouse : getWarehouse();
 
         if (!getCampaignOptions().get(CampaignOption.USE_AMMO_BY_TYPE)) {
             // We can't just use findSpareAmmo, that will return the first
             // matching ammo. There may be multiple instances of matching
             // ammo that have different qualities, so we should return
             // all of those counts as viable and not just the first we find.
-            return getWarehouse()
+            return stock
                          .streamSpareParts()
                          .filter(ForceQuartermaster::isAvailableAsSpareAmmo)
                          .mapToInt(part -> {
@@ -529,7 +542,7 @@ public record ForceQuartermaster(Campaign campaign) {
         } else {
             // If we're using ammo by type, stream through all
             // the ammo that matches strictly or is compatible.
-            return getWarehouse()
+            return stock
                          .streamSpareParts()
                          .filter(ForceQuartermaster::isAvailableAsSpareAmmo)
                          .mapToInt(part -> {

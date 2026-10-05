@@ -1,0 +1,409 @@
+# MegaMek Data (C) 2025-2026 by The MegaMek Team is licensed under CC BY-NC-SA 4.0.
+# To view a copy of this license, visit https://creativecommons.org/licenses/by-nc-sa/4.0/
+#
+# NOTICE: The MegaMek organization is a non-profit group of volunteers
+# creating free software for the BattleTech community.
+#
+# MechWarrior, BattleMech, `Mech and AeroTech are registered trademarks
+# of The Topps Company, Inc. All Rights Reserved.
+#
+# Catalyst Game Labs and the Catalyst Game Labs logo are trademarks of
+# InMediaRes Productions, LLC.
+#
+# MechWarrior Copyright Microsoft Corporation. MegaMek Data was created under
+# Microsoft's "Game Content Usage Rules"
+# <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
+# affiliated with Microsoft.
+
+#Saved from version 0.51.01 on 2026-07-12
+<UUID>
+019f583e-ee33-7a84-b34b-ace2dffd2eff
+</UUID>
+
+<UnitType>
+Warship
+</UnitType>
+
+<Name>
+Commonwealth Light Cruiser
+</Name>
+
+<Model>
+(Block I)
+</Model>
+
+<mul id:>
+6985
+</mul id:>
+
+<year>
+2375
+</year>
+
+<type>
+IS Level 3
+</type>
+
+<role>
+None
+</role>
+
+<motion_type>
+Aerodyne
+</motion_type>
+
+<transporters>
+smallcraftbay:22.0:5:1::-1:0
+cargobay:89058.0:2:2::-1:0
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+dockingcollar
+1stclassquarters:500.0:0:-1::-1:0
+crewquarters:1680.0:0:-1::-1:0
+steeragequarters:600.0:0:-1::-1:0
+cargobay:8464.0:1:12::-1:0
+</transporters>
+
+<SafeThrust>
+3
+</SafeThrust>
+
+<heatsinks>
+3200
+</heatsinks>
+
+<sink_type>
+0
+</sink_type>
+
+<fuel>
+12500
+</fuel>
+
+<engine_type>
+1
+</engine_type>
+
+<armor_type>
+41
+</armor_type>
+
+<armor_tech_rating>
+0
+</armor_tech_rating>
+
+<armor_tech_level>
+5
+</armor_tech_level>
+
+<armor>
+53
+53
+53
+49
+51
+51
+</armor>
+
+<Nose Equipment>
+(B) Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+(B) Capital Missile Launcher (Killer Whale)
+Capital Missile Launcher (Killer Whale)
+Capital Missile Launcher (Killer Whale)
+Capital Missile Launcher (Killer Whale)
+Ammo Killer Whale:40
+(B) Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+IS Ammo MG - Full:800
+</Nose Equipment>
+
+<Left Front Side Equipment>
+(B) Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+(B) Capital Missile Launcher (White Shark)
+Capital Missile Launcher (White Shark)
+Ammo White Shark:100
+(B) Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+IS Ammo MG - Full:800
+</Left Front Side Equipment>
+
+<Right Front Side Equipment>
+(B) Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+(B) Capital Missile Launcher (White Shark)
+Capital Missile Launcher (White Shark)
+Ammo White Shark:100
+(B) Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+IS Ammo MG - Full:800
+</Right Front Side Equipment>
+
+<Aft Equipment>
+(B) Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+(B) Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+IS Ammo MG - Full:800
+</Aft Equipment>
+
+<Aft Left Side Equipment>
+(B) Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+(B) Naval Autocannon (NAC/35)
+Naval Autocannon (NAC/35)
+Ammo NAC/35:50
+(B) Capital Missile Launcher (White Shark)
+Capital Missile Launcher (White Shark)
+Ammo White Shark:100
+(B) Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+IS Ammo MG - Full:800
+</Aft Left Side Equipment>
+
+<Aft Right Side Equipment>
+(B) Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+Naval Laser 35
+(B) Naval Autocannon (NAC/35)
+Naval Autocannon (NAC/35)
+Ammo NAC/35:50
+(B) Capital Missile Launcher (White Shark)
+Capital Missile Launcher (White Shark)
+Ammo White Shark:100
+(B) Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+IS Ammo MG - Full:800
+</Aft Right Side Equipment>
+
+<Hull Equipment>
+</Hull Equipment>
+
+<Left Broadsides Equipment>
+(B) Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+(B) Naval Autocannon (NAC/35)
+Naval Autocannon (NAC/35)
+Ammo NAC/35:50
+(B) Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+IS Ammo MG - Full:800
+</Left Broadsides Equipment>
+
+<Right Broadsides Equipment>
+(B) Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+Naval Laser 55
+(B) Naval Autocannon (NAC/35)
+Naval Autocannon (NAC/35)
+Ammo NAC/35:50
+(B) Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+Machine Gun
+IS Ammo MG - Full:800
+</Right Broadsides Equipment>
+
+<structural_integrity>
+50
+</structural_integrity>
+
+<capabilities>
+<p>The Commonwealth-class light cruiser carries a weapons suite emphasizing ranged engagement through an extensive missile battery capable of outranging many contemporary opponents. Four Killer Whale launchers in the nose provide devastating long-range striking power, supplemented by White Shark launchers distributed across the broadside and quarter arcs in the original configuration. Naval lasers form the primary energy armament, with twenty-four NL55 tubes concentrated in the nose, broadside, and aft arcs while thirty-two NL35 tubes cover the forward and aft quarter positions. Eight NAC/35 naval autocannons deliver tremendous close-range firepower from the broadside and aft-quarter positions, discouraging opponents from closing to knife-fighting range. Seven hundred tons of improved ferro-aluminum armor provides solid protection distributed evenly across all facing arcs.</p><p>The Block II modernization replaced the White Shark missile systems with Barracuda launchers offering improved rate of fire, while anti-missile systems supplanted the original machine guns for more effective point defense against incoming missile salvos. The revised configuration also reorganized the bay layout to accommodate eighteen aerospace fighters and four small craft, replacing the original twenty-two small craft complement and significantly enhancing the vessel's combat air patrol capability. Six docking collars support substantial combined-arms operations, while two 145-meter gravity decks provide crew amenities for extended deployments. The massive cargo capacity exceeding eighty-nine thousand tons ensures prolonged independent operations without resupply.</p>
+</capabilities>
+
+<overview>
+<p>The Commonwealth holds the distinction of being the Lyran Commonwealth's first domestically produced WarShip, born from a convergence of strategic necessity and financial ingenuity that circumvented legal barriers to military technology acquisition. When the Lyran state sought to develop an independent WarShip construction capability, conventional channels proved closed by restrictions that prevented established military shipbuilders from sharing proprietary technologies with foreign powers. A creative financial arrangement established a new manufacturing enterprise that quietly incorporated the expertise needed to design and build capital WarShips, producing a light cruiser that proved slightly heavier but more compact than contemporary designs of similar classification. The resulting vessel earned a reputation as a dependable fleet asset, well suited to the escort, patrol, and screening duties that formed the backbone of Lyran naval operations during an era of rapid territorial expansion.</p>
+</overview>
+
+<deployment>
+<p>Block I Commonwealth cruisers formed a key element of the early Lyran fleet's patrol and escort forces, screening trade convoys along the Commonwealth's expanding border regions and providing a credible deterrent against raiders and hostile WarShips. Operating alongside foreign-built vessels acquired through the secondhand market, the class proved well suited to the steady, unglamorous work of maintaining a naval presence across the vast distances of Lyran space. No named vessels from the Block I production run have been documented in surviving records, and the operational histories of individual Block I hulls remain largely unrecorded.</p>
+</deployment>
+
+<history>
+<p>The Commonwealth-class light cruiser traces its origins to the Lyran Commonwealth's earliest efforts to build a domestic WarShip construction capability in the twenty-fourth century. When the Lyran state began seeking assistance with WarShip design and manufacturing, it attracted the attention of Di Tron Heavy Industries, then at the forefront of WarShip innovation as the producer of the successful Dart-class cruiser and with its new Aegis-class scheduled for launch. However, Terran Hegemony legal restrictions prevented Di Tron from directly selling restricted military technologies to foreign powers.</p><p>Lyran businessmen proved characteristically resourceful in circumventing these barriers. Through two months of financial maneuvering, a new enterprise called Ioto Galactic Enterprises was established and debuted on the Tharkan stock exchange, quietly incorporating the expertise and technology transfers needed to design and construct capital WarShips. Three years later, in 2375, the first Commonwealth-class light cruisers launched from the Port Sydney Naval Yards on Alarion.</p><p>The design itself reflected both borrowed expertise and independent Lyran engineering priorities. Slightly heavier but more compact than the Dart-class that had inspired it, the Commonwealth employed larger engines and more advanced protection than found in most non-Terran vessels of the period. A formidable armament suite gave the class the ability to engage at multiple range brackets, while generous docking capacity connected the design to the growing trend toward DropShip-based combined-arms operations, a forward-thinking feature that would ensure the class's continued relevance.</p><p>Produced for decades at Port Sydney, the Commonwealth proved a solid performer alongside the secondhand Hegemony vessels that the Lyrans ultimately stocked their navy with. The class served competently through the Age of War and into the Star League era, but like most WarShips of its generation, few vessels survived long past the Reunification War. Germanium was too valuable to leave tied up in aging hulls, and most surviving Commonwealths were scrapped during the long peace that followed, their jump cores recycled to serve newer construction programs.</p><p>In the years preceding the Amaris Crisis, the Lyran Commonwealth began reinforcing its depleted WarShip fleets and turned once again to the proven Commonwealth design. The Block II variant launched in 2765 incorporated updated systems and a reorganized flight deck better suited to modern fleet operations. These modernized vessels served primarily as escorts for the powerful Tharkad-class battlecruisers through the early Succession Wars. Commonwealth cruisers proved their worth during Operation ELBOW JOINT at Bolan in March 2785 and again at the Battle of Denebola in 2786, where Lyran naval forces delivered punishing strikes against Free Worlds League opposition. However, the relentless pace of naval warfare during the Succession Wars, combined with the systematic destruction of the Lyran Commonwealth's heavy aerospace manufacturing infrastructure, meant that combat losses could never be replaced. The Commonwealth class, along with the rest of the once-proud Lyran fleet, gradually ceased to exist as a coherent naval force.</p>
+</history>
+
+<manufacturer>
+Ioto Galactic Enterprises
+</manufacturer>
+
+<primaryFactory>
+Alarion
+</primaryFactory>
+
+<systemManufacturers>
+CHASSIS:Unknown
+ENGINE:Unknown
+ARMOR:Unknown
+JUMP_JET:Unknown
+COMMUNICATIONS:Unknown
+TARGETING:Unknown
+</systemManufacturers>
+
+<systemModels>
+CHASSIS:Unknown
+ENGINE:Unknown
+ARMOR:Improved Ferro-Aluminum
+JUMP_JET:Unknown
+COMMUNICATIONS:Unknown
+TARGETING:Unknown
+</systemModels>
+
+<use>
+Cruiser
+</use>
+
+<length>
+694 m
+</length>
+
+<height>
+1003 m Sail
+</height>
+
+<source>
+FR:2765-LCAF
+</source>
+
+<tonnage>
+700000.0
+</tonnage>
+
+<kf_core>
+1
+</kf_core>
+
+<sail>
+1
+</sail>
+
+<grav_decks>
+145
+145
+</grav_decks>
+
+<designtype>
+1
+</designtype>
+
+<crew>
+400
+</crew>
+
+<officers>
+50
+</officers>
+
+<gunners>
+100
+</gunners>
+
+<passengers>
+0
+</passengers>
+
+<marines>
+120
+</marines>
+
+<battlearmor>
+0
+</battlearmor>
+
+<life_boat>
+35
+</life_boat>
+
+<escape_pod>
+30
+</escape_pod>
+
