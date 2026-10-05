@@ -35,6 +35,7 @@ package mekhq.campaign.parts;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Nonnull;
@@ -45,6 +46,7 @@ import megamek.common.units.Entity;
 import megamek.common.units.Tank;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.location.LocationNode;
@@ -67,7 +69,7 @@ public class PodSpace implements IPartWork {
     protected Campaign campaign;
     protected Unit unit;
     protected int location;
-    protected List<Integer> childPartIds = new ArrayList<>();
+    protected List<UUID> childPartIds = new ArrayList<>();
     private final LocationNode locationNode = new LocationNode(this);
 
     protected Person tech;
@@ -95,6 +97,15 @@ public class PodSpace implements IPartWork {
         }
     }
 
+    /**
+     * Finds one of the pod-mounted parts by its identity, wherever it is kept: with the unit, which may be at a base.
+     *
+     * @return the part, or {@code null} if it is no longer in the campaign
+     */
+    private @Nullable Part findChildPart(UUID childPartId) {
+        return campaign.getCampaignLocationManager().findPartAnywhere(campaign, childPartId);
+    }
+
     @Override
     public int getBaseTime() {
         return 30;
@@ -103,7 +114,7 @@ public class PodSpace implements IPartWork {
     @Deprecated(since = "0.51.0", forRemoval = true)
     public List<Part> getPartList() {
         return childPartIds.stream()
-                     .map(id -> getWarehouse().getPart(id))
+                     .map(this::findChildPart)
                      .filter(Objects::nonNull)
                      .collect(Collectors.toList());
     }
@@ -113,7 +124,7 @@ public class PodSpace implements IPartWork {
         childPartIds.clear();
         for (Part part : getUnit().getParts()) {
             if (part.isOmniPodded() && part.getLocation() == location) {
-                childPartIds.add(part.getId());
+                childPartIds.add(part.getUniqueId());
             }
         }
     }
@@ -127,8 +138,8 @@ public class PodSpace implements IPartWork {
     public void remove(boolean salvage) {
         shorthandedMod = 0;
         //Iterate through all pod-mounted equipment in space and remove them.
-        for (int pid : childPartIds) {
-            final Part part = getWarehouse().getPart(pid);
+        for (UUID pid : childPartIds) {
+            final Part part = findChildPart(pid);
             // Don't remove missing parts! We'll need to fix them.
             if (part != null && !(part instanceof MissingPart)) {
                 part.remove(salvage);
@@ -141,8 +152,8 @@ public class PodSpace implements IPartWork {
     @Override
     public void fix() {
         shorthandedMod = 0;
-        for (int pid : childPartIds) {
-            final Part part = getWarehouse().getPart(pid);
+        for (UUID pid : childPartIds) {
+            final Part part = findChildPart(pid);
             if (part != null &&
                       !(part instanceof MissingPart) &&
                       !(part instanceof AmmoBin) &&
@@ -153,8 +164,8 @@ public class PodSpace implements IPartWork {
             }
         }
         updateConditionFromEntity(false);
-        for (int pid : childPartIds) {
-            final Part part = getWarehouse().getPart(pid);
+        for (UUID pid : childPartIds) {
+            final Part part = findChildPart(pid);
             if (part instanceof MissingPart) {
                 part.fix();
                 MekHQ.triggerEvent(new PartChangedEvent(part));
@@ -171,9 +182,9 @@ public class PodSpace implements IPartWork {
     @Override
     public @Nullable String checkFixable() {
         if ((isSalvaging() && !childPartIds.isEmpty()) || location < 0) {
-            for (int partId : childPartIds) {
+            for (UUID partId : childPartIds) {
                 // If all remaining parts are already missing, we don't need to keep salvaging
-                if (!(getWarehouse().getPart(partId) instanceof MissingPart)) {
+                if (!(findChildPart(partId) instanceof MissingPart)) {
                     return null;
                 }
             }
@@ -189,8 +200,8 @@ public class PodSpace implements IPartWork {
             }
             if (repairInPlace) {
                 boolean hasMissingPart = false;
-                for (int id : childPartIds) {
-                    final Part p = unit.getCampaign().getPlayerForce().getWarehouse().getPart(id);
+                for (UUID id : childPartIds) {
+                    final Part p = findChildPart(id);
                     if (p instanceof MissingPart missing) {
                         hasMissingPart = true;
                         // Only fixable if a replacement is actually in stock. This check prevents an infinite loop
@@ -207,8 +218,8 @@ public class PodSpace implements IPartWork {
                 }
                 return unit.getEntity().getLocationName(location) + " is not missing any pod-mounted equipment.";
             } else {
-                for (int id : childPartIds) {
-                    final Part p = unit.getCampaign().getPlayerForce().getWarehouse().getPart(id);
+                for (UUID id : childPartIds) {
+                    final Part p = findChildPart(id);
                     if (p == null || !p.needsFixing()) {
                         continue;
                     }
@@ -233,7 +244,7 @@ public class PodSpace implements IPartWork {
     @Override
     public boolean needsFixing() {
         return childPartIds.stream()
-                     .map(id -> getWarehouse().getPart(id))
+                     .map(this::findChildPart)
                      .filter(Objects::nonNull)
                      .anyMatch(p -> !(p instanceof AmmoBin) && p.needsFixing());
     }
@@ -294,8 +305,8 @@ public class PodSpace implements IPartWork {
         timeSpent = 0;
         shorthandedMod = 0;
         boolean replacing = false;
-        for (int id : childPartIds) {
-            final Part part = getWarehouse().getPart(id);
+        for (UUID id : childPartIds) {
+            final Part part = findChildPart(id);
             if (part != null && (isSalvaging() || (!(part instanceof AmmoBin) && part.needsFixing()))) {
                 part.fail(rating);
                 replacing |= part instanceof MissingPart;
@@ -322,9 +333,13 @@ public class PodSpace implements IPartWork {
         return (unit != null) ? unit.getLocationNode() : locationNode;
     }
 
+    /**
+     * Pod work draws on the stock kept with the unit, which is a base's for a unit at a base.
+     */
     @Override
-    public mekhq.campaign.LocalWarehouse getWarehouse() {
-        return campaign.getPlayerForce().getWarehouse();
+    public LocalWarehouse getWarehouse() {
+        LocalWarehouse unitWarehouse = (unit == null) ? null : unit.getWarehouse();
+        return (unitWarehouse != null) ? unitWarehouse : campaign.getPlayerForce().getWarehouse();
     }
 
     @Override
@@ -340,8 +355,8 @@ public class PodSpace implements IPartWork {
     @Override
     public int getSkillMin() {
         int minSkill = SkillType.EXP_GREEN;
-        for (int id : childPartIds) {
-            final Part part = getWarehouse().getPart(id);
+        for (UUID id : childPartIds) {
+            final Part part = findChildPart(id);
             if (part != null) {
                 if ((isSalvaging() && !(part instanceof MissingPart)) ||
                           (!isSalvaging() && (part instanceof MissingPart) ||
@@ -454,8 +469,8 @@ public class PodSpace implements IPartWork {
         int replacements = 0;
         int inTransit = 0;
         int onOrder = 0;
-        for (int id : childPartIds) {
-            Part part = getWarehouse().getPart(id);
+        for (UUID id : childPartIds) {
+            Part part = findChildPart(id);
             if (part != null) {
                 if (!isSalvaging() && !(part instanceof AmmoBin) && part.needsFixing()) {
                     allParts++;
@@ -520,8 +535,8 @@ public class PodSpace implements IPartWork {
     }
 
     public boolean hasSalvageableParts() {
-        for (int id : childPartIds) {
-            final Part p = getWarehouse().getPart(id);
+        for (UUID id : childPartIds) {
+            final Part p = findChildPart(id);
             if (p != null && p.isSalvaging()) {
                 return true;
             }
@@ -532,7 +547,7 @@ public class PodSpace implements IPartWork {
     @Override
     public void reservePart() {
         childPartIds.stream()
-              .map(id -> getWarehouse().getPart(id))
+              .map(this::findChildPart)
               .filter(Objects::nonNull)
               .forEach(Part::reservePart);
     }
@@ -540,7 +555,7 @@ public class PodSpace implements IPartWork {
     @Override
     public void cancelReservation() {
         childPartIds.stream()
-              .map(id -> getWarehouse().getPart(id))
+              .map(this::findChildPart)
               .filter(Objects::nonNull)
               .forEach(Part::cancelReservation);
     }
