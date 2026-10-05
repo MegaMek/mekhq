@@ -134,7 +134,10 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     private final LocationNode locationNode = new LocationNode(this);
 
     protected String name;
+    /** The part's number in its warehouse, shown to the player; numbers repeat between warehouses */
     protected int id;
+    /** The part's identity, unique across the whole campaign and kept when the part moves */
+    private UUID uniqueId = UUID.randomUUID();
 
     /**
      * This is the unitTonnage which needs to be tracked for some parts even when off the unit. Actual tonnage is
@@ -260,6 +263,15 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     public int getId() {
         return id;
     }
+
+    /**
+     * @return the part's identity, unique across the campaign: every warehouse numbers its parts from 1, so use this,
+     *       not {@link #getId()}, to find or link a part
+     */
+    public UUID getUniqueId() {
+        return uniqueId;
+    }
+
 
     public void setCampaign(Campaign c) {
         this.campaign = c;
@@ -694,6 +706,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     protected int writeToXMLBegin(final PrintWriter pw, int indent) {
         MHQXMLUtility.writeSimpleXMLOpenTag(pw, indent++, "part", "id", id, "type", getClass());
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "id", id);
+        MHQXMLUtility.writeSimpleXMLTag(pw, indent, "uniqueId", uniqueId);
         MHQXMLUtility.writeSimpleXMLTag(pw, indent, "name", getName());
         if (omniPodded) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "omniPodded", true);
@@ -891,6 +904,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
                 if (wn2.getNodeName().equalsIgnoreCase("id")) {
                     retVal.id = Integer.parseInt(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("uniqueId")) {
+                    // a save from before parts had an identity has none, and the part keeps the one it was made with
+                    readUniqueId(retVal, wn2.getTextContent().trim());
                 } else if (wn2.getNodeName().equalsIgnoreCase("name")) {
                     retVal.name = wn2.getTextContent();
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitTonnage")) {
@@ -1433,6 +1449,15 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
     @Override
     public abstract Part clone();
+
+    private static void readUniqueId(Part part, String uniqueIdText) {
+        try {
+            part.uniqueId = UUID.fromString(uniqueIdText);
+        } catch (IllegalArgumentException exception) {
+            LOGGER.warn("[PartIdentity] Part {} has an unreadable identity '{}'; it keeps a new one", part.id,
+                  uniqueIdText);
+        }
+    }
 
     protected void copyBaseData(Part part) {
         this.mode = part.mode;
