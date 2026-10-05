@@ -33,6 +33,7 @@
 package mekhq.campaign;
 
 import static mekhq.campaign.enums.DailyReportType.ACQUISITIONS;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,6 +69,8 @@ import mekhq.campaign.unit.UnitAcquisitionType;
  * Manages machines and material for a campaign.
  */
 public record ForceQuartermaster(Campaign campaign) {
+    private static final String FINANCES_RESOURCE_BUNDLE = "mekhq.resources.Finances";
+
     private static final MMLogger LOGGER = MMLogger.create(ForceQuartermaster.class);
 
     public enum PartAcquisitionResult {
@@ -719,7 +722,7 @@ public record ForceQuartermaster(Campaign campaign) {
         // a unit the campaign cannot find is not sold, so nothing is paid for it
         if (campaign().removeUnit(unit.getId())) {
             campaign().getPlayerForce().getFinances().credit(TransactionType.UNIT_SALE, campaign().getLocalDate(),
-                  sellValue, "Sale of " + unit.getName());
+                  sellValue, getFormattedTextAt(FINANCES_RESOURCE_BUNDLE, "UnitSale.finances", unit.getName()));
         }
     }
 

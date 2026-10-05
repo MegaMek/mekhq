@@ -122,5 +122,7 @@ class BasePartRemovalTest {
 
         assertNull(campaign.getUnit(unitAtBase.getId()), "The unit was sold, not kept");
         assertEquals(fundsBefore.plus(sellValue), campaign.getPlayerForce().getFinances().getBalance());
+        assertEquals("Sale of " + unitAtBase.getName(),
+              campaign.getPlayerForce().getFinances().getTransactions().getLast().getDescription());
     }
 }
