@@ -2671,6 +2671,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             });
         }
 
+        // Units an older version left with duplicate or scattered parts, at a base or after a move, are put right
+        UnitPartsRepair.repair(campaign);
+
         // Spares reserved by tasks on units that have since left the campaign are freed
         ReservedSpares.releaseOrphanedReservations(campaign);
 
