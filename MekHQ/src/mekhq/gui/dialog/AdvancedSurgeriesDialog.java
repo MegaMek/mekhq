@@ -837,7 +837,7 @@ public class AdvancedSurgeriesDialog extends JDialog {
     private void payForSurgeries() {
         Finances finances = campaign.getPlayerForce().getFinances();
         LocalDate today = campaign.getLocalDate();
-        finances.debit(TransactionType.REPAIRS, today, totalCost,
+        finances.debit(TransactionType.MEDICAL_EXPENSES, today, totalCost,
               getFormattedTextAt(RESOURCE_BUNDLE, "AdvancedSurgeriesDialog.transaction",
                     patient.getFullTitle()));
     }

@@ -55,7 +55,6 @@ import megamek.common.battleArmor.BattleArmor;
 import megamek.common.compute.Compute;
 import megamek.common.equipment.IArmorState;
 import megamek.common.equipment.MiscType;
-import megamek.common.equipment.Mounted;
 import megamek.common.event.PostGameResolution;
 import megamek.common.icons.Camouflage;
 import megamek.common.interfaces.IEntityRemovalConditions;
@@ -95,6 +94,7 @@ import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.personnel.medical.InjurySPAUtility;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.randomEvents.prisoners.CapturePrisoners;
+import mekhq.campaign.unit.SlotMounts;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.VehicleLocations;
@@ -785,18 +785,12 @@ public class ResolveScenarioTracker {
                 if (null == cs || !cs.isEverHittable()) {
                     continue;
                 }
-                Mounted<?> m = cs.getMount();
                 if (cs.isMissing()) {
                     if (controlsField) {
                         cs.setMissing(false);
-                        if (null != m) {
-                            m.setMissing(false);
-                        }
-                    } else {
-                        if (null != m) {
-                            m.setMissing(true);
-                        }
                     }
+                    // Both items in a superheavy's shared slot are found, or lost, with it
+                    SlotMounts.forEach(cs, mount -> mount.setMissing(!controlsField));
                 }
             }
         }
