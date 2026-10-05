@@ -994,12 +994,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                               + "(orphaned arrived node); re-homed to main hangar", unitId);
                         }
                     }
-                    for (int partId : travelLocation.drainPendingPartIds()) {
-                        Part part = campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
-                        if (part != null && !part.isParented()) {
+                    for (Part part : drainPendingParts(campaign, travelLocation)) {
+                        if (!part.isParented()) {
                             LocationNode.LocationManager.setLocation(part, campaign.getPlayerForce().getWarehouse());
                             LOGGER.warn("reconnectPersonsToTravelLocations: part {} had no parent "
-                                              + "(orphaned arrived node); re-homed to main warehouse", partId);
+                                              + "(orphaned arrived node); re-homed to main warehouse", part.getId());
                         }
                     }
                     continue;
@@ -1024,11 +1023,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 }
 
                 // Parts in transit — in base warehouse data structure, but LocationNode under the travel node
-                for (int partId : travelLocation.drainPendingPartIds()) {
-                    Part part = campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
-                    if (part != null) {
-                        LocationNode.LocationManager.setLocation(part, travelLocation);
-                    }
+                for (Part part : drainPendingParts(campaign, travelLocation)) {
+                    LocationNode.LocationManager.setLocation(part, travelLocation);
                 }
 
             }
@@ -1135,11 +1131,18 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     Unit unit = campaign.getUnit(parseUuidOrNull(text));
                     addIfNotNull(travelers, unit, "unit", text);
                 }
-                case "partId" -> {
-                    Integer partId = parsePartId(text);
-                    Part part = partId == null
+                case "partUniqueId" -> {
+                    UUID partId = parseUuidOrNull(text);
+                    Part part = (partId == null)
                                       ? null
                                       : campaign.getCampaignLocationManager().findPartAnywhere(campaign, partId);
+                    addIfNotNull(travelers, part, "part", text);
+                }
+                case "partId" -> {
+                    Integer partId = parsePartId(text);
+                    Part part = (partId == null)
+                                      ? null
+                                      : campaign.getCampaignLocationManager().findPartByLegacyNumber(campaign, partId);
                     addIfNotNull(travelers, part, "part", text);
                 }
                 default -> { /* destination tags and whitespace */ }
@@ -1163,6 +1166,28 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         } catch (IllegalArgumentException ex) {
             return null;
         }
+    }
+
+    /**
+     * The parts a travel location named in the save, by identity or, in an older save, by number. Each name is used
+     * once; a part that is no longer in the campaign is skipped.
+     */
+    private static List<Part> drainPendingParts(Campaign campaign, AbstractMobileLocation travelLocation) {
+        List<Part> parts = new ArrayList<>();
+        CampaignLocationManager locationManager = campaign.getCampaignLocationManager();
+        for (UUID partId : travelLocation.drainPendingPartUniqueIds()) {
+            Part part = locationManager.findPartAnywhere(campaign, partId);
+            if (part != null) {
+                parts.add(part);
+            }
+        }
+        for (int legacyNumber : travelLocation.drainPendingPartIds()) {
+            Part part = locationManager.findPartByLegacyNumber(campaign, legacyNumber);
+            if (part != null) {
+                parts.add(part);
+            }
+        }
+        return parts;
     }
 
     private static @Nullable Integer parsePartId(String text) {

@@ -41,6 +41,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.base.PlayerBase;
 import mekhq.campaign.parts.Part.PartRef;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -51,8 +52,8 @@ import mekhq.campaign.unit.Unit;
  * <p>A link saved by identity names exactly one part in the campaign. A link from an older save names a part number,
  * and every warehouse numbers its parts from 1, so the same number can name a part at a base and a different part in
  * the main force. Such a link is looked for first in the warehouse that holds the linking part, then in the warehouse
- * of its unit, then in the main warehouse, and a part found there is used only if the link makes sense from its end as
- * well. A link that fits no part is dropped and logged rather than tied to the wrong part.</p>
+ * of its unit, then in the main warehouse and the bases', and a part found there is used only if the link makes sense
+ * from its end as well. A link that fits no part is dropped and logged rather than tied to the wrong part.</p>
  */
 final class PartLinkResolver {
     private static final MMLogger LOGGER = MMLogger.create(PartLinkResolver.class);
@@ -64,7 +65,15 @@ final class PartLinkResolver {
         /** The part this one belongs to, such as the bay a door belongs to */
         PARENT,
         /** A part that belongs to this one */
-        CHILD
+        CHILD,
+        /** A part a refit takes off its unit: it is on that unit */
+        REFIT_OLD_PART,
+        /** A part a refit puts on its unit: it is on that unit, or a spare reserved for the refit */
+        REFIT_NEW_PART,
+        /** The armor set aside for a refit: spare armor reserved for it */
+        REFIT_ARMOR_SUPPLIES,
+        /** A large craft ammunition bin a refit changes: it is on the refit's unit */
+        REFIT_LARGE_CRAFT_BIN
     }
 
     private PartLinkResolver() {}
@@ -83,8 +92,8 @@ final class PartLinkResolver {
         if (linkedUniqueId != null) {
             Part linkedPart = locationManager.findPartAnywhere(campaign, linkedUniqueId);
             if (linkedPart == null) {
-                LOGGER.error("[PartIdentity] {} #{} links to a {} part {} that is not in the campaign",
-                      linkingPart.getName(), linkingPart.getId(), kind, linkedUniqueId);
+                LOGGER.error("[PartIdentity] {} links to a {} part {} that is not in the campaign",
+                      describe(linkingPart), kind, linkedUniqueId);
             }
             return linkedPart;
         }
@@ -100,14 +109,24 @@ final class PartLinkResolver {
                 return candidate;
             }
         }
-        LOGGER.warn("[PartIdentity] {} #{}: no part numbered {} fits as its {} part, so the link is dropped",
-              linkingPart.getName(), linkingPart.getId(), legacyNumber, kind);
+        LOGGER.warn("[PartIdentity] {}: no part numbered {} fits as its {} part, so the link is dropped",
+              describe(linkingPart), legacyNumber, kind);
         return null;
+    }
+
+    /** Names the linking part in the log; a refit is named by the unit it refits. */
+    private static String describe(Part linkingPart) {
+        if (linkingPart instanceof Refit refit) {
+            Unit refittingUnit = refit.getUnit();
+            return "the refit of " + ((refittingUnit == null) ? "an unknown unit" : refittingUnit.getName());
+        }
+        return linkingPart.getName() + " #" + linkingPart.getId();
     }
 
     /**
      * The warehouses to look in for a part number from an older save: the one holding the linking part, where the
-     * save numbered its links, then its unit's, then the main force's.
+     * save numbered its links, then its unit's, then the main force's, then each base's, for a unit whose parts are
+     * kept somewhere other than where it is.
      */
     private static Set<LocalWarehouse> legacySearchOrder(Campaign campaign, Part linkingPart) {
         Set<LocalWarehouse> searchOrder = new LinkedHashSet<>();
@@ -121,6 +140,9 @@ final class PartLinkResolver {
             searchOrder.add(unitWarehouse);
         }
         searchOrder.add(campaign.getPlayerForce().getWarehouse());
+        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
+            searchOrder.add(base.getBaseWarehouse());
+        }
         return searchOrder;
     }
 
@@ -132,7 +154,22 @@ final class PartLinkResolver {
             case REPLACEMENT -> isReservedFor(linkingPart, candidate);
             case PARENT -> isOnSameUnit(linkingPart, candidate) && listsAsChild(candidate, linkingPart);
             case CHILD -> isOnSameUnit(linkingPart, candidate) && pointsAt(candidate.getParentPart(), linkingPart);
+            case REFIT_OLD_PART, REFIT_LARGE_CRAFT_BIN -> isOn(candidate.getUnit(), linkingPart.getUnit());
+            case REFIT_NEW_PART -> isOn(candidate.getUnit(), linkingPart.getUnit())
+                                         || isReservedForRefit(candidate, linkingPart.getUnit());
+            case REFIT_ARMOR_SUPPLIES -> (candidate instanceof Armor)
+                                               && isReservedForRefit(candidate, linkingPart.getUnit());
         };
+    }
+
+    /** Whether the part's unit is the given unit. */
+    private static boolean isOn(@Nullable Unit partUnit, @Nullable Unit unit) {
+        return (partUnit != null) && (unit != null) && partUnit.getId().equals(unit.getId());
+    }
+
+    /** A spare set aside for the given unit's refit. */
+    private static boolean isReservedForRefit(Part candidate, @Nullable Unit refitUnit) {
+        return (candidate.getUnit() == null) && isOn(candidate.getRefitUnit(), refitUnit);
     }
 
     /** A replacement is a spare reserved by the tech who is working on the missing part. */
