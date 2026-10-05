@@ -1518,6 +1518,15 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     }
 
     /**
+     * @param personId a person's id
+     *
+     * @return {@code true} if this part is reserved for overnight work by that person
+     */
+    boolean isReservedByPerson(UUID personId) {
+        return (reservedBy != null) && personId.equals(reservedBy.getId());
+    }
+
+    /**
      * Gets a value indicating if the part is reserved for an overnight replacement task.
      */
     public boolean isReservedForReplacement() {
