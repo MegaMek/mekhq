@@ -41,6 +41,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.mission.contract.contractSpecialRules.ContractSupportPayments;
 import mekhq.campaign.parts.Armor;
+import mekhq.campaign.parts.Refit;
 import mekhq.campaign.work.IPartWork;
 
 /**
@@ -59,12 +60,14 @@ public final class RepairPayments {
      * @param isFix    {@code true} if the task fixes a damaged part, rather than replacing, salvaging, reloading,
      *                 re-attaching or sealing it
      *
-     * @return {@code true} if the task is paid for: Pay for Repairs is on, and it is a fix of anything but armor
+     * @return {@code true} if the task is paid for: Pay for Repairs is on, and it is a fix of anything but armor. A
+     *       refit is never paid for here; it has its own costs.
      */
     public static boolean isPaidFor(Campaign campaign, IPartWork partWork, boolean isFix) {
         boolean isPayForRepairsOn = campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_REPAIRS);
         boolean isArmor = partWork instanceof Armor;
-        return isPayForRepairsOn && isFix && !isArmor;
+        boolean isRefit = partWork instanceof Refit;
+        return isPayForRepairsOn && isFix && !isArmor && !isRefit;
     }
 
     /**
