@@ -160,6 +160,7 @@ import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.cleanup.EquipmentUnscrambler;
 import mekhq.campaign.unit.cleanup.EquipmentUnscramblerResult;
+import mekhq.campaign.unit.cleanup.WithdrawnInfernoSrmAmmoCleanup;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -737,6 +738,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             }
         }
 
+        WithdrawnInfernoSrmAmmoCleanup.cleanUnit(unit);
         final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(unit);
         final EquipmentUnscramblerResult result = unscrambler.unscramble();
         if (!result.succeeded()) {
@@ -879,6 +881,17 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                     }
                 }
             });
+        }
+    }
+
+    /**
+     * Inferno ammo for infantry SRM launchers was withdrawn (TechManual pp. 350-352 errata); turn any left in a
+     * warehouse into standard ammo for the same launcher.
+     */
+    private static void cleanWithdrawnInfernoSrmStock(Campaign campaign) {
+        WithdrawnInfernoSrmAmmoCleanup.cleanWarehouse(campaign.getPlayerForce().getWarehouse());
+        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
+            WithdrawnInfernoSrmAmmoCleanup.cleanWarehouse(base.getBaseWarehouse());
         }
     }
 
@@ -2491,6 +2504,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Note: Units must have their Entities set prior to reaching this point!
         postProcessParts(campaign, version);
         rehomeBaseHangarUnitParts(campaign);
+        cleanWithdrawnInfernoSrmStock(campaign);
 
         LOGGER.info("[Campaign Load] Parts processed in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
@@ -2527,6 +2541,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             // possible that these might have changed if changes were made to
             // the ordering of equipment in the underlying data file for the unit.
             // We're not checking for refit here.
+            WithdrawnInfernoSrmAmmoCleanup.cleanUnit(unit);
             final EquipmentUnscrambler unscrambler = EquipmentUnscrambler.create(unit);
             final EquipmentUnscramblerResult result = unscrambler.unscramble();
             if (!result.succeeded()) {
