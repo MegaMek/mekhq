@@ -34,12 +34,15 @@ package mekhq.campaign.unit;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
 
 import megamek.common.annotations.Nullable;
+import megamek.common.battleArmor.BattleArmor;
 import megamek.logging.MMLogger;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -128,6 +131,23 @@ public class TrooperSlots {
         LOGGER.debug("[TrooperSlots] {} of {} people kept their suit, {} newly seated, {} suits usable",
               keptTheirSuit, seatedBefore, wornSlots.size() - keptTheirSuit, usableSlots.size());
         return wornSlots;
+    }
+
+    /**
+     * Finds the people whose suit was lost in a battle: they wore a suit that came back with no living trooper in it.
+     *
+     * @param battleEntity the squad as it came back from the battle
+     *
+     * @return the ids of the people in the lost suits
+     */
+    public Set<UUID> findWearersOfLostSuits(BattleArmor battleEntity) {
+        Set<UUID> wearersOfLostSuits = new HashSet<>();
+        for (Map.Entry<Integer, UUID> entry : occupantBySlot.entrySet()) {
+            if (!battleEntity.isTrooperActive(entry.getKey())) {
+                wearersOfLostSuits.add(entry.getValue());
+            }
+        }
+        return wearersOfLostSuits;
     }
 
     /**
