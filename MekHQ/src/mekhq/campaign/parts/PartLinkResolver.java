@@ -175,10 +175,9 @@ final class PartLinkResolver {
     /** A replacement is a spare reserved by the tech who is working on the missing part. */
     private static boolean isReservedFor(Part missingPart, Part candidate) {
         boolean isSpare = candidate.getUnit() == null;
-        Person reservedBy = candidate.getReservedBy();
         Person tech = missingPart.getTech();
-        boolean isReservedByThatTech = (reservedBy != null) && ((tech == null) || tech.getId()
-                                                                                         .equals(reservedBy.getId()));
+        boolean isReservedByThatTech = (tech == null) ? candidate.isReservedForReplacement()
+                                             : candidate.isReservedByPerson(tech.getId());
         return isSpare && isReservedByThatTech;
     }
 
