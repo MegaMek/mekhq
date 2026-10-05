@@ -1394,6 +1394,24 @@ public class Unit implements ITechnology, ILocatable {
         return new TankLocation(location, tonnage, getCampaign());
     }
 
+    /**
+     * Takes a part off this unit and out of the warehouse that keeps it, for a part the unit has no place for.
+     */
+    private void discardPart(Part part) {
+        removePart(part);
+        // the warehouse that keeps the part, which need not be the unit's when an older version left it elsewhere
+        LocalWarehouse warehouse = (part.getParentLocation() instanceof LocalWarehouse holdingWarehouse)
+                                         ? holdingWarehouse
+                                         : part.getWarehouse();
+        if ((warehouse != null) && (warehouse.getPart(part.getId()) == part)) {
+            warehouse.removePart(part);
+        } else {
+            LOGGER.warn("[UnitParts] {}: could not find the warehouse keeping {} #{}", getName(), part.getName(),
+                  part.getId());
+        }
+        part.setUnit(null);
+    }
+
     public void removePart(Part part) {
         parts.remove(part);
     }
@@ -4254,9 +4272,13 @@ public class Unit implements ITechnology, ILocatable {
 
             part.updateConditionFromPart();
         }
-        // Remove invalid Aero parts due to changes after 0.45.4
+        // Parts the unit has no place for, such as heat sink parts for the sinks a fusion engine provides, leave the
+        // campaign rather than staying in the warehouse tied to the unit, where they turned into free spares once it left
         for (Part part : partsToRemove) {
-            removePart(part);
+            discardPart(part);
+        }
+        if (!partsToRemove.isEmpty()) {
+            LOGGER.debug("[UnitParts] {}: {} parts it has no place for were discarded", getName(), partsToRemove.size());
         }
 
         LocalWarehouse warehouse = getWarehouse();
